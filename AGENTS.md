@@ -367,31 +367,26 @@ appear in any workflow. Say "N gates pass", naming them; never say
 
 ### Issue-first loops
 
-Start with the GitHub issue number or numbers the user gives you. Read the live
-issue bodies and the repository guidance, then work to the issues' acceptance
-criteria. A user request naming issues is enough to start and authorizes the
-issue-scoped branch, commits, pull requests, and closure after the requested
+For a user-initiated Codex task, the GitHub issue number or numbers are enough
+to start. Read the live issue bodies and repository guidance; they define scope
+and acceptance. The user's request naming those issues authorizes scoped
+implementation, branch commits, pull requests, and closure after the requested
 work is merged. Do not require a generated manifest, a separate OpenSpec plan
-in each repository, an authority file, or another approval before coding.
+in each repository, a standing authority file, or preflight before coding.
+One optional progress record can cover a batch across repositories.
 
-For a batch, one optional progress record is enough. It may track work across
-repositories; each change still belongs in its owning repository. Choose the
-smallest reading that satisfies the issue, record material decisions in the
-PR description, and continue other issues if one hits a real external problem.
-Run checks that apply to the changed code and use the normal hosted CI and
-branch-protection rules before merge. A protected-path trust review, unavailable
-credential, failed required check, or contradictory acceptance criterion is a
-real stop for the affected action; a missing planning artifact, issue label,
-contact email, or secondary repository plan is not a reason to pause when the
-user has directly authorized those issues.
+Run checks that apply to the changed code, honor hosted CI, branch protection,
+and protected-path trust review, and never approve your own PR. Use independent
+mathematical review when a change adds or materially alters a mathematical claim.
+If an issue has a real external blocker, record it and continue independent
+issues. A missing planning artifact, issue label, or contact email that the
+acceptance criteria do not require is not a reason to stop.
 
-Use independent mathematical review when a change adds or materially alters a
-mathematical claim. Use the bounded loop controller and its review ledger when
-the user asks for a controlled multi-agent run or the change's risk warrants
-that extra record; the controller is an optional tool, not the entry point for
-ordinary issue work. Never bypass branch protection, required checks, or
-`trust-reviewed`, and never approve your own PR. Close a code issue only after
-its accepted implementation is merged.
+The bounded controller protocol in `.claude/skills/run-loop/SKILL.md` is for
+standalone unattended runs not started by an active user request. Those runs
+use a manifest, default-branch provider grants, and the review ledger described
+in `.claude/loop-specs/README.md`; a branch-authored manifest cannot grant itself
+provider actions. Those controls do not gate the user-started issue-first path.
 
 `scripts/loop_tokens.py` reports what a run cost, for either runtime. It reads
 the transcripts both already write -- Claude Code's
@@ -410,9 +405,17 @@ sentence is why `single-instantiation` ran nowhere for months: the hook made the
 script unrunnable, the summary said CI had it covered, and `bb8a1278` records the
 24 abstractions that drifted past its baseline with nothing going red.
 
-**For a local pre-flight the hook allows**, run `scripts/precheck.sh`: every gate
-that needs no Lean build, plus a targeted build of the modules you changed, in
-seconds. It is a cheap green, not a green.
+**For a local pre-flight the hook allows**, install the loop controller's pinned
+Python dependencies in each fresh worktree, then put that environment first on
+`PATH` when running precheck. It runs every gate that needs no Lean build, plus
+a targeted build of the modules you changed, in seconds. It is a cheap green,
+not a green.
+
+```bash
+python3 -m venv .loop-tools
+.loop-tools/bin/python -m pip install -r scripts/requirements-loop.txt
+PATH="$PWD/.loop-tools/bin:$PATH" scripts/precheck.sh
+```
 
 Build locally by **naming a target**, and **naming your own `lake`**, which is
 what the hook allows:
@@ -520,7 +523,7 @@ precisely what this rule exists to keep off the developer's machine.
 Useful focused commands are:
 
 ```bash
-scripts/precheck.sh     # every gate needing no Lean build, plus a targeted build
+PATH="$PWD/.loop-tools/bin:$PATH" scripts/precheck.sh  # gates plus targeted build
 lake build AlgebraicGeometryAudit StabilityConditionAudit DGCategoryAudit
 lake exe runLinter DerivedAlgGeo
 lake exe lint-style

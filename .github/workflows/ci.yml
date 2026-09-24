@@ -1273,10 +1273,9 @@ jobs:
         run: |
           set -euo pipefail
           # The interpreter is CHOSEN, not inherited -- the rule `build`
-          # learned the expensive way. This script needs PyYAML, which is the
-          # reason it used to ride inside `.mfc-venv`; here it gets a venv of
-          # its own, so the dependency is declared rather than borrowed from
-          # whatever the image ships. Costs about five seconds.
+          # learned the expensive way. The roadmap checker and loop controller
+          # have declared dependencies, so this isolated venv installs their
+          # requirements rather than borrowing whatever the image ships.
           #
           # Do not "simplify" this to a bare `python3 scripts/...` on the
           # strength of the hosted image having PyYAML today. That is the
@@ -1284,8 +1283,9 @@ jobs:
           # rather than on the change that made the assumption.
           python3 -m venv .roadmap-venv
           VENV_PY=.roadmap-venv/bin/python
-          "$VENV_PY" -m pip install --quiet --disable-pip-version-check pyyaml
-          "$VENV_PY" -c 'import sys, yaml; print("roadmap gate: python", sys.version.split()[0], "/ PyYAML", yaml.__version__)'
+          "$VENV_PY" -m pip install --quiet --disable-pip-version-check -r scripts/requirements-loop.txt
+          "$VENV_PY" -c 'import sys, yaml; from importlib.metadata import version; print("repository Python tools: python", sys.version.split()[0], "/ PyYAML", yaml.__version__, "/ markdown-it-py", version("markdown-it-py"))'
+          "$VENV_PY" -m unittest discover -s scripts/tests -p "test_*.py"
 
           # `--require-api` is deliberate. Without `gh` the script prints
           # NOT_RUN and exits 0, so a contributor with no `gh` is not blocked

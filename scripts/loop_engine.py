@@ -16,6 +16,7 @@ an unattended run from silently widening its scope.
 from __future__ import annotations
 
 import argparse
+import ast
 import contextlib
 import hashlib
 import json
@@ -26,10 +27,32 @@ import subprocess
 import sys
 import tempfile
 from datetime import datetime, timezone
+from importlib.metadata import PackageNotFoundError, version as package_version
 from pathlib import Path
 from typing import Any, Iterable
 
 import loop_recovery
+
+try:
+    from markdown_it import MarkdownIt
+except ImportError as exc:  # pragma: no cover - covered by the documented dependency setup
+    raise SystemExit(
+        "markdown-it-py==3.0.0 is required; install scripts/requirements-loop.txt"
+    ) from exc
+
+try:
+    MARKDOWN_IT_VERSION = package_version("markdown-it-py")
+except PackageNotFoundError as exc:  # pragma: no cover - guarded by the import above
+    raise SystemExit(
+        "markdown-it-py==3.0.0 is required; install scripts/requirements-loop.txt"
+    ) from exc
+if MARKDOWN_IT_VERSION != "3.0.0":
+    raise SystemExit(
+        "loop ledger digests require markdown-it-py==3.0.0; "
+        f"found {MARKDOWN_IT_VERSION}. Install scripts/requirements-loop.txt"
+    )
+
+COMMONMARK_PARSER = MarkdownIt("commonmark")
 
 try:
     import yaml
@@ -84,9 +107,12 @@ STANDING_AUTHORITY_PATH = ".claude/loop-authority.yaml"
 STANDING_AUTHORITY_SCHEMA = "derived-alg-geo-lean.loop-authority/v1"
 # Manifests the owner reviewed and merged through a planning PR before plans
 # moved into work PRs, by content digest. Their explicit grants and policies
-# stand, except where the standing file explicitly revokes a grant. Merging a
-# manifest later confers nothing: a work PR ships its own manifest, so "on the
-# default branch" no longer means "reviewed by the owner".
+# stand, except where the standing file explicitly revokes a grant. Every
+# legacy-only privilege checks that the digest appears in the provider's
+# default-branch copy of this controller, so a plan branch cannot activate a
+# digest it just added locally. Merging a manifest later confers nothing: a
+# work PR ships its own manifest, so "on the default branch" alone does not
+# mean "reviewed by the owner".
 LEGACY_REVIEWED_MANIFESTS = frozenset(
     {
         "7d7fde4cef8154044665c68b8aee9a063fd19d9dd3f4b8af9aebfc3c53146ebd",  # aut1-570-doc-hygiene
@@ -102,6 +128,7 @@ LEGACY_REVIEWED_MANIFESTS = frozenset(
         "3e6decf24291404867b90849dd84e75ea273a018b312c070fe38e12a4d522e3f",  # sf8-5-affine-resolution-pullback
         "0a22b5bdf3d841aa6bda71126233fb12c5a97166a10c04117e3792374b66cabf",  # sf8-5-nonflat-derived-effect
         "a00cfa7a3006a8354033e9ccc87b620fb707ec92f395bf920d2125c213c24d1e",  # sf8-5-tor-witness-comparison
+        "d3b27c3bcd91b0a332127dfb86cf24c9e3c8c187c425e8cb904937f680202322",  # sf8-5-affine-kprojective-scheme-comparison
         "69b451bac920101e28dff6c2f0c524f29f48146966ee9bdfc6a4e5ce0497606a",  # sf8-sf9-pilot
         "315637cf2347791dce3abb9fdd1b57a6fcf83f63f5c0cb5ffab986ef9cb57419",  # rou1-919-rouquier-dimension (#1478)
     }
@@ -150,13 +177,30 @@ UNPROTECTED_RECORD_RES = (
 # that had to resolve a conflict, say). They need the full panel but do not
 # spend the critique/improve cap; this bounds how often a pass can be reopened.
 MAX_REVALIDATION_ROUNDS = 2
-# v1 hashed every artifact byte for byte, so ticking a task box or appending
-# the observation log invalidated a ledger. v2 hashes the contract instead.
-OPENSPEC_DIGEST_VERSION = 2
+# v1 hashes every artifact with universal-newline text reads. v2 adds the
+# original regex-based task normalization. v3 uses CommonMark structure.
+OPENSPEC_DIGEST_VERSION = 3
+SUPPORTED_OPENSPEC_DIGEST_VERSIONS = frozenset({1, 2, 3})
 LOG_ARTIFACT_NAMES = {"agent-observations.md"}
-TASK_CHECKBOX_RE = re.compile(r"^(\s*[-*+] )\[[ xX]\]", re.MULTILINE)
 ISSUE_ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 BRANCH_RE = re.compile(r"^agent/[a-z0-9][a-z0-9._/-]*$")
+TASK_LIST_CHECKBOX_RE = re.compile(r"^([ \t]*[-*+][ \t]+)\[[ xX]\]")
+TASK_INLINE_CHECKBOX_RE = re.compile(r"^\[[ xX]\](?:[ \t\n]|$)")
+# Preserve the semantics used by already-written v2 ledgers. Do not use this
+# regex for new ledgers: CommonMark parsing distinguishes task boxes from links.
+TASK_CHECKBOX_RE_V2 = re.compile(r"^(\s*[-*+] )\[[ xX]\]", re.MULTILINE)
+MARKDOWN_LINE_END_RE = re.compile(r"\r\n|\r|\n")
+MARKDOWN_BLOCK_CONTENT_TYPES = {
+    "blockquote_open",
+    "bullet_list_open",
+    "code_block",
+    "fence",
+    "heading_open",
+    "html_block",
+    "hr",
+    "ordered_list_open",
+    "paragraph_open",
+}
 CLOSING_KEYWORD_RE = re.compile(r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)\b", re.I)
 # Common non-closing issue-link phrases accepted for progress PRs.
 NON_CLOSING_REFERENCE_RE = re.compile(
@@ -194,14 +238,6 @@ def canonical_json(value: Any) -> str:
     # YAML turns an unquoted date into a date object; stringify it rather than
     # crash. No digest changes: such a value could not be serialized before.
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True, default=str)
-
-
-def is_legacy_manifest(spec: dict[str, Any]) -> bool:
-    return digest(spec) in LEGACY_REVIEWED_MANIFESTS
-
-
-def is_legacy_state(state: dict[str, Any]) -> bool:
-    return state.get("spec_digest") in LEGACY_REVIEWED_MANIFESTS
 
 
 def canonical_repo_path(path: str) -> str:
@@ -263,15 +299,132 @@ def has_openspec(spec: dict[str, Any]) -> bool:
     return spec.get("openspec") is not None
 
 
+def split_markdown_lines(markdown: str, *, keepends: bool = False) -> list[str]:
+    """Split only on Markdown line endings, preserving every other code point."""
+
+    lines: list[str] = []
+    start = 0
+    for match in MARKDOWN_LINE_END_RE.finditer(markdown):
+        end = match.end() if keepends else match.start()
+        lines.append(markdown[start:end])
+        start = match.end()
+    if start < len(markdown):
+        lines.append(markdown[start:])
+    return lines
+
+
+def _parse_markdown(markdown: str) -> list[Any]:
+    """Parse with the pinned CommonMark grammar used by the ledger digest."""
+
+    return COMMONMARK_PARSER.parse(markdown)
+
+
+def normalize_task_checkboxes(markdown: str) -> str:
+    """Normalize checkbox state only in actual Markdown list-item paragraphs.
+
+    The first direct block of a list item must be a paragraph whose inline
+    content starts with the checkbox. Source maps then tie that parsed item
+    back to the exact line being normalized; checkbox-shaped code and links
+    stay fixed.
+    """
+
+    lines = split_markdown_lines(markdown, keepends=True)
+    tokens = _parse_markdown(markdown)
+
+    list_items: list[dict[str, Any]] = []
+    for token in tokens:
+        if token.type == "list_item_open":
+            list_items.append(
+                {
+                    "level": token.level,
+                    "first_block_seen": False,
+                    "paragraph_level": None,
+                }
+            )
+            continue
+
+        if token.type == "list_item_close":
+            while list_items and list_items[-1]["level"] >= token.level:
+                list_items.pop()
+            continue
+
+        if not list_items:
+            continue
+        item = list_items[-1]
+        if (
+            not item["first_block_seen"]
+            and token.level == item["level"] + 1
+            and token.type in MARKDOWN_BLOCK_CONTENT_TYPES
+        ):
+            item["first_block_seen"] = True
+            if token.type == "paragraph_open":
+                item["paragraph_level"] = token.level
+            continue
+
+        if item["paragraph_level"] is not None:
+            if (
+                token.type == "inline"
+                and token.level == item["paragraph_level"] + 1
+                and token.map
+                and token.children
+                and token.children[0].type == "text"
+                and TASK_INLINE_CHECKBOX_RE.match(token.children[0].content)
+            ):
+                line_number = token.map[0]
+                if (
+                    0 <= line_number < len(lines)
+                    and TASK_LIST_CHECKBOX_RE.match(lines[line_number])
+                ):
+                    lines[line_number] = TASK_LIST_CHECKBOX_RE.sub(
+                        r"\1[ ]", lines[line_number], count=1
+                    )
+            if token.type == "paragraph_close" and token.level == item["paragraph_level"]:
+                item["paragraph_level"] = None
+    return "".join(lines)
+
+
+def has_visible_why_heading(markdown: str) -> bool:
+    """Recognize a root-level ATX h2 whose rendered inline text is exactly Why."""
+
+    tokens = _parse_markdown(markdown)
+    for index, token in enumerate(tokens):
+        if (
+            token.type != "heading_open"
+            or token.tag != "h2"
+            or token.level != 0
+            or token.markup != "##"
+            or index + 1 >= len(tokens)
+            or tokens[index + 1].type != "inline"
+        ):
+            continue
+        inline = tokens[index + 1]
+        children = inline.children or []
+        # Raw HTML can hide text through attributes such as `hidden` or inline
+        # styles. Do not call that text visibly present; unrelated HTML outside
+        # this candidate heading remains irrelevant.
+        if any(child.type in {"html_inline", "image"} for child in children):
+            continue
+        visible_text = "".join(child.content for child in children if child.type in {"text", "code_inline"}).strip()
+        if visible_text == "Why":
+            return True
+    return False
+
+
+def checked_openspec_digest_version(version: Any) -> int:
+    if type(version) is not int or version not in SUPPORTED_OPENSPEC_DIGEST_VERSIONS:
+        raise LoopError(f"unsupported OpenSpec digest version: {version!r}")
+    return version
+
+
 def openspec_digest(root: Path, spec: dict[str, Any], version: int = OPENSPEC_DIGEST_VERSION) -> str:
     """Hash planning content; the registered digest freezes it, not its Git path.
 
-    Version 2 freezes the contract and nothing else: task checkbox state and
-    append-only observation logs are progress records, and hashing them made
-    the bookkeeping the protocol asks for invalidate the review it recorded.
-    Version 1 remains available so ledgers written by it keep verifying.
+    Version 2 preserves its original regex normalization so existing ledgers
+    keep verifying. Version 3 freezes the contract with CommonMark-aware task
+    checkbox normalization. Version 1 and 2 remain available for old ledgers.
     """
 
+    version = checked_openspec_digest_version(version)
     if not has_openspec(spec):
         return digest([])
     change_dir = openspec_change_dir(root, spec)
@@ -283,9 +436,18 @@ def openspec_digest(root: Path, spec: dict[str, Any], version: int = OPENSPEC_DI
         # records; a file of the same name under specs/ is contract.
         if version >= 2 and relative in LOG_ARTIFACT_NAMES:
             continue
-        content = path.read_text(encoding="utf-8")
-        if version >= 2 and relative == "tasks.md":
-            content = TASK_CHECKBOX_RE.sub(r"\1[ ]", content)
+        try:
+            if version >= 3:
+                content = path.read_bytes().decode("utf-8")
+            else:
+                # Keep historical universal-newline normalization for v1/v2.
+                content = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError as exc:
+            raise LoopError(f"OpenSpec artifact is not valid UTF-8: {relative}") from exc
+        if version == 2 and relative == "tasks.md":
+            content = TASK_CHECKBOX_RE_V2.sub(r"\1[ ]", content)
+        elif version >= 3 and relative == "tasks.md":
+            content = normalize_task_checkboxes(content)
         parts.append({"path": relative, "content": content})
     return digest(parts)
 
@@ -293,8 +455,7 @@ def openspec_digest(root: Path, spec: dict[str, Any], version: int = OPENSPEC_DI
 def ledger_digest_version(state: dict[str, Any]) -> int:
     """Ledgers written before v2 recorded no version and hashed with v1."""
 
-    version = state.get("openspec_digest_version", 1)
-    return version if isinstance(version, int) and not isinstance(version, bool) else 1
+    return checked_openspec_digest_version(state.get("openspec_digest_version", 1))
 
 
 def ledger_openspec_matches(root: Path, spec: dict[str, Any], state: dict[str, Any]) -> bool:
@@ -324,11 +485,10 @@ def validate_openspec_artifacts(root: Path, spec: dict[str, Any]) -> None:
             raise LoopError(f"OpenSpec artifact is missing: {path.relative_to(root)}")
         if not path.read_text(encoding="utf-8").strip():
             raise LoopError(f"OpenSpec artifact is empty: {path.relative_to(root)}")
-    required_text = "\n".join(
-        ensure_inside(root, change_dir / relative).read_text(encoding="utf-8")
-        for relative in openspec["required_artifacts"]
-    )
-    if "proposal.md" in openspec["required_artifacts"] and "## Why" not in required_text:
+    proposal = ensure_inside(root, change_dir / "proposal.md")
+    if "proposal.md" in openspec["required_artifacts"] and not has_visible_why_heading(
+        proposal.read_text(encoding="utf-8")
+    ):
         raise LoopError("OpenSpec proposal must contain a Why section")
     spec_texts = [
         ensure_inside(root, change_dir / relative).read_text(encoding="utf-8")
@@ -415,7 +575,9 @@ def gh_json(root: Path, args: list[str]) -> Any:
         raise LoopError(f"gh command returned invalid JSON: gh {' '.join(args)}") from exc
 
 
-def load_spec(path: Path, root: Path | None = None) -> dict[str, Any]:
+def load_spec(
+    path: Path, root: Path | None = None, *, verify_owner_review: bool = True
+) -> dict[str, Any]:
     try:
         data = yaml.safe_load(path.read_text(encoding="utf-8"))
     except FileNotFoundError as exc:
@@ -426,7 +588,12 @@ def load_spec(path: Path, root: Path | None = None) -> dict[str, Any]:
         raise LoopError(f"specification {path} is not valid YAML: {exc}") from exc
     if not isinstance(data, dict):
         raise LoopError("specification root must be a YAML mapping")
-    validate_spec(data)
+    owner_reviewed = (
+        owner_reviewed_legacy_manifest(root, data)
+        if root is not None and verify_owner_review
+        else False
+    )
+    validate_spec(data, owner_reviewed_legacy=owner_reviewed)
     if root is not None:
         validate_openspec_artifacts(root, data)
     return data
@@ -514,6 +681,47 @@ def standing_authority(root: Path, spec: dict[str, Any]) -> dict[str, bool]:
     return dict(grants)
 
 
+def owner_reviewed_legacy_manifest(root: Path, spec: dict[str, Any]) -> bool:
+    """Check that the exact legacy digest is allowlisted on the default branch.
+
+    A planning branch necessarily contains its proposed allowlist entry before
+    that entry has been reviewed and merged. Reading the default branch's
+    controller copy prevents that local entry from authorizing the branch
+    which introduced it.
+    """
+
+    source = read_owner_file(root, spec, "scripts/loop_engine.py")
+    if source is None:
+        return False
+    try:
+        tree = ast.parse(source)
+    except SyntaxError as exc:
+        raise LoopError("scripts/loop_engine.py on the default branch is not valid Python") from exc
+    for node in tree.body:
+        if not isinstance(node, ast.Assign):
+            continue
+        if not any(isinstance(target, ast.Name) and target.id == "LEGACY_REVIEWED_MANIFESTS" for target in node.targets):
+            continue
+        value = node.value
+        if (
+            not isinstance(value, ast.Call)
+            or not isinstance(value.func, ast.Name)
+            or value.func.id != "frozenset"
+            or len(value.args) != 1
+        ):
+            raise LoopError("LEGACY_REVIEWED_MANIFESTS on the default branch has an unsupported format")
+        try:
+            digests = ast.literal_eval(value.args[0])
+        except (ValueError, TypeError) as exc:
+            raise LoopError("LEGACY_REVIEWED_MANIFESTS on the default branch is not a literal set") from exc
+        if not isinstance(digests, (set, frozenset, tuple, list)) or any(
+            not isinstance(item, str) for item in digests
+        ):
+            raise LoopError("LEGACY_REVIEWED_MANIFESTS on the default branch must contain string digests")
+        return digest(spec) in digests
+    raise LoopError("LEGACY_REVIEWED_MANIFESTS is missing from the default-branch controller")
+
+
 def effective_mutations(root: Path, spec: dict[str, Any]) -> dict[str, bool]:
     """Resolve provider authority for this manifest from owner-controlled sources.
 
@@ -525,7 +733,7 @@ def effective_mutations(root: Path, spec: dict[str, Any]) -> dict[str, bool]:
 
     configured = manifest_mutations(spec)
     standing = standing_authority(root, spec)
-    if is_legacy_manifest(spec):
+    if owner_reviewed_legacy_manifest(root, spec):
         return {
             key: standing.get(key) is not False and configured.get(key, standing.get(key, False))
             for key in MUTATION_KEYS
@@ -637,7 +845,7 @@ def predecessor_prs(spec: dict[str, Any]) -> list[dict[str, Any]]:
     return entries
 
 
-def validate_spec(spec: dict[str, Any]) -> None:
+def validate_spec(spec: dict[str, Any], *, owner_reviewed_legacy: bool = False) -> None:
     """Validate the stable, intentionally small v1 specification schema."""
 
     if spec.get("schema") != RUN_SCHEMA:
@@ -867,7 +1075,7 @@ def validate_spec(spec: dict[str, Any]) -> None:
         if selected_dependencies:
             raise LoopError("independent mode cannot contain dependencies between selected issues")
 
-    if not is_legacy_manifest(spec) and spec["enabled"]:
+    if not owner_reviewed_legacy and spec["enabled"]:
         # A branch-authored manifest cannot choose the base its change is
         # measured against, nor scope its chunk over its own authority. A
         # disabled manifest authorizes nothing and is kept only as history.
@@ -946,7 +1154,7 @@ def recovery_record(root: Path, spec: dict[str, Any]) -> tuple[Path, dict[str, A
 
 def validate_registered_state(record: dict[str, Any], state: dict[str, Any]) -> None:
     root = Path(record["repo_root"])
-    spec = load_spec(Path(record["spec_path"]), root)
+    spec = load_spec(Path(record["spec_path"]), root, verify_owner_review=True)
     if "recovery" not in spec or digest(spec) != record["spec_digest"]:
         raise LoopError("registered recovery manifest changed; a reset is not a migration")
     if openspec_digest(root, spec, ledger_digest_version(state)) != record["openspec_digest"]:
@@ -1026,7 +1234,7 @@ def chunk_entry(spec: dict[str, Any], number: int, chunk_id: str) -> tuple[dict[
 
 def print_validation(path: Path, root: Path) -> int:
     try:
-        spec = load_spec(path, root)
+        spec = load_spec(path, root, verify_owner_review=True)
     except LoopError as exc:
         print(f"FAIL spec {path}: {exc}")
         return 1
@@ -1138,7 +1346,7 @@ def require_legacy_issue_open(root: Path, spec: dict[str, Any], number: int) -> 
     reusable for new work.
     """
 
-    if not is_legacy_manifest(spec):
+    if not owner_reviewed_legacy_manifest(root, spec):
         return
     state = str(issue_state(root, spec["repository"], number).get("state", "")).upper()
     if state != "OPEN":
@@ -1518,11 +1726,12 @@ def reviewed_content_matches(
 
     if not re.fullmatch(r"[0-9a-fA-F]{40}", head) or not re.fullmatch(r"[0-9a-fA-F]{7,40}", reviewed_commit):
         return False
-    if head.lower() == reviewed_commit.lower():
-        return True
-    if len(reviewed_commit) < 40 and reviewed_commit_matches_head(root, reviewed_commit, head):
-        return True
     try:
+        version = ledger_digest_version(state)
+        if head.lower() == reviewed_commit.lower():
+            return True
+        if len(reviewed_commit) < 40 and reviewed_commit_matches_head(root, reviewed_commit, head):
+            return True
         ensure_commit(root, spec["remote"], head)
         ensure_commit(root, spec["remote"], reviewed_commit)
         base = trusted_base_commit(root, spec)
@@ -1532,8 +1741,8 @@ def reviewed_content_matches(
         ):
             return False
         for path in exclude:
-            if Path(path).name == "tasks.md" and normalized_tasks(root, reviewed_commit, path) != normalized_tasks(
-                root, head, path
+            if Path(path).name == "tasks.md" and normalized_tasks(root, reviewed_commit, path, version) != normalized_tasks(
+                root, head, path, version
             ):
                 print("WARN task wording changed after review; only checkbox state may change")
                 return False
@@ -1556,8 +1765,25 @@ def blob_at(root: Path, commit: str, path: str) -> str | None:
     return result.stdout if result.returncode == 0 else None
 
 
-def normalized_tasks(root: Path, commit: str, path: str) -> str:
-    return TASK_CHECKBOX_RE.sub(r"\1[ ]", blob_at(root, commit, path) or "")
+def normalized_tasks(root: Path, commit: str, path: str, version: int) -> str:
+    """Use the ledger's original task semantics when comparing reviewed heads."""
+
+    version = checked_openspec_digest_version(version)
+    result = subprocess.run(["git", "show", f"{commit}:{path}"], cwd=root, capture_output=True)
+    if result.returncode != 0:
+        return ""
+    try:
+        content = result.stdout.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise LoopError(f"reviewed task artifact is not valid UTF-8: {path}") from exc
+    if version < 3:
+        # v1/v2 read artifacts in text mode, which normalized line endings.
+        content = content.replace("\r\n", "\n").replace("\r", "\n")
+    if version == 2:
+        return TASK_CHECKBOX_RE_V2.sub(r"\1[ ]", content)
+    if version == 3:
+        return normalize_task_checkboxes(content)
+    return content
 
 
 LEAN_IMPORT_RE = re.compile(r"^(?:(?:public|private|meta)\s+)*import\s+(.+?)\s*$", re.MULTILINE)
@@ -1604,7 +1830,7 @@ def roadmap_gate_args(base_ref: str) -> list[str]:
 
 def preflight(root: Path, spec_path: Path) -> int:
     try:
-        spec = load_spec(spec_path, root)
+        spec = load_spec(spec_path, root, verify_owner_review=True)
     except LoopError as exc:
         print(f"FAIL preflight: {exc}")
         return 1
@@ -1725,7 +1951,9 @@ def preflight(root: Path, spec_path: Path) -> int:
         # An epic opt-in is an owner's eligibility decision; a branch-authored
         # manifest cannot make it for itself.
         allow_epic_issues = (
-            set(spec.get("eligibility", {}).get("allow_epic_issues", [])) if is_legacy_manifest(spec) else set()
+            set(spec.get("eligibility", {}).get("allow_epic_issues", []))
+            if owner_reviewed_legacy_manifest(root, spec)
+            else set()
         )
         if "epic" in forbidden and number in allow_epic_issues:
             forbidden.remove("epic")
@@ -1791,7 +2019,7 @@ def preflight(root: Path, spec_path: Path) -> int:
         print("PASS OpenSpec structural validation")
 
     roadmap_gate = spec.get("roadmap_gate", "required")
-    if roadmap_gate != "required" and not is_legacy_manifest(spec):
+    if roadmap_gate != "required" and not owner_reviewed_legacy_manifest(root, spec):
         warnings.append(f"roadmap_gate {roadmap_gate!r} is owner policy; a branch-authored manifest runs it as required")
         roadmap_gate = "required"
     if roadmap_gate != "disabled":
@@ -1988,7 +2216,7 @@ def register_recovery(root: Path, spec_path: Path, spec: dict[str, Any], path: P
 
 def ledger_init(root: Path, spec_path: Path, number: int, chunk_id: str, requested_state_dir: str | None) -> int:
     try:
-        spec = load_spec(spec_path, root)
+        spec = load_spec(spec_path, root, verify_owner_review=True)
         issue, chunk = chunk_entry(spec, number, chunk_id)
         require_legacy_issue_open(root, spec, number)
         predecessor_proofs = require_predecessor_prs(root, spec)
@@ -2544,17 +2772,31 @@ def require_recovery_lift_backlog(state: dict[str, Any]) -> None:
         raise LoopError("recovery lift obligations are absent from the backlog: " + ", ".join(sorted(missing)))
 
 
-def require_unprotected(paths: Iterable[str], state: dict[str, Any]) -> None:
+def owner_reviewed_legacy_state(root: Path, spec: dict[str, Any], state: dict[str, Any]) -> bool:
+    """A ledger inherits legacy privileges only for its exact owner-reviewed spec."""
+
+    return (
+        state.get("spec_id") == spec["id"]
+        and state.get("spec_digest") == digest(spec)
+        and owner_reviewed_legacy_manifest(root, spec)
+    )
+
+
+def require_unprotected(
+    root: Path, spec: dict[str, Any], paths: Iterable[str], state: dict[str, Any]
+) -> None:
     """Refuse a branch-authored run's change to its own authority or controller."""
 
-    if is_legacy_state(state):
+    if owner_reviewed_legacy_state(root, spec, state):
         return
     blocked = protected_paths(paths, ledger_plan_paths(state))
     if blocked:
         raise LoopError("change touches protected paths a run may not modify: " + ", ".join(blocked))
 
 
-def require_no_links(root: Path, base: str, head: str, state: dict[str, Any]) -> None:
+def require_no_links(
+    root: Path, spec: dict[str, Any], base: str, head: str, state: dict[str, Any]
+) -> None:
     """Refuse symlinks and gitlinks a branch-authored change introduces.
 
     Each is judged by its own path, but a symlink writes through to its target
@@ -2562,7 +2804,7 @@ def require_no_links(root: Path, base: str, head: str, state: dict[str, Any]) ->
     protected one.
     """
 
-    if is_legacy_state(state):
+    if owner_reviewed_legacy_state(root, spec, state):
         return
     raw = run_command(root, ["git", "diff", "--raw", "--no-renames", "-z", f"{base}...{head}"], check=True).stdout
     fields = raw.split("\0")
@@ -2576,10 +2818,10 @@ def require_no_links(root: Path, base: str, head: str, state: dict[str, Any]) ->
 
 
 def require_published_head_has_no_links(root: Path, spec: dict[str, Any], state: dict[str, Any], head: str) -> None:
-    if is_legacy_state(state):
+    if owner_reviewed_legacy_state(root, spec, state):
         return
     ensure_commit(root, spec["remote"], head)
-    require_no_links(root, trusted_base_commit(root, spec), head, state)
+    require_no_links(root, spec, trusted_base_commit(root, spec), head, state)
 
 
 def recovery_scoped_paths(
@@ -2604,8 +2846,8 @@ def recovery_scoped_paths(
         value = safe(path)
         if not any(value == prefix or value.startswith(prefix + "/") for prefix in allowed):
             raise LoopError(f"changed path lies outside frozen recovery scope: {path}")
-    require_unprotected(changed, state)
-    require_no_links(root, base or spec["base_ref"], head, state)
+    require_unprotected(root, spec, changed, state)
+    require_no_links(root, spec, base or spec["base_ref"], head, state)
 
 
 def authorize_action(root: Path, spec: dict[str, Any], action: str) -> None:
@@ -2644,7 +2886,7 @@ def action_close(
     dry_run: bool,
 ) -> int:
     authorize_action(root, spec, "close")
-    if merged_pr is None and not is_legacy_manifest(spec):
+    if merged_pr is None and not owner_reviewed_legacy_manifest(root, spec):
         raise LoopError("a branch-authored manifest closes issues only through a verified merged PR")
     recovered = recovery_publication_state(root, spec)
     selected_issue_for_action(spec, number)
@@ -2673,7 +2915,7 @@ def action_close(
         if recovered is not None:
             require_pr_targets_base(pr, spec)
             require_pr_matches_frozen_issue(pr, recovered)
-            verify_remote_chunk_files(pr, recovered)
+            verify_remote_chunk_files(root, spec, pr, recovered)
     args = ["gh", "issue", "close", str(number), "--repo", spec["repository"]]
     if comment:
         args.extend(["--comment", comment])
@@ -2691,7 +2933,7 @@ def planned_branches(spec: dict[str, Any]) -> set[str]:
 
 def action_push(root: Path, spec: dict[str, Any], branch: str | None, force_with_lease: bool, dry_run: bool) -> int:
     authorize_action(root, spec, "push")
-    if force_with_lease and not is_legacy_manifest(spec):
+    if force_with_lease and not owner_reviewed_legacy_manifest(root, spec):
         raise LoopError("force-with-lease is not available to a branch-authored manifest")
     recovery_state = recovery_publication_state(root, spec)
     if recovery_state is not None:
@@ -2846,8 +3088,8 @@ def verify_local_chunk_files(root: Path, spec: dict[str, Any], state: dict[str, 
     changed = [line.strip() for line in result.stdout.splitlines() if line.strip()]
     if not changed:
         raise LoopError("frozen chunk has no committed file changes relative to the protected base")
-    require_unprotected(changed, state)
-    require_no_links(root, base_ref, "HEAD", state)
+    require_unprotected(root, spec, changed, state)
+    require_no_links(root, spec, base_ref, "HEAD", state)
     allowed = chunk_allowed_paths(state)
     outside = [path for path in changed if not path_is_in_frozen_chunk(path, allowed)]
     if outside:
@@ -2866,14 +3108,16 @@ def verify_local_chunk_files(root: Path, spec: dict[str, Any], state: dict[str, 
         raise LoopError("chunk diff contains files outside the frozen list: " + ", ".join(outside))
 
 
-def verify_remote_chunk_files(pr: dict[str, Any], state: dict[str, Any]) -> None:
+def verify_remote_chunk_files(
+    root: Path, spec: dict[str, Any], pr: dict[str, Any], state: dict[str, Any]
+) -> None:
     if "recovery" in state:
         root = Path(state["repo_root"])
         records = [record for _, record in recovery_registry(root)
                    if record["objective_id"] == state["recovery"]["policy"]["objective_id"]]
         if len(records) != 1:
             raise LoopError("unregistered recovery publication")
-        spec = load_spec(Path(records[0]["spec_path"]), root)
+        spec = load_spec(Path(records[0]["spec_path"]), root, verify_owner_review=True)
         head = str(pr.get("headRefOid") or "")
         if not reviewed_content_matches(root, spec, state, state["rounds"][-1]["commit"], head):
             raise LoopError("remote PR head does not carry the reviewed recovery change")
@@ -2883,7 +3127,7 @@ def verify_remote_chunk_files(pr: dict[str, Any], state: dict[str, Any]) -> None
     paths = [file.get("path") for file in files if isinstance(file, dict) and isinstance(file.get("path"), str)]
     if not paths:
         raise LoopError("PR has no readable changed-file list; refusing to approve an unbound chunk")
-    require_unprotected(paths, state)
+    require_unprotected(root, spec, paths, state)
     outside = [path for path in paths if not path_is_in_frozen_chunk(path, chunk_allowed_paths(state))]
     if outside:
         raise LoopError("PR contains files outside the frozen list: " + ", ".join(outside))
@@ -3002,7 +3246,7 @@ def action_create_pr(
                                 "--json", "headRefName,headRefOid,baseRefName,body,files"])
             require_pr_targets_base(pr, spec)
             require_pr_matches_frozen_issue(pr, recovered)
-            verify_remote_chunk_files(pr, recovered)
+            verify_remote_chunk_files(root, spec, pr, recovered)
         except (LoopError, loop_recovery.RecoveryError) as exc:
             raise LoopError(f"PR was created at {url}, but its recovery binding failed; do not approve or close: {exc}") from exc
     print(f"PASS PR created for issue #{number}")
@@ -3056,7 +3300,7 @@ def action_attest_pr(
     require_predecessor_merges_ancestor(root, predecessor_proofs, pr.get("headRefOid", ""), "PR head")
     if not reviewed_content_matches(root, spec, state, str(current.get("commit", "")), str(pr.get("headRefOid", ""))):
         raise LoopError("PR head does not carry the change reviewed by the passing ledger")
-    verify_remote_chunk_files(pr, state)
+    verify_remote_chunk_files(root, spec, pr, state)
     require_published_head_has_no_links(root, spec, state, str(pr.get("headRefOid", "")))
     payload = predecessor_attestation_from_state(state, pr["headRefOid"])
     matches = matching_predecessor_attestations(pr.get("comments"), payload, spec["actor"])
@@ -3108,7 +3352,7 @@ def action_ready(root: Path, spec: dict[str, Any], pr_number: int, ledger_file: 
     require_pr_matches_frozen_issue(pr, state)
     if not reviewed_content_matches(root, spec, state, str(current.get("commit", "")), str(pr.get("headRefOid", ""))):
         raise LoopError("PR head does not carry the change reviewed by the passing ledger")
-    verify_remote_chunk_files(pr, state)
+    verify_remote_chunk_files(root, spec, pr, state)
     require_published_head_has_no_links(root, spec, state, str(pr.get("headRefOid", "")))
     if pr.get("isDraft") is False:
         print(f"PASS PR already ready for review: #{pr_number}")
@@ -3272,7 +3516,7 @@ def action_approve(
     require_predecessor_merges_ancestor(root, predecessor_proofs, pr.get("headRefOid", ""), "PR head")
     if not reviewed_content_matches(root, spec, state, str(current.get("commit", "")), str(pr.get("headRefOid", ""))):
         raise LoopError("PR head does not carry the change reviewed by the passing ledger")
-    verify_remote_chunk_files(pr, state)
+    verify_remote_chunk_files(root, spec, pr, state)
     require_published_head_has_no_links(root, spec, state, str(pr.get("headRefOid", "")))
     check_required_checks(root, spec, pr_number)
     args = [
@@ -3357,7 +3601,7 @@ def action_merge(
     dry_run: bool,
 ) -> int:
     authorize_action(root, spec, "merge")
-    if admin and not is_legacy_manifest(spec):
+    if admin and not owner_reviewed_legacy_manifest(root, spec):
         raise LoopError("administrator merge is never available to a branch-authored manifest")
     recovery_publication_state(root, spec, ledger_file)
     predecessor_proofs = require_predecessor_prs(root, spec)
@@ -3394,7 +3638,7 @@ def action_merge(
     require_predecessor_merges_ancestor(root, predecessor_proofs, pr.get("headRefOid", ""), "PR head")
     if not reviewed_content_matches(root, spec, state, str(current.get("commit", "")), str(pr.get("headRefOid", ""))):
         raise LoopError("PR head does not carry the change reviewed by the passing ledger")
-    verify_remote_chunk_files(pr, state)
+    verify_remote_chunk_files(root, spec, pr, state)
     require_published_head_has_no_links(root, spec, state, str(pr.get("headRefOid", "")))
     if predecessor_attestation_policy(spec)["emit"]:
         payload = predecessor_attestation_from_state(state, pr["headRefOid"])
@@ -3580,7 +3824,7 @@ def dispatch(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
                 reason=getattr(args, "reason", None))
         if args.command == "action":
             root = args.repo_root.resolve()
-            spec = load_spec(repo_path(root, args.spec), root)
+            spec = load_spec(repo_path(root, args.spec), root, verify_owner_review=True)
             if args.action_command == "comment":
                 return action_comment(root, spec, args.issue, args.body, args.dry_run)
             if args.action_command == "close":

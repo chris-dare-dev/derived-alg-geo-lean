@@ -4,6 +4,12 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineNonflatExample
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineKProjectivePullback
+import DerivedAlgGeo.AlgebraicGeometry.Modules.AB
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.AffineSpec
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.Extensions
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Homology
+import Mathlib.AlgebraicGeometry.Modules.Tilde
+import Mathlib.Algebra.Homology.Additive
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Bounded
 import Mathlib.Algebra.Category.ModuleCat.ChangeOfRingsExact
 import Mathlib.Algebra.Category.ModuleCat.Projective
@@ -41,6 +47,9 @@ affine K-projective pullback on this representative.
   derived-second-argument `Tor` for the displayed modules.
 - `affineKProjectivePullbackObject_homology_negOne_not_isZero` transports the
   effect to the supported pullback object.
+- `affineKProjectiveSchemeModulePullbackObject_homology_negOne_not_isZero`
+  transports the effect through the affine K-projective scheme-module
+  comparison.
 
 ## Implementation notes
 
@@ -59,6 +68,25 @@ open scoped ChangeOfRings
 noncomputable section
 
 attribute [local instance] HasDerivedCategory.standard
+
+private instance intTildeFunctor_additive :
+    (AlgebraicGeometry.tilde.functor (CommRingCat.of ℤ)).Additive :=
+  AlgebraicGeometry.instAdditiveModuleCatCarrierModulesSpecOfFunctor
+
+private instance zmodTwoTildeFunctor_additive :
+    (AlgebraicGeometry.tilde.functor zmodTwoRing).Additive :=
+  AlgebraicGeometry.instAdditiveModuleCatCarrierModulesSpecOfFunctor
+
+private instance zmodTwoTildeFunctor_preservesFiniteLimits :
+    PreservesFiniteLimits (AlgebraicGeometry.tilde.functor zmodTwoRing) :=
+  AlgebraicGeometry.tilde_preservesFiniteLimits
+
+private instance zmodTwoTildeFunctor_isLeftAdjoint :
+    (AlgebraicGeometry.tilde.functor zmodTwoRing).IsLeftAdjoint :=
+  (AlgebraicGeometry.tilde.adjunction (R := zmodTwoRing)).isLeftAdjoint
+
+private instance zmodTwoTildeFunctor_preservesFiniteColimits :
+    PreservesFiniteColimits (AlgebraicGeometry.tilde.functor zmodTwoRing) := inferInstance
 
 namespace ZModTwoNonflatDerived
 
@@ -357,6 +385,117 @@ theorem supportedAffineBoundedAboveProjectiveRepresentative_homology_negOne_not_
     ¬ IsZero (supportedAffineBoundedAboveProjectiveRepresentative.obj.as.homology (-1)) := by
   change ¬ IsZero (baseChangedResolution.homology (-1))
   exact baseChangedResolution_homology_negOne_not_isZero
+
+/-- The actual degreewise scheme-module pullback of the sheafified two-term
+resolution along `zmodTwoSchemeMap`. This is an ordinary complex, before
+passing to the derived category. -/
+noncomputable def schemeModulePulledBackResolution :
+    CochainComplex ((Spec zmodTwoRing).Modules) ℤ :=
+  ((Scheme.Modules.pullback zmodTwoSchemeMap).mapHomologicalComplex (ComplexShape.up ℤ)).obj
+    (((AlgebraicGeometry.tilde.functor (CommRingCat.of ℤ)).mapHomologicalComplex
+      (ComplexShape.up ℤ)).obj twoTermResolution)
+
+/-- The actual scheme-module pullback complex is isomorphic to the tilde of
+the already computed scalar extension of the resolution. -/
+noncomputable def schemeModulePulledBackResolutionIso :
+    schemeModulePulledBackResolution ≅
+      ((AlgebraicGeometry.tilde.functor zmodTwoRing).mapHomologicalComplex
+        (ComplexShape.up ℤ)).obj baseChangedResolution := by
+  simpa [schemeModulePulledBackResolution, baseChangedResolution, zmodTwoExtend,
+    zmodTwoSchemeMap, Functor.comp_obj] using
+      (Scheme.Modules.pullbackSpecMapTildeMapHomologicalComplexIso zmodTwoRingMap).app
+        twoTermResolution
+
+/-- The derived object represented by the degreewise, underived
+scheme-module pullback of the displayed resolution has nonzero `H⁻¹`. -/
+theorem schemeModulePulledBackResolution_homology_negOne_not_isZero :
+    ¬ IsZero ((DerivedCategory.homologyFunctor ((Spec zmodTwoRing).Modules) (-1)).obj
+      (DerivedCategory.Q.obj schemeModulePulledBackResolution)) := by
+  letI : (AlgebraicGeometry.tilde.functor zmodTwoRing).Additive := inferInstance
+  letI : PreservesFiniteLimits (AlgebraicGeometry.tilde.functor zmodTwoRing) :=
+    AlgebraicGeometry.tilde_preservesFiniteLimits
+  letI : (AlgebraicGeometry.tilde.functor zmodTwoRing).IsLeftAdjoint :=
+    (AlgebraicGeometry.tilde.adjunction (R := zmodTwoRing)).isLeftAdjoint
+  letI : PreservesFiniteColimits (AlgebraicGeometry.tilde.functor zmodTwoRing) := inferInstance
+  intro h
+  let qIso : DerivedCategory.Q.obj schemeModulePulledBackResolution ≅
+      (AlgebraicGeometry.tilde.functor zmodTwoRing).mapDerivedCategory.obj
+        (DerivedCategory.Q.obj baseChangedResolution) :=
+    DerivedCategory.Q.mapIso schemeModulePulledBackResolutionIso ≪≫
+      ((AlgebraicGeometry.tilde.functor zmodTwoRing).mapDerivedCategoryFactors.app
+        baseChangedResolution).symm
+  have hDerived : IsZero ((DerivedCategory.homologyFunctor ((Spec zmodTwoRing).Modules) (-1)).obj
+      ((AlgebraicGeometry.tilde.functor zmodTwoRing).mapDerivedCategory.obj
+        (DerivedCategory.Q.obj baseChangedResolution))) :=
+    h.of_iso (((DerivedCategory.homologyFunctor ((Spec zmodTwoRing).Modules) (-1)).mapIso
+      qIso).symm)
+  have hTilde : IsZero ((AlgebraicGeometry.tilde.functor zmodTwoRing).obj
+      ((DerivedCategory.homologyFunctor (ModuleCat (ZMod 2)) (-1)).obj
+        (DerivedCategory.Q.obj baseChangedResolution))) :=
+    hDerived.of_iso (CategoryTheory.mapDerivedCategoryHomologyIso
+      (AlgebraicGeometry.tilde.functor zmodTwoRing)
+      (by infer_instance) (by infer_instance) (by infer_instance)
+      (DerivedCategory.Q.obj baseChangedResolution) (-1)).symm
+  have hModule : IsZero ((DerivedCategory.homologyFunctor (ModuleCat (ZMod 2)) (-1)).obj
+      (DerivedCategory.Q.obj baseChangedResolution)) := by
+    rw [IsZero.iff_id_eq_zero]
+    apply (AlgebraicGeometry.tilde.fullyFaithfulFunctor (R := zmodTwoRing)).map_injective
+    have hTildeId :
+        𝟙 ((AlgebraicGeometry.tilde.functor zmodTwoRing).obj
+          ((DerivedCategory.homologyFunctor (ModuleCat (ZMod 2)) (-1)).obj
+            (DerivedCategory.Q.obj baseChangedResolution))) = 0 := by
+      rw [IsZero.iff_id_eq_zero] at hTilde
+      exact hTilde
+    calc
+      (AlgebraicGeometry.tilde.functor zmodTwoRing).map (𝟙 _) =
+          𝟙 ((AlgebraicGeometry.tilde.functor zmodTwoRing).obj _) :=
+        (AlgebraicGeometry.tilde.functor zmodTwoRing).map_id _
+      _ = 0 := hTildeId
+      _ = (AlgebraicGeometry.tilde.functor zmodTwoRing).map 0 := by
+        rw [Functor.map_zero]
+  have hComplex : IsZero (baseChangedResolution.homology (-1)) :=
+    hModule.of_iso
+      ((DerivedCategory.homologyFunctorFactors (ModuleCat (ZMod 2)) (-1)).symm.app
+        baseChangedResolution)
+  exact baseChangedResolution_homology_negOne_not_isZero hComplex
+
+private def schemeModulePulledBackResolution_affineKProjectiveComparisonIso :
+    DerivedCategory.Q.obj schemeModulePulledBackResolution ≅
+      (AlgebraicGeometry.tilde.functor zmodTwoRing).mapDerivedCategory.obj
+        ((affineKProjectiveDerivedPullback zmodTwoRingMap).obj
+          ((kProjectiveQhEquivalence (ModuleCat ℤ)).functor.obj
+            kProjectiveRepresentative)) := by
+  let F := AlgebraicGeometry.tilde.functor (CommRingCat.of ℤ) ⋙
+    Scheme.Modules.pullback (Spec.map zmodTwoRingMap)
+  let E := kProjectiveQhEquivalence (ModuleCat ℤ)
+  let X := E.functor.obj kProjectiveRepresentative
+  let h₀ := (CategoryTheory.kProjectiveLocusDerivedComparison F).app
+    kProjectiveRepresentative
+  let h₁ := CategoryTheory.kProjectiveDerivedFunctorObjIso F twoTermResolution 0
+  let eComplex := Functor.mapHomologicalComplexCompIso (Iso.refl F) (ComplexShape.up ℤ)
+  have hRep : (CategoryTheory.kProjectiveLocusDerivedFunctor F).obj X ≅
+      DerivedCategory.Q.obj schemeModulePulledBackResolution := by
+    simpa [F, X, E, kProjectiveRepresentative, schemeModulePulledBackResolution,
+      zmodTwoSchemeMap, Functor.comp_obj] using
+      h₀ ≪≫ h₁ ≪≫ DerivedCategory.Q.mapIso
+        (eComplex.app twoTermResolution).symm
+  simpa [X, E, Functor.comp_obj] using
+    hRep.symm ≪≫ (affineKProjectiveSchemeModulePullbackComparison
+      zmodTwoRingMap).app X
+
+/-- The generic affine comparison carries the existing `ℤ → ZMod 2` example's
+nonzero degree-minus-one cohomology to its derived target in all scheme-module
+sheaves. -/
+theorem affineKProjectiveSchemeModulePullbackObject_homology_negOne_not_isZero :
+    ¬ IsZero ((DerivedCategory.homologyFunctor ((Spec zmodTwoRing).Modules) (-1)).obj
+      ((AlgebraicGeometry.tilde.functor zmodTwoRing).mapDerivedCategory.obj
+        ((affineKProjectiveDerivedPullback zmodTwoRingMap).obj
+          ((kProjectiveQhEquivalence (ModuleCat ℤ)).functor.obj
+            kProjectiveRepresentative)))) := by
+  intro h
+  exact schemeModulePulledBackResolution_homology_negOne_not_isZero
+    (h.of_iso ((DerivedCategory.homologyFunctor ((Spec zmodTwoRing).Modules) (-1)).mapIso
+      schemeModulePulledBackResolution_affineKProjectiveComparisonIso))
 
 private abbrev torRingHom : ℤ →+* ZMod 2 := Int.castRingHom (ZMod 2)
 

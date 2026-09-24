@@ -1,0 +1,7 @@
+schema: derived-alg-geo-lean.loop-authority/v1
+mutations:
+  # Controller-issued predecessor attestations are PR comments.
+  comment_issue: true
+  push_branch: true
+  create_pr: true
+  merge_pr: true
