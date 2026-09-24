@@ -97,7 +97,7 @@ noncomputable def originalHeartCohNegOneIsoOfAmplitude
   let e : ((t.truncGELE (-1) (-1)).obj X) ≅ K⟦(1 : ℤ)⟧ :=
     e₁ ≪≫ e₂ ≪≫ e₃
   refine ObjectProperty.isoMk _ ?_
-  simpa [originalHeartCoh, originalHeartCohFunctor] using
+  simpa [originalHeartCoh, originalHeartCohFunctor, TStructure.heartCohFunctor] using
     ((shiftFunctor C (-1 : ℤ)).mapIso e ≪≫
       shiftShiftNeg (X := K) (i := (1 : ℤ)))
 
@@ -123,7 +123,7 @@ noncomputable def originalHeartCohZeroIsoOfAmplitude
   let e₂ : (t.truncGE 0).obj X ≅ Q := (asIso eT.hom.hom₃).symm
   let e : ((t.truncGELE 0 0).obj X) ≅ Q := e₁ ≪≫ e₂
   refine ObjectProperty.isoMk _ ?_
-  simpa [originalHeartCoh, originalHeartCohFunctor] using
+  simpa [originalHeartCoh, originalHeartCohFunctor, TStructure.heartCohFunctor] using
     ((shiftFunctorZero C ℤ).app ((t.truncGELE 0 0).obj X) ≪≫ e)
 
 /-- The tautological shift sequence on degree-zero original-heart

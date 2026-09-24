@@ -46,6 +46,26 @@ variable {C : Type u} [Category.{v} C] [Preadditive C] [HasZeroObject C]
   [HasShift C ℤ] [∀ n : ℤ, (shiftFunctor C n).Additive]
   [Pretriangulated C] (t : TStructure C)
 
+/-- Degree-`n` cohomology in the heart of `t`, constructed from the pure
+truncation `τ^[n,n]` and the shift placing it in degree zero. -/
+noncomputable def heartCohFunctor [IsTriangulated C] (n : ℤ) :
+    C ⥤ t.heart.FullSubcategory :=
+  ObjectProperty.lift _ ((t.truncGELE n n) ⋙ shiftFunctor C n) (fun E ↦ by
+    rw [t.mem_heart_iff]
+    constructor
+    · simpa using t.isLE_shift ((t.truncGELE n n).obj E) n n 0 (by lia)
+    · simpa using t.isGE_shift ((t.truncGELE n n).obj E) n n 0 (by lia))
+
+instance heartCohFunctor_additive [IsTriangulated C] (n : ℤ) :
+    Functor.Additive (t.heartCohFunctor n) where
+  map_add := by
+    intro X Y f g
+    ext
+    change (shiftFunctor C n).map ((t.truncGE n).map ((t.truncLE n).map (f + g))) =
+      (shiftFunctor C n).map ((t.truncGE n).map ((t.truncLE n).map f)) +
+        (shiftFunctor C n).map ((t.truncGE n).map ((t.truncLE n).map g))
+    simp [Functor.map_add]
+
 /-- Degree-zero cohomology in the heart of `t`, given by the pure truncation
 `τ^[0,0]`. -/
 noncomputable def heartH0Functor [IsTriangulated C] :

@@ -92,8 +92,12 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Functor.isLeftTExact_rightAdjoint
 #print axioms CategoryTheory.Functor.isRightTExact_leftAdjoint
 #print axioms CategoryTheory.Functor.mapTriangleLEGEIso
+#print axioms CategoryTheory.Functor.mapTriangleLEGEIso_hom₂
 #print axioms CategoryTheory.Functor.mapTruncLEIso
+#print axioms CategoryTheory.Functor.mapTruncLEIso_hom_comp_ι
+#print axioms CategoryTheory.Functor.mapTruncLEIso_hom_naturality
 #print axioms CategoryTheory.Functor.mapTruncGEIso
+#print axioms CategoryTheory.Functor.mapTruncGEIso_π_comp_hom
 #print axioms CategoryTheory.Functor.isLE_iff_of_reflectsZeroObjects
 #print axioms CategoryTheory.Functor.isGE_iff_of_reflectsZeroObjects
 #print axioms CategoryTheory.Functor.isBounded_of_target
@@ -380,6 +384,8 @@ open CategoryTheory.Triangulated
 
 -- Repository-owned heart results used by weak-tilting cohomology.
 #print axioms CategoryTheory.ObjectProperty.FullSubcategory.isZero_of_obj_isZero
+#print axioms CategoryTheory.Triangulated.TStructure.heartCohFunctor
+#print axioms CategoryTheory.Triangulated.TStructure.heartCohFunctor_additive
 #print axioms CategoryTheory.Triangulated.TStructure.heartH0Functor
 #print axioms CategoryTheory.Triangulated.TStructure.heartH0OnHeartIso
 #print axioms CategoryTheory.Triangulated.TStructure.heart_hι
@@ -511,6 +517,7 @@ quasi-compact opens of a base is geometric and is not taken here.
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.tStructure_eq_of_le_eq
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.ext
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.heartFunctor
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction.heartH0Comparison
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.heartFunctor_obj
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.heartFunctor_map
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.heartFunctor_additive
