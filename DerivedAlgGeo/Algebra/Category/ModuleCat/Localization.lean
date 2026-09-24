@@ -8,7 +8,7 @@ import Mathlib.Algebra.Homology.Additive
 import Mathlib.RingTheory.Localization.BaseChange
 
 /-!
-# Tensor extension and canonical module localization
+# Tensor extension and canonical module localization in `ModuleCat`
 
 For the canonical ring `Localization S`, extension of scalars and Mathlib's
 `localizedModuleFunctor S` are naturally isomorphic. The latter uses a
