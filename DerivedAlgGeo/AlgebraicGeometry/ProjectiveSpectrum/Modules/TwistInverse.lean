@@ -35,6 +35,9 @@ keeps it an epimorphism (`epi_tensorHom_id_of_invertible`), the symmetry and `te
 carry the target to `F`, and `tensorLeftFreeIso` identifies the source with `∐ O(-N)`. That is
 Hartshorne II.5.17 in the form `#586` states: every coherent `F` on `Proj 𝒜` is a quotient of a
 finite direct sum of copies of one `O(-N)`.
+Its specialization to projective space and lift to a coherent short exact sequence is
+`exists_shortExact_coproduct_twist` in `Cohomology/Finiteness/Projective.lean`, completing the
+parent issue `#570`.
 
 ## What is not here
 
