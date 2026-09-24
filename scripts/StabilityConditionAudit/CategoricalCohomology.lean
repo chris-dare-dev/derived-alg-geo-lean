@@ -239,6 +239,7 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms CochainComplex.HomComplex.cochainLocalizedMap_delta
 #print axioms CochainComplex.HomComplex.cochainLocalizedMap_isLocalized
 #print axioms CochainComplex.HomComplex.cochainLocalizedMap_isLocalized_of_finite_projective
+#print axioms CochainComplex.HomComplex.cochainLocalizedMap_isLocalized_of_bounded_above_below
 
 /-! ## Subcomplexes from degreewise subobject data -/
 

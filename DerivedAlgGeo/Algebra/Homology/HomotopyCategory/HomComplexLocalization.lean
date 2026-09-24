@@ -10,12 +10,16 @@ import Mathlib.Algebra.Homology.Embedding.CochainComplex
 import Mathlib.Data.Int.Interval
 
 /-!
-# Localization of bounded-source Hom complexes
+# Localization of Hom-complex cochains under finite effective support
 
 When the source complex is supported in a finite interval and its terms are
 finitely presented, localization of modules commutes with each degree of its
 Hom complex. The comparison also commutes with the Hom-complex differential.
 Finite projective terms provide a useful specialization.
+
+In each fixed degree, a source bounded above and a target bounded below also
+have finite effective support. Finite presentation of the source terms on that
+degree-dependent interval gives the same localization comparison.
 
 This is a cochain-level statement. It does not yet identify cohomology of Hom
 complexes, derived-category Homs, or bounded-coherent geometric base change.
@@ -318,6 +322,112 @@ theorem cochainLocalizedMap_isLocalized_of_finite_projective (a b : ℤ)
       Module.FinitePresentation R (P.X i.1) :=
     Module.finitePresentation_of_projective R (P.X i.1)
   exact cochainLocalizedMap_isLocalized P Q n S a b
+
+end
+
+end CochainComplex.HomComplex
+
+namespace CochainComplex.HomComplex
+
+universe u v w
+
+noncomputable section
+
+section HalfBoundedCochains
+
+variable {R : Type u} [CommRing R]
+  {C : Type w} [Category.{v} C] [Preadditive C] [Linear R C]
+  (P Q : CochainComplex C ℤ) (c b n : ℤ)
+  [P.IsStrictlyLE b] [Q.IsStrictlyGE c]
+
+private lemma halfBounded_eq_zero_outside (γ : Cochain P Q n) (p : ℤ)
+    (hp : p ∉ Finset.Icc (c - n) b) : γ.v p (p + n) rfl = 0 := by
+  simp only [Finset.mem_Icc, not_and_or, not_le] at hp
+  rcases hp with h | h
+  · exact (Q.isZero_of_isStrictlyGE c (p + n) (by omega)).eq_zero_of_tgt _
+  · exact (P.isZero_of_isStrictlyLE b p h).eq_zero_of_src _
+
+private def halfBoundedFiniteEquiv :
+    Cochain P Q n ≃ₗ[R] finiteCochain P Q (c - n) b n where
+  toLinearMap := cochainRestrict (R := R) P Q (c - n) b n
+  invFun := cochainExtend (R := R) P Q (c - n) b n
+  left_inv γ := by
+    apply Cochain.ext
+    intro p q hpq
+    subst q
+    by_cases hp : p ∈ Finset.Icc (c - n) b
+    · change (if h : p ∈ Finset.Icc (c - n) b then
+          γ.v p (p + n) rfl else 0) = γ.v p (p + n) rfl
+      simp only [dif_pos hp]
+    · rw [halfBounded_eq_zero_outside P Q c b n γ p hp]
+      change (if h : p ∈ Finset.Icc (c - n) b then
+          γ.v p (p + n) rfl else 0) = 0
+      simp only [dif_neg hp]
+  right_inv v := by
+    funext i
+    change (if h : (i : ℤ) ∈ Finset.Icc (c - n) b then
+        v ⟨i.1, h⟩ else 0) = v i
+    simp only [dif_pos i.2]
+
+end HalfBoundedCochains
+
+variable {R : Type u} [CommRing R]
+  (P Q : CochainComplex (ModuleCat.{u} R) ℤ) (n : ℤ) (S : Submonoid R)
+
+private instance localizedQ_ge_half (c : ℤ) [Q.IsStrictlyGE c] :
+    CochainComplex.IsStrictlyGE (localizedQ Q S) c := by
+  rw [CochainComplex.isStrictlyGE_iff]
+  intro i hi
+  change IsZero ((ModuleCat.localizedModuleFunctor.{u} S).obj (Q.X i))
+  exact (ModuleCat.localizedModuleFunctor.{u} S).map_isZero
+    (Q.isZero_of_isStrictlyGE c i hi)
+
+/-- If the source is bounded above and the target bounded below, each fixed
+degree of their Hom complex commutes with localization, provided the finitely
+many source terms that contribute in that degree are finitely presented. The
+support interval depends on the degree; this is not yet derived-Hom base change. -/
+theorem cochainLocalizedMap_isLocalized_of_bounded_above_below (c b : ℤ)
+    [P.IsStrictlyLE b] [Q.IsStrictlyGE c]
+    [∀ i : {p : ℤ // p ∈ Finset.Icc (c - n) b},
+      Module.FinitePresentation R (P.X i.1)] :
+    IsLocalizedModule S (cochainLocalizedMap P Q n S) := by
+  letI : IsLocalizedModule S (finiteLocalizedMap P Q (c - n) b n S) :=
+    finiteLocalizedMap_isLocalized P Q (c - n) b n S
+  have h₁ : IsLocalizedModule S
+      ((finiteLocalizedMap P Q (c - n) b n S) ∘ₗ
+        (halfBoundedFiniteEquiv (R := R) P Q c b n).toLinearMap) :=
+    IsLocalizedModule.of_linearEquiv_right S
+      (finiteLocalizedMap P Q (c - n) b n S)
+      (halfBoundedFiniteEquiv (R := R) P Q c b n)
+  have h₂ : IsLocalizedModule S
+      ((halfBoundedFiniteEquiv (R := R) (localizedP P S) (localizedQ Q S)
+          c b n).symm.toLinearMap ∘ₗ
+        (finiteLocalizedMap P Q (c - n) b n S) ∘ₗ
+          (halfBoundedFiniteEquiv (R := R) P Q c b n).toLinearMap) :=
+    IsLocalizedModule.of_linearEquiv S _
+      (halfBoundedFiniteEquiv (R := R) (localizedP P S) (localizedQ Q S)
+        c b n).symm
+  convert h₂ using 1
+  apply LinearMap.ext
+  intro γ
+  apply (halfBoundedFiniteEquiv (R := R) (localizedP P S) (localizedQ Q S)
+    c b n).injective
+  have hcomm := LinearMap.congr_fun
+    (cochainFinite_localized_comm P Q (c - n) b n S) γ
+  change (halfBoundedFiniteEquiv (R := R) (localizedP P S) (localizedQ Q S)
+      c b n) (cochainLocalizedMap P Q n S γ) =
+    (halfBoundedFiniteEquiv (R := R) (localizedP P S) (localizedQ Q S)
+      c b n)
+      ((halfBoundedFiniteEquiv (R := R) (localizedP P S) (localizedQ Q S)
+        c b n).symm
+        ((finiteLocalizedMap P Q (c - n) b n S)
+          ((halfBoundedFiniteEquiv (R := R) P Q c b n) γ)))
+  rw [LinearEquiv.apply_symm_apply]
+  change (halfBoundedFiniteEquiv (R := R) (localizedP P S) (localizedQ Q S)
+      c b n) (cochainLocalizedMap P Q n S γ) =
+    (finiteLocalizedMap P Q (c - n) b n S)
+      ((halfBoundedFiniteEquiv (R := R) P Q c b n) γ) at hcomm
+  exact hcomm
 
 end
 
