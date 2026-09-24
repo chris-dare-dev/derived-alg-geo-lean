@@ -41,6 +41,12 @@ handoff between issues explicit before the loop is enabled.
   K-projective derived locus. This applies to arbitrary affine ring maps but
   does not construct a replacement on all scheme-module complexes or assert a
   general scheme-morphism theorem.
+- Add the flat-generator prerequisite for the all-complex construction as a
+  separate issue-sized slice: prove the canonical open free-Yoneda stalk
+  formula and stalkwise flatness, and add the natural element-indexed
+  epimorphism at the generic small-ringed-site owner. This does not claim
+  projectivity, a K-flat replacement, or arbitrary pullback acyclicity, and
+  does not close #554.
 - Execute each outstanding #554 progress chunk through its own one-issue
   independent manifest, with a distinct branch name and a bounded adversarial
   review cap. The merged witness/effect chunks are historical and must not be

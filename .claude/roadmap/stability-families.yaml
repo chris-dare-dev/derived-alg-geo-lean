@@ -521,6 +521,7 @@ items:
   - id: stability-families-e14-5
     gh_issue: 554
     gh_sub_issues: []
+    blocked_by: [1495]
     kind: deliverable
     parent: stability-families-e14
     title: "Arbitrary derived pullback on the universally-gluable relative-perfect locus"
@@ -529,6 +530,18 @@ items:
     priority: must
     size: XL
     tags: [derived-pullback, relative-perfect, k-flat, moduli]
+
+  - id: stability-families-e14-5-1
+    gh_issue: 1495
+    gh_sub_issues: []
+    kind: deliverable
+    parent: stability-families-e14-5
+    title: "Establish flat generators for scheme module sheaves"
+    status: in_progress
+    summary: "Prove the free-Yoneda stalk formula and stalkwise flatness for every scheme, with a natural element-indexed flat epimorphism at the generic small-ringed-site owner. This is a prerequisite only; it does not supply an unbounded K-flat resolution or arbitrary pullback acyclicity."
+    priority: must
+    size: M
+    tags: [derived-pullback, module-sheaves, flat-generators]
 
   - id: stability-families-m9
     gh_milestone: 30
