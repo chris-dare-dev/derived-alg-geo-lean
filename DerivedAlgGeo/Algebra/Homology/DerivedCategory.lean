@@ -23,9 +23,11 @@ import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KProjective
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomology
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyLinear
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyLocalization
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyLocalizationNaturality
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyFiniteResolutionLocalization
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyDegreeZeroLocalization
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyFiniteReplacementLocalization
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyBoundedComplexLocalization
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyIntLocalization
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KFlatResolution
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.BoundedAboveProjective
@@ -52,7 +54,8 @@ the derived-category Hom-set map from the module's degree-zero complex into
 a bounded-below complex.
 A bounded-above complex of finite modules also has a chosen finite-projective
 replacement whose derived-category Hom map into a bounded-below complex
-localizes; localization for Hom out of the original complex is not asserted.
+localizes. The quasi-isomorphism comparison now transports this localization
+to derived-category Hom-sets out of the original bounded-above complex.
 The codomains remain degreewise localizations of the displayed complexes.
 No internal derived-Hom or geometric base-change comparison is asserted.
 Algebraic geometry supplies abelian categories such as `Coh X` and consumes
