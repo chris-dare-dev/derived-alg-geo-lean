@@ -3713,6 +3713,53 @@ def add_common_spec_parser(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--repo-root", type=Path, default=Path.cwd(), help="repository root")
 
 
+def report_ci_evidence(
+    repository: str, pr_number: int, output: Path | None = None
+) -> int:
+    """Report one read-only collector verdict; queue admission remains separate."""
+    if __package__:
+        from . import ci_github_evidence
+    else:  # Standalone scripts/loop_engine.py invocation.
+        import ci_github_evidence
+
+    try:
+        result = ci_github_evidence.collect(
+            ci_github_evidence.GitHubClient(repository), pr_number
+        )
+        if output is not None:
+            ci_github_evidence.write_bundle(result, output)
+    except ci_github_evidence.EvidenceError as exc:
+        print(
+            json.dumps(
+                {
+                    "valid": False,
+                    "errors": [str(exc)],
+                    "claims": {"required_ci_verified": False},
+                },
+                indent=2,
+            )
+        )
+        return 1
+    evidence = result["evidence"]
+    verdict = result["validation"]
+    print(
+        json.dumps(
+            {
+                "repository": evidence["repository"],
+                "base": evidence["base_commit"],
+                "head": evidence["head_commit"],
+                "candidate": evidence["candidate_commit"],
+                "run_id": evidence["run_id"],
+                "run_attempt": evidence["run_attempt"],
+                "validation": verdict,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
+    return 0 if verdict["claims"]["required_ci_verified"] else 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -3722,6 +3769,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     preflight_parser = sub.add_parser("preflight", help="run read-only repository/provider preflight")
     add_common_spec_parser(preflight_parser)
+
+    evidence_parser = sub.add_parser("evidence", help="report read-only GitHub CI evidence for one PR")
+    evidence_parser.add_argument("--repo", required=True, help="GitHub owner/repository")
+    evidence_parser.add_argument("--pr", required=True, type=int, help="open pull request number")
+    evidence_parser.add_argument("--output", type=Path, help="optional local evidence bundle directory")
 
     ledger_parser = sub.add_parser("ledger", help="create and update the bounded review ledger")
     ledger_sub = ledger_parser.add_subparsers(dest="ledger_command", required=True)
@@ -3846,6 +3898,8 @@ def dispatch(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
         if args.command == "preflight":
             root = args.repo_root.resolve()
             return preflight(root, repo_path(root, args.spec))
+        if args.command == "evidence":
+            return report_ci_evidence(args.repo, args.pr, args.output)
         if args.command == "ledger":
             if args.ledger_command == "init":
                 root = args.repo_root.resolve()
@@ -3932,6 +3986,10 @@ def main(argv: list[str] | None = None) -> int:
     force_utf8_output()
     parser = build_parser()
     args = parser.parse_args(argv)
+    if args.command == "evidence":
+        # The evidence command makes provider GETs and optional local output
+        # only; it neither needs nor writes the mutation controller lock.
+        return dispatch(args, parser)
     root = getattr(args, "repo_root", None)
     if root is None:
         ledger = getattr(args, "state", None) or getattr(args, "ledger", None)
