@@ -24,6 +24,8 @@ restriction to the members `Uᵢ` of an open cover lands in the different catego
 
 * `isNoetherianObject_of_finite_jointlyReflectsIsomorphisms` — finite-family detection.
 * `isNoetherianObject_of_liftedSubobjectChains` — transfer from anchored chain lifts.
+* `anchored_chain_of_pointwise_lifts_iso` — build an anchored chain from pointwise lifts
+  when the functor preserves binary joins of subobjects.
 * `isNoetherianObject_of_reflectsIsomorphisms` — the one-functor specialization.
 -/
 
@@ -115,6 +117,72 @@ theorem isNoetherianObject_of_liftedSubobjectChains
     c n = (Subobject.map e.hom).obj (Subobject.mapFunctor G (d n)) := (hd n).symm
     _ = (Subobject.map e.hom).obj (Subobject.mapFunctor G (d m)) := by rw [hn m hm]
     _ = c m := hd m
+
+/-- Pointwise lifts of an increasing target-subobject chain can be made increasing
+in one source ambient object by taking successive binary joins. Preservation of
+these joins is an explicit hypothesis; preservation of monomorphisms alone does
+not supply it. -/
+theorem anchored_chain_of_pointwise_lifts
+    {D : Type u₂} [Category.{v₂} D]
+    [HasImages A] [HasBinaryCoproducts A]
+    [HasImages D] [HasBinaryCoproducts D]
+    (G : A ⥤ D) [G.PreservesMonomorphisms] (X : A)
+    (hjoin : ∀ p q : Subobject X,
+      Subobject.mapFunctor G (p ⊔ q) =
+        Subobject.mapFunctor G p ⊔ Subobject.mapFunctor G q)
+    (c : ℕ →o Subobject (G.obj X))
+    (hpt : ∀ n : ℕ, ∃ p : Subobject X, Subobject.mapFunctor G p = c n) :
+    ∃ d : ℕ →o Subobject X, ∀ n, Subobject.mapFunctor G (d n) = c n := by
+  classical
+  choose p hp using hpt
+  let d : ℕ → Subobject X := fun n => Nat.rec (p 0) (fun k acc => acc ⊔ p (k + 1)) n
+  have hstep (n : ℕ) : d n ≤ d (n + 1) := by
+    change d n ≤ d n ⊔ p (n + 1)
+    exact le_sup_left
+  have hm : Monotone d := monotone_nat_of_le_succ hstep
+  refine ⟨⟨d, hm⟩, ?_⟩
+  intro n
+  induction n with
+  | zero => exact hp 0
+  | succ n ih =>
+      change Subobject.mapFunctor G (d n) = c n at ih
+      change Subobject.mapFunctor G (d n ⊔ p (n + 1)) = c (n + 1)
+      rw [hjoin, ih, hp]
+      exact sup_eq_right.mpr (c.monotone (Nat.le_succ n))
+
+/-- The pointwise-to-anchored construction when the target ambient object is
+identified with the functor image by an isomorphism. -/
+theorem anchored_chain_of_pointwise_lifts_iso
+    {D : Type u₂} [Category.{v₂} D]
+    [HasImages A] [HasBinaryCoproducts A]
+    [HasImages D] [HasBinaryCoproducts D]
+    (G : A ⥤ D) [G.PreservesMonomorphisms]
+    (X : A) {Y : D} (e : G.obj X ≅ Y)
+    (hjoin : ∀ p q : Subobject X,
+      Subobject.mapFunctor G (p ⊔ q) =
+        Subobject.mapFunctor G p ⊔ Subobject.mapFunctor G q)
+    (c : ℕ →o Subobject Y)
+    (hpt : ∀ n : ℕ, ∃ p : Subobject X,
+      (Subobject.map e.hom).obj (Subobject.mapFunctor G p) = c n) :
+    ∃ d : ℕ →o Subobject X, ∀ n,
+      (Subobject.map e.hom).obj (Subobject.mapFunctor G (d n)) = c n := by
+  let E := Subobject.mapIsoToOrderIso e
+  let c' : ℕ →o Subobject (G.obj X) :=
+    ⟨fun n => E.symm (c n), fun a b h => E.symm.monotone (c.monotone h)⟩
+  have hp : ∀ n : ℕ, ∃ p : Subobject X, Subobject.mapFunctor G p = c' n := by
+    intro n
+    obtain ⟨p, hp⟩ := hpt n
+    refine ⟨p, ?_⟩
+    apply E.injective
+    change E (Subobject.mapFunctor G p) = E (E.symm (c n))
+    change E (Subobject.mapFunctor G p) = c n at hp
+    simpa only [E.apply_symm_apply] using hp
+  obtain ⟨d, hd⟩ := anchored_chain_of_pointwise_lifts G X hjoin c' hp
+  refine ⟨d, ?_⟩
+  intro n
+  change E (Subobject.mapFunctor G (d n)) = c n
+  rw [hd]
+  exact E.apply_symm_apply (c n)
 
 /-- A mono-preserving, isomorphism-reflecting functor detects Noetherian objects. -/
 theorem isNoetherianObject_of_reflectsIsomorphisms
