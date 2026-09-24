@@ -39,6 +39,8 @@ def evidence(*, event: str = "pull_request", workflow: str | None = None) -> dic
         status = "passed" if applicable else "skipped"
         conclusion = "success" if applicable else "skipped"
         artifact_id = f"artifact-{index}"
+        runless = definition["run_binding"] in {"status", "check"}
+        subject_commit = SHA_B if definition["run_binding"] == "check" else candidate_commit
         if applicable:
             artifacts.append(
                 {
@@ -50,9 +52,8 @@ def evidence(*, event: str = "pull_request", workflow: str | None = None) -> dic
                     "producer": definition["producer"],
                     "kind": definition["artifact"],
                     "subject": definition["id"],
-                    "commit": candidate_commit,
-                    "run_id": 35532316123,
-                    "run_attempt": 1,
+                    "commit": subject_commit,
+                    **({} if runless else {"run_id": 35532316123, "run_attempt": 1}),
                 }
             )
         gates.append(
@@ -62,9 +63,8 @@ def evidence(*, event: str = "pull_request", workflow: str | None = None) -> dic
                 "producer": definition["producer"],
                 "platform": definition["platforms"][0],
                 "provider_id": f"run-3553-job-{index}",
-                "commit": candidate_commit,
-                "run_id": 35532316123,
-                "run_attempt": 1,
+                "commit": subject_commit,
+                **({} if runless else {"run_id": 35532316123, "run_attempt": 1}),
                 "status": status,
                 "conclusion": conclusion,
                 "applicable": applicable,
@@ -74,7 +74,7 @@ def evidence(*, event: str = "pull_request", workflow: str | None = None) -> dic
             }
         )
     return {
-        "schema_version": 4,
+        "schema_version": INVENTORY["schema_version"],
         "repository": INVENTORY["repository"],
         "base_commit": base_commit,
         "head_commit": SHA_B,
@@ -150,6 +150,66 @@ class ContractTests(unittest.TestCase):
 
     def test_inventory_is_complete_and_well_formed(self) -> None:
         self.assertEqual(ci_contract.validate_inventory(INVENTORY), [])
+
+    def test_v4_policy_remains_readable_without_accepting_v5_check_binding(self) -> None:
+        legacy = copy.deepcopy(INVENTORY)
+        legacy["schema_version"] = 4
+        security_definition = next(
+            gate for gate in legacy["gates"] if gate["id"] == "github-advanced-security"
+        )
+        security_definition["run_binding"] = "independent"
+        security_definition["platforms"] = ["github-actions"]
+        self.assertEqual(ci_contract.validate_inventory(legacy), [])
+
+        candidate = evidence()
+        candidate["schema_version"] = 4
+        candidate["gates"] = [
+            gate for gate in candidate["gates"] if gate["id"] != "github-advanced-security"
+        ]
+        candidate["artifacts"] = [
+            artifact
+            for artifact in candidate["artifacts"]
+            if artifact["subject"] != "github-advanced-security"
+        ]
+        candidate["policy_binding"]["inventory_sha256"] = ci_contract._canonical_sha256(legacy)
+        bind_provider_proof(candidate)
+        result = ci_contract.validate_evidence(
+            legacy,
+            candidate,
+            trusted_base_commit=SHA_A,
+            trusted_head_commit=SHA_B,
+            trusted_inventory_sha256=ci_contract._canonical_sha256(legacy),
+        )
+        self.assertTrue(result["claims"]["required_ci_verified"], result)
+        self.assertFalse(result["claims"]["auxiliary_checks_healthy"])
+
+        candidate["artifacts"][0]["commit"] = SHA_B
+        result = ci_contract.validate_evidence(
+            legacy,
+            candidate,
+            trusted_base_commit=SHA_A,
+            trusted_head_commit=SHA_B,
+            trusted_inventory_sha256=ci_contract._canonical_sha256(legacy),
+        )
+        self.assertTrue(any("allowed head" in error for error in result["errors"]))
+        candidate["artifacts"][0]["commit"] = SHA_C
+
+        candidate["schema_version"] = 5
+        result = ci_contract.validate_evidence(
+            legacy,
+            candidate,
+            trusted_base_commit=SHA_A,
+            trusted_head_commit=SHA_B,
+            trusted_inventory_sha256=ci_contract._canonical_sha256(legacy),
+        )
+        self.assertIn(
+            "evidence.schema_version does not match inventory.schema_version",
+            result["errors"],
+        )
+        security_definition["run_binding"] = "check"
+        self.assertTrue(
+            any("run_binding" in error for error in ci_contract.validate_inventory(legacy))
+        )
 
     def test_inventory_rejects_unknown_scope_and_platform(self) -> None:
         inventory = copy.deepcopy(INVENTORY)
@@ -398,6 +458,21 @@ class ContractTests(unittest.TestCase):
         self.assertFalse(result["claims"]["all_pipelines_green"])
         self.assertTrue(any("github-advanced-security is missing" in w for w in result["warnings"]))
 
+    def test_runless_security_check_uses_head_without_invented_run(self) -> None:
+        candidate = evidence()
+        bind_provider_proof(candidate)
+        security = next(gate for gate in candidate["gates"] if gate["id"] == "github-advanced-security")
+        artifact = next(item for item in candidate["artifacts"] if item["subject"] == "github-advanced-security")
+        self.assertEqual(security["commit"], candidate["head_commit"])
+        self.assertNotIn("run_id", security)
+        self.assertNotIn("run_attempt", artifact)
+        self.assertTrue(self.evaluate(candidate)["claims"]["auxiliary_checks_healthy"])
+        security["run_id"] = 123
+        self.assert_invalid(candidate, "runless observation must not claim a workflow run")
+        del security["run_id"]
+        artifact["commit"] = candidate["candidate_commit"]
+        self.assert_invalid(candidate, "artifact commit does not match gate revision")
+
     def test_missing_required_gate_still_denies_ci_claim(self) -> None:
         candidate = evidence()
         bind_provider_proof(candidate)
@@ -525,7 +600,7 @@ class ContractTests(unittest.TestCase):
         candidate = evidence()
         bind_provider_proof(candidate)
         candidate["schema_version"] = 99
-        self.assert_invalid(candidate, "evidence.schema_version must be 4")
+        self.assert_invalid(candidate, "evidence.schema_version must be one of")
 
     def test_passed_gate_requires_passed_prerequisites(self) -> None:
         candidate = evidence()
