@@ -1,6 +1,7 @@
 # Decision record: CI gate and evidence contract (CI1.01)
 
-Status: proposed for workflow and controller review. Schema version: 4.
+Status: proposed for workflow and controller review. Current schema version: 5;
+the validator also reads protected-base version 4 during migration.
 
 ## Decision
 
@@ -13,6 +14,16 @@ inventory directly from `<trusted-base-commit>:scripts/ci_gate_inventory.json`
 through Git. The trusted base SHA must itself come from the provider's current
 protected branch metadata; a SHA supplied by the PR is not a trust anchor.
 Missing or mismatched base, head or policy anchors deny admission.
+
+Evidence uses the exact schema version of the protected-base inventory. Version
+4 remains readable while the current protected base still contains version 4; its
+`github-advanced-security` entry retains the legacy independent-workflow
+binding and may be reported missing, so it cannot make auxiliary health true.
+Version 5 adds `run_binding=check` for a runless check-app observation on the
+PR head. A version 4 inventory cannot use that binding, and evidence whose
+version differs from its trusted inventory is rejected. Once version 5 is on
+the protected base, the collector can report the security check with its
+actual provider identity.
 
 The record binds repository, base, PR head, tested commit and tree, event/ref,
 run and attempt, producer, toolchain and the SHA-256 of `lean-toolchain`,
@@ -30,14 +41,16 @@ The gate's platform is separate from the primary CI record's platform.
 `run_binding=primary` ties a
 gate to the record's CI run; `independent` allows an auxiliary workflow to
 have its own run and attempt. `status` represents a commit status, which has
-a provider status ID but no workflow run. A check-run artifact must match its
-gate's run identity; a commit-status artifact must not invent one. The adapter
-must fetch every
-page of check runs and commit statuses for the exact candidate and preserve
-their provider identities. A name-only or latest-timestamp selection is not
-eligible evidence. A rerun supersedes an earlier attempt only when the adapter
-has verified the provider's run/attempt relationship and the selected attempt
-belongs to the exact candidate.
+a provider status ID but no workflow run. `check` represents a check-app run
+on the PR head with no Actions workflow run; it records the head SHA rather
+than claiming the merge tree was tested. Workflow check-run artifacts must
+match their gate's run identity; runless status/check artifacts must not invent
+one. The adapter fetches every page of check runs and commit statuses on the
+PR head and preserves their provider identities. The primary workflow's run
+artifact and Git parents separately prove the tested merge candidate. A
+name-only or latest-timestamp selection is not eligible evidence. A rerun
+supersedes an earlier attempt only when the adapter has verified the provider's
+run/attempt relationship and the selected attempt belongs to that candidate.
 
 Only an applicable gate with status `passed` and raw conclusion `success`
 satisfies required work. Missing, pending, failed, cancelled, timed-out and
@@ -103,3 +116,76 @@ Workflow and controller owners must independently review this contract at the
 final revision before adoption. Operational verification requires a provider
 adapter and a real PR/merge-group exercise; the local fixtures establish only
 validator behavior.
+
+## Read-only GitHub collector (CI1.01 progress)
+
+`python3 -m scripts.ci_github_evidence --repo
+chris-dare-dev/derived-alg-geo-lean --pr <number> --output <directory>` reads
+GitHub through GET requests and writes a local evidence bundle. It obtains the
+protected `main` SHA from the branch API, the PR base and head from the pull
+request API, and live strict required contexts and app IDs from branch
+protection. It reads the inventory from the protected-base Git object, not
+from the candidate checkout. Unknown protected contexts, a missing protected
+`ci` aggregate, a policy read failure, or a base/head movement deny a current
+claim. The same protected branch, PR and protection values are read again
+after observation collection.
+
+For a `pull_request` run, GitHub's Actions run and check suite identify the
+PR **head** SHA. This repository's protected `ci.yml` uploads a run-scoped
+`trust-artifacts-${{ github.sha }}` artifact after checkout. The collector
+requires the tested candidate's workflow bytes to equal the protected-base
+workflow, takes the merge SHA from exactly one current run artifact, and
+checks that Git commit's tree and ordered parents against the protected base
+and PR head, and matches the PR API's current `merge_commit_sha`. A missing,
+expired, ambiguous or stale-attempt artifact denies
+the claim. The artifact name is a run-to-merge-SHA binding under this
+workflow's rule; it is not a cryptographic attestation. The collector never
+replaces the merge candidate with the run API's head SHA.
+
+The collector traverses all pages of check suites on the head, all runs in
+each suite, all commit statuses, and jobs for each attempt of the selected
+workflow run. `check_run_url`, check ID, suite app ID, job run ID and attempt
+must agree for a primary gate. Earlier attempts and other producers remain
+in `source-observations.json`; they cannot authorize the current gate. A
+same-named commit status cannot replace a check run. Source observations with
+no proven gate mapping remain visible and prevent an all-pipelines-green
+claim. A missing or red required gate denies `required_ci_verified`; optional
+warnings remain separate.
+
+In version 5, the optional GitHub Advanced Security entry uses `run_binding=check` and
+`github-checks` platform. When the app reports a unique check run on the
+current PR head, the collector records its real app ID, provider ID, head
+subject and outcome without a workflow run. A green check can make auxiliary
+health true; a red check is a warning while required CI remains separately
+verified. If the app reports no check run, auxiliary health is false rather
+than assuming success. No independent Actions workflow in the current
+inventory applies to `pull_request`; Cache warm and Docs have separate event
+selectors and cannot borrow the primary run.
+
+Separate workflow runs on one head cannot silently supersede an older red
+required check: the collector denies a current claim if more than one CI run
+exists for that head. It also rechecks the run and attempt after collection.
+Failed-jobs-only reruns may reuse a successful job and candidate artifact from
+an earlier attempt; neither schema version can represent required gates spanning
+attempts, so this collector currently denies that case conservatively.
+
+The local bundle contains `evidence.json`, `validation.json`, canonical
+`results/check-run-<id>.json` payloads, `source-observations.json`,
+`protected-inventory.json`, `live-protection.json`, and
+`bundle-manifest.json`. The protection snapshot is the live required-check
+API response compared with the inventory, after an identical final reread.
+Each schema artifact records the SHA-256 and byte length of its actual
+payload. The manifest hashes the full retained observations, protected-base
+inventory and live protection snapshot; the inventory hash must also match
+`evidence.policy_binding.inventory_sha256`. A reviewer can inspect the
+retained required contexts and app IDs alongside the policy that authorized
+them. `lean-toolchain`, `lake-manifest.json`, and `pins.json`
+digests come from the candidate Git tree. These hashes detect a changed
+local bundle; they do not authenticate GitHub beyond the authenticated API
+response. `ci_contract.validate_evidence` remains the canonical consistency
+validator. `scripts/loop_engine.py evidence --repo <owner/name> --pr <number>`
+is a read-only controller command for inspecting one open PR; `--output`
+optionally writes the local bundle. Its exit code reports whether required
+CI was verified. It makes no review, queue-admission, merge, or post-merge
+health decision. The CI workflow and durable controller admission path do
+not call this collector yet; #1434 owns that adoption.
