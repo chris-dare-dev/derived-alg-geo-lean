@@ -101,6 +101,7 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Functor.mapTruncGEIso
 #print axioms CategoryTheory.Functor.mapTruncGEIso_π_comp_hom
 #print axioms CategoryTheory.Functor.mapTruncGEIso_π_comp_hom_assoc
+#print axioms CategoryTheory.Functor.mapTruncGEIso_hom_naturality
 #print axioms CategoryTheory.Functor.isLE_iff_of_reflectsZeroObjects
 #print axioms CategoryTheory.Functor.isGE_iff_of_reflectsZeroObjects
 #print axioms CategoryTheory.Functor.isBounded_of_target
@@ -522,6 +523,7 @@ quasi-compact opens of a base is geometric and is not taken here.
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.ext
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.heartFunctor
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.heartH0Comparison
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction.heartH0ComparisonNatIso
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.heartFunctor_obj
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.heartFunctor_map
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.heartFunctor_additive
