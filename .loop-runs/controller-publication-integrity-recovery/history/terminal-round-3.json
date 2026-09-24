@@ -1,0 +1,385 @@
+{
+  "base_commit_at_init": "e18e20f9c3768269eedb622da04b9ab9f26ce127",
+  "base_ref": "origin/main",
+  "bootstrap_identity": {
+    "chunk_id": "controller-publication-integrity-repair",
+    "manifest_id": "controller-publication-integrity-repair",
+    "predecessor_chunk_id": "controller-ledger-integrity-core",
+    "predecessor_issue": 1458,
+    "predecessor_manifest_id": "controller-ledger-integrity",
+    "predecessor_openspec_change": "controller-ledger-integrity",
+    "reviewed_base": "e18e20f9c3768269eedb622da04b9ab9f26ce127",
+    "tracking_issue": 1482
+  },
+  "bootstrap_initial_commit": "d993ec1381b27ee0fc545e0e7c983354a9f0bd30",
+  "chunk": {
+    "acceptance": [
+      "One common ledger validator reconstructs every authority-bearing field from the manifest and rejects inconsistent scope, digests, reviewer rosters, round sequences, evidence, commits, and terminal adjudications.",
+      "Each formal review has one full Reviewed commit marker immediately followed by its only terminal Close verdict and no trailing text.",
+      "Deferred findings have unique durable IDs and append-only lifecycle transitions bound to the reviewer, chunk, full commit, and canonical in-scope target.",
+      "Local and provider path snapshots validate all rename endpoints, every provider entry, and a matching changed-file count; only a visible Markdown Why heading satisfies the proposal check.",
+      "Every non-dry-run mutation rechecks live action grants, identity, repository and effective push destinations immediately before the provider command; pushes name one branch and disable tag following.",
+      "PR creation requires exact equality between the terminal reviewed SHA, local HEAD, and live issue branch, then verifies the created PR's head, base, body, and complete file scope.",
+      "Draft readiness requires green head-bound checks and matching initial, immediate pre-action, and post-action snapshots, and runs only the ready transition.",
+      "Focused tests, strict OpenSpec validation, manifest validation, permitted precheck, and seven independent exact-commit reviews pass within three rounds; hosted and self-hosted CI are separately verified before an owner-reviewed merge.",
+      "No Lean declaration, proof, import, or mathematical API changes; issues #1458 through #1462 and #1482 close only on confirmed merge."
+    ],
+    "closure": "complete",
+    "files": [
+      "AGENTS.md",
+      "CLAUDE.md",
+      ".claude/agents/abstraction-adversary.md",
+      ".claude/agents/altitude-scout.md",
+      ".claude/agents/bootstrap-security.md",
+      ".claude/agents/bootstrap-test-design.md",
+      ".claude/agents/bootstrap-workflow.md",
+      ".claude/agents/hypothesis-elimination-scout.md",
+      ".claude/agents/mathematics-adversary.md",
+      ".claude/agents/mathlib-reviewer.md",
+      ".claude/agents/repository-boundary-adversary.md",
+      ".claude/loop-specs/README.md",
+      ".claude/loop-specs/controller-publication-integrity-repair.yaml",
+      ".claude/skills/run-loop/SKILL.md",
+      "docs/architecture/generalization-backlog.md",
+      "docs/architecture/loop-recovery.md",
+      "scripts/loop_engine.py",
+      "scripts/tests/test_loop_engine.py",
+      "scripts/tests/test_loop_recovery.py",
+      "openspec/changes/controller-publication-integrity-repair"
+    ],
+    "id": "controller-publication-integrity-repair",
+    "lift_targets": [],
+    "requirements": [
+      "Ledger authority is reconstructed from the validated selection",
+      "Reviewer evidence has an exact terminal binding",
+      "Deferred findings are structured and review-bound",
+      "Frozen file scope is complete and path-safe",
+      "Mutation authority is revalidated at the action boundary",
+      "Pull-request creation uses the exact terminal reviewed head",
+      "Draft readiness is a checked, reviewed-head-bound transition",
+      "Bootstrap and repository guidance preserve the terminal boundary"
+    ],
+    "scope": "Repair the loop controller's ledger integrity, reviewer evidence, deferred-finding records, path validation, live mutation authority, exact-head PR creation, and reviewed draft-readiness behavior; align repository guidance and preserve all exhausted predecessor histories."
+  },
+  "created_at": "2026-09-23T04:18:04Z",
+  "issue": {
+    "number": 1482,
+    "slug": "controller-publication-integrity-repair"
+  },
+  "issue_body_digest": null,
+  "max_review_rounds": 3,
+  "no_rechunking": true,
+  "openspec_change": "controller-publication-integrity-repair",
+  "openspec_digest": "9c813e44a65286c703c6218c1e904e2c56b242f28b8a637ba0106e9cf992c51e",
+  "openspec_digest_version": 2,
+  "plan_paths": [
+    ".claude/loop-specs/controller-publication-integrity-repair.yaml",
+    "openspec/changes/controller-publication-integrity-repair"
+  ],
+  "predecessor_prs": [],
+  "repo_root": "/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean",
+  "reviewers": [
+    "mathematics-adversary",
+    "repository-boundary-adversary",
+    "abstraction-adversary",
+    "mathlib-reviewer",
+    "bootstrap-security",
+    "bootstrap-workflow",
+    "bootstrap-test-design"
+  ],
+  "rounds": [
+    {
+      "adjudication": {
+        "note": "Round 1 exact-commit panel identified actionable crash-recovery, scope/precheck, reviewer-guidance, publication-authority, provider-snapshot, and test-coverage findings. Preserve this scope; fix within the chunk and rerun the complete panel.",
+        "recorded_at": "2026-09-23T05:54:57Z",
+        "verdict": "needs_changes"
+      },
+      "base_commit": "4739a0f85ffe62fe014dc669d1a9ee359f7a86b2",
+      "commit": "8bc9ebfc137c783cbeab3abb2e6e6c214acbf23b",
+      "number": 1,
+      "reviews": [
+        {
+          "commit": "8bc9ebfc137c783cbeab3abb2e6e6c214acbf23b",
+          "finding": "",
+          "finding_digest": "896513120de00d16905c980ee254b019d3dee7b7e854707dd495106af6d4b338",
+          "finding_source": "/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean/.loop-runs/controller-publication-integrity-repair/review-round-1/mathematics-adversary.md",
+          "finding_text": "The OpenSpec scope and issue acceptance criteria require no Lean declarations, proofs, imports, or mathematical API changes. The frozen diff contains no Lean files, so it introduces no mathematical theorem or hidden mathematical hypothesis to assess. I found no mathematical truth or source-faithfulness defects.\n\nVerdict: PASS  \nFinding count: 0\n\nReviewed commit: 8bc9ebfc137c783cbeab3abb2e6e6c214acbf23b\nClose: PASS\n",
+          "lift_finding_id": "",
+          "lift_target": "",
+          "recorded_at": "2026-09-23T05:41:42Z",
+          "reviewer": "mathematics-adversary",
+          "verdict": "pass"
+        },
+        {
+          "commit": "8bc9ebfc137c783cbeab3abb2e6e6c214acbf23b",
+          "finding": "",
+          "finding_digest": "321d121997d00f25e0f53caad0584abd12706489b131de05e6affe73d4429fb6",
+          "finding_source": "/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean/.loop-runs/controller-publication-integrity-repair/review-round-1/abstraction-adversary.md",
+          "finding_text": "The proposed canonical owner is the loop controller in `scripts/loop_engine.py`. This chunk adds no Lean declarations, public mathematical API, carrier, instance, or comparison theorem. There are no central mathematical statements or hypothesis sets to assess; no Mathlib paths were searched because the change is controller infrastructure and makes no mathematical novelty claim. The structured backlog schema is owned by `docs/architecture/generalization-backlog.md` and parsed by the controller.\n\n`scripts/loop_engine.py:2452-2473` \u2014 **should-fix**  \nBootstrap state is persisted twice: the ignored ledger file holds the full state, while the shared Git-directory registry holds only its digest and status. `write_json` atomically replaces the ledger first, then updates the registry. If execution stops between those writes, `load_state` rejects the ledger because its digest no longer matches, and the controller has no supported recovery path for the existing ledger. The recovery registry already avoids this split by storing the full ledger as canonical state. Apply that pattern to bootstrap state: atomically update the shared registry with the full validated ledger, load from that record, and treat the ignored file as a recoverable view.\n\nVerdict: NEEDS_CHANGES; findings: 1; lifts: 0.\n\nReviewed commit: 8bc9ebfc137c783cbeab3abb2e6e6c214acbf23b\nClose: NEEDS_CHANGES\n",
+          "lift_finding_id": "",
+          "lift_target": "",
+          "recorded_at": "2026-09-23T05:44:05Z",
+          "reviewer": "abstraction-adversary",
+          "verdict": "needs_changes"
+        },
+        {
+          "commit": "8bc9ebfc137c783cbeab3abb2e6e6c214acbf23b",
+          "finding": "",
+          "finding_digest": "f4af0ed3abbf4ad58c6ea09784aa7059c0169fe5091b7e4a7b36bcf731ae37fd",
+          "finding_source": "/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean/.loop-runs/controller-publication-integrity-repair/review-round-1/repository-boundary-adversary.md",
+          "finding_text": "Repository-boundary review covered the exact frozen commit. All 26 changed paths are covered by the manifest\u2019s 20 scope entries, with the OpenSpec directory covering seven files; the worktree is clean. The new manifest validates, `git diff --check` passes, and there are no Lean source or generated-artifact changes.\n\nFinding count: 1.\n\n`.claude/loop-specs/issue-1394-audit-record-cleanup.yaml:7` \u2014 should-fix  \n  The required precheck remains red: `scripts/validate_loop_specs.sh` validates every manifest, and this unchanged manifest fails because `base_ref` is `agent/issue-1394-plan`. The OpenSpec acceptance requires the permitted precheck to pass. Add the merged issue\u2019s manifest to the declared scope, disable it, and rerun the precheck before claiming that acceptance.\n\nVerdict: NEEDS_CHANGES (1 finding).\n\nReviewed commit: 8bc9ebfc137c783cbeab3abb2e6e6c214acbf23b\nClose: NEEDS_CHANGES\n",
+          "lift_finding_id": "",
+          "lift_target": "",
+          "recorded_at": "2026-09-23T05:44:45Z",
+          "reviewer": "repository-boundary-adversary",
+          "verdict": "needs_changes"
+        },
+        {
+          "commit": "8bc9ebfc137c783cbeab3abb2e6e6c214acbf23b",
+          "finding": "",
+          "finding_digest": "8dcc2d57c66eb86539045fcf18d6039b030eb8203362c439b960c3c009dfe043",
+          "finding_source": "/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean/.loop-runs/controller-publication-integrity-repair/review-round-1/mathlib-reviewer.md",
+          "finding_text": "The candidate diff contains no `.lean` files, and the OpenSpec confirms that no Lean API or mathematical ownership decision changes. There are no Mathlib naming, statement-shape, documentation, or placement findings. The added tests cover the new controller evidence and publication boundaries; I did not execute them. Test files are outside this reviewer\u2019s Mathlib-style scope.\n\nFinding count: 0 blocker, 0 should-fix, 0 nit.  \nController verdict: PASS  \nReviewed commit: 8bc9ebfc137c783cbeab3abb2e6e6c214acbf23b\nClose: PASS\n",
+          "lift_finding_id": "",
+          "lift_target": "",
+          "recorded_at": "2026-09-23T05:45:46Z",
+          "reviewer": "mathlib-reviewer",
+          "verdict": "pass"
+        },
+        {
+          "commit": "8bc9ebfc137c783cbeab3abb2e6e6c214acbf23b",
+          "finding": "",
+          "finding_digest": "02d4b52aa34789669568e85c2fe1100d72d588da52bbbbab4e1f705efbacb515",
+          "finding_source": "/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean/.loop-runs/controller-publication-integrity-repair/review-round-1/bootstrap-workflow.md",
+          "finding_text": "Reviewed the bootstrap publication workflow against commit `8bc9ebfc137c783cbeab3abb2e6e6c214acbf23b`. The manifest selects one issue and chunk, uses a distinct tracking identity and exact base, stays disabled with zero provider grants, names seven reviewers, and caps the run at three rounds. The terminal-boundary guidance is consistent.\n\nFindings: 3 actionable contradictions.\n\n1. **Lift findings cannot be recorded under this manifest.** The abstraction reviewer says to use `PASS_WITH_LIFT` for a target outside the frozen chunk and record its structured finding in the backlog (`.claude/agents/abstraction-adversary.md`, \u201cLifts whose target is outside the frozen chunk\u201d). The run-loop skill likewise prescribes that route even when the target is outside all declared prefixes (`.claude/skills/run-loop/SKILL.md`, \u201cGeneralization findings\u201d). But this manifest declares no `lift_targets`, and `ledger_record_review` rejects every lift target outside that authority (`scripts/loop_engine.py:2985\u20132989`; ledger validation repeats the check at `1852\u20131859`). Define a recordable disposition for backlog-only lifts without widening file authority, or align the reviewer guidance with a route the controller accepts.\n\n2. **The manual bootstrap push conflicts with the run-loop skill.** The bootstrap instructions prescribe a direct `git push` (`.claude/loop-specs/README.md:259\u2013268`), while the run-loop skill says to use only controller actions and explicitly forbids direct `git push` (`.claude/skills/run-loop/SKILL.md:104\u2013107`). Since this manifest is disabled, its push action cannot serve as the documented alternative. Add an explicit, scoped bootstrap exception or make clear that this manual step is for an owner outside the run-loop skill.\n\n3. **The stated precheck requirement is unmet.** The manifest acceptance requires the \u201cpermitted precheck\u201d to pass (`.claude/loop-specs/controller-publication-integrity-repair.yaml:156\u2013159`), and the design makes passing precheck a condition of manual publication (`design.md:147\u2013150`). Yet observation OBS-008 records that precheck fails its `loop-spec` gate on the unchanged #1394 manifest, which is outside this chunk (`agent-observations.md:34\u201338`). Reconcile the acceptance/publication condition with this recorded failure or obtain an authorized resolution before treating publication as reachable.\n\nFinding count: 3. Verdict: NEEDS_CHANGES.\n\nReviewed commit: 8bc9ebfc137c783cbeab3abb2e6e6c214acbf23b\nClose: NEEDS_CHANGES\n",
+          "lift_finding_id": "",
+          "lift_target": "",
+          "recorded_at": "2026-09-23T05:51:40Z",
+          "reviewer": "bootstrap-workflow",
+          "verdict": "needs_changes"
+        },
+        {
+          "commit": "8bc9ebfc137c783cbeab3abb2e6e6c214acbf23b",
+          "finding": "",
+          "finding_digest": "24ead89fe71ae7c86aebb2530599a96b5d8d19300fca0b3f42eb42ba008dc754",
+          "finding_source": "/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean/.loop-runs/controller-publication-integrity-repair/review-round-1/bootstrap-test-design.md",
+          "finding_text": "**Verdict: NEEDS_CHANGES**\n\nThe changed tests cover exact review markers, several copied-ledger fields, structured lift parsing, rename scope, and basic create/ready flows. I found three test gaps against the stated acceptance criteria:\n\n1. **Tampered ledger history is not tested through a ledger-dependent action.** `test_load_state_reconstructs_and_rejects_mutated_selection_and_terminal_status` checks a few mutations, but not skipped or reordered rounds, mixed review SHAs, duplicate/missing reviewers in a serialized round, missing or digest-mismatched evidence, or a forged adjudication/status pair. The round-cap test exercises the normal API, not corrupted persisted history. Add adversarial ledger fixtures and assert that a dependent provider command is not invoked. These would catch regressions that let forged review history authorize publication.\n\n2. **The guarded push command is not asserted exactly.** `test_push_lands_only_on_the_authorized_repository` exercises dry-run remote validation and only checks that output starts with \u201cDRY-RUN git push\u201d. It would still pass if the command stopped specifying the selected branch or dropped `--no-follow-tags`. Assert the complete refspec and flag, and verify the command at the mutation boundary.\n\n3. **Malformed and post-create PR snapshots lack action-level no-write/postcondition tests.** The remote-file tests call `verify_remote_chunk_files` directly. Add `action_ready` cases for a missing/non-string file path and a mismatched `changedFiles` count, asserting `gh pr ready` is not invoked. Add `action_create_pr` post-create cases with wrong head, base, body, and file scope, asserting it reports the created-but-unverified PR and never reports success. These would catch regressions that bypass snapshot validation or trust an incorrectly bound created PR.\n\nReviewed commit: 8bc9ebfc137c783cbeab3abb2e6e6c214acbf23b\nClose: NEEDS_CHANGES\n",
+          "lift_finding_id": "",
+          "lift_target": "",
+          "recorded_at": "2026-09-23T05:54:05Z",
+          "reviewer": "bootstrap-test-design",
+          "verdict": "needs_changes"
+        },
+        {
+          "commit": "8bc9ebfc137c783cbeab3abb2e6e6c214acbf23b",
+          "finding": "",
+          "finding_digest": "6e2fb6edc94ca2cf691f35dd123bc511e17928aef14e7462b8549c3bfa438c70",
+          "finding_source": "/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean/.loop-runs/controller-publication-integrity-repair/review-round-1/bootstrap-security.md",
+          "finding_text": "Bootstrap-security review of `8bc9ebfc137c783cbeab3abb2e6e6c214acbf23b` found two actionable gaps:\n\n- `scripts/loop_engine.py:4122\u20134136`: The ready action rechecks authorization before fetching its final PR snapshot and required checks. If the owner revokes `ready_pr` during those calls, the controller still runs `gh pr ready`. Revalidate live authority at the final command boundary and cover revocation in a regression test.\n- `scripts/loop_engine.py:3737\u20133751`: The changed-file count check accepts duplicate `path` entries. A count-matching response can repeat an allowed path while omitting an out-of-scope file, causing the frozen-scope check to pass. Reject duplicate file entries and add a regression test.\n\nI reviewed the manifest, OpenSpec, controller, guidance, and available predecessor ledger histories. I made no changes and ran no tests or builds.\n\nReviewed commit: 8bc9ebfc137c783cbeab3abb2e6e6c214acbf23b\nClose: NEEDS_CHANGES\n",
+          "lift_finding_id": "",
+          "lift_target": "",
+          "recorded_at": "2026-09-23T05:54:51Z",
+          "reviewer": "bootstrap-security",
+          "verdict": "needs_changes"
+        }
+      ]
+    },
+    {
+      "adjudication": {
+        "note": "Round 2 exact-commit panel found test-design gaps, predecessor-alias identity weakness, recursive submodule push risk, reviewer prompt inconsistencies, and the inherited #1394 loop-spec precheck blocker; preserve the frozen scope and address within the three-round cap.",
+        "recorded_at": "2026-09-23T06:44:03Z",
+        "verdict": "needs_changes"
+      },
+      "base_commit": "4739a0f85ffe62fe014dc669d1a9ee359f7a86b2",
+      "commit": "2f8bf824e177ed9638b7e1a580a8dd59aed7f983",
+      "number": 2,
+      "reviews": [
+        {
+          "commit": "2f8bf824e177ed9638b7e1a580a8dd59aed7f983",
+          "finding": "",
+          "finding_digest": "307e1f018ca9e97703689913976edbb2c3666711576461e3be7b0ce3e556acd1",
+          "finding_source": "/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean/.loop-runs/controller-publication-integrity-repair/review-round-2/mathematics-adversary.md",
+          "finding_text": "The frozen diff contains no changed `.lean` files, imports, declarations, proofs, or mathematical APIs. Its lift-record changes authenticate reviewer evidence; they do not claim to prove a generalization. The OpenSpec\u2019s no-Lean-mathematics-change claim matches the diff. I found no mathematical trust-boundary issue.\n\nFindings: 0  \nVerdict: PASS\n\nReviewed commit: 2f8bf824e177ed9638b7e1a580a8dd59aed7f983\nClose: PASS\n",
+          "lift_finding_id": "",
+          "lift_target": "",
+          "recorded_at": "2026-09-23T06:44:01Z",
+          "reviewer": "mathematics-adversary",
+          "verdict": "pass"
+        },
+        {
+          "commit": "2f8bf824e177ed9638b7e1a580a8dd59aed7f983",
+          "finding": "",
+          "finding_digest": "869b9883b815e0f520badea8f078eab7fe9d089e78a1102c67cfb3458760e3f0",
+          "finding_source": "/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean/.loop-runs/controller-publication-integrity-repair/review-round-2/repository-boundary-adversary.md",
+          "finding_text": "Repository-boundary review: exact commit is integrated with current `origin/main`; all changed paths are within the frozen file list, and there are no Lean/API, generated-artifact, or unrelated issue-plan changes. Manifest validation and `git diff --check` pass.\n\nFinding count: 1 blocker, 0 should-fix, 0 nits.\n\n`.claude/loop-specs/controller-publication-integrity-repair.yaml:157`  blocker  \n  `scripts/precheck.sh --no-build` exits 1: the `loop-spec` gate rejects the unchanged #1394 manifest because it still names `agent/issue-1394-plan` instead of `origin/main`. This is material: issue #1482 acceptance requires the permitted precheck to pass, and the documented bootstrap publication path also requires precheck. Recording the failure in OBS-012 does not satisfy that acceptance. Resolve the inherited protected-manifest failure through an authorized path, or obtain approval to revise the acceptance and publication condition to document an exception; then rerun precheck and record its result. Keep the other manifest untouched absent that authorization.\n\nVerdict: NEEDS_CHANGES  \nFinding count: 1.\n\nReviewed commit: 2f8bf824e177ed9638b7e1a580a8dd59aed7f983\nClose: NEEDS_CHANGES\n",
+          "lift_finding_id": "",
+          "lift_target": "",
+          "recorded_at": "2026-09-23T06:44:02Z",
+          "reviewer": "repository-boundary-adversary",
+          "verdict": "needs_changes"
+        },
+        {
+          "commit": "2f8bf824e177ed9638b7e1a580a8dd59aed7f983",
+          "finding": "",
+          "finding_digest": "2dcbc303a866687e656eecf37fe7ad567c494218918db5b8507fd575d2290367",
+          "finding_source": "/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean/.loop-runs/controller-publication-integrity-repair/review-round-2/abstraction-adversary.md",
+          "finding_text": "Canonical owner: the loop controller in `scripts/loop_engine.py`. This change adds no Lean declarations, carriers, instances, or mathematical comparisons, so there is no new mathematical root or hypothesis generalization to assess.\n\nThe bootstrap registry under Git\u2019s common directory owns the full ledger. The per-worktree `.loop-runs` file is a recoverable view: loading validates the registry against the manifest-derived selection and repairs a missing or stale view; writing updates the registry before the view. The v1 migration accepts only a local snapshot matching its recorded digest. These checks make the duplicate representation a canonical record plus projection, not competing authorities.\n\nKeeping bootstrap and recovery registries separate is justified by their different lifecycle rules; a shared abstraction would add no mathematical content. The guidance also matches the controller boundary: the bootstrap remains disabled, and the documented owner-operated publication steps are outside the run-loop skill and grant the controller no provider authority.\n\nMathlib search: `lake-manifest.json` pins Mathlib at `520045ab14e26149ee970e2e617ca04b09bde5d6`; `.lake/packages/mathlib/Mathlib` is absent in this checkout. No claim of a new mathematical abstraction depends on that search.\n\nVerdict: PASS  \nFindings: 0; lift findings: 0\n\nReviewed commit: 2f8bf824e177ed9638b7e1a580a8dd59aed7f983\nClose: PASS\n",
+          "lift_finding_id": "",
+          "lift_target": "",
+          "recorded_at": "2026-09-23T06:44:02Z",
+          "reviewer": "abstraction-adversary",
+          "verdict": "pass"
+        },
+        {
+          "commit": "2f8bf824e177ed9638b7e1a580a8dd59aed7f983",
+          "finding": "",
+          "finding_digest": "a02e3d9ac59daa5ccf1e2b54bf21e06a5bfa5a7bc65c5000f03850cb4ce062a7",
+          "finding_source": "/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean/.loop-runs/controller-publication-integrity-repair/review-round-2/mathlib-reviewer.md",
+          "finding_text": "Finding count: 0 \u2014 blockers 0, should-fix 0, nits 0. No actionable findings.\n\nThe candidate commit changes only the OpenSpec observation log. The cumulative diff against `origin/main` contains no `DerivedAlgGeo/` files, so it introduces no Lean declarations or Mathlib API changes. The style checker passed on the candidate file and all 11 non-excluded changed files. The in-scope guidance consistently describes the three-round cap, exact review evidence, and disabled bootstrap; the observation log accurately records the remaining `loop-spec` precheck failure rather than claiming a fully passing precheck.\n\nReviewed commit: 2f8bf824e177ed9638b7e1a580a8dd59aed7f983\nClose: PASS\n",
+          "lift_finding_id": "",
+          "lift_target": "",
+          "recorded_at": "2026-09-23T06:44:02Z",
+          "reviewer": "mathlib-reviewer",
+          "verdict": "pass"
+        },
+        {
+          "commit": "2f8bf824e177ed9638b7e1a580a8dd59aed7f983",
+          "finding": "",
+          "finding_digest": "6fd9ca1b309d20479629964edda14fac15d61b6bde3976278ac3c120da8da158",
+          "finding_source": "/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean/.loop-runs/controller-publication-integrity-repair/review-round-2/bootstrap-security.md",
+          "finding_text": "Bootstrap-security review of `2f8bf824e177ed9638b7e1a580a8dd59aed7f983`. The terminal ledgers for #1458, #1459, and #1460 are preserved as blocked, with their respective final commits `dcdfadc3aa82872c3604c50dac4bc87efdd15c06`, `c0c1320d688d4eff4bf14b8a2704a583129cced3`, and `58d825a124a27d87efdb222d90797401f08346d9`.\n\nFindings:\n\n1. **A sibling bootstrap can restart the same predecessor objective.** [`scripts/loop_engine.py:1088`] keys the shared registry only by repository and predecessor issue. Validation checks that predecessor issue numbers are distinct and that the manifest/OpenSpec/chunk identifiers are well-formed, but does not bind those identifiers to the issue number ([`scripts/loop_engine.py:990`](/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean/scripts/loop_engine.py:990)). A sibling manifest can reuse the #1458 predecessor manifest/OpenSpec/chunk identity, substitute another terminal issue such as #1459, and receive a fresh registry key. `ledger_init` then sees no existing record and can start another capped attempt. Key and validate the registry against the complete canonical predecessor identity, and reject its reuse across issue aliases.\n\n2. **Push configuration can still publish submodule commits.** [`scripts/loop_engine.py:3642`] constructs the push with `--no-follow-tags` and an explicit branch refspec, but omits `--no-recurse-submodules`. With `push.recurseSubmodules=on-demand`, Git may push submodule commits as a side effect to another repository. This leaves the push broader than the authorized branch and misses the recursive-submodule safeguard recorded in the terminal #1462 acceptance. Disable submodule recursion explicitly and assert it in the exact-command test.\n\nThe bootstrap manifest is disabled, explicitly denies all mutations, and grants no merge overrides. Review and snapshot checks for evidence, PR creation/readback, and readiness did not reveal another concrete bypass in this pass.\n\nReviewed commit: 2f8bf824e177ed9638b7e1a580a8dd59aed7f983\nClose: NEEDS_CHANGES\n",
+          "lift_finding_id": "",
+          "lift_target": "",
+          "recorded_at": "2026-09-23T06:44:02Z",
+          "reviewer": "bootstrap-security",
+          "verdict": "needs_changes"
+        },
+        {
+          "commit": "2f8bf824e177ed9638b7e1a580a8dd59aed7f983",
+          "finding": "",
+          "finding_digest": "93823323bb8a8bc1b22bb757b5889cb473613832c4a9cd77171c90afdf6ec3de",
+          "finding_source": "/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean/.loop-runs/controller-publication-integrity-repair/review-round-2/bootstrap-workflow.md",
+          "finding_text": "Workflow review found 3 actionable issues.\n\n1. **Blocker \u2014 required precheck is failing.** The manifest acceptance requires the permitted precheck to pass (`.claude/loop-specs/controller-publication-integrity-repair.yaml:156\u2013159`), and the design makes precheck part of the bootstrap publication condition. OBS-012 records that `scripts/precheck.sh --no-build` still fails the `loop-spec` gate because of the unchanged #1394 manifest (`openspec/changes/controller-publication-integrity-repair/agent-observations.md:63\u201368`). Until the gate passes or the acceptance and publication condition explicitly resolve this inherited failure, the required condition is unmet.\n\n2. **Should-fix \u2014 verdict-token instructions conflict.** The mathematics, repository-boundary, and Mathlib reviewer prompts list `PASS`, `NEEDS_CHANGES`, and `BLOCKED` as the permitted trailer tokens, then separately allow `PASS_WITH_LIFT` under conditions (`.claude/agents/mathematics-adversary.md:74\u201386`, `.claude/agents/repository-boundary-adversary.md:75\u201386`, `.claude/agents/mathlib-reviewer.md:99\u2013108`). The run-loop skill also gives both lists (`.claude/skills/run-loop/SKILL.md:337\u2013343`). Reconcile the token lists and state the authorization condition clearly. This manifest has no `lift_targets`, so `PASS_WITH_LIFT` is unavailable for this run.\n\n3. **Should-fix \u2014 abstraction reviewer lacks an in-scope repair verdict.** Its output instructions say to use `PASS` when no actionable finding remains or `BLOCKED` for an out-of-authority scope decision, but give no verdict for an in-scope defect (`.claude/agents/abstraction-adversary.md:139\u2013143`). Add `NEEDS_CHANGES` for required in-scope repairs so the prompt matches the manifest\u2019s controller protocol.\n\nThe bootstrap otherwise has one selected issue and chunk, a distinct identity from the terminal predecessors, a full reviewed-base SHA, zero mutation grants, and a three-round cap. The owner-only publication handoff specifies the reviewed SHA, exact branch, draft PR, and read-back checks; local precheck and hosted and self-hosted CI are distinguished.\n\nReviewed commit: 2f8bf824e177ed9638b7e1a580a8dd59aed7f983\nClose: NEEDS_CHANGES\n",
+          "lift_finding_id": "",
+          "lift_target": "",
+          "recorded_at": "2026-09-23T06:44:03Z",
+          "reviewer": "bootstrap-workflow",
+          "verdict": "needs_changes"
+        },
+        {
+          "commit": "2f8bf824e177ed9638b7e1a580a8dd59aed7f983",
+          "finding": "",
+          "finding_digest": "f38df63d1cdc2cd6e343a0eccfa0c48bb9e1e02b0a0da7874f519c6b650ac035",
+          "finding_source": "/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean/.loop-runs/controller-publication-integrity-repair/review-round-2/bootstrap-test-design.md",
+          "finding_text": "The focused suite has useful end-to-end ledger-tampering and exact push-command checks, but several acceptance scenarios still lack regression tests:\n\n- **Ready snapshot drift:** `test_ready_transition_rechecks_green_head_and_post_action_snapshot` tests a post-action body change, but not drift between the initial and immediate pre-action snapshots. The malformed-snapshot test exercises only the initial response. A regression that skips the immediate comparison, or accepts a malformed post-action file/count snapshot, could pass. Add an immediate-snapshot drift case that asserts `gh pr ready` is not invoked, and a malformed post-action case that asserts no verified-success result.\n\n- **Ready must perform no other mutation:** The success test checks `command.call_args`, which inspects only the last command. An accidental approve, merge, or close command before `gh pr ready` would not fail that assertion. Assert the complete command list contains exactly one command: `gh pr ready`.\n\n- **PR creation\u2019s negative cases:** `test_create_pr_requires_the_exact_local_review_and_live_remote_sha` covers a remote branch moving between reads, but not an absent or malformed remote ref, wrong local branch, dirty worktree, or local HEAD differing from the reviewed SHA. The post-create tests also omit a malformed or truncated file snapshot at the action boundary. These are explicit acceptance cases; add action-level tests asserting PR creation is not invoked for pre-create failures and success is not reported for malformed post-create snapshots.\n\n- **Live authority drift at mutation time:** The boundary unit test checks that identity and remote validators are called, while the push URL test uses dry-run. The push test mocks the boundary itself. No mutation-action test changes the actor, repository, fetch URL, or push URL between early validation and the final boundary, then asserts the subprocess/provider mutation is not invoked. Such a test would catch stale or ineffective last-boundary validation.\n\n- **Copied ledger selection coverage:** `test_load_state_reconstructs_and_rejects_mutated_selection_and_terminal_status` mutates files, reviewers, OpenSpec digest, issue number, cap, and status, but not lift targets, acceptance, closure mode, or manifest digest. Omitting validation for one of those copied fields could therefore go undetected despite the requirement naming each.\n\nReviewed commit: 2f8bf824e177ed9638b7e1a580a8dd59aed7f983\nClose: NEEDS_CHANGES\n",
+          "lift_finding_id": "",
+          "lift_target": "",
+          "recorded_at": "2026-09-23T06:44:03Z",
+          "reviewer": "bootstrap-test-design",
+          "verdict": "needs_changes"
+        }
+      ]
+    },
+    {
+      "adjudication": {
+        "note": "Round 3 is terminal and did not pass: repository-boundary and workflow reviews block on the inherited out-of-scope #1394 precheck failure, while security and test-design reviews report actionable needs_changes findings. The disabled bootstrap has no provider grants; no publication or issue closure is authorized.",
+        "recorded_at": "2026-09-23T08:15:46Z",
+        "verdict": "blocked"
+      },
+      "base_commit": "51e667042d70359bbfe22b6be6da9dd31f89d44e",
+      "commit": "956d9cc4af4bcd04325d00b57211a73f18d197d2",
+      "number": 3,
+      "reviews": [
+        {
+          "commit": "956d9cc4af4bcd04325d00b57211a73f18d197d2",
+          "finding": "",
+          "finding_digest": "7a0780d62607cec718363a018c0903d631813861a436ede4a7ecc399a6726b28",
+          "finding_source": "/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean/.loop-runs/controller-publication-integrity-repair/review-round-3/abstraction-adversary.md",
+          "finding_text": "Canonical controller owner: `scripts/loop_engine.py`; the structured lift backlog is documented in `docs/architecture/generalization-backlog.md` and parsed by the controller. The shared Git-directory registry is the canonical bootstrap ledger, and the per-worktree ledger is its recoverable view.\n\nThis diff adds no Lean files, mathematical carriers, classes, instances, comparison theorems, or central mathematical statements. No mathematical hypotheses or new-owner claims need assessment. Mathlib search was not applicable: `lake-manifest.json` pins revision `520045ab14e26149ee970e2e617ca04b09bde5d6`, but `.lake/packages/mathlib/Mathlib` is absent.\n\nThe round-one registry finding is resolved: `load_bootstrap_registry_state` validates the shared ledger and repairs a missing or stale view; `write_json` updates the shared registry before the view. The prior round-two abstraction review also passed. The manifest authorizes no lift targets, and no lift finding remains.\n\nFindings: 0 blockers, 0 should-fix, 0 nits. Lift findings: 0. Verdict: PASS.\n\nReviewed commit: 956d9cc4af4bcd04325d00b57211a73f18d197d2\nClose: PASS\n",
+          "lift_finding_id": "",
+          "lift_target": "",
+          "recorded_at": "2026-09-23T07:57:09Z",
+          "reviewer": "abstraction-adversary",
+          "verdict": "pass"
+        },
+        {
+          "commit": "956d9cc4af4bcd04325d00b57211a73f18d197d2",
+          "finding": "",
+          "finding_digest": "465edb0e684b4a111286d71bee541b60a115bf6e11cf71a884a2759ba4b4f6cf",
+          "finding_source": "/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean/.loop-runs/controller-publication-integrity-repair/review-round-3/mathlib-reviewer.md",
+          "finding_text": "Reviewed the scoped diff against `origin/main...HEAD`. Following the reviewer instructions, I skipped `scripts/` and `.claude/`. No Lean files changed, so there are no new declarations, statements, module docstrings, or placements to assess; the Mathlib style checker has no changed Lean file to inspect.\n\nFindings: 0 blockers, 0 should-fix, 0 nits.\n\nController verdict: PASS\n\nReviewed commit: 956d9cc4af4bcd04325d00b57211a73f18d197d2\nClose: PASS\n",
+          "lift_finding_id": "",
+          "lift_target": "",
+          "recorded_at": "2026-09-23T07:57:27Z",
+          "reviewer": "mathlib-reviewer",
+          "verdict": "pass"
+        },
+        {
+          "commit": "956d9cc4af4bcd04325d00b57211a73f18d197d2",
+          "finding": "",
+          "finding_digest": "8ca538b3004f28999bb8b5c7b764945683f314f8b342f5313ac506012c2a38e6",
+          "finding_source": "/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean/.loop-runs/controller-publication-integrity-repair/review-round-3/repository-boundary-adversary.md",
+          "finding_text": "The changed paths are within the frozen scope: 26 changed files are covered by the 20 manifest entries, including the OpenSpec directory. I found no Lean source, generated-artifact, or untracked-file changes.\n\nRound-one and round-two repository-boundary findings are addressed: the bootstrap registry now owns the ledger and repairs its ignored view; pushes disable submodule recursion; and path validation checks provider entries, rename sources, and changed-file counts. I found no new in-scope boundary defect.\n\nFinding count: 1 blocker, 0 should-fix, 0 nits.\n\n`.claude/loop-specs/controller-publication-integrity-repair.yaml:156` \u2014 blocker  \nThe recorded precheck fails only `loop-spec`, because the unchanged #1394 manifest still names `agent/issue-1394-plan` as its base. That manifest is outside this frozen scope, so this is not an in-scope code defect and should not be fixed by editing #1394 here. However, the frozen acceptance requires the permitted precheck to pass, and no approved exception or scope decision is recorded. The acceptance therefore remains unmet.\n\nVerdict: BLOCKED.\n\nReviewed commit: 956d9cc4af4bcd04325d00b57211a73f18d197d2\nClose: BLOCKED\n",
+          "lift_finding_id": "",
+          "lift_target": "",
+          "recorded_at": "2026-09-23T07:58:12Z",
+          "reviewer": "repository-boundary-adversary",
+          "verdict": "blocked"
+        },
+        {
+          "commit": "956d9cc4af4bcd04325d00b57211a73f18d197d2",
+          "finding": "",
+          "finding_digest": "f3664c6a3329f239dc303c474c93608f36285c272dd6f6edc1e6afb1cba19c6b",
+          "finding_source": "/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean/.loop-runs/controller-publication-integrity-repair/review-round-3/mathematics-adversary.md",
+          "finding_text": "The frozen diff has no `.lean` files and changes no Lean declarations, proofs, imports, instances, or mathematical APIs. The proposal\u2019s claim that this adds no mathematical theorem or existence claim matches the diff. The backlog changes record provenance for deferred findings; they make no mathematical claim. The round 1 and round 2 mathematics reviews also found no issues.\n\nFinding count: 0\nVerdict: PASS\n\nReviewed commit: 956d9cc4af4bcd04325d00b57211a73f18d197d2\nClose: PASS\n",
+          "lift_finding_id": "",
+          "lift_target": "",
+          "recorded_at": "2026-09-23T07:58:58Z",
+          "reviewer": "mathematics-adversary",
+          "verdict": "pass"
+        },
+        {
+          "commit": "956d9cc4af4bcd04325d00b57211a73f18d197d2",
+          "finding": "",
+          "finding_digest": "b395276d8a9ec0b5459a0f5cfeda8f71c1e793c98411c5cd06041b113498db0c",
+          "finding_source": "/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean/.loop-runs/controller-publication-integrity-repair/review-round-3/bootstrap-test-design.md",
+          "finding_text": "Two in-scope test gaps remain:\n\n1. **Non-green checks are not covered.** OpenSpec task 3.3 calls for a non-green required-check scenario. The helper test covers a missing check and an all-green result ([test_loop_engine.py](/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean/scripts/tests/test_loop_engine.py:2759)); action-level ready tests mock checks as green or return a mismatched SHA. A regression that accepts a failing or pending required check would not be caught by an assertion that `gh pr ready` was not invoked.\n\n2. **PR creation lacks an action-level out-of-scope local-file case.** Its failure matrix covers missing or malformed remote refs, wrong branch, dirty worktree, and moved HEAD ([test_loop_engine.py](/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean/scripts/tests/test_loop_engine.py:1378)). Out-of-scope coverage is helper-level or checks the remote PR after creation. Add an action-level case with a committed out-of-scope local path and assert `gh pr create` is never called.\n\nNo tests were run during this review.\n\nReviewed commit: 956d9cc4af4bcd04325d00b57211a73f18d197d2\nClose: NEEDS_CHANGES\n",
+          "lift_finding_id": "",
+          "lift_target": "",
+          "recorded_at": "2026-09-23T08:12:28Z",
+          "reviewer": "bootstrap-test-design",
+          "verdict": "needs_changes"
+        },
+        {
+          "commit": "956d9cc4af4bcd04325d00b57211a73f18d197d2",
+          "finding": "",
+          "finding_digest": "db980f295c43eab729b6792ea6ae5fae2ac8ca0e2954720f7d3008716c4b62a7",
+          "finding_source": "/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean/.loop-runs/controller-publication-integrity-repair/review-round-3/bootstrap-workflow.md",
+          "finding_text": "Findings: 1 blocker.\n\n`.claude/loop-specs/controller-publication-integrity-repair.yaml:156` \u2014 blocker  \nThe frozen acceptance requires the permitted precheck to pass, and the design and owner handoff require it before publication. Running `scripts/precheck.sh --no-build` on this exact candidate exited 1: the sole failure is `loop-spec`, which rejects the unchanged #1394 manifest because its base is `agent/issue-1394-plan` instead of `origin/main`. That manifest is outside this frozen chunk. The observation log records the same failure; reporting it does not satisfy the acceptance. An authorized scope or acceptance decision is needed before this chunk can pass or proceed to publication.\n\nThe remaining workflow checks are consistent: one issue and chunk, distinct bootstrap identity, disabled manifest with zero grants, seven reviewers, three-round cap, exact review trailers, constrained lift handling, and an owner-operated draft-only publication handoff with separate hosted and self-hosted CI checks.\n\nVerdict: BLOCKED\n\nReviewed commit: 956d9cc4af4bcd04325d00b57211a73f18d197d2\nClose: BLOCKED\n",
+          "lift_finding_id": "",
+          "lift_target": "",
+          "recorded_at": "2026-09-23T08:14:18Z",
+          "reviewer": "bootstrap-workflow",
+          "verdict": "blocked"
+        },
+        {
+          "commit": "956d9cc4af4bcd04325d00b57211a73f18d197d2",
+          "finding": "",
+          "finding_digest": "fdcad8a970124669fd9db6971efe93f7a2e0fbc0d7992dca58608780a1bf7a14",
+          "finding_source": "/home/chris-dare/.codex/worktrees/issue-1458-1460-loop/derived-alg-geo-lean/.loop-runs/controller-publication-integrity-repair/review-round-3/bootstrap-security.md",
+          "finding_text": "Bootstrap-security review of the exact candidate found three actionable gaps. The bootstrap manifest remains disabled with no mutation grants, and the controller push includes both `--no-follow-tags` and `--no-recurse-submodules`.\n\nFindings:\n\n1. **The manual bootstrap push does not preserve the controller\u2019s push safeguards.** `.claude/loop-specs/README.md:269\u2013272` tells the owner to run `git push --no-follow-tags origin ...`, omitting `--no-recurse-submodules`. With `push.recurseSubmodules=on-demand`, Git may push submodule commits to another repository. The steps also do not require checking that `origin`\u2019s effective push URL resolves to the manifest repository. Add the recursion flag and require verification of the push destination before publishing.\n\n2. **The live-authority check is not the last check before several mutations.** In `scripts/loop_engine.py:4170\u20134181`, PR creation revalidates authority before reading the ledger, resolving the live branch SHA, and checking scope. Approval and merge similarly call `check_required_checks` after revalidation at lines 4591\u20134595 and 4713\u20134718. If the actor, grant, or remote changes during those provider reads, the controller can still invoke the mutation with stale authority. Revalidate after the final reads and immediately before each mutation; cover revocation during those reads.\n\n3. **Malformed issue responses can still pass eligibility checks.** `issue_state` accepts any JSON mapping without validating the returned issue number or required field shapes. `preflight` treats missing labels as empty, and `blocked_by_entries` treats missing or malformed `blockedBy` data as no blockers (`scripts/loop_engine.py:1529\u20131544, 2426\u20132455`). A malformed response can therefore make a labeled or blocked issue appear eligible. Validate the issue number, labels, and blocked-by response shape, and fail closed on missing or malformed values. This also leaves the corresponding concern from predecessor history #1462 unresolved.\n\nReviewed commit: 956d9cc4af4bcd04325d00b57211a73f18d197d2\nClose: NEEDS_CHANGES\n",
+          "lift_finding_id": "",
+          "lift_target": "",
+          "recorded_at": "2026-09-23T08:15:39Z",
+          "reviewer": "bootstrap-security",
+          "verdict": "needs_changes"
+        }
+      ]
+    }
+  ],
+  "schema": "derived-alg-geo-lean.loop-run/v1/ledger",
+  "spec_digest": "0876dfd19e07d47968f4f3b59d6f2b52a4b96d5ec63fb6f50f4b2c419df111ff",
+  "spec_id": "controller-publication-integrity-repair",
+  "spec_path": ".claude/loop-specs/controller-publication-integrity-repair.yaml",
+  "status": "blocked"
+}
