@@ -1,3 +1,4 @@
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Affine.BasicOpen
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Affine.Comparison
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Affine.Free
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Affine.Localization

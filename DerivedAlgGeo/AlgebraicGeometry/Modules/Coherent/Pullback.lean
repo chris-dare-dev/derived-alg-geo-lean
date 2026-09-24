@@ -20,6 +20,8 @@ module-sheaf pullback is, which flatness supplies.
   presentation of `f⁺ M` on `f⁻¹ U`.
 * `Coh.pullback`: the functor `f^* : Coh Y ⥤ Coh X`, with `Coh.pullbackCompι`, its comparison
   with module-sheaf pullback.
+* `Coh.pullbackComp`, `Coh.pullbackId`, and `Coh.pullbackEquivalence`: coherent pullback
+  respects composition and identities, and a scheme isomorphism induces an equivalence.
 
 ## Main results
 
@@ -136,6 +138,50 @@ coherence.  Definitional, since `ObjectProperty.liftCompιIso` is `Iso.refl`; re
 contract `HasCoherentPullback` asks for the comparison as data. -/
 noncomputable def pullbackCompι : pullback f ⋙ ι X ≅ ι Y ⋙ Scheme.Modules.pullback f :=
   (Scheme.coherent X).liftCompιIso _ _
+
+/-- Coherent pullback along a composite is the composite of coherent pullbacks.
+This is the module-sheaf comparison transported through the fully faithful inclusion. -/
+noncomputable def pullbackComp {Z : Scheme.{u}} (g : Y ⟶ Z) :
+    pullback g ⋙ pullback f ≅ pullback (f ≫ g) := by
+  refine Functor.fullyFaithfulCancelRight (ι X) ?_
+  calc
+    (pullback g ⋙ pullback f) ⋙ ι X ≅
+        pullback g ⋙ (pullback f ⋙ ι X) := Functor.associator _ _ _
+    _ ≅ pullback g ⋙ (ι Y ⋙ Scheme.Modules.pullback f) :=
+        Functor.isoWhiskerLeft _ (pullbackCompι f)
+    _ ≅ (pullback g ⋙ ι Y) ⋙ Scheme.Modules.pullback f :=
+        (Functor.associator _ _ _).symm
+    _ ≅ (ι Z ⋙ Scheme.Modules.pullback g) ⋙ Scheme.Modules.pullback f :=
+        Functor.isoWhiskerRight (pullbackCompι g) _
+    _ ≅ ι Z ⋙ (Scheme.Modules.pullback g ⋙ Scheme.Modules.pullback f) :=
+        Functor.associator _ _ _
+    _ ≅ ι Z ⋙ Scheme.Modules.pullback (f ≫ g) :=
+        Functor.isoWhiskerLeft _ (Scheme.Modules.pullbackComp f g)
+    _ ≅ pullback (f ≫ g) ⋙ ι X :=
+        (pullbackCompι (f ≫ g)).symm
+
+/-- Pullback along the identity morphism is naturally isomorphic to the identity on
+coherent sheaves. -/
+noncomputable def pullbackId (X : Scheme.{u}) : pullback (𝟙 X) ≅ 𝟭 (Coh X) := by
+  refine Functor.fullyFaithfulCancelRight (ι X) ?_
+  exact (pullbackCompι (𝟙 X)) ≪≫
+    Functor.isoWhiskerLeft (ι X) (Scheme.Modules.pullbackId X) ≪≫
+    Functor.rightUnitor (ι X) ≪≫
+    (Functor.leftUnitor (ι X)).symm
+
+/-- Pullback along a scheme isomorphism is an equivalence of coherent-sheaf categories.
+The inverse is ordinary coherent pullback along the inverse scheme morphism. -/
+noncomputable def pullbackEquivalence {Z : Scheme.{u}} (e : Y ≅ Z) :
+    Coh Z ≌ Coh Y := by
+  let η : pullback e.hom ⋙ pullback e.inv ≅ 𝟭 (Coh Z) := by
+    have h : pullback e.hom ⋙ pullback e.inv ≅ pullback (𝟙 Z) := by
+      simpa only [e.inv_hom_id] using (pullbackComp e.inv e.hom)
+    exact h ≪≫ pullbackId Z
+  let ε : pullback e.inv ⋙ pullback e.hom ≅ 𝟭 (Coh Y) := by
+    have h : pullback e.inv ⋙ pullback e.hom ≅ pullback (𝟙 Y) := by
+      simpa only [e.hom_inv_id] using (pullbackComp e.hom e.inv)
+    exact h ≪≫ pullbackId Y
+  exact CategoryTheory.Equivalence.mk (pullback e.hom) (pullback e.inv) η.symm ε
 
 /-- Coherent pullback preserves finite colimits, for every morphism: module-sheaf pullback is a
 left adjoint, `Coh.ι Y` is right exact on a locally Noetherian scheme, and the fully faithful
