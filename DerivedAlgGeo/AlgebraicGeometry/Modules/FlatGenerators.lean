@@ -8,6 +8,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Stalk
 import DerivedAlgGeo.CategoryTheory.Limits.Preserves.Reflective
 import Mathlib.Algebra.Category.ModuleCat.Products
 import Mathlib.Algebra.Homology.LeftResolution.Basic
+import Mathlib.Algebra.Homology.LeftResolution.Reduced
 import Mathlib.CategoryTheory.ObjectProperty.FullSubcategory
 
 /-!
@@ -654,6 +655,100 @@ noncomputable def freeYonedaSheafCoproductLeftResolution (X : Scheme.{u}) :
     (fun M => freeYonedaSheafCoproduct_isFlatOver_id X M)
   π := SheafOfModules.freeYonedaSheafCoproductToIdentity X.ringCatSheaf
   epi_π_app := fromFreeYonedaSheafCoproduct_epi X
+
+private theorem isFlatOverId_iff_stalkwiseFlat
+    (X : Scheme.{u}) (M : X.Modules) :
+    IsFlatOver (𝟙 X) M ↔
+      ∀ x : X, Module.Flat (X.presheaf.stalk x) ((moduleStalkFunctor X x).obj M) := by
+  constructor
+  · intro h x
+    have h := h x
+    dsimp [IsFlatOver] at h
+    rw [Scheme.Hom.stalkMap_id] at h
+    change Module.Flat (X.presheaf.stalk x)
+      ((ModuleCat.restrictScalars (RingHom.id (X.presheaf.stalk x))).obj
+        ((moduleStalkFunctor X x).obj M)) at h
+    letI : Module.Flat (X.presheaf.stalk x)
+        ((ModuleCat.restrictScalars (RingHom.id (X.presheaf.stalk x))).obj
+          ((moduleStalkFunctor X x).obj M)) := h
+    exact Module.Flat.of_linearEquiv
+      (ModuleCat.restrictScalarsId'App (RingHom.id _) rfl
+        ((moduleStalkFunctor X x).obj M)).toLinearEquiv.symm
+  · intro h x
+    have h := h x
+    dsimp [IsFlatOver]
+    rw [Scheme.Hom.stalkMap_id]
+    change Module.Flat (X.presheaf.stalk x)
+      ((ModuleCat.restrictScalars (RingHom.id (X.presheaf.stalk x))).obj
+        ((moduleStalkFunctor X x).obj M))
+    letI : Module.Flat (X.presheaf.stalk x) ((moduleStalkFunctor X x).obj M) := h
+    exact Module.Flat.of_linearEquiv
+      (ModuleCat.restrictScalarsId'App (RingHom.id _) rfl
+        ((moduleStalkFunctor X x).obj M)).toLinearEquiv
+
+private theorem isIdempotentComplete_stalkwiseFlatSubcategory (X : Scheme.{u}) :
+    IsIdempotentComplete
+      (ObjectProperty.FullSubcategory
+        (fun M : X.Modules => IsFlatOver (𝟙 X) M)) := by
+  refine ⟨?_⟩
+  intro M p hp
+  have hp' : p.hom ≫ p.hom = p.hom := by
+    simpa using congrArg (fun f => f.hom) hp
+  obtain ⟨Y, i, r, hir, hri⟩ :=
+    IsIdempotentComplete.idempotents_split M.obj p.hom hp'
+  have hYStalk : ∀ x : X,
+      Module.Flat (X.presheaf.stalk x) ((moduleStalkFunctor X x).obj Y) := by
+    intro x
+    let F := moduleStalkFunctor X x
+    have hcomp : (F.map r).hom.comp (F.map i).hom = LinearMap.id := by
+      simpa using congrArg (fun f => (F.map f).hom) hir
+    letI : Module.Flat (X.presheaf.stalk x) (F.obj M.obj) :=
+      (isFlatOverId_iff_stalkwiseFlat X M.obj).mp M.property x
+    exact Module.Flat.of_retract (R := X.presheaf.stalk x)
+      (M := F.obj M.obj) (N := F.obj Y) (F.map i).hom (F.map r).hom hcomp
+  have hY : IsFlatOver (𝟙 X) Y :=
+    (isFlatOverId_iff_stalkwiseFlat X Y).mpr hYStalk
+  let Y' : ObjectProperty.FullSubcategory
+      (fun M : X.Modules => IsFlatOver (𝟙 X) M) := ⟨Y, hY⟩
+  refine ⟨Y', ObjectProperty.homMk i, ObjectProperty.homMk r, ?_, ?_⟩
+  · apply ObjectProperty.hom_ext
+    change i ≫ r = 𝟙 Y
+    exact hir
+  · apply ObjectProperty.hom_ext
+    change r ≫ i = p.hom
+    exact hri
+
+/-- The free-Yoneda resolution refined by Mathlib's
+`CategoryTheory.Abelian.LeftResolution.reduced`; its reduced functor preserves zero morphisms.
+This still gives an objectwise resolution, not a K-flat replacement on unbounded complexes. -/
+noncomputable def freeYonedaSheafCoproductReducedLeftResolution (X : Scheme.{u}) :
+    CategoryTheory.Abelian.LeftResolution
+      (ObjectProperty.ι (fun M : X.Modules =>
+        AlgebraicGeometry.Scheme.Modules.IsFlatOver (𝟙 X) M)) := by
+  letI : IsIdempotentComplete
+      (ObjectProperty.FullSubcategory
+        (fun M : X.Modules => AlgebraicGeometry.Scheme.Modules.IsFlatOver (𝟙 X) M)) :=
+    isIdempotentComplete_stalkwiseFlatSubcategory X
+  exact (freeYonedaSheafCoproductLeftResolution X).reduced
+
+/-- The reduced free-Yoneda resolution functor preserves zero morphisms. -/
+instance freeYonedaSheafCoproductReducedLeftResolution_preservesZeroMorphisms
+    (X : Scheme.{u}) :
+    (freeYonedaSheafCoproductReducedLeftResolution X).F.PreservesZeroMorphisms := by
+  letI : IsIdempotentComplete
+      (ObjectProperty.FullSubcategory
+        (fun M : X.Modules => AlgebraicGeometry.Scheme.Modules.IsFlatOver (𝟙 X) M)) :=
+    isIdempotentComplete_stalkwiseFlatSubcategory X
+  change ((freeYonedaSheafCoproductLeftResolution X).reduced).F.PreservesZeroMorphisms
+  infer_instance
+
+/-- The chain-complex map induced by the reduced free-Yoneda resolution sends zero to zero. -/
+theorem freeYonedaSheafCoproductReducedLeftResolution_chainComplexMap_zero
+    (X : Scheme.{u}) {M N : X.Modules} :
+    (freeYonedaSheafCoproductReducedLeftResolution X).chainComplexMap
+      (0 : M ⟶ N) = 0 := by
+  exact CategoryTheory.Abelian.LeftResolution.chainComplexMap_zero
+    (Λ := freeYonedaSheafCoproductReducedLeftResolution X) M N
 
 /-- Naturality of the specialized coproduct map follows from the generic naturality theorem. -/
 lemma fromFreeYonedaSheafCoproduct_natural (X : Scheme.{u})
