@@ -10,10 +10,11 @@
 
 - [x] 2.1 Enumerate all check-suite pages, each suite's check-run pages and all commit-status pages for the exact candidate while preserving provider IDs and distinct producers; verify duplicate-name, mixed-status and incomplete-enumeration fixtures in `scripts/tests/test_ci_github_evidence.py`.
 - [x] 2.2 Associate GitHub Actions jobs with the verified workflow run and attempt, retaining earlier attempts as non-authorizing observations; verify successful rerun and ambiguous-attempt fixtures in `scripts/tests/test_ci_github_evidence.py`.
-- [x] 2.3 Read candidate pin blobs and emit canonical observation payloads plus schema v4 evidence with hashes of actual retained bytes; call `ci_contract.validate_evidence` with independently read anchors. Verify tampered payload, absent pin, optional-red and required-red fixtures using `python3 -m unittest discover -s scripts/tests -p 'test_ci_github_evidence.py'`.
+- [x] 2.3 Read candidate pin blobs and emit canonical observation payloads plus evidence in the trusted inventory's schema version with hashes of actual retained bytes; call `ci_contract.validate_evidence` with independently read anchors. Verify tampered payload, absent pin, optional-red and required-red fixtures using `python3 -m unittest discover -s scripts/tests -p 'test_ci_github_evidence.py'`.
 - [x] 2.4 Add a read-only `scripts/loop_engine.py evidence` command that consumes collector/validator output without changing queue admission; verify a passing fixture and a denied fixture through the controller command in `scripts/tests/test_loop_engine.py`.
-- [x] 2.5 In `scripts/ci_contract.py` and `scripts/ci_gate_inventory.json`, represent the optional runless GitHub Advanced Security check with its actual head subject and no invented workflow run; verify schema v4 focused fixtures reject a fabricated run and accept a genuine head-bound check.
+- [x] 2.5 In `scripts/ci_contract.py` and `scripts/ci_gate_inventory.json`, represent the optional runless GitHub Advanced Security check with its actual head subject and no invented workflow run; verify version 5 focused fixtures reject a fabricated run and accept a genuine head-bound check.
 - [x] 2.6 Normalize applicable auxiliary check-app observations in `scripts/ci_github_evidence.py` with provider ID, app producer, raw outcome and hashed payload; verify optional green can report auxiliary health and optional red remains visible without invalidating required CI.
+- [x] 2.7 Version the new check binding as schema 5 while reading the protected base's published schema 4 during migration; verify a version 4 base emits valid version 4 required-CI evidence, version 4 rejects the new binding, and mixed inventory/evidence versions fail.
 
 ## 3. Documentation and bounded verification
 

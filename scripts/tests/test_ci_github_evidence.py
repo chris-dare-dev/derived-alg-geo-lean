@@ -298,6 +298,21 @@ class ClientTests(unittest.TestCase):
 
 
 class CollectorTests(unittest.TestCase):
+    def test_current_v4_base_emits_v4_until_protected_policy_is_upgraded(self) -> None:
+        fixture = ProviderFixture()
+        fixture.inventory["schema_version"] = 4
+        security = next(
+            gate
+            for gate in fixture.inventory["gates"]
+            if gate["id"] == "github-advanced-security"
+        )
+        security["run_binding"] = "independent"
+        security["platforms"] = ["github-actions"]
+        result = collect(fixture.client(), 7)
+        self.assertEqual(result["evidence"]["schema_version"], 4)
+        self.assertTrue(result["validation"]["claims"]["required_ci_verified"])
+        self.assertFalse(result["validation"]["claims"]["auxiliary_checks_healthy"])
+
     def test_exact_merge_candidate_and_real_payload_hashes(self) -> None:
         fixture = ProviderFixture()
         result = collect(fixture.client(), 7)

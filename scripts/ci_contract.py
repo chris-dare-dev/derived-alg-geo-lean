@@ -20,7 +20,8 @@ from pathlib import Path
 from typing import Any
 
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
+SUPPORTED_SCHEMA_VERSIONS = {4, SCHEMA_VERSION}
 FULL_SHA = re.compile(r"^[0-9a-fA-F]{40}$")
 SHA256 = re.compile(r"^[0-9a-fA-F]{64}$")
 BRANCH_REF = re.compile(r"^refs/heads/[A-Za-z0-9._/-]+$")
@@ -217,8 +218,15 @@ def validate_inventory(inventory: Any) -> list[str]:
     errors: list[str] = []
     if not isinstance(inventory, dict):
         return ["inventory must be an object"]
-    if inventory.get("schema_version") != SCHEMA_VERSION:
-        errors.append(f"inventory.schema_version must be {SCHEMA_VERSION}")
+    version = inventory.get("schema_version")
+    if (
+        not isinstance(version, int)
+        or isinstance(version, bool)
+        or version not in SUPPORTED_SCHEMA_VERSIONS
+    ):
+        errors.append(
+            f"inventory.schema_version must be one of {sorted(SUPPORTED_SCHEMA_VERSIONS)}"
+        )
     if not _is_string(inventory.get("repository")):
         errors.append("inventory.repository is required")
     gates = inventory.get("gates")
@@ -260,10 +268,11 @@ def validate_inventory(inventory: Any) -> list[str]:
             errors.append(f"{prefix}.class is not a recognized gate class")
         if not isinstance(gate.get("required"), bool):
             errors.append(f"{prefix}.required must be boolean")
-        if not _is_string(gate.get("run_binding")) or gate.get("run_binding") not in {
-            "primary", "independent", "status", "check"
-        }:
-            errors.append(f"{prefix}.run_binding must be primary, independent, status or check")
+        bindings = {"primary", "independent", "status"}
+        if version == SCHEMA_VERSION:
+            bindings.add("check")
+        if not _is_string(gate.get("run_binding")) or gate.get("run_binding") not in bindings:
+            errors.append(f"{prefix}.run_binding must be one of {sorted(bindings)}")
         artifact_kind = gate.get("artifact")
         if gate.get("run_binding") == "status" and not (
             _is_string(artifact_kind) and artifact_kind.startswith("commit-status:")
@@ -352,8 +361,17 @@ def validate_evidence(
     for field in required_fields:
         if field not in evidence:
             errors.append(f"evidence.{field} is required")
-    if evidence.get("schema_version") != SCHEMA_VERSION:
-        errors.append(f"evidence.schema_version must be {SCHEMA_VERSION}")
+    version = evidence.get("schema_version")
+    if (
+        not isinstance(version, int)
+        or isinstance(version, bool)
+        or version not in SUPPORTED_SCHEMA_VERSIONS
+    ):
+        errors.append(
+            f"evidence.schema_version must be one of {sorted(SUPPORTED_SCHEMA_VERSIONS)}"
+        )
+    if isinstance(inventory, dict) and version != inventory.get("schema_version"):
+        errors.append("evidence.schema_version does not match inventory.schema_version")
     if not _is_string(evidence.get("repository")):
         errors.append("evidence.repository is required")
     if isinstance(inventory, dict) and evidence.get("repository") != inventory.get("repository"):
@@ -458,11 +476,14 @@ def validate_evidence(
             errors.append(f"{prefix}.sha256 must be a 64-character SHA-256")
         if artifact.get("commit") is not None and not _is_sha(artifact.get("commit")):
             errors.append(f"{prefix}.commit must be a full SHA")
-        elif _is_sha(artifact.get("commit")) and artifact.get("commit", "").lower() not in {
-            str(evidence.get("candidate_commit", "")).lower(),
-            str(evidence.get("head_commit", "")).lower(),
-        }:
-            errors.append(f"{prefix}.commit is not bound to evidence candidate or head")
+        else:
+            allowed_commits = {str(evidence.get("candidate_commit", "")).lower()}
+            if version == SCHEMA_VERSION:
+                allowed_commits.add(str(evidence.get("head_commit", "")).lower())
+            if _is_sha(artifact.get("commit")) and artifact["commit"].lower() not in allowed_commits:
+                errors.append(
+                    f"{prefix}.commit is not bound to evidence candidate or allowed head"
+                )
 
     definitions = {
         gate.get("id"): gate

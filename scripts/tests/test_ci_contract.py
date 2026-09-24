@@ -74,7 +74,7 @@ def evidence(*, event: str = "pull_request", workflow: str | None = None) -> dic
             }
         )
     return {
-        "schema_version": 4,
+        "schema_version": INVENTORY["schema_version"],
         "repository": INVENTORY["repository"],
         "base_commit": base_commit,
         "head_commit": SHA_B,
@@ -150,6 +150,66 @@ class ContractTests(unittest.TestCase):
 
     def test_inventory_is_complete_and_well_formed(self) -> None:
         self.assertEqual(ci_contract.validate_inventory(INVENTORY), [])
+
+    def test_v4_policy_remains_readable_without_accepting_v5_check_binding(self) -> None:
+        legacy = copy.deepcopy(INVENTORY)
+        legacy["schema_version"] = 4
+        security_definition = next(
+            gate for gate in legacy["gates"] if gate["id"] == "github-advanced-security"
+        )
+        security_definition["run_binding"] = "independent"
+        security_definition["platforms"] = ["github-actions"]
+        self.assertEqual(ci_contract.validate_inventory(legacy), [])
+
+        candidate = evidence()
+        candidate["schema_version"] = 4
+        candidate["gates"] = [
+            gate for gate in candidate["gates"] if gate["id"] != "github-advanced-security"
+        ]
+        candidate["artifacts"] = [
+            artifact
+            for artifact in candidate["artifacts"]
+            if artifact["subject"] != "github-advanced-security"
+        ]
+        candidate["policy_binding"]["inventory_sha256"] = ci_contract._canonical_sha256(legacy)
+        bind_provider_proof(candidate)
+        result = ci_contract.validate_evidence(
+            legacy,
+            candidate,
+            trusted_base_commit=SHA_A,
+            trusted_head_commit=SHA_B,
+            trusted_inventory_sha256=ci_contract._canonical_sha256(legacy),
+        )
+        self.assertTrue(result["claims"]["required_ci_verified"], result)
+        self.assertFalse(result["claims"]["auxiliary_checks_healthy"])
+
+        candidate["artifacts"][0]["commit"] = SHA_B
+        result = ci_contract.validate_evidence(
+            legacy,
+            candidate,
+            trusted_base_commit=SHA_A,
+            trusted_head_commit=SHA_B,
+            trusted_inventory_sha256=ci_contract._canonical_sha256(legacy),
+        )
+        self.assertTrue(any("allowed head" in error for error in result["errors"]))
+        candidate["artifacts"][0]["commit"] = SHA_C
+
+        candidate["schema_version"] = 5
+        result = ci_contract.validate_evidence(
+            legacy,
+            candidate,
+            trusted_base_commit=SHA_A,
+            trusted_head_commit=SHA_B,
+            trusted_inventory_sha256=ci_contract._canonical_sha256(legacy),
+        )
+        self.assertIn(
+            "evidence.schema_version does not match inventory.schema_version",
+            result["errors"],
+        )
+        security_definition["run_binding"] = "check"
+        self.assertTrue(
+            any("run_binding" in error for error in ci_contract.validate_inventory(legacy))
+        )
 
     def test_inventory_rejects_unknown_scope_and_platform(self) -> None:
         inventory = copy.deepcopy(INVENTORY)
@@ -540,7 +600,7 @@ class ContractTests(unittest.TestCase):
         candidate = evidence()
         bind_provider_proof(candidate)
         candidate["schema_version"] = 99
-        self.assert_invalid(candidate, "evidence.schema_version must be 4")
+        self.assert_invalid(candidate, "evidence.schema_version must be one of")
 
     def test_passed_gate_requires_passed_prerequisites(self) -> None:
         candidate = evidence()

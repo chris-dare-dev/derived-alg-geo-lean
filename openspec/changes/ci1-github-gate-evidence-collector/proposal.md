@@ -6,7 +6,7 @@ CI1.01 (#1430) has a schema v4 inventory and validator, but no code collects the
 
 ## What Changes
 
-- Add a read-only GitHub collector that obtains the current protected base, PR head, tested candidate, workflow run, check runs, and commit statuses from provider responses, then produces schema v4 evidence for the existing validator.
+- Add a read-only GitHub collector that obtains the current protected base, PR head, tested candidate, workflow run, check runs, and commit statuses from provider responses, then produces evidence in the trusted inventory's schema version for the existing validator.
 - Fetch complete paginated observations, preserve producer and run-attempt identities, and deny an admission claim when provider metadata is missing, ambiguous, stale, or truncated.
 - Add focused provider-response fixtures and a read-only current-PR exercise through a narrow `loop_engine.py` evidence command. Document the source of each trusted field and the limits of the evidence claim.
 

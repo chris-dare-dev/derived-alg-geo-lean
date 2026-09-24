@@ -1,6 +1,7 @@
 # Decision record: CI gate and evidence contract (CI1.01)
 
-Status: proposed for workflow and controller review. Schema version: 4.
+Status: proposed for workflow and controller review. Current schema version: 5;
+the validator also reads protected-base version 4 during migration.
 
 ## Decision
 
@@ -13,6 +14,16 @@ inventory directly from `<trusted-base-commit>:scripts/ci_gate_inventory.json`
 through Git. The trusted base SHA must itself come from the provider's current
 protected branch metadata; a SHA supplied by the PR is not a trust anchor.
 Missing or mismatched base, head or policy anchors deny admission.
+
+Evidence uses the exact schema version of the protected-base inventory. Version
+4 remains readable for PRs opened before version 5 reaches `main`; its
+`github-advanced-security` entry retains the legacy independent-workflow
+binding and may be reported missing, so it cannot make auxiliary health true.
+Version 5 adds `run_binding=check` for a runless check-app observation on the
+PR head. A version 4 inventory cannot use that binding, and evidence whose
+version differs from its trusted inventory is rejected. Once version 5 is on
+the protected base, the collector can report the security check with its
+actual provider identity.
 
 The record binds repository, base, PR head, tested commit and tree, event/ref,
 run and attempt, producer, toolchain and the SHA-256 of `lean-toolchain`,
@@ -141,7 +152,7 @@ no proven gate mapping remain visible and prevent an all-pipelines-green
 claim. A missing or red required gate denies `required_ci_verified`; optional
 warnings remain separate.
 
-The optional GitHub Advanced Security entry uses `run_binding=check` and
+In version 5, the optional GitHub Advanced Security entry uses `run_binding=check` and
 `github-checks` platform. When the app reports a unique check run on the
 current PR head, the collector records its real app ID, provider ID, head
 subject and outcome without a workflow run. A green check can make auxiliary
@@ -155,7 +166,7 @@ Separate workflow runs on one head cannot silently supersede an older red
 required check: the collector denies a current claim if more than one CI run
 exists for that head. It also rechecks the run and attempt after collection.
 Failed-jobs-only reruns may reuse a successful job and candidate artifact from
-an earlier attempt; schema v4 cannot represent required gates spanning
+an earlier attempt; neither schema version can represent required gates spanning
 attempts, so this collector currently denies that case conservatively.
 
 The local bundle contains `evidence.json`, `validation.json`, canonical

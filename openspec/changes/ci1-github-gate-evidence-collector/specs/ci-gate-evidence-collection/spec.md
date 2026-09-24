@@ -11,7 +11,7 @@ The collector SHALL derive the protected base, PR head, tested candidate commit 
 
 #### Scenario: Current pull request candidate
 - **WHEN** the provider reports a current PR base and head, a completed CI run on a candidate, and Git objects that establish the candidate's required parent relationship
-- **THEN** the collected record binds those exact revisions, tree, event, ref, run and attempt for schema v4 validation
+- **THEN** the collected record binds those exact revisions, tree, event, ref, run and attempt for validation under the trusted inventory's schema version
 
 #### Scenario: Head or base moves during collection
 - **WHEN** the PR head or protected base differs on the final provider read
@@ -38,21 +38,29 @@ The collector SHALL enumerate every page of candidate check suites, check runs a
 
 #### Scenario: Failed-jobs-only rerun reuses an earlier artifact
 - **WHEN** the latest run attempt reuses a successful job and candidate artifact from an earlier attempt, so required gates would span two attempts
-- **THEN** the collector denies a schema v4 required-CI claim until a same-attempt proof or later contract can represent that composition
+- **THEN** the collector denies a required-CI claim until a same-attempt proof or later contract can represent that composition
 
 ### Requirement: Protected policy and gate coverage
 The collector SHALL read the inventory from the current protected base revision and compare its required contexts with live branch protection. A PR-authored inventory change MUST NOT remove a required gate from the collected policy.
 
 #### Scenario: Required contexts agree
 - **WHEN** live protection requires the inventory's declared required contexts and the corresponding candidate observations are successful
-- **THEN** the collector may submit the record to the existing schema v4 validator
+- **THEN** the collector may submit the record to the existing validator using the trusted inventory's version
 
 #### Scenario: Unknown required context
 - **WHEN** live protection requires a context absent from the trusted-base inventory, or the provider cannot return protection metadata
 - **THEN** the collector denies a required-CI verified claim and names the unaccounted or unavailable policy input
 
 ### Requirement: Honest evidence and claims
-The collector SHALL produce schema v4 evidence with provider-sourced observation identifiers, candidate pin digests and content hashes for its retained observation payloads. It MUST run the existing validator with independently obtained base, head and inventory anchors. It SHALL report required-CI verification separately from auxiliary health, merge readiness and post-merge health.
+The collector SHALL produce evidence in the trusted inventory's schema version with provider-sourced observation identifiers, candidate pin digests and content hashes for its retained observation payloads. It MUST run the existing validator with independently obtained base, head and inventory anchors. It SHALL report required-CI verification separately from auxiliary health, merge readiness and post-merge health.
+
+#### Scenario: Version 4 base during version 5 publication
+- **WHEN** the protected base still contains the published version 4 inventory
+- **THEN** the collector emits version 4 evidence, the validator accepts that trusted policy without applying version 5's runless check binding, and any missing optional security observation cannot claim auxiliary health
+
+#### Scenario: New binding with old version
+- **WHEN** an inventory labels itself version 4 while declaring the version 5 `check` run binding, or evidence uses a different version from its protected inventory
+- **THEN** validation rejects the record rather than silently treating the new semantics as version 4
 
 #### Scenario: Required CI succeeds while auxiliary check fails
 - **WHEN** all required candidate gates pass and an optional security check fails
@@ -82,11 +90,11 @@ The collector SHALL use read-only provider and Git operations. Its output MUST N
 - **THEN** the collector exits unsuccessfully with an actionable error and no passing admission claim
 
 ### Requirement: Read-only controller evidence demonstration
-The loop controller SHALL expose a read-only command that invokes the collector and existing schema v4 validator for one open PR, reports the exact base, head, candidate, run/attempt and classification, and returns failure when required CI is not verified. It MUST NOT alter the existing queue admission, protected merge or issue-closure path.
+The loop controller SHALL expose a read-only command that invokes the collector and existing validator for one open PR, reports the exact base, head, candidate, run/attempt and classification, and returns failure when required CI is not verified. It MUST NOT alter the existing queue admission, protected merge or issue-closure path.
 
 #### Scenario: Live current PR
 - **WHEN** an operator runs the controller evidence command against an open PR with complete provider data
-- **THEN** the command reports the collector's schema v4 validation and revision-bound classification without any provider mutation
+- **THEN** the command reports the collector's version-matched validation and revision-bound classification without any provider mutation
 
 #### Scenario: Incomplete or conflicting provider evidence
 - **WHEN** the collector rejects a moved run, contradictory job/check/workflow outcomes, or unavailable candidate binding

@@ -746,7 +746,7 @@ def collect(client: GitHubClient, pr_number: int) -> dict[str, Any]:
     }
     proof["proof_sha256"] = ci_contract._canonical_sha256(proof)
     evidence = {
-        "schema_version": ci_contract.SCHEMA_VERSION,
+        "schema_version": inventory["schema_version"],
         "repository": client.repository,
         **revision,
         "revision_binding": revision.copy(),
