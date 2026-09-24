@@ -784,8 +784,8 @@ theorem freeYonedaSheafCoproductResolutionBicomplex_exactAt_succ
 
 /-- Resolve each term of an unbounded cochain complex by the zero-preserving
 free-Yoneda flat cover. This is the degree-zero column of the resolution
-bicomplex; its natural map to the input is only an epimorphism, not a
-quasi-isomorphism. -/
+bicomplex; its natural map to the input is proved epi, but this does not
+establish a quasi-isomorphism. -/
 noncomputable def freeYonedaSheafCoproductDegreewiseEpiCover (X : Scheme.{u}) :
     CochainComplex X.Modules ℤ ⥤ CochainComplex X.Modules ℤ := by
   let Λ := freeYonedaSheafCoproductReducedLeftResolution X
