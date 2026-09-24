@@ -51,12 +51,10 @@ theorem boundedPullback_fixedTargetArrowExtension_of_ambient
       (pull.boundedFunctor hBounded) ((DU.boundedComponent P).ι.obj E)) :
     Subobject.FixedTargetArrowExtension
       (boundedPullback DT DU P pull hDqc hBounded) E := by
-  let H : pU.CompatibleFunctor pT (pull.boundedFunctor hBounded)
-      (boundedPullback DT DU P pull hDqc hBounded) :=
-    { inclusionIso := boundedPullbackCompInclusion DT DU P pull hDqc hBounded
-      projectionIso := projectorIso
-      counit_compat := counit_compat }
-  intro Z β
-  exact (H.fixedTargetArrowExtension_of_ambient E hExt) β
+  exact pU.fixedTargetArrowExtension_of_ambient pT
+    (pull.boundedFunctor hBounded)
+    (boundedPullback DT DU P pull hDqc hBounded)
+    (boundedPullbackCompInclusion DT DU P pull hDqc hBounded)
+    projectorIso counit_compat E hExt
 
 end AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.DerivedBaseChangeData
