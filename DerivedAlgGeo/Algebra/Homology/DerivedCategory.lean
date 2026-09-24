@@ -12,6 +12,7 @@ import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Opposite
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.LinearDual
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ModuleCatLocalization
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ModuleCatLocalizationQh
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor.Bounded
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.FGModuleCatInclusion
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor.Coproducts
@@ -46,7 +47,8 @@ comparison, the exact derived lift of algebraic linear duality, `Ext`
 adjunction and dimension shift, K-projective and bounded-above-projective
 models, and the construction of derived tensor from a K-flat resolution.
 Canonical localization of modules is naturally isomorphic, as an exact derived
-functor, to scalar extension to the localization.
+functor, to scalar extension to the localization; this comparison agrees with
+the degreewise cochain comparison after `Qh` on displayed complexes.
 Degree-zero Hom-complex classes identify with derived-category morphisms when
 the source is K-projective. For module complexes, a conditional localization
 comparison assumes K-projectivity of both the source and its localization;
