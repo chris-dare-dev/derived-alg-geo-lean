@@ -5,6 +5,8 @@ Released under the MIT license.
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Coproducts
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexLocalization
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyLinear
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyNaturality
 import DerivedAlgGeo.Algebra.Homology.Homotopy.HomologyModel
 import DerivedAlgGeo.Algebra.Homology.Homotopy.ModuleCatFormality
 import DerivedAlgGeo.Algebra.Homology.Homotopy.FiniteCohomologyPresentation
@@ -240,6 +242,24 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms CochainComplex.HomComplex.cochainLocalizedMap_isLocalized
 #print axioms CochainComplex.HomComplex.cochainLocalizedMap_isLocalized_of_finite_projective
 #print axioms CochainComplex.HomComplex.cochainLocalizedMap_isLocalized_of_bounded_above_below
+
+/-! ## Linear Hom-complex cohomology classes -/
+
+#print axioms CochainComplex.HomComplex.cyclesLinearEquiv
+#print axioms CochainComplex.HomComplex.boundaryToCyclesLinear
+#print axioms CochainComplex.HomComplex.cohomologyClassModule
+#print axioms CochainComplex.HomComplex.cohomologyClassLinearEquiv
+#print axioms CochainComplex.HomComplex.cohomologyClassLinearEquiv_mk
+#print axioms CochainComplex.HomComplex.cohomologyClass_mk_smul
+#print axioms CochainComplex.HomComplex.cohomologyClass_mk_zsmul
+#print axioms CochainComplex.HomComplex.cohomologyClassIntLinearEquiv
+#print axioms CochainComplex.HomComplex.cohomologyClassMapLinear
+#print axioms CochainComplex.HomComplex.cohomologyClassMapLinear_mk
+#print axioms CochainComplex.HomComplex.concreteCohomologyMap
+#print axioms CochainComplex.HomComplex.concreteCohomologyMap_mk
+#print axioms CochainComplex.HomComplex.cohomologyClassLinearEquiv_naturality
+#print axioms CochainComplex.HomComplex.cohomologyClassIntLinearEquiv_mk
+#print axioms CochainComplex.HomComplex.cohomologyClassIntLinearEquiv_naturality
 
 /-! ## Subcomplexes from degreewise subobject data -/
 
