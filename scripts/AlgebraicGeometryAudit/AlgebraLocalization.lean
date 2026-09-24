@@ -19,3 +19,12 @@ import DerivedAlgGeo.Algebra.Module.Localization
 #print axioms Module.exists_finite_submodule_of_isLocalization_containing
 #print axioms Module.exists_finitely_presented_submodule_of_isLocalization_containing
 #print axioms Module.exists_finite_submodules_of_isLocalization_map
+
+/-! ## Cohomology of a localized three-term complex -/
+
+#print axioms IsLocalizedModule.boundaryToCycles
+#print axioms IsLocalizedModule.localizedDifferential
+#print axioms IsLocalizedModule.localizedCyclesMap
+#print axioms IsLocalizedModule.localizedBoundaryToCycles
+#print axioms IsLocalizedModule.cohomologyMap
+#print axioms IsLocalizedModule.cohomologyMap_isLocalized
