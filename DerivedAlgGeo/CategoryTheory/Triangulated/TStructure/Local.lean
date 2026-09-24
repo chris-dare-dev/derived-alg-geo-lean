@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.Exactness
+import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.ImageFactorisation
 import Mathlib.CategoryTheory.Subobject.NoetherianObject
 import Mathlib.CategoryTheory.Triangulated.TStructure.TruncLTGE
 
@@ -178,6 +179,29 @@ theorem heartFunctor_map (r : t.Restriction F)
     {X Y : t.heart.FullSubcategory} (f : X ⟶ Y) :
     (r.heartFunctor.map f).hom = F.map f.hom :=
   rfl
+
+/-- A triangulated, t-exact functor restricts to a functor preserving
+monomorphisms on hearts. This uses the triangle associated to a heart mono;
+t-exactness alone, without preservation of triangles, is insufficient. -/
+noncomputable instance heartFunctor_preservesMonomorphisms
+    [IsTriangulated D] [F.CommShift ℤ]
+    [F.IsTriangulated] (r : t.Restriction F) :
+    r.heartFunctor.PreservesMonomorphisms where
+  preserves {X Y} f _ := by
+    letI := t.hasHeartFullSubcategory
+    obtain ⟨Q, q, δ, hT⟩ :=
+      exists_distinguished_triangle_of_heart_mono t f
+    letI := r.tStructure.hasHeartFullSubcategory
+    have hF : Triangle.mk ((r.heartFunctor.map f).hom)
+        ((r.heartFunctor.map q).hom)
+        (F.map δ ≫ (F.commShiftIso (1 : ℤ)).hom.app X.obj) ∈ distTriang D := by
+      have hF0 := F.map_distinguished _ hT
+      change Triangle.mk (F.map f.hom) (F.map q.hom)
+        (F.map δ ≫ (F.commShiftIso (1 : ℤ)).hom.app X.obj) ∈ distTriang D at hF0
+      exact hF0
+    have hS := r.tStructure.heartFullSubcategory_shortExact_of_distTriang
+      (f := r.heartFunctor.map f) (g := r.heartFunctor.map q) hF
+    exact hS.mono_f
 
 /-- The identity functor restricts every t-structure to itself. -/
 def id (t : TStructure C) : t.Restriction (𝟭 C) where
