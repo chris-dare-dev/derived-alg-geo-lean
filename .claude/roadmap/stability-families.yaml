@@ -520,15 +520,28 @@ items:
 
   - id: stability-families-e14-5
     gh_issue: 554
-    gh_sub_issues: []
+    gh_sub_issues: [1495]
     kind: deliverable
     parent: stability-families-e14
+    blocked_by: [1495]
     title: "Arbitrary derived pullback on the universally-gluable relative-perfect locus"
     status: in_progress
     summary: "Coherent left-derived pullback along supported arbitrary morphisms in Over S, lifted to universally-gluable relative-perfect complexes with the preservation and coherence the full big-Zariski moduli stack needs. Four of thirteen deliverables are done: the arbitrary pullback interface against Mathlib's left-derived universal property, the exact-pullback comparison, the lift to the universally-gluable locus with identity and composition APIs, and the moduli boundary on the relative big-Zariski site. Nine remain, and they are the substance: functorial flat/K-flat resolutions, inhabiting the pullback without caller-supplied preservation assertions, preservation of quasi-coherent cohomology, pseudo-coherence, local finite Tor amplitude and fiberwise negative Ext/universal gluability, the unit/compositor/triangle/pentagon/shift coherences, agreement with the existing exact-flat construction, and at least one nonidentity nonflat supported example. Blocks #522."
     priority: must
     size: XL
     tags: [derived-pullback, relative-perfect, k-flat, moduli]
+
+  - id: stability-families-e14-5a
+    gh_issue: 1495
+    gh_sub_issues: []
+    kind: deliverable
+    parent: stability-families-e14-5
+    title: "Establish flat generators for scheme module sheaves"
+    status: planned
+    summary: "Prove a stalkwise flat separating family for every scheme and a natural epimorphism onto every module sheaf from an explicitly indexed coproduct of those objects. This is a prerequisite for the remaining unbounded K-flat replacement work in #554; it does not itself construct a K-flat resolution or arbitrary derived pullback."
+    priority: must
+    size: L
+    tags: [module-sheaves, flat-generators, derived-pullback]
 
   - id: stability-families-m9
     gh_milestone: 30
@@ -701,15 +714,27 @@ items:
 
   - id: stability-families-e21
     gh_issue: 1063
-    gh_sub_issues: []
+    gh_sub_issues: [1496]
     kind: epic
     parent: stability-families-m11
     title: "Theorems 5.6, 5.7 and Corollary 5.8: the bounded coherent case"
-    status: planned
-    summary: "Theorem 5.6 induces a t-structure on D_T for a finite perfect morphism, as the analogue of Polishchuk 2.3.5 -- a sibling of the Polishchuk 2.1.2 result the repository owns through SF7 and #1054-#1057, and the relationship should be recorded rather than assumed. Theorem 5.7 is the main base change result for essentially perfect morphisms, and its clause (2), that noetherianity is inherited, is the load-bearing one: Step 2 of Theorem 12.17 gets finiteness of an a priori infinite filtration from it. Corollary 5.8 specialises to a point of the base."
+    status: in_progress
+    summary: "Theorem 5.6 induces a t-structure on D_T for a finite perfect morphism, as the analogue of Polishchuk 2.3.5 -- a sibling of the Polishchuk 2.1.2 result the repository owns through SF7 and #1054-#1057, and the relationship should be recorded rather than assumed. Theorem 5.7 is the main base change result for essentially perfect morphisms, and its clause (2), that noetherianity is inherited, is the load-bearing one: Step 2 of Theorem 12.17 gets finiteness of an a priori infinite filtration from it. Child #1496 addresses only the finite-cover Noetherian-heart detection step; bounded-coherent restriction and geometric local Noetherianity remain open. Corollary 5.8 specialises to a point of the base."
     priority: must
     size: XL
     tags: [lean, derived, base-change, noetherian]
+
+  - id: stability-families-e21-1
+    gh_issue: 1496
+    gh_sub_issues: []
+    kind: deliverable
+    parent: stability-families-e21
+    title: "Finite-cover Noetherian-heart detection"
+    status: in_progress
+    summary: "Prove that triangulated t-exact restrictions preserve heart monomorphisms and derive the finite-family local-to-global Noetherian implication from the existing detector. Leave geometric conservativity, local Noetherianity on bounded-coherent D_T, and Theorem 5.7(2) under parent #1063."
+    priority: must
+    size: M
+    tags: [lean, derived, t-structure, noetherian]
 
   - id: stability-families-e22
     gh_issue: 1064
