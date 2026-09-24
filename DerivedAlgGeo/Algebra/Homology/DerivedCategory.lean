@@ -24,6 +24,7 @@ import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomology
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyLinear
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyLocalization
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyFiniteResolutionLocalization
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyDegreeZeroLocalization
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyIntLocalization
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KFlatResolution
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.BoundedAboveProjective
@@ -46,8 +47,12 @@ an ordinary integer-linear adapter is available separately. Neither API
 constructs internal derived Hom or geometric base change.
 A finite module over a noetherian ring has a chosen finite-term, bounded-above
 projective resolution whose derived-category Hom-set map into a bounded-below
-complex localizes; this does not identify the map for the module's degree-zero
-complex without a further quasi-isomorphism comparison.
+complex localizes. Its quasi-isomorphism comparison now gives localization of
+the derived-category Hom-set map from the module's degree-zero complex into
+a bounded-below complex.
+The codomain remains degreewise localization of the displayed complexes;
+no internal derived-Hom, geometric, or arbitrary bounded-complex base change
+is asserted.
 Algebraic geometry supplies abelian categories such as `Coh X` and consumes
 this API; it does not own the derived-category construction.
 -/
