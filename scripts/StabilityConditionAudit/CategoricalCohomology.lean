@@ -266,6 +266,7 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 
 #print axioms CochainComplex.HomComplex.concreteCohomology
 #print axioms CochainComplex.HomComplex.concreteCohomologyLocalizedMap
+#print axioms CochainComplex.HomComplex.concreteCohomologyLocalizedMap_mk
 #print axioms CochainComplex.HomComplex.concreteCohomologyLocalizedMap_isLocalized
 #print axioms CochainComplex.HomComplex.concreteCohomologyLocalizedMapOfBoundedAboveBelow
 #print axioms CochainComplex.HomComplex.concreteCohomologyLocalizedMapOfBoundedAboveBelow_isLocalized

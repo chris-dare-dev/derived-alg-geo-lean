@@ -79,6 +79,20 @@ private def cohomologyEquivOfEq
   subst d₁'
   exact LinearEquiv.refl R _
 
+private theorem cohomologyEquivOfEq_mk
+    {M₀ M₁ M₂ : Type*} [AddCommGroup M₀] [AddCommGroup M₁] [AddCommGroup M₂]
+    [Module R M₀] [Module R M₁] [Module R M₂]
+    (d₀ d₀' : M₀ →ₗ[R] M₁) (d₁ d₁' : M₁ →ₗ[R] M₂)
+    (hd : d₁.comp d₀ = 0) (hd' : d₁'.comp d₀' = 0)
+    (h₀ : d₀ = d₀') (h₁ : d₁ = d₁') (z : d₁.ker) :
+    cohomologyEquivOfEq d₀ d₀' d₁ d₁' hd hd' h₀ h₁
+      (Submodule.Quotient.mk z) =
+    Submodule.Quotient.mk
+      (⟨z.1, by rw [← h₁]; exact z.2⟩ : d₁'.ker) := by
+  subst d₀'
+  subst d₁'
+  rfl
+
 private def localizedCohomologyEquiv
     (hprev : IsLocalizedModule S (cochainLocalizedMap P Q (-1) S))
     (hcur : IsLocalizedModule S (cochainLocalizedMap P Q 0 S))
@@ -113,6 +127,41 @@ private def localizedCohomologyEquiv
     (δ_hom R (localized S P) (localized S Q) 0 1)
     hd (delta_comp_delta (localized S P) (localized S Q)) h₀ h₁
 
+private theorem localizedCohomologyEquiv_mk
+    (hprev : IsLocalizedModule S (cochainLocalizedMap P Q (-1) S))
+    (hcur : IsLocalizedModule S (cochainLocalizedMap P Q 0 S))
+    (hnext : IsLocalizedModule S (cochainLocalizedMap P Q 1 S))
+    (z : (IsLocalizedModule.localizedDifferential S
+      (cochainLocalizedMap P Q 0 S) (cochainLocalizedMap P Q 1 S)
+      (δ_hom R P Q 0 1)).ker) :
+    localizedCohomologyEquiv P Q S hprev hcur hnext
+      (Submodule.Quotient.mk z) =
+    Submodule.Quotient.mk
+      (⟨z.1, by
+        have h₁ := localized_delta_eq_map P Q S 0 1
+        rw [← h₁]
+        exact z.2⟩ : (δ_hom R (localized S P) (localized S Q) 0 1).ker) := by
+  letI := hprev
+  letI := hcur
+  letI := hnext
+  have h₀ := localized_delta_eq_map P Q S (-1) 0
+  have h₁ := localized_delta_eq_map P Q S 0 1
+  have hd : ((IsLocalizedModule.map S (cochainLocalizedMap P Q 0 S)
+      (cochainLocalizedMap P Q 1 S)) (δ_hom R P Q 0 1)).comp
+      ((IsLocalizedModule.map S (cochainLocalizedMap P Q (-1) S)
+        (cochainLocalizedMap P Q 0 S)) (δ_hom R P Q (-1) 0)) = 0 := by
+    rw [h₀, h₁]
+    exact delta_comp_delta (localized S P) (localized S Q)
+  convert (cohomologyEquivOfEq_mk
+      ((IsLocalizedModule.map S (cochainLocalizedMap P Q (-1) S)
+        (cochainLocalizedMap P Q 0 S)) (δ_hom R P Q (-1) 0))
+      (δ_hom R (localized S P) (localized S Q) (-1) 0)
+      ((IsLocalizedModule.map S (cochainLocalizedMap P Q 0 S)
+        (cochainLocalizedMap P Q 1 S)) (δ_hom R P Q 0 1))
+      (δ_hom R (localized S P) (localized S Q) 0 1)
+      hd (delta_comp_delta (localized S P) (localized S Q)) h₀ h₁ z) using 1
+  all_goals rfl
+
 /-- The canonical map on concrete degree-zero Hom-complex cohomology induced
 by termwise module localization. Its codomain uses the actual differentials
 of the localized Hom complex. -/
@@ -132,6 +181,34 @@ def concreteCohomologyLocalizedMap
       (cochainLocalizedMap P Q 1 S)
       (δ_hom R P Q (-1) 0) (δ_hom R P Q 0 1)
       (delta_comp_delta P Q)
+
+/-- On a cycle representative, the concrete localization map applies the
+degree-zero cochain localization map. -/
+@[simp] theorem concreteCohomologyLocalizedMap_mk
+    (hprev : IsLocalizedModule S (cochainLocalizedMap P Q (-1) S))
+    (hcur : IsLocalizedModule S (cochainLocalizedMap P Q 0 S))
+    (hnext : IsLocalizedModule S (cochainLocalizedMap P Q 1 S))
+    (z : (δ_hom R P Q 0 1).ker) :
+    concreteCohomologyLocalizedMap P Q S hprev hcur hnext
+      (Submodule.Quotient.mk z) =
+    Submodule.Quotient.mk
+      (⟨(cochainLocalizedMap P Q 0 S) z.1, by
+        change δ 0 1 ((cochainLocalizedMap P Q 0 S) z.1) = 0
+        have hz : δ 0 1 z.1 = 0 := z.2
+        rw [← cochainLocalizedMap_delta P Q 0 S 1 z.1, hz, map_zero]⟩ :
+        (δ_hom R (localized S P) (localized S Q) 0 1).ker) := by
+  letI := hprev
+  letI := hcur
+  letI := hnext
+  simp only [concreteCohomologyLocalizedMap, LinearMap.comp_apply,
+    IsLocalizedModule.cohomologyMap, Submodule.mapQ_apply]
+  change localizedCohomologyEquiv P Q S hprev hcur hnext
+    (Submodule.Quotient.mk
+      ((IsLocalizedModule.localizedCyclesMap S
+        (cochainLocalizedMap P Q 0 S) (cochainLocalizedMap P Q 1 S)
+        (δ_hom R P Q 0 1)) z)) = _
+  rw [localizedCohomologyEquiv_mk]
+  rfl
 
 /-- Three localized cochain degrees give localization on their degree-zero
 kernel/range quotient. -/
