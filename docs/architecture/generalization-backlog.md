@@ -84,6 +84,7 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   comparison, chain/cochain indexing bridge, and restriction-of-scalars
   comparison remain unverified. Do not duplicate this row for the same lift.
 - state:              UNVERIFIED
+
 - progress note (2026-09-22, after PR #1464): The concrete `ℤ → ZMod 2`
   specialization, selected projective-resolution comparison, chain/cochain
   bridge, and restriction-of-scalars Tor comparison are merged. Only the
@@ -320,3 +321,81 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   field-based, and this finding is outside the frozen #897 chunk.
 - state:              FALSIFIED compiler witness: `Module.evalEquiv R M` fails
   with `failed to synthesize Module.IsReflexive R M`.
+### 2026-09-24 — stabilization of a lifted localization-heart filtration (planned)
+- chunk:              sf11-4a-1496-noetherian-cover
+- reviewing commit:   ce58cc9e44340c07c89836ba2a81fdd07aaee6b4
+- found by:           altitude-scout
+- proposed ancestor:  `Mathlib.CategoryTheory.Subobject.NoetherianObject`
+- weaker hypotheses:  any category `C`, object `E : C`, and a filtration
+  `F : ℕ ⥤ MonoOver E`; no scheme or t-structure hypotheses.
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Subobject/NoetherianObject.lean:88`
+- source note:        `isNoetherianObject_iff_isEventuallyConstant` supplies ACC
+  once a localization filtration is lifted into subobjects of a fixed global
+  heart object. The current `Lemma416Part3Data` lifts to a chain of objects
+  but records no common ambient object or embeddings, so this application
+  remains unverified.
+- state:              UNVERIFIED
+- progress note (2026-09-24): The categorical transfer from an explicit
+  fixed-ambient subobject-chain lift is proved in this SF11.4 continuation.
+  The geometric lift for a section-open or affine localization, the bounded
+  `D_T` heart restriction, and their comparison remain `UNVERIFIED`.
+- progress note (2026-09-24): Successive binary joins now turn pointwise
+  subobject lifts into a fixed-ambient monotone chain. A triangulated t-exact
+  restriction induces an exact heart functor and therefore preserves those
+  joins, so the heart-level transfer needs only chainwise pointwise lifts.
+  The bounded-component geometric pointwise lift is still not supplied by
+  the existing `SLocal` owner-data fields.
+
+### 2026-09-24 — `anchored_chain_of_pointwise_lifts` with local join structure
+- chunk:              sf11-4d-pointwise-anchored
+- reviewing commit:   46d220ce422f8ea2aa1c712de1c08634522e7b56
+- found by:           abstraction-adversary
+- proposed ancestor:  `DerivedAlgGeo/CategoryTheory/Subobject/NoetherianObject.lean`
+- weaker hypotheses:  binary joins only in `Subobject X` and in the target
+  ambient subobject poset, rather than category-wide images and binary
+  coproducts
+- pin status:         UNCOMPILED
+- source note:        The current proof uses Mathlib's category-wide instances
+  to synthesize the two joins. A locally quantified semilattice formulation
+  may suffice mathematically, but its Lean instance binding and theorem type
+  have not been tested; do not present it as an available API.
+- state:              UNVERIFIED
+
+### 2026-09-24 — `SLocalSlicingData.restriction_eq_of_phase_iff`
+- chunk:              sf11-4a-1496-noetherian-cover
+- reviewing commit:   ce58cc9e44340c07c89836ba2a81fdd07aaee6b4
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Stability/SLocal.lean`
+- weaker hypotheses:  drop `_L : SLocalSlicingData R s`; retain the open,
+  compactness, both restrictions, and the phase comparison.
+- pin status:         Focused copy of the existing proof compiled from
+  `/dev/stdin` at this base.
+- state:              UNVERIFIED
+
+### 2026-09-24 — `Coh.restrict_jointlyReflectsIsomorphisms`
+- chunk:              sf11-4a-1496-noetherian-cover
+- reviewing commit:   ce58cc9e44340c07c89836ba2a81fdd07aaee6b4
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `DerivedAlgGeo/AlgebraicGeometry/Modules/Coherent/Noetherian.lean`
+- weaker hypotheses:  drop `[IsLocallyNoetherian X]`; retain the open cover
+  and the premise that every restricted map is an isomorphism.
+- pin status:         Focused copy of the existing proof compiled from
+  `/dev/stdin` at this base.
+- state:              UNVERIFIED
+
+### 2026-09-24 — `isNoetherianObject_of_finite_jointlyReflectsIsomorphisms`
+- chunk:              sf11-4a-1496-noetherian-cover
+- reviewing commit:   1187331a9df2c7be6907d2385eb3329675facd6b
+- found by:           abstraction-adversary
+- proposed ancestor:  `DerivedAlgGeo/CategoryTheory/Subobject/NoetherianObject.lean`
+- weaker hypotheses:  jointly reflect isomorphisms only for monomorphisms,
+  rather than all morphisms; no scheme or t-structure hypothesis
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Subobject/Basic.lean:298`
+- source note:        The generic detector applies joint reflection to
+  `Subobject.ofLE`, which is monic at the pinned Mathlib API. A theorem with
+  reflection restricted to monomorphisms may therefore suffice, but the
+  weaker statement has not been compiled. This generic API change is outside
+  the SF11.4a geometry chunk.
+- state:              UNVERIFIED

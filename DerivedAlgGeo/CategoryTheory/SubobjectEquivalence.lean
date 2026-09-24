@@ -5,6 +5,7 @@ Released under the MIT license.
 import Mathlib.CategoryTheory.Subobject.Lattice
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Zero
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Kernels
+import Mathlib.CategoryTheory.Limits.Preserves.Shapes.BinaryProducts
 import Mathlib.CategoryTheory.Abelian.Basic
 
 /-!
@@ -17,7 +18,8 @@ lattices.
 
 This file supplies that. `mapFunctor` pushes a subobject forward along any mono-preserving functor,
 and `mapEquivalence` upgrades it to an order isomorphism when the functor is half of an
-equivalence.
+equivalence. For abelian categories, a functor preserving monos, epis, and binary coproducts
+also carries binary joins of subobjects to binary joins.
 
 ## Why an order isomorphism and not just a monotone map
 
@@ -69,6 +71,45 @@ theorem mapFunctor_monotone {X : A} : Monotone (mapFunctor F (X := X)) := by
   rw [mapFunctor_eq_mk_arrow, mapFunctor_eq_mk_arrow]
   refine Subobject.mk_le_mk_of_comm (F.map (Subobject.ofLE P Q h)) ?_
   rw [← F.map_comp, Subobject.ofLE_arrow]
+
+/-- A functor between abelian categories that preserves monomorphisms,
+epimorphisms, and binary coproducts carries binary joins of subobjects to
+binary joins. The join is the image of the map from the coproduct. -/
+theorem mapFunctor_sup [Abelian A] [Abelian B]
+    [F.PreservesEpimorphisms]
+    [PreservesColimitsOfShape (Discrete WalkingPair) F]
+    {X : A} (P Q : Subobject X) :
+    mapFunctor F (P ⊔ Q) = mapFunctor F P ⊔ mapFunctor F Q := by
+  apply Subobject.ind₂ (P := P) (Q := Q)
+  intro A₁ A₂ f g hmf hmg
+  change Subobject.mk (F.map (image.ι (coprod.desc f g))) =
+    Subobject.mk (image.ι (coprod.desc (F.map f) (F.map g)))
+  let h := coprod.desc f g
+  let h' := coprod.desc (F.map f) (F.map g)
+  let c := coprodComparison F A₁ A₂
+  have hc : h' = c ≫ F.map h := by
+    apply coprod.hom_ext
+    · dsimp [h', h, c]
+      rw [coprod.inl_desc, ← Category.assoc, coprodComparison_inl, ← F.map_comp,
+        coprod.inl_desc]
+    · dsimp [h', h, c]
+      rw [coprod.inr_desc, ← Category.assoc, coprodComparison_inr, ← F.map_comp,
+        coprod.inr_desc]
+  haveI : StrongEpi (F.map (factorThruImage h)) := strongEpi_of_epi _
+  let eI : F.obj (image h) ≅ image (F.map h) :=
+    image.isoStrongEpiMono (F.map (factorThruImage h))
+      (F.map (image.ι h)) (by rw [← F.map_comp, image.fac])
+  let e : image h' ≅ F.obj (image h) :=
+    image.eqToIso hc ≪≫ (asIso (image.preComp c (F.map h))) ≪≫ eI.symm
+  have he : e.hom ≫ F.map (image.ι h) = image.ι h' := by
+    simp only [e, Iso.trans_hom, Category.assoc, Iso.symm_hom]
+    rw [image.isoStrongEpiMono_inv_comp_mono]
+    simpa only [asIso_hom, Category.assoc, image.preComp_ι] using
+      (image.eq_fac hc).symm
+  have he' : e.inv ≫ image.ι h' = F.map (image.ι h) := by
+    rw [← he, ← Category.assoc, e.inv_hom_id, Category.id_comp]
+  exact Subobject.mk_eq_mk_of_comm _ _ e.symm
+    (by simpa only [Iso.symm_hom] using he')
 
 /-- Pushing forward along the identity does nothing. -/
 theorem mapFunctor_id {X : A} (P : Subobject X) : mapFunctor (𝟭 A) P = P := by

@@ -37,11 +37,10 @@ autoequivalences in lattice isometries, local finiteness for the corresponding
 walls on the stability space, and finite-dimensionality sufficient to deduce
 local compactness.  Those inputs are absent from the generic stability API.
 
-Proper discontinuity also does not imply finiteness of a chamber stabilizer.
-A chamber is generally a noncompact open set, and its setwise stabilizer
-contains its point stabilizers rather than being contained in them.  Such a
-finiteness theorem would need additional control of the chamber or the wall
-arrangement and is not asserted here.
+Proper discontinuity here gives finite stabilizers of individual stability
+conditions, but does not by itself give finiteness of a chamber's setwise
+stabilizer.  A chamber-level statement needs a specified chamber action and
+additional control of that action; none is asserted here.
 -/
 
 open CategoryTheory.Triangulated
