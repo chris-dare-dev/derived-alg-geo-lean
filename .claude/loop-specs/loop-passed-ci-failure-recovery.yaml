@@ -59,8 +59,10 @@ mutations:
   close_issue: false
   push_branch: false
   create_pr: false
+  ready_pr: false
   approve_pr: false
   merge_pr: false
+  create_issue: false
 
 issues:
   - number: 1483
