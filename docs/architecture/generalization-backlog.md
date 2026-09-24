@@ -315,3 +315,19 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
 - pin status:         Focused copy of the existing proof compiled from
   `/dev/stdin` at this base.
 - state:              UNVERIFIED
+
+### 2026-09-24 — `isNoetherianObject_of_finite_jointlyReflectsIsomorphisms`
+- chunk:              sf11-4a-1496-noetherian-cover
+- reviewing commit:   1187331a9df2c7be6907d2385eb3329675facd6b
+- found by:           abstraction-adversary
+- proposed ancestor:  `DerivedAlgGeo/CategoryTheory/Subobject/NoetherianObject.lean`
+- weaker hypotheses:  jointly reflect isomorphisms only for monomorphisms,
+  rather than all morphisms; no scheme or t-structure hypothesis
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Subobject/Basic.lean:298`
+- source note:        The generic detector applies joint reflection to
+  `Subobject.ofLE`, which is monic at the pinned Mathlib API. A theorem with
+  reflection restricted to monomorphisms may therefore suffice, but the
+  weaker statement has not been compiled. This generic API change is outside
+  the SF11.4a geometry chunk.
+- state:              UNVERIFIED

@@ -50,7 +50,7 @@ namespace AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 open CategoryTheory CategoryTheory.Triangulated AlgebraicGeometry
 open AlgebraicGeometry.DerivedCategory.Families
 
-universe u
+universe u w
 
 variable {S : Scheme.{u}}
 
@@ -151,6 +151,27 @@ that restrictions preserve heart monomorphisms and jointly detect
 isomorphisms. The converse direction and the geometric filtration lift remain
 owner inputs. -/
 
+/-- Apply `CategoryTheory.isNoetherianObject_of_finite_jointlyReflectsIsomorphisms`
+to each object of the global heart. Joint isomorphism reflection is the
+categorical detection hypothesis used here; no topological covering proof is
+stored in the restriction family. -/
+theorem isNoetherian_of_restrictions_isNoetherian {ι : Type w} [Finite ι]
+    (L : SLocalData R t) (U : ι → S.Opens)
+    (hU : ∀ i, CompactSpace (U i).toScheme)
+    (hmono : ∀ i, ((L.restriction (U i) (hU i)).heartFunctor).PreservesMonomorphisms)
+    (hreflect : ∀ {Y Z : t.heart.FullSubcategory} (f : Y ⟶ Z),
+      (∀ i : ι, IsIso ((L.restriction (U i) (hU i)).heartFunctor.map f)) → IsIso f)
+    (hlocal : ∀ i, (L.restriction (U i) (hU i)).tStructure.IsNoetherian) :
+    t.IsNoetherian := by
+  letI (i : ι) :
+      ((L.restriction (U i) (hU i)).heartFunctor).PreservesMonomorphisms :=
+    hmono i
+  intro X
+  exact CategoryTheory.isNoetherianObject_of_finite_jointlyReflectsIsomorphisms
+    (F := fun i ↦ (L.restriction (U i) (hU i)).heartFunctor)
+    (fun i ↦ hlocal i _)
+    (fun f hf ↦ hreflect f hf)
+
 /-- Owner data for the noetherian-locality equivalence of Lemma 4.15.
 
 The finite family below is intended to come from a quasi-compact open cover.
@@ -173,7 +194,7 @@ structure NoetherianLocalityData (R : OpenRestrictionFamily X P DS)
   opens : index → S.Opens
   compact (i : index) : CompactSpace (opens i).toScheme
   /-- Exactness on hearts, or another proof that restriction preserves monos. -/
-  preservesMono (i : index) :
+  preservesMonomorphisms (i : index) :
     ((localData.restriction (opens i) (compact i)).heartFunctor).PreservesMonomorphisms
   /-- The geometric conservativity of restriction on this finite cover. -/
   jointlyReflectsIsomorphisms :
@@ -181,31 +202,17 @@ structure NoetherianLocalityData (R : OpenRestrictionFamily X P DS)
       (∀ i : index, IsIso
         ((localData.restriction (opens i) (compact i)).heartFunctor.map f)) → IsIso f
 
-/-- A finite family of noetherian restricted hearts detects a noetherian
-global heart, provided their restriction functors preserve monomorphisms and
-jointly detect isomorphisms. -/
-theorem NoetherianLocalityData.noetherian_of_finite_restrictions
-    (H : NoetherianLocalityData R t)
-    (hlocal : ∀ i : H.index,
-      (H.localData.restriction (H.opens i) (H.compact i)).tStructure.IsNoetherian) :
-    t.IsNoetherian := by
-  letI : Finite H.index := H.finite_index
-  letI (i : H.index) :
-      ((H.localData.restriction (H.opens i) (H.compact i)).heartFunctor).PreservesMonomorphisms :=
-    H.preservesMono i
-  intro X
-  exact CategoryTheory.isNoetherianObject_of_finite_jointlyReflectsIsomorphisms
-    (F := fun i ↦ (H.localData.restriction (H.opens i) (H.compact i)).heartFunctor)
-    (fun i ↦ hlocal i _)
-    (fun f hf ↦ H.jointlyReflectsIsomorphisms f hf)
-
 /-- The local-to-global half of Lemma 4.15 follows from the chosen finite
-detecting family. -/
+detecting family. This adapter supplies the finite detector above with the
+record's categorical hypotheses; the converse `global_to_local` is not used. -/
 theorem NoetherianLocalityData.local_to_global (H : NoetherianLocalityData R t)
     (hlocal : ∀ (U : S.Opens) (hU : CompactSpace U.toScheme),
       (H.localData.restriction U hU).tStructure.IsNoetherian) :
-    t.IsNoetherian :=
-  H.noetherian_of_finite_restrictions (fun i ↦ hlocal (H.opens i) (H.compact i))
+    t.IsNoetherian := by
+  letI : Finite H.index := H.finite_index
+  exact isNoetherian_of_restrictions_isNoetherian H.localData H.opens H.compact
+    H.preservesMonomorphisms (fun f hf ↦ H.jointlyReflectsIsomorphisms f hf)
+    (fun i ↦ hlocal (H.opens i) (H.compact i))
 
 theorem lemma_4_15 (H : NoetherianLocalityData R t) :
     t.IsNoetherian ↔
