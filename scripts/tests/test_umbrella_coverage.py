@@ -1,0 +1,183 @@
+"""Pinned-Lean header parsing and fail-closed umbrella ownership regressions."""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import pathlib
+import subprocess
+import sys
+import tempfile
+import unittest
+from unittest import mock
+
+SCRIPTS = pathlib.Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(SCRIPTS))
+import check_umbrella_coverage as gate  # noqa: E402
+
+
+FIXTURES = pathlib.Path(__file__).parent / "fixtures" / "umbrella_headers"
+PARENT = "DerivedAlgGeo.Fixture"
+LEAF = f"{PARENT}.Leaf"
+
+
+class UmbrellaCoverageTest(unittest.TestCase):
+    def setUp(self) -> None:
+        temporary = tempfile.TemporaryDirectory(prefix="umbrella-headers-")
+        self.addCleanup(temporary.cleanup)
+        self.root = pathlib.Path(temporary.name)
+        self.source = self.root / "DerivedAlgGeo"
+        self.child_dir = self.source / "Fixture"
+        self.child_dir.mkdir(parents=True)
+        self.umbrella = self.source / "Fixture.lean"
+        self.leaf = self.child_dir / "Leaf.lean"
+        self.leaf.write_text("import Init\ndef leafValue : Nat := 7\n", encoding="utf-8")
+
+    def put_fixture(self, name: str) -> str:
+        source = (FIXTURES / name).read_text(encoding="utf-8")
+        self.umbrella.write_text(source, encoding="utf-8")
+        return source
+
+    def compile_source(self, source: str, *, succeeds: bool = True) -> None:
+        proc = subprocess.run(
+            ["lean", "--stdin"],
+            input=source,
+            capture_output=True,
+            text=True,
+            cwd=gate.ROOT,
+            check=False,
+        )
+        if succeeds:
+            self.assertEqual(proc.returncode, 0, proc.stderr + proc.stdout)
+        else:
+            self.assertNotEqual(proc.returncode, 0)
+
+    def check(self, *, owners=None, boundaries=None) -> tuple[int, list[str]]:
+        return gate.check_coverage(
+            self.root,
+            owners={} if owners is None else owners,
+            child_boundaries={} if boundaries is None else boundaries,
+        )
+
+    def test_compiled_fake_imports_never_cover_leaf(self) -> None:
+        for name in (
+            "DocText.lean",
+            "Comments.lean",
+            "RawHashes.lean",
+            "CharLiteral.lean",
+            "NestedInterpolation.lean",
+            "Unicode.lean",
+        ):
+            with self.subTest(fixture=name):
+                source = self.put_fixture(name)
+                self.compile_source(source)
+                imports = gate.lean_header_imports([self.umbrella])[self.umbrella]
+                self.assertNotIn(LEAF, imports)
+                checked, failures = self.check()
+                self.assertEqual(checked, 1)
+                self.assertEqual(len(failures), 1)
+                self.assertIn("does not re-export", failures[0])
+
+    def test_compiled_real_header_import_covers_leaf(self) -> None:
+        self.put_fixture("RealHeader.lean")
+        env = os.environ.copy()
+        previous = env.get("LEAN_PATH")
+        env["LEAN_PATH"] = str(self.root) + (os.pathsep + previous if previous else "")
+        child = subprocess.run(
+            ["lean", "-R", str(self.root), "-o", str(self.leaf.with_suffix(".olean")), str(self.leaf)],
+            capture_output=True,
+            text=True,
+            cwd=gate.ROOT,
+            env=env,
+            check=False,
+        )
+        self.assertEqual(child.returncode, 0, child.stderr + child.stdout)
+        parent = subprocess.run(
+            ["lean", "-R", str(self.root), str(self.umbrella)],
+            capture_output=True,
+            text=True,
+            cwd=gate.ROOT,
+            env=env,
+            check=False,
+        )
+        self.assertEqual(parent.returncode, 0, parent.stderr + parent.stdout)
+        imports = gate.lean_header_imports([self.umbrella])[self.umbrella]
+        self.assertIn(LEAF, imports)
+        self.assertEqual(self.check(), (1, []))
+
+    def test_multiple_headers_are_parsed_in_one_ordered_batch(self) -> None:
+        self.put_fixture("RealHeader.lean")
+        parsed = gate.lean_header_imports([self.leaf, self.umbrella])
+        self.assertNotIn(LEAF, parsed[self.leaf])
+        self.assertIn(LEAF, parsed[self.umbrella])
+
+    def test_malformed_header_is_fatal_even_when_lean_returns_json(self) -> None:
+        source = self.put_fixture("MalformedHeader.lean")
+        self.compile_source(source, succeeds=False)
+        with self.assertRaisesRegex(gate.CoverageError, "Lean header errors"):
+            self.check()
+
+    def test_reviewed_owner_witness_and_changed_digest(self) -> None:
+        source = self.put_fixture("OwnerModule.lean")
+        self.compile_source(source)
+        witness = gate.OwnerWitness(
+            3, "def fixtureOwner : Nat := 1", hashlib.sha256(source.encode()).hexdigest()
+        )
+        self.assertEqual(self.check(owners={PARENT: witness}), (0, []))
+        changed = source.replace("def fixtureOwner : Nat := 1", "-- def fixtureOwner : Nat := 1")
+        self.umbrella.write_text(changed, encoding="utf-8")
+        self.compile_source(changed)
+        _, failures = self.check(owners={PARENT: witness})
+        self.assertTrue(any("witness line changed" in failure for failure in failures))
+        self.assertTrue(any("digest changed" in failure for failure in failures))
+
+    def test_invalid_owner_exception_is_rejected(self) -> None:
+        self.put_fixture("DocText.lean")
+        witness = gate.OwnerWitness(4, "class Fake", "0" * 64)
+        _, failures = self.check(owners={PARENT: witness})
+        self.assertTrue(any("digest changed" in failure for failure in failures))
+        _, failures = self.check(owners={f"{PARENT}.Wrong": witness})
+        self.assertTrue(any("stale declaration-owner exception" in failure for failure in failures))
+        self.assertTrue(any("does not re-export" in failure for failure in failures))
+
+    def test_child_exception_is_exact_and_validated(self) -> None:
+        self.put_fixture("DocText.lean")
+        self.assertEqual(self.check(boundaries={PARENT: {LEAF}}), (1, []))
+        _, failures = self.check(boundaries={PARENT: {f"{PARENT}.Wrong"}})
+        self.assertTrue(any("stale umbrella/child exception" in failure for failure in failures))
+        self.assertTrue(any("does not re-export" in failure for failure in failures))
+        _, failures = self.check(boundaries={f"{PARENT}.Wrong": {LEAF}})
+        self.assertTrue(any("stale umbrella/child exception" in failure for failure in failures))
+
+    def test_json_count_error_and_result_shape_are_fatal(self) -> None:
+        self.put_fixture("DocText.lean")
+        bad_payloads = (
+            {"imports": []},
+            {"imports": [{"errors": []}]},
+            {"imports": [{"result": {"imports": [], "isModule": False}}]},
+            {"imports": [{"errors": [], "result": {"imports": ["bad"], "isModule": False}}]},
+        )
+        for payload in bad_payloads:
+            with self.subTest(payload=payload):
+                fake = subprocess.CompletedProcess([], 0, json.dumps(payload), "")
+                with mock.patch.object(gate.subprocess, "run", return_value=fake):
+                    with self.assertRaises(gate.CoverageError):
+                        self.check()
+
+    def test_parser_process_failure_is_fatal(self) -> None:
+        self.put_fixture("DocText.lean")
+        fake = subprocess.CompletedProcess([], 1, "", "failed")
+        with mock.patch.object(gate.subprocess, "run", return_value=fake):
+            with self.assertRaisesRegex(gate.CoverageError, "exited 1"):
+                self.check()
+
+    def test_empty_candidate_set_is_not_a_green_gate(self) -> None:
+        self.umbrella.write_text("import Init\n", encoding="utf-8")
+        self.umbrella.unlink()
+        with self.assertRaisesRegex(gate.CoverageError, "no same-named"):
+            self.check()
+
+
+if __name__ == "__main__":
+    unittest.main()
