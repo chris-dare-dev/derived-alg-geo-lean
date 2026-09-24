@@ -521,7 +521,6 @@ items:
   - id: stability-families-e14-5
     gh_issue: 554
     gh_sub_issues: [1495]
-    blocked_by: [1495]
     kind: deliverable
     parent: stability-families-e14
     blocked_by: [1495]
