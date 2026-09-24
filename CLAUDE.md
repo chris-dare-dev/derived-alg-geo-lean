@@ -353,10 +353,10 @@ Advice was what this section used to give, and advice is what failed: on
 `lake build` on a cold tree, and spent three hours of the developer's machine on
 work the runners were idle and waiting to absorb.
 
-`gates.sh` was already discouraged here for a second reason worth keeping: several
-agent lanes share one Mac, Lake takes one core per job by default, and four
-concurrent full gates oversubscribe a 14-core machine five times over — that is
-how a ten-minute gate becomes an hour.
+`gates.sh` was already discouraged here for a second reason worth keeping:
+several agent lanes and four Ubuntu runner services share one physical host.
+Lake takes one core per job by default, so concurrent full builds can exhaust
+that host's CPU and memory. Runner labels are not independent capacity.
 
 Neither the local script nor the runner lane is CI-equivalent on its own, and
 **neither list contains the other**. CI runs the `mfc` contract tooling, which
@@ -499,30 +499,12 @@ LEAN_NUM_THREADS=2 ~/.elan/bin/lake build DerivedAlgGeo.The.Module.You.Changed
 
 ### Whose lake
 
-`~/.elan/bin/lake` is not decoration. Each of the four self-hosted runners keeps
-its own elan under `C:\actions-runner\<runner>\.elan`, and those `bin`
-directories sit on this machine's user PATH **ahead of** `~/.elan/bin` — put
-there by CI, not by hand. `lean-action` runs `elan-init` with no
-`--no-modify-path`, and `run-runner.cmd` points `HOME` at the runner directory,
-so every job re-persists its own shim directory into the user environment.
-Deleting the entries does not hold: on 2026-09-16 all four were removed and
-three were back within ten minutes.
-
-So a bare `lake` here executes a **runner's** `lake.exe`. Windows will not
-replace a running image, so the next CI job on that runner cannot relink its
-shims and dies about a second in with
-
-    error: could not create link from 'elan.exe' to 'lake.exe'
-
-That is what took `main` red across three consecutive runs on 2026-09-16
-(bc973621, 6217d770, b9e18832), behind one local build that broke none of the
-other rules here: named target, `LEAN_NUM_THREADS=2`, gate green.
-
-It costs contention, not correctness. The same declaration sweep run through a
-runner's shim and through `~/.elan/bin/lake` came back byte-identical (14589
-rows), with audit-completeness reporting the same numbers, so a result already
-produced through the wrong tree does **not** need re-running. Check which one
-you are using with `which lake`.
+`~/.elan/bin/lake` names the developer's elan explicitly. The four self-hosted
+runners were migrated from Windows to Ubuntu on 2026-09-21; their service
+homes and elan installations are separate from this checkout. The earlier
+Windows PATH/shim collision that broke three main runs on 2026-09-16 is
+historical, not the current runner layout. Check `which lake` if a shell's
+environment is uncertain, and keep local builds targeted and capped.
 
 `LEAN_NUM_THREADS` is **required and enforced**, not advice: the same hook
 refuses a `lake build` that does not set it, or that sets it above 4. Naming a
@@ -575,14 +557,13 @@ the seconds-long probe interactive proof work depends on; routing each attempt a
 a lemma through CI would be a ~12 minute round trip and would stop anyone writing
 a proof at all.
 
-### The olean asymmetry, and why the rule still stands
+### Cache loss, and why the rule still stands
 
-Lean's `.olean` files are platform-specific, so the Windows runners can never warm
-this checkout: a local build is the only way to get local oleans, and a targeted
-build still compiles its dependencies. **After a cache loss, naming a target does
-not make the cost go away.** That is the honest limit of this rule, and the answer
-is not to quietly run the whole-library build anyway — it is to take the verdict
-from the runners, which need no local oleans at all:
+The Ubuntu runners and this host use the same platform, but their writable
+build directories are separate. A runner build does not populate this
+checkout's `.olean` files. A targeted local build may still compile its
+dependencies after cache loss; naming a target bounds the work without making
+that cost vanish. For a full verification verdict, use the CI workflow:
 
 ```bash
 gh workflow run ci.yml --ref <branch>
