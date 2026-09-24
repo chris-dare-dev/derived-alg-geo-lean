@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.Algebra.Homology.DGCategory
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory
 import DerivedAlgGeo.Algebra.Homology.HomologicalComplexLimits
+import DerivedAlgGeo.Algebra.Homology.HomologicalComplexFiniteDescent
 import DerivedAlgGeo.Algebra.Homology.Homotopy
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory
 import DerivedAlgGeo.Algebra.Homology.Localization
