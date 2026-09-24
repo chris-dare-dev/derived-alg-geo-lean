@@ -18,6 +18,14 @@ amplitude bound on `F`, with no finiteness hypothesis anywhere; finite
 presentation of the cohomology sheaves of `F.obj E` follows from no amplitude
 bound at all and is a genuine geometric input. Naming the conjuncts separately
 lets a consumer discharge the first and assume only the second.
+
+When finite-presentation module sheaves are closed under kernels and
+cokernels, they form a weak Serre class; a locally Noetherian scheme supplies
+these two closure conditions. Both halves then cut out triangulated
+subcategories of `Dqc(X)`, as does their intersection. This gives the
+intrinsic bounded-coherent locus the triangulated structure needed to
+restrict later base-change constructions; it does not construct a
+base-changed t-structure.
 -/
 
 attribute [local instance] HasDerivedCategory.standard
@@ -25,6 +33,7 @@ attribute [local instance] HasDerivedCategory.standard
 namespace AlgebraicGeometry.DerivedCategory.Dqc
 
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry
+open CategoryTheory.Pretriangulated
 open AlgebraicGeometry.DerivedCategory
 
 noncomputable section
@@ -66,6 +75,40 @@ instance : (schemeFinitePresentationCohomology X).IsClosedUnderIsomorphisms wher
     (SheafOfModules.isFinitePresentation X.ringCatSheaf).prop_of_iso
       ((DerivedCategory.homologyFunctor X.Modules n).mapIso
         ((SchemeQuasicoherentDerivedCategory.ι X).mapIso e)) (hE n)
+
+/-- Ambient cohomological boundedness is triangulated after restriction to
+`Dqc(X)`, without a Noetherian hypothesis. -/
+instance schemeBoundedQuasicoherent_isTriangulated :
+    (schemeBoundedQuasicoherent X).IsTriangulated := by
+  change ((DerivedCategory.TStructure.t (C := X.Modules)).bounded.inverseImage
+    (SchemeQuasicoherentDerivedCategory.ι X)).IsTriangulated
+  infer_instance
+
+/-- Kernel and cokernel closure of coherent module sheaves complete their
+unconditional weak-Serre properties, so coherent cohomology is triangulated
+on `Dqc(X)`. Locally Noetherian schemes supply these two hypotheses. -/
+instance schemeFinitePresentationCohomology_isTriangulated
+    [(Scheme.coherent X).IsClosedUnderKernels]
+    [(Scheme.coherent X).IsClosedUnderCokernels] :
+    (schemeFinitePresentationCohomology X).IsTriangulated := by
+  change ((DerivedCategory.cohomologyIn (Scheme.coherent X)).inverseImage
+    (SchemeQuasicoherentDerivedCategory.ι X)).IsTriangulated
+  infer_instance
+
+/-- The intrinsic bounded-coherent locus is triangulated whenever the
+coherent-cohomology half is triangulated, in particular on a locally Noetherian
+scheme. This is a prerequisite for restricting a t-structure to that locus,
+not a proof that its truncations preserve coherent cohomology. -/
+instance schemeBoundedCoherentCohomology_isTriangulated
+    [(schemeFinitePresentationCohomology X).IsTriangulated] :
+    (schemeBoundedCoherentCohomology X).IsTriangulated := by
+  rw [schemeBoundedCoherentCohomology_eq_inf]
+  infer_instance
+
+/-- The geometric local-Noetherian hypothesis supplies the weaker closure
+premises without further caller data. -/
+example [IsLocallyNoetherian X] :
+    (schemeBoundedCoherentCohomology X).IsTriangulated := by infer_instance
 
 end
 
