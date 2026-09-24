@@ -4232,6 +4232,13 @@ def ledger_admit_ci_repair(root: Path, spec: dict[str, Any], state_file: Path, c
     reread_repair_provider_state(root, spec, state, pr, base_sha)
     require_legacy_issue_open(root, spec, number)
     require_manifest_remote(root, spec)
+    protected_before_write = strict_protected_check_map(root, spec)
+    if protected_before_write != protected:
+        raise LoopError("required-check protection changed during CI-failure admission")
+    # A same-head rerun may turn the initial failure green while the other
+    # provider snapshots are being reread. Use the final required-check
+    # snapshot for the event and do not charge a review round after recovery.
+    current_evidence = required_check_failure_evidence(root, spec, pr["head_sha"], protected_before_write)
     if state_file.read_bytes() != raw_before:
         raise LoopError("ledger changed while CI-failure evidence was being collected; no repair was admitted")
 
@@ -4244,7 +4251,7 @@ def ledger_admit_ci_repair(root: Path, spec: dict[str, Any], state_file: Path, c
         "sequence": sequence,
         "prior_passing_round": passed["number"],
         "failed_head": pr["head_sha"],
-        "required_check": evidence,
+        "required_check": current_evidence,
         "pr_number": pr["number"],
         "pr_url": pr["url"],
         "source_repository": pr["head_repository"],

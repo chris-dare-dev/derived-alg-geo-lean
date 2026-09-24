@@ -1926,6 +1926,7 @@ class CIFailureRepairTests(unittest.TestCase):
         self.open_pulls = [self.pull]
         self.protection: dict = {"contexts": ["ci"], "checks": []}
         self.check_runs: list[dict] = [self.check_run(self.failed_head, "failure", "2026-09-24T01:00:00Z")]
+        self.check_runs_sequence: list[list[dict]] = []
         self.statuses: list[dict] = []
         self.source_sha_sequence: list[str] = []
         self.base_sha_sequence: list[str] = []
@@ -2003,7 +2004,8 @@ class CIFailureRepairTests(unittest.TestCase):
         if "/protection/required_status_checks" in request:
             return self.protection_sequence.pop(0) if self.protection_sequence else self.protection
         if "/check-runs?per_page=100" in request:
-            return {"total_count": len(self.check_runs), "check_runs": self.check_runs}
+            check_runs = self.check_runs_sequence.pop(0) if self.check_runs_sequence else self.check_runs
+            return {"total_count": len(check_runs), "check_runs": check_runs}
         if "/statuses?per_page=100" in request:
             return self.statuses
         raise AssertionError(f"unexpected provider request: {request}")
@@ -2056,10 +2058,23 @@ class CIFailureRepairTests(unittest.TestCase):
         with self.assertRaisesRegex(loop_engine.LoopError, "attacker/fork"):
             self.admit(candidate)
         self.assertEqual(self.state_file.read_bytes(), original)
-
         git_in(self.root, "remote", "set-url", "origin", "https://github.com/example/repository.git")
         git_in(self.root, "remote", "set-url", "--push", "origin", "https://github.com/attacker/fork.git")
         with self.assertRaisesRegex(loop_engine.LoopError, "attacker/fork"):
+            self.admit(candidate)
+        self.assertEqual(self.state_file.read_bytes(), original)
+
+    def test_same_head_successful_rerun_during_admission_does_not_consume_a_slot(self) -> None:
+        candidate = self.repair_candidate()
+        self.check_runs_sequence = [
+            [self.check_run(self.failed_head, "failure", "2026-09-24T01:00:00Z")],
+            [
+                self.check_run(self.failed_head, "failure", "2026-09-24T01:00:00Z"),
+                {**self.check_run(self.failed_head, "success", "2026-09-24T02:00:00Z"), "id": 7002},
+            ],
+        ]
+        original = self.state_file.read_bytes()
+        with self.assertRaisesRegex(loop_engine.LoopError, "no current required check"):
             self.admit(candidate)
         self.assertEqual(self.state_file.read_bytes(), original)
 
