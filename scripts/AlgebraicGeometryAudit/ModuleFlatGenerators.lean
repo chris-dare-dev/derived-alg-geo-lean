@@ -1,0 +1,15 @@
+import DerivedAlgGeo.AlgebraicGeometry.Modules.FlatGenerators
+
+#print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaModuleSheaf
+#print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaModuleSheafStalkIsoRegularOfMem
+#print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaModuleSheaf_stalk_isZero_of_not_mem
+#print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaModuleSheaf_stalk_flat_of_mem
+#print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaModuleSheaf_stalk_flat_of_not_mem
+#print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaModuleSheaf_stalk_flat
+#print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaModuleSheaf_isFlatOver_id
+#print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaSheafCoproduct
+#print axioms AlgebraicGeometry.Scheme.Modules.fromFreeYonedaSheafCoproduct
+#print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaSheafCoproductMap
+#print axioms AlgebraicGeometry.Scheme.Modules.fromFreeYonedaSheafCoproduct_epi
+#print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaSheafCoproduct_summand_stalk_flat
+#print axioms AlgebraicGeometry.Scheme.Modules.fromFreeYonedaSheafCoproduct_natural

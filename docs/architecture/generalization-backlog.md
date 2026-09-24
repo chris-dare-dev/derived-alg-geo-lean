@@ -365,3 +365,20 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   weaker statement has not been compiled. This generic API change is outside
   the SF11.4a geometry chunk.
 - state:              UNVERIFIED
+
+### 2026-09-24 — compare the open free-Yoneda sheaf with extension by zero
+- chunk:              sf8-flat-generators
+- reviewing commit:   300a828ce99b9b7b02e7f77320bd1aacde3fc84
+- found by:           altitude-scout
+- proposed ancestor:  the extension-by-zero functor `j_!` for an open immersion
+- weaker hypotheses:  an open immersion of ringed spaces and a module sheaf on
+  its source; no scheme-specific free-Yoneda construction is needed for the
+  upstream stalk formula
+- pin status:         UPSTREAM-ONLY (Stacks Project Lemma 6.31.8, tag 00A7;
+  no pinned Lean comparison established)
+- source note:        Stacks gives zero stalks off the open and the original
+  stalk on it for `j_!`. This does not prove that the repository's canonical
+  `SheafOfModules.freeYonedaSheaf` is `j_!` of the restricted structure sheaf.
+  The current scheme-level result proves the stalk formula directly and makes
+  no such identification.
+- state:              UNVERIFIED
