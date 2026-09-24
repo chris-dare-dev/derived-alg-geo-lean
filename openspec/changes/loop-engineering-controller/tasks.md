@@ -21,4 +21,4 @@
 ## 3. Pilot readiness
 
 - [x] 3.1 Document the OpenSpec-first loop and the handoff between proposal, apply, review ledger, CI, and archive; verify a fresh checkout can discover the workflow
-- [ ] 3.2 Run the disabled pilot's read-only validation, inspect live preflight failures, and record the exact prerequisites for enabling it; verify no GitHub mutation occurs during the dry run
+- [x] 3.2 Run the disabled pilot's read-only validation, inspect live preflight failures, and record the exact prerequisites for enabling it; verify no GitHub mutation occurs during the dry run
