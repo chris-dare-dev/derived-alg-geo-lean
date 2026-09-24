@@ -146,7 +146,9 @@ and halt. Do not guess.
 ## 3. Pre-flight locally — this is not the verdict
 
 ```bash
-scripts/precheck.sh
+python3 -m venv .loop-tools
+.loop-tools/bin/python -m pip install -r scripts/requirements-loop.txt
+PATH="$PWD/.loop-tools/bin:$PATH" scripts/precheck.sh
 ```
 
 Seconds, not minutes. It runs every gate that needs no Lean build — workflows,
