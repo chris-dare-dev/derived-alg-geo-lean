@@ -7,24 +7,25 @@ context: |
   formalization of derived algebraic geometry and its claims are
   correctness-critical.
 
-  OpenSpec artifacts are the source of truth for the intended behavior of a
-  change. Keep mathematical requirements and observable proof obligations in
+  User-named GitHub issues are the default source of scope and acceptance for
+  issue-driven work. OpenSpec is optional progress documentation for that flow;
+  a batch spanning repositories does not need duplicate OpenSpec roots or a
+  generated loop manifest before implementation starts. If an OpenSpec change
+  is used, keep mathematical requirements and observable proof obligations in
   specs/*.md; put implementation choices in design.md and tasks.md. Never use
   sorry, admit, axioms that bypass the stated construction, or a postulated
   representability/algebraicity conclusion.
 
-  The repository has a separate bounded loop controller in
-  scripts/loop_engine.py. It owns issue selection, mutation authorization, and
-  the review ledger; OpenSpec owns the proposal, requirements, design, and task
-  artifacts when a change exists. A single issue may be planned by its own body
-  instead. A run must not widen a frozen chunk or silently skip a required
-  reviewer. Inside an unattended run, planning is a step of the run, not a
-  separate session: write the artifacts, then continue into implementation
-  without waiting for a new request.
+  The repository also has a bounded loop controller in
+  scripts/loop_engine.py for runs that need frozen chunks and a review ledger.
+  It is optional for a user-initiated issue task: the user request naming issue
+  IDs authorizes work within those issue scopes, and the live issue bodies are
+  sufficient acceptance criteria. When OpenSpec is useful, use one shared
+  batch change and continue into implementation in the same task.
 
 rules:
   proposal:
-    - State the mathematical and repository motivation separately from the implementation approach.
+    - State the mathematical and repository motivation separately from the implementation approach when a proposal is useful.
     - Name the affected GitHub issues and the OpenSpec capability paths when this is a batch plan.
     - Record explicit non-goals, especially unproved existence, preservation, descent, or algebraicity claims.
   specs:
@@ -33,24 +34,20 @@ rules:
     - Do not turn a theorem, algebraicity result, preservation property, or descent statement into an interface field.
   design:
     - Record ownership, dependency direction, projection/comparison maps, diamond-instance agreement, and import boundaries.
-    - "Include the three adversarial review lenses: mathematical/source faithfulness, repository boundary, and abstraction/adoption."
-    - Set at most three review/improve rounds per attempt for new work; preserve historical manifests unchanged.
-    - State whether bounded recovery is enabled and how exhaustion schedules research, independent plan review, finding inheritance and eventual parking.
+    - Apply mathematical/source-faithfulness, repository-boundary, and abstraction/adoption review in proportion to the changed work; do not require a fixed review roster to start implementation.
   tasks:
-    - Keep each task small enough to be reviewed as a frozen chunk with an explicit file list and acceptance statement.
-    - Every task MUST include its verification command or observable check.
-    - Include targeted Lean checks, scripts/precheck.sh where appropriate, and self-hosted CI requirements.
+    - Keep tasks checkable and scoped to the named issues.
+    - Record relevant verification commands or observable acceptance evidence.
+    - Use targeted Lean checks and hosted CI where they apply; do not make OpenSpec validation a prerequisite when no OpenSpec change is needed.
 
 operations:
   apply:
     guidance:
-      - Work only from the issue, the OpenSpec artifacts and the active loop manifest; do not invent new scope in code.
-      - Tick task checkboxes and append agent-observations.md as work proceeds; the ledger's plan digest ignores both.
-      - Resolve an unclear task by taking the smallest reading that meets the definition of done and recording it; do not pause for confirmation.
-      - Keep the mathematical, repository-boundary, abstraction, and style reviews independent on the same commit.
-      - Preserve exhausted attempts; for opted-in recovery consume the controller's next action automatically, within the same scope and cumulative budget.
-      - Require independent acceptance of the exact research plan before resuming; research acceptance never satisfies implementation review or provider permissions.
+      - Work from the live issue bodies and repository guidance; do not invent scope beyond the user-named issues.
+      - Resolve ordinary ambiguity by taking the smallest reading that meets acceptance and recording it; do not pause for confirmation.
+      - Keep working independent issues when one has a real blocker.
+      - Use an OpenSpec change or loop-controller ledger only when it materially helps the work; do not require either to begin.
+      - Respect actual required checks, branch protection, and protected-path review.
   archive:
     guidance:
-      - Archive only after OpenSpec validation, repository gates, and the bounded adversarial ledger all pass.
-      - Never treat archiving as permission to merge, approve, comment, or close a GitHub issue; those are separately guarded actions.
+      - Archive an OpenSpec change only after its requirements are satisfied and applicable repository checks pass.
