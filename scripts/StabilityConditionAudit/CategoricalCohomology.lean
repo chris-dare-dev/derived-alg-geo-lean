@@ -6,6 +6,7 @@ import DerivedAlgGeo.Algebra.Homology.SpectralSequence
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Coproducts
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexLocalization
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyLinear
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyNaturality
 import DerivedAlgGeo.Algebra.Homology.Homotopy.HomologyModel
 import DerivedAlgGeo.Algebra.Homology.Homotopy.ModuleCatFormality
 import DerivedAlgGeo.Algebra.Homology.Homotopy.FiniteCohomologyPresentation
@@ -252,6 +253,11 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms CochainComplex.HomComplex.cohomologyClass_mk_smul
 #print axioms CochainComplex.HomComplex.cohomologyClass_mk_zsmul
 #print axioms CochainComplex.HomComplex.cohomologyClassIntLinearEquiv
+#print axioms CochainComplex.HomComplex.cohomologyClassMapLinear
+#print axioms CochainComplex.HomComplex.cohomologyClassMapLinear_mk
+#print axioms CochainComplex.HomComplex.concreteCohomologyMap
+#print axioms CochainComplex.HomComplex.concreteCohomologyMap_mk
+#print axioms CochainComplex.HomComplex.cohomologyClassLinearEquiv_naturality
 
 /-! ## Subcomplexes from degreewise subobject data -/
 
