@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Coproducts
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyLocalization
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexLocalization
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyLinear
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyNaturality
@@ -260,6 +261,14 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms CochainComplex.HomComplex.cohomologyClassLinearEquiv_naturality
 #print axioms CochainComplex.HomComplex.cohomologyClassIntLinearEquiv_mk
 #print axioms CochainComplex.HomComplex.cohomologyClassIntLinearEquiv_naturality
+
+/-! ## Concrete degree-zero Hom-complex cohomology localization -/
+
+#print axioms CochainComplex.HomComplex.concreteCohomology
+#print axioms CochainComplex.HomComplex.concreteCohomologyLocalizedMap
+#print axioms CochainComplex.HomComplex.concreteCohomologyLocalizedMap_isLocalized
+#print axioms CochainComplex.HomComplex.concreteCohomologyLocalizedMapOfBoundedAboveBelow
+#print axioms CochainComplex.HomComplex.concreteCohomologyLocalizedMapOfBoundedAboveBelow_isLocalized
 
 /-! ## Subcomplexes from degreewise subobject data -/
 
