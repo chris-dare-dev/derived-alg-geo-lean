@@ -744,7 +744,7 @@ instance freeYonedaSheafCoproductReducedLeftResolution_preservesZeroMorphisms
   infer_instance
 
 /-- This zero-map lemma supplies the preservation instance required by
-`Functor.mapHomologicalComplex` for the induced resolution functor. -/
+`CategoryTheory.Functor.mapHomologicalComplex` for the induced resolution functor. -/
 theorem freeYonedaSheafCoproductReducedLeftResolution_chainComplexMap_zero
     (X : Scheme.{u}) {M N : X.Modules} :
     (freeYonedaSheafCoproductReducedLeftResolution X).chainComplexMap
@@ -795,7 +795,7 @@ noncomputable def freeYonedaSheafCoproductDegreewiseEpiCover (X : Scheme.{u}) :
   exact (Λ.F ⋙ ι).mapHomologicalComplex (ComplexShape.up ℤ)
 
 /-- The natural augmentation of the termwise flat cover, induced by the
-epimorphisms in the objectwise `LeftResolution`. -/
+epimorphisms in the objectwise `CategoryTheory.Abelian.LeftResolution`. -/
 noncomputable def freeYonedaSheafCoproductDegreewiseEpiCoverMap
     (X : Scheme.{u}) :
     freeYonedaSheafCoproductDegreewiseEpiCover X ⟶
