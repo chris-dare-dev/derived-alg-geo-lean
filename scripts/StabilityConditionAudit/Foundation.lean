@@ -1591,5 +1591,6 @@ it jointly reflects isomorphisms. The one-functor specialization feeds the modul
 geometric realizations. -/
 
 #print axioms CategoryTheory.isNoetherianObject_of_finite_jointlyReflectsIsomorphisms
+#print axioms CategoryTheory.isNoetherianObject_of_liftedSubobjectChains
 #print axioms CategoryTheory.isNoetherianObject_of_reflectsIsomorphisms
 #print axioms ModuleCat.isNoetherianObject_of_isNoetherian
