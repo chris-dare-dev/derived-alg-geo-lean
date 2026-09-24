@@ -190,18 +190,34 @@ def FixedTargetArrowExtension (G : A ⥤ B) (X : A) : Prop :=
   ∀ {Z : B} (β : Z ⟶ G.obj X),
     ∃ (Y : A) (f : Y ⟶ X) (e : Z ≅ G.obj Y), β = e.hom ≫ G.map f
 
-/-- Fixed-target arrow extension yields pointwise lifting of subobjects by
-taking the image of each extended arrow. -/
-theorem mapFunctor_surjective_of_fixedTargetArrowExtension (G : A ⥤ B)
+/-- Only monomorphisms into `G.obj X` need extend in order to lift subobjects.
+Unlike extension of all arrows, this does not force every object of `B` into
+the essential image of `G`. -/
+def FixedTargetMonoExtension (G : A ⥤ B) (X : A) : Prop :=
+  ∀ {Z : B} (β : Z ⟶ G.obj X), Mono β →
+    ∃ (Y : A) (f : Y ⟶ X) (e : Z ≅ G.obj Y), β = e.hom ≫ G.map f
+
+/-- Fixed-target mono extension yields pointwise lifting of subobjects by
+taking the image of each extended monomorphism. -/
+theorem mapFunctor_surjective_of_fixedTargetMonoExtension (G : A ⥤ B)
     [G.PreservesMonomorphisms] [G.PreservesEpimorphisms]
-    (X : A) (hExt : FixedTargetArrowExtension G X) :
+    (X : A) (hExt : FixedTargetMonoExtension G X) :
     Function.Surjective (mapFunctor G (X := X)) := by
   intro Q
-  obtain ⟨Y, f, e, he⟩ := hExt Q.arrow
+  obtain ⟨Y, f, e, he⟩ := hExt Q.arrow inferInstance
   refine ⟨imageSubobject f, ?_⟩
   rw [mapFunctor_image]
   rw [← imageSubobject_iso_comp e.hom (G.map f)]
   simp only [← he, imageSubobject_mono, Subobject.mk_arrow]
+
+/-- All-arrow extension is a stronger, geometry-facing sufficient condition
+for lifting subobjects. -/
+theorem mapFunctor_surjective_of_fixedTargetArrowExtension (G : A ⥤ B)
+    [G.PreservesMonomorphisms] [G.PreservesEpimorphisms]
+    (X : A) (hExt : FixedTargetArrowExtension G X) :
+    Function.Surjective (mapFunctor G (X := X)) :=
+  mapFunctor_surjective_of_fixedTargetMonoExtension G X
+    (fun β _ => hExt β)
 
 end MapFunctorImage
 

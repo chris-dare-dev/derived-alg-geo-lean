@@ -48,6 +48,7 @@ universe v v' u u'
 namespace CategoryTheory.Triangulated
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
+open scoped ZeroObject
 
 namespace TStructure
 
@@ -336,35 +337,55 @@ theorem isNoetherian_of_pointwiseSubobjectLifts
   obtain ⟨X, e, hpt⟩ := hlift Y
   exact ⟨X, e, fun n => hpt (c n)⟩
 
-/-- Essential surjectivity on target-heart objects and extension of arrows
-into each fixed source object imply Noetherianity of the target heart. The
-arrow extension is a separate geometric input for affine localization; it
-does not follow from essential surjectivity alone. -/
-theorem isNoetherian_of_fixedTargetArrowExtensions
+/-- For each target-heart object, choose a source lift whose fixed target
+admits extension of monomorphisms. This pointwise criterion implies
+Noetherianity without requiring arrow extension at unrelated source objects. -/
+theorem isNoetherian_of_fixedTargetMonoExtensions
     [IsTriangulated C] [IsTriangulated D]
     [F.CommShift ℤ] [F.IsTriangulated]
     (r : t.Restriction F)
     (hglobal : t.IsNoetherian)
-    (hObj : ∀ Y : r.tStructure.heart.FullSubcategory,
-      ∃ X : t.heart.FullSubcategory, Nonempty (r.heartFunctor.obj X ≅ Y))
-    (hExt : ∀ X : t.heart.FullSubcategory,
-      Subobject.FixedTargetArrowExtension r.heartFunctor X) :
+    (hlift : ∀ Y : r.tStructure.heart.FullSubcategory,
+      ∃ X : t.heart.FullSubcategory, Nonempty (r.heartFunctor.obj X ≅ Y) ∧
+        Subobject.FixedTargetMonoExtension r.heartFunctor X) :
     r.tStructure.IsNoetherian := by
   letI : PreservesFiniteLimits r.heartFunctor := (heartFunctor_finiteExact r).1
   letI : PreservesFiniteColimits r.heartFunctor := (heartFunctor_finiteExact r).2
   apply r.isNoetherian_of_pointwiseSubobjectLifts hglobal
   intro Y
-  obtain ⟨X, ⟨e⟩⟩ := hObj Y
+  obtain ⟨X, ⟨⟨e⟩, hExt⟩⟩ := hlift Y
   refine ⟨X, e, ?_⟩
   intro p
   let E := Subobject.mapIsoToOrderIso e
   obtain ⟨q, hq⟩ :=
-    Subobject.mapFunctor_surjective_of_fixedTargetArrowExtension
-      r.heartFunctor X (hExt X) (E.symm p)
+    Subobject.mapFunctor_surjective_of_fixedTargetMonoExtension
+      r.heartFunctor X hExt (E.symm p)
   refine ⟨q, ?_⟩
   change E (Subobject.mapFunctor r.heartFunctor q) = p
   rw [hq]
   exact E.apply_symm_apply p
+
+/-- Extension of every arrow into every fixed source-heart target is a
+stronger geometric criterion. The zero arrow also supplies each target-heart
+object as the image of some source object, so no separate object-lift premise
+is needed. -/
+theorem isNoetherian_of_fixedTargetArrowExtensions
+    [IsTriangulated C] [IsTriangulated D]
+    [F.CommShift ℤ] [F.IsTriangulated]
+    (r : t.Restriction F)
+    (hglobal : t.IsNoetherian)
+    (hExt : ∀ X : t.heart.FullSubcategory,
+      Subobject.FixedTargetArrowExtension r.heartFunctor X) :
+    r.tStructure.IsNoetherian := by
+  letI := t.hasHeartFullSubcategory
+  letI : Abelian t.heart.FullSubcategory := heartFullSubcategoryAbelian t
+  letI : HasZeroObject t.heart.FullSubcategory := inferInstance
+  letI : Zero t.heart.FullSubcategory := HasZeroObject.zero' _
+  apply r.isNoetherian_of_fixedTargetMonoExtensions hglobal
+  intro Y
+  obtain ⟨X, _, e, _⟩ := hExt (0 : t.heart.FullSubcategory)
+    (0 : Y ⟶ r.heartFunctor.obj (0 : t.heart.FullSubcategory))
+  exact ⟨X, ⟨e.symm⟩, fun β _ => hExt X β⟩
 
 /-- The identity functor restricts every t-structure to itself. -/
 def id (t : TStructure C) : t.Restriction (𝟭 C) where
