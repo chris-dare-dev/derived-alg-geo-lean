@@ -1271,6 +1271,19 @@ jobs:
           # default single-commit checkout will not do.
           fetch-depth: 0
 
+      # The roadmap step runs every repository Python test, including the
+      # header-parser fixtures that compile tiny Lean clients. This job has no
+      # build, but it still needs the repository's pinned Lean executable.
+      - name: Install pinned Lean for parser fixtures
+        uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9 # v1
+        with:
+          auto-config: false
+          build: false
+          test: false
+          lint: false
+          use-mathlib-cache: false
+          use-github-cache: false
+
       - name: Roadmap and tracker agree
         env:
           # For scripts/check_roadmap.py's `gh` calls. Read-only issue
