@@ -95,6 +95,18 @@ EXPLICIT_CHILD_BOUNDARIES = {
         "DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Stability",
     },
 }
+# The omitted child must not enter the neutral umbrella even privately, and
+# must still have a public export route through the outer subject umbrella.
+STABILITY_EXPORT_ROUTE = (
+    "DerivedAlgGeo.AlgebraicGeometry.DerivedCategory",
+    "DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Stability",
+    "DerivedAlgGeo.AlgebraicGeometry",
+)
+
+
+class HeaderImports(NamedTuple):
+    all: set[str]
+    exported: set[str]
 
 
 class CoverageError(Exception):
@@ -105,7 +117,7 @@ def module_name(path: pathlib.Path, root: pathlib.Path = ROOT) -> str:
     return ".".join(path.relative_to(root).with_suffix("").parts)
 
 
-def lean_header_imports(paths: list[pathlib.Path]) -> dict[pathlib.Path, set[str]]:
+def lean_header_imports(paths: list[pathlib.Path]) -> dict[pathlib.Path, HeaderImports]:
     """Ask pinned Lean to parse every candidate header in a single process."""
     if not paths:
         return {}
@@ -138,7 +150,7 @@ def lean_header_imports(paths: list[pathlib.Path]) -> dict[pathlib.Path, set[str
         raise CoverageError(
             f"pinned Lean header parser returned {len(results)} results for {len(paths)} paths"
         )
-    imports_by_path: dict[pathlib.Path, set[str]] = {}
+    imports_by_path: dict[pathlib.Path, HeaderImports] = {}
     for path, entry in zip(paths, results, strict=True):
         if not isinstance(entry, dict) or not isinstance(entry.get("errors"), list):
             raise CoverageError(f"{path}: missing Lean header error list")
@@ -149,7 +161,8 @@ def lean_header_imports(paths: list[pathlib.Path]) -> dict[pathlib.Path, set[str
             raise CoverageError(f"{path}: missing Lean header result/import list")
         if not isinstance(result.get("isModule"), bool):
             raise CoverageError(f"{path}: malformed Lean header result (isModule)")
-        modules: set[str] = set()
+        all_modules: set[str] = set()
+        exported_modules: set[str] = set()
         for item in result["imports"]:
             if (
                 not isinstance(item, dict)
@@ -158,9 +171,10 @@ def lean_header_imports(paths: list[pathlib.Path]) -> dict[pathlib.Path, set[str
                 or not isinstance(item.get("isExported"), bool)
             ):
                 raise CoverageError(f"{path}: malformed Lean header import record")
+            all_modules.add(item["module"])
             if item["isExported"]:
-                modules.add(item["module"])
-        imports_by_path[path] = modules
+                exported_modules.add(item["module"])
+        imports_by_path[path] = HeaderImports(all_modules, exported_modules)
     return imports_by_path
 
 
@@ -168,6 +182,7 @@ def check_coverage(
     root: pathlib.Path = ROOT,
     owners: dict[str, OwnerWitness] = DECLARATION_OWNERS,
     child_boundaries: dict[str, set[str]] = EXPLICIT_CHILD_BOUNDARIES,
+    export_route: tuple[str, str, str] | None = STABILITY_EXPORT_ROUTE,
 ) -> tuple[int, list[str]]:
     source_root = root / "DerivedAlgGeo"
     if not source_root.is_dir():
@@ -213,12 +228,25 @@ def check_coverage(
                 failures.append(f"stale umbrella/child exception: {name} / {child}")
 
     imports = lean_header_imports([pair[0] for _, pair in sorted(candidates.items())])
+    if export_route is not None:
+        neutral, child, outer = export_route
+        if child_boundaries != {neutral: {child}}:
+            failures.append(f"umbrella/child boundary must remain exact: {neutral} / {child}")
+        if neutral not in candidates:
+            failures.append(f"missing neutral umbrella for boundary: {neutral}")
+        elif child in imports[candidates[neutral][0]].all:
+            failures.append(f"{neutral}: must not import omitted child {child}")
+        if outer not in candidates:
+            failures.append(f"missing public export umbrella for boundary: {outer}")
+        elif child not in imports[candidates[outer][0]].exported:
+            failures.append(f"{outer}: must publicly re-export omitted child {child}")
+
     checked = 0
     for name, (umbrella, directory) in sorted(candidates.items()):
         if name in owners:
             continue
         checked += 1
-        declared = imports[umbrella]
+        declared = imports[umbrella].exported
         omitted = child_boundaries.get(name, set())
         # Direct children only. A file beside a same-named directory is
         # reached by both loops, so deduplicate its missing-import message.

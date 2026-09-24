@@ -88,6 +88,7 @@ class UmbrellaCoverageTest(unittest.TestCase):
             self.root,
             owners={} if owners is None else owners,
             child_boundaries={} if boundaries is None else boundaries,
+            export_route=None,  # These one-directory fixtures do not model geometry.
         )
 
     def test_compiled_fake_imports_never_cover_leaf(self) -> None:
@@ -102,7 +103,7 @@ class UmbrellaCoverageTest(unittest.TestCase):
             with self.subTest(fixture=name):
                 source = self.put_fixture(name)
                 self.compile_source(source)
-                imports = gate.lean_header_imports([self.umbrella])[self.umbrella]
+                imports = gate.lean_header_imports([self.umbrella])[self.umbrella].exported
                 self.assertNotIn(LEAF, imports)
                 checked, failures = self.check()
                 self.assertEqual(checked, 1)
@@ -111,7 +112,7 @@ class UmbrellaCoverageTest(unittest.TestCase):
 
     def test_compiled_real_header_import_covers_leaf(self) -> None:
         self.compile_importing_fixture("RealHeader.lean")
-        imports = gate.lean_header_imports([self.umbrella])[self.umbrella]
+        imports = gate.lean_header_imports([self.umbrella])[self.umbrella].exported
         self.assertIn(LEAF, imports)
         self.assertEqual(self.check(), (1, []))
 
@@ -122,7 +123,7 @@ class UmbrellaCoverageTest(unittest.TestCase):
         ):
             with self.subTest(fixture=fixture):
                 self.compile_importing_fixture(fixture)
-                imports = gate.lean_header_imports([self.umbrella])[self.umbrella]
+                imports = gate.lean_header_imports([self.umbrella])[self.umbrella].exported
                 self.assertEqual(LEAF in imports, exported)
                 checked, failures = self.check()
                 self.assertEqual(checked, 1)
@@ -135,8 +136,8 @@ class UmbrellaCoverageTest(unittest.TestCase):
     def test_multiple_headers_are_parsed_in_one_ordered_batch(self) -> None:
         self.put_fixture("RealHeader.lean")
         parsed = gate.lean_header_imports([self.leaf, self.umbrella])
-        self.assertNotIn(LEAF, parsed[self.leaf])
-        self.assertIn(LEAF, parsed[self.umbrella])
+        self.assertNotIn(LEAF, parsed[self.leaf].exported)
+        self.assertIn(LEAF, parsed[self.umbrella].exported)
 
     def test_malformed_header_is_fatal_even_when_lean_returns_json(self) -> None:
         source = self.put_fixture("MalformedHeader.lean")
@@ -223,6 +224,98 @@ class UmbrellaCoverageTest(unittest.TestCase):
         self.umbrella.unlink()
         with self.assertRaisesRegex(gate.CoverageError, "no same-named"):
             self.check()
+
+
+class StabilityExportRouteTest(unittest.TestCase):
+    """The one omitted child has a forbidden neutral edge and a required outer edge."""
+
+    def setUp(self) -> None:
+        temporary = tempfile.TemporaryDirectory(prefix="umbrella-stability-route-")
+        self.addCleanup(temporary.cleanup)
+        self.root = pathlib.Path(temporary.name)
+        self.neutral_name, self.child_name, self.outer_name = gate.STABILITY_EXPORT_ROUTE
+        geometry = self.root / "DerivedAlgGeo" / "AlgebraicGeometry"
+        derived = geometry / "DerivedCategory"
+        derived.mkdir(parents=True)
+        self.outer = self.root / "DerivedAlgGeo" / "AlgebraicGeometry.lean"
+        self.neutral = geometry / "DerivedCategory.lean"
+        self.child = derived / "Stability.lean"
+        self.outer.write_text(
+            f"import {self.neutral_name}\nimport {self.child_name}\n", encoding="utf-8"
+        )
+        self.neutral.write_text("import Init\n", encoding="utf-8")
+        self.child.write_text("module\npublic import Init\n", encoding="utf-8")
+
+    def assert_tree_compiles(self) -> None:
+        env = os.environ.copy()
+        previous = env.get("LEAN_PATH")
+        env["LEAN_PATH"] = str(self.root) + (os.pathsep + previous if previous else "")
+        for path in (self.child, self.neutral, self.outer):
+            proc = subprocess.run(
+                ["lean", "-R", str(self.root), "-o", str(path.with_suffix(".olean")), str(path)],
+                capture_output=True,
+                text=True,
+                cwd=gate.ROOT,
+                env=env,
+                check=False,
+            )
+            self.assertEqual(proc.returncode, 0, proc.stderr + proc.stdout)
+
+    def check_route(self, *, boundaries=None) -> tuple[int, list[str]]:
+        return gate.check_coverage(
+            self.root,
+            owners={},
+            child_boundaries=(
+                {self.neutral_name: {self.child_name}} if boundaries is None else boundaries
+            ),
+        )
+
+    def test_current_valid_header_route(self) -> None:
+        self.assert_tree_compiles()
+        parsed = gate.lean_header_imports([self.neutral, self.outer])
+        self.assertNotIn(self.child_name, parsed[self.neutral].all)
+        self.assertIn(self.child_name, parsed[self.outer].exported)
+        self.assertEqual(self.check_route(), (2, []))
+
+    def test_neutral_umbrella_must_not_import_child_even_privately(self) -> None:
+        for source in (
+            f"import {self.child_name}\n",
+            f"module\nimport {self.child_name}\n",
+        ):
+            with self.subTest(source=source):
+                self.neutral.write_text(source, encoding="utf-8")
+                self.assert_tree_compiles()
+                parsed = gate.lean_header_imports([self.neutral])[self.neutral]
+                self.assertIn(self.child_name, parsed.all)
+                _, failures = self.check_route()
+                self.assertTrue(any("must not import omitted child" in f for f in failures))
+
+    def test_outer_umbrella_must_publicly_import_child(self) -> None:
+        for source in (
+            f"import {self.neutral_name}\n",
+            f"module\npublic import {self.neutral_name}\nimport {self.child_name}\n",
+        ):
+            with self.subTest(source=source):
+                self.outer.write_text(source, encoding="utf-8")
+                if source.startswith("module"):
+                    self.neutral.write_text("module\npublic import Init\n", encoding="utf-8")
+                self.assert_tree_compiles()
+                parsed = gate.lean_header_imports([self.outer])[self.outer]
+                self.assertNotIn(self.child_name, parsed.exported)
+                _, failures = self.check_route()
+                self.assertTrue(any("must publicly re-export omitted child" in f for f in failures))
+
+    def test_child_exception_cannot_lose_its_export_route(self) -> None:
+        _, failures = self.check_route(boundaries={})
+        self.assertTrue(any("boundary must remain exact" in f for f in failures))
+
+    def test_child_exception_cannot_gain_an_unreviewed_child(self) -> None:
+        other = self.neutral.parent / "DerivedCategory" / "Other.lean"
+        other.write_text("import Init\n", encoding="utf-8")
+        _, failures = self.check_route(
+            boundaries={self.neutral_name: {self.child_name, f"{self.neutral_name}.Other"}}
+        )
+        self.assertTrue(any("boundary must remain exact" in f for f in failures))
 
 
 if __name__ == "__main__":
