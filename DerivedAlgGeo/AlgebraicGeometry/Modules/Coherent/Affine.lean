@@ -4,9 +4,13 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Affine.BasicOpenSubobjec
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Affine.Comparison
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Affine.Free
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Affine.Localization
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Affine.LocalizedSubobject
 
 /-! # Coherent sheaves on affine schemes
 
 `Affine.Localization` exports the underived fixed-target arrow and zero-composite
 three-term descent theorems for affine noetherian localizations.
+`Affine.LocalizedSubobject` compares coherent tilde subobjects with localized
+finite submodules on the localized spectrum, using explicit global-sections
+transport; it does not assert the corresponding equality on `D(r)`.
 -/
