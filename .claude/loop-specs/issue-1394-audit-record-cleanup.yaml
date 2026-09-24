@@ -6,7 +6,7 @@ remote: origin
 base_branch: main
 base_ref: agent/issue-1394-plan
 mode: independent
-enabled: true
+enabled: false
 allow_force_push: false
 state_dir: .loop-runs/issue-1394-audit-record-cleanup-publication
 roadmap_gate: disabled
