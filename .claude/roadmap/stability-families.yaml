@@ -730,8 +730,8 @@ items:
     kind: deliverable
     parent: stability-families-e21
     title: "Finite-cover Noetherian-heart detection"
-    status: in_progress
-    summary: "Prove that triangulated t-exact restrictions preserve heart monomorphisms and derive the finite-family local-to-global Noetherian implication from the existing detector. Leave geometric conservativity, local Noetherianity on bounded-coherent D_T, and Theorem 5.7(2) under parent #1063."
+    status: done
+    summary: "Proved that triangulated t-exact restrictions preserve heart monomorphisms and derived the finite-family local-to-global Noetherian implication from the existing detector. Geometric conservativity, local Noetherianity on bounded-coherent D_T, and Theorem 5.7(2) remain under parent #1063."
     priority: must
     size: M
     tags: [lean, derived, t-structure, noetherian]
