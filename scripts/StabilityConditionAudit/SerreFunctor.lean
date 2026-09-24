@@ -46,8 +46,6 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor
 #print axioms CategoryTheory.SerreFunctor.CoSerreFunctorData.eta
 #print axioms CategoryTheory.SerreFunctor.CoSerreFunctorData.naturality_left
 #print axioms CategoryTheory.SerreFunctor.CoSerreFunctorData.naturality_right
-#print axioms CategoryTheory.SerreFunctor.CoSerreFunctorData.mk.inj
-#print axioms CategoryTheory.SerreFunctor.CoSerreFunctorData.mk.sizeOf_spec
 #print axioms CategoryTheory.SerreFunctor.CoSerreFunctorData.fullyFaithful
 #print axioms CategoryTheory.SerreFunctor.CoSerreFunctorData.adjunction
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.isEquivalence
