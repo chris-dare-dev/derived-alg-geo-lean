@@ -1592,5 +1592,7 @@ geometric realizations. -/
 
 #print axioms CategoryTheory.isNoetherianObject_of_finite_jointlyReflectsIsomorphisms
 #print axioms CategoryTheory.isNoetherianObject_of_liftedSubobjectChains
+#print axioms CategoryTheory.anchored_chain_of_pointwise_lifts
+#print axioms CategoryTheory.anchored_chain_of_pointwise_lifts_iso
 #print axioms CategoryTheory.isNoetherianObject_of_reflectsIsomorphisms
 #print axioms ModuleCat.isNoetherianObject_of_isNoetherian

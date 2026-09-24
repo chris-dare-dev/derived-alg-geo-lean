@@ -297,6 +297,11 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   fixed-ambient subobject-chain lift is proved in this SF11.4 continuation.
   The geometric lift for a section-open or affine localization, the bounded
   `D_T` heart restriction, and their comparison remain `UNVERIFIED`.
+- progress note (2026-09-24): Successive binary joins now turn pointwise
+  subobject lifts into a fixed-ambient monotone chain, provided the functor
+  preserves those joins. The heart-level transfer consumes this conditional
+  construction. Join preservation and the geometric pointwise lift are not
+  inferred from mono preservation or the existing `SLocal` owner-data fields.
 
 ### 2026-09-24 — `SLocalSlicingData.restriction_eq_of_phase_iff`
 - chunk:              sf11-4a-1496-noetherian-cover

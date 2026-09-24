@@ -18,8 +18,10 @@ uniqueness vocabulary; the family-level quantifier and its geometric witnesses
 remain in `Families/SLocal.lean`.
 
 This file supplies the categorical half, for one functor at a time.
-It also transfers Noetherianity across an anchored lift of subobject chains;
-the existence of such lifts remains a geometric input.
+It also transfers Noetherianity across an anchored lift of subobject chains.
+Pointwise lifts suffice when the heart functor preserves binary joins of
+subobjects; both that preservation and the pointwise lifts remain explicit
+inputs to the categorical result.
 
 **Uniqueness is really a statement about aisles.** A t-structure carries two
 object properties, but they determine each other: `t.ge (n + 1)` is the right
@@ -225,6 +227,36 @@ theorem isNoetherian_of_liftedSubobjectChains
   intro c
   obtain ⟨X, e, d, hd⟩ := hlift Y c
   exact ⟨X, e, d, hglobal X, hd⟩
+
+/-- Pointwise lifting of target-heart subobjects into one source-heart ambient
+object implies Noetherianity when the restricted heart functor preserves binary
+joins of source subobjects. This separates the finite-join step in the proof of
+Lemma 4.16(3) from the geometric pointwise-lifting obligation. -/
+theorem isNoetherian_of_pointwiseSubobjectLifts
+    [HasImages t.heart.FullSubcategory]
+    [HasBinaryCoproducts t.heart.FullSubcategory]
+    (r : t.Restriction F) [r.heartFunctor.PreservesMonomorphisms]
+    [HasImages r.tStructure.heart.FullSubcategory]
+    [HasBinaryCoproducts r.tStructure.heart.FullSubcategory]
+    (hglobal : t.IsNoetherian)
+    (hjoin : ∀ (X : t.heart.FullSubcategory) (p q : Subobject X),
+      Subobject.mapFunctor r.heartFunctor (p ⊔ q) =
+        Subobject.mapFunctor r.heartFunctor p ⊔
+          Subobject.mapFunctor r.heartFunctor q)
+    (hlift : ∀ (Y : r.tStructure.heart.FullSubcategory),
+      ∃ (X : t.heart.FullSubcategory) (e : r.heartFunctor.obj X ≅ Y),
+        ∀ p : Subobject Y, ∃ q : Subobject X,
+          (Subobject.map e.hom).obj
+            (Subobject.mapFunctor r.heartFunctor q) = p) :
+    r.tStructure.IsNoetherian := by
+  letI := t.hasHeartFullSubcategory
+  letI := r.tStructure.hasHeartFullSubcategory
+  apply r.isNoetherian_of_liftedSubobjectChains hglobal
+  intro Y c
+  obtain ⟨X, e, hpt⟩ := hlift Y
+  obtain ⟨d, hd⟩ := CategoryTheory.anchored_chain_of_pointwise_lifts_iso
+    r.heartFunctor X e (hjoin X) c (fun n => hpt (c n))
+  exact ⟨X, e, d, hd⟩
 
 /-- The identity functor restricts every t-structure to itself. -/
 def id (t : TStructure C) : t.Restriction (𝟭 C) where
