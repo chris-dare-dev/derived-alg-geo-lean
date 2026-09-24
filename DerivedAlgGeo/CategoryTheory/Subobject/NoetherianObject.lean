@@ -13,12 +13,17 @@ functors jointly reflect isomorphisms, and every image of an object is Noetheria
 object is Noetherian: choose a stabilization index in every target, take their finite supremum,
 and reflect that the resulting chain step is an isomorphism.
 
+In the other direction, a chain of subobjects in a target object stabilizes if
+it lifts to subobjects of one Noetherian source object. This requires a fixed
+ambient object for the whole chain, not merely Noetherianity of each term.
+
 The targets are allowed to depend on the index. This is essential for geometric applications:
 restriction to the members `Uᵢ` of an open cover lands in the different categories `Coh Uᵢ`.
 
 ## Main results
 
 * `isNoetherianObject_of_finite_jointlyReflectsIsomorphisms` — finite-family detection.
+* `isNoetherianObject_of_liftedSubobjectChains` — transfer from anchored chain lifts.
 * `isNoetherianObject_of_reflectsIsomorphisms` — the one-functor specialization.
 -/
 
@@ -86,6 +91,30 @@ theorem isNoetherianObject_of_finite_jointlyReflectsIsomorphisms
     _ = Subobject.mk (c m).arrow :=
       Subobject.mk_eq_mk_of_comm _ _ (asIso step) (Subobject.ofLE_arrow _)
     _ = c m := Subobject.mk_arrow _
+
+/-- A mono-preserving functor transfers Noetherianity to a target object if
+every increasing chain of its subobjects lifts, up to an isomorphism of the
+ambient object, to a chain of subobjects of one Noetherian source object.
+The source object may depend on the chain. No isomorphism reflection is needed:
+stabilization is carried forward by the functor. -/
+theorem isNoetherianObject_of_liftedSubobjectChains
+    {D : Type u₂} [Category.{v₂} D] (G : A ⥤ D)
+    [G.PreservesMonomorphisms] (Y : D)
+    (hglobal : ∀ X : A, IsNoetherianObject X)
+    (hlift : ∀ c : ℕ →o Subobject Y,
+      ∃ (X : A) (e : G.obj X ≅ Y) (d : ℕ →o Subobject X),
+        ∀ n, (Subobject.map e.hom).obj (Subobject.mapFunctor G (d n)) = c n) :
+    IsNoetherianObject Y := by
+  rw [isNoetherianObject_iff_monotone_chain_condition]
+  intro c
+  obtain ⟨X, e, d, hd⟩ := hlift c
+  letI : IsNoetherianObject X := hglobal X
+  obtain ⟨n, hn⟩ := monotone_chain_condition_of_isNoetherianObject d
+  refine ⟨n, fun m hm ↦ ?_⟩
+  calc
+    c n = (Subobject.map e.hom).obj (Subobject.mapFunctor G (d n)) := (hd n).symm
+    _ = (Subobject.map e.hom).obj (Subobject.mapFunctor G (d m)) := by rw [hn m hm]
+    _ = c m := hd m
 
 /-- A mono-preserving, isomorphism-reflecting functor detects Noetherian objects. -/
 theorem isNoetherianObject_of_reflectsIsomorphisms
