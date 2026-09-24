@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.Exactness
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.ImageFactorisation
 import DerivedAlgGeo.CategoryTheory.Subobject.NoetherianObject
+import Mathlib.Algebra.Homology.ShortComplex.ExactFunctor
 import Mathlib.CategoryTheory.Triangulated.TStructure.TruncLTGE
 
 /-!
@@ -18,8 +19,10 @@ uniqueness vocabulary; the family-level quantifier and its geometric witnesses
 remain in `Families/SLocal.lean`.
 
 This file supplies the categorical half, for one functor at a time.
-It also transfers Noetherianity across an anchored lift of subobject chains;
-the existence of such lifts remains a geometric input.
+It also transfers Noetherianity across an anchored lift of subobject chains.
+For triangulated t-exact functors, exactness of the induced heart functor
+supplies preservation of binary joins, so pointwise lifts along each target
+chain suffice. Constructing those lifts remains a geometric input.
 
 **Uniqueness is really a statement about aisles.** A t-structure carries two
 object properties, but they determine each other: `t.ge (n + 1)` is the right
@@ -182,6 +185,16 @@ theorem heartFunctor_map (r : t.Restriction F)
     (r.heartFunctor.map f).hom = F.map f.hom :=
   rfl
 
+/-- The restriction to hearts is additive when the ambient functor is additive. -/
+noncomputable instance heartFunctor_additive
+    [F.Additive] (r : t.Restriction F) :
+    r.heartFunctor.Additive where
+  map_add := by
+    intro X Y f g
+    apply ObjectProperty.hom_ext
+    change F.map (f.hom + g.hom) = F.map f.hom + F.map g.hom
+    simp
+
 /-- A triangulated, t-exact functor restricts to a functor preserving
 monomorphisms on hearts. This uses the triangle associated to a heart mono;
 t-exactness alone, without preservation of triangles, is insufficient. -/
@@ -205,6 +218,58 @@ noncomputable instance heartFunctor_preservesMonomorphisms
       (f := r.heartFunctor.map f) (g := r.heartFunctor.map q) hF
     exact hS.mono_f
 
+attribute [local instance] heartFullSubcategoryAbelian
+
+/-- A triangulated t-exact functor sends short exact sequences in the source
+heart to short exact sequences in the target heart. -/
+theorem heartFunctor_shortExact
+    [IsTriangulated C] [IsTriangulated D]
+    [F.CommShift ℤ] [F.IsTriangulated]
+    (r : t.Restriction F)
+    (S : ShortComplex t.heart.FullSubcategory) (hS : S.ShortExact) :
+    (S.map r.heartFunctor).ShortExact := by
+  letI := t.hasHeartFullSubcategory
+  letI : Mono S.f := hS.mono_f
+  letI : Epi S.g := hS.epi_g
+  obtain ⟨δ, hT⟩ := t.heartFullSubcategory_shortExact_triangle S.f S.g S.zero
+    (fun {W} α hα =>
+      ⟨hS.fIsKernel.lift (KernelFork.ofι α hα),
+       hS.fIsKernel.fac (KernelFork.ofι α hα) WalkingParallelPair.zero⟩)
+  have hTF : Triangle.mk ((r.heartFunctor.map S.f).hom)
+      ((r.heartFunctor.map S.g).hom)
+      (F.map δ ≫ (F.commShiftIso (1 : ℤ)).hom.app S.X₁.obj) ∈ distTriang D := by
+    have hTF0 := F.map_distinguished _ hT
+    change Triangle.mk (F.map S.f.hom) (F.map S.g.hom)
+      (F.map δ ≫ (F.commShiftIso (1 : ℤ)).hom.app S.X₁.obj) ∈ distTriang D at hTF0
+    exact hTF0
+  exact r.tStructure.heartFullSubcategory_shortExact_of_distTriang
+    (f := r.heartFunctor.map S.f) (g := r.heartFunctor.map S.g) hTF
+
+/-- Exactness on heart short exact sequences gives preservation of finite
+limits and colimits. -/
+theorem heartFunctor_finiteExact
+    [IsTriangulated C] [IsTriangulated D]
+    [F.CommShift ℤ] [F.IsTriangulated]
+    (r : t.Restriction F) :
+    PreservesFiniteLimits r.heartFunctor ∧
+      PreservesFiniteColimits r.heartFunctor := by
+  exact ((Functor.exact_tfae r.heartFunctor).out 0 3).1
+    (heartFunctor_shortExact r)
+
+/-- The restricted heart functor preserves binary joins of subobjects.
+This is the categorical finite-sum step needed after pointwise lifts. -/
+theorem heartFunctor_mapFunctor_sup
+    [IsTriangulated C] [IsTriangulated D]
+    [F.CommShift ℤ] [F.IsTriangulated]
+    (r : t.Restriction F) (X : t.heart.FullSubcategory)
+    (p q : Subobject X) :
+    Subobject.mapFunctor r.heartFunctor (p ⊔ q) =
+      Subobject.mapFunctor r.heartFunctor p ⊔
+        Subobject.mapFunctor r.heartFunctor q := by
+  letI : PreservesFiniteLimits r.heartFunctor := (heartFunctor_finiteExact r).1
+  letI : PreservesFiniteColimits r.heartFunctor := (heartFunctor_finiteExact r).2
+  exact Subobject.mapFunctor_sup r.heartFunctor p q
+
 /-- Noetherianity transfers to a restricted heart when every ascending chain
 of subobjects of each target-heart object lifts to subobjects of one
 source-heart object, with the ambient and subobjects identified after applying
@@ -225,6 +290,49 @@ theorem isNoetherian_of_liftedSubobjectChains
   intro c
   obtain ⟨X, e, d, hd⟩ := hlift Y c
   exact ⟨X, e, d, hglobal X, hd⟩
+
+/-- Pointwise lifts of each member of an ascending target-heart subobject
+chain into one source-heart ambient object imply Noetherianity. The geometric
+pointwise-lifting obligation remains explicit; finite-join preservation now
+follows from the exactness of the restricted heart functor. -/
+theorem isNoetherian_of_pointwiseChainLifts
+    [IsTriangulated C] [IsTriangulated D]
+    [F.CommShift ℤ] [F.IsTriangulated]
+    (r : t.Restriction F)
+    (hglobal : t.IsNoetherian)
+    (hlift : ∀ (Y : r.tStructure.heart.FullSubcategory)
+      (c : ℕ →o Subobject Y),
+      ∃ (X : t.heart.FullSubcategory) (e : r.heartFunctor.obj X ≅ Y),
+        ∀ n : ℕ, ∃ q : Subobject X,
+          (Subobject.map e.hom).obj
+            (Subobject.mapFunctor r.heartFunctor q) = c n) :
+    r.tStructure.IsNoetherian := by
+  letI := t.hasHeartFullSubcategory
+  letI := r.tStructure.hasHeartFullSubcategory
+  apply r.isNoetherian_of_liftedSubobjectChains hglobal
+  intro Y c
+  obtain ⟨X, e, hpt⟩ := hlift Y c
+  obtain ⟨d, hd⟩ := CategoryTheory.anchored_chain_of_pointwise_lifts_iso
+    r.heartFunctor X e (r.heartFunctor_mapFunctor_sup X) c hpt
+  exact ⟨X, e, d, hd⟩
+
+/-- A convenient whole-subobject lifting criterion for the chainwise result.
+The chosen source ambient object is fixed for each target-heart object. -/
+theorem isNoetherian_of_pointwiseSubobjectLifts
+    [IsTriangulated C] [IsTriangulated D]
+    [F.CommShift ℤ] [F.IsTriangulated]
+    (r : t.Restriction F)
+    (hglobal : t.IsNoetherian)
+    (hlift : ∀ (Y : r.tStructure.heart.FullSubcategory),
+      ∃ (X : t.heart.FullSubcategory) (e : r.heartFunctor.obj X ≅ Y),
+        ∀ p : Subobject Y, ∃ q : Subobject X,
+          (Subobject.map e.hom).obj
+            (Subobject.mapFunctor r.heartFunctor q) = p) :
+    r.tStructure.IsNoetherian := by
+  apply r.isNoetherian_of_pointwiseChainLifts hglobal
+  intro Y c
+  obtain ⟨X, e, hpt⟩ := hlift Y
+  exact ⟨X, e, fun n => hpt (c n)⟩
 
 /-- The identity functor restricts every t-structure to itself. -/
 def id (t : TStructure C) : t.Restriction (𝟭 C) where
