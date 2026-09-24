@@ -308,10 +308,24 @@ class CollectorTests(unittest.TestCase):
         )
         security["run_binding"] = "independent"
         security["platforms"] = ["github-actions"]
+        fixture.security_check = {
+            "id": 900,
+            "name": "github-advanced-security",
+            "head_sha": SHA_HEAD,
+            "status": "completed",
+            "conclusion": "success",
+            "app": {"id": 4444, "slug": "github-advanced-security"},
+        }
         result = collect(fixture.client(), 7)
         self.assertEqual(result["evidence"]["schema_version"], 4)
+        self.assertNotIn(
+            "github-advanced-security",
+            [gate["id"] for gate in result["evidence"]["gates"]],
+        )
+        self.assertIn(fixture.security_check, result["observations"]["check_runs"])
         self.assertTrue(result["validation"]["claims"]["required_ci_verified"])
         self.assertFalse(result["validation"]["claims"]["auxiliary_checks_healthy"])
+        self.assertFalse(result["validation"]["claims"]["all_pipelines_green"])
 
     def test_exact_merge_candidate_and_real_payload_hashes(self) -> None:
         fixture = ProviderFixture()

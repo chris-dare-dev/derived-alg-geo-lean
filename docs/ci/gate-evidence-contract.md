@@ -16,7 +16,7 @@ protected branch metadata; a SHA supplied by the PR is not a trust anchor.
 Missing or mismatched base, head or policy anchors deny admission.
 
 Evidence uses the exact schema version of the protected-base inventory. Version
-4 remains readable for PRs opened before version 5 reaches `main`; its
+4 remains readable while the current protected base still contains version 4; its
 `github-advanced-security` entry retains the legacy independent-workflow
 binding and may be reported missing, so it cannot make auxiliary health true.
 Version 5 adds `run_binding=check` for a runless check-app observation on the

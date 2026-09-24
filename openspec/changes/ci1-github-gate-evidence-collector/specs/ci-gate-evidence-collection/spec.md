@@ -22,10 +22,10 @@ The collector SHALL derive the protected base, PR head, tested candidate commit 
 - **THEN** the collector fails closed instead of substituting the PR head or a locally synthesized merge commit
 
 ### Requirement: Complete and distinct observations
-The collector SHALL enumerate every page of candidate check suites, check runs and commit statuses needed by the inventory, preserving each provider ID, producer, workflow run and attempt. It MUST reject incomplete enumeration and ambiguous same-name observations; name or latest timestamp alone MUST NOT select a required result.
+The collector SHALL enumerate every page of PR-head check suites, check runs and commit statuses needed by the inventory, preserving each provider ID, producer, workflow run and attempt. The separately proven workflow artifact and Git parents bind required run observations to the merge candidate. It MUST reject incomplete enumeration and ambiguous same-name observations; name or latest timestamp alone MUST NOT select a required result.
 
 #### Scenario: Multiple check-run pages and a commit status
-- **WHEN** candidate observations span multiple provider pages and include a commit status whose name matches a check run
+- **WHEN** PR-head observations span multiple provider pages and include a commit status whose name matches a check run
 - **THEN** all pages are included and the status and check run retain separate provider and run identities
 
 #### Scenario: Truncated or ambiguous provider results
@@ -44,7 +44,7 @@ The collector SHALL enumerate every page of candidate check suites, check runs a
 The collector SHALL read the inventory from the current protected base revision and compare its required contexts with live branch protection. A PR-authored inventory change MUST NOT remove a required gate from the collected policy.
 
 #### Scenario: Required contexts agree
-- **WHEN** live protection requires the inventory's declared required contexts and the corresponding candidate observations are successful
+- **WHEN** live protection requires the inventory's declared required contexts and the corresponding PR-head observations are successful on the proven candidate's workflow run
 - **THEN** the collector may submit the record to the existing validator using the trusted inventory's version
 
 #### Scenario: Unknown required context

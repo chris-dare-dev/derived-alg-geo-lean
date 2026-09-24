@@ -8,7 +8,7 @@
 
 ## 2. Observations and evidence
 
-- [x] 2.1 Enumerate all check-suite pages, each suite's check-run pages and all commit-status pages for the exact candidate while preserving provider IDs and distinct producers; verify duplicate-name, mixed-status and incomplete-enumeration fixtures in `scripts/tests/test_ci_github_evidence.py`.
+- [x] 2.1 Enumerate all PR-head check-suite pages, each suite's check-run pages and all PR-head commit-status pages while proving the separate merge candidate through the workflow artifact and Git parents; preserve provider IDs and distinct producers, and verify duplicate-name, mixed-status and incomplete-enumeration fixtures in `scripts/tests/test_ci_github_evidence.py`.
 - [x] 2.2 Associate GitHub Actions jobs with the verified workflow run and attempt, retaining earlier attempts as non-authorizing observations; verify successful rerun and ambiguous-attempt fixtures in `scripts/tests/test_ci_github_evidence.py`.
 - [x] 2.3 Read candidate pin blobs and emit canonical observation payloads plus evidence in the trusted inventory's schema version with hashes of actual retained bytes; call `ci_contract.validate_evidence` with independently read anchors. Verify tampered payload, absent pin, optional-red and required-red fixtures using `python3 -m unittest discover -s scripts/tests -p 'test_ci_github_evidence.py'`.
 - [x] 2.4 Add a read-only `scripts/loop_engine.py evidence` command that consumes collector/validator output without changing queue admission; verify a passing fixture and a denied fixture through the controller command in `scripts/tests/test_loop_engine.py`.
