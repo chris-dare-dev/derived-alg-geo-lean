@@ -21,7 +21,8 @@ This file supplies that. `mapFunctor` pushes a subobject forward along any mono-
 and `mapEquivalence` upgrades it to an order isomorphism when the functor is half of an
 equivalence. For abelian categories, a functor preserving monos, epis, and binary coproducts
 also carries binary joins of subobjects to binary joins. Preserving monos and epis likewise
-allows the image of a lifted arrow into a fixed target to lift its image subobject.
+allows the image of a lifted arrow into a fixed target to lift its image subobject in
+the abelian setting.
 
 ## Why an order isomorphism and not just a monotone map
 
@@ -32,10 +33,9 @@ it possible to transport a Harder–Narasimhan filtration along an equivalence.
 
 ## The shape of the proofs
 
-Every proof is induction on a subobject down to a representing mono, after which both sides are
-`mk` of an explicit morphism and the statement is `mk_eq_mk_of_comm` against a comparison
-isomorphism. The only step with content is `mapFunctor_inverse_functor`, where naturality of the
-unit turns the round trip into composition with a unit component, which is invertible.
+For the equivalence results, the proofs reduce a subobject to a representing mono,
+then compare explicit morphisms using the unit isomorphism. Image preservation
+uses the epi--mono image factorization and balancedness instead.
 -/
 
 universe v₁ v₂ u₁ u₂
@@ -171,8 +171,9 @@ private theorem image_epi_comp {X Y Z : B} (e : X ⟶ Y) [Epi e]
   exact Subobject.le_of_comm (inv (Subobject.ofLE _ _ hle)) (by
     rw [IsIso.inv_comp_eq, Subobject.ofLE_arrow])
 
-/-- A functor preserving monomorphisms and epimorphisms carries the image
-subobject of an arrow to the image subobject of the mapped arrow. -/
+/-- Between categories with images and equalizers, with balanced target, a
+functor preserving monomorphisms and epimorphisms carries the image subobject
+of an arrow to the image subobject of the mapped arrow. -/
 theorem mapFunctor_image (G : A ⥤ B)
     [G.PreservesMonomorphisms] [G.PreservesEpimorphisms]
     {X Y : A} (f : X ⟶ Y) :
