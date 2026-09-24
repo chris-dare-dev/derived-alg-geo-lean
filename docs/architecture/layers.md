@@ -64,9 +64,10 @@ complete mathematical ownership policy.
    private and meta imports), and rejects any path to the exact
    `DerivedCategory.Stability` or triangulated `StabilityCondition` module or
    their descendants. The outer `AlgebraicGeometry` umbrella must directly
-   publicly import the exact `DerivedCategory.Stability` module (including a
-   `public meta import`, whose header is marked exported by pinned Lean for
-   downstream meta use; this does not grant ordinary runtime use).
+   publicly import the exact `DerivedCategory.Stability` module through a
+   non-meta edge, preserving an ordinary downstream export/build route. Pinned
+   Lean marks `public meta import` as exported, but that alone gives only meta
+   visibility: an ordinary downstream `def` cannot use it.
    This does not replace the broader layering policy, umbrella child-coverage
    check, or compilation of the source modules.
 4. **Weak stability is independent of Bridgeland stability.** No module of the

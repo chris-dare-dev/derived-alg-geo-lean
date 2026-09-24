@@ -82,11 +82,14 @@ class NeutralStabilityImportsTest(unittest.TestCase):
             )
             self.assertEqual(proc.returncode, 0, f"{name}: {proc.stderr}{proc.stdout}")
 
-    def compile_downstream_client(self, *, succeeds: bool) -> None:
+    def compile_downstream_client(self, *, meta: bool, succeeds: bool) -> None:
         """The client imports only the outer umbrella, not Stability itself."""
         client = self.root / "Client.lean"
         client.write_text(
-            source(f"public import {O}", body="meta def clientWitness : Nat := stabilityWitness\n"),
+            source(
+                f"public import {O}",
+                body=("meta " if meta else "") + "def clientWitness : Nat := stabilityWitness\n",
+            ),
             encoding="utf-8",
         )
         env = os.environ.copy()
@@ -167,25 +170,36 @@ class NeutralStabilityImportsTest(unittest.TestCase):
             with self.subTest(case=label):
                 self.put(O, outer_source)
                 failures = self.check()
-                self.assertTrue(any("must directly publicly import" in f
+                self.assertTrue(any("must directly publicly import non-meta" in f
                                     for f in failures), failures)
 
-    def test_public_meta_export_and_private_meta_nonexport_compile_with_client(self) -> None:
+    def test_ordinary_and_meta_export_routes_with_compiled_clients(self) -> None:
         self.put(S, source(
             "public import Init", body="public def stabilityWitness : Nat := 7\n"
         ))
-        for modifier, exported in (("public meta import", True), ("meta import", False)):
-            with self.subTest(modifier=modifier):
-                self.put(O, source(f"public import {N}", f"{modifier} {S}"))
+        cases = (
+            ("public ordinary", (f"public import {S}",), True, True, None),
+            ("public meta", (f"public meta import {S}",), True, False, True),
+            ("private meta", (f"meta import {S}",), False, False, False),
+            # Exported and non-meta must describe the same import record.
+            ("public meta and private ordinary",
+             (f"public meta import {S}", f"import {S}"), True, False, True),
+        )
+        for label, imports, exported, ordinary_visible, meta_visible in cases:
+            with self.subTest(case=label):
+                self.put(O, source(f"public import {N}", *imports))
                 paths = self.write_sources()
                 self.compile_sources(paths)
                 outer = next(path for path in paths if gate.module_name(path, self.root) == O)
                 header = gate.parse_headers([outer])[outer]
                 self.assertIn(S, header.all_imports)
                 self.assertEqual(S in header.exported_imports, exported)
+                self.assertEqual(S in header.ordinary_exported_imports, ordinary_visible)
                 _, failures = gate.check_neutrality(self.root, paths)
-                self.assertEqual(failures == [], exported, failures)
-                self.compile_downstream_client(succeeds=exported)
+                self.assertEqual(failures == [], ordinary_visible, failures)
+                self.compile_downstream_client(meta=False, succeeds=ordinary_visible)
+                if meta_visible is not None:
+                    self.compile_downstream_client(meta=True, succeeds=meta_visible)
 
     def test_unknown_internal_import_fails_closed(self) -> None:
         # Even an unrelated tracked header must not silently leave a graph hole.

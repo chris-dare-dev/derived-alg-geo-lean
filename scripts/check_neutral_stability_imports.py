@@ -3,7 +3,9 @@
 
 Pinned Lean parses every tracked library header in one ``--deps-json --stdin``
 batch. All imports, including private and meta imports, contribute graph edges;
-only a direct import with ``isExported`` supplies the outer Stability export route.
+the outer Stability route needs one direct import marked both exported and
+non-meta so ordinary downstream declarations can use it. A public meta import
+alone is visible only to downstream meta code.
 This is a focused architecture check, not general layering or elaboration.
 """
 
@@ -36,6 +38,7 @@ class GateError(Exception):
 class Header(NamedTuple):
     all_imports: frozenset[str]
     exported_imports: frozenset[str]
+    ordinary_exported_imports: frozenset[str]
 
 
 def module_name(path: Path, root: Path) -> str:
@@ -115,6 +118,7 @@ def parse_headers(paths: list[Path], *, lean_root: Path = ROOT) -> dict[Path, He
             raise GateError(f"{path}: malformed Lean header isModule flag")
         all_imports: set[str] = set()
         exported: set[str] = set()
+        ordinary_exported: set[str] = set()
         for item in result["imports"]:
             if (
                 not isinstance(item, dict)
@@ -128,7 +132,11 @@ def parse_headers(paths: list[Path], *, lean_root: Path = ROOT) -> dict[Path, He
             all_imports.add(name)
             if item["isExported"]:
                 exported.add(name)
-        headers[path] = Header(frozenset(all_imports), frozenset(exported))
+                if not item["isMeta"]:
+                    ordinary_exported.add(name)
+        headers[path] = Header(
+            frozenset(all_imports), frozenset(exported), frozenset(ordinary_exported)
+        )
     return headers
 
 
@@ -159,9 +167,9 @@ def check_graph(headers: dict[Path, Header], root: Path) -> list[str]:
         raise GateError(f"internal import cycle: {exc.args[1]!r}") from exc
 
     failures: list[str] = []
-    if GEOMETRIC_STABILITY not in by_name[OUTER].exported_imports:
+    if GEOMETRIC_STABILITY not in by_name[OUTER].ordinary_exported_imports:
         failures.append(
-            f"{OUTER}: must directly publicly import {GEOMETRIC_STABILITY}"
+            f"{OUTER}: must directly publicly import non-meta {GEOMETRIC_STABILITY}"
         )
     parents: dict[str, str | None] = {NEUTRAL: None}
     queue = deque([NEUTRAL])
