@@ -2,21 +2,22 @@
 
 ## Why
 
-Milestone 13 tracks three connected outcomes: parent issue #137, the reusable Copier topic template in #182, and the reduced second-topic falsifiability gate in #183. The old gate estimate assumed a much larger ingest and formalization; the revised scope is one analytic-number-theory paper, five registry entries, and one direct binding to a theorem already in Mathlib, with the generalization claim held false until that evidence exists.
+Milestone 13 consists of the parent issue #137 and its two deliverables: the reusable topic template (#182) and the reduced second-topic gate (#183). The issue bodies define the scope. The user explicitly asked to complete all three and bootstrap an issue-first loop, so the `gate:owner` labels are not waiting for another authorization step.
 
 ## What Changes
 
-- Add a Copier template to MathFormalContract with an optional upstream anchor, an exact topmost package pin, honest generated metadata, and a full source-commit answer so later schema updates can be applied reproducibly.
-- Demonstrate the template in an anchor-free analytic-number-theory adopter using the exact Mathlib pin.
-- Establish the reduced second-topic gate: one fetched and ingested arXiv paper, five sourced entries including an Iwaniec–Kowalski textbook entry using `digest_only`, and at least one Mathlib external declaration whose claimed relation is `exact`.
-- Keep `generalization_validated: false` until the corpus, registry, Lean emission, environment binding, and contract checks all pass; record evidence and date the transition if they do.
-- Keep the Derived issue plan, the MathFormalContract implementation, and the arXMCP notebook as separate repository-scoped work. Do not use one loop manifest to claim control of all three repositories.
+- Finish the Copier template with an optional anchor, direct Mathlib pin fallback, complete saved answers, honest metadata, and zero Bridgeland-specific template bytes.
+- Demonstrate the template in an anchor-free analytic-number-theory adopter.
+- Pass the reduced gate with one fetched and ingested arXiv paper, five sourced registry entries including a digest-only Iwaniec–Kowalski contents locator, and an exact external binding to `Nat.infinite_setOf_prime` in the pinned Mathlib environment.
+- Mark the reusable template's own trust record validated with dated gate evidence; keep each newly generated topic's trust record false by default.
+- Record the issue-first loop procedure: issue acceptance drives the work; a second repository plan, contact email, generated manifest, or separate owner reauthorization is not a prerequisite.
 
 ## Capabilities
 
 ### New Capabilities
 
-- `topic-template-gate`: Reproducible generation and evidence requirements for a second mathematical topic.
+- `topic-template-gate`: reproducible generation and a falsifiable second-topic demonstration.
+- `issue-first-loop`: a user-requested issue list is sufficient to begin scoped implementation and continue across participating repositories.
 
 ### Modified Capabilities
 
@@ -24,6 +25,6 @@ Milestone 13 tracks three connected outcomes: parent issue #137, the reusable Co
 
 ## Impact
 
-The implementation target for #182/#183 is the separate MathFormalContract repository and its generated topic adopter; the real source corpus is stored in arXMCP. This Derived repository owns the milestone plan and issue tracking only. No public `DerivedAlgGeo` Lean API or mathematical declaration changes. The current loop controller can validate and preflight Derived issues, but it cannot freeze files in another repository; separate repository-local plans and runs are required before provider actions.
+Implementation spans MathFormalContract (template and tooling), arXMCP (source fetch and corpus), and a generated analytic-number-theory adopter. DerivedAlgGeo owns the milestone issues and this compact progress record. No public `DerivedAlgGeo` Lean API changes.
 
-Issue #137 and #183 carry `gate:owner`; no issue closure, publication, approval, or merge is authorized by this plan. The plan records the two-week budget requested by the issue while keeping the gate's acceptance criteria fixed.
+Use repository-native branches and pull requests where code belongs. One batch record is enough; do not create per-repository OpenSpec roots or manifests just to start. Keep normal correctness checks, hosted CI, branch protection, and the repository's trust review for protected paths. Those checks report actual code or platform constraints rather than planning prerequisites.
