@@ -102,7 +102,41 @@ concerns belong to a small repository-local controller.
 4. Enable a pilot only after the issue set, dependencies, branch protection,
    and the action policy have been reviewed.
 
+## Pilot preflight record (2026-09-23)
+
+On `origin/main`, `python3 scripts/loop_engine.py validate --spec
+ .claude/loop-specs/sf11-pilot.yaml` passes. Running the checked-in disabled
+ manifest's preflight returns `DISABLED` before provider reads, as intended.
+ To inspect current readiness without changing that manifest, a temporary
+ diagnostic copy was used with `enabled: true`, `base_ref: origin/main`,
+ independent mode, no epic opt-in or selected dependencies, a three-round cap,
+ and a harmless documentation path as its nominal chunk scope. It made only
+ GitHub read requests and local validation; no provider action was invoked.
+
+The diagnostic preflight reported:
+
+- GitHub authentication as `chris-dare-dev`, current branch-protection checks,
+  and strict OpenSpec validation pass.
+- The checkout is detached, so preflight refuses to run on the protected base
+  instead of an issue branch.
+- Issues #1060, #1061, and #1062 are all closed and each still has the `epic`
+  label, so none is eligible for a new branch-authored run.
+- The owner-controlled `.claude/loop-authority.yaml` is absent from GitHub's
+  default branch. No provider actions are granted to a new run until the owner
+  adds and reviews that file.
+
+The original pilot also points `base_ref` at `agent/sf11-base`, opts into epic
+issues, permits administrator merge, and allows five rounds. Those settings do
+not describe a viable fresh run under the current controller and repository
+rules. Keep `sf11-pilot.yaml` disabled; do not revive closed issues. A future
+run needs a clean issue-specific branch containing `origin/main`, open eligible
+issues, no unresolved predecessor, the repository's three-round cap, passing
+OpenSpec and required-check preflight, and owner-granted provider actions.
+Chunks must remain inside the single repository controlled by that manifest;
+cross-repository work needs separate repo-local plans and runs.
+
 ## Open Questions
 
-- Whether the final pilot should use stack mode with explicit merge authority or
-  be split into independent issue batches remains a repository-owner decision.
+- Whether a future set of dependent issues should use stack mode with explicit
+  merge authority or be split into independent issue batches remains a
+  repository-owner decision.
