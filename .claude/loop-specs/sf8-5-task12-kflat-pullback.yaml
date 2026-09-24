@@ -126,7 +126,9 @@ issues:
             all gates applicable to changed files, four independent reviews
             on the same final commit, and required hosted ci check pass before
             merge. Run scripts/precheck.sh and record its exact result; the
-            documented pre-existing loop-spec and loop-engine-tests failures
-            do not count as green and do not block this chunk unless this
-            chunk adds a failure to either gate.
+            current baseline's known loop-spec failure for #1394 does not
+            count as green and does not block this chunk if it remains the
+            only failing precheck gate. The loop-engine-tests and every other
+            precheck gate must pass; refresh these expectations against the
+            exact base before each implementation PR.
         closure: progress
