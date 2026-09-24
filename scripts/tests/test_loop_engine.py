@@ -1943,6 +1943,39 @@ class BranchManifestPolicyTests(unittest.TestCase):
             loop_engine.action_approve(self.root, self.spec, 12, self.root / "ledger.json", "body", False)
         command.assert_not_called()
 
+    def test_approval_posts_a_commit_bound_review(self) -> None:
+        state = passing_ledger_state(self.root, self.spec)
+        head = "a" * 40
+        pr = {
+            "state": "OPEN", "isDraft": False, "baseRefName": "main",
+            "headRefName": "agent/test-issue", "headRefOid": head,
+            "body": "Closes #1\n", "files": [{"path": "a.txt"}],
+        }
+        response = {"commit_id": head, "state": "APPROVED"}
+        with mock.patch.object(loop_engine, "authorize_action"), mock.patch.object(
+            loop_engine, "recovery_publication_state"
+        ), mock.patch.object(loop_engine, "require_predecessor_prs", return_value=[]), mock.patch.object(
+            loop_engine, "load_state", return_value=state
+        ), mock.patch.object(loop_engine, "ledger_openspec_matches", return_value=True), mock.patch.object(
+            loop_engine, "gh_json", side_effect=[pr, response]
+        ) as provider, mock.patch.object(loop_engine, "require_pr_targets_base"), mock.patch.object(
+            loop_engine, "require_pr_matches_frozen_issue"
+        ), mock.patch.object(loop_engine, "require_predecessor_merges_ancestor"), mock.patch.object(
+            loop_engine, "reviewed_content_matches", return_value=True
+        ), mock.patch.object(loop_engine, "verify_remote_chunk_files"), mock.patch.object(
+            loop_engine, "require_published_head_has_no_links"
+        ), mock.patch.object(loop_engine, "check_required_checks", return_value=head):
+            self.assertEqual(
+                loop_engine.action_approve(self.root, self.spec, 12, self.root / "ledger.json", "body", False), 0
+            )
+        self.assertEqual(
+            provider.call_args_list[1].args[1],
+            [
+                "api", "--method", "POST", "repos/example/repository/pulls/12/reviews",
+                "-f", f"commit_id={head}", "-f", "body=body", "-f", "event=APPROVE",
+            ],
+        )
+
 
 class ContentBindingTests(unittest.TestCase):
     """A review binds the change it read, not the base the change sits on."""

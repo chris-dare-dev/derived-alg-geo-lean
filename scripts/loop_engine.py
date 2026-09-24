@@ -3561,21 +3561,26 @@ def action_approve(
     checked_head = check_required_checks(root, spec, pr_number)
     if checked_head.lower() != str(pr.get("headRefOid", "")).lower():
         raise LoopError("PR head moved between review verification and check read; rerun the approval")
+    # `gh pr review` has no head pin. The REST endpoint binds this approval to
+    # the checked commit even if the PR branch moves after the final read.
     args = [
-        "gh",
-        "pr",
-        "review",
-        str(pr_number),
-        "--repo",
-        spec["repository"],
-        "--approve",
-        "--body",
-        body,
+        "api",
+        "--method",
+        "POST",
+        f"repos/{spec['repository']}/pulls/{pr_number}/reviews",
+        "-f",
+        f"commit_id={checked_head}",
+        "-f",
+        f"body={body}",
+        "-f",
+        "event=APPROVE",
     ]
     if dry_run:
-        print("DRY-RUN " + " ".join(args[:7]) + " <body>")
+        print("DRY-RUN gh " + " ".join(args[:6]) + " <body> -f event=APPROVE")
         return 0
-    run_command(root, args, check=True)
+    review = gh_json(root, args)
+    if not isinstance(review, dict) or review.get("commit_id") != checked_head or review.get("state") != "APPROVED":
+        raise LoopError("provider did not confirm approval on the checked PR head")
     print(f"PASS PR approved: #{pr_number}")
     return 0
 
