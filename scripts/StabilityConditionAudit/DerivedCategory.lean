@@ -64,6 +64,10 @@ categories. Scheme and affine consumers are audited by AlgebraicGeometryAudit.
 #print axioms DerivedCategory.idFactors
 #print axioms DerivedCategory.compFactors
 
+/-! ## Degree-zero Hom-complex classes and derived morphisms -/
+
+#print axioms CochainComplex.HomComplex.CohomologyClass.derivedCategoryHomAddEquiv
+
 /-! ## K-projective derived functors -/
 
 #print axioms CategoryTheory.kProjectiveHomotopy
