@@ -2,7 +2,7 @@
 
 ## 1. Issue #897 — Full faithfulness and the co-Serre condition
 
-- [ ] 1.1 Add `CoSerreFunctorData`, prove full faithfulness of both duality functors under explicit Hom-finiteness, construct their adjunction, and derive the existing equivalence package from the co-Serre input; update the linear umbrella and `SerreFunctor` audit. Freeze this chunk to `CategoryTheory/Linear/SerreFunctor/Equivalence.lean`, `CategoryTheory/Linear/SerreFunctor.lean`, `scripts/StabilityConditionAudit/SerreFunctor.lean`, and `docs/architecture/generalization-backlog.md`. Verify with a named build of `DerivedAlgGeo.CategoryTheory.Linear.SerreFunctor`, the focused audit target, `scripts/check_layering.py`, and `scripts/check_umbrella_coverage.py`.
+- [x] 1.1 Add `CoSerreFunctorData`, prove full faithfulness of both duality functors under explicit Hom-finiteness, construct their adjunction, and derive the existing equivalence package from the co-Serre input; update the linear umbrella and `SerreFunctor` audit. Freeze this chunk to `CategoryTheory/Linear/SerreFunctor/Equivalence.lean`, `CategoryTheory/Linear/SerreFunctor.lean`, `scripts/StabilityConditionAudit/SerreFunctor.lean`, and `docs/architecture/generalization-backlog.md`. Verify with a named build of `DerivedAlgGeo.CategoryTheory.Linear.SerreFunctor`, the focused audit target, `scripts/check_layering.py`, and `scripts/check_umbrella_coverage.py`.
 
 ## 2. Issue #898 — Conjugation and shift consequences
 

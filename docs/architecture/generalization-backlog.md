@@ -255,3 +255,47 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   The generic API is outside this frozen chunk and is deferred; do not move or
   duplicate the geometric declaration to implement it.
 - state:              UNVERIFIED
+
+### 2026-09-23 — `SerreFunctorData.fullyFaithful` without Hom-finiteness
+- chunk:              srf1-897-full-faithfulness
+- reviewing commit:   74a05e716502cd3034958530c8134021fd2688c1
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `CategoryTheory.Linear.SerreFunctor.Equivalence`
+- weaker hypotheses:  retain `[Field k] [Category C] [Preadditive C] [Linear k C]`
+  and the Serre duality data, but omit `[HomFinite k C]` and all replacement
+  reflexivity hypotheses.
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/LinearAlgebra/Dual/Defs.lean:229` and
+  `.lake/packages/mathlib/Mathlib/LinearAlgebra/Dual/Lemmas.lean:288-306`
+- source note:        `/tmp/srf1-hypothesis-probes.lean` attempted the double-dual
+  Hom equivalence without `HomFinite`; Mathlib failed to synthesize
+  `Module.IsReflexive k (A ⟶ B)` for `Module.evalEquiv`. The full-faithfulness
+  chain needs reflexivity of each Hom module. A probe replacing Hom-finiteness
+  by `[∀ A B, Module.IsReflexive k (A ⟶ B)]` compiled, but over the existing
+  `[Field k]` root Mathlib infers `FiniteDimensional` from reflexivity, so that
+  is not a genuine weakening. The adjunction from both duality structures does
+  not itself use Hom-finiteness; this row concerns the double-dual step.
+- state:              FALSIFIED compiler witness: without Hom-finiteness or
+  reflexivity, `Module.evalEquiv k (A ⟶ B)` has no `Module.IsReflexive` instance.
+
+### 2026-09-23 — `SerreFunctorData.fullyFaithful` over a commutative ring
+- chunk:              srf1-897-full-faithfulness
+- reviewing commit:   74a05e716502cd3034958530c8134021fd2688c1
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `CategoryTheory.Linear.SerreFunctor`, if its existing
+  scalar binder is ever generalized
+- weaker hypotheses:  replace `[Field k]` by `[CommRing k]` while retaining
+  finite generation `[Module.Finite k (A ⟶ B)]` for each Hom module.
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/LinearAlgebra/Dual/Defs.lean:229` and
+  `.lake/packages/mathlib/Mathlib/LinearAlgebra/Dual/Lemmas.lean:258-288`
+- source note:        `/tmp/srf1-hypothesis-probes.lean` attempted
+  `Module.evalEquiv R M` with `[CommRing R] [Module.Finite R M]`; pinned Mathlib
+  could not synthesize `Module.IsReflexive R M`. Finite generation over a
+  commutative ring does not supply the finite-projective/free reflexivity
+  hypotheses used by the available instances. This falsifies the weakening
+  with finite generation alone; an explicit reflexivity or finite-projective
+  condition is a different hypothesis set. The existing Serre root is
+  field-based, and this finding is outside the frozen #897 chunk.
+- state:              FALSIFIED compiler witness: `Module.evalEquiv R M` fails
+  with `failed to synthesize Module.IsReflexive R M`.
