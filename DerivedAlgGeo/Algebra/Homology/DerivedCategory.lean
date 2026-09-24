@@ -12,6 +12,7 @@ import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Opposite
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.LinearDual
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor.Bounded
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.FGModuleCatInclusion
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor.Coproducts
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Heart
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.BoundedHeart
