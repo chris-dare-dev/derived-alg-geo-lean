@@ -232,6 +232,15 @@ class LoopEngineTests(unittest.TestCase):
             self.assertIsInstance(result, subprocess.CompletedProcess)
             self.assertEqual(process.call_args.args[0], ["openspec.cmd", "--version"])
 
+    def test_executable_launch_error_is_controlled_even_without_check(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for error in (FileNotFoundError("not installed"), PermissionError("not executable")):
+                with self.subTest(error=type(error).__name__), mock.patch.object(
+                    loop_engine.subprocess, "run", side_effect=error
+                ), self.assertRaisesRegex(loop_engine.LoopError, "could not start command: openspec"):
+                    loop_engine.run_command(root, ["openspec", "validate"], check=False)
+
     def test_structural_openspec_validation_and_manifest(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -1838,6 +1847,46 @@ class BranchManifestPolicyTests(unittest.TestCase):
         ):
             self.assertEqual(loop_engine.check_required_checks(self.root, self.spec, 12), "c" * 40)
 
+    def test_required_checks_fail_closed_when_live_protection_is_unavailable(self) -> None:
+        rollup = {
+            "headRefOid": "c" * 40,
+            "statusCheckRollup": [{"name": "ci", "conclusion": "SUCCESS"}],
+        }
+        with mock.patch.object(loop_engine, "gh_json", return_value=rollup), mock.patch.object(
+            loop_engine, "protected_check_names", side_effect=loop_engine.LoopError("protection unavailable")
+        ), self.assertRaisesRegex(loop_engine.LoopError, "protection unavailable"):
+            loop_engine.check_required_checks(self.root, self.spec, 12)
+
+    def test_required_checks_reject_a_malformed_protection_response(self) -> None:
+        rollup = {
+            "headRefOid": "c" * 40,
+            "statusCheckRollup": [{"name": "ci", "conclusion": "SUCCESS"}],
+        }
+        with mock.patch.object(loop_engine, "gh_json", side_effect=[rollup, {}]), self.assertRaisesRegex(
+            loop_engine.LoopError, "branch protection returned an unexpected response"
+        ):
+            loop_engine.check_required_checks(self.root, self.spec, 12)
+
+    def test_required_checks_reject_an_unbound_head(self) -> None:
+        rollup = {"statusCheckRollup": [{"name": "ci", "conclusion": "SUCCESS"}]}
+        with mock.patch.object(loop_engine, "gh_json", return_value=rollup), self.assertRaisesRegex(
+            loop_engine.LoopError, "missing a valid head commit"
+        ):
+            loop_engine.check_required_checks(self.root, self.spec, 12)
+
+    def test_live_required_failure_cannot_be_hidden_by_manifest(self) -> None:
+        rollup = {
+            "headRefOid": "c" * 40,
+            "statusCheckRollup": [
+                {"name": "ci", "conclusion": "SUCCESS"},
+                {"name": "trust-surface", "conclusion": "FAILURE"},
+            ],
+        }
+        with mock.patch.object(loop_engine, "gh_json", return_value=rollup), mock.patch.object(
+            loop_engine, "protected_check_names", return_value={"ci", "trust-surface"}
+        ), self.assertRaisesRegex(loop_engine.LoopError, "trust-surface=FAILURE"):
+            loop_engine.check_required_checks(self.root, self.spec, 12)
+
 
 class ContentBindingTests(unittest.TestCase):
     """A review binds the change it read, not the base the change sits on."""
@@ -2119,6 +2168,31 @@ class PlanInPullRequestPreflightTests(unittest.TestCase):
     def test_an_uncommitted_plan_on_the_work_branch_passes(self) -> None:
         code, output = self.preflight()
         self.assertEqual(code, 0, output)
+
+    def test_required_openspec_cli_absence_uses_documented_structural_fallback(self) -> None:
+        self.spec["openspec"]["validation"] = "cli-required"
+        write_manifest(self.root, self.spec)
+        with mock.patch.object(loop_engine.shutil, "which", return_value=None):
+            code, output = self.preflight()
+        self.assertEqual(code, 0, output)
+        self.assertIn("OpenSpec CLI is not installed; structural validation passed", output)
+
+    def test_required_openspec_cli_launch_race_fails_preflight(self) -> None:
+        self.spec["openspec"]["validation"] = "cli-required"
+        write_manifest(self.root, self.spec)
+        original = loop_engine.run_command
+
+        def launch_or_run(root: Path, args: list[str], *, check: bool = False) -> subprocess.CompletedProcess[str]:
+            if args[0] == "openspec":
+                raise loop_engine.LoopError("could not start command: openspec: not installed")
+            return original(root, args, check=check)
+
+        with mock.patch.object(loop_engine.shutil, "which", return_value="/usr/bin/openspec"), mock.patch.object(
+            loop_engine, "run_command", side_effect=launch_or_run
+        ):
+            code, output = self.preflight()
+        self.assertEqual(code, 1, output)
+        self.assertIn("OpenSpec CLI validation could not start", output)
 
     def test_unplanned_uncommitted_work_fails(self) -> None:
         (self.root / "stray.lean").write_text("-- unfinished\n", encoding="utf-8")

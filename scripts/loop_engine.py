@@ -546,15 +546,18 @@ def run_command(root: Path, args: list[str], *, check: bool = False) -> subproce
     # has the same behavior and is available wherever the CLI is installed.
     if sys.platform == "win32" and command and command[0] == "openspec":
         command[0] = "openspec.cmd"
-    result = subprocess.run(
-        command,
-        cwd=root,
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-        check=False,
-    )
+    try:
+        result = subprocess.run(
+            command,
+            cwd=root,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            check=False,
+        )
+    except OSError as exc:
+        raise LoopError(f"could not start command: {' '.join(command)}: {exc}") from exc
     if check and result.returncode != 0:
         detail = (result.stderr or result.stdout).strip()
         raise LoopError(f"command failed ({result.returncode}): {' '.join(command)}\n{detail}")
@@ -2003,20 +2006,29 @@ def preflight(root: Path, spec_path: Path) -> int:
     if openspec_validation is None:
         print("PASS no OpenSpec change: the issue body and manifest acceptance are the specification")
     elif openspec_validation in {"cli-advisory", "cli-required"} and shutil.which("openspec") is None:
-        # The structural check above already ran; a missing Node tool is a
-        # host gap to log, not a reason to stop an otherwise valid run.
+        # Preserve the documented structural fallback when the optional Node
+        # tool is absent before launch; a launch failure after discovery is
+        # diagnosed separately below.
         warnings.append("OpenSpec CLI is not installed; structural validation passed and was used instead")
     elif openspec_validation in {"cli-advisory", "cli-required"}:
-        cli = run_command(root, ["openspec", "validate", spec["openspec"]["change"], "--strict", "--no-interactive"], check=False)
-        if cli.returncode != 0:
-            detail = (cli.stdout or cli.stderr).strip().splitlines()
-            message = detail[-1] if detail else "OpenSpec CLI validation failed"
+        try:
+            cli = run_command(root, ["openspec", "validate", spec["openspec"]["change"], "--strict", "--no-interactive"], check=False)
+        except LoopError as exc:
+            message = f"OpenSpec CLI validation could not start: {exc}"
             if openspec_validation == "cli-required":
-                failures.append(f"OpenSpec CLI validation failed: {message}")
+                failures.append(message)
             else:
-                warnings.append(f"OpenSpec CLI validation advisory failure: {message}")
-        elif cli.stdout.strip():
-            print("PASS OpenSpec CLI validation")
+                warnings.append(message)
+        else:
+            if cli.returncode != 0:
+                detail = (cli.stdout or cli.stderr).strip().splitlines()
+                message = detail[-1] if detail else "OpenSpec CLI validation failed"
+                if openspec_validation == "cli-required":
+                    failures.append(f"OpenSpec CLI validation failed: {message}")
+                else:
+                    warnings.append(f"OpenSpec CLI validation advisory failure: {message}")
+            elif cli.stdout.strip():
+                print("PASS OpenSpec CLI validation")
     elif openspec_validation == "structural":
         print("PASS OpenSpec structural validation")
 
@@ -3416,10 +3428,16 @@ def protected_check_names(root: Path, spec: dict[str, Any]) -> set[str]:
     )
     if not isinstance(protection, dict):
         raise LoopError("branch protection returned an unexpected response")
-    names = {name for name in protection.get("contexts") or [] if isinstance(name, str)}
+    contexts = protection.get("contexts")
+    checks = protection.get("checks")
+    if (contexts is None and checks is None) or (contexts is not None and not isinstance(contexts, list)) or (
+        checks is not None and not isinstance(checks, list)
+    ):
+        raise LoopError("branch protection returned an unexpected response")
+    names = {name for name in contexts or [] if isinstance(name, str)}
     names.update(
         item["context"]
-        for item in protection.get("checks") or []
+        for item in checks or []
         if isinstance(item, dict) and isinstance(item.get("context"), str)
     )
     return names
@@ -3432,6 +3450,10 @@ def check_required_checks(root: Path, spec: dict[str, Any], pr_number: int) -> s
         root,
         ["pr", "view", str(pr_number), "--repo", spec["repository"], "--json", "headRefOid,statusCheckRollup"],
     )
+    if not isinstance(data, dict) or not isinstance(data.get("headRefOid"), str) or not FULL_GIT_SHA_RE.fullmatch(
+        data["headRefOid"]
+    ):
+        raise LoopError("PR check rollup is missing a valid head commit")
     latest: dict[str, dict[str, Any]] = {}
     for check in data.get("statusCheckRollup") or []:
         if not isinstance(check, dict):
@@ -3450,10 +3472,7 @@ def check_required_checks(root: Path, spec: dict[str, Any], pr_number: int) -> s
     # Branch protection is the live list of required checks. A manifest check
     # still counts when the PR actually runs it; a name that neither the
     # protection nor the PR knows was retired after the manifest was written.
-    try:
-        live = protected_check_names(root, spec)
-    except LoopError:
-        live = set()
+    live = protected_check_names(root, spec)
     # With no live list, a manifest check that has not started must not drop out.
     required_names = (
         live | {name for name in spec["runner"]["required_checks"] if name in latest}
@@ -3475,7 +3494,7 @@ def check_required_checks(root: Path, spec: dict[str, Any], pr_number: int) -> s
         if failed:
             detail.append("not successful " + ", ".join(failed))
         raise LoopError("required checks are not green: " + "; ".join(detail))
-    return str(data.get("headRefOid") or "")
+    return data["headRefOid"]
 
 
 def action_approve(
