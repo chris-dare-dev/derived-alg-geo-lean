@@ -714,15 +714,27 @@ items:
 
   - id: stability-families-e21
     gh_issue: 1063
-    gh_sub_issues: []
+    gh_sub_issues: [1496]
     kind: epic
     parent: stability-families-m11
     title: "Theorems 5.6, 5.7 and Corollary 5.8: the bounded coherent case"
-    status: planned
-    summary: "Theorem 5.6 induces a t-structure on D_T for a finite perfect morphism, as the analogue of Polishchuk 2.3.5 -- a sibling of the Polishchuk 2.1.2 result the repository owns through SF7 and #1054-#1057, and the relationship should be recorded rather than assumed. Theorem 5.7 is the main base change result for essentially perfect morphisms, and its clause (2), that noetherianity is inherited, is the load-bearing one: Step 2 of Theorem 12.17 gets finiteness of an a priori infinite filtration from it. Corollary 5.8 specialises to a point of the base."
+    status: in_progress
+    summary: "Theorem 5.6 induces a t-structure on D_T for a finite perfect morphism, as the analogue of Polishchuk 2.3.5 -- a sibling of the Polishchuk 2.1.2 result the repository owns through SF7 and #1054-#1057, and the relationship should be recorded rather than assumed. Theorem 5.7 is the main base change result for essentially perfect morphisms, and its clause (2), that noetherianity is inherited, is the load-bearing one: Step 2 of Theorem 12.17 gets finiteness of an a priori infinite filtration from it. Child #1496 addresses only the finite-cover Noetherian-heart detection step; bounded-coherent restriction and geometric local Noetherianity remain open. Corollary 5.8 specialises to a point of the base."
     priority: must
     size: XL
     tags: [lean, derived, base-change, noetherian]
+
+  - id: stability-families-e21-1
+    gh_issue: 1496
+    gh_sub_issues: []
+    kind: deliverable
+    parent: stability-families-e21
+    title: "Finite-cover Noetherian-heart detection"
+    status: in_progress
+    summary: "Prove that triangulated t-exact restrictions preserve heart monomorphisms and derive the finite-family local-to-global Noetherian implication from the existing detector. Leave geometric conservativity, local Noetherianity on bounded-coherent D_T, and Theorem 5.7(2) under parent #1063."
+    priority: must
+    size: M
+    tags: [lean, derived, t-structure, noetherian]
 
   - id: stability-families-e22
     gh_issue: 1064
