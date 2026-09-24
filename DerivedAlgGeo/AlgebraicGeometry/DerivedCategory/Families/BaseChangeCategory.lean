@@ -96,6 +96,16 @@ namespace SchemeBaseChange
 
 variable {S : Scheme.{u}}
 
+/-- The identity scheme over `S`, used as the terminal base-change object. -/
+abbrev identityBaseChange (S : Scheme.{u}) : SchemeBaseChange S :=
+  Over.mk (𝟙 S)
+
+/-- The structure morphism `X → S`, regarded as a morphism in `Over S` to
+the identity base change. -/
+def toIdentityBaseChange (X : SchemeBaseChange S) :
+    X ⟶ identityBaseChange S :=
+  Over.homMk X.hom (Category.comp_id _)
+
 /-- An actual left-derived pullback whose ambient functor preserves
 quasi-coherent cohomology.
 
