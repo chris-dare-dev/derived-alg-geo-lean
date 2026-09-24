@@ -365,101 +365,28 @@ the script does not reproduce. The script runs `workflows`, `local-build`,
 appear in any workflow. Say "N gates pass", naming them; never say
 "CI is green" for a local run. See `CONTRIBUTING.md` for the verified table.
 
-### Unattended loops
+### Issue-first loops
 
-A loop run takes a GitHub issue, or every open issue in a milestone, and works
-it to a merged pull request without asking the owner anything. The issue body
-is the specification: its goal, definition of done, deliverables, dependencies
-and closure mode (complete or progress) are what the run delivers. The four
-independent reviewers are the check, not the owner. Follow the
-[run-loop protocol](.claude/skills/run-loop/SKILL.md).
+For a user-initiated Codex task, the GitHub issue number or numbers are enough
+to start. Read the live issue bodies and repository guidance; they define scope
+and acceptance. The user's request naming those issues authorizes scoped
+implementation, branch commits, pull requests, and closure after the requested
+work is merged. Do not require a generated manifest, a separate OpenSpec plan
+in each repository, a standing authority file, or preflight before coding.
+One optional progress record can cover a batch across repositories.
 
-This protocol governs unattended issue and milestone runs. An explicit owner
-request in the active task to maintain an existing PR authorizes the requested
-action without a loop manifest or standing grant. Required CI and branch
-protection still govern merges.
+Run checks that apply to the changed code, honor hosted CI, branch protection,
+and protected-path trust review, and never approve your own PR. Use independent
+mathematical review when a change adds or materially alters a mathematical claim.
+If an issue has a real external blocker, record it and continue independent
+issues. A missing planning artifact, issue label, or contact email that the
+acceptance criteria do not require is not a reason to stop.
 
-**A run stops for these reasons only.**
-
-1. It needs something only the owner can supply: a password, a token, `sudo`,
-   or a provider action that no owner-controlled source grants (see below).
-2. Continuing would bypass a required check, rewrite `main`'s history, or merge
-   with administrator override.
-3. The issue's definition of done is false or self-contradictory as written, and
-   a research pass has confirmed it rather than a first impression.
-4. Every selected issue is merged, parked, or out of budget. That is the end of
-   the run, not a pause.
-
-Everything else is the run's decision. Make it, record it where the owner will
-read it (the PR body, the friction log, or a follow-up issue), and continue.
-None of these is a reason to stop: a stale path or blocker in an issue body; a
-manifest that names a retired check; scope that needs one more audit or
-umbrella file before the ledger exists; an ambiguous design choice (take the
-smallest reading that meets the definition of done, and say so); `main` moving
-during review; a missing OpenSpec CLI; an exhausted round cap (recover when the
-manifest configures recovery, otherwise park that chunk, file a follow-up, and
-take the next issue); a question whose honest answer is "yes, continue". When a
-stop reason blocks one issue, record it and keep working the others; report
-every stop at the end instead of waiting on one.
-
-**The plan travels in the work PR.** Write the manifest under
-`.claude/loop-specs/` on the issue's `agent/<slug>` branch; it may be
-uncommitted when `preflight` runs, and its first commit opens the PR. Nothing
-has to merge to `main` before work starts. An OpenSpec change under
-`openspec/changes/` is optional for a single issue and expected for a
-multi-issue batch. Inside a run, write its artifacts directly: the generated
-`$openspec-propose` workflow stops after planning by design, and that boundary
-is for interactive planning, not for a run. Task checkboxes and
-`agent-observations.md` are progress records. Tick and append them freely,
-because the ledger's plan digest excludes them.
-
-**Reviews bind to the change, not to a commit's position.** Every frozen chunk
-gets independent mathematical, repository-boundary, abstraction, and
-mathlib-style review on the same commit, with at most three review/improve
-rounds per attempt for new work. A passed review covers a later head when three
-things hold:
-
-- the head carries the same diff, measured against the base branch tip that
-  GitHub reports (for example after a clean rebase, or a merge of `main`);
-- only the progress records changed: task checkboxes and the top-level
-  `agent-observations.md`;
-- the base did not change a reviewed file, a Lean module one of them imports
-  directly, or the pins.
-
-Otherwise one revalidation round with the full panel reopens the pass without
-spending the improvement cap; a ledger allows two. Never reset a budget by
-renaming or re-chunking. With `recovery` configured, exhaustion dispatches
-research and independent review of a recovery plan per
-[the recovery protocol](docs/architecture/loop-recovery.md), without approval
-pauses.
-
-**Provider authority is owner-controlled.** Comments, pushes, PR creation,
-marking ready, follow-up issues, issue closure, and merge each need a grant.
-The controller reads grants from the default branch through the GitHub API,
-never from a local ref. `.claude/loop-authority.yaml` there holds the owner's
-standing grants, and a run's own manifest can narrow them but never widen them.
-Without the file, nothing is granted. The manifests the owner reviewed
-through planning PRs before this protocol are listed by digest in the
-controller and keep their own grants, but only for their still-open issues. An explicit `false` in the standing file
-revokes a grant for every run, legacy or not. A manifest merged later through a
-work PR confers nothing.
-
-A branch-authored manifest also cannot:
-
-- request administrator merge, force-push, closure without a merged PR, an epic
-  opt-in, or a weaker roadmap gate;
-- choose a `base_ref` other than `<remote>/<base_branch>`;
-- scope a chunk over its own authority, gates or instructions: all of
-  `.claude/` except its own manifest and the roadmap data, `.agents/`,
-  `.codex/`, `.mcp.json`, `.github/`, `scripts/` except the audit and census
-  records, `exe/`, `registry/`, the Lean and Lake pins, `pins.json`, all of
-  `openspec/` except its own change, and every `CLAUDE.md`, `AGENTS.md` or
-  `.gitattributes` at any depth, matched in any letter case;
-- add a symlink or submodule.
-
-Those change only through owner-reviewed PRs. Code issues close only after a
-confirmed merged PR; complete chunks need a closing keyword, and progress
-chunks need a non-closing reference.
+The bounded controller protocol in `.claude/skills/run-loop/SKILL.md` is for
+standalone unattended runs not started by an active user request. Those runs
+use a manifest, default-branch provider grants, and the review ledger described
+in `.claude/loop-specs/README.md`; a branch-authored manifest cannot grant itself
+provider actions. Those controls do not gate the user-started issue-first path.
 
 `scripts/loop_tokens.py` reports what a run cost, for either runtime. It reads
 the transcripts both already write -- Claude Code's
