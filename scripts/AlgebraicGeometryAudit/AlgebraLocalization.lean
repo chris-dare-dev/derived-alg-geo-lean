@@ -16,3 +16,6 @@ import DerivedAlgGeo.Algebra.Module.Localization
 
 #print axioms Module.exists_finite_submodule_of_isLocalization
 #print axioms Module.exists_finitely_presented_submodule_of_isLocalization
+#print axioms Module.exists_finite_submodule_of_isLocalization_containing
+#print axioms Module.exists_finitely_presented_submodule_of_isLocalization_containing
+#print axioms Module.exists_finite_submodules_of_isLocalization_map
