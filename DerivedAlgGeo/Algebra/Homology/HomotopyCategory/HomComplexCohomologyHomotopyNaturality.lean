@@ -3,25 +3,18 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyClassLocalization
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyHomotopy
 
 /-!
-# Degree-zero Hom-complex classes and localization in the homotopy category
-
-Mathlib identifies `CohomologyClass K L 0` with morphisms from `K` to `L⟦0⟧`
-in the homotopy category. Composing with `shiftFunctorZero` removes that shift.
-On representatives this equivalence sends a cocycle `z` to the homotopy class
-of `Cocycle.homOf z`.
+# Degree-zero class localization in the homotopy category
 
 The degree-zero class-localization map commutes with the functor on homotopy
 categories induced by degreewise module localization. This additive square
 requires no boundedness, finite-presentation, or K-projectivity hypotheses.
 It is not a derived-Hom localization or geometric base-change theorem.
 
-The earlier `CohomologyClass.derivedCategoryHomAddEquiv` internally spells out
-the same class-to-homotopy, zero-shift factor before applying `Qh`. A downstream
-factorization is definitionally equal; this module deliberately does not import
-the derived-category comparison. A later refactor can extract the shared factor
-to a neutral HomotopyCategory leaf before both consumers import it.
+The class-to-homotopy equivalence and its cocycle formula come from the neutral
+`HomComplexCohomologyHomotopy` leaf; only the localization square is proved here.
 -/
 
 set_option autoImplicit false
@@ -32,58 +25,9 @@ open scoped ModuleCat.Algebra
 
 namespace CochainComplex.HomComplex
 
-universe u v
+universe u
 
 noncomputable section
-
-variable {C : Type u} [Category.{v} C] [Preadditive C]
-  (K L : CochainComplex C ℤ)
-
-/-- Degree-zero Hom-complex cohomology classes as morphisms of the homotopy
-category, using the canonical zero-shift isomorphism. -/
-def cohomologyClassHomotopyAddEquiv :
-    CohomologyClass K L 0 ≃+
-      ((HomotopyCategory.quotient C (.up ℤ)).obj K ⟶
-        (HomotopyCategory.quotient C (.up ℤ)).obj L) := by
-  let e : (HomotopyCategory.quotient C (.up ℤ)).obj (L⟦(0 : ℤ)⟧) ≅
-      (HomotopyCategory.quotient C (.up ℤ)).obj L :=
-    (HomotopyCategory.quotient C (.up ℤ)).mapIso
-      ((shiftFunctorZero (CochainComplex C ℤ) ℤ).app L)
-  let e₁ : ((HomotopyCategory.quotient C (.up ℤ)).obj K ⟶
-      (HomotopyCategory.quotient C (.up ℤ)).obj (L⟦(0 : ℤ)⟧)) ≃+
-      ((HomotopyCategory.quotient C (.up ℤ)).obj K ⟶
-        (HomotopyCategory.quotient C (.up ℤ)).obj L) :=
-    { toFun := fun f => f ≫ e.hom
-      invFun := fun g => g ≫ e.inv
-      left_inv := by intro f; simp
-      right_inv := by intro g; simp
-      map_add' := by intro f g; simp [Preadditive.add_comp] }
-  exact CohomologyClass.homAddEquiv.trans e₁
-
-private theorem cocycle_equivHomShift_symm_comp_shiftZero (z : Cocycle K L 0) :
-    Cocycle.equivHomShift.symm z ≫
-      (shiftFunctorZero (CochainComplex C ℤ) ℤ).hom.app L =
-      Cocycle.homOf z := by
-  ext i
-  simp [Cocycle.equivHomShift_symm_apply, Cocycle.homOf_f,
-    Cochain.rightShift_v, CochainComplex.shiftFunctorZero_hom_app_f]
-  -- The remaining inverse/forward `XIsoOfEq` composite contains dependent casts.
-  -- Ordinary `rw` fails at instances transparency; `erw` closes it.
-  erw [Category.assoc, Iso.inv_hom_id, Category.comp_id]
-
-/-- The class of a degree-zero cocycle corresponds to the homotopy class of its
-associated chain map. -/
-@[simp] theorem cohomologyClassHomotopyAddEquiv_mk (z : Cocycle K L 0) :
-    cohomologyClassHomotopyAddEquiv K L (CohomologyClass.mk z) =
-      (HomotopyCategory.quotient C (.up ℤ)).map z.homOf := by
-  change CohomologyClass.homAddEquiv (CohomologyClass.mk z) ≫
-    (HomotopyCategory.quotient C (.up ℤ)).map
-      ((shiftFunctorZero (CochainComplex C ℤ) ℤ).hom.app L) =
-    (HomotopyCategory.quotient C (.up ℤ)).map z.homOf
-  rw [CohomologyClass.homAddEquiv_apply, CohomologyClass.toHom_mk]
-  rw [← Functor.map_comp]
-  rw [cocycle_equivHomShift_symm_comp_shiftZero K L z]
-  rfl
 
 variable {R : Type u} [CommRing R]
   (P Q : CochainComplex (ModuleCat.{u} R) ℤ) (S : Submonoid R)
