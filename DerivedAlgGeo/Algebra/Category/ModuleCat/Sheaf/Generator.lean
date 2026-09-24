@@ -17,8 +17,9 @@ modules on representables separate presheaves of modules
 `SheafOfModules R` and hence no `IsGrothendieckAbelian` instance for it. This file adds both
 over a small site. The separating family is the sheafification of the free presheaves of
 modules on representables; the argument is the one for `Sheaf.freeYoneda`, run through the
-sheafification adjunction for modules, whose right adjoint is the forgetful functor (the
-restriction of scalars along `𝟙` is the identity on the nose).
+sheafification adjunction for modules. Its right adjoint is `forget R ⋙
+PresheafOfModules.restrictScalars (𝟙 R.obj)`, canonically isomorphic pointwise to `forget R`
+via `ModuleCat.restrictScalarsId'App`.
 
 AB5 for sheaves of modules is `SheafOfModules.ab5OfSize` in `Sheaf/AB.lean`, so with a
 separator the Grothendieck abelian instance is a one-liner, and Mathlib then supplies enough
@@ -28,6 +29,9 @@ injectives and `HasExt`. The instance for `X.Modules` on a scheme is in
 ## Main results
 
 * `SheafOfModules.freeYonedaSheaf`, `SheafOfModules.freeYonedaSheaf_isSeparating`.
+* `SheafOfModules.Elements.freeYonedaSheaf`, `SheafOfModules.freeYonedaSheafCoproduct`, and
+  `SheafOfModules.fromFreeYonedaSheafCoproduct_epi` give a canonical element-indexed coproduct
+  presentation of any module sheaf.
 * `SheafOfModules.hasSeparator`.
 * `SheafOfModules.isGrothendieckAbelian`.
 -/
