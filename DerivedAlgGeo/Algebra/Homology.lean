@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.Algebra.Homology.CochainComplexFiniteProjectiveResolution
 import DerivedAlgGeo.Algebra.Homology.DGCategory
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory
 import DerivedAlgGeo.Algebra.Homology.HomologicalComplexLimits
