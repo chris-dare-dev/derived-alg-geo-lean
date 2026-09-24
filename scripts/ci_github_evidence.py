@@ -822,6 +822,16 @@ def collect(client: GitHubClient, pr_number: int) -> dict[str, Any]:
 
 def write_bundle(result: dict[str, Any], directory: Path) -> None:
     """Write actual retained bytes and their manifest; never trust claimed hashes."""
+    # The contract's policy digest uses canonical JSON without the bundle's
+    # usual trailing newline, so retain those exact digest-bound bytes.
+    inventory = _canonical(result["inventory"])[:-1]
+    if (
+        hashlib.sha256(inventory).hexdigest()
+        != result["evidence"]["policy_binding"]["inventory_sha256"]
+    ):
+        raise EvidenceError("retained inventory does not match evidence policy binding")
+    observations = _canonical(result["observations"])
+    protection = _canonical(result["protection"])
     directory.mkdir(parents=True, exist_ok=True)
     for path, content in result["payloads"].items():
         artifact = next(
@@ -837,8 +847,9 @@ def write_bundle(result: dict[str, Any], directory: Path) -> None:
         target = directory / path
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(content)
-    observations = _canonical(result["observations"])
     (directory / "source-observations.json").write_bytes(observations)
+    (directory / "protected-inventory.json").write_bytes(inventory)
+    (directory / "live-protection.json").write_bytes(protection)
     (directory / "evidence.json").write_bytes(_canonical(result["evidence"]))
     (directory / "validation.json").write_bytes(_canonical(result["validation"]))
     (directory / "bundle-manifest.json").write_bytes(
@@ -846,6 +857,10 @@ def write_bundle(result: dict[str, Any], directory: Path) -> None:
             {
                 "source_observations_sha256": hashlib.sha256(observations).hexdigest(),
                 "source_observations_size_bytes": len(observations),
+                "protected_inventory_sha256": hashlib.sha256(inventory).hexdigest(),
+                "protected_inventory_size_bytes": len(inventory),
+                "live_protection_sha256": hashlib.sha256(protection).hexdigest(),
+                "live_protection_size_bytes": len(protection),
                 "candidate": result["evidence"]["candidate_commit"],
             }
         )

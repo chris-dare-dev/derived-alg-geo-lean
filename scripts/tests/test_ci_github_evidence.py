@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import base64
 import copy
+import hashlib
 import json
 import tempfile
 import unittest
@@ -17,7 +18,6 @@ from scripts.ci_github_evidence import (
     collect,
     write_bundle,
 )
-
 
 REPO = "chris-dare-dev/derived-alg-geo-lean"
 BASE = f"https://api.github.com/repos/{REPO}"
@@ -338,6 +338,25 @@ class CollectorTests(unittest.TestCase):
             destination = Path(temporary)
             write_bundle(result, destination)
             self.assertTrue((destination / "source-observations.json").is_file())
+            inventory = (destination / "protected-inventory.json").read_bytes()
+            protection = (destination / "live-protection.json").read_bytes()
+            manifest = json.loads((destination / "bundle-manifest.json").read_bytes())
+            self.assertEqual(json.loads(inventory), result["inventory"])
+            self.assertEqual(json.loads(protection), fixture.protection)
+            self.assertEqual(
+                manifest["protected_inventory_sha256"],
+                result["evidence"]["policy_binding"]["inventory_sha256"],
+            )
+            self.assertEqual(manifest["protected_inventory_size_bytes"], len(inventory))
+            self.assertEqual(
+                manifest["live_protection_sha256"],
+                hashlib.sha256(protection).hexdigest(),
+            )
+            self.assertEqual(manifest["live_protection_size_bytes"], len(protection))
+            result["inventory"] = {"changed": True}
+            with self.assertRaisesRegex(EvidenceError, "retained inventory"):
+                write_bundle(result, destination)
+            result["inventory"] = json.loads(inventory)
             result["payloads"]["results/check-run-100.json"] = b"tampered"
             with self.assertRaisesRegex(EvidenceError, "do not match"):
                 write_bundle(result, destination)

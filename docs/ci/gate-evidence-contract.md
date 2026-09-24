@@ -170,10 +170,16 @@ an earlier attempt; neither schema version can represent required gates spanning
 attempts, so this collector currently denies that case conservatively.
 
 The local bundle contains `evidence.json`, `validation.json`, canonical
-`results/check-run-<id>.json` payloads, `source-observations.json`, and
-`bundle-manifest.json`. Each schema artifact records the SHA-256 and byte
-length of its actual payload, and the manifest hashes the full retained
-observation file. `lean-toolchain`, `lake-manifest.json`, and `pins.json`
+`results/check-run-<id>.json` payloads, `source-observations.json`,
+`protected-inventory.json`, `live-protection.json`, and
+`bundle-manifest.json`. The protection snapshot is the live required-check
+API response compared with the inventory, after an identical final reread.
+Each schema artifact records the SHA-256 and byte length of its actual
+payload. The manifest hashes the full retained observations, protected-base
+inventory and live protection snapshot; the inventory hash must also match
+`evidence.policy_binding.inventory_sha256`. A reviewer can inspect the
+retained required contexts and app IDs alongside the policy that authorized
+them. `lean-toolchain`, `lake-manifest.json`, and `pins.json`
 digests come from the candidate Git tree. These hashes detect a changed
 local bundle; they do not authenticate GitHub beyond the authenticated API
 response. `ci_contract.validate_evidence` remains the canonical consistency
