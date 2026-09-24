@@ -1923,6 +1923,7 @@ class CIFailureRepairTests(unittest.TestCase):
         self.remote_head = self.failed_head
         self.pull = self.make_pull(self.failed_head)
         self.pull_reread: dict | None = None
+        self.pull_reread_sequence: list[dict] = []
         self.open_pulls = [self.pull]
         self.protection: dict = {"contexts": ["ci"], "checks": []}
         self.check_runs: list[dict] = [self.check_run(self.failed_head, "failure", "2026-09-24T01:00:00Z")]
@@ -1994,6 +1995,8 @@ class CIFailureRepairTests(unittest.TestCase):
         if "/pulls?state=open" in request:
             return self.open_pulls
         if request.endswith("/pulls/42"):
+            if self.pull_reread_sequence:
+                return self.pull_reread_sequence.pop(0)
             return self.pull_reread or self.pull
         if "/git/ref/heads/agent/test-issue" in request:
             value = self.source_sha_sequence.pop(0) if self.source_sha_sequence else self.remote_head
@@ -2077,6 +2080,44 @@ class CIFailureRepairTests(unittest.TestCase):
         with self.assertRaisesRegex(loop_engine.LoopError, "no current required check"):
             self.admit(candidate)
         self.assertEqual(self.state_file.read_bytes(), original)
+
+    def test_provider_state_movement_during_final_check_read_is_rejected(self) -> None:
+        candidate = self.repair_candidate()
+        original = self.state_file.read_bytes()
+        cases = ["PR head", "source ref", "base ref", "protection"]
+        for label in cases:
+            with self.subTest(label=label):
+                self.pull = self.make_pull(self.failed_head)
+                self.pull_reread = None
+                self.pull_reread_sequence = []
+                self.open_pulls = [self.pull]
+                self.remote_head = self.failed_head
+                self.source_sha_sequence = []
+                self.base_sha_sequence = []
+                self.protection = {"contexts": ["ci"], "checks": []}
+                self.protection_sequence = []
+                self.check_runs = [self.check_run(self.failed_head, "failure", "2026-09-24T01:00:00Z")]
+                if label == "PR head":
+                    self.pull_reread_sequence = [
+                        self.make_pull(self.failed_head),
+                        self.make_pull("d" * 40),
+                    ]
+                elif label == "source ref":
+                    self.source_sha_sequence = [self.failed_head, self.failed_head, "f" * 40]
+                elif label == "base ref":
+                    self.base_sha_sequence = [self.base_sha, self.base_sha, "e" * 40]
+                else:
+                    self.protection_sequence = [
+                        {"contexts": ["ci"], "checks": []},
+                        {"contexts": ["ci"], "checks": []},
+                        {"contexts": ["ci"], "checks": []},
+                        {"contexts": ["build"], "checks": []},
+                    ]
+                with mock.patch.object(loop_engine, "gh_json", side_effect=self.provider_api), self.assertRaises(
+                    loop_engine.LoopError
+                ):
+                    loop_engine.ledger_admit_ci_repair(self.root, self.spec, self.state_file, candidate)
+                self.assertEqual(self.state_file.read_bytes(), original)
 
     def test_failure_admission_rejects_stale_moved_or_ambiguous_heads_without_writing(self) -> None:
         candidate = self.repair_candidate()
