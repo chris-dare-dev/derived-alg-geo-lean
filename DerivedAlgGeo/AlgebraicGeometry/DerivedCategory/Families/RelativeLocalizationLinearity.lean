@@ -325,4 +325,31 @@ theorem boundedFunctor_linearOfLocalization {R A : Type u}
   letI : IsExactPullback f := isExactPullback_of_flat f
   exact relativeBoundedPullback_linear X P h
 
+/-- Relative bounded-coherent pullback along an affine localization is additive.
+Together with `boundedFunctor_linearOfLocalization`, this makes its actual
+action on Hom groups available as `Functor.mapLinearMap` for the affine-base
+scalar actions. This does not assert that those Hom maps are localizations. -/
+theorem boundedFunctor_additiveOfLocalization {R A : Type u}
+    [CommRing R] [CommRing A] [Algebra R A]
+    (M : Submonoid R) [IsLocalization M A]
+    (X : SchemeBaseChange (Spec (CommRingCat.of R)))
+    (P : DqcLeftDerivedPullback (baseChangeMap X
+      (toIdentityBaseChange (affineAlgebraBaseChange (R := R) (A := A)))))
+    (h : P.PreservesBoundedCoherent) :
+    (P.boundedFunctor h).Additive := by
+  let T := affineAlgebraBaseChange (R := R) (A := A)
+  let f := baseChangeMap X (toIdentityBaseChange T)
+  letI : Flat f.left := relativeFlat M X
+  letI : IsExactPullback f := isExactPullback_of_flat f
+  letI : P.ambient.functor.Additive := by
+    letI : (derivedPullback f).Additive := by
+      change ((modulePullback f).mapDerivedCategory).Additive
+      infer_instance
+    exact Functor.additive_of_iso (P.ambient.exactComparison).symm
+  letI : P.functor.Additive := by
+    dsimp [DqcLeftDerivedPullback.functor]
+    infer_instance
+  dsimp [DqcLeftDerivedPullback.boundedFunctor]
+  infer_instance
+
 end AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
