@@ -23,7 +23,11 @@ import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KProjective
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomology
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyLinear
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyLocalization
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyLocalizationNaturality
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyFiniteResolutionLocalization
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyDegreeZeroLocalization
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyFiniteReplacementLocalization
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyBoundedComplexLocalization
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyIntLocalization
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KFlatResolution
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.BoundedAboveProjective
@@ -42,12 +46,18 @@ models, and the construction of derived tensor from a K-flat resolution.
 Degree-zero Hom-complex classes identify with derived-category morphisms when
 the source is K-projective. For module complexes, a conditional localization
 comparison assumes K-projectivity of both the source and its localization;
-an ordinary integer-linear adapter is available separately. Neither API
-constructs internal derived Hom or geometric base change.
+an ordinary integer-linear adapter is available separately.
 A finite module over a noetherian ring has a chosen finite-term, bounded-above
 projective resolution whose derived-category Hom-set map into a bounded-below
-complex localizes; this does not identify the map for the module's degree-zero
-complex without a further quasi-isomorphism comparison.
+complex localizes. Its quasi-isomorphism comparison now gives localization of
+the derived-category Hom-set map from the module's degree-zero complex into
+a bounded-below complex.
+A bounded-above complex of finite modules also has a chosen finite-projective
+replacement whose derived-category Hom map into a bounded-below complex
+localizes. The quasi-isomorphism comparison now transports this localization
+to derived-category Hom-sets out of the original bounded-above complex.
+The codomains remain degreewise localizations of the displayed complexes.
+No internal derived-Hom or geometric base-change comparison is asserted.
 Algebraic geometry supplies abelian categories such as `Coh X` and consumes
 this API; it does not own the derived-category construction.
 -/
