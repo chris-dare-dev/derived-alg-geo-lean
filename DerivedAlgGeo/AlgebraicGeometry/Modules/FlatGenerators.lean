@@ -642,7 +642,8 @@ private theorem freeYonedaSheafCoproduct_isFlatOver_id
 module sheaf by sheaves flat over the identity of `X`.
 
 Applying `CategoryTheory.Abelian.LeftResolution.chainComplexFunctor` yields the functorial
-nonnegative resolution in the full subcategory cut out by `IsFlatOver (𝟙 X)`. This is an
+nonnegative resolution in the full subcategory cut out by
+`AlgebraicGeometry.Scheme.Modules.IsFlatOver (𝟙 X)`. This is an
 objectwise resolution; it is not a K-flat replacement functor on unbounded complexes. -/
 noncomputable def freeYonedaSheafCoproductLeftResolution (X : Scheme.{u}) :
     CategoryTheory.Abelian.LeftResolution
