@@ -2006,10 +2006,11 @@ def preflight(root: Path, spec_path: Path) -> int:
     if openspec_validation is None:
         print("PASS no OpenSpec change: the issue body and manifest acceptance are the specification")
     elif openspec_validation in {"cli-advisory", "cli-required"} and shutil.which("openspec") is None:
-        # Preserve the documented structural fallback when the optional Node
-        # tool is absent before launch; a launch failure after discovery is
-        # diagnosed separately below.
-        warnings.append("OpenSpec CLI is not installed; structural validation passed and was used instead")
+        message = "OpenSpec CLI is not installed; structural validation passed but CLI validation did not run"
+        if openspec_validation == "cli-required":
+            failures.append(message)
+        else:
+            warnings.append(message)
     elif openspec_validation in {"cli-advisory", "cli-required"}:
         try:
             cli = run_command(root, ["openspec", "validate", spec["openspec"]["change"], "--strict", "--no-interactive"], check=False)
@@ -3434,12 +3435,13 @@ def protected_check_names(root: Path, spec: dict[str, Any]) -> set[str]:
         checks is not None and not isinstance(checks, list)
     ):
         raise LoopError("branch protection returned an unexpected response")
-    names = {name for name in contexts or [] if isinstance(name, str)}
-    names.update(
-        item["context"]
+    if any(not isinstance(name, str) or not name.strip() for name in contexts or []) or any(
+        not isinstance(item, dict) or not isinstance(item.get("context"), str) or not item["context"].strip()
         for item in checks or []
-        if isinstance(item, dict) and isinstance(item.get("context"), str)
-    )
+    ):
+        raise LoopError("branch protection returned an unexpected response")
+    names = set(contexts or [])
+    names.update(item["context"] for item in checks or [])
     return names
 
 
@@ -3454,6 +3456,17 @@ def check_required_checks(root: Path, spec: dict[str, Any], pr_number: int) -> s
         data["headRefOid"]
     ):
         raise LoopError("PR check rollup is missing a valid head commit")
+
+    def start_time(item: dict[str, Any]) -> datetime | None:
+        value = item.get("startedAt") or item.get("createdAt")
+        if not isinstance(value, str):
+            return None
+        try:
+            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError:
+            return None
+        return parsed if parsed.tzinfo is not None else None
+
     latest: dict[str, dict[str, Any]] = {}
     for check in data.get("statusCheckRollup") or []:
         if not isinstance(check, dict):
@@ -3461,11 +3474,17 @@ def check_required_checks(root: Path, spec: dict[str, Any], pr_number: int) -> s
         name = check.get("name") or check.get("context")
         if not isinstance(name, str):
             continue
-        timestamp = str(check.get("completedAt") or check.get("startedAt") or "")
         previous = latest.get(name)
-        if previous is None or timestamp >= str(previous.get("_timestamp", "")):
-            check = dict(check)
-            check["_timestamp"] = timestamp
+        if previous is None:
+            latest[name] = check
+            continue
+        # A completion time can be later than the start of a newer pending
+        # attempt. Compare starts only; an unorderable duplicate is not green.
+        current_start = start_time(check)
+        previous_start = start_time(previous)
+        if current_start is None or previous_start is None or current_start == previous_start:
+            raise LoopError(f"cannot order duplicate check runs for {name}")
+        if current_start > previous_start:
             latest[name] = check
     missing: list[str] = []
     failed: list[str] = []
@@ -3539,7 +3558,9 @@ def action_approve(
         raise LoopError("PR head does not carry the change reviewed by the passing ledger")
     verify_remote_chunk_files(root, spec, pr, state)
     require_published_head_has_no_links(root, spec, state, str(pr.get("headRefOid", "")))
-    check_required_checks(root, spec, pr_number)
+    checked_head = check_required_checks(root, spec, pr_number)
+    if checked_head.lower() != str(pr.get("headRefOid", "")).lower():
+        raise LoopError("PR head moved between review verification and check read; rerun the approval")
     args = [
         "gh",
         "pr",
