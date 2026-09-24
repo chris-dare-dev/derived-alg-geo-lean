@@ -103,3 +103,49 @@ Workflow and controller owners must independently review this contract at the
 final revision before adoption. Operational verification requires a provider
 adapter and a real PR/merge-group exercise; the local fixtures establish only
 validator behavior.
+
+## Read-only GitHub collector (CI1.01 progress)
+
+`python3 -m scripts.ci_github_evidence --repo
+chris-dare-dev/derived-alg-geo-lean --pr <number> --output <directory>` reads
+GitHub through GET requests and writes a local evidence bundle. It obtains the
+protected `main` SHA from the branch API, the PR base and head from the pull
+request API, and live strict required contexts and app IDs from branch
+protection. It reads the inventory from the protected-base Git object, not
+from the candidate checkout. Unknown protected contexts, a missing protected
+`ci` aggregate, a policy read failure, or a base/head movement deny a current
+claim. The same protected branch, PR and protection values are read again
+after observation collection.
+
+For a `pull_request` run, GitHub's Actions run and check suite identify the
+PR **head** SHA. This repository's protected `ci.yml` uploads a run-scoped
+`trust-artifacts-${{ github.sha }}` artifact after checkout. The collector
+requires the tested candidate's workflow bytes to equal the protected-base
+workflow, takes the merge SHA from exactly one current run artifact, and
+checks that Git commit's tree and ordered parents against the protected base
+and PR head, and matches the PR API's current `merge_commit_sha`. A missing,
+expired, ambiguous or stale-attempt artifact denies
+the claim. The artifact name is a run-to-merge-SHA binding under this
+workflow's rule; it is not a cryptographic attestation. The collector never
+replaces the merge candidate with the run API's head SHA.
+
+The collector traverses all pages of check suites on the head, all runs in
+each suite, all commit statuses, and jobs for each attempt of the selected
+workflow run. `check_run_url`, check ID, suite app ID, job run ID and attempt
+must agree for a primary gate. Earlier attempts and other producers remain
+in `source-observations.json`; they cannot authorize the current gate. A
+same-named commit status cannot replace a check run. Source observations with
+no proven gate mapping remain visible and prevent an all-pipelines-green
+claim. A missing or red required gate denies `required_ci_verified`; optional
+warnings remain separate.
+
+The local bundle contains `evidence.json`, `validation.json`, canonical
+`results/check-run-<id>.json` payloads, `source-observations.json`, and
+`bundle-manifest.json`. Each schema artifact records the SHA-256 and byte
+length of its actual payload, and the manifest hashes the full retained
+observation file. `lean-toolchain`, `lake-manifest.json`, and `pins.json`
+digests come from the candidate Git tree. These hashes detect a changed
+local bundle; they do not authenticate GitHub beyond the authenticated API
+response. `ci_contract.validate_evidence` remains the canonical consistency
+validator. This collector makes no review, merge, or post-merge health
+decision and is not yet called by the controller or CI workflow.
