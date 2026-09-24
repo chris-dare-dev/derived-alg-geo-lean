@@ -10,13 +10,6 @@
   boundedness, quasicoherence, Noetherian, flatness, or exactness restriction;
   leave preservation and coherence to tasks 1.3–1.4; verify targeted Lean
   declarations and no-sorry checks.
-- [ ] 1.2a Add the natural, explicitly `M.val.Elements`-indexed coproduct
-  epimorphism for sheaves of modules on small ringed sites, and specialize it
-  to `X.Modules`; prove the stalk formula and stalkwise flatness of the
-  canonical free-Yoneda module sheaves on opens of every scheme. State the
-  universe bound and verify the targeted Lean build and declaration audit.
-  This prerequisite does not construct projective or K-flat resolutions and
-  does not prove arbitrary pullback acyclicity.
 - [ ] 1.3 Prove supported pseudo-coherence, finite-Tor, and negative-Ext preservation; verify targeted Lean tests and the relevant audit scripts
 - [ ] 1.4 Add the five coherence laws, comparison/agreement result, and non-flat nonidentity example; verify targeted Lean checks and mathematical adversarial review
 - [x] 1.5 Add the explicit `ℤ → ZMod 2` non-flat/nonidentity affine witness as a progress chunk; verify the supported pullback instantiation, full Lean build, and non-closing PR policy
@@ -32,11 +25,6 @@ outstanding. Task 1.8 was implemented by PR #1471 and is checked here in the
 post-merge plan sync. Task 1.9 is a further affine progress slice and does not
 complete task 1.2. Its separate manifest does not schedule #522 or #525; those
 downstream tasks remain blocked on #554's eventual complete closure.
-
-Task 1.2a is the flat-generator prerequisite tracked by issue #1495. Its
-completion supplies actual flat generators and a natural epimorphism, not a
-K-flat replacement of unbounded complexes; task 1.2 remains unchecked until
-its own full construction and pullback-acyclicity obligations are proved.
 
 The loop-controller digest normalizes task-checkbox state, so an active task
 may be checked in its implementation PR. Task wording and the other required

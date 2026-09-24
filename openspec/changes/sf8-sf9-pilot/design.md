@@ -127,17 +127,6 @@ construction prerequisite for #522, and #525 remains downstream.
     resolution or derived-pullback carrier. The broader ringed-topoi analogue
     is recorded as an unverified altitude lift, not claimed by this scheme
     implementation.
-17. Treat the scheme-module flat-generator construction as a prerequisite
-    progress slice for #554, tracked by #1495 and task 1.2a. Add the natural,
-    explicitly `M.val.Elements`-indexed coproduct presentation at the generic
-    small-ringed-site owner beside `freeYonedaSheaf` in
-    `Algebra/Category/ModuleCat/Sheaf/Generator.lean`; specialize it to
-    `X.Modules` without a competing carrier. Put the scheme-specific stalk
-    computation and stalkwise flatness in `AlgebraicGeometry/Modules/` and
-    reuse `Scheme.Modules.IsFlatOver` and `moduleStalkFunctor`. The index
-    universe is exposed by the Lean type. This work provides no projectivity,
-    unbounded K-flat resolution, or arbitrary-pullback acyclicity, so it does
-    not complete task 1.2 or close #554.
 
 ## Risks / Trade-offs
 

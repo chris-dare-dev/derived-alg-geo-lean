@@ -8,34 +8,6 @@ the repository's mathematical trust boundary.
 
 ## ADDED Requirements
 
-### Requirement: Scheme module sheaves have explicit stalkwise-flat generators
-
-For every scheme `X`, the implementation SHALL prove that the canonical
-free-Yoneda module sheaf associated to an open `U` has stalk `𝒪ₓ` when `x ∈ U`
-and the zero module otherwise. It SHALL prove that these objects are flat at
-every stalk and that their family generates `X.Modules`. For every
-`M : X.Modules`, it SHALL construct a natural epimorphism onto `M` from the
-coproduct indexed explicitly by `M.val.Elements`, with the index universe
-bound stated in the public API. This requirement provides flat generators
-only. The coproduct presentation and its naturality SHALL be implemented at
-the generic small-ringed-site owner and specialized to `X.Modules`. It does
-not provide projective objects, unbounded K-flat resolutions, or acyclicity
-for pullback along arbitrary scheme morphisms.
-
-#### Scenario: Element-indexed flat epimorphism
-
-- **WHEN** a scheme `X` and a module sheaf `M : X.Modules` are supplied
-- **THEN** an explicitly `M.val.Elements`-indexed coproduct of the canonical
-  open free-Yoneda sheaves maps epimorphically to `M`, naturally in `M`, and
-  each summand is proved stalkwise flat with the stated open-membership stalks
-
-#### Scenario: Flat generators do not discharge task 1.2
-
-- **WHEN** this generator construction is complete but the unbounded K-flat
-  resolution and arbitrary-morphism pullback-acyclicity evidence are absent
-- **THEN** task 1.2 and issue #554 remain open, and no projectivity or general
-  derived-pullback claim is inferred
-
 ### Requirement: Supported arbitrary derived pullbacks are constructed
 
 The implementation SHALL construct the arbitrary derived pullback objects
