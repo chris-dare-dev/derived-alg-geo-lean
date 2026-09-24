@@ -22,7 +22,10 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode, urlsplit
 
-from scripts import ci_contract
+if __package__:
+    from . import ci_contract
+else:  # Imported by the standalone loop_engine.py entry point.
+    import ci_contract
 
 
 API_ROOT = "https://api.github.com"
@@ -420,26 +423,26 @@ def _candidate(
                 "candidate artifact has wrong run/head identity or expired"
             )
         matches.append(artifact)
+    if attempt > 1:
+        current = client.get_object(f"/actions/runs/{run_id}/attempts/{attempt}")
+        if current.get("run_attempt") != attempt or current.get("head_sha") != head:
+            raise EvidenceError("current run attempt identity is inconsistent")
+        started = current.get("run_started_at")
+        if not isinstance(started, str):
+            raise EvidenceError("current run attempt has no start time")
+        matches = [
+            item
+            for item in matches
+            if isinstance(item.get("created_at"), str) and item["created_at"] >= started
+        ]
     if len(matches) != 1:
         raise EvidenceError(
-            "run lacks one unambiguous trust-artifacts candidate binding"
+            "run lacks one unambiguous trust-artifacts candidate binding for its current attempt"
         )
     artifact = matches[0]
     candidate = _sha(
         artifact["name"].removeprefix("trust-artifacts-"), "run artifact candidate"
     )
-    if attempt > 1:
-        current = client.get_object(f"/actions/runs/{run_id}/attempts/{attempt}")
-        if current.get("run_attempt") != attempt or current.get("head_sha") != head:
-            raise EvidenceError("current run attempt identity is inconsistent")
-        if (
-            not isinstance(artifact.get("created_at"), str)
-            or not isinstance(current.get("run_started_at"), str)
-            or artifact["created_at"] < current["run_started_at"]
-        ):
-            raise EvidenceError(
-                "candidate artifact cannot be bound to current run attempt"
-            )
     base_workflow = _blob(client, base, ".github/workflows/ci.yml")
     candidate_workflow = _blob(client, candidate, ".github/workflows/ci.yml")
     if (
@@ -584,9 +587,66 @@ def collect(client: GitHubClient, pr_number: int) -> dict[str, Any]:
             },
         ):
             continue
+        if definition["run_binding"] == "check":
+            matches = [
+                check
+                for check in observed["check_runs"]
+                if check.get("name") == definition["name"]
+                and isinstance(check.get("app"), dict)
+                and check["app"].get("slug") == definition["producer"]
+            ]
+            if len(matches) > 1:
+                raise EvidenceError(
+                    f"ambiguous check-app observations for {definition['name']!r}"
+                )
+            if not matches:
+                continue  # Missing optional check is reported by the validator.
+            check = matches[0]
+            check_id = _positive(check.get("id"), "check-app run ID")
+            _positive(
+                _required_object(check.get("app"), "check app").get("id"),
+                "check app ID",
+            )
+            status, raw = _conclusion(check)
+            path = f"results/check-run-{check_id}.json"
+            body = _canonical(
+                {"check_run": check, "head": head, "candidate": candidate}
+            )
+            payloads[path] = body
+            artifact_id = f"github-check-run-{check_id}"
+            artifacts.append(
+                {
+                    "id": artifact_id,
+                    "path": path,
+                    "sha256": hashlib.sha256(body).hexdigest(),
+                    "media_type": "application/json",
+                    "size_bytes": len(body),
+                    "producer": definition["producer"],
+                    "kind": definition["artifact"],
+                    "subject": definition["id"],
+                    "commit": head,
+                }
+            )
+            gate = {
+                "id": definition["id"],
+                "name": definition["name"],
+                "producer": definition["producer"],
+                "platform": "github-checks",
+                "provider_id": str(check_id),
+                "commit": head,
+                "status": status,
+                "conclusion": raw,
+                "applicable": True,
+                "prerequisites": definition["prerequisites"],
+                "artifact_refs": [artifact_id],
+            }
+            if status == "skipped":
+                gate["skip_reason"] = "provider reported skipped"
+            gates.append(gate)
+            continue
         if definition["run_binding"] != "primary":
-            # Other applications' raw checks are retained below. They cannot
-            # borrow the primary workflow run identity.
+            # Independent workflows require their own proven run/candidate
+            # identity. No such inventory gate applies to this PR event.
             continue
         matches = jobs_by_name.get(definition["name"], [])
         if len(matches) > 1:
@@ -612,6 +672,12 @@ def collect(client: GitHubClient, pr_number: int) -> dict[str, Any]:
             or _required_object(check.get("app"), "check app").get("id") != app_id
         ):
             raise EvidenceError("workflow job has no matching GitHub Actions check run")
+        if job.get("status") != check.get("status") or job.get(
+            "conclusion"
+        ) != check.get("conclusion"):
+            raise EvidenceError(
+                f"workflow job and check run outcomes conflict for {definition['name']!r}"
+            )
         status, raw = _conclusion(check)
         payload = {
             "check_run": check,
@@ -720,6 +786,13 @@ def collect(client: GitHubClient, pr_number: int) -> dict[str, Any]:
         trusted_head_commit=final_head,
         trusted_inventory_sha256=ci_contract._canonical_sha256(inventory),
     )
+    if run.get("conclusion") != "success":
+        validation["valid"] = False
+        validation["errors"].append(
+            f"primary CI workflow conclusion is {run.get('conclusion')!r}, not success"
+        )
+        validation["claims"]["required_ci_verified"] = False
+        validation["claims"]["all_pipelines_green"] = False
     if not artifacts:
         validation["valid"] = False
         validation["errors"].append("no provider-bound gate artifacts were collected")

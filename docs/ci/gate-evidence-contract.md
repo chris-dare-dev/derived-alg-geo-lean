@@ -30,8 +30,11 @@ The gate's platform is separate from the primary CI record's platform.
 `run_binding=primary` ties a
 gate to the record's CI run; `independent` allows an auxiliary workflow to
 have its own run and attempt. `status` represents a commit status, which has
-a provider status ID but no workflow run. A check-run artifact must match its
-gate's run identity; a commit-status artifact must not invent one. The adapter
+a provider status ID but no workflow run. `check` represents a check-app run
+on the PR head with no Actions workflow run; it records the head SHA rather
+than claiming the merge tree was tested. Workflow check-run artifacts must
+match their gate's run identity; runless status/check artifacts must not invent
+one. The adapter
 must fetch every
 page of check runs and commit statuses for the exact candidate and preserve
 their provider identities. A name-only or latest-timestamp selection is not
@@ -139,6 +142,16 @@ no proven gate mapping remain visible and prevent an all-pipelines-green
 claim. A missing or red required gate denies `required_ci_verified`; optional
 warnings remain separate.
 
+The optional GitHub Advanced Security entry uses `run_binding=check` and
+`github-checks` platform. When the app reports a unique check run on the
+current PR head, the collector records its real app ID, provider ID, head
+subject and outcome without a workflow run. A green check can make auxiliary
+health true; a red check is a warning while required CI remains separately
+verified. If the app reports no check run, auxiliary health is false rather
+than assuming success. No independent Actions workflow in the current
+inventory applies to `pull_request`; Cache warm and Docs have separate event
+selectors and cannot borrow the primary run.
+
 Separate workflow runs on one head cannot silently supersede an older red
 required check: the collector denies a current claim if more than one CI run
 exists for that head. It also rechecks the run and attempt after collection.
@@ -154,5 +167,9 @@ observation file. `lean-toolchain`, `lake-manifest.json`, and `pins.json`
 digests come from the candidate Git tree. These hashes detect a changed
 local bundle; they do not authenticate GitHub beyond the authenticated API
 response. `ci_contract.validate_evidence` remains the canonical consistency
-validator. This collector makes no review, merge, or post-merge health
-decision and is not yet called by the controller or CI workflow.
+validator. `scripts/loop_engine.py evidence --repo <owner/name> --pr <number>`
+is a read-only controller command for inspecting one open PR; `--output`
+optionally writes the local bundle. Its exit code reports whether required
+CI was verified. It makes no review, queue-admission, merge, or post-merge
+health decision. The CI workflow and durable controller admission path do
+not call this collector yet; #1434 owns that adoption.

@@ -39,6 +39,8 @@ def evidence(*, event: str = "pull_request", workflow: str | None = None) -> dic
         status = "passed" if applicable else "skipped"
         conclusion = "success" if applicable else "skipped"
         artifact_id = f"artifact-{index}"
+        runless = definition["run_binding"] in {"status", "check"}
+        subject_commit = SHA_B if definition["run_binding"] == "check" else candidate_commit
         if applicable:
             artifacts.append(
                 {
@@ -50,9 +52,8 @@ def evidence(*, event: str = "pull_request", workflow: str | None = None) -> dic
                     "producer": definition["producer"],
                     "kind": definition["artifact"],
                     "subject": definition["id"],
-                    "commit": candidate_commit,
-                    "run_id": 35532316123,
-                    "run_attempt": 1,
+                    "commit": subject_commit,
+                    **({} if runless else {"run_id": 35532316123, "run_attempt": 1}),
                 }
             )
         gates.append(
@@ -62,9 +63,8 @@ def evidence(*, event: str = "pull_request", workflow: str | None = None) -> dic
                 "producer": definition["producer"],
                 "platform": definition["platforms"][0],
                 "provider_id": f"run-3553-job-{index}",
-                "commit": candidate_commit,
-                "run_id": 35532316123,
-                "run_attempt": 1,
+                "commit": subject_commit,
+                **({} if runless else {"run_id": 35532316123, "run_attempt": 1}),
                 "status": status,
                 "conclusion": conclusion,
                 "applicable": applicable,
@@ -397,6 +397,21 @@ class ContractTests(unittest.TestCase):
         self.assertTrue(result["claims"]["required_ci_verified"])
         self.assertFalse(result["claims"]["all_pipelines_green"])
         self.assertTrue(any("github-advanced-security is missing" in w for w in result["warnings"]))
+
+    def test_runless_security_check_uses_head_without_invented_run(self) -> None:
+        candidate = evidence()
+        bind_provider_proof(candidate)
+        security = next(gate for gate in candidate["gates"] if gate["id"] == "github-advanced-security")
+        artifact = next(item for item in candidate["artifacts"] if item["subject"] == "github-advanced-security")
+        self.assertEqual(security["commit"], candidate["head_commit"])
+        self.assertNotIn("run_id", security)
+        self.assertNotIn("run_attempt", artifact)
+        self.assertTrue(self.evaluate(candidate)["claims"]["auxiliary_checks_healthy"])
+        security["run_id"] = 123
+        self.assert_invalid(candidate, "runless observation must not claim a workflow run")
+        del security["run_id"]
+        artifact["commit"] = candidate["candidate_commit"]
+        self.assert_invalid(candidate, "artifact commit does not match gate revision")
 
     def test_missing_required_gate_still_denies_ci_claim(self) -> None:
         candidate = evidence()

@@ -74,6 +74,7 @@ class ProviderFixture:
             for i, name in enumerate(("build", "roadmap", "ci"))
         ]
         self.jobs = {1: [self._job(check, 1) for check in self.checks]}
+        self.security_check: dict | None = None
         self.statuses: list[dict] = []
         self.calls: list[str] = []
         self.move_head_on_recheck = False
@@ -102,6 +103,8 @@ class ProviderFixture:
             "run_id": 12345,
             "run_attempt": attempt,
             "check_run_url": f"{BASE}/check-runs/{check['id']}",
+            "status": check["status"],
+            "conclusion": check["conclusion"],
         }
 
     @staticmethod
@@ -194,9 +197,18 @@ class ProviderFixture:
                     "app": {"id": 15368, "slug": "github-actions"},
                 }
             ]
+            if self.security_check is not None:
+                suites.append(
+                    {
+                        "id": 333,
+                        "head_sha": SHA_HEAD,
+                        "latest_check_runs_count": 1,
+                        "app": {"id": 4444, "slug": "github-advanced-security"},
+                    }
+                )
             if self.paginate_suites and "page=2" not in url:
                 next_url = f"{BASE}{path}?per_page=100&page=2"
-                return {"total_count": 1, "check_suites": []}, {
+                return {"total_count": len(suites), "check_suites": []}, {
                     "Link": f'<{next_url}>; rel="next"'
                 }
             return {"total_count": len(suites), "check_suites": suites}, {}
@@ -207,6 +219,8 @@ class ProviderFixture:
                     "Link": f'<{next_url}>; rel="next"'
                 }
             return {"total_count": len(self.checks), "check_runs": self.checks}, {}
+        if path == "/check-suites/333/check-runs":
+            return {"total_count": 1, "check_runs": [self.security_check]}, {}
         if path == f"/commits/{SHA_HEAD}/statuses":
             if self.paginate_statuses and "page=2" not in url:
                 next_url = f"{BASE}{path}?per_page=100&page=2"
@@ -398,6 +412,7 @@ class CollectorTests(unittest.TestCase):
     def test_required_red_and_auxiliary_red_are_distinct(self) -> None:
         fixture = ProviderFixture()
         fixture.checks[0]["conclusion"] = "failure"
+        fixture.jobs[1][0]["conclusion"] = "failure"
         denied = collect(fixture.client(), 7)
         self.assertFalse(denied["validation"]["claims"]["required_ci_verified"])
         self.assertEqual(denied["evidence"]["gates"][0]["status"], "failed")
@@ -415,6 +430,44 @@ class CollectorTests(unittest.TestCase):
         self.assertTrue(result["validation"]["claims"]["required_ci_verified"])
         self.assertFalse(result["validation"]["claims"]["all_pipelines_green"])
         self.assertEqual(result["observations"]["statuses"][0]["state"], "failure")
+
+    def test_security_check_green_and_red_without_workflow_run(self) -> None:
+        fixture = ProviderFixture()
+        fixture.security_check = {
+            "id": 900,
+            "name": "github-advanced-security",
+            "head_sha": SHA_HEAD,
+            "status": "completed",
+            "conclusion": "success",
+            "app": {"id": 4444, "slug": "github-advanced-security"},
+        }
+        green = collect(fixture.client(), 7)
+        self.assertTrue(green["validation"]["claims"]["required_ci_verified"])
+        self.assertTrue(green["validation"]["claims"]["auxiliary_checks_healthy"])
+        self.assertTrue(green["validation"]["claims"]["all_pipelines_green"])
+        gate = next(
+            g
+            for g in green["evidence"]["gates"]
+            if g["id"] == "github-advanced-security"
+        )
+        self.assertEqual(gate["commit"], SHA_HEAD)
+        self.assertNotIn("run_id", gate)
+        fixture.security_check["conclusion"] = "failure"
+        red = collect(fixture.client(), 7)
+        self.assertTrue(red["validation"]["claims"]["required_ci_verified"])
+        self.assertFalse(red["validation"]["claims"]["auxiliary_checks_healthy"])
+        self.assertFalse(red["validation"]["claims"]["all_pipelines_green"])
+
+    def test_conflicting_job_or_workflow_outcome_denies_claim(self) -> None:
+        fixture = ProviderFixture()
+        fixture.jobs[1][0]["conclusion"] = "failure"
+        with self.assertRaisesRegex(EvidenceError, "outcomes conflict"):
+            collect(fixture.client(), 7)
+        fixture = ProviderFixture()
+        fixture.run["conclusion"] = "failure"
+        result = collect(fixture.client(), 7)
+        self.assertFalse(result["validation"]["claims"]["required_ci_verified"])
+        self.assertIn("workflow conclusion", result["validation"]["errors"][0])
 
     def test_suites_and_statuses_follow_all_pages(self) -> None:
         fixture = ProviderFixture()
@@ -463,8 +516,24 @@ class CollectorTests(unittest.TestCase):
         )
         self.assertEqual(len(result["observations"]["attempt_jobs"][1]), 3)
         fixture.artifacts[0]["created_at"] = "2026-09-23T08:00:00Z"
-        with self.assertRaisesRegex(EvidenceError, "cannot be bound"):
+        with self.assertRaisesRegex(EvidenceError, "current attempt"):
             collect(fixture.client(), 7)
+
+    def test_rerun_selects_current_artifact_among_retained_older_artifacts(
+        self,
+    ) -> None:
+        fixture = ProviderFixture()
+        fixture.run["run_attempt"] = 2
+        fixture.jobs[2] = [fixture._job(check, 2) for check in fixture.checks]
+        earlier = {
+            **fixture.artifacts[0],
+            "id": 2,
+            "created_at": "2026-09-23T08:00:00Z",
+        }
+        fixture.artifacts.append(earlier)
+        result = collect(fixture.client(), 7)
+        self.assertTrue(result["validation"]["claims"]["required_ci_verified"])
+        self.assertEqual(len(result["observations"]["run_artifacts"]), 2)
 
 
 if __name__ == "__main__":

@@ -58,6 +58,10 @@ The collector SHALL produce schema v4 evidence with provider-sourced observation
 - **WHEN** all required candidate gates pass and an optional security check fails
 - **THEN** the record may report required-CI verified while retaining an auxiliary warning and MUST NOT report all pipelines green
 
+#### Scenario: Runless security check is green
+- **WHEN** a GitHub check app reports a successful security check on the exact PR head with no Actions workflow run
+- **THEN** the collector records the check app, provider ID, head subject and outcome without inventing a workflow run, and auxiliary health may be true
+
 #### Scenario: Required work is absent or non-successful
 - **WHEN** a required gate is missing, pending, failed, cancelled, timed out or unexpectedly skipped
 - **THEN** the collector reports no required-CI verified claim, with the raw provider outcome visible
@@ -76,3 +80,14 @@ The collector SHALL use read-only provider and Git operations. Its output MUST N
 #### Scenario: Provider access fails
 - **WHEN** authentication, permission, rate limiting, timeout or malformed provider data prevents a complete read
 - **THEN** the collector exits unsuccessfully with an actionable error and no passing admission claim
+
+### Requirement: Read-only controller evidence demonstration
+The loop controller SHALL expose a read-only command that invokes the collector and existing schema v4 validator for one open PR, reports the exact base, head, candidate, run/attempt and classification, and returns failure when required CI is not verified. It MUST NOT alter the existing queue admission, protected merge or issue-closure path.
+
+#### Scenario: Live current PR
+- **WHEN** an operator runs the controller evidence command against an open PR with complete provider data
+- **THEN** the command reports the collector's schema v4 validation and revision-bound classification without any provider mutation
+
+#### Scenario: Incomplete or conflicting provider evidence
+- **WHEN** the collector rejects a moved run, contradictory job/check/workflow outcomes, or unavailable candidate binding
+- **THEN** the command reports no required-CI verified claim and leaves queue admission unchanged

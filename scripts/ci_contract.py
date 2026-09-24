@@ -261,14 +261,18 @@ def validate_inventory(inventory: Any) -> list[str]:
         if not isinstance(gate.get("required"), bool):
             errors.append(f"{prefix}.required must be boolean")
         if not _is_string(gate.get("run_binding")) or gate.get("run_binding") not in {
-            "primary", "independent", "status"
+            "primary", "independent", "status", "check"
         }:
-            errors.append(f"{prefix}.run_binding must be primary, independent or status")
+            errors.append(f"{prefix}.run_binding must be primary, independent, status or check")
         artifact_kind = gate.get("artifact")
         if gate.get("run_binding") == "status" and not (
             _is_string(artifact_kind) and artifact_kind.startswith("commit-status:")
         ):
             errors.append(f"{prefix}.artifact must identify a commit status")
+        if gate.get("run_binding") == "check" and not (
+            _is_string(artifact_kind) and artifact_kind.startswith("check-run:")
+        ):
+            errors.append(f"{prefix}.artifact must identify a check run")
         prerequisites = gate.get("prerequisites", [])
         if not isinstance(prerequisites, list) or any(
             not _is_string(item) for item in prerequisites
@@ -454,10 +458,11 @@ def validate_evidence(
             errors.append(f"{prefix}.sha256 must be a 64-character SHA-256")
         if artifact.get("commit") is not None and not _is_sha(artifact.get("commit")):
             errors.append(f"{prefix}.commit must be a full SHA")
-        elif _is_sha(artifact.get("commit")) and artifact.get("commit", "").lower() != str(
-            evidence.get("candidate_commit", "")
-        ).lower():
-            errors.append(f"{prefix}.commit is not bound to evidence.candidate_commit")
+        elif _is_sha(artifact.get("commit")) and artifact.get("commit", "").lower() not in {
+            str(evidence.get("candidate_commit", "")).lower(),
+            str(evidence.get("head_commit", "")).lower(),
+        }:
+            errors.append(f"{prefix}.commit is not bound to evidence candidate or head")
 
     definitions = {
         gate.get("id"): gate
@@ -506,19 +511,24 @@ def validate_evidence(
             errors.append(f"{prefix}.provider_id duplicates within producer {gate.get('provider_id')!r}")
         else:
             seen_provider_ids.add((str(gate.get("producer")), gate.get("provider_id")))
+        expected_commit = (
+            evidence.get("head_commit") if definition.get("run_binding") == "check"
+            else evidence.get("candidate_commit")
+        )
         if not _is_sha(gate.get("commit")):
             errors.append(f"{prefix}.commit must be a full SHA")
-        elif gate.get("commit", "").lower() != str(evidence.get("candidate_commit", "")).lower():
-            errors.append(f"{prefix}.commit is not bound to evidence.candidate_commit")
+        elif gate.get("commit", "").lower() != str(expected_commit).lower():
+            subject_name = "head_commit" if definition.get("run_binding") == "check" else "candidate_commit"
+            errors.append(f"{prefix}.commit is not bound to evidence.{subject_name}")
         if not _is_string(gate.get("status")) or gate.get("status") not in STATUSES:
             errors.append(f"{prefix}.status is not recognized")
         if not _is_string(gate.get("conclusion")):
             errors.append(f"{prefix}.conclusion is required")
         if not isinstance(gate.get("applicable"), bool):
             errors.append(f"{prefix}.applicable must be boolean")
-        if definition.get("run_binding") == "status":
+        if definition.get("run_binding") in {"status", "check"}:
             if "run_id" in gate or "run_attempt" in gate:
-                errors.append(f"{prefix}: commit status must not claim a workflow run")
+                errors.append(f"{prefix}: runless observation must not claim a workflow run")
         else:
             if not _is_positive_int(gate.get("run_id")):
                 errors.append(f"{prefix}.run_id must be a positive integer")
@@ -604,9 +614,11 @@ def validate_evidence(
                 errors.append(f"{prefix}: artifact kind does not match inventory")
             if artifact.get("subject") != gate_id:
                 errors.append(f"{prefix}: artifact subject does not match gate id")
-            if definition.get("run_binding") == "status":
+            if artifact.get("commit") != expected_commit:
+                errors.append(f"{prefix}: artifact commit does not match gate revision")
+            if definition.get("run_binding") in {"status", "check"}:
                 if "run_id" in artifact or "run_attempt" in artifact:
-                    errors.append(f"{prefix}: commit-status artifact must not claim a workflow run")
+                    errors.append(f"{prefix}: runless artifact must not claim a workflow run")
             else:
                 if artifact.get("run_id") != gate.get("run_id"):
                     errors.append(f"{prefix}: artifact run_id must equal gate.run_id")

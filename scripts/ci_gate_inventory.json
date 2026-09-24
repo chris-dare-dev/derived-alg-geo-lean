@@ -135,13 +135,13 @@
       "name": "github-advanced-security",
       "class": "auxiliary",
       "required": false,
-      "run_binding": "independent",
+      "run_binding": "check",
       "prerequisites": [],
       "applies_to": [
         "pull_request"
       ],
       "platforms": [
-        "github-actions"
+        "github-checks"
       ],
       "producer": "github-advanced-security",
       "artifact": "check-run:github-advanced-security"
