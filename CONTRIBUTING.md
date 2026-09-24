@@ -165,8 +165,15 @@ request when you use it.
 For a local pre-flight that the hook allows, run:
 
 ```bash
+python3 -m venv .loop-tools
+source .loop-tools/bin/activate
+python -m pip install -r scripts/requirements-loop.txt
 scripts/precheck.sh
 ```
+
+Keep this environment activated for local precheck and loop-controller
+commands: the scripts invoke `python3`, which will then resolve to the same
+environment that received the parser dependency.
 
 It runs every gate in `scripts/gates.sh` that needs no Lean build — workflows,
 `--diff-only` style on your own lines, source-independence, layering, umbrella
@@ -207,6 +214,11 @@ keeps a passed review; a moved change needs one revalidation round. Opting into
 `recovery` schedules research after exhaustion. Without it, the run parks the
 chunk, files a follow-up issue, and moves on. See
 [the recovery protocol](docs/architecture/loop-recovery.md).
+
+These grants govern unattended controller runs. An explicit owner request in
+the active task to maintain an existing PR authorizes the named action without
+a new manifest or standing grant; required CI and branch protection still
+govern merges.
 
 Provider actions need grants from `.claude/loop-authority.yaml` on the default
 branch, which the controller reads through the GitHub API rather than a local

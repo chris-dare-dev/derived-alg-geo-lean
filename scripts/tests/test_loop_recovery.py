@@ -6,6 +6,7 @@ import contextlib
 import hashlib
 import io
 import json
+import os
 from pathlib import Path
 import sys
 import subprocess
@@ -396,6 +397,36 @@ class RecoveryCliTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
+        provider_temp = tempfile.TemporaryDirectory()
+        self.addCleanup(provider_temp.cleanup)
+        provider_bin = Path(provider_temp.name)
+        fake_gh = provider_bin / "gh"
+        fake_gh.write_text(
+            "#!/usr/bin/env python3\n"
+            "import json, subprocess, sys\n"
+            "args = sys.argv[1:]\n"
+            "if args and args[0] == 'api':\n"
+            "    endpoint = args[-1]\n"
+            "    if endpoint == 'repos/example/repository':\n"
+            "        print('{}')\n"
+            "        sys.exit(0)\n"
+            "    if endpoint == 'repos/example/repository/commits/main':\n"
+            "        sha = subprocess.check_output(['git', 'rev-parse', 'main'], text=True).strip()\n"
+            "        print(json.dumps({'sha': sha}))\n"
+            "        sys.exit(0)\n"
+            "    if endpoint.startswith('repos/example/repository/contents/'):\n"
+            "        print('gh: Not Found (HTTP 404)', file=sys.stderr)\n"
+            "        sys.exit(1)\n"
+            "print('unexpected fake gh call: ' + ' '.join(args), file=sys.stderr)\n"
+            "sys.exit(2)\n",
+            encoding="utf-8",
+        )
+        fake_gh.chmod(0o755)
+        self.provider_env = os.environ.copy()
+        self.provider_env["PATH"] = str(provider_bin) + os.pathsep + self.provider_env.get("PATH", "")
+        owner_file = mock.patch.object(loop_engine, "read_owner_file", return_value=None)
+        owner_file.start()
+        self.addCleanup(owner_file.stop)
         self.git("init", "-b", "main")
         self.git("config", "user.email", "test@example.invalid")
         self.git("config", "user.name", "Recovery Test")
@@ -419,7 +450,7 @@ class RecoveryCliTests(unittest.TestCase):
 
     def cli(self, *args, ok=True):
         result = subprocess.run([sys.executable, str(SCRIPT_DIR / "loop_engine.py"), *map(str, args)],
-                                cwd=self.root, text=True, capture_output=True)
+                                cwd=self.root, env=self.provider_env, text=True, capture_output=True)
         if ok:
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         else:

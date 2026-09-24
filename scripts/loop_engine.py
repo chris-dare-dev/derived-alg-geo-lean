@@ -27,10 +27,32 @@ import subprocess
 import sys
 import tempfile
 from datetime import datetime, timezone
+from importlib.metadata import PackageNotFoundError, version as package_version
 from pathlib import Path
 from typing import Any, Iterable
 
 import loop_recovery
+
+try:
+    from markdown_it import MarkdownIt
+except ImportError as exc:  # pragma: no cover - covered by the documented dependency setup
+    raise SystemExit(
+        "markdown-it-py==3.0.0 is required; install scripts/requirements-loop.txt"
+    ) from exc
+
+try:
+    MARKDOWN_IT_VERSION = package_version("markdown-it-py")
+except PackageNotFoundError as exc:  # pragma: no cover - guarded by the import above
+    raise SystemExit(
+        "markdown-it-py==3.0.0 is required; install scripts/requirements-loop.txt"
+    ) from exc
+if MARKDOWN_IT_VERSION != "3.0.0":
+    raise SystemExit(
+        "loop ledger digests require markdown-it-py==3.0.0; "
+        f"found {MARKDOWN_IT_VERSION}. Install scripts/requirements-loop.txt"
+    )
+
+COMMONMARK_PARSER = MarkdownIt("commonmark")
 
 try:
     import yaml
@@ -156,13 +178,30 @@ UNPROTECTED_RECORD_RES = (
 # that had to resolve a conflict, say). They need the full panel but do not
 # spend the critique/improve cap; this bounds how often a pass can be reopened.
 MAX_REVALIDATION_ROUNDS = 2
-# v1 hashed every artifact byte for byte, so ticking a task box or appending
-# the observation log invalidated a ledger. v2 hashes the contract instead.
-OPENSPEC_DIGEST_VERSION = 2
+# v1 hashes every artifact with universal-newline text reads. v2 adds the
+# original regex-based task normalization. v3 uses CommonMark structure.
+OPENSPEC_DIGEST_VERSION = 3
+SUPPORTED_OPENSPEC_DIGEST_VERSIONS = frozenset({1, 2, 3})
 LOG_ARTIFACT_NAMES = {"agent-observations.md"}
-TASK_CHECKBOX_RE = re.compile(r"^(\s*[-*+] )\[[ xX]\]", re.MULTILINE)
 ISSUE_ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 BRANCH_RE = re.compile(r"^agent/[a-z0-9][a-z0-9._/-]*$")
+TASK_LIST_CHECKBOX_RE = re.compile(r"^([ \t]*[-*+][ \t]+)\[[ xX]\]")
+TASK_INLINE_CHECKBOX_RE = re.compile(r"^\[[ xX]\](?:[ \t\n]|$)")
+# Preserve the semantics used by already-written v2 ledgers. Do not use this
+# regex for new ledgers: CommonMark parsing distinguishes task boxes from links.
+TASK_CHECKBOX_RE_V2 = re.compile(r"^(\s*[-*+] )\[[ xX]\]", re.MULTILINE)
+MARKDOWN_LINE_END_RE = re.compile(r"\r\n|\r|\n")
+MARKDOWN_BLOCK_CONTENT_TYPES = {
+    "blockquote_open",
+    "bullet_list_open",
+    "code_block",
+    "fence",
+    "heading_open",
+    "html_block",
+    "hr",
+    "ordered_list_open",
+    "paragraph_open",
+}
 CLOSING_KEYWORD_RE = re.compile(r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)\b", re.I)
 # Common non-closing issue-link phrases accepted for progress PRs.
 NON_CLOSING_REFERENCE_RE = re.compile(
@@ -261,15 +300,132 @@ def has_openspec(spec: dict[str, Any]) -> bool:
     return spec.get("openspec") is not None
 
 
+def split_markdown_lines(markdown: str, *, keepends: bool = False) -> list[str]:
+    """Split only on Markdown line endings, preserving every other code point."""
+
+    lines: list[str] = []
+    start = 0
+    for match in MARKDOWN_LINE_END_RE.finditer(markdown):
+        end = match.end() if keepends else match.start()
+        lines.append(markdown[start:end])
+        start = match.end()
+    if start < len(markdown):
+        lines.append(markdown[start:])
+    return lines
+
+
+def _parse_markdown(markdown: str) -> list[Any]:
+    """Parse with the pinned CommonMark grammar used by the ledger digest."""
+
+    return COMMONMARK_PARSER.parse(markdown)
+
+
+def normalize_task_checkboxes(markdown: str) -> str:
+    """Normalize checkbox state only in actual Markdown list-item paragraphs.
+
+    The first direct block of a list item must be a paragraph whose inline
+    content starts with the checkbox. Source maps then tie that parsed item
+    back to the exact line being normalized; checkbox-shaped code and links
+    stay fixed.
+    """
+
+    lines = split_markdown_lines(markdown, keepends=True)
+    tokens = _parse_markdown(markdown)
+
+    list_items: list[dict[str, Any]] = []
+    for token in tokens:
+        if token.type == "list_item_open":
+            list_items.append(
+                {
+                    "level": token.level,
+                    "first_block_seen": False,
+                    "paragraph_level": None,
+                }
+            )
+            continue
+
+        if token.type == "list_item_close":
+            while list_items and list_items[-1]["level"] >= token.level:
+                list_items.pop()
+            continue
+
+        if not list_items:
+            continue
+        item = list_items[-1]
+        if (
+            not item["first_block_seen"]
+            and token.level == item["level"] + 1
+            and token.type in MARKDOWN_BLOCK_CONTENT_TYPES
+        ):
+            item["first_block_seen"] = True
+            if token.type == "paragraph_open":
+                item["paragraph_level"] = token.level
+            continue
+
+        if item["paragraph_level"] is not None:
+            if (
+                token.type == "inline"
+                and token.level == item["paragraph_level"] + 1
+                and token.map
+                and token.children
+                and token.children[0].type == "text"
+                and TASK_INLINE_CHECKBOX_RE.match(token.children[0].content)
+            ):
+                line_number = token.map[0]
+                if (
+                    0 <= line_number < len(lines)
+                    and TASK_LIST_CHECKBOX_RE.match(lines[line_number])
+                ):
+                    lines[line_number] = TASK_LIST_CHECKBOX_RE.sub(
+                        r"\1[ ]", lines[line_number], count=1
+                    )
+            if token.type == "paragraph_close" and token.level == item["paragraph_level"]:
+                item["paragraph_level"] = None
+    return "".join(lines)
+
+
+def has_visible_why_heading(markdown: str) -> bool:
+    """Recognize a root-level ATX h2 whose rendered inline text is exactly Why."""
+
+    tokens = _parse_markdown(markdown)
+    for index, token in enumerate(tokens):
+        if (
+            token.type != "heading_open"
+            or token.tag != "h2"
+            or token.level != 0
+            or token.markup != "##"
+            or index + 1 >= len(tokens)
+            or tokens[index + 1].type != "inline"
+        ):
+            continue
+        inline = tokens[index + 1]
+        children = inline.children or []
+        # Raw HTML can hide text through attributes such as `hidden` or inline
+        # styles. Do not call that text visibly present; unrelated HTML outside
+        # this candidate heading remains irrelevant.
+        if any(child.type in {"html_inline", "image"} for child in children):
+            continue
+        visible_text = "".join(child.content for child in children if child.type in {"text", "code_inline"}).strip()
+        if visible_text == "Why":
+            return True
+    return False
+
+
+def checked_openspec_digest_version(version: Any) -> int:
+    if type(version) is not int or version not in SUPPORTED_OPENSPEC_DIGEST_VERSIONS:
+        raise LoopError(f"unsupported OpenSpec digest version: {version!r}")
+    return version
+
+
 def openspec_digest(root: Path, spec: dict[str, Any], version: int = OPENSPEC_DIGEST_VERSION) -> str:
     """Hash planning content; the registered digest freezes it, not its Git path.
 
-    Version 2 freezes the contract and nothing else: task checkbox state and
-    append-only observation logs are progress records, and hashing them made
-    the bookkeeping the protocol asks for invalidate the review it recorded.
-    Version 1 remains available so ledgers written by it keep verifying.
+    Version 2 preserves its original regex normalization so existing ledgers
+    keep verifying. Version 3 freezes the contract with CommonMark-aware task
+    checkbox normalization. Version 1 and 2 remain available for old ledgers.
     """
 
+    version = checked_openspec_digest_version(version)
     if not has_openspec(spec):
         return digest([])
     change_dir = openspec_change_dir(root, spec)
@@ -281,9 +437,18 @@ def openspec_digest(root: Path, spec: dict[str, Any], version: int = OPENSPEC_DI
         # records; a file of the same name under specs/ is contract.
         if version >= 2 and relative in LOG_ARTIFACT_NAMES:
             continue
-        content = path.read_text(encoding="utf-8")
-        if version >= 2 and relative == "tasks.md":
-            content = TASK_CHECKBOX_RE.sub(r"\1[ ]", content)
+        try:
+            if version >= 3:
+                content = path.read_bytes().decode("utf-8")
+            else:
+                # Keep historical universal-newline normalization for v1/v2.
+                content = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError as exc:
+            raise LoopError(f"OpenSpec artifact is not valid UTF-8: {relative}") from exc
+        if version == 2 and relative == "tasks.md":
+            content = TASK_CHECKBOX_RE_V2.sub(r"\1[ ]", content)
+        elif version >= 3 and relative == "tasks.md":
+            content = normalize_task_checkboxes(content)
         parts.append({"path": relative, "content": content})
     return digest(parts)
 
@@ -291,8 +456,7 @@ def openspec_digest(root: Path, spec: dict[str, Any], version: int = OPENSPEC_DI
 def ledger_digest_version(state: dict[str, Any]) -> int:
     """Ledgers written before v2 recorded no version and hashed with v1."""
 
-    version = state.get("openspec_digest_version", 1)
-    return version if isinstance(version, int) and not isinstance(version, bool) else 1
+    return checked_openspec_digest_version(state.get("openspec_digest_version", 1))
 
 
 def ledger_openspec_matches(root: Path, spec: dict[str, Any], state: dict[str, Any]) -> bool:
@@ -322,11 +486,10 @@ def validate_openspec_artifacts(root: Path, spec: dict[str, Any]) -> None:
             raise LoopError(f"OpenSpec artifact is missing: {path.relative_to(root)}")
         if not path.read_text(encoding="utf-8").strip():
             raise LoopError(f"OpenSpec artifact is empty: {path.relative_to(root)}")
-    required_text = "\n".join(
-        ensure_inside(root, change_dir / relative).read_text(encoding="utf-8")
-        for relative in openspec["required_artifacts"]
-    )
-    if "proposal.md" in openspec["required_artifacts"] and "## Why" not in required_text:
+    proposal = ensure_inside(root, change_dir / "proposal.md")
+    if "proposal.md" in openspec["required_artifacts"] and not has_visible_why_heading(
+        proposal.read_text(encoding="utf-8")
+    ):
         raise LoopError("OpenSpec proposal must contain a Why section")
     spec_texts = [
         ensure_inside(root, change_dir / relative).read_text(encoding="utf-8")
@@ -1564,11 +1727,12 @@ def reviewed_content_matches(
 
     if not re.fullmatch(r"[0-9a-fA-F]{40}", head) or not re.fullmatch(r"[0-9a-fA-F]{7,40}", reviewed_commit):
         return False
-    if head.lower() == reviewed_commit.lower():
-        return True
-    if len(reviewed_commit) < 40 and reviewed_commit_matches_head(root, reviewed_commit, head):
-        return True
     try:
+        version = ledger_digest_version(state)
+        if head.lower() == reviewed_commit.lower():
+            return True
+        if len(reviewed_commit) < 40 and reviewed_commit_matches_head(root, reviewed_commit, head):
+            return True
         ensure_commit(root, spec["remote"], head)
         ensure_commit(root, spec["remote"], reviewed_commit)
         base = trusted_base_commit(root, spec)
@@ -1578,8 +1742,8 @@ def reviewed_content_matches(
         ):
             return False
         for path in exclude:
-            if Path(path).name == "tasks.md" and normalized_tasks(root, reviewed_commit, path) != normalized_tasks(
-                root, head, path
+            if Path(path).name == "tasks.md" and normalized_tasks(root, reviewed_commit, path, version) != normalized_tasks(
+                root, head, path, version
             ):
                 print("WARN task wording changed after review; only checkbox state may change")
                 return False
@@ -1602,8 +1766,25 @@ def blob_at(root: Path, commit: str, path: str) -> str | None:
     return result.stdout if result.returncode == 0 else None
 
 
-def normalized_tasks(root: Path, commit: str, path: str) -> str:
-    return TASK_CHECKBOX_RE.sub(r"\1[ ]", blob_at(root, commit, path) or "")
+def normalized_tasks(root: Path, commit: str, path: str, version: int) -> str:
+    """Use the ledger's original task semantics when comparing reviewed heads."""
+
+    version = checked_openspec_digest_version(version)
+    result = subprocess.run(["git", "show", f"{commit}:{path}"], cwd=root, capture_output=True)
+    if result.returncode != 0:
+        return ""
+    try:
+        content = result.stdout.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise LoopError(f"reviewed task artifact is not valid UTF-8: {path}") from exc
+    if version < 3:
+        # v1/v2 read artifacts in text mode, which normalized line endings.
+        content = content.replace("\r\n", "\n").replace("\r", "\n")
+    if version == 2:
+        return TASK_CHECKBOX_RE_V2.sub(r"\1[ ]", content)
+    if version == 3:
+        return normalize_task_checkboxes(content)
+    return content
 
 
 LEAN_IMPORT_RE = re.compile(r"^(?:(?:public|private|meta)\s+)*import\s+(.+?)\s*$", re.MULTILINE)
