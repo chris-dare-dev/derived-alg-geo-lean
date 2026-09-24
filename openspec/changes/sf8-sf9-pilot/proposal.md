@@ -9,7 +9,10 @@ handoff between issues explicit before the loop is enabled.
 
 ## What Changes
 
-- Plan the supported arbitrary derived-pullback construction in SF8.5 (#554).
+- Plan the arbitrary derived-pullback construction in SF8.5 (#554) on the full
+  existing interface domain: every scheme morphism and every unbounded complex
+  of modules on its source scheme, without a boundedness, quasicoherence,
+  Noetherian, flatness, or exactness restriction.
 - Plan the algebraicity proof for the supported relative-perfect moduli stack
   in SF9.2 (#522).
 - Plan semistable reduction and the quasi-properness adapter in SF9.3 (#525)
