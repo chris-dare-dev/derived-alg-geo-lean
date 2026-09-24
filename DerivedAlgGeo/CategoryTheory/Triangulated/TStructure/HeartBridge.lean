@@ -5,6 +5,7 @@ Released under the MIT license.
 import Mathlib.CategoryTheory.Triangulated.TStructure.Heart
 import Mathlib.CategoryTheory.Triangulated.TStructure.AbelianSubcategory
 import Mathlib.CategoryTheory.Triangulated.TStructure.TruncLTGE
+import Mathlib.CategoryTheory.Triangulated.TStructure.TruncLEGT
 import Mathlib.CategoryTheory.ObjectProperty.FiniteProducts
 import Mathlib.Algebra.Homology.ShortComplex.ShortExact
 
@@ -44,6 +45,39 @@ open _root_.CategoryTheory.Triangulated
 variable {C : Type u} [Category.{v} C] [Preadditive C] [HasZeroObject C]
   [HasShift C ℤ] [∀ n : ℤ, (shiftFunctor C n).Additive]
   [Pretriangulated C] (t : TStructure C)
+
+/-- Degree-zero cohomology in the heart of `t`, given by the pure truncation
+`τ^[0,0]`. -/
+noncomputable def heartH0Functor [IsTriangulated C] :
+    C ⥤ t.heart.FullSubcategory :=
+  ObjectProperty.lift _ (t.truncGELE 0 0) (fun _ ↦
+    (t.mem_heart_iff _).mpr ⟨inferInstance, inferInstance⟩)
+
+/-- Degree-zero cohomology is naturally the identity on the heart. -/
+noncomputable def heartH0OnHeartIso [IsTriangulated C] :
+    t.heart.ι ⋙ t.heartH0Functor ≅ 𝟭 t.heart.FullSubcategory := by
+  let eLE : t.heart.ι ⋙ t.truncLE 0 ≅ t.heart.ι :=
+    NatIso.ofComponents
+      (fun E ↦ by
+        haveI : t.IsLE E.obj 0 := ((t.mem_heart_iff E.obj).mp E.property).1
+        exact asIso ((t.truncLEι 0).app E.obj))
+      (by
+        intro X Y f
+        exact (t.truncLEι 0).naturality f.hom)
+  let eGE : t.heart.ι ≅ t.heart.ι ⋙ t.truncGE 0 :=
+    NatIso.ofComponents
+      (fun E ↦ by
+        haveI : t.IsGE E.obj 0 := ((t.mem_heart_iff E.obj).mp E.property).2
+        exact asIso ((t.truncGEπ 0).app E.obj))
+      (by
+        intro X Y f
+        exact (t.truncGEπ 0).naturality f.hom)
+  let e : (t.heart.ι ⋙ t.truncLE 0) ⋙ t.truncGE 0 ≅ t.heart.ι :=
+    Functor.isoWhiskerRight eLE (t.truncGE 0) ≪≫ eGE.symm
+  refine NatIso.ofComponents (fun E ↦ t.heart.isoMk (e.app E)) ?_
+  intro X Y f
+  ext
+  exact e.hom.naturality f
 
 /-- Negative ambient Hom spaces between objects of a t-structure heart vanish. -/
 theorem heart_hι

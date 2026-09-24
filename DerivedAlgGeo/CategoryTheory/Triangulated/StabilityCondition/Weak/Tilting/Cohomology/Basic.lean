@@ -63,6 +63,18 @@ instance originalHeartCohFunctor_additive [IsTriangulated C]
         (shiftFunctor C n).map ((t.truncGE n).map ((t.truncLE n).map g))
     simp [Functor.map_add]
 
+/-- The existing degree-zero tilted-cohomology notation agrees naturally with
+the t-structure-owned degree-zero heart functor. -/
+noncomputable def originalHeartCohFunctorZeroIso [IsTriangulated C]
+    (t : TStructure C) :
+    originalHeartCohFunctor t 0 ≅ t.heartH0Functor :=
+  NatIso.ofComponents
+    (fun X ↦ ObjectProperty.isoMk _
+      ((shiftFunctorZero C ℤ).app ((t.truncGELE 0 0).obj X)))
+    (fun {X Y} f ↦ by
+      apply ObjectProperty.hom_ext
+      exact (shiftFunctorZero C ℤ).hom.naturality ((t.truncGELE 0 0).map f))
+
 /-- The object-level notation for `originalHeartCohFunctor`. -/
 noncomputable abbrev originalHeartCoh [IsTriangulated C]
     (t : TStructure C) (n : ℤ) (E : C) :

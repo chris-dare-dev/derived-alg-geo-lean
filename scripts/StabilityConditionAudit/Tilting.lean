@@ -130,6 +130,7 @@ cohomology sequence remains deliberately undeclared. -/
 
 #print axioms Tilting.originalHeartCohFunctor
 #print axioms Tilting.originalHeartCohFunctor_additive
+#print axioms Tilting.originalHeartCohFunctorZeroIso
 #print axioms Tilting.originalHeartCoh
 #print axioms Tilting.originalHeartCohIsoOfHeart
 #print axioms Tilting.HeartTorsionPair.tiltedHeartCohFunctor

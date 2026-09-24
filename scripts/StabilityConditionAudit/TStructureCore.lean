@@ -2,6 +2,7 @@
 TStructureCore slice of the StabilityCondition audit, split out so concurrent
 branches append to different files (#480). See the umbrella file for the contract and reading guide.
 -/
+import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.HeartBridge
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Presheaf.Monoidal
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KFlatResolution
@@ -379,6 +380,8 @@ open CategoryTheory.Triangulated
 
 -- Repository-owned heart results used by weak-tilting cohomology.
 #print axioms CategoryTheory.ObjectProperty.FullSubcategory.isZero_of_obj_isZero
+#print axioms CategoryTheory.Triangulated.TStructure.heartH0Functor
+#print axioms CategoryTheory.Triangulated.TStructure.heartH0OnHeartIso
 #print axioms CategoryTheory.Triangulated.TStructure.heart_hι
 #print axioms CategoryTheory.Triangulated.TStructure.heart_containsZero
 #print axioms CategoryTheory.Triangulated.TStructure.heart_closedUnderBinaryProducts
