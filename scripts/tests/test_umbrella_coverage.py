@@ -53,6 +53,36 @@ class UmbrellaCoverageTest(unittest.TestCase):
         else:
             self.assertNotEqual(proc.returncode, 0)
 
+    def compile_importing_fixture(self, name: str) -> None:
+        self.put_fixture(name)
+        if name in ("ModulePrivateHeader.lean", "ModulePublicHeader.lean"):
+            # Pinned Lean forbids importing a non-`module` source from `module`.
+            self.leaf.write_text(
+                "module\npublic import Init\npublic def leafValue : Nat := 7\n",
+                encoding="utf-8",
+            )
+        env = os.environ.copy()
+        previous = env.get("LEAN_PATH")
+        env["LEAN_PATH"] = str(self.root) + (os.pathsep + previous if previous else "")
+        child = subprocess.run(
+            ["lean", "-R", str(self.root), "-o", str(self.leaf.with_suffix(".olean")), str(self.leaf)],
+            capture_output=True,
+            text=True,
+            cwd=gate.ROOT,
+            env=env,
+            check=False,
+        )
+        self.assertEqual(child.returncode, 0, child.stderr + child.stdout)
+        parent = subprocess.run(
+            ["lean", "-R", str(self.root), str(self.umbrella)],
+            capture_output=True,
+            text=True,
+            cwd=gate.ROOT,
+            env=env,
+            check=False,
+        )
+        self.assertEqual(parent.returncode, 0, parent.stderr + parent.stdout)
+
     def check(self, *, owners=None, boundaries=None) -> tuple[int, list[str]]:
         return gate.check_coverage(
             self.root,
@@ -80,31 +110,27 @@ class UmbrellaCoverageTest(unittest.TestCase):
                 self.assertIn("does not re-export", failures[0])
 
     def test_compiled_real_header_import_covers_leaf(self) -> None:
-        self.put_fixture("RealHeader.lean")
-        env = os.environ.copy()
-        previous = env.get("LEAN_PATH")
-        env["LEAN_PATH"] = str(self.root) + (os.pathsep + previous if previous else "")
-        child = subprocess.run(
-            ["lean", "-R", str(self.root), "-o", str(self.leaf.with_suffix(".olean")), str(self.leaf)],
-            capture_output=True,
-            text=True,
-            cwd=gate.ROOT,
-            env=env,
-            check=False,
-        )
-        self.assertEqual(child.returncode, 0, child.stderr + child.stdout)
-        parent = subprocess.run(
-            ["lean", "-R", str(self.root), str(self.umbrella)],
-            capture_output=True,
-            text=True,
-            cwd=gate.ROOT,
-            env=env,
-            check=False,
-        )
-        self.assertEqual(parent.returncode, 0, parent.stderr + parent.stdout)
+        self.compile_importing_fixture("RealHeader.lean")
         imports = gate.lean_header_imports([self.umbrella])[self.umbrella]
         self.assertIn(LEAF, imports)
         self.assertEqual(self.check(), (1, []))
+
+    def test_module_header_requires_public_import_for_reexport(self) -> None:
+        for fixture, exported in (
+            ("ModulePrivateHeader.lean", False),
+            ("ModulePublicHeader.lean", True),
+        ):
+            with self.subTest(fixture=fixture):
+                self.compile_importing_fixture(fixture)
+                imports = gate.lean_header_imports([self.umbrella])[self.umbrella]
+                self.assertEqual(LEAF in imports, exported)
+                checked, failures = self.check()
+                self.assertEqual(checked, 1)
+                if exported:
+                    self.assertEqual(failures, [])
+                else:
+                    self.assertEqual(len(failures), 1)
+                    self.assertIn("does not re-export", failures[0])
 
     def test_multiple_headers_are_parsed_in_one_ordered_batch(self) -> None:
         self.put_fixture("RealHeader.lean")
@@ -163,6 +189,26 @@ class UmbrellaCoverageTest(unittest.TestCase):
                 fake = subprocess.CompletedProcess([], 0, json.dumps(payload), "")
                 with mock.patch.object(gate.subprocess, "run", return_value=fake):
                     with self.assertRaises(gate.CoverageError):
+                        self.check()
+
+    def test_missing_or_malformed_export_flag_is_fatal(self) -> None:
+        self.put_fixture("RealHeader.lean")
+        for record in (
+            {"module": LEAF},
+            {"module": LEAF, "isExported": None},
+            {"module": LEAF, "isExported": "true"},
+            {"module": LEAF, "isExported": 1},
+        ):
+            with self.subTest(record=record):
+                payload = {
+                    "imports": [{
+                        "errors": [],
+                        "result": {"imports": [record], "isModule": True},
+                    }],
+                }
+                fake = subprocess.CompletedProcess([], 0, json.dumps(payload), "")
+                with mock.patch.object(gate.subprocess, "run", return_value=fake):
+                    with self.assertRaisesRegex(gate.CoverageError, "malformed Lean header import"):
                         self.check()
 
     def test_parser_process_failure_is_fatal(self) -> None:

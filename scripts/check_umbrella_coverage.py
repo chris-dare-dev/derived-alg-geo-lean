@@ -8,6 +8,8 @@ its SHA-256 is updated; the gate never guesses ownership from source regexes.
 
 Imports come from the pinned Lean executable's ``--deps-json --stdin`` header
 parser, not a Python approximation of Lean comments, strings, or interpolation.
+Only records marked ``isExported`` count: under a ``module`` header a plain
+``import`` is available locally but does not re-export the child.
 All candidate paths are parsed in one invocation, and any parser error or
 unexpected JSON shape fails the gate. This checks *header imports*, not Lean
 elaboration or transitive reachability.
@@ -153,9 +155,11 @@ def lean_header_imports(paths: list[pathlib.Path]) -> dict[pathlib.Path, set[str
                 not isinstance(item, dict)
                 or not isinstance(item.get("module"), str)
                 or not item["module"]
+                or not isinstance(item.get("isExported"), bool)
             ):
                 raise CoverageError(f"{path}: malformed Lean header import record")
-            modules.add(item["module"])
+            if item["isExported"]:
+                modules.add(item["module"])
         imports_by_path[path] = modules
     return imports_by_path
 
