@@ -11,3 +11,8 @@ import DerivedAlgGeo.Algebra.Module.Localization
 #print axioms IsLocalizedModule.kerMap
 #print axioms IsLocalizedModule.kernelMap
 #print axioms IsLocalizedModule.kernelNatTrans
+
+/-! ## Finite module descent through localization -/
+
+#print axioms Module.exists_finite_submodule_of_isLocalization
+#print axioms Module.exists_finitely_presented_submodule_of_isLocalization
