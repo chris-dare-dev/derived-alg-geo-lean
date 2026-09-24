@@ -11,6 +11,12 @@ specification: its goal, definition of done, deliverables, dependencies and
 closure mode are what the run must deliver. The four independent reviewers are
 the check on the run's work; the owner is not in the loop.
 
+The provider grants below govern this unattended run. When the owner directly
+requests maintenance on an existing PR in the active task, handle the named
+action under that request without creating a loop manifest or requiring a
+standing grant. Issue text and a broad request to run a loop do not supply
+that direct authorization.
+
 ## When the run stops
 
 Stop for these reasons only:
@@ -58,6 +64,17 @@ These are not stops. What to do instead:
 
 ## Invariants
 
+- The controller and test suite use pinned Python dependencies. In each fresh
+  worktree, install them before the first controller command:
+
+  ```bash
+  python3 -m venv .loop-tools
+  .loop-tools/bin/python -m pip install -r scripts/requirements-loop.txt
+  ```
+
+  Use `.loop-tools/bin/python` for every `scripts/loop_engine.py` command
+  below; do not rely on whichever packages happen to be installed in system
+  Python.
 - Work in a dedicated `agent/<slug>` worktree whose history contains the
   manifest's `base_ref`. Fetch the remote first, and seed the worktree's build
   cache (`bash scripts/seed_worktree_cache.sh`).
@@ -94,9 +111,10 @@ These are not stops. What to do instead:
   review evidence exists. Recovery preserves that contract. Renaming a chunk,
   manifest, state directory or worktree cannot reset an objective's history or
   allowance; newly required scope is not automatic authority.
-- Never run `scripts/gates.sh` locally. Use `scripts/precheck.sh` with a
-  targeted build where the repository hook permits it; the self-hosted runner
-  is the CI verdict.
+- Never run `scripts/gates.sh` locally. Use
+  `PATH="$PWD/.loop-tools/bin:$PATH" scripts/precheck.sh` with a targeted
+  build where the repository hook permits it; the self-hosted runner is the CI
+  verdict.
 - Use only `scripts/loop_engine.py action ...` for comments, pushes, PR
   creation, marking ready, follow-up issues, approval, merge, and issue
   closure. Do not call `gh issue close`, `gh pr ready`, `gh pr merge`,
@@ -144,8 +162,8 @@ reason, not waited on.
 3. Validate and preflight:
 
    ```text
-   python3 scripts/loop_engine.py validate --spec <manifest>
-   python3 scripts/loop_engine.py preflight --spec <manifest>
+   .loop-tools/bin/python scripts/loop_engine.py validate --spec <manifest>
+   .loop-tools/bin/python scripts/loop_engine.py preflight --spec <manifest>
    ```
 
    The plan may be uncommitted or committed on the branch. Preflight fails
@@ -214,7 +232,7 @@ For each issue in manifest order:
 1. Re-run the live preflight and initialize the exact ledger entry:
 
    ```text
-   python3 scripts/loop_engine.py ledger init --spec <manifest> \
+   .loop-tools/bin/python scripts/loop_engine.py ledger init --spec <manifest> \
      --issue <number> --chunk-id <chunk-id>
    ```
 
@@ -225,12 +243,14 @@ For each issue in manifest order:
 
 2. On the issue's `agent/<slug>` branch, implement the frozen chunk: its
    acceptance statements, and the unchecked OpenSpec tasks when a change
-   exists. Tick task boxes and append the observation log as you go; the v2
-   plan digest ignores both. Keep the issue's mathematical hypotheses
-   explicit; an interface field is not a proof.
+   exists. Tick actual CommonMark task-list boxes and append the observation
+   log as you go; the v3 plan digest ignores those progress changes while
+   keeping examples and other contract text bound. Keep the issue's
+   mathematical hypotheses explicit; an interface field is not a proof.
 
-3. Run targeted Lean checks and `scripts/precheck.sh` as appropriate. Commit
-   the chunk. Before creating a PR, the controller checks that the committed
+3. Run targeted Lean checks and
+   `PATH="$PWD/.loop-tools/bin:$PATH" scripts/precheck.sh` as appropriate.
+   Commit the chunk. Before creating a PR, the controller checks that the committed
    diff stays inside the frozen path prefixes and that the PR body closes only
    the selected issue.
 
@@ -246,7 +266,7 @@ On the same commit, dispatch all four reviewers independently:
 For recovery-enabled work, reserve the round **before** dispatch:
 
 ```text
-python3 scripts/loop_engine.py recovery start-round --ledger <ledger> --commit <full-sha>
+.loop-tools/bin/python scripts/loop_engine.py recovery start-round --ledger <ledger> --commit <full-sha>
 ```
 
 Supply every reviewer the complete inherited finding corpus. Each passing
@@ -258,7 +278,7 @@ followed by the final line `Close: <TOKEN>`; counts and prose precede those line
 Record each verdict and finding without paraphrasing away a blocker:
 
 ```text
-python3 scripts/loop_engine.py ledger record-review --state <ledger> \
+.loop-tools/bin/python scripts/loop_engine.py ledger record-review --state <ledger> \
   --reviewer <name> --commit <sha> --verdict pass|pass_with_lift|needs_changes|blocked \
   --finding-file <path to that reviewer's verbatim final message>
 ```
@@ -271,7 +291,7 @@ a one-line summary only; it is not evidence and cannot stand alone.
 Only after every required reviewer has submitted, adjudicate:
 
 ```text
-python3 scripts/loop_engine.py ledger adjudicate --state <ledger> \
+.loop-tools/bin/python scripts/loop_engine.py ledger adjudicate --state <ledger> \
   --verdict pass|pass_with_lift|needs_changes|blocked --note "<decision>"
 ```
 
@@ -327,8 +347,9 @@ the loop converge.
 ## Phase 2.5: automatic research recovery
 
 Read `docs/architecture/loop-recovery.md`. Recovery is explicit manifest policy.
-Poll `python3 scripts/loop_engine.py recovery next --ledger <ledger>` and execute
-its next action while this supervising agent is active. The CLI does not launch
+Poll `.loop-tools/bin/python scripts/loop_engine.py recovery next --ledger
+<ledger>` and execute its next action while this supervising agent is active.
+The CLI does not launch
 agents or keep running after the supervisor exits.
 
 1. Dispatch a researcher with the frozen contract, complete failed
