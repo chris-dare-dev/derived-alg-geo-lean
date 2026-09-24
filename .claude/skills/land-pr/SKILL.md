@@ -1,13 +1,13 @@
 ---
 name: land-pr
-description: Run one unattended landing iteration — take the base of the open PR stack, rebase it, pre-flight it with scripts/precheck.sh, review it, push for the CI gate verdict, mark it ready, then stop. Never merges. Pair with /loop.
+description: Run one unattended landing iteration — select an eligible open PR, update it against main, pre-flight it with scripts/precheck.sh, review it, take the PR CI verdict, then stop. Never merges. Pair with /loop.
 ---
 
 # One landing iteration
 
-The open PR queue, not the issue tracker, is where this repository's work is
-stuck. This is **one** iteration against that queue and it **halts** before the
-merge. Merging is a human action, always.
+This is **one** iteration against an eligible open PR and it **halts** before
+the merge. Merging is a human action, always. Read the issue tracker and native
+blockers before selecting a PR; an open PR is not by itself admission-ready.
 
 When called by a bounded loop manifest, the controller's OpenSpec change and
 review ledger remain authoritative. Landing may act only on the reviewed head;
@@ -19,18 +19,17 @@ is unchanged.
 
 ## What the queue actually is
 
-Every open PR is based on `main`, but they are a **cumulative stack**: each
-slice contains all of its predecessors, so diffs run +65, +134, +168, … +2925
-along one chain. Two consequences drive everything below:
+The historical 28-PR cumulative stack and 90-minute Windows queue have
+drained. Current PR branches may be independent, stacked, or in conflict.
+Inspect each candidate's base, dependency issues, files and reviewed head.
+For a real stack, admit its base first; do not infer stack membership from
+file-set inclusion alone. `scripts/pr_queue.py` still uses that older heuristic,
+so its ordering is a hint to verify, not authority to admit a candidate.
 
-- **Land the base, not the tip.** Merging the tip would land 26 issues in one
-  unreviewable commit. Merging the base makes the next PR's diff collapse to its
-  own slice.
-- **The queue is CI-bound, not review-bound.** One 90-minute build job serialises
-  28 PRs, and there is no way around that: the verdict comes from the
-  self-hosted Windows runners and nowhere else. What you *can* do locally is
-  fail fast — `scripts/precheck.sh` answers the cheap half in seconds, so a
-  typo never costs a 90-minute round trip. It is not a verdict. See step 3.
+The required `ci` verdict comes from the `pull_request` workflow on hosted
+Ubuntu. Main and manually dispatched runs use the self-hosted Ubuntu services.
+`scripts/precheck.sh` catches local errors quickly, but it is not the CI
+verdict. See steps 3 and 5.
 
   This section used to say "never wait on GitHub CI — gate locally and let CI
   confirm afterwards", and steps 3 and 4 below told you to run
@@ -72,14 +71,11 @@ git fetch origin
 python3 scripts/pr_queue.py
 ```
 
-Take the **first row**. The ranking already encodes the landing order: `READY`
-before `GATE` before `FIX` before `CONFLICT`, then smallest diff first.
+Treat the rows as candidates. Verify the selected PR's native issue blockers,
+actual Git ancestry and overlap with other open PRs before acting. Do not
+advance a dependent PR ahead of its predecessor.
 
-Never take a row out of order to find easier work — the stack means a later PR's
-diff is a lie until its predecessors land.
-
-If the first row is `CONFLICT`, that is the iteration: rebase it, resolve, gate,
-push, and halt.
+If the selected PR is `CONFLICT`, rebase it, resolve, gate, push, and halt.
 
 **Exit code 2 means stop the loop, and it means two different things.** The
 script prints which:
@@ -109,8 +105,8 @@ origin/main` rebases whatever branch you happen to be standing on — which is
 not the PR, and may be unmerged work. Never run the two as separate steps that
 both execute regardless.
 
-**This repository uses ~22 git worktrees**, and `gh pr checkout` fails outright
-when the PR's branch is checked out in one of them:
+`gh pr checkout` fails when the PR's branch is already checked out in another
+worktree:
 
 > fatal: 'agent/…' is already used by worktree at '…'
 
@@ -131,20 +127,17 @@ Two things to check before working in someone else's worktree:
   though `.lake` plainly exists. Check with `ls -la .lake`, and repoint it at
   the main checkout's packages when it dangles:
 
-  ```bash
-  ls -d "$(readlink .lake/packages)" 2>/dev/null || {
-    rm .lake/packages
-    ln -s /Users/chris.dare/Personal/SourceCode/coherent-sheaves-lean/.lake/packages .lake/packages
-  }
-  ```
+  For a fresh worktree, use `scripts/seed_worktree_cache.sh --dry-run` to
+  inspect a suitable donor. For an existing cache, resolve the actual shared
+  package location before repairing the symlink. Never reuse a hard-coded
+  path from another machine.
 
   Only do this once `lean-toolchain` and `lakefile.toml` are identical to
   `origin/main`, which after step 2's rebase they are. Sharing a package set
   across differing pins would be silent corruption, not a repair.
 
-A conflict here is normal for a stacked queue and is your work to resolve. Resolve
-it in favour of `origin/main` for anything outside this slice's own leaf path —
-a stacked branch carrying a stale copy of an earlier slice is the usual cause.
+A conflict needs a declaration-level review. Preserve the selected PR's intended
+work and current main; do not resolve by a blanket preference for either side.
 
 If the rebase cannot be resolved without guessing at mathematical intent, abort
 it (`git rebase --abort`), comment on the PR with the exact conflicting hunks,
@@ -153,7 +146,9 @@ and halt. Do not guess.
 ## 3. Pre-flight locally — this is not the verdict
 
 ```bash
-scripts/precheck.sh
+python3 -m venv .loop-tools
+.loop-tools/bin/python -m pip install -r scripts/requirements-loop.txt
+PATH="$PWD/.loop-tools/bin:$PATH" scripts/precheck.sh
 ```
 
 Seconds, not minutes. It runs every gate that needs no Lean build — workflows,
@@ -174,13 +169,13 @@ audit-completeness ratchet, `runLinter`/`lint-style`, the warning ratchet, the
 emitter and its coverage check, the `exe` sorry sweep, and the `mfc` contract
 tooling. A clean precheck is a *cheap* green, not a green.
 
-A failing check is the iteration's work, not a reason to weaken it. The usual
-failures on this queue, in order of frequency:
+A failing check is the iteration's work, not a reason to weaken it. Historical
+examples include:
 
 - a new public theorem missing from `scripts/StabilityConditionAudit.lean`,
   `scripts/AlgebraicGeometryAudit.lean`, or `scripts/DGCategoryAudit.lean`
   — **CI only**, so read the branch diff for new `theorem`/`def` lines and add
-  the records before you push rather than learning it 90 minutes later;
+  the records before you push rather than waiting for the PR CI run;
 - `check_source_independence.py` rejecting a retired or external source root
   — precheck catches this;
 - convention errors the edit hook would have caught had the branch been written
@@ -226,20 +221,21 @@ every `--force-with-lease` in step 5 kills the run before it. Observed
 2026-09-16 on run 35158669480 — the watcher returned 0 and the run's conclusion
 was `cancelled`. Only `completed/success` is green.
 
-**Bound the wait.** One build job serialises the whole queue, so a run can sit
-queued for longer than this iteration is worth. If the run has not *started*
+**Bound the wait.** Capacity and queue delay vary. If the run has not *started*
 within about ten minutes, stop waiting: post the verdict comment with the run
 URL and the precheck result, leave the PR as it is, and halt. The next
 iteration re-reads the queue and will find the finished run.
 
-To re-run the gate without pushing again — after a label change, or when a run
-was cancelled by the concurrency group:
+To gather supplemental self-hosted Ubuntu evidence without pushing again:
 
 ```bash
 gh workflow run ci.yml --ref "$(git branch --show-current)"
 ```
 
-Then report:
+This manual `workflow_dispatch` run does not replace the required PR `ci`
+check. If that check was cancelled, obtain a new `pull_request` run for the
+current head and verify its completed conclusion before treating the PR as
+green. Then report:
 
 ```bash
 gh pr comment <N> -R chris-dare-dev/derived-alg-geo-lean --body "<verdict>"
@@ -252,8 +248,8 @@ queued when the iteration halted; what you fixed; what you left for a human and
 why; and the reviewer's verdict with finding counts by severity. If you used
 `DAG_ALLOW_LOCAL_BUILD=1` for anything, say so here.
 
-Never write "gates pass" on the strength of a local run. Precheck is fifteen of
-the thirty-odd gates and none of the expensive ones.
+Never write "gates pass" on the strength of a local run. Precheck does not run
+the full library build or the expensive audit and emitter checks.
 
 If the PR is a draft, **the CI run concluded green**, and the reviewer said
 `MERGE`:
@@ -272,5 +268,4 @@ switch it to `main`, since a human may be using it. Report three lines: the
 PR touched, its new state, and the one thing a human must decide.
 
 **Do not merge. Do not start the next PR.** The next iteration re-reads the
-queue, which is the point: once a human merges the base, the rest of the stack
-shrinks and the ranking changes underneath you.
+PRs, dependencies and main, since a merge or new push can change eligibility.

@@ -353,10 +353,10 @@ Advice was what this section used to give, and advice is what failed: on
 `lake build` on a cold tree, and spent three hours of the developer's machine on
 work the runners were idle and waiting to absorb.
 
-`gates.sh` was already discouraged here for a second reason worth keeping: several
-agent lanes share one Mac, Lake takes one core per job by default, and four
-concurrent full gates oversubscribe a 14-core machine five times over — that is
-how a ten-minute gate becomes an hour.
+`gates.sh` was already discouraged here for a second reason worth keeping:
+several agent lanes and four Ubuntu runner services share one physical host.
+Lake takes one core per job by default, so concurrent full builds can exhaust
+that host's CPU and memory. Runner labels are not independent capacity.
 
 Neither the local script nor the runner lane is CI-equivalent on its own, and
 **neither list contains the other**. CI runs the `mfc` contract tooling, which
@@ -373,6 +373,11 @@ is the specification: its goal, definition of done, deliverables, dependencies
 and closure mode (complete or progress) are what the run delivers. The four
 independent reviewers are the check, not the owner. Follow the
 [run-loop protocol](.claude/skills/run-loop/SKILL.md).
+
+This protocol governs unattended issue and milestone runs. An explicit owner
+request in the active task to maintain an existing PR authorizes the requested
+action without a loop manifest or standing grant. Required CI and branch
+protection still govern merges.
 
 **A run stops for these reasons only.**
 
@@ -406,7 +411,7 @@ multi-issue batch. Inside a run, write its artifacts directly: the generated
 `$openspec-propose` workflow stops after planning by design, and that boundary
 is for interactive planning, not for a run. Task checkboxes and
 `agent-observations.md` are progress records. Tick and append them freely,
-because the ledger's plan digest (v2) excludes them.
+because the ledger's plan digest excludes them.
 
 **Reviews bind to the change, not to a commit's position.** Every frozen chunk
 gets independent mathematical, repository-boundary, abstraction, and
@@ -473,9 +478,17 @@ sentence is why `single-instantiation` ran nowhere for months: the hook made the
 script unrunnable, the summary said CI had it covered, and `bb8a1278` records the
 24 abstractions that drifted past its baseline with nothing going red.
 
-**For a local pre-flight the hook allows**, run `scripts/precheck.sh`: every gate
-that needs no Lean build, plus a targeted build of the modules you changed, in
-seconds. It is a cheap green, not a green.
+**For a local pre-flight the hook allows**, install the loop controller's pinned
+Python dependencies in each fresh worktree, then put that environment first on
+`PATH` when running precheck. It runs every gate that needs no Lean build, plus
+a targeted build of the modules you changed, in seconds. It is a cheap green,
+not a green.
+
+```bash
+python3 -m venv .loop-tools
+.loop-tools/bin/python -m pip install -r scripts/requirements-loop.txt
+PATH="$PWD/.loop-tools/bin:$PATH" scripts/precheck.sh
+```
 
 Build locally by **naming a target**, and **naming your own `lake`**, which is
 what the hook allows:
@@ -486,30 +499,12 @@ LEAN_NUM_THREADS=2 ~/.elan/bin/lake build DerivedAlgGeo.The.Module.You.Changed
 
 ### Whose lake
 
-`~/.elan/bin/lake` is not decoration. Each of the four self-hosted runners keeps
-its own elan under `C:\actions-runner\<runner>\.elan`, and those `bin`
-directories sit on this machine's user PATH **ahead of** `~/.elan/bin` — put
-there by CI, not by hand. `lean-action` runs `elan-init` with no
-`--no-modify-path`, and `run-runner.cmd` points `HOME` at the runner directory,
-so every job re-persists its own shim directory into the user environment.
-Deleting the entries does not hold: on 2026-09-16 all four were removed and
-three were back within ten minutes.
-
-So a bare `lake` here executes a **runner's** `lake.exe`. Windows will not
-replace a running image, so the next CI job on that runner cannot relink its
-shims and dies about a second in with
-
-    error: could not create link from 'elan.exe' to 'lake.exe'
-
-That is what took `main` red across three consecutive runs on 2026-09-16
-(bc973621, 6217d770, b9e18832), behind one local build that broke none of the
-other rules here: named target, `LEAN_NUM_THREADS=2`, gate green.
-
-It costs contention, not correctness. The same declaration sweep run through a
-runner's shim and through `~/.elan/bin/lake` came back byte-identical (14589
-rows), with audit-completeness reporting the same numbers, so a result already
-produced through the wrong tree does **not** need re-running. Check which one
-you are using with `which lake`.
+`~/.elan/bin/lake` names the developer's elan explicitly. The four self-hosted
+runners were migrated from Windows to Ubuntu on 2026-09-21; their service
+homes and elan installations are separate from this checkout. The earlier
+Windows PATH/shim collision that broke three main runs on 2026-09-16 is
+historical, not the current runner layout. Check `which lake` if a shell's
+environment is uncertain, and keep local builds targeted and capped.
 
 `LEAN_NUM_THREADS` is **required and enforced**, not advice: the same hook
 refuses a `lake build` that does not set it, or that sets it above 4. Naming a
@@ -562,14 +557,13 @@ the seconds-long probe interactive proof work depends on; routing each attempt a
 a lemma through CI would be a ~12 minute round trip and would stop anyone writing
 a proof at all.
 
-### The olean asymmetry, and why the rule still stands
+### Cache loss, and why the rule still stands
 
-Lean's `.olean` files are platform-specific, so the Windows runners can never warm
-this checkout: a local build is the only way to get local oleans, and a targeted
-build still compiles its dependencies. **After a cache loss, naming a target does
-not make the cost go away.** That is the honest limit of this rule, and the answer
-is not to quietly run the whole-library build anyway — it is to take the verdict
-from the runners, which need no local oleans at all:
+The Ubuntu runners and this host use the same platform, but their writable
+build directories are separate. A runner build does not populate this
+checkout's `.olean` files. A targeted local build may still compile its
+dependencies after cache loss; naming a target bounds the work without making
+that cost vanish. For a full verification verdict, use the CI workflow:
 
 ```bash
 gh workflow run ci.yml --ref <branch>
@@ -583,7 +577,7 @@ precisely what this rule exists to keep off the developer's machine.
 Useful focused commands are:
 
 ```bash
-scripts/precheck.sh     # every gate needing no Lean build, plus a targeted build
+PATH="$PWD/.loop-tools/bin:$PATH" scripts/precheck.sh  # gates plus targeted build
 lake build AlgebraicGeometryAudit StabilityConditionAudit DGCategoryAudit
 lake exe runLinter DerivedAlgGeo
 lake exe lint-style
