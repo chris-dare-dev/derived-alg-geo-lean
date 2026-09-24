@@ -57,6 +57,16 @@ complete mathematical ownership policy.
    sheaf stability instantiates is abelian, it moved to
    `CategoryTheory/Abelian/Stability/`, and the whole `Stability/` subtree is
    now held neutral by this rule rather than exempted from it.
+
+   The focused `check_neutral_stability_imports.py` gate separately checks the
+   neutral `AlgebraicGeometry.DerivedCategory` umbrella. It parses every tracked
+   library header with pinned Lean, follows all internal import edges (including
+   private and meta imports), and rejects any path to the exact
+   `DerivedCategory.Stability` or triangulated `StabilityCondition` module or
+   their descendants. The outer `AlgebraicGeometry` umbrella must directly
+   publicly import the exact `DerivedCategory.Stability` module at runtime.
+   This does not replace the broader layering policy, umbrella child-coverage
+   check, or compilation of the source modules.
 4. **Weak stability is independent of Bridgeland stability.** No module of the
    weak theory imports the Bridgeland theory, and
    `PreStabilityCondition` structurally `extends toWeak :
