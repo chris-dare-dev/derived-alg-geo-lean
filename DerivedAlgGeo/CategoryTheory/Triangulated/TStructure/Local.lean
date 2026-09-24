@@ -185,11 +185,9 @@ theorem heartFunctor_map (r : t.Restriction F)
     (r.heartFunctor.map f).hom = F.map f.hom :=
   rfl
 
-/-- The restriction to hearts is additive when the ambient functor is
-triangulated. -/
+/-- The restriction to hearts is additive when the ambient functor is additive. -/
 noncomputable instance heartFunctor_additive
-    [IsTriangulated C] [IsTriangulated D] [F.CommShift ℤ]
-    [F.IsTriangulated] (r : t.Restriction F) :
+    [F.Additive] (r : t.Restriction F) :
     r.heartFunctor.Additive where
   map_add := by
     intro X Y f g
