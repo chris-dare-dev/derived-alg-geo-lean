@@ -518,4 +518,5 @@ quasi-compact opens of a base is geometric and is not taken here.
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.isNoetherian_of_liftedSubobjectChains
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.isNoetherian_of_pointwiseChainLifts
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.isNoetherian_of_pointwiseSubobjectLifts
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction.isNoetherian_of_fixedTargetArrowExtensions
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.id

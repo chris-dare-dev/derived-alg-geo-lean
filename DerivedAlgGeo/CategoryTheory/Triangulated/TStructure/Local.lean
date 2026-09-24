@@ -22,7 +22,9 @@ This file supplies the categorical half, for one functor at a time.
 It also transfers Noetherianity across an anchored lift of subobject chains.
 For triangulated t-exact functors, exactness of the induced heart functor
 supplies preservation of binary joins, so pointwise lifts along each target
-chain suffice. Constructing those lifts remains a geometric input.
+chain suffice. The image-factorisation step turns fixed-target arrow extension
+into pointwise subobject lifts; constructing those arrows geometrically remains
+an explicit input.
 
 **Uniqueness is really a statement about aisles.** A t-structure carries two
 object properties, but they determine each other: `t.ge (n + 1)` is the right
@@ -333,6 +335,36 @@ theorem isNoetherian_of_pointwiseSubobjectLifts
   intro Y c
   obtain ⟨X, e, hpt⟩ := hlift Y
   exact ⟨X, e, fun n => hpt (c n)⟩
+
+/-- Essential surjectivity on target-heart objects and extension of arrows
+into each fixed source object imply Noetherianity of the target heart. The
+arrow extension is a separate geometric input for affine localization; it
+does not follow from essential surjectivity alone. -/
+theorem isNoetherian_of_fixedTargetArrowExtensions
+    [IsTriangulated C] [IsTriangulated D]
+    [F.CommShift ℤ] [F.IsTriangulated]
+    (r : t.Restriction F)
+    (hglobal : t.IsNoetherian)
+    (hObj : ∀ Y : r.tStructure.heart.FullSubcategory,
+      ∃ X : t.heart.FullSubcategory, Nonempty (r.heartFunctor.obj X ≅ Y))
+    (hExt : ∀ X : t.heart.FullSubcategory,
+      Subobject.FixedTargetArrowExtension r.heartFunctor X) :
+    r.tStructure.IsNoetherian := by
+  letI : PreservesFiniteLimits r.heartFunctor := (heartFunctor_finiteExact r).1
+  letI : PreservesFiniteColimits r.heartFunctor := (heartFunctor_finiteExact r).2
+  apply r.isNoetherian_of_pointwiseSubobjectLifts hglobal
+  intro Y
+  obtain ⟨X, ⟨e⟩⟩ := hObj Y
+  refine ⟨X, e, ?_⟩
+  intro p
+  let E := Subobject.mapIsoToOrderIso e
+  obtain ⟨q, hq⟩ :=
+    Subobject.mapFunctor_surjective_of_fixedTargetArrowExtension
+      r.heartFunctor X (hExt X) (E.symm p)
+  refine ⟨q, ?_⟩
+  change E (Subobject.mapFunctor r.heartFunctor q) = p
+  rw [hq]
+  exact E.apply_symm_apply p
 
 /-- The identity functor restricts every t-structure to itself. -/
 def id (t : TStructure C) : t.Restriction (𝟭 C) where

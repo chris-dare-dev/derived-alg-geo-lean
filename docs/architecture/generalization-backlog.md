@@ -303,6 +303,11 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   joins, so the heart-level transfer needs only chainwise pointwise lifts.
   The bounded-component geometric pointwise lift is still not supplied by
   the existing `SLocal` owner-data fields.
+- progress note (2026-09-24): A mono/epi-preserving functor now maps image
+  subobjects to image subobjects. Fixed-target arrow extension therefore
+  implies pointwise subobject lifting, and together with a target-object
+  lift it feeds the heart Noetherian transfer. Constructing those arrows for
+  the bounded coherent base-change component remains `UNVERIFIED`.
 
 ### 2026-09-24 — `anchored_chain_of_pointwise_lifts` with local join structure
 - chunk:              sf11-4d-pointwise-anchored
