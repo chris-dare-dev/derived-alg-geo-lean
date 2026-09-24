@@ -39,7 +39,9 @@ variable {R A : Type u} [CommRing R] [CommRing A] [Algebra R A]
 private abbrev ringMap : CommRingCat.of R ⟶ CommRingCat.of A :=
   CommRingCat.ofHom (algebraMap R A)
 
-private noncomputable def finiteExtendScalars : FGModuleCat.{u} R ⥤ FGModuleCat.{u} A :=
+/-- Extension of scalars restricted to finite modules. This is defined for any ring map;
+flatness is only needed when subsequently passing to derived categories. -/
+noncomputable def finiteExtendScalars : FGModuleCat.{u} R ⥤ FGModuleCat.{u} A :=
   (ModuleCat.isFG A).lift
     ((ModuleCat.isFG R).ι ⋙ ModuleCat.extendScalars (algebraMap R A))
     (fun M => by
@@ -66,8 +68,9 @@ private noncomputable def affineTildePullbackCompιIso [IsNoetherianRing R]
   exact isoWhiskerLeft (ModuleCat.isFG R).ι
     (Scheme.Modules.pullbackSpecMapTildeIso (ringMap (R := R) (A := A)))
 
-/-- The affine tilde/pullback square restricted to coherent sheaves. -/
-private noncomputable def affineTildePullbackIso [IsNoetherianRing R]
+/-- Affine sheafification commutes with coherent pullback after finite-module
+extension of scalars. This is an isomorphism of ordinary functors. -/
+noncomputable def affineTildePullbackIso [IsNoetherianRing R]
     [IsNoetherianRing A] :
     FGModuleCat.affineTilde (R := CommRingCat.of R) ⋙
         Coh.pullback (Spec.map (ringMap (R := R) (A := A))) ≅
