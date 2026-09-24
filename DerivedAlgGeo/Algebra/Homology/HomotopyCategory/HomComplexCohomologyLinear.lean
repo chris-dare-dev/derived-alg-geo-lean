@@ -106,7 +106,8 @@ private def quotientAddEquiv :
     (boundary_addSubgroup_map_eq (R := R) P Q n)
 
 /-- The scalar action on Hom-complex cohomology classes, transported from
-the concrete kernel/range quotient. This instance is deliberately scoped. -/
+the concrete kernel/range quotient. This instance is scoped to callers that
+open `CochainComplex.HomComplex`; it is not a global instance. -/
 scoped instance cohomologyClassModule : Module R (CohomologyClass P Q n) :=
   (quotientAddEquiv (R := R) P Q n).symm.module R
 
@@ -140,5 +141,20 @@ representatives, including when Lean uses the canonical integer action. -/
   exact map_zsmul (CohomologyClass.mkAddMonoidHom P Q n) r z
 
 end
+
+section IntegerCoefficients
+
+variable (P Q : CochainComplex (ModuleCat ℤ) ℤ) (n : ℤ)
+
+/-- For complexes of integer modules, the quotient identifies with cohomology
+classes using the canonical integer module structures on both additive groups. -/
+noncomputable def cohomologyClassIntLinearEquiv :
+    ((δ_hom ℤ P Q n (n + 1)).ker ⧸
+      (boundaryToCyclesLinear (R := ℤ) P Q n).range) ≃ₗ[ℤ]
+      CohomologyClass P Q n := by
+  convert cohomologyClassLinearEquiv (R := ℤ) P Q n using 1
+  all_goals first | rfl | exact Subsingleton.elim _ _
+
+end IntegerCoefficients
 
 end CochainComplex.HomComplex
