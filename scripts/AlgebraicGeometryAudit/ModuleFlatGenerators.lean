@@ -1,7 +1,7 @@
 import DerivedAlgGeo.AlgebraicGeometry.Modules.FlatGenerators
 
 #print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaModuleSheaf
-#print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaModuleSheaf_stalkIsoRegular_of_mem
+#print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaModuleSheafStalkIsoRegularOfMem
 #print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaModuleSheaf_stalk_isZero_of_not_mem
 #print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaModuleSheaf_stalk_flat_of_mem
 #print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaModuleSheaf_stalk_flat_of_not_mem

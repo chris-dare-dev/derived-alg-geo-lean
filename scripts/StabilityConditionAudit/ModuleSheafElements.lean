@@ -10,6 +10,7 @@ import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Generator
 #print axioms SheafOfModules.fromFreeYonedaSheafCoproduct
 #print axioms SheafOfModules.ι_fromFreeYonedaSheafCoproduct
 #print axioms SheafOfModules.fromFreeYonedaSheafCoproduct_epi
+#print axioms SheafOfModules.ι_fromFreeYonedaSheafCoproduct_assoc
 #print axioms SheafOfModules.Elements.map
 #print axioms SheafOfModules.Elements.map_id
 #print axioms SheafOfModules.Elements.map_comp

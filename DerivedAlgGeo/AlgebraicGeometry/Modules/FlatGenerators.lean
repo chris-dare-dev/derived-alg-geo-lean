@@ -399,7 +399,7 @@ private lemma freeYonedaUnitSheafMap_stalk_isIso
 
 /-- On an open containing `x`, the stalk of the free-Yoneda module sheaf is the
 regular module over the local ring. -/
-noncomputable def freeYonedaModuleSheaf_stalkIsoRegular_of_mem
+noncomputable def freeYonedaModuleSheafStalkIsoRegularOfMem
     (X : Scheme.{u}) (U : X.Opens) (x : X) (hx : x ∈ U) :
     (moduleStalkFunctor X x).obj (freeYonedaModuleSheaf X U) ≅
       ModuleCat.of (X.presheaf.stalk x) (X.presheaf.stalk x) := by
@@ -412,7 +412,7 @@ theorem freeYonedaModuleSheaf_stalk_flat_of_mem
     (X : Scheme.{u}) (U : X.Opens) (x : X) (hx : x ∈ U) :
     Module.Flat (X.presheaf.stalk x)
       ((moduleStalkFunctor X x).obj (freeYonedaModuleSheaf X U)) := by
-  let e := freeYonedaModuleSheaf_stalkIsoRegular_of_mem X U x hx
+  let e := freeYonedaModuleSheafStalkIsoRegularOfMem X U x hx
   exact Module.Flat.of_linearEquiv e.toLinearEquiv
 
 private lemma freeModuleYonedaPresheaf_stalk_isZero_of_not_mem
