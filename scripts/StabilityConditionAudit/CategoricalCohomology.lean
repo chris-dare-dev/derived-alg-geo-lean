@@ -5,6 +5,8 @@ Released under the MIT license.
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Coproducts
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyClassLocalization
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyHomotopy
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyHomotopyNaturality
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyIntLocalization
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyLinear
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyLocalization
@@ -280,6 +282,16 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms CochainComplex.HomComplex.cohomologyClassLocalizedMap_naturality
 #print axioms CochainComplex.HomComplex.cohomologyClassLocalizedMap_isLocalized
 #print axioms CochainComplex.HomComplex.cohomologyClassLocalizedMap_isLocalized_of_bounded_above_below
+
+/-! ## Degree-zero Hom-complex classes as homotopy-category morphisms -/
+
+#print axioms CochainComplex.HomComplex.cohomologyClassHomotopyAddEquiv
+#print axioms CochainComplex.HomComplex.cohomologyClassHomotopyAddEquiv_mk
+
+/-! ## Degree-zero class localization in the homotopy category -/
+
+#print axioms CochainComplex.HomComplex.cohomologyClassLocalizedMap_homotopy_mk
+#print axioms CochainComplex.HomComplex.cohomologyClassLocalizedMap_homotopy_naturality
 
 /-! ## Canonical integer class-localization bridge and ordinary client -/
 
