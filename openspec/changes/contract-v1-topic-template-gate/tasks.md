@@ -18,7 +18,7 @@
 
 ## 4. Publish and close — issue #137
 
-- [ ] 4.1 Review the final diffs, run the required package checks, and open the repository PR for the MFC template/gate implementation.
-- [ ] 4.2 Verify hosted checks and merge when branch protection permits; close #182 and #183 only after the implementation is merged, then close #137.
+- [x] 4.1 Review the final diffs, run the required package checks, and open the repository PR for the MFC template/gate implementation.
+- [x] 4.2 Verify hosted checks and merge when branch protection permits; close #182 and #183 only after the implementation is merged, then close #137.
 
 Each task is complete when its acceptance evidence is recorded below. If a real test, source, permission, or branch-protection failure occurs, fix it or report that specific external limit and keep unrelated work moving.
