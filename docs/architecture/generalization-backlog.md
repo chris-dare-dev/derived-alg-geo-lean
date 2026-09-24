@@ -46,6 +46,27 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
 
 ## Rows
 
+### 2026-09-23 — K-flat resolutions and derived pullback for ringed topoi (planned)
+- chunk:              sf8-5-task12-kflat-pullback
+- reviewing commit:   e2332372922d884eea345f3ad79c536e66c22d84
+- found by:           altitude-scout
+- proposed ancestor:  ringed-site/topos module complexes and their derived
+  pullback interface
+- weaker hypotheses:  a morphism of ringed topoi and an arbitrary unbounded
+  complex of modules; no scheme, affine, flatness, boundedness,
+  quasicoherence, or Noetherian hypothesis
+- pin status:         UPSTREAM-ONLY (absent from pinned Mathlib)
+- source note:        Stacks Project §21.17, Lemma 21.17.11, gives an
+  objectwise K-flat replacement with flat terms; §21.18, Lemmas 21.18.2–.3,
+  constructs derived pullback and its composition law for ringed-topoi
+  morphisms. The cited lemmas do not supply a functorial replacement object
+  with natural comparison, and the derived-functor existence argument is not
+  a Lean producer. This is a broader
+  mathematical analogue, not a dependency or theorem of the scheme chunk.
+  Sources: [flat resolutions](https://stacks.math.columbia.edu/tag/06YL),
+  [derived pullback](https://stacks.math.columbia.edu/tag/06YV).
+- state:              UNVERIFIED
+
 ### 2026-09-22 — compare the explicit affine `H^{-1}` witness with `CategoryTheory.Tor` (planned)
 - chunk:              sf8-5-tor-witness-comparison
 - reviewing commit:   b8306d6b
