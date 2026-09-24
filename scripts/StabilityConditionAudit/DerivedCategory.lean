@@ -67,6 +67,50 @@ categories. Scheme and affine consumers are audited by AlgebraicGeometryAudit.
 /-! ## Degree-zero Hom-complex classes and derived morphisms -/
 
 #print axioms CochainComplex.HomComplex.CohomologyClass.derivedCategoryHomAddEquiv
+#print axioms CochainComplex.HomComplex.CohomologyClass.derivedCategoryHomAddEquiv_apply_eq
+#print axioms CochainComplex.HomComplex.CohomologyClass.derivedCategoryHomLinearEquiv
+#print axioms CochainComplex.HomComplex.derivedLocalizationComparison
+#print axioms CochainComplex.HomComplex.derivedHomLocalizedMap
+#print axioms CochainComplex.HomComplex.cohomologyClassLocalizedMap_derived_naturality
+#print axioms CochainComplex.HomComplex.derivedHomLocalizedMap_class_square
+#print axioms CochainComplex.HomComplex.derivedHomLocalizedMap_isLocalized
+#print axioms CochainComplex.HomComplex.derivedHomLocalizedMap_isLocalized_of_bounded_above_below
+#print axioms CochainComplex.HomComplex.derivedHomLocalizedMap_isLocalized_of_bounded_projective
+
+/-! A downstream client through the DerivedCategory umbrella, with the full
+localized complex type written out rather than a private abbreviation. -/
+noncomputable section DerivedHomLocalizationClient
+
+open CategoryTheory
+open scoped ModuleCat.Algebra CochainComplex.HomComplex
+
+universe u
+
+variable {R : Type u} [CommRing R] (S : Submonoid R)
+  (P Q : CochainComplex (ModuleCat.{u} R) ℤ)
+
+local instance : HasDerivedCategory (ModuleCat.{u} R) := HasDerivedCategory.standard _
+local instance : HasDerivedCategory (ModuleCat.{u} (Localization S)) :=
+  HasDerivedCategory.standard _
+
+example :
+    (DerivedCategory.Qh.obj ((HomotopyCategory.quotient _ (.up ℤ)).obj P) ⟶
+      DerivedCategory.Qh.obj ((HomotopyCategory.quotient _ (.up ℤ)).obj Q)) →ₗ[R]
+    (DerivedCategory.Qh.obj ((HomotopyCategory.quotient _ (.up ℤ)).obj
+        (((ModuleCat.localizedModuleFunctor.{u} S).mapHomologicalComplex (.up ℤ)).obj P)) ⟶
+      DerivedCategory.Qh.obj ((HomotopyCategory.quotient _ (.up ℤ)).obj
+        (((ModuleCat.localizedModuleFunctor.{u} S).mapHomologicalComplex (.up ℤ)).obj Q))) :=
+  CochainComplex.HomComplex.derivedHomLocalizedMap S P Q
+
+example [P.IsKProjective]
+    [CochainComplex.IsKProjective
+      (((ModuleCat.localizedModuleFunctor.{u} S).mapHomologicalComplex (.up ℤ)).obj P)]
+    (hclass : IsLocalizedModule S
+      (CochainComplex.HomComplex.cohomologyClassLocalizedMap P Q S)) :
+    IsLocalizedModule S (CochainComplex.HomComplex.derivedHomLocalizedMap S P Q) :=
+  CochainComplex.HomComplex.derivedHomLocalizedMap_isLocalized S P Q hclass
+
+end DerivedHomLocalizationClient
 
 /-! ## K-projective derived functors -/
 
