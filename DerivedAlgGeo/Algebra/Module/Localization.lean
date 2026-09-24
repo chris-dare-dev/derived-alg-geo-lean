@@ -4,5 +4,6 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Module.Localization.Kernels
 import DerivedAlgGeo.Algebra.Module.Localization.FiniteDescent
+import DerivedAlgGeo.Algebra.Module.Localization.Cohomology
 
 /-! # Localization of modules -/
