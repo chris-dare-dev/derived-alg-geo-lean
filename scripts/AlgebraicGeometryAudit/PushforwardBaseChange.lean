@@ -19,6 +19,9 @@ sheaf pushforward and restriction. No coherence or affine hypothesis is used.
 #print axioms AlgebraicGeometry.restrictSquareSectionsEquiv
 #print axioms AlgebraicGeometry.pushforwardRestrictIso
 #print axioms AlgebraicGeometry.pushforwardRestrictNatIso
+#print axioms AlgebraicGeometry.pullbackRestrictNatIso
+#print axioms AlgebraicGeometry.squarePushforwardIso
+#print axioms AlgebraicGeometry.pushforwardRestrictNatIso_mate
 
 noncomputable section
 
@@ -35,6 +38,22 @@ example :
       Scheme.Modules.restrictFunctor (f ⁻¹ᵁ U).ι ⋙
         Scheme.Modules.pushforward (f ∣_ U) :=
   pushforwardRestrictNatIso f U
+
+example :
+    Scheme.Modules.pullback f ⋙ Scheme.Modules.restrictFunctor (f ⁻¹ᵁ U).ι ≅
+      Scheme.Modules.restrictFunctor U.ι ⋙ Scheme.Modules.pullback (f ∣_ U) :=
+  pullbackRestrictNatIso f U
+
+example :
+    Scheme.Modules.pushforward (f ⁻¹ᵁ U).ι ⋙ Scheme.Modules.pushforward f ≅
+      Scheme.Modules.pushforward (f ∣_ U) ⋙ Scheme.Modules.pushforward U.ι :=
+  squarePushforwardIso f U
+
+example :
+    mateEquiv (Scheme.Modules.restrictAdjunction (f ⁻¹ᵁ U).ι)
+      (Scheme.Modules.restrictAdjunction U.ι) (pushforwardRestrictNatIso f U).hom =
+        (squarePushforwardIso f U).hom :=
+  pushforwardRestrictNatIso_mate f U
 
 example (M : X.Modules) :
     (pushforwardRestrictNatIso f U).hom.app M = (pushforwardRestrictIso f U M).hom :=

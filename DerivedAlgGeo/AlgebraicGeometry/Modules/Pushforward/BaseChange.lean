@@ -5,6 +5,7 @@ Released under the MIT license.
 import Mathlib.AlgebraicGeometry.Restrict
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Restriction.Sections
 import Mathlib.AlgebraicGeometry.Modules.Sheaf
+import Mathlib.CategoryTheory.Adjunction.Mates
 
 /-!
 # Pushforward and restriction across an open square
@@ -70,8 +71,10 @@ The lesson generalises, and it is the opposite of the reflex: a large heartbeat 
 the use site only `exact` is available — `exact` unifies up to defeq and never has to match
 syntactically, which is what the defective goal rules out.
 
-The functor comparison is built from these explicit objectwise components;
-it does not use an adjunction mate or identify one with this comparison.
+The functor comparison is built from these explicit objectwise components.
+The last theorem identifies its mate in the open-immersion direction with
+the direct pushforward-composite comparison. The separate claim that the
+mate of `pullbackRestrictNatIso` equals this functor comparison remains open.
 -/
 
 universe u
@@ -222,5 +225,53 @@ noncomputable def pushforwardRestrictNatIso :
     ext x
     exact (NatTrans.naturality_apply g.mapPresheaf
       (eqToHom (image_morphismRestrict_preimage f U W)).op x).symm)
+
+/-- The geometric pullback comparison around the open square, assembled directly from
+the restriction/pullback comparison, pullback composition, and the equality of the two
+scheme morphism composites. -/
+noncomputable def pullbackRestrictNatIso :
+    Scheme.Modules.pullback f ⋙ Scheme.Modules.restrictFunctor (f ⁻¹ᵁ U).ι ≅
+      Scheme.Modules.restrictFunctor U.ι ⋙ Scheme.Modules.pullback (f ∣_ U) :=
+  Functor.isoWhiskerLeft (Scheme.Modules.pullback f)
+      (Scheme.Modules.restrictFunctorIsoPullback (f ⁻¹ᵁ U).ι) ≪≫
+    Scheme.Modules.pullbackComp (f ⁻¹ᵁ U).ι f ≪≫
+    Scheme.Modules.pullbackCongr (morphismRestrict_ι f U).symm ≪≫
+    (Scheme.Modules.pullbackComp (f ∣_ U) U.ι).symm ≪≫
+    Functor.isoWhiskerRight (Scheme.Modules.restrictFunctorIsoPullback U.ι).symm
+      (Scheme.Modules.pullback (f ∣_ U))
+
+/-- The two pushforward composites around the open square agree. This comparison is
+built from composition and the equality `morphismRestrict_ι`, independently of
+`pushforwardRestrictNatIso`. -/
+noncomputable def squarePushforwardIso :
+    Scheme.Modules.pushforward (f ⁻¹ᵁ U).ι ⋙ Scheme.Modules.pushforward f ≅
+      Scheme.Modules.pushforward (f ∣_ U) ⋙ Scheme.Modules.pushforward U.ι :=
+  Scheme.Modules.pushforwardComp (f ⁻¹ᵁ U).ι f ≪≫
+    Scheme.Modules.pushforwardCongr (morphismRestrict_ι f U).symm ≪≫
+    (Scheme.Modules.pushforwardComp (f ∣_ U) U.ι).symm
+
+set_option maxRecDepth 2048 in
+set_option backward.isDefEq.respectTransparency false in
+/-- Taking the mate of the independent pushforward/restriction comparison in
+the open-immersion direction gives the direct comparison of pushforward
+composites. The proof reduces pointwise to maps in the poset of opens. -/
+theorem pushforwardRestrictNatIso_mate :
+    mateEquiv (Scheme.Modules.restrictAdjunction (f ⁻¹ᵁ U).ι)
+      (Scheme.Modules.restrictAdjunction U.ι) (pushforwardRestrictNatIso f U).hom =
+        (squarePushforwardIso f U).hom := by
+  ext M W x
+  change ((
+    (Scheme.Modules.restrictAdjunction U.ι).unit.app
+      ((Scheme.Modules.pushforward (f ⁻¹ᵁ U).ι ⋙ Scheme.Modules.pushforward f).obj M) ≫
+    (Scheme.Modules.pushforward U.ι).map
+      ((pushforwardRestrictNatIso f U).hom.app
+        ((Scheme.Modules.pushforward (f ⁻¹ᵁ U).ι).obj M)) ≫
+    (Scheme.Modules.pushforward (f ∣_ U) ⋙ Scheme.Modules.pushforward U.ι).map
+      ((Scheme.Modules.restrictAdjunction (f ⁻¹ᵁ U).ι).counit.app M)).app W).hom x =
+      (((squarePushforwardIso f U).hom.app M).app W).hom x
+  change (M.presheaf.map _ ≫ M.presheaf.map _ ≫ M.presheaf.map _).hom x =
+    (M.presheaf.map _).hom x
+  rw [← Functor.map_comp, ← Functor.map_comp]
+  congr 1
 
 end AlgebraicGeometry
