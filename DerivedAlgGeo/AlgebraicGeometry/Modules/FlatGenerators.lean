@@ -6,7 +6,6 @@ import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Generator
 import DerivedAlgGeo.Algebra.Homology.LeftResolution
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Flat
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Stalk
-import DerivedAlgGeo.CategoryTheory.Limits.Preserves.Reflective
 import Mathlib.Algebra.Category.ModuleCat.Products
 import Mathlib.Algebra.Homology.LeftResolution.Basic
 import Mathlib.Algebra.Homology.LeftResolution.Reduced
@@ -550,44 +549,6 @@ theorem freeYonedaSheafCoproduct_summand_stalk_flat
           (R := X.ringCatSheaf) (M := M) m)) := by
   exact freeYonedaModuleSheaf_stalk_flat X m.1.unop x
 
-private theorem moduleStalkFunctor_preservesColimitsOfShape
-    (X : Scheme.{u}) (x : X) (I : Type u) :
-    PreservesColimitsOfShape (Discrete I) (moduleStalkFunctor X x) := by
-  let forgetModule := forget₂ (ModuleCat.{u} (X.presheaf.stalk x)) AddCommGrpCat.{u}
-  let G := TopCat.Sheaf.forget AddCommGrpCat.{u} X ⋙
-    TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} x
-  have hF : PreservesColimitsOfShape (Discrete I)
-      (SheafOfModules.toSheaf X.ringCatSheaf) := by
-    let α := 𝟙 X.ringCatSheaf.obj
-    haveI : PreservesColimitsOfShape (Discrete I)
-        (PresheafOfModules.sheafification α ⋙ SheafOfModules.toSheaf X.ringCatSheaf) := by
-      exact inferInstanceAs (PreservesColimitsOfShape (Discrete I)
-        (PresheafOfModules.toPresheaf X.ringCatSheaf.obj ⋙
-          presheafToSheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}))
-    exact (PresheafOfModules.sheafificationAdjunction α).preservesColimitsOfShape_of_comp_left
-      (K := Discrete I) (SheafOfModules.toSheaf X.ringCatSheaf)
-  have hG : PreservesColimitsOfShape (Discrete I)
-      (TopCat.Sheaf.forget AddCommGrpCat.{u} X ⋙
-        TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} x) := inferInstance
-  have hFG : PreservesColimitsOfShape (Discrete I)
-      (SheafOfModules.toSheaf X.ringCatSheaf ⋙ G) := by
-    exact @comp_preservesColimitsOfShape _ _ _ _ _ _ _ _
-      (SheafOfModules.toSheaf X.ringCatSheaf) G hF hG
-  have hFGi : PreservesColimitsOfShape (Discrete I)
-      (SheafOfModules.toSheaf X.ringCatSheaf ⋙
-        (TopCat.Sheaf.forget AddCommGrpCat.{u} X ⋙
-          TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} x)) := by
-    change PreservesColimitsOfShape (Discrete I)
-      (SheafOfModules.toSheaf X.ringCatSheaf ⋙ G)
-    exact hFG
-  have hComposite : PreservesColimitsOfShape (Discrete I)
-      (moduleStalkFunctor X x ⋙ forgetModule) := by
-    exact (preservesColimitsOfShape_iff_of_natIso
-      (moduleStalkForgetIso X x)).mp hFGi
-  letI := hComposite
-  exact preservesColimitsOfShape_of_reflects_of_preserves
-    (moduleStalkFunctor X x) forgetModule
-
 /-- The element-indexed free-Yoneda coproduct has flat stalks over every point.
 
 This proves stalkwise flatness only. It is not a global flatness or K-flat resolution result. -/
@@ -656,36 +617,6 @@ noncomputable def freeYonedaSheafCoproductLeftResolution (X : Scheme.{u}) :
     (fun M => freeYonedaSheafCoproduct_isFlatOver_id X M)
   π := SheafOfModules.freeYonedaSheafCoproductToIdentity X.ringCatSheaf
   epi_π_app := fromFreeYonedaSheafCoproduct_epi X
-
-private theorem isFlatOverId_iff_stalkwiseFlat
-    (X : Scheme.{u}) (M : X.Modules) :
-    IsFlatOver (𝟙 X) M ↔
-      ∀ x : X, Module.Flat (X.presheaf.stalk x) ((moduleStalkFunctor X x).obj M) := by
-  constructor
-  · intro h x
-    have h := h x
-    dsimp [IsFlatOver] at h
-    rw [Scheme.Hom.stalkMap_id] at h
-    change Module.Flat (X.presheaf.stalk x)
-      ((ModuleCat.restrictScalars (RingHom.id (X.presheaf.stalk x))).obj
-        ((moduleStalkFunctor X x).obj M)) at h
-    letI : Module.Flat (X.presheaf.stalk x)
-        ((ModuleCat.restrictScalars (RingHom.id (X.presheaf.stalk x))).obj
-          ((moduleStalkFunctor X x).obj M)) := h
-    exact Module.Flat.of_linearEquiv
-      (ModuleCat.restrictScalarsId'App (RingHom.id _) rfl
-        ((moduleStalkFunctor X x).obj M)).toLinearEquiv.symm
-  · intro h x
-    have h := h x
-    dsimp [IsFlatOver]
-    rw [Scheme.Hom.stalkMap_id]
-    change Module.Flat (X.presheaf.stalk x)
-      ((ModuleCat.restrictScalars (RingHom.id (X.presheaf.stalk x))).obj
-        ((moduleStalkFunctor X x).obj M))
-    letI : Module.Flat (X.presheaf.stalk x) ((moduleStalkFunctor X x).obj M) := h
-    exact Module.Flat.of_linearEquiv
-      (ModuleCat.restrictScalarsId'App (RingHom.id _) rfl
-        ((moduleStalkFunctor X x).obj M)).toLinearEquiv
 
 private theorem isIdempotentComplete_stalkwiseFlatSubcategory (X : Scheme.{u}) :
     IsIdempotentComplete
