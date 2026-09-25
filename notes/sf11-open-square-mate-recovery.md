@@ -1,9 +1,9 @@
 # SF11 #1063 open-square mate research recovery
 
 Cutover: `6d966b64` on `agent/sf11-open-square-mate-research`.
-Scope: the underived scheme-module open square. This note records the bounded
-attempt to identify two independently defined comparisons; it is not a proof
-of that identification or of relative base change.
+Scope: the underived scheme-module open square. The formerly missing
+identification of two independently defined comparisons now compiles. This
+does not prove relative base change.
 
 ## Compiled part
 
@@ -30,31 +30,10 @@ composite of three `M.presheaf.map` calls; `Functor.map_comp` and uniqueness
 of morphisms between opens close it. The proof uses an explicit `change` to
 avoid a known `instances` transparency problem.
 
-## Missing identification
+## Compiled identification
 
-The requested chart bridge is still the equality
-
-```lean
-mateEquiv (Scheme.Modules.pullbackPushforwardAdjunction f)
-  (Scheme.Modules.pullbackPushforwardAdjunction (f ∣_ U))
-  (pullbackRestrictNatIso f U).inv = (pushforwardRestrictNatIso f U).hom
-```
-
-This statement typechecks, but no proof is installed. The direct pointwise
-attempt left the unit of `pullbackPushforwardAdjunction (f ∣_ U)`, the inverse
-geometric pullback comparison, and the counit of
-`pullbackPushforwardAdjunction f` in the section-level goal. Simplifying the
-mate definition did not remove those genuinely nontrivial maps. An analogous
-pointwise simplification of the auxiliary pushforward mate initially failed
-with the exact Lean diagnostic:
-
-> `simp made no progress` — `The target expression is not type-correct under
-> the instances transparency level ... Application type mismatch ... presheaf
-> has type TopCat.Presheaf Ab ... but is expected to have type (Opens ↥Y)ᵒᵖ ⥤ Ab`.
-
-The auxiliary lemma was recovered with an explicit presheaf-map `change`.
-The remaining, narrower obligation has been typechecked in Lean but has an
-unsolved goal:
+The theorem `pullbackRestrictNatIso_conjugate` proves the formerly missing
+conjugate equality:
 
 ```lean
 conjugateEquiv
@@ -65,24 +44,50 @@ conjugateEquiv
   (pullbackRestrictNatIso f U).inv = (squarePushforwardIso f U).hom
 ```
 
-No placeholder theorem was added.
+`pullbackRestrictNatIso_mate` then proves the requested horizontal mate
+equality against the independently defined `pushforwardRestrictNatIso`:
 
-## Next proof route
+```lean
+mateEquiv (Scheme.Modules.pullbackPushforwardAdjunction f)
+  (Scheme.Modules.pullbackPushforwardAdjunction (f ∣_ U))
+  (pullbackRestrictNatIso f U).inv = (pushforwardRestrictNatIso f U).hom
+```
 
-1. Prove the displayed conjugate equality by pasting the five factors of
-   `pullbackRestrictNatIso`. Use pinned
-   `Adjunction.unit_leftAdjointUniq_hom_app` for both
-   `restrictFunctorIsoPullback` factors,
-   `Scheme.Modules.conjugateEquiv_pullbackComp_inv` for the two composition
-   factors, and `pushforwardCongr_hom_app_app` for the scheme-morphism equality.
-   `mateEquiv_hcomp`/`mateEquiv_vcomp` organize the pasting; evaluate any
-   remaining pushforward components with `pushforwardComp_hom_app_app` and
-   `image_morphismRestrict_preimage`.
-2. Apply pinned `CategoryTheory.iterated_mateEquiv_conjugateEquiv` to the
-   independent pullback iso. The compiled `pushforwardRestrictNatIso_mate`
-   supplies the same target `squarePushforwardIso`; injectivity of the second
-   `mateEquiv` then gives the requested equality.
-3. Only after that equality compiles, transport through the slice-site
-   `pullbackOverIso` and state its pointwise section/unit consequence. None of
-   this by itself proves relative or derived base change, Hom localization,
-   or Theorem 5.7(2).
+## Proof and friction
+
+The conjugate proof names six adjunctions and splits the inverse geometric
+iso into five factors. `conjugateEquiv_comp` reverses their order. The two
+restriction/pullback factors become identity maps because
+`restrictFunctorIsoPullback` is `leftAdjointUniq`. The two composition factors
+become `pushforwardComp` and its inverse via pinned
+`Scheme.Modules.conjugateEquiv_pullbackComp_inv` and
+`conjugateEquiv_comm`. The equality-transport factor is proved separately:
+after substituting the scheme-morphism equality,
+`pullbackCongr` becomes identity, and `pushforwardCongr_hom_app_app`
+becomes a presheaf map of an identity open morphism. `M.presheaf.map_id`
+finishes its component calculation. The final normal form uses
+`Iso.symm_hom` to match the direct pushforward iso.
+
+`CategoryTheory.iterated_mateEquiv_conjugateEquiv`, the already compiled
+`pushforwardRestrictNatIso_mate`, and injectivity of the second `mateEquiv`
+give the horizontal equality. An explicit `change` aligns the iterated mate
+with the displayed conjugate equality at the pinned API's transparency level.
+
+The earlier direct pointwise attempt left the pullback unit, inverse
+geometric pullback comparison, and pullback counit in the section-level goal.
+The auxiliary pushforward mate initially failed with the exact Lean diagnostic:
+
+> `simp made no progress` — `The target expression is not type-correct under
+> the instances transparency level ... Application type mismatch ... presheaf
+> has type TopCat.Presheaf Ab ... but is expected to have type (Opens ↥Y)ᵒᵖ ⥤ Ab`.
+
+The auxiliary lemma was recovered with an explicit presheaf-map `change`.
+The conjugate proof likewise keeps the equality transport explicit; there is
+no comparison defined from `conjugateEquiv` and no placeholder theorem.
+
+## Remaining follow-up
+
+Transport the proved horizontal mate through the slice-site
+`pullbackOverIso` and state its pointwise section/unit consequence. The
+underived open-square mate alone does not establish relative or derived base
+change, Hom localization, or Theorem 5.7(2).
