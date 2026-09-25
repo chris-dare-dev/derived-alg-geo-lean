@@ -5,3 +5,4 @@ import DerivedAlgGeo.Algebra.Homology.LeftResolution
 #print axioms CategoryTheory.Abelian.LeftResolution.augmentedShortComplex
 #print axioms CategoryTheory.Abelian.LeftResolution.augmentedShortComplex_exact
 #print axioms CategoryTheory.Abelian.LeftResolution.augmentedShortComplex_epi_g
+#print axioms CategoryTheory.Abelian.LeftResolution.homologyZeroIso
