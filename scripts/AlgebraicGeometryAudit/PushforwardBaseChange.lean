@@ -19,6 +19,14 @@ sheaf pushforward and restriction. No coherence or affine hypothesis is used.
 #print axioms AlgebraicGeometry.restrictSquareSectionsEquiv
 #print axioms AlgebraicGeometry.pushforwardRestrictIso
 #print axioms AlgebraicGeometry.pushforwardRestrictNatIso
+#print axioms AlgebraicGeometry.pullbackRestrictNatIso
+#print axioms AlgebraicGeometry.squarePushforwardIso
+#print axioms AlgebraicGeometry.pushforwardRestrictNatIso_mate
+#print axioms AlgebraicGeometry.pullbackRestrictNatIso_conjugate
+#print axioms AlgebraicGeometry.pullbackRestrictNatIso_mate
+#print axioms AlgebraicGeometry.pullbackRestrictNatIso_unit_app
+#print axioms AlgebraicGeometry.pullbackRestrictNatIso_unit
+#print axioms AlgebraicGeometry.pullbackRestrictNatIso_unit_sections
 
 noncomputable section
 
@@ -36,6 +44,37 @@ example :
         Scheme.Modules.pushforward (f ∣_ U) :=
   pushforwardRestrictNatIso f U
 
+example :
+    Scheme.Modules.pullback f ⋙ Scheme.Modules.restrictFunctor (f ⁻¹ᵁ U).ι ≅
+      Scheme.Modules.restrictFunctor U.ι ⋙ Scheme.Modules.pullback (f ∣_ U) :=
+  pullbackRestrictNatIso f U
+
+example :
+    Scheme.Modules.pushforward (f ⁻¹ᵁ U).ι ⋙ Scheme.Modules.pushforward f ≅
+      Scheme.Modules.pushforward (f ∣_ U) ⋙ Scheme.Modules.pushforward U.ι :=
+  squarePushforwardIso f U
+
+example :
+    mateEquiv (Scheme.Modules.restrictAdjunction (f ⁻¹ᵁ U).ι)
+      (Scheme.Modules.restrictAdjunction U.ι) (pushforwardRestrictNatIso f U).hom =
+        (squarePushforwardIso f U).hom :=
+  pushforwardRestrictNatIso_mate f U
+
+example :
+    conjugateEquiv
+      ((Scheme.Modules.pullbackPushforwardAdjunction f).comp
+        (Scheme.Modules.restrictAdjunction (f ⁻¹ᵁ U).ι))
+      ((Scheme.Modules.restrictAdjunction U.ι).comp
+        (Scheme.Modules.pullbackPushforwardAdjunction (f ∣_ U)))
+      (pullbackRestrictNatIso f U).inv = (squarePushforwardIso f U).hom :=
+  pullbackRestrictNatIso_conjugate f U
+
+example :
+    mateEquiv (Scheme.Modules.pullbackPushforwardAdjunction f)
+      (Scheme.Modules.pullbackPushforwardAdjunction (f ∣_ U))
+      (pullbackRestrictNatIso f U).inv = (pushforwardRestrictNatIso f U).hom :=
+  pullbackRestrictNatIso_mate f U
+
 example (M : X.Modules) :
     (pushforwardRestrictNatIso f U).hom.app M = (pushforwardRestrictIso f U M).hom :=
   rfl
@@ -45,5 +84,45 @@ example (M : X.Modules) (W : U.toScheme.Opens)
     ((pushforwardRestrictNatIso f U).hom.app M).app W x =
       (restrictSquareSections f U M W).hom x :=
   rfl
+
+example (N : Y.Modules) :
+    (Scheme.Modules.restrictFunctor U.ι).map
+        ((Scheme.Modules.pullbackPushforwardAdjunction f).unit.app N) ≫
+      (pushforwardRestrictNatIso f U).hom.app ((Scheme.Modules.pullback f).obj N) =
+    (Scheme.Modules.pullbackPushforwardAdjunction (f ∣_ U)).unit.app
+        ((Scheme.Modules.restrictFunctor U.ι).obj N) ≫
+      (Scheme.Modules.pushforward (f ∣_ U)).map
+        ((pullbackRestrictNatIso f U).inv.app N) :=
+  pullbackRestrictNatIso_unit_app f U N
+
+example :
+    (Functor.leftUnitor (Scheme.Modules.restrictFunctor U.ι)).inv ≫
+      Functor.whiskerRight (Scheme.Modules.pullbackPushforwardAdjunction f).unit
+        (Scheme.Modules.restrictFunctor U.ι) ≫
+      (Functor.associator (Scheme.Modules.pullback f) (Scheme.Modules.pushforward f)
+        (Scheme.Modules.restrictFunctor U.ι)).hom ≫
+      Functor.whiskerLeft (Scheme.Modules.pullback f) (pushforwardRestrictNatIso f U).hom ≫
+      (Functor.associator (Scheme.Modules.pullback f)
+        (Scheme.Modules.restrictFunctor (f ⁻¹ᵁ U).ι)
+        (Scheme.Modules.pushforward (f ∣_ U))).inv =
+    (Functor.rightUnitor (Scheme.Modules.restrictFunctor U.ι)).inv ≫
+      Functor.whiskerLeft (Scheme.Modules.restrictFunctor U.ι)
+        (Scheme.Modules.pullbackPushforwardAdjunction (f ∣_ U)).unit ≫
+      (Functor.associator (Scheme.Modules.restrictFunctor U.ι)
+        (Scheme.Modules.pullback (f ∣_ U))
+        (Scheme.Modules.pushforward (f ∣_ U))).inv ≫
+      Functor.whiskerRight (pullbackRestrictNatIso f U).inv
+        (Scheme.Modules.pushforward (f ∣_ U)) :=
+  pullbackRestrictNatIso_unit f U
+
+example (N : Y.Modules) (W : U.toScheme.Opens) (x : Γ(N.restrict U.ι, W)) :
+    (restrictSquareSections f U ((Scheme.Modules.pullback f).obj N) W).hom
+      (((Scheme.Modules.restrictFunctor U.ι).map
+        ((Scheme.Modules.pullbackPushforwardAdjunction f).unit.app N)).app W x) =
+    ((Scheme.Modules.pushforward (f ∣_ U)).map
+      ((pullbackRestrictNatIso f U).inv.app N)).app W
+        (((Scheme.Modules.pullbackPushforwardAdjunction (f ∣_ U)).unit.app
+          (N.restrict U.ι)).app W x) :=
+  pullbackRestrictNatIso_unit_sections f U N W x
 
 end AlgebraicGeometry

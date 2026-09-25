@@ -5,6 +5,7 @@ Released under the MIT license.
 import Mathlib.AlgebraicGeometry.Restrict
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Restriction.Sections
 import Mathlib.AlgebraicGeometry.Modules.Sheaf
+import Mathlib.CategoryTheory.Adjunction.Mates
 
 /-!
 # Pushforward and restriction across an open square
@@ -70,8 +71,16 @@ The lesson generalises, and it is the opposite of the reflex: a large heartbeat 
 the use site only `exact` is available — `exact` unifies up to defeq and never has to match
 syntactically, which is what the defective goal rules out.
 
-The functor comparison is built from these explicit objectwise components;
-it does not use an adjunction mate or identify one with this comparison.
+The functor comparison is built from these explicit objectwise components.
+The mate of the independent pushforward/restriction comparison in the
+open-immersion direction is the direct pushforward-composite comparison.
+Pasting the five factors of the independent pullback iso gives the same
+pushforward-composite comparison under conjugation; the iterated-mate
+identity then identifies its horizontal mate with the independent comparison.
+The actual pullback/pushforward units obey the resulting natural open-square
+unit equation. Its ordinary-section form evaluates the pushforward comparison
+as `restrictSquareSections`; this is distinct from slice-site `pullbackOverIso`
+transport and does not assert relative base-change invertibility.
 -/
 
 universe u
@@ -222,5 +231,263 @@ noncomputable def pushforwardRestrictNatIso :
     ext x
     exact (NatTrans.naturality_apply g.mapPresheaf
       (eqToHom (image_morphismRestrict_preimage f U W)).op x).symm)
+
+/-- The geometric pullback comparison around the open square, assembled directly from
+the restriction/pullback comparison, pullback composition, and the equality of the two
+scheme morphism composites. -/
+noncomputable def pullbackRestrictNatIso :
+    Scheme.Modules.pullback f ⋙ Scheme.Modules.restrictFunctor (f ⁻¹ᵁ U).ι ≅
+      Scheme.Modules.restrictFunctor U.ι ⋙ Scheme.Modules.pullback (f ∣_ U) :=
+  Functor.isoWhiskerLeft (Scheme.Modules.pullback f)
+      (Scheme.Modules.restrictFunctorIsoPullback (f ⁻¹ᵁ U).ι) ≪≫
+    Scheme.Modules.pullbackComp (f ⁻¹ᵁ U).ι f ≪≫
+    Scheme.Modules.pullbackCongr (morphismRestrict_ι f U).symm ≪≫
+    (Scheme.Modules.pullbackComp (f ∣_ U) U.ι).symm ≪≫
+    Functor.isoWhiskerRight (Scheme.Modules.restrictFunctorIsoPullback U.ι).symm
+      (Scheme.Modules.pullback (f ∣_ U))
+
+/-- The two pushforward composites around the open square agree. This comparison is
+built from composition and the equality `morphismRestrict_ι`, independently of
+`pushforwardRestrictNatIso`. -/
+noncomputable def squarePushforwardIso :
+    Scheme.Modules.pushforward (f ⁻¹ᵁ U).ι ⋙ Scheme.Modules.pushforward f ≅
+      Scheme.Modules.pushforward (f ∣_ U) ⋙ Scheme.Modules.pushforward U.ι :=
+  Scheme.Modules.pushforwardComp (f ⁻¹ᵁ U).ι f ≪≫
+    Scheme.Modules.pushforwardCongr (morphismRestrict_ι f U).symm ≪≫
+    (Scheme.Modules.pushforwardComp (f ∣_ U) U.ι).symm
+
+set_option maxRecDepth 2048 in
+set_option backward.isDefEq.respectTransparency false in
+/-- Taking the mate of the independent pushforward/restriction comparison in
+the open-immersion direction gives the direct comparison of pushforward
+composites. The proof reduces pointwise to maps in the poset of opens. -/
+theorem pushforwardRestrictNatIso_mate :
+    mateEquiv (Scheme.Modules.restrictAdjunction (f ⁻¹ᵁ U).ι)
+      (Scheme.Modules.restrictAdjunction U.ι) (pushforwardRestrictNatIso f U).hom =
+        (squarePushforwardIso f U).hom := by
+  ext M W x
+  change ((
+    (Scheme.Modules.restrictAdjunction U.ι).unit.app
+      ((Scheme.Modules.pushforward (f ⁻¹ᵁ U).ι ⋙ Scheme.Modules.pushforward f).obj M) ≫
+    (Scheme.Modules.pushforward U.ι).map
+      ((pushforwardRestrictNatIso f U).hom.app
+        ((Scheme.Modules.pushforward (f ⁻¹ᵁ U).ι).obj M)) ≫
+    (Scheme.Modules.pushforward (f ∣_ U) ⋙ Scheme.Modules.pushforward U.ι).map
+      ((Scheme.Modules.restrictAdjunction (f ⁻¹ᵁ U).ι).counit.app M)).app W).hom x =
+      (((squarePushforwardIso f U).hom.app M).app W).hom x
+  change (M.presheaf.map _ ≫ M.presheaf.map _ ≫ M.presheaf.map _).hom x =
+    (M.presheaf.map _).hom x
+  rw [← Functor.map_comp, ← Functor.map_comp]
+  congr 1
+
+private theorem congrMate {A B : Scheme.{u}} {a b : A ⟶ B} (h : a = b) :
+    conjugateEquiv (Scheme.Modules.pullbackPushforwardAdjunction a)
+      (Scheme.Modules.pullbackPushforwardAdjunction b)
+      (Scheme.Modules.pullbackCongr h).inv =
+        (Scheme.Modules.pushforwardCongr h).hom := by
+  subst b
+  ext M W x
+  simp only [Scheme.Modules.pullbackCongr, eqToIso_refl, Iso.refl_inv,
+    conjugateEquiv_id, NatTrans.id_app,
+    Scheme.Modules.Hom.id_app,
+    Scheme.Modules.pushforwardCongr_hom_app_app,
+    eqToHom_refl, op_id]
+  change x = (M.presheaf.map (𝟙 _)).hom x
+  exact congrArg (fun φ => φ.hom x) (M.presheaf.map_id _).symm
+
+private theorem compMateHom {A B C : Scheme.{u}} (a : A ⟶ B) (b : B ⟶ C) :
+    conjugateEquiv
+      (Scheme.Modules.pullbackPushforwardAdjunction (a ≫ b))
+      ((Scheme.Modules.pullbackPushforwardAdjunction b).comp
+        (Scheme.Modules.pullbackPushforwardAdjunction a))
+      (Scheme.Modules.pullbackComp a b).hom =
+        (Scheme.Modules.pushforwardComp a b).inv := by
+  let p := Scheme.Modules.pullbackComp a b
+  let adj₁ := (Scheme.Modules.pullbackPushforwardAdjunction b).comp
+    (Scheme.Modules.pullbackPushforwardAdjunction a)
+  let adj₂ := Scheme.Modules.pullbackPushforwardAdjunction (a ≫ b)
+  have h₁ : conjugateEquiv adj₁ adj₂ p.inv =
+      (Scheme.Modules.pushforwardComp a b).hom :=
+    Scheme.Modules.conjugateEquiv_pullbackComp_inv a b
+  have h₂ : conjugateEquiv adj₁ adj₂ p.inv ≫ conjugateEquiv adj₂ adj₁ p.hom = 𝟙 _ :=
+    conjugateEquiv_comm adj₁ adj₂ (by simp)
+  have h₃ : (Scheme.Modules.pushforwardComp a b).hom ≫
+      conjugateEquiv adj₂ adj₁ p.hom = 𝟙 _ := h₁ ▸ h₂
+  exact ((Scheme.Modules.pushforwardComp a b).hom_comp_eq_id).mp h₃
+
+private theorem restrictMateHom :
+    conjugateEquiv
+      (Scheme.Modules.pullbackPushforwardAdjunction U.ι)
+      (Scheme.Modules.restrictAdjunction U.ι)
+      (Scheme.Modules.restrictFunctorIsoPullback U.ι).hom =
+        (𝟙 (Scheme.Modules.pushforward U.ι)) := by
+  simp [Scheme.Modules.restrictFunctorIsoPullback, Adjunction.leftAdjointUniq]
+
+private theorem restrictMateInv :
+    conjugateEquiv
+      (Scheme.Modules.restrictAdjunction U.ι)
+      (Scheme.Modules.pullbackPushforwardAdjunction U.ι)
+      (Scheme.Modules.restrictFunctorIsoPullback U.ι).inv =
+        (𝟙 (Scheme.Modules.pushforward U.ι)) := by
+  simp [Scheme.Modules.restrictFunctorIsoPullback, Adjunction.leftAdjointUniq]
+
+/-- Conjugating the directly assembled pullback comparison gives the direct
+pushforward-composite comparison. This proves the equality-transport factor
+pointwise, then pastes all five independent factors. -/
+theorem pullbackRestrictNatIso_conjugate :
+  conjugateEquiv
+    ((Scheme.Modules.pullbackPushforwardAdjunction f).comp
+      (Scheme.Modules.restrictAdjunction (f ⁻¹ᵁ U).ι))
+    ((Scheme.Modules.restrictAdjunction U.ι).comp
+      (Scheme.Modules.pullbackPushforwardAdjunction (f ∣_ U)))
+    (pullbackRestrictNatIso f U).inv = (squarePushforwardIso f U).hom := by
+  let a := (Scheme.Modules.pullbackPushforwardAdjunction f).comp
+    (Scheme.Modules.restrictAdjunction (f ⁻¹ᵁ U).ι)
+  let b := (Scheme.Modules.pullbackPushforwardAdjunction f).comp
+    (Scheme.Modules.pullbackPushforwardAdjunction (f ⁻¹ᵁ U).ι)
+  let c := Scheme.Modules.pullbackPushforwardAdjunction ((f ⁻¹ᵁ U).ι ≫ f)
+  let d := Scheme.Modules.pullbackPushforwardAdjunction ((f ∣_ U) ≫ U.ι)
+  let e := (Scheme.Modules.pullbackPushforwardAdjunction U.ι).comp
+    (Scheme.Modules.pullbackPushforwardAdjunction (f ∣_ U))
+  let z := (Scheme.Modules.restrictAdjunction U.ι).comp
+    (Scheme.Modules.pullbackPushforwardAdjunction (f ∣_ U))
+  let t₁ := Functor.whiskerRight (Scheme.Modules.restrictFunctorIsoPullback U.ι).hom
+    (Scheme.Modules.pullback (f ∣_ U))
+  let t₂ := (Scheme.Modules.pullbackComp (f ∣_ U) U.ι).hom
+  let t₃ := (Scheme.Modules.pullbackCongr (morphismRestrict_ι f U).symm).inv
+  let t₄ := (Scheme.Modules.pullbackComp (f ⁻¹ᵁ U).ι f).inv
+  let t₅ := Functor.whiskerLeft (Scheme.Modules.pullback f)
+    (Scheme.Modules.restrictFunctorIsoPullback (f ⁻¹ᵁ U).ι).inv
+  change conjugateEquiv a z ((((t₁ ≫ t₂) ≫ t₃) ≫ t₄) ≫ t₅) =
+    (squarePushforwardIso f U).hom
+  have hpaste :
+      (conjugateEquiv a z) ((((t₁ ≫ t₂) ≫ t₃) ≫ t₄) ≫ t₅) =
+        (conjugateEquiv a b t₅) ≫
+          (conjugateEquiv b c t₄) ≫
+          (conjugateEquiv c d t₃) ≫
+          (conjugateEquiv d e t₂) ≫
+          (conjugateEquiv e z t₁) := by
+    simp only [conjugateEquiv_comp, Category.assoc]
+  rw [hpaste]
+  have h₅ : (conjugateEquiv a b) t₅ = 𝟙 _ := by
+    dsimp only [a, b, t₅]
+    rw [conjugateEquiv_whiskerLeft, restrictMateInv]
+    simp
+  have h₄ : (conjugateEquiv b c) t₄ =
+      (Scheme.Modules.pushforwardComp (f ⁻¹ᵁ U).ι f).hom := by
+    exact Scheme.Modules.conjugateEquiv_pullbackComp_inv (f ⁻¹ᵁ U).ι f
+  have h₃ : (conjugateEquiv c d) t₃ =
+      (Scheme.Modules.pushforwardCongr (morphismRestrict_ι f U).symm).hom := by
+    exact congrMate (morphismRestrict_ι f U).symm
+  have h₂ : (conjugateEquiv d e) t₂ =
+      (Scheme.Modules.pushforwardComp (f ∣_ U) U.ι).inv := by
+    exact compMateHom (f ∣_ U) U.ι
+  have h₁ : (conjugateEquiv e z) t₁ = 𝟙 _ := by
+    dsimp only [e, z, t₁]
+    rw [conjugateEquiv_whiskerRight, restrictMateHom]
+    simp
+  rw [h₅, h₄, h₃, h₂, h₁]
+  simp only [Category.id_comp, Category.comp_id, squarePushforwardIso,
+    Iso.trans_hom, Iso.symm_hom]
+
+/-- The horizontal mate of the independent geometric pullback comparison is
+exactly the independently defined pushforward/restriction comparison. -/
+theorem pullbackRestrictNatIso_mate :
+    mateEquiv (Scheme.Modules.pullbackPushforwardAdjunction f)
+      (Scheme.Modules.pullbackPushforwardAdjunction (f ∣_ U))
+      (pullbackRestrictNatIso f U).inv = (pushforwardRestrictNatIso f U).hom := by
+  let af := Scheme.Modules.pullbackPushforwardAdjunction f
+  let ag := Scheme.Modules.pullbackPushforwardAdjunction (f ∣_ U)
+  let ai := Scheme.Modules.restrictAdjunction U.ι
+  let av := Scheme.Modules.restrictAdjunction (f ⁻¹ᵁ U).ι
+  have hi := iterated_mateEquiv_conjugateEquiv af ag ai av
+    (pullbackRestrictNatIso f U).inv
+  change (mateEquiv av ai (mateEquiv af ag (pullbackRestrictNatIso f U).inv)) =
+    conjugateEquiv (af.comp av) (ai.comp ag) (pullbackRestrictNatIso f U).inv at hi
+  have hm : mateEquiv av ai (pushforwardRestrictNatIso f U).hom =
+      (squarePushforwardIso f U).hom := pushforwardRestrictNatIso_mate f U
+  have hc : conjugateEquiv (af.comp av) (ai.comp ag)
+      (pullbackRestrictNatIso f U).inv = (squarePushforwardIso f U).hom :=
+    pullbackRestrictNatIso_conjugate f U
+  apply (mateEquiv av ai).injective
+  change mateEquiv av ai (mateEquiv af ag (pullbackRestrictNatIso f U).inv) =
+    mateEquiv av ai (pushforwardRestrictNatIso f U).hom
+  exact hi.trans (hc.trans hm.symm)
+
+/-- The actual pullback/pushforward units commute with the independent open-square
+comparisons. This is the component of the natural unit square at `N`. -/
+theorem pullbackRestrictNatIso_unit_app (N : Y.Modules) :
+    (Scheme.Modules.restrictFunctor U.ι).map
+        ((Scheme.Modules.pullbackPushforwardAdjunction f).unit.app N) ≫
+      (pushforwardRestrictNatIso f U).hom.app ((Scheme.Modules.pullback f).obj N) =
+    (Scheme.Modules.pullbackPushforwardAdjunction (f ∣_ U)).unit.app
+        ((Scheme.Modules.restrictFunctor U.ι).obj N) ≫
+      (Scheme.Modules.pushforward (f ∣_ U)).map
+        ((pullbackRestrictNatIso f U).inv.app N) := by
+  have hα : ((mateEquiv
+      (Scheme.Modules.pullbackPushforwardAdjunction f)
+      (Scheme.Modules.pullbackPushforwardAdjunction (f ∣_ U))).symm
+      (pushforwardRestrictNatIso f U).hom) = (pullbackRestrictNatIso f U).inv := by
+    rw [Equiv.symm_apply_eq]
+    exact (pullbackRestrictNatIso_mate f U).symm
+  have h := unit_mateEquiv_symm
+    (Scheme.Modules.pullbackPushforwardAdjunction f)
+    (Scheme.Modules.pullbackPushforwardAdjunction (f ∣_ U))
+    (pushforwardRestrictNatIso f U).hom N
+  rw [hα] at h
+  exact h
+
+set_option backward.isDefEq.respectTransparency false in
+/-- The natural unit square for the actual pullback/pushforward adjunctions.
+The upper route uses the independent pushforward/restriction comparison;
+the lower route uses the independent geometric pullback comparison. -/
+theorem pullbackRestrictNatIso_unit :
+    (Functor.leftUnitor (Scheme.Modules.restrictFunctor U.ι)).inv ≫
+      Functor.whiskerRight (Scheme.Modules.pullbackPushforwardAdjunction f).unit
+        (Scheme.Modules.restrictFunctor U.ι) ≫
+      (Functor.associator (Scheme.Modules.pullback f) (Scheme.Modules.pushforward f)
+        (Scheme.Modules.restrictFunctor U.ι)).hom ≫
+      Functor.whiskerLeft (Scheme.Modules.pullback f) (pushforwardRestrictNatIso f U).hom ≫
+      (Functor.associator (Scheme.Modules.pullback f)
+        (Scheme.Modules.restrictFunctor (f ⁻¹ᵁ U).ι)
+        (Scheme.Modules.pushforward (f ∣_ U))).inv =
+    (Functor.rightUnitor (Scheme.Modules.restrictFunctor U.ι)).inv ≫
+      Functor.whiskerLeft (Scheme.Modules.restrictFunctor U.ι)
+        (Scheme.Modules.pullbackPushforwardAdjunction (f ∣_ U)).unit ≫
+      (Functor.associator (Scheme.Modules.restrictFunctor U.ι)
+        (Scheme.Modules.pullback (f ∣_ U))
+        (Scheme.Modules.pushforward (f ∣_ U))).inv ≫
+      Functor.whiskerRight (pullbackRestrictNatIso f U).inv
+        (Scheme.Modules.pushforward (f ∣_ U)) := by
+  apply NatTrans.ext
+  funext N
+  convert pullbackRestrictNatIso_unit_app f U N using 1 <;>
+    simp only [NatTrans.comp_app, Functor.leftUnitor_inv_app, Functor.rightUnitor_inv_app,
+      Functor.whiskerLeft_app, Functor.whiskerRight_app, Functor.associator_hom_app,
+      Functor.associator_inv_app, Functor.comp_obj, Functor.id_obj,
+      Category.id_comp, Category.comp_id]
+
+/-- On ordinary sections over `W`, the independent pushforward comparison in
+the actual unit square is exactly `restrictSquareSections`. This is the direct
+open-square equation, not its slice-site `pullbackOverIso` transport. -/
+theorem pullbackRestrictNatIso_unit_sections (N : Y.Modules)
+    (W : U.toScheme.Opens) (x : Γ(N.restrict U.ι, W)) :
+    (restrictSquareSections f U ((Scheme.Modules.pullback f).obj N) W).hom
+      (((Scheme.Modules.restrictFunctor U.ι).map
+        ((Scheme.Modules.pullbackPushforwardAdjunction f).unit.app N)).app W x) =
+    ((Scheme.Modules.pushforward (f ∣_ U)).map
+      ((pullbackRestrictNatIso f U).inv.app N)).app W
+        (((Scheme.Modules.pullbackPushforwardAdjunction (f ∣_ U)).unit.app
+          (N.restrict U.ι)).app W x) := by
+  have h := pullbackRestrictNatIso_unit_app f U N
+  have hW := congrArg (fun ψ => ψ.app W x) h
+  change (restrictSquareSections f U ((Scheme.Modules.pullback f).obj N) W).hom
+      (((Scheme.Modules.restrictFunctor U.ι).map
+        ((Scheme.Modules.pullbackPushforwardAdjunction f).unit.app N)).app W x) =
+    ((Scheme.Modules.pushforward (f ∣_ U)).map
+      ((pullbackRestrictNatIso f U).inv.app N)).app W
+        (((Scheme.Modules.pullbackPushforwardAdjunction (f ∣_ U)).unit.app
+          (N.restrict U.ι)).app W x) at hW
+  exact hW
 
 end AlgebraicGeometry
