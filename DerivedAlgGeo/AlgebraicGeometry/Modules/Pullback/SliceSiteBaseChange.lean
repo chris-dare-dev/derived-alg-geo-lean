@@ -75,6 +75,8 @@ theorem overEquiv_map_pullbackOverIso_hom (f : X ⟶ Y) (N : Y.Modules)
     Iso.trans_inv, Functor.map_comp, Category.assoc]
   rfl
 
+-- The expanded composite-adjunction unit needs `instances` transparency at this
+-- pinned Mathlib version; keep the relaxation scoped to this theorem.
 set_option backward.isDefEq.respectTransparency false in
 /-- Transporting the unit of the composite slice-site adjunction through the
 outer equivalence gives the actual unit for the restricted scheme morphism,
@@ -108,7 +110,6 @@ private theorem counitInv_map_counit {C : Type*} {D : Type*}
   exact (Category.assoc _ _ _).symm.trans
     (h₁.trans ((Category.assoc _ _ _).trans (h₂.trans (Category.comp_id h))))
 
-set_option backward.isDefEq.respectTransparency false in
 /-- Mapping a slice-site morphism by pushforward agrees, under the outer
 equivalence's counit, with mapping its transported morphism by the restricted
 scheme pushforward. -/

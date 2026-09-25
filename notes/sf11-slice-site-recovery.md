@@ -1,7 +1,7 @@
 # SF11 slice-site open-square recovery (2026-09-24)
 
 Issue #1063 remains open. This bounded chunk is **underived**: it constructs the
-slice-site pushforward comparison and proves three transport identities in
+slice-site pushforward comparison and proves four transport identities in
 `Modules/Pullback/SliceSiteBaseChange.lean`. It does not prove the slice-site
 unit square, relative base-change invertibility, derived Hom localization, a
 heart statement, or Theorem 5.7(2).
@@ -64,3 +64,38 @@ identifies structure sheaves; it is **not** the adjunction unit. Lean accepts
 stdin probes via `lake env lean /dev/stdin`; `lake env lean -` fails with “no
 such file or directory” at this pin. Both details cost a probe and should be
 recorded in future loop tooling guidance.
+
+The first scoped `backward.isDefEq.respectTransparency false` remains necessary
+for the composite-adjunction unit transport at the pinned Mathlib version; an
+independent reviewer reproduced the `instances` transparency mismatch without
+it. The same option on `pushforwardOverFunctor_map_transport` was unnecessary
+and was removed after review.
+
+The reviewer reproduced the **separate transparency probe** from the frozen
+commit (not a fourth unit-square proof attempt) with:
+
+```bash
+git show d9b9ab04:DerivedAlgGeo/AlgebraicGeometry/Modules/Pullback/SliceSiteBaseChange.lean |
+  sed -n '5p;17,25p;82,101p' | lake env lean /dev/stdin
+```
+
+The diagnostic starts `Tactic \`rewrite\` failed: Did not find an occurrence of
+the pattern` at `/dev/stdin:29:40` and ends with the following verbatim cause:
+
+```text
+Note: The target expression is not type-correct under the `instances` transparency level,
+which may have triggered the failure.
+Application type mismatch: The argument
+  Y.ringCatSheaf
+has type
+  TopCat.Sheaf RingCat ↑Y.toPresheafedSpace
+but is expected to have type
+  Sheaf (Opens.grothendieckTopology ↥Y) RingCat
+in the application
+  Sheaf.over Y.ringCatSheaf
+```
+
+The three capped unit-square attempts left prose symptoms but not verbatim
+diagnostics or failed proof snippets in tracked files. Those cannot be
+reconstructed from this commit without rerunning an attempt; future loop
+tooling should retain a minimal failed probe before the recovery pivot.
