@@ -53,13 +53,18 @@ These are not stops. What to do instead:
   definition of done, and state it in the PR body.
 - **`main` moved.** Merge `origin/main` into the branch. Do not rebase a pushed
   branch: pushes are fast-forward only, and branch manifests cannot
-  force-push. A passed review carries over when the change is unchanged, and a
-  changed one needs one revalidation round (Phase 3).
+  force-push. A passed review carries over only when the reviewed change is
+  unchanged and the protected-base movement meets the revalidation conditions
+  in the ledger guide (Phase 3). A changed implementation cannot use this free
+  path; after an exact required-check failure, record and charge a repair
+  against the same ledger (see “CI-failure repair” below).
 - **Round cap exhausted.** With `recovery` configured, run Phase 2.5. Without
   it, preserve the ledger, park the chunk, file a follow-up issue that carries
   the unresolved findings, and take the next issue.
-- **The OpenSpec CLI is missing.** Structural validation is used instead, and
-  preflight warns.
+- **The OpenSpec CLI is missing.** A manifest with `cli-required` fails
+  preflight; install the CLI or choose a different validation mode before
+  freezing the run. With `cli-advisory`, structural validation is used and
+  preflight warns. A `structural` run never needs the CLI.
 - **A reviewer returns nothing.** Re-dispatch that role on the same commit.
 
 ## Invariants
@@ -376,6 +381,9 @@ permissions remain separate; a research approval grants none.
 
 The PR can open as soon as the plan commit exists: CI then runs while the
 panel reviews. It must not be marked ready or merged before the ledger passes.
+After a pass, push and PR creation stay bound to the latest passing round's
+reviewed change; changed implementation goes through exact CI-failure admission
+and a charged panel.
 
 1. Push and create the PR through the controller (`action push`,
    `action create-pr --draft`), supplying the ledger. The PR body states the
@@ -388,16 +396,16 @@ panel reviews. It must not be marked ready or merged before the ledger passes.
    decides which checks are required; a manifest check it no longer requires is
    ignored. Local precheck is evidence for debugging, not a CI verdict. A red
    check is a finding: fix it, commit, and take the new commit through Phase 2
-   as the next round.
+   as the next round. If the ledger had already passed, first admit the repair
+   using the exact current failed-check evidence described below.
 4. If `main` moved, merge `origin/main` into the branch (never rebase a pushed
-   branch; a push must fast-forward), rerun the targeted checks, and push.
-   A head that carries the same change keeps the
-   pass, as long as only progress records changed and the base left the
-   reviewed files, their direct imports and the pins alone. Otherwise, when
-   `action ready` or `action merge` reports that the head does not carry the
-   reviewed change, run one revalidation panel on the new commit, for example
-   after a conflict resolution. It needs all four reviewers and does not spend
-   the improvement cap; at most two are allowed.
+   branch; a push must fast-forward) and rerun the targeted checks. If the base
+   left the reviewed files, their direct imports and the pins alone, push the
+   same reviewed change. If the base changed something under review, first run
+   one revalidation panel on a commit that carries the new base and preserves
+   the reviewed change; it needs all four reviewers and does not spend the
+   improvement cap, with at most two allowed. A changed implementation cannot
+   use revalidation.
 5. If `predecessor_attestation.emit` is true, run `action attest-pr` after the
    ledger passes and before merging. It binds the current PR head.
 6. Run `action merge`. The controller pins `--match-head-commit` to the head it
@@ -406,6 +414,40 @@ panel reviews. It must not be marked ready or merged before the ledger passes.
    failed check.
 7. The closing keyword closes a complete chunk's issue on merge. Use
    `action close --merged-pr` only when it did not. Then take the next issue.
+
+### CI-failure repair after a passed ledger
+
+A changed implementation after a passed ledger is not a protected-base
+revalidation. Admit it only when one open, non-draft PR on the planned branch
+has a full head SHA equal to its live source ref, and the exact failed check on
+that SHA is required by both the manifest and current branch protection. The
+controller rereads the PR, source/base refs and protection after fetching
+check evidence. If any evidence is unavailable, ambiguous or moved, it leaves
+the ledger unchanged and stops.
+
+Use the existing ledger and a full candidate SHA:
+
+```text
+.loop-tools/bin/python scripts/loop_engine.py ledger admit-ci-repair \
+  --spec .claude/loop-specs/<slug>.yaml --repo-root . \
+  --state .loop-runs/<ledger>.json --commit <full-local-candidate-sha>
+```
+
+The candidate must descend from the failed PR head and stay within frozen
+chunk paths. Admission appends exact evidence to `ci_failure_repairs` and
+allocates the next ordinary panel round, counting against the original cap.
+Do not create a replacement ledger. Ledgers created before this protocol are
+read with compatibility defaults; `ledger init` does not rewrite their stored
+bytes. A repeated repair needs a passing prior repair followed
+by a new failure on the then-current PR head. If the cap is already used, the
+ledger becomes terminal `repair_exhausted`. Push, PR creation, attestation,
+ready, approval, merge and close all check the ledger repair state;
+`action push` and `action close` require `--ledger`. Push stays bound to the
+existing open PR and refuses a source head that is not an ancestor of the exact
+reviewed commit. `action create-pr` cannot replace the PR after repair. A
+successful rerun on the same head consumes no repair slot. After a repair
+passes, merge still requires green current required checks on the exact live
+PR head.
 
 When the controller reports that an action is not authorized, that is stop
 reason 1 for this issue only. Leave the PR in its current verified state,

@@ -1,0 +1,90 @@
+schema: derived-alg-geo-lean.loop-run/v1
+id: srf1-897-full-faithfulness
+repository: chris-dare-dev/derived-alg-geo-lean
+actor: chris-dare-dev
+remote: origin
+base_branch: main
+base_ref: origin/main
+mode: independent
+enabled: true
+allow_force_push: false
+state_dir: .loop-runs
+roadmap_gate: required
+
+openspec:
+  change: srf1-serre-functor
+  validation: cli-required
+  required_artifacts:
+    - proposal.md
+    - design.md
+    - tasks.md
+    - specs/serre-functor/spec.md
+
+limits:
+  min_issues: 1
+  max_issues: 1
+  max_review_rounds_per_chunk: 3
+
+review:
+  independent: true
+  reviewers:
+    - mathematics-adversary
+    - repository-boundary-adversary
+    - abstraction-adversary
+    - mathlib-reviewer
+  advisors:
+    - altitude-scout
+    - hypothesis-elimination-scout
+
+runner:
+  required_checks:
+    - ci
+
+merge:
+  method: squash
+  delete_branch: true
+  allow_method_override: false
+  allow_delete_branch_override: false
+  allow_auto: false
+  allow_admin: false
+
+closure:
+  code_issue: pr_merge_keyword
+  allow_non_pr: false
+
+predecessor_attestation:
+  emit: true
+
+mutations:
+  comment_issue: true
+  close_issue: false
+  push_branch: true
+  create_pr: true
+  ready_pr: false
+  create_issue: false
+  approve_pr: false
+  merge_pr: true
+
+issues:
+  - number: 897
+    slug: srf1-897-full-faithfulness
+    depends_on:
+      - 895
+      - 896
+    chunks:
+      - id: srf1-897-full-faithfulness
+        scope: Prove full faithfulness under finite Hom hypotheses and derive equivalence only from a separate co-Serre duality input.
+        requirements:
+          - A right Serre functor is fully faithful under finite Hom hypotheses
+        files:
+          - DerivedAlgGeo/CategoryTheory/Linear/SerreFunctor/Equivalence.lean
+          - DerivedAlgGeo/CategoryTheory/Linear/SerreFunctor.lean
+          - scripts/StabilityConditionAudit/SerreFunctor.lean
+          - docs/architecture/generalization-backlog.md
+          - openspec/changes/srf1-serre-functor/tasks.md
+        acceptance:
+          - SerreFunctorData.fullyFaithful carries HomFinite explicitly and names the finite-dimensional double-dual step.
+          - CoSerreFunctorData includes natural duality data and yields the adjunction needed for essential surjectivity.
+          - The existing SerreCategoryData is constructible from the derived equivalence, while a right Serre functor alone does not claim essential surjectivity.
+          - New public declarations are audited; the focused named build, layering check, and umbrella coverage check pass without sorry, admit, or an axiom bypass.
+          - The passing ledger produces the controller attestation required to bind the #898 successor before this PR is merged.
