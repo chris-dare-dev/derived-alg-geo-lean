@@ -8,6 +8,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Monoidal
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Restriction
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.ScalarExtendedSections
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.ScalarExtendedOpenSections
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.ScalarExtendedTwoOpen
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Stalk
 
 /-! # Pullback of scheme-module sheaves -/
