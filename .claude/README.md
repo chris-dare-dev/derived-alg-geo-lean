@@ -56,6 +56,17 @@ neither runtime has to be instrumented in advance, and attributes them to the
 frozen chunks recorded in `.loop-runs/`. It reads those ledgers and never
 writes to them.
 
+`scripts/loop_transcripts.py` is the behaviour side. `sync` copies every Codex
+and Claude Code transcript that touches this repository -- from every Codex
+home, archived threads included -- into a local archive outside the working
+tree (`~/.loop-runs/transcripts`), groups each root thread with its subagents
+into a run, and writes a digest per run: the owner's messages, every point the
+run stopped and what it said, the questions it asked, the idle time, and where
+its tool calls went. `list`, `stops`, `profile` and `show` read the archive
+back after the runtimes have deleted the originals. The archive holds raw
+transcripts, so it never belongs in this repository. Loop runs do not need it;
+it exists to find out why they stop.
+
 ## The artifacts in `notes/`
 
 Produced 2026-08-04 by two multi-agent workflows (34 agents, ~4.2M tokens).
