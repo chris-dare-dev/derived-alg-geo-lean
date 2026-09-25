@@ -12,6 +12,10 @@ noncomputable section
 #print axioms AlgebraicGeometry.Scheme.Modules.fixedBasePullbackOpenAfterExtension
 #print axioms AlgebraicGeometry.Scheme.Modules.fixedBasePullbackOpenAfterExtension_one_tmul
 #print axioms AlgebraicGeometry.Scheme.Modules.fixedBasePullbackOpenAfterExtension_restrict
+#print axioms AlgebraicGeometry.Scheme.Modules.fixedBasePullbackOpenAfterExtension_compat_of_isPullback
+#print axioms AlgebraicGeometry.Scheme.Modules.fixedBasePullbackOpenOfIsPullback
+#print axioms AlgebraicGeometry.Scheme.Modules.fixedBasePullbackOpenOfIsPullback_one_tmul
+#print axioms AlgebraicGeometry.Scheme.Modules.fixedBasePullbackOpenOfIsPullback_restrict
 
 -- The map is A-linear for an arbitrary scheme morphism and arbitrary open.
 example {R A : CommRingCat.{u}} {Y Z : Scheme.{u}}

@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.AffineSpec
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.FixedBaseSections
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.ScalarExtendedOpenSections
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Localization
 
 /-!
@@ -161,6 +162,36 @@ theorem affineLocalizationTopNatIso_hom_localizedMk_section
   have hx : (AlgebraicGeometry.tilde.isoTop M).hom m = x :=
     Iso.inv_hom_id_apply (AlgebraicGeometry.tilde.isoTop M) x
   simpa only [hx] using affineLocalizationTopNatIso_hom_localizedMk S M m
+
+/-- On a localization square of affine spectra, the localization generator
+comparison is the square-specialized actual pullback unit on top sections. -/
+theorem affineLocalizationTopNatIso_hom_localizedMk_square
+    (M : ModuleCat.{u} R)
+    (x : (AlgebraicGeometry.fixedBaseSectionsFunctor (Spec R)
+      (Scheme.ΓSpecIso R).inv ⊤).obj (AlgebraicGeometry.tilde M)) :
+    let A := CommRingCat.of (Localization S)
+    let f : R ⟶ A := CommRingCat.ofHom (algebraMap R (Localization S))
+    ((affineLocalizationTopNatIso S).hom.app M).hom
+        (((AlgebraicGeometry.fixedBaseSectionsFunctor (Spec R)
+          (Scheme.ΓSpecIso R).inv ⊤).obj (AlgebraicGeometry.tilde M)).localizedModuleMkLinearMap S
+          x) =
+      (fixedBasePullbackOpenOfIsPullback (Spec.map f) (AlgebraicGeometry.tilde M) f
+        (𝟙 (Spec R)) (𝟙 (Spec A)) IsPullback.of_id_snd ⊤).hom
+          ((1 : A) ⊗ₜ[R] x) := by
+  let A := CommRingCat.of (Localization S)
+  let f : R ⟶ A := CommRingCat.ofHom (algebraMap R (Localization S))
+  calc
+    _ = (fixedBasePullbackTop (Scheme.ΓSpecIso R).inv (Spec.map f)
+          (AlgebraicGeometry.tilde M)).hom x :=
+      affineLocalizationTopNatIso_hom_localizedMk_section S M x
+    _ = (((pullbackPushforwardAdjunction (Spec.map f)).unit.app
+          (AlgebraicGeometry.tilde M)).app ⊤) x :=
+      fixedBasePullbackTop_apply (Scheme.ΓSpecIso R).inv (Spec.map f)
+        (AlgebraicGeometry.tilde M) x
+    _ = _ := by
+      exact (fixedBasePullbackOpenOfIsPullback_one_tmul
+        (Spec.map f) (AlgebraicGeometry.tilde M) f
+        (𝟙 (Spec R)) (𝟙 (Spec A)) IsPullback.of_id_snd ⊤ x).symm
 
 end AlgebraicGeometry.Scheme.Modules
 

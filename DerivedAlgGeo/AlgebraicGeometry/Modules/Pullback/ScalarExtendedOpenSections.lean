@@ -146,4 +146,67 @@ theorem fixedBasePullbackOpenAfterExtension_restrict
     ModuleCat.ExtendRestrictScalarsAdj.homEquiv_symm_apply] at hA
   convert hA.symm using 1 <;> rfl
 
+/-- The commutative square underlying a Cartesian base-change square supplies
+the scalar compatibility for the actual open-section pullback unit. -/
+theorem fixedBasePullbackOpenAfterExtension_compat_of_isPullback
+    {p : Y ⟶ Spec R} {q : Z ⟶ Spec A}
+    (h : IsPullback f q p (Spec.map a)) :
+    ((Scheme.ΓSpecIso R).inv ≫ p.appTop) ≫ f.appTop =
+      a ≫ ((Scheme.ΓSpecIso A).inv ≫ q.appTop) := by
+  calc
+    ((Scheme.ΓSpecIso R).inv ≫ p.appTop) ≫ f.appTop =
+        (Scheme.ΓSpecIso R).inv ≫ (f ≫ p).appTop := by
+          rw [Scheme.Hom.comp_appTop, Category.assoc]
+    _ = (Scheme.ΓSpecIso R).inv ≫ (q ≫ Spec.map a).appTop := by rw [h.w]
+    _ = ((Scheme.ΓSpecIso R).inv ≫ (Spec.map a).appTop) ≫ q.appTop := by
+          rw [Scheme.Hom.comp_appTop, Category.assoc]
+    _ = a ≫ ((Scheme.ΓSpecIso A).inv ≫ q.appTop) := by
+          rw [← Scheme.ΓSpecIso_inv_naturality, Category.assoc]
+
+/-- The actual scalar-extended pullback unit for a Cartesian square over
+affine spectra, with its scalar action determined by the two structure maps. -/
+noncomputable def fixedBasePullbackOpenOfIsPullback
+    (p : Y ⟶ Spec R) (q : Z ⟶ Spec A)
+    (h : IsPullback f q p (Spec.map a)) (U : Y.Opens) :
+    (ModuleCat.extendScalars a.hom).obj
+        ((fixedBaseSectionsFunctor Y ((Scheme.ΓSpecIso R).inv ≫ p.appTop) U).obj M) ⟶
+      (fixedBaseSectionsFunctor Z ((Scheme.ΓSpecIso A).inv ≫ q.appTop)
+        (f ⁻¹ᵁ U)).obj ((pullback f).obj M) :=
+  fixedBasePullbackOpenAfterExtension
+    ((Scheme.ΓSpecIso R).inv ≫ p.appTop) f M a
+    ((Scheme.ΓSpecIso A).inv ≫ q.appTop) U
+    (fixedBasePullbackOpenAfterExtension_compat_of_isPullback f a h)
+
+/-- The square-specialized unit sends a tensor generator to the component of
+the scheme-module pullback adjunction unit. -/
+theorem fixedBasePullbackOpenOfIsPullback_one_tmul
+    (p : Y ⟶ Spec R) (q : Z ⟶ Spec A)
+    (h : IsPullback f q p (Spec.map a)) (U : Y.Opens) (x : Γ(M, U)) :
+    (fixedBasePullbackOpenOfIsPullback f M a p q h U).hom
+        ((1 : A) ⊗ₜ[R,(a.hom)] x) =
+      (((pullbackPushforwardAdjunction f).unit.app M).app U) x :=
+  fixedBasePullbackOpenAfterExtension_one_tmul
+    ((Scheme.ΓSpecIso R).inv ≫ p.appTop) f M a
+    ((Scheme.ΓSpecIso A).inv ≫ q.appTop) U
+    (fixedBasePullbackOpenAfterExtension_compat_of_isPullback f a h) x
+
+/-- The unit obtained from the Cartesian square commutes with restriction to
+every open, including affine opens, without a chosen scalar compatibility. -/
+theorem fixedBasePullbackOpenOfIsPullback_restrict
+    (p : Y ⟶ Spec R) (q : Z ⟶ Spec A)
+    (h : IsPullback f q p (Spec.map a))
+    {U V : Y.Opens} (hUV : U ≤ V) :
+    fixedBasePullbackOpenOfIsPullback f M a p q h V ≫
+        (((modulesToFixedBaseSheaf Z ((Scheme.ΓSpecIso A).inv ≫ q.appTop)).obj
+          ((pullback f).obj M)).presheaf.map
+            ((Opens.map f.base).map (homOfLE hUV)).op) =
+      (ModuleCat.extendScalars a.hom).map
+          (((modulesToFixedBaseSheaf Y ((Scheme.ΓSpecIso R).inv ≫ p.appTop)).obj
+            M).presheaf.map (homOfLE hUV).op) ≫
+        fixedBasePullbackOpenOfIsPullback f M a p q h U :=
+  fixedBasePullbackOpenAfterExtension_restrict
+    ((Scheme.ΓSpecIso R).inv ≫ p.appTop) f M a
+    ((Scheme.ΓSpecIso A).inv ≫ q.appTop) hUV
+    (fixedBasePullbackOpenAfterExtension_compat_of_isPullback f a h)
+
 end AlgebraicGeometry.Scheme.Modules

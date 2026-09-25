@@ -15,6 +15,7 @@ universe u
 #print axioms AlgebraicGeometry.Scheme.Modules.affineLocalizationTopNatIso
 #print axioms AlgebraicGeometry.Scheme.Modules.affineLocalizationTopNatIso_hom_localizedMk
 #print axioms AlgebraicGeometry.Scheme.Modules.affineLocalizationTopNatIso_hom_localizedMk_section
+#print axioms AlgebraicGeometry.Scheme.Modules.affineLocalizationTopNatIso_hom_localizedMk_square
 
 -- `CommRingCat` ranges over arbitrary commutative rings, without finiteness assumptions.
 example {R : CommRingCat.{u}} (S : Submonoid R)
