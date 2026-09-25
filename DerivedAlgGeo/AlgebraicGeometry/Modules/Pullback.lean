@@ -1,5 +1,6 @@
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Invertible
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.AffineSpec
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.FixedBaseSections
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.LocallyFree
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Monoidal
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Restriction
