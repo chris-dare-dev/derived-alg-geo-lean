@@ -3167,9 +3167,7 @@ def action_push(
     require_manifest_remote(root, spec)
     if force_with_lease and not spec.get("allow_force_push", False):
         raise LoopError("force-with-lease is disabled by the specification")
-    args = ["git", "push"]
-    if recovery_state is not None:
-        args.extend(["--no-follow-tags"])
+    args = ["git", "push", "--no-follow-tags"]
     if force_with_lease:
         args.append("--force-with-lease")
     args.extend([spec["remote"], f"HEAD:refs/heads/{current}" if recovery_state is not None else current])
