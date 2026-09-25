@@ -2,6 +2,7 @@
 TStructureCore slice of the StabilityCondition audit, split out so concurrent
 branches append to different files (#480). See the umbrella file for the contract and reading guide.
 -/
+import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.HeartBridge
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Presheaf.Monoidal
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KFlatResolution
@@ -91,8 +92,17 @@ open CategoryTheory.Triangulated
 #print axioms CategoryTheory.Functor.isLeftTExact_rightAdjoint
 #print axioms CategoryTheory.Functor.isRightTExact_leftAdjoint
 #print axioms CategoryTheory.Functor.mapTriangleLEGEIso
+#print axioms CategoryTheory.Functor.mapTriangleLEGEIso_hom₂
 #print axioms CategoryTheory.Functor.mapTruncLEIso
+#print axioms CategoryTheory.Functor.mapTruncLEIso_hom_comp_ι
+#print axioms CategoryTheory.Functor.mapTruncLEIso_hom_comp_ι_assoc
+#print axioms CategoryTheory.Functor.mapTruncLEIso_hom_naturality
+#print axioms CategoryTheory.Functor.mapTruncLEIso_hom_naturality_assoc
 #print axioms CategoryTheory.Functor.mapTruncGEIso
+#print axioms CategoryTheory.Functor.mapTruncGEIso_π_comp_hom
+#print axioms CategoryTheory.Functor.mapTruncGEIso_π_comp_hom_assoc
+#print axioms CategoryTheory.Functor.mapTruncGEIso_hom_naturality
+#print axioms CategoryTheory.Functor.mapTruncGEIso_hom_naturality_assoc
 #print axioms CategoryTheory.Functor.isLE_iff_of_reflectsZeroObjects
 #print axioms CategoryTheory.Functor.isGE_iff_of_reflectsZeroObjects
 #print axioms CategoryTheory.Functor.isBounded_of_target
@@ -379,6 +389,11 @@ open CategoryTheory.Triangulated
 
 -- Repository-owned heart results used by weak-tilting cohomology.
 #print axioms CategoryTheory.ObjectProperty.FullSubcategory.isZero_of_obj_isZero
+#print axioms CategoryTheory.Triangulated.TStructure.heartCohFunctor
+#print axioms CategoryTheory.Triangulated.TStructure.heartCohFunctor_additive
+#print axioms CategoryTheory.Triangulated.TStructure.heartH0Functor
+#print axioms CategoryTheory.Triangulated.TStructure.heartH0Functor_additive
+#print axioms CategoryTheory.Triangulated.TStructure.heartH0OnHeartIso
 #print axioms CategoryTheory.Triangulated.TStructure.heart_hι
 #print axioms CategoryTheory.Triangulated.TStructure.heart_containsZero
 #print axioms CategoryTheory.Triangulated.TStructure.heart_closedUnderBinaryProducts
@@ -508,6 +523,9 @@ quasi-compact opens of a base is geometric and is not taken here.
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.tStructure_eq_of_le_eq
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.ext
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.heartFunctor
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction.heartH0Comparison
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction.heartH0ComparisonNatIso
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction.fixedTargetArrowExtension_of_ambient
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.heartFunctor_obj
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.heartFunctor_map
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.heartFunctor_additive
@@ -518,4 +536,7 @@ quasi-compact opens of a base is geometric and is not taken here.
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.isNoetherian_of_liftedSubobjectChains
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.isNoetherian_of_pointwiseChainLifts
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.isNoetherian_of_pointwiseSubobjectLifts
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction.isNoetherian_of_fixedTargetMonoExtensions
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction.isNoetherian_of_fixedTargetArrowExtensions
+#print axioms CategoryTheory.Triangulated.TStructure.Restriction.isNoetherian_of_ambientFixedTargetArrowExtensions
 #print axioms CategoryTheory.Triangulated.TStructure.Restriction.id

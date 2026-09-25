@@ -5,6 +5,9 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.ExteriorPower
 import DerivedAlgGeo.AlgebraicGeometry.Modules.ExteriorPower.Restriction
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Flasque
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Flat
+import DerivedAlgGeo.AlgebraicGeometry.Modules.FlatGenerators
+import DerivedAlgGeo.AlgebraicGeometry.Modules.FixedBaseSheaf
+import DerivedAlgGeo.AlgebraicGeometry.Modules.FixedBaseSheafLocalization
 import DerivedAlgGeo.AlgebraicGeometry.Modules.LocalCombination
 import DerivedAlgGeo.AlgebraicGeometry.Modules.LocallySurjective
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback
@@ -12,14 +15,16 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Pushforward
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Restriction
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Tilde
 
 /-!
 # Sheaves of modules on a scheme
 
 Everything stated about Mathlib's `X.Modules`: Grothendieck's axioms AB4 and AB5, affine
 comparisons,
-presentations, restriction, pullback, pushforward, tensor products, exterior
-powers, and the refinement chain `X.Modules ⊇ QCoh(X) ⊇ Coh(X)` under
+presentations, stalkwise-flat generators, restriction, pullback, pushforward,
+tensor products, exterior powers, and the refinement chain
+`X.Modules ⊇ QCoh(X) ⊇ Coh(X)` under
 `Quasicoherent/` and `Coherent/`. Mathlib defines `X.Modules` in
 `AlgebraicGeometry/Modules/Sheaf.lean`, so the subcategories cut out of it live
 here, with the object, as `ModuleCat/Abelian.lean` lives with `ModuleCat`.
