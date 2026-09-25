@@ -36,7 +36,7 @@ Grothendieck slope boundedness, which remains the other field of `MuHNInput`.
 * `Coh.isNoetherianObject` — coherent sheaves on a Noetherian scheme are Noetherian objects.
 -/
 
-universe u
+universe u v
 
 open CategoryTheory CategoryTheory.Limits Opposite
 
@@ -78,7 +78,7 @@ that preimage, so an isomorphism after restriction gives an isomorphism on the o
 The stalk criterion then gives an isomorphism of module sheaves, and the fully faithful coherent
 inclusion reflects it. -/
 theorem restrict_jointlyReflectsIsomorphisms
-    (Uc : Scheme.OpenCover.{u} X) [IsLocallyNoetherian X]
+    (Uc : Scheme.OpenCover.{v} X) [IsLocallyNoetherian X]
     {M N : Coh X} (f : M ⟶ N)
     (hf : ∀ i, IsIso ((restrict (Uc.f i)).map f)) : IsIso f := by
   let M' : TopCat.Sheaf AddCommGrpCat.{u} X :=

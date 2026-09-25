@@ -43,7 +43,10 @@ private def basicOpenToLocalizedSpectrumIso {R : CommRingCat.{u}} (r : R) :
     (Functor.isoWhiskerLeft F β.unitIso.symm) ≪≫
     (Functor.rightUnitor F)
 
-private def basicOpenGlobalSectionsIso {R : CommRingCat.{u}}
+/-- Transport global sections of the pullback of `E` on the actual basic open
+to Mathlib's canonical localization of its chosen finite-module presentation.
+The comparison factors through `basicOpenIsoSpecAway r`; it is not definitional. -/
+def basicOpenGlobalSectionsIso {R : CommRingCat.{u}}
     [IsNoetherianRing R] (r : R) (M : FGModuleCat.{u} R)
     (E : Coh (Spec R)) (cR : E ≅ (FGModuleCat.affineTilde (R := R)).obj M) :
     let A := Localization.Away r
