@@ -8,6 +8,7 @@ import DerivedAlgGeo.Algebra.Homology.HomologicalComplexLimits
 import DerivedAlgGeo.Algebra.Homology.Homotopy
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory
 import DerivedAlgGeo.Algebra.Homology.Localization
+import DerivedAlgGeo.Algebra.Homology.LeftResolution
 import DerivedAlgGeo.Algebra.Homology.ShortComplex
 import DerivedAlgGeo.Algebra.Homology.Subcomplex
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence

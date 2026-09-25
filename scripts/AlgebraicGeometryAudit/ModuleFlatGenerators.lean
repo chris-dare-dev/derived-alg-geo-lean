@@ -22,4 +22,5 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.FlatGenerators
 #print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaSheafCoproductDegreewiseEpiCover
 #print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaSheafCoproductDegreewiseEpiCoverMap
 #print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaSheafCoproductDegreewiseEpiCoverMap_epi
+#print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaSheafCoproductReducedLeftResolution_augmentedExact
 #print axioms AlgebraicGeometry.Scheme.Modules.fromFreeYonedaSheafCoproduct_natural

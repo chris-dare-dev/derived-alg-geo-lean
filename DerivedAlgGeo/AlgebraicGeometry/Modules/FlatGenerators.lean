@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Generator
+import DerivedAlgGeo.Algebra.Homology.LeftResolution
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Flat
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Stalk
 import DerivedAlgGeo.CategoryTheory.Limits.Preserves.Reflective
@@ -812,6 +813,21 @@ theorem freeYonedaSheafCoproductDegreewiseEpiCoverMap_epi
   intro i
   change Epi ((freeYonedaSheafCoproductReducedLeftResolution X).π.app (K.X i))
   infer_instance
+
+/-- The augmented first segment of the free-Yoneda flat resolution is exact
+after inclusion into all module sheaves. This objectwise fact does not identify
+the total complex of the resolution bicomplex with its input. -/
+theorem freeYonedaSheafCoproductReducedLeftResolution_augmentedExact
+    (X : Scheme.{u}) (M : X.Modules) :
+    ((freeYonedaSheafCoproductReducedLeftResolution X).augmentedShortComplex
+      (ObjectProperty.ι (fun M : X.Modules => IsFlatOver (𝟙 X) M)) M).Exact := by
+  letI : IsIdempotentComplete
+      (ObjectProperty.FullSubcategory
+        (fun M : X.Modules => IsFlatOver (𝟙 X) M)) :=
+    isIdempotentComplete_stalkwiseFlatSubcategory X
+  exact CategoryTheory.Abelian.LeftResolution.augmentedShortComplex_exact
+    (ι := ObjectProperty.ι (fun M : X.Modules => IsFlatOver (𝟙 X) M))
+    (Λ := freeYonedaSheafCoproductReducedLeftResolution X) (X := M)
 
 /-- Naturality of the specialized coproduct map follows from the generic naturality theorem. -/
 lemma fromFreeYonedaSheafCoproduct_natural (X : Scheme.{u})
