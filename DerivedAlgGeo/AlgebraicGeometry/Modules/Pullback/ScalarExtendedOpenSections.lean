@@ -54,6 +54,21 @@ private noncomputable def fixedBaseOpenSections_restrictScalars
             ((a ≫ ψ).hom r))).hom (show Γ(N, f ⁻¹ᵁ U) from x)
         rw [compat] }
 
+/-- The change-of-scalars comparison on the same section carrier commutes
+with restriction; this is separate from the pullback unit. -/
+private theorem fixedBaseOpenSections_restrictScalars_restrict
+    {U V : Y.Opens} (h : U ≤ V)
+    (compat : φ ≫ f.appTop = a ≫ ψ) (N : Z.Modules) :
+    fixedBaseOpenSections_restrictScalars φ f a ψ V compat N ≫
+      (ModuleCat.restrictScalars a.hom).map
+        (((modulesToFixedBaseSheaf Z ψ).obj N).presheaf.map
+          ((Opens.map f.base).map (homOfLE h)).op) =
+      (((modulesToFixedBaseSheaf Z (φ ≫ f.appTop)).obj N).presheaf.map
+          ((Opens.map f.base).map (homOfLE h)).op) ≫
+        fixedBaseOpenSections_restrictScalars φ f a ψ U compat N := by
+  ext x
+  rfl
+
 /-- The actual open-section pullback unit, transposed across extension of scalars. -/
 noncomputable def fixedBasePullbackOpenAfterExtension (U : Y.Opens)
     (compat : φ ≫ f.appTop = a ≫ ψ) :
@@ -82,5 +97,53 @@ theorem fixedBasePullbackOpenAfterExtension_one_tmul (U : Y.Opens)
   rw [one_smul]
   simp only [ModuleCat.comp_apply, fixedBasePullbackOpen_apply]
   rfl
+
+/-- The scalar-extended actual pullback unit commutes with restriction of
+opens. The proof transposes the already proved `R`-linear restriction square
+through the extension/restriction-of-scalars adjunction. -/
+theorem fixedBasePullbackOpenAfterExtension_restrict
+    {U V : Y.Opens} (h : U ≤ V)
+    (compat : φ ≫ f.appTop = a ≫ ψ) :
+    fixedBasePullbackOpenAfterExtension φ f M a ψ V compat ≫
+        (((modulesToFixedBaseSheaf Z ψ).obj ((pullback f).obj M)).presheaf.map
+          ((Opens.map f.base).map (homOfLE h)).op) =
+      (ModuleCat.extendScalars a.hom).map
+          (((modulesToFixedBaseSheaf Y φ).obj M).presheaf.map (homOfLE h).op) ≫
+        fixedBasePullbackOpenAfterExtension φ f M a ψ U compat := by
+  let N := (pullback f).obj M
+  let rY := (((modulesToFixedBaseSheaf Y φ).obj M).presheaf.map (homOfLE h).op)
+  let rZ := (((modulesToFixedBaseSheaf Z ψ).obj N).presheaf.map
+    ((Opens.map f.base).map (homOfLE h)).op)
+  let rZR := (((modulesToFixedBaseSheaf Z (φ ≫ f.appTop)).obj N).presheaf.map
+    ((Opens.map f.base).map (homOfLE h)).op)
+  let kU := fixedBaseOpenSections_restrictScalars φ f a ψ U compat N
+  let kV := fixedBaseOpenSections_restrictScalars φ f a ψ V compat N
+  let pU := fixedBasePullbackOpen φ f M U
+  let pV := fixedBasePullbackOpen φ f M V
+  have hbase : pV ≫ rZR = rY ≫ pU :=
+    fixedBasePullbackOpen_restrict φ f M h
+  have hk : kV ≫ (ModuleCat.restrictScalars a.hom).map rZ =
+      rZR ≫ kU :=
+    fixedBaseOpenSections_restrictScalars_restrict φ f a ψ h compat N
+  have hstep : pV ≫ (rZR ≫ kU) =
+      pV ≫ (kV ≫ (ModuleCat.restrictScalars a.hom).map rZ) :=
+    congrArg (fun q => pV ≫ q) hk.symm
+  have hR : rY ≫ (pU ≫ kU) = (pV ≫ kV) ≫
+      (ModuleCat.restrictScalars a.hom).map rZ := by
+    have hleft : rY ≫ (pU ≫ kU) = pV ≫ (rZR ≫ kU) :=
+      (Category.assoc rY pU kU).symm |>.trans
+        ((congrArg (fun q => q ≫ kU) hbase.symm).trans
+          (Category.assoc pV rZR kU))
+    have hright : pV ≫ (kV ≫ (ModuleCat.restrictScalars a.hom).map rZ) =
+        (pV ≫ kV) ≫ (ModuleCat.restrictScalars a.hom).map rZ :=
+      (Category.assoc pV kV ((ModuleCat.restrictScalars a.hom).map rZ)).symm
+    exact hleft.trans (hstep.trans hright)
+  let adj := ModuleCat.extendRestrictScalarsAdj a.hom
+  have hA := adj.homEquiv_naturality_right_square rY (pU ≫ kU)
+    (pV ≫ kV) rZ hR
+  simp only [adj, ModuleCat.extendRestrictScalarsAdj,
+    Adjunction.mk'_homEquiv,
+    ModuleCat.ExtendRestrictScalarsAdj.homEquiv_symm_apply] at hA
+  convert hA.symm using 1 <;> rfl
 
 end AlgebraicGeometry.Scheme.Modules

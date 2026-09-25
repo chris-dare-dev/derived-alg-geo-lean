@@ -11,6 +11,7 @@ noncomputable section
 
 #print axioms AlgebraicGeometry.Scheme.Modules.fixedBasePullbackOpenAfterExtension
 #print axioms AlgebraicGeometry.Scheme.Modules.fixedBasePullbackOpenAfterExtension_one_tmul
+#print axioms AlgebraicGeometry.Scheme.Modules.fixedBasePullbackOpenAfterExtension_restrict
 
 -- The map is A-linear for an arbitrary scheme morphism and arbitrary open.
 example {R A : CommRingCat.{u}} {Y Z : Scheme.{u}}
@@ -32,5 +33,19 @@ example {R A : CommRingCat.{u}} {Y Z : Scheme.{u}}
         ((1 : A) ⊗ₜ[R,(a.hom)] x) =
       (((Scheme.Modules.pullbackPushforwardAdjunction f).unit.app M).app U) x :=
   Scheme.Modules.fixedBasePullbackOpenAfterExtension_one_tmul φ f M a ψ U compat x
+
+-- The same concrete map, not an abstract pointwise replacement, commutes
+-- with the two open-restriction maps after extension of scalars.
+example {R A : CommRingCat.{u}} {Y Z : Scheme.{u}}
+    (φ : R ⟶ Γ(Y, ⊤)) (f : Z ⟶ Y) (M : Y.Modules)
+    (a : R ⟶ A) (ψ : A ⟶ Γ(Z, ⊤))
+    {U V : Y.Opens} (h : U ≤ V) (compat : φ ≫ f.appTop = a ≫ ψ) :
+    Scheme.Modules.fixedBasePullbackOpenAfterExtension φ f M a ψ V compat ≫
+        (((modulesToFixedBaseSheaf Z ψ).obj ((Scheme.Modules.pullback f).obj M)).presheaf.map
+          ((Opens.map f.base).map (homOfLE h)).op) =
+      (ModuleCat.extendScalars a.hom).map
+          (((modulesToFixedBaseSheaf Y φ).obj M).presheaf.map (homOfLE h).op) ≫
+        Scheme.Modules.fixedBasePullbackOpenAfterExtension φ f M a ψ U compat :=
+  Scheme.Modules.fixedBasePullbackOpenAfterExtension_restrict φ f M a ψ h compat
 
 end
