@@ -15,40 +15,32 @@ evidence behind one.
 | `open-questions.md` | The decisions blocking work, each with a GitHub issue. |
 | `references/mathlib-style.md` | The Mathlib conventions this repo holds itself to, and the deltas it keeps on purpose. The spec `agents/mathlib-reviewer.md` enforces. |
 | `agents/` | Repo-local agent specifications. One per file. |
-| `skills/` | Repo-local skills, one directory each. `formalize-issue` is the unattended iteration. |
-| `loop-specs/` | Tracked execution manifests. They select issue batches and authorize provider actions; OpenSpec remains the planning source of truth. |
+| `skills/` | Repo-local skills, one directory each. `run-loop` works issues or a milestone to merged PRs; `formalize-issue` and `land-pr` are single iterations. |
+| `loop-specs/` | Manifests of the retired loop controller. Runs no longer write them; they are kept for the ledgers they produced. |
 | `settings.json` | Hooks. Currently: the Mathlib-convention check on every Lean edit. |
 
 OpenSpec's generated Codex skills live in `.agents/skills/` and are refreshed by
 `openspec update`; do not hand-edit those generated files. Repository-specific
-reviewers and the bounded outer-loop protocol remain in `.claude/agents/` and
-`.claude/skills/`.
+reviewers and the loop protocol live in `.claude/agents/` and `.claude/skills/`.
 
-## OpenSpec and bounded loop runs
+## Loop runs and OpenSpec
 
-OpenSpec lives at the repository root in `openspec/`. Its proposal, delta
-specifications, design, and task artifacts describe what a change means and how
-it is intended to be built. The tracked manifests in `.claude/loop-specs/`
-reference those artifacts and add the separate execution policy: issue order,
-reviewer panel, frozen chunks, and individually enabled GitHub actions.
+A loop run follows `skills/run-loop/SKILL.md`:
+- it takes GitHub issues or a milestone, researches each issue, and writes its
+  plan into the PR description;
+- it merges once the four reviewers in `agents/` pass on the same commit and the
+  required CI is green;
+- the PR description is its record. There is no manifest, ledger or controller
+  on the run path.
 
-`scripts/loop_engine.py` is the safety boundary between the two. It performs a
-read-only preflight, keeps a digest-bound review ledger under ignored
-`.loop-runs/`, and refuses a review/improve round beyond the manifest's cap
-(which may not exceed five) for one chunk. The
-mathematical, repository-boundary, abstraction, and mathlib reviewers are
-independent; a passing style review is not mathematical evidence. Code issues
-are closed only after a confirmed merged pull request. The owner-enabled pilot
-has a checked-in merge policy that makes method, auto-merge, administrator
-merge, and branch deletion explicit; the controller still requires its live
-preflight and digest-bound review ledger before any mutation.
+OpenSpec lives in `openspec/`, with its generated skills in `.agents/skills/`.
+It remains available for interactive design work; a run does not use it.
 
-When a later run must depend on a progress PR for the same issue, it pins a
-controller-generated predecessor attestation, the reviewed head, and the merge
-commit. The controller checks that the PR targets the protected base and that
-its merge remains in both the base and current-branch history before every
-successor action; an untracked local ledger or a prose handoff cannot unlock a
-new review budget.
+`scripts/loop_engine.py` and the manifests in `loop-specs/` are the retired
+manifest controller. It kept a digest-bound review ledger under the ignored
+`.loop-runs/` directory and gated every provider action on it. Runs no longer
+use it. It is kept, with `docs/architecture/loop-recovery.md`, for the ledgers it
+already wrote.
 
 `scripts/loop_tokens.py` is the cost side of the same run. It reconstructs
 token totals from the Claude Code and Codex transcripts after the fact, so

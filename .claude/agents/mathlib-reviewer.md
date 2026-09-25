@@ -60,31 +60,6 @@ output as already-known. Your findings are the ones it cannot produce:
 
 ## Output
 
-When dispatched for a controller ledger (including legacy loops), use `PASS`
-when acceptable, `NEEDS_CHANGES` when repairs are required, or `BLOCKED` when
-the claim cannot be reconstructed. This overrides the standalone `MERGE`
-vocabulary below. The controller does not translate standalone verdicts.
-
-For a recovery-enabled objective, read the complete inherited finding corpus.
-Before any passing verdict, provide a JSON object mapping **every** inherited
-finding ID to concrete resolution evidence; the supervisor records it with
-`--resolutions-file`. Judge the evidence independently. Research-plan acceptance
-is not implementation acceptance. Preserve unresolved findings regardless of
-the attempt number. An allocated recovery review counts even if it passes with
-a lift or remains incomplete.
-
-For recovery-enabled reviews, place counts and explanations before this exact
-two-line trailer, with one applicable verdict token and no following text:
-
-```text
-Reviewed commit: <full 40-character commit SHA>
-Close: <TOKEN>
-```
-
-This trailer supersedes the legacy closing format below only in recovery mode.
-Here `<TOKEN>` is `PASS`, `PASS_WITH_LIFT`, `NEEDS_CHANGES`, or `BLOCKED`;
-never use `MERGE` in a recovery trailer.
-
 Ranked most severe first. Report every finding and state the total — do not cap
 the list. For each:
 
@@ -94,6 +69,22 @@ the list. For each:
   <the concrete replacement — the corrected name, or the rewritten docstring>
 ```
 
-Close with a one-line verdict: `MERGE`, `MERGE AFTER FIXES`, or `NEEDS REWORK`,
-and the finding count by severity. If you found nothing, say so plainly rather
-than inventing a nit.
+If you found nothing, say so plainly rather than inventing a nit.
+
+When a loop run dispatched you, end with this exact two-line trailer, with
+nothing after it:
+
+```text
+Reviewed commit: <full 40-character commit SHA>
+Close: <TOKEN>
+```
+
+`<TOKEN>` is `PASS` when the change is acceptable, `NEEDS_CHANGES` when repairs
+are required, or `BLOCKED` when a claim cannot be reconstructed. Use
+`PASS_WITH_LIFT` only for a generalization whose target lies outside the change.
+Never put `MERGE` in the trailer. A review for a legacy controller ledger with
+recovery enabled also maps every inherited finding ID to concrete resolution
+evidence in a JSON object; see `docs/architecture/loop-recovery.md`.
+
+Otherwise, close with a one-line verdict: `MERGE`, `MERGE AFTER FIXES`, or
+`NEEDS REWORK`, and the finding count by severity.
