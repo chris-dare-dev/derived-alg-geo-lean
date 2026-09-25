@@ -8,7 +8,7 @@ This capability lets the bounded loop controller admit a CI-driven code repair o
 
 ### Requirement: CI-driven repair is admitted from exact required-check evidence
 
-The controller SHALL distinguish a changed implementation review from protected-base-only revalidation. For an ordinary passed ledger, it SHALL admit a CI-driven repair only when the selected manifest and ledger still agree, the selected issue and exactly one matching open non-draft pull request remain in scope, and a check required by both the frozen manifest and live branch protection has a completed `failure` conclusion for the pull request's current full head SHA. The check result, provider pull-request head, and live source-branch head SHALL identify that same commit. Failure to read an unambiguous live protection/check snapshot SHALL reject admission; the fallback used by the existing green-check gate SHALL NOT qualify as failure evidence. The candidate repair commit SHALL descend from that failed-check head and remain within the frozen file scope. Recovery-managed ledgers and changes without qualifying CI evidence SHALL NOT use this transition.
+The controller SHALL distinguish a changed implementation review from protected-base-only revalidation. For an ordinary passed ledger, it SHALL admit a CI-driven repair only when the selected manifest and ledger still agree, the selected issue and exactly one matching open non-draft pull request remain in scope, and a check required by both the frozen manifest and live branch protection has a completed `failure` conclusion for the pull request's current full head SHA. The check result, provider pull-request head, and live source-branch head SHALL identify that same commit. Failure to read an unambiguous live protection/check snapshot SHALL reject admission. The controller SHALL read all returned same-head check-run attempts and SHALL NOT treat an older completed failure as current while a newer attempt is pending. The candidate repair commit SHALL descend from that failed-check head and remain within the frozen file scope. Recovery-managed ledgers and changes without qualifying CI evidence SHALL NOT use this transition.
 
 #### Scenario: Required check failed on the current pull-request head
 - **WHEN** an ordinary passed ledger's matching pull request is open and its current source head has a completed failure for a check required by both the frozen manifest and live branch protection, and a frozen-scope repair candidate descends from that head
@@ -21,6 +21,10 @@ The controller SHALL distinguish a changed implementation review from protected-
 #### Scenario: Check is absent, optional, pending, or cancelled
 - **WHEN** no check required by both the frozen manifest and live branch protection has a completed failing result on the exact current pull-request head
 - **THEN** the controller rejects the repair admission and does not treat missing, pending, cancelled, or unrelated check results as CI-failure evidence
+
+#### Scenario: Newer check attempt is pending while an older failure completes
+- **WHEN** an older required check attempt failed on the current head, but a newer same-head attempt is pending or its start order is ambiguous
+- **THEN** the controller rejects repair admission without changing the ledger or allocating a review round
 
 ### Requirement: CI repair preserves history and consumes the frozen review cap
 
