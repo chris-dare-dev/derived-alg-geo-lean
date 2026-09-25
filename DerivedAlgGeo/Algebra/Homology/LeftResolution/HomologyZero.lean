@@ -44,4 +44,64 @@ noncomputable def homologyZeroIso :
     (ChainComplex.isIso_descOpcycles_iff K φ hφ).2 ⟨hS, inferInstance⟩
   exact K.isoHomologyι₀ ≪≫ asIso ψ
 
+set_option backward.defeqAttrib.useBackward true in
+set_option backward.isDefEq.respectTransparency false in
+private lemma homologyZeroIso_hom_eq :
+    let K : ChainComplex A ℕ :=
+      (ι.mapHomologicalComplex (ComplexShape.down ℕ)).obj (Λ.chainComplex X)
+    K.pOpcycles 0 ≫ K.isoHomologyι₀.inv ≫ (Λ.homologyZeroIso ι X).hom =
+      ι.map (Λ.chainComplexXZeroIso X).hom ≫ Λ.π.app X := by
+  dsimp [homologyZeroIso]
+  simp
+
+set_option backward.defeqAttrib.useBackward true in
+set_option backward.isDefEq.respectTransparency false in
+/-- The degree-zero homology identification commutes with maps between resolved objects. -/
+lemma homologyZeroIso_naturality {Y : A} (f : X ⟶ Y) :
+    HomologicalComplex.homologyMap
+        ((ι.mapHomologicalComplex (ComplexShape.down ℕ)).map (Λ.chainComplexMap f)) 0 ≫
+      (Λ.homologyZeroIso ι Y).hom =
+      (Λ.homologyZeroIso ι X).hom ≫ f := by
+  let KX : ChainComplex A ℕ :=
+    (ι.mapHomologicalComplex (ComplexShape.down ℕ)).obj (Λ.chainComplex X)
+  let KY : ChainComplex A ℕ :=
+    (ι.mapHomologicalComplex (ComplexShape.down ℕ)).obj (Λ.chainComplex Y)
+  let α : KX ⟶ KY :=
+    (ι.mapHomologicalComplex (ComplexShape.down ℕ)).map (Λ.chainComplexMap f)
+  change HomologicalComplex.homologyMap α 0 ≫ (Λ.homologyZeroIso ι Y).hom =
+    (Λ.homologyZeroIso ι X).hom ≫ f
+  apply (cancel_epi (KX.pOpcycles 0 ≫ KX.isoHomologyι₀.inv)).1
+  calc
+    (KX.pOpcycles 0 ≫ KX.isoHomologyι₀.inv) ≫
+        (HomologicalComplex.homologyMap α 0 ≫ (Λ.homologyZeroIso ι Y).hom) =
+      α.f 0 ≫ (KY.pOpcycles 0 ≫ KY.isoHomologyι₀.inv ≫
+        (Λ.homologyZeroIso ι Y).hom) := by
+        simp only [Category.assoc, ChainComplex.isoHomologyι₀_inv_naturality_assoc,
+          HomologicalComplex.p_opcyclesMap_assoc]
+    _ = α.f 0 ≫ (ι.map (Λ.chainComplexXZeroIso Y).hom ≫ Λ.π.app Y) := by
+      rw [homologyZeroIso_hom_eq]
+    _ = (ι.map (Λ.chainComplexXZeroIso X).hom ≫ Λ.π.app X) ≫ f := by
+      dsimp [α]
+      change ι.map ((Λ.chainComplexXZeroIso X).hom ≫ Λ.F.map f ≫
+        (Λ.chainComplexXZeroIso Y).inv) ≫
+          ι.map (Λ.chainComplexXZeroIso Y).hom ≫ Λ.π.app Y =
+        (ι.map (Λ.chainComplexXZeroIso X).hom ≫ Λ.π.app X) ≫ f
+      simp only [Functor.map_comp, Category.assoc, Iso.map_inv_hom_id_assoc,
+        Λ.π_naturality X Y f]
+    _ = (KX.pOpcycles 0 ≫ KX.isoHomologyι₀.inv) ≫
+        ((Λ.homologyZeroIso ι X).hom ≫ f) := by
+      dsimp [KX]
+      rw [← homologyZeroIso_hom_eq ι Λ X]
+      simp [Category.assoc]
+
+set_option backward.defeqAttrib.useBackward true in
+set_option backward.isDefEq.respectTransparency false in
+/-- Functorially, degree-zero homology of the mapped left resolution is the identity. -/
+noncomputable def homologyZeroNatIso :
+    Λ.chainComplexFunctor ⋙ ι.mapHomologicalComplex (ComplexShape.down ℕ) ⋙
+      HomologicalComplex.homologyFunctor A (ComplexShape.down ℕ) 0 ≅ 𝟭 A :=
+  NatIso.ofComponents (fun X => Λ.homologyZeroIso ι X) (by
+    intro X Y f
+    exact Λ.homologyZeroIso_naturality ι X f)
+
 end CategoryTheory.Abelian.LeftResolution
