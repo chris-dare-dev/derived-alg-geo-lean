@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Module.LocalizedModule.Submodule
 import DerivedAlgGeo.Algebra.Module.LocalizedModule.NestedSubmodule
+import DerivedAlgGeo.Algebra.Module.LocalizedModule.NestedSubmoduleLeft
 import DerivedAlgGeo.Algebra.Module.LocalizedModule.TwoChartSubmodule
 
 /-! # Localized modules -/
