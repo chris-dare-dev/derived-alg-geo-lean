@@ -33,6 +33,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.naturality_right
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.mk.inj
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.mk.sizeOf_spec
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.fullyFaithful
 #print axioms CategoryTheory.SerreFunctor.HasRightSerreFunctor
 #print axioms CategoryTheory.SerreFunctor.SerreCategoryData
 #print axioms CategoryTheory.SerreFunctor.SerreCategoryData.serre
@@ -40,6 +41,15 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor
 #print axioms CategoryTheory.SerreFunctor.SerreCategoryData.mk.inj
 #print axioms CategoryTheory.SerreFunctor.SerreCategoryData.mk.sizeOf_spec
 #print axioms CategoryTheory.SerreFunctor.SerreCategoryData.hasSerreEquivalence
+#print axioms CategoryTheory.SerreFunctor.CoSerreFunctorData
+#print axioms CategoryTheory.SerreFunctor.CoSerreFunctorData.S
+#print axioms CategoryTheory.SerreFunctor.CoSerreFunctorData.eta
+#print axioms CategoryTheory.SerreFunctor.CoSerreFunctorData.naturality_left
+#print axioms CategoryTheory.SerreFunctor.CoSerreFunctorData.naturality_right
+#print axioms CategoryTheory.SerreFunctor.CoSerreFunctorData.fullyFaithful
+#print axioms CategoryTheory.SerreFunctor.CoSerreFunctorData.adjunction
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.isEquivalence
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.toSerreCategoryData
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.pairing
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.pairing_apply
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.pairing_separating_left

@@ -19,6 +19,11 @@ namespace AlgebraicGeometry.Scheme.Modules
 
 variable {X Y : Scheme.{u}} (f : X ⟶ Y) (M : Y.Modules)
 
+/-! ## Affine tilde and pullback comparison -/
+
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackSpecMapTildeIso
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackSpecMapTildeMapHomologicalComplexIso
+
 #print axioms AlgebraicGeometry.Scheme.Modules.pullbackOverIso
 #print axioms AlgebraicGeometry.Scheme.Modules.pullbackTrivializationOver
 #print axioms AlgebraicGeometry.Scheme.Modules.isInvertible_pullback
@@ -50,6 +55,9 @@ variable {X Y : Scheme.{u}} (f : X ⟶ Y) (M : Y.Modules)
 #print axioms AlgebraicGeometry.Scheme.Modules.isCoherent_pullback
 #print axioms AlgebraicGeometry.Coh.pullback
 #print axioms AlgebraicGeometry.Coh.pullbackCompι
+#print axioms AlgebraicGeometry.Coh.pullbackComp
+#print axioms AlgebraicGeometry.Coh.pullbackId
+#print axioms AlgebraicGeometry.Coh.pullbackEquivalence
 #print axioms AlgebraicGeometry.Coh.pullback_preservesFiniteColimits
 #print axioms AlgebraicGeometry.Coh.pullback_preservesFiniteLimits
 #print axioms AlgebraicGeometry.Coh.pullback_additive

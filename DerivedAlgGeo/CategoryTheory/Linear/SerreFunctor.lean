@@ -1,4 +1,5 @@
 import DerivedAlgGeo.CategoryTheory.Linear.SerreFunctor.Basic
+import DerivedAlgGeo.CategoryTheory.Linear.SerreFunctor.Equivalence
 import DerivedAlgGeo.CategoryTheory.Linear.SerreFunctor.Uniqueness
 
 /-! # Serre functors on a `k`-linear category

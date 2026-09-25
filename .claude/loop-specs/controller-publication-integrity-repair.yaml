@@ -1,0 +1,161 @@
+schema: derived-alg-geo-lean.loop-run/v1
+id: controller-publication-integrity-repair
+repository: chris-dare-dev/derived-alg-geo-lean
+actor: chris-dare-dev
+remote: origin
+base_branch: main
+base_ref: origin/main
+mode: independent
+enabled: true
+allow_force_push: false
+state_dir: .loop-runs/controller-publication-integrity-recovery
+roadmap_gate: required
+
+recovery:
+  objective_id: controller-publication-integrity-repair
+  implementer: codex-loop-supervisor
+  max_episodes: 2
+  max_total_rounds: 9
+  max_plan_submissions: 2
+  max_elapsed_seconds: 604800
+  history:
+    - path: .loop-runs/controller-publication-integrity-recovery/history/terminal-round-3.json
+      sha256: 5cf2d4e8b442917f4e6a2e8cab9133f4fa2f0204b08fe3d76be44c2888983529
+
+openspec:
+  change: controller-publication-integrity-repair
+  validation: cli-required
+  required_artifacts:
+    - .openspec.yaml
+    - proposal.md
+    - design.md
+    - tasks.md
+    - agent-observations.md
+    - pr-body.md
+    - specs/controller-publication-integrity/spec.md
+
+limits:
+  min_issues: 1
+  max_issues: 1
+  max_review_rounds_per_chunk: 3
+
+review:
+  independent: true
+  reviewers:
+    - mathematics-adversary
+    - repository-boundary-adversary
+    - abstraction-adversary
+    - mathlib-reviewer
+    - bootstrap-security
+    - bootstrap-workflow
+    - bootstrap-test-design
+  advisors:
+    - altitude-scout
+    - hypothesis-elimination-scout
+
+runner:
+  required_checks:
+    - ci
+
+merge:
+  method: squash
+  delete_branch: false
+  allow_method_override: false
+  allow_delete_branch_override: false
+  allow_auto: false
+  allow_admin: false
+
+closure:
+  code_issue: pr_merge_keyword
+  allow_non_pr: false
+  allow_progress_pr: false
+
+mutations:
+  comment_issue: false
+  close_issue: false
+  push_branch: false
+  create_pr: false
+  ready_pr: false
+  create_issue: false
+  approve_pr: false
+  merge_pr: false
+
+issues:
+  - number: 1482
+    slug: controller-publication-integrity-repair
+    depends_on: []
+    chunks:
+      - id: controller-publication-integrity-repair
+        scope: >-
+          Repair the loop controller's ledger integrity, reviewer evidence,
+          deferred-finding records, path validation, live mutation authority,
+          exact-head PR creation, and reviewed draft-readiness behavior; align
+          repository guidance and preserve all exhausted predecessor histories.
+        requirements:
+          - Ledger authority is reconstructed from the validated selection
+          - Reviewer evidence has an exact terminal binding
+          - Deferred findings are structured and review-bound
+          - Frozen file scope is complete and path-safe
+          - Mutation authority is revalidated at the action boundary
+          - Pull-request creation uses the exact terminal reviewed head
+          - Draft readiness is a checked, reviewed-head-bound transition
+          - Bootstrap and repository guidance preserve the terminal boundary
+        files:
+          - AGENTS.md
+          - CLAUDE.md
+          - .claude/agents/abstraction-adversary.md
+          - .claude/agents/altitude-scout.md
+          - .claude/agents/bootstrap-security.md
+          - .claude/agents/bootstrap-test-design.md
+          - .claude/agents/bootstrap-workflow.md
+          - .claude/agents/hypothesis-elimination-scout.md
+          - .claude/agents/mathematics-adversary.md
+          - .claude/agents/mathlib-reviewer.md
+          - .claude/agents/repository-boundary-adversary.md
+          - .claude/loop-specs/README.md
+          - .claude/loop-specs/controller-publication-integrity-repair.yaml
+          - .claude/skills/run-loop/SKILL.md
+          - docs/architecture/generalization-backlog.md
+          - docs/architecture/loop-recovery.md
+          - scripts/loop_engine.py
+          - scripts/tests/test_loop_engine.py
+          - scripts/tests/test_loop_recovery.py
+          - openspec/changes/controller-publication-integrity-repair
+        acceptance:
+          - >-
+            One common ledger validator reconstructs every authority-bearing
+            field from the manifest and rejects inconsistent scope, digests,
+            reviewer rosters, round sequences, evidence, commits, and terminal
+            adjudications.
+          - >-
+            Each formal review has one full Reviewed commit marker immediately
+            followed by its only terminal Close verdict and no trailing text.
+          - >-
+            Deferred findings have unique durable IDs and append-only lifecycle
+            transitions bound to the reviewer, chunk, full commit, and
+            canonical in-scope target.
+          - >-
+            Local and provider path snapshots validate all rename endpoints,
+            every provider entry, and a matching changed-file count; only a
+            visible Markdown Why heading satisfies the proposal check.
+          - >-
+            Every non-dry-run mutation rechecks live action grants, identity,
+            repository and effective push destinations immediately before the
+            provider command; pushes name one branch and disable tag following.
+          - >-
+            PR creation requires exact equality between the terminal reviewed
+            SHA, local HEAD, and live issue branch, then verifies the created
+            PR's head, base, body, and complete file scope.
+          - >-
+            Draft readiness requires green head-bound checks and matching
+            initial, immediate pre-action, and post-action snapshots, and runs
+            only the ready transition.
+          - >-
+            Focused tests, strict OpenSpec validation, manifest validation,
+            permitted precheck, and seven independent exact-commit reviews pass
+            within three rounds; hosted and self-hosted CI are separately
+            verified before an owner-reviewed merge.
+          - >-
+            No Lean declaration, proof, import, or mathematical API changes;
+            issues #1458 through #1462 and #1482 close only on confirmed merge.
+        closure: complete

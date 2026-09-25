@@ -1,4 +1,28 @@
-# Loop manifests
+# Issue-first loops and optional manifests
+
+## Default: work from the issue list
+
+For a user-initiated Codex task, the issue number or numbers are the input. Read
+their live bodies and repository guidance, then start the scoped work. The issue
+acceptance criteria are the definition of done. A generated manifest,
+per-repository OpenSpec plan, standing authority file, or preflight is not
+required to begin. One optional OpenSpec record can track a multi-issue batch
+across repositories; do not duplicate it just because code lives in more than
+one repository.
+
+The user's request to complete named issues authorizes issue-scoped branches,
+commits, pull requests, and closure after merge. Continue independent issues if
+one hits a real external constraint. Run the checks that apply to the changed
+code and honor hosted CI, branch protection, and the trust review for protected
+paths. Do not pause over missing planning artifacts, issue labels, or contact
+information that the issue does not require.
+
+Use the controller below only when a bounded review ledger or a controlled
+unattended multi-agent run adds value. Its manifest, authority, frozen-chunk,
+and review-ledger rules apply when the controller is used; they are not
+prerequisites for the default issue-first path.
+
+## Optional controller manifests
 
 A manifest is the plan for one unattended run: which issues it takes, how each
 is cut into frozen chunks, which files each chunk may touch, what "done" means
@@ -57,6 +81,11 @@ issues:
 ```
 
 ## Provider authority
+
+This section governs unattended runs using the controller. A direct owner
+request in the active task to maintain an existing PR authorizes that named
+action without a new loop manifest or standing grant; it does not authorize
+other provider actions.
 
 Provider actions each need a grant: comments, pushes, PR creation, marking
 ready, follow-up issues, issue closure, approval, and merge. The controller
@@ -148,10 +177,10 @@ history and partial panels count toward the cumulative limit. Existing
 manifests retain their behavior unless explicitly opted in.
 
 An active supervising agent consumes
-`python3 scripts/loop_engine.py recovery next --ledger <ledger>`, dispatches
-research and independent plan review on exhaustion, and resumes only after
-acceptance. No background daemon or routine user approval is involved. The
-failed attempt remains preserved and provider permissions remain separate.
+`.loop-tools/bin/python scripts/loop_engine.py recovery next --ledger <ledger>`,
+dispatches research and independent plan review on exhaustion, and resumes only
+after acceptance. No background daemon or routine user approval is involved.
+The failed attempt remains preserved and provider permissions remain separate.
 
 ## Lift targets and the lift chunk
 
@@ -205,11 +234,14 @@ Derive them from `docs/architecture/abstraction-tree.md` when you plan the run,
 and leave the key absent rather than guessing: an ancestor named wrongly is
 standing authorization to edit a file nobody meant to open.
 
-Validate and preflight a manifest from its work branch:
+Set up the pinned controller dependencies once in each fresh worktree, then
+validate and preflight a manifest from its work branch:
 
 ```text
-python3 scripts/loop_engine.py validate --spec .claude/loop-specs/<slug>.yaml
-python3 scripts/loop_engine.py preflight --spec .claude/loop-specs/<slug>.yaml
+python3 -m venv .loop-tools
+.loop-tools/bin/python -m pip install -r scripts/requirements-loop.txt
+.loop-tools/bin/python scripts/loop_engine.py validate --spec .claude/loop-specs/<slug>.yaml
+.loop-tools/bin/python scripts/loop_engine.py preflight --spec .claude/loop-specs/<slug>.yaml
 ```
 
 Preflight accepts an uncommitted or branch-committed plan, and any head that
@@ -229,15 +261,18 @@ Code issues may only be closed after a confirmed merged pull request.
 ## Ledgers and moving bases
 
 - A ledger written by this controller records its plan paths and plan-digest
-  version 2. Version 2 ignores task checkbox state and `agent-observations.md`,
-  so ticking tasks or appending the observation log no longer invalidates a
-  review. Ledgers written before this change keep verifying under version 1.
+  version 3. Version 3 ignores the state of parsed CommonMark list-item
+  checkboxes in `tasks.md` and the top-level `agent-observations.md`, so task
+  progress no longer invalidates a review while examples and other contract
+  text remain bound. Existing v2 ledgers keep their original regex-based
+  normalization; v1 ledgers keep their original behavior as well.
 - A passing round covers a later head only when all three of these hold:
   - it carries the same change against the base branch tip GitHub reports
     (such as after a clean rebase onto a moved `main` or a merge of `main`);
-  - only the progress records differ, meaning checkbox state in `tasks.md` and
-    the change's top-level `agent-observations.md`; the manifest and every
-    other plan file are part of the reviewed change;
+  - only the progress records differ: for a v3 ledger, parsed list-item
+    checkbox state in `tasks.md` and the change's top-level
+    `agent-observations.md`; the manifest and every other plan file are part
+    of the reviewed change;
   - the base did not change a chunk file, a Lean module a chunk file imports
     directly, or `lake-manifest.json`, `lean-toolchain` or `lakefile.toml`.
 - Otherwise, one revalidation round with the full panel reopens the pass. A

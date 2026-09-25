@@ -165,12 +165,20 @@ request when you use it.
 For a local pre-flight that the hook allows, run:
 
 ```bash
+python3 -m venv .loop-tools
+source .loop-tools/bin/activate
+python -m pip install -r scripts/requirements-loop.txt
 scripts/precheck.sh
 ```
 
+Keep this environment activated for local precheck and loop-controller
+commands: the scripts invoke `python3`, which will then resolve to the same
+environment that received the parser dependency.
+
 It runs every gate in `scripts/gates.sh` that needs no Lean build — workflows,
-`--diff-only` style on your own lines, source-independence, layering, umbrella
-coverage, root reachability, coherent families, coverage map, pin, nolints,
+`--diff-only` style on your own lines, source-independence, layering, the
+neutral derived-category Stability import closure, umbrella coverage, root
+reachability, coherent families, coverage map, pin, nolints,
 roadmap, and the two hook tests — then a targeted `lake build` of the modules
 you changed. Seconds, not minutes. It is a cheap green, not a green: the
 library build, the audits, the ratchets, the linters and the emitter all need
@@ -208,6 +216,11 @@ keeps a passed review; a moved change needs one revalidation round. Opting into
 chunk, files a follow-up issue, and moves on. See
 [the recovery protocol](docs/architecture/loop-recovery.md).
 
+These grants govern unattended controller runs. An explicit owner request in
+the active task to maintain an existing PR authorizes the named action without
+a new manifest or standing grant; required CI and branch protection still
+govern merges.
+
 Provider actions need grants from `.claude/loop-authority.yaml` on the default
 branch, which the controller reads through the GitHub API rather than a local
 ref. A run's manifest can narrow those grants, never widen them. It also cannot
@@ -216,6 +229,15 @@ through owner-reviewed PRs. The manifests reviewed through planning
 PRs before this protocol keep their own grants for their open issues, and an explicit `false` in the
 standing file revokes an action for every run. Issue closure for code work
 requires a merged PR.
+
+For these planning-PR manifests, a matching digest in the local worktree is not
+enough to activate provider grants or legacy-only policy exceptions: the
+controller also checks that the exact digest is present in
+`LEGACY_REVIEWED_MANIFESTS` from the provider's current default-branch copy of
+`scripts/loop_engine.py`. Thus a planning branch can validate and preflight its
+proposal, but cannot use its own not-yet-merged allowlist entry to authorize
+pushes, PR creation, ready-for-review, merge, or relaxed scope/publication
+checks.
 Progress chunks use non-closing issue references; complete chunks require a
 closing keyword. Keep run ledgers in ignored `.loop-runs/`.
 

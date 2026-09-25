@@ -10,16 +10,22 @@ the repository's mathematical trust boundary.
 
 ### Requirement: Supported arbitrary derived pullbacks are constructed
 
-The implementation SHALL construct the supported arbitrary derived pullback
-objects required by SF8.5 (#554), including the stated K-flat/resolution,
-inhabitation, preservation, coherence, comparison, and non-flat nonidentity
-obligations, rather than merely adding an interface that names them.
+The implementation SHALL construct the arbitrary derived pullback objects
+required by SF8.5 (#554), including the stated K-flat/resolution, inhabitation,
+preservation, coherence, comparison, and non-flat nonidentity obligations,
+rather than merely adding an interface that names them.
 
-For this pilot, "supported" means the explicitly named input class and
-hypotheses already accepted by the SF8.5 issue contract and the repository's
-derived-category interfaces. The required hypotheses SHALL be explicit in the
-Lean statement or supplied by a proved instance; they SHALL NOT be inferred
-from an unproved marker typeclass introduced by the chunk.
+For SF8.5, the supported input is the full existing scheme-module interface:
+for every scheme `S`, every `T U : SchemeBaseChange S`, every morphism
+`f : T ⟶ U`, and every object of `U.DerivedFiber`, where
+`U.DerivedFiber = DerivedCategory (U.left.Modules)` is the unbounded derived
+category of all `O_U`-module-sheaf complexes. No boundedness, quasicoherence,
+Noetherian, flatness, or exactness restriction is imposed on this construction.
+The required hypotheses SHALL be explicit in the Lean statement or supplied
+by a proved instance; they SHALL NOT be inferred from an unproved marker
+typeclass introduced by the chunk. Resolution functoriality is in complexes
+for each fixed scheme; this requirement does not assert naturality of the
+resolution in the scheme variable.
 
 #### Scenario: Nontrivial supported pullback
 
@@ -79,6 +85,21 @@ from an unproved marker typeclass introduced by the chunk.
   that pullback preserves quasi-coherence on arbitrary scheme maps, or that a
   general K-flat resolution exists.
 
+#### Scenario: The affine comparison descends on the K-projective derived locus
+
+- **WHEN** a commutative-ring map `R → S` is applied to an object of
+  `KProjectiveDerivedCategory (ModuleCat R)`
+- **THEN** a natural isomorphism identifies actual degreewise scheme-module
+  pullback of its sheafified K-projective representatives, followed by
+  localization in `DerivedCategory ((Spec S).Modules)`, with the existing
+  affine K-projective derived pullback followed by the derived functor induced
+  by `AlgebraicGeometry.tilde.functor S`. This is the ambient category of all
+  scheme-module sheaves, not the separate affine quasi-coherent derived
+  category. The comparison is affine and restricted to the K-projective
+  derived locus; it SHALL NOT assert a left-derived-pullback universal
+  property on all scheme-module complexes, a general K-flat resolution, or a
+  theorem for arbitrary scheme morphisms.
+
 #### Scenario: Preservation obligation is tested
 
 - **WHEN** a supported object satisfies the declared pseudo-coherence, finite
@@ -92,12 +113,18 @@ from an unproved marker typeclass introduced by the chunk.
 - **THEN** the API does not silently manufacture the preservation conclusion or
   expose it as an unproved field
 
-#### Scenario: Unsupported input class
+#### Scenario: Preservation hypothesis is absent
 
-- **WHEN** an input falls outside the explicitly supported class or lacks a
-  proved required hypothesis
-- **THEN** the construction remains unavailable or returns only the weaker
-  data justified by the available hypotheses
+- **WHEN** an object lacks hypotheses required by a particular
+  pseudo-coherence, finite-Tor, or negative-Ext preservation theorem
+- **THEN** the arbitrary left-derived pullback remains available, but the
+  corresponding preservation conclusion is not manufactured
+
+#### Scenario: Ringed-topoi generalization
+
+- **WHEN** the result is considered for an arbitrary morphism of ringed topoi
+- **THEN** no ringed-topoi resolution or pullback theorem is claimed by this
+  scheme-module implementation
 
 ### Requirement: Algebraicity is proved for the supported moduli stack
 

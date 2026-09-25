@@ -9,7 +9,10 @@ handoff between issues explicit before the loop is enabled.
 
 ## What Changes
 
-- Plan the supported arbitrary derived-pullback construction in SF8.5 (#554).
+- Plan the arbitrary derived-pullback construction in SF8.5 (#554) on the full
+  existing interface domain: every scheme morphism and every unbounded complex
+  of modules on its source scheme, without a boundedness, quasicoherence,
+  Noetherian, flatness, or exactness restriction.
 - Plan the algebraicity proof for the supported relative-perfect moduli stack
   in SF9.2 (#522).
 - Plan semistable reduction and the quasi-properness adapter in SF9.3 (#525)
@@ -33,12 +36,17 @@ handoff between issues explicit before the loop is enabled.
   with the sheafification of its scalar extension and carries the example's
   nonzero `H⁻¹` to scheme-module sheaves. This is a degreewise representative
   calculation, not a `LeftDerivedPullback` or a K-flat-resolution result.
+- Add a fifth explicitly marked #554 progress chunk that promotes the affine
+  tilde/pullback comparison through derived localization on the full
+  K-projective derived locus. This applies to arbitrary affine ring maps but
+  does not construct a replacement on all scheme-module complexes or assert a
+  general scheme-morphism theorem.
 - Execute each outstanding #554 progress chunk through its own one-issue
   independent manifest, with a distinct branch name and a bounded adversarial
   review cap. The merged witness/effect chunks are historical and must not be
   replayed. Keep #522 and #525 out of those runs: they remain a later
   post-closure stack, not a false consequence of a progress PR. The affine
-  scheme-module pullback comparison remains a progress slice of SF8.5 and does
+  scheme-module pullback comparisons remain progress slices of SF8.5 and do
   not complete task 1.2 or close #554.
 
 ## Capabilities

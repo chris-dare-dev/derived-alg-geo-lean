@@ -12,6 +12,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Noetherian
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pullback
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.StructureSheaf
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.SubobjectLocality
 
 /-! # Coherent sheaves
 

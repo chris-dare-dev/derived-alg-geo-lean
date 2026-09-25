@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 5,
   "repository": "chris-dare-dev/derived-alg-geo-lean",
   "gates": [
     {
@@ -7,12 +7,13 @@
       "name": "build",
       "class": "required_ci",
       "required": true,
+      "run_binding": "primary",
       "prerequisites": [],
       "applies_to": [
         "pull_request",
         "push:main",
         "merge_group",
-        "workflow_dispatch"
+        "workflow_dispatch:CI"
       ],
       "platforms": [
         "github-actions"
@@ -25,12 +26,13 @@
       "name": "roadmap",
       "class": "required_ci",
       "required": true,
+      "run_binding": "primary",
       "prerequisites": [],
       "applies_to": [
         "pull_request",
         "push:main",
         "merge_group",
-        "workflow_dispatch"
+        "workflow_dispatch:CI"
       ],
       "platforms": [
         "github-actions"
@@ -43,6 +45,7 @@
       "name": "ci",
       "class": "merge_readiness",
       "required": true,
+      "run_binding": "primary",
       "prerequisites": [
         "build",
         "roadmap"
@@ -51,7 +54,7 @@
         "pull_request",
         "push:main",
         "merge_group",
-        "workflow_dispatch"
+        "workflow_dispatch:CI"
       ],
       "platforms": [
         "github-actions"
@@ -61,66 +64,87 @@
     },
     {
       "id": "cache-warm",
-      "name": "cache-warm",
+      "name": "warm",
       "class": "auxiliary",
       "required": false,
+      "run_binding": "independent",
       "prerequisites": [],
       "applies_to": [
         "push:main",
-        "workflow_dispatch"
+        "workflow_dispatch:Cache warm"
       ],
       "platforms": [
         "github-actions"
       ],
-      "producer": "github-actions/cache-warm",
-      "artifact": "check-run:cache-warm"
+      "producer": "github-actions/Cache warm",
+      "artifact": "check-run:warm"
     },
     {
-      "id": "docs-build",
-      "name": "docs-build",
+      "id": "docs-check",
+      "name": "check",
       "class": "auxiliary",
       "required": false,
+      "run_binding": "independent",
       "prerequisites": [],
       "applies_to": [
-        "workflow_dispatch"
+        "schedule",
+        "workflow_dispatch:Docs"
       ],
       "platforms": [
         "github-actions"
       ],
       "producer": "github-actions/Docs",
-      "artifact": "check-run:docs-build"
+      "artifact": "check-run:check"
+    },
+    {
+      "id": "docs-build",
+      "name": "build",
+      "class": "auxiliary",
+      "required": false,
+      "run_binding": "independent",
+      "prerequisites": ["docs-check"],
+      "applies_to": [
+        "schedule",
+        "workflow_dispatch:Docs"
+      ],
+      "platforms": [
+        "github-actions"
+      ],
+      "producer": "github-actions/Docs",
+      "artifact": "check-run:build"
+    },
+    {
+      "id": "docs-deploy",
+      "name": "deploy",
+      "class": "auxiliary",
+      "required": false,
+      "run_binding": "independent",
+      "prerequisites": ["docs-build"],
+      "applies_to": [
+        "schedule",
+        "workflow_dispatch:Docs"
+      ],
+      "platforms": [
+        "github-actions"
+      ],
+      "producer": "github-actions/Docs",
+      "artifact": "check-run:deploy"
     },
     {
       "id": "github-advanced-security",
       "name": "github-advanced-security",
       "class": "auxiliary",
       "required": false,
+      "run_binding": "check",
       "prerequisites": [],
       "applies_to": [
         "pull_request"
       ],
       "platforms": [
-        "github-actions"
+        "github-checks"
       ],
       "producer": "github-advanced-security",
       "artifact": "check-run:github-advanced-security"
-    },
-    {
-      "id": "post-merge-health",
-      "name": "post-merge-health",
-      "class": "post_merge_health",
-      "required": false,
-      "prerequisites": [
-        "ci"
-      ],
-      "applies_to": [
-        "push:main"
-      ],
-      "platforms": [
-        "github-actions"
-      ],
-      "producer": "github-actions/CI",
-      "artifact": "check-run:post-merge-health"
     }
   ]
 }

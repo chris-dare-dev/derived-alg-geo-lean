@@ -54,11 +54,13 @@ construction prerequisite for #522, and #525 remains downstream.
    general scheme-level `LeftDerivedPullback` or proof of full
    relative-perfect preservation.
 8. For each new concrete progress chunk, freeze its source leaf, relevant
-   public audit, generalization-backlog record, and any outcome log before
-   ledger initialization. The required OpenSpec task checklist is itself
-   digest-bound, so leave it unchanged during the code loop; sync its completed
-   checkbox in a separate post-merge planning update rather than invalidating
-   the review ledger.
+   public audit, generalization-backlog path, and any outcome log before ledger
+   initialization. Append only generalization findings that cannot be acted on
+   within that chunk; an existing API consumed directly is not an unverified
+   lift, and an empty disposition does not warrant a placeholder row. The
+   current loop-controller digest normalizes task-checkbox state, so the active
+   task may be checked in its implementation PR. Task wording and the other
+   required OpenSpec artifacts remain frozen after ledger initialization.
 9. State the first derived-effect endpoint as nonzero degree-minus-one homology
    of the supported affine bounded-projective representative. A Tor
    interpretation is not part of that result unless a proved comparison to an
@@ -78,10 +80,10 @@ construction prerequisite for #522, and #525 remains downstream.
     merges, start from a fresh clean checkout at the exact `origin/main`, run
     preflight and initialize the digest-bound ledger, then route every
     implementation-phase provider action through the controller.
-13. Do not change any required OpenSpec artifact after ledger initialization.
-    In particular, update task completion only in a post-merge plan-sync PR;
-    the code PR must not claim a task checkbox while that would invalidate its
-    digest-bound controller evidence.
+13. Do not change task wording or any other required OpenSpec artifact after
+    ledger initialization. The controller's v2 digest normalizes task-checkbox
+    state, so check the active task in the implementation PR when its work is
+    complete; this does not invalidate the ledger evidence.
 14. Treat the actual affine scheme-module pullback of the displayed resolution
     as a fourth #554 progress slice. Its comparison is the underived,
     degreewise `Scheme.Modules.pullback` on one finite free representative,
@@ -92,6 +94,39 @@ construction prerequisite for #522, and #525 remains downstream.
     `AlgebraicGeometry/Modules/Pullback` owner and its concrete derived effect
     beside the existing affine witness; do not infer an arbitrary-scheme
     derived comparison from it.
+15. Treat the affine K-projective-locus comparison as a separate progress
+    slice: for each commutative-ring map `R → S`, compare degreewise actual
+    `Scheme.Modules.pullback (Spec.map f)` on the sheafification of
+    K-projective representatives, after localization, with extension of
+    scalars followed by the derived functor induced by the exact
+    `AlgebraicGeometry.tilde.functor S : ModuleCat S ⥤ (Spec S).Modules`.
+    The target is the derived category of all scheme-module sheaves, not the
+    separate affine quasi-coherent derived category. The source is only
+    `KProjectiveDerivedCategory (ModuleCat R)`. This does not construct a
+    replacement on all scheme-module complexes, inhabit
+    `SchemeBaseChange.LeftDerivedPullback` for nonflat maps, prove
+    preservation for the full relative-perfect locus, or generalize from
+    affine spectra to arbitrary scheme morphisms. Keep the comparison beside
+    the affine K-projective application in `Dqc/AffineKProjectivePullback.lean`;
+    reuse the existing `Modules/Pullback/AffineSpec` comparison and do not add
+    another carrier or derived-pullback interface.
+16. Resolve the word “supported” in task 1.2 by choosing the full domain of
+    the existing geometric interfaces as this chunk's scope; #554 itself does
+    not define that word. The choice follows the existing interfaces: for
+    every scheme `S`, every
+    `T U : SchemeBaseChange S`, every `f : T ⟶ U`, and the unbounded derived
+    category `U.DerivedFiber` of all `O_U`-module-sheaf complexes. Construct a
+    functorial `SchemeKFlatResolution X` for each scheme `X` (functorial in
+    complexes, not asserted natural in `X`), prove its pullback acyclicity for
+    every such `f`, and use the existing constructor to inhabit
+    `LeftDerivedPullback f`. Impose no boundedness, quasicoherence,
+    Noetherian, flatness, or exactness restriction. This task does not prove
+    the preservation claims in task 1.3 or the coherence laws in task 1.4.
+    Keep the resolution beside the scheme K-flat tensor interface and the
+    pullback transport beside `Families/KFlatPullback.lean`; add no competing
+    resolution or derived-pullback carrier. The broader ringed-topoi analogue
+    is recorded as an unverified altitude lift, not claimed by this scheme
+    implementation.
 
 ## Risks / Trade-offs
 

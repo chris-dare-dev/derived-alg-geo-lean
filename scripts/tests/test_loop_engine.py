@@ -16,6 +16,7 @@ SCRIPT_DIR = Path(__file__).resolve().parents[1]
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
+import ci_github_evidence  # noqa: E402
 import loop_engine  # noqa: E402
 
 
@@ -189,8 +190,7 @@ class LoopEngineTests(unittest.TestCase):
         # planning PR, so its own grants and policies are the authority.
         # AuthorityTests and BranchManifestPolicyTests cover branch manifests.
         for name, value in (
-            ("is_legacy_manifest", True),
-            ("is_legacy_state", True),
+            ("owner_reviewed_legacy_manifest", True),
             ("standing_authority", {}),
             ("require_legacy_issue_open", None),
         ):
@@ -233,11 +233,20 @@ class LoopEngineTests(unittest.TestCase):
             self.assertIsInstance(result, subprocess.CompletedProcess)
             self.assertEqual(process.call_args.args[0], ["openspec.cmd", "--version"])
 
+    def test_executable_launch_error_is_controlled_even_without_check(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for error in (FileNotFoundError("not installed"), PermissionError("not executable")):
+                with self.subTest(error=type(error).__name__), mock.patch.object(
+                    loop_engine.subprocess, "run", side_effect=error
+                ), self.assertRaisesRegex(loop_engine.LoopError, "could not start command: openspec"):
+                    loop_engine.run_command(root, ["openspec", "validate"], check=False)
+
     def test_structural_openspec_validation_and_manifest(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             spec_path, spec = make_spec(root)
-            loaded = loop_engine.load_spec(spec_path, root)
+            loaded = loop_engine.load_spec(spec_path, root, verify_owner_review=False)
             self.assertEqual(loaded["openspec"]["change"], "pilot-change")
             self.assertEqual(loop_engine.digest(loaded), loop_engine.digest(spec))
 
@@ -249,11 +258,13 @@ class LoopEngineTests(unittest.TestCase):
             import yaml
 
             spec_path.write_text(yaml.safe_dump(spec, sort_keys=False), encoding="utf-8")
-            self.assertEqual(loop_engine.load_spec(spec_path, root)["eligibility"], spec["eligibility"])
+            self.assertEqual(
+                loop_engine.load_spec(spec_path, root, verify_owner_review=False)["eligibility"], spec["eligibility"]
+            )
             spec["eligibility"] = {"allow_epic_issues": [2]}
             spec_path.write_text(yaml.safe_dump(spec, sort_keys=False), encoding="utf-8")
             with self.assertRaises(loop_engine.LoopError):
-                loop_engine.load_spec(spec_path, root)
+                loop_engine.load_spec(spec_path, root, verify_owner_review=False)
 
     def test_roadmap_gate_is_scoped_to_manifest_base(self) -> None:
         self.assertEqual(
@@ -292,11 +303,11 @@ class LoopEngineTests(unittest.TestCase):
 
             spec_path.write_text(yaml.safe_dump(spec, sort_keys=False), encoding="utf-8")
             with self.assertRaises(loop_engine.LoopError):
-                loop_engine.load_spec(spec_path, root)
+                loop_engine.load_spec(spec_path, root, verify_owner_review=False)
 
             spec["closure"]["allow_progress_pr"] = True
             spec_path.write_text(yaml.safe_dump(spec, sort_keys=False), encoding="utf-8")
-            loaded = loop_engine.load_spec(spec_path, root)
+            loaded = loop_engine.load_spec(spec_path, root, verify_owner_review=False)
             self.assertEqual(loaded["issues"][0]["chunks"][0]["closure"], "progress")
 
     def test_progress_pr_link_cannot_close_an_issue(self) -> None:
@@ -328,14 +339,14 @@ class LoopEngineTests(unittest.TestCase):
             spec["predecessor_prs"] = [binding, dict(binding)]
             spec_path.write_text(json.dumps(spec), encoding="utf-8")
             with self.assertRaises(loop_engine.LoopError) as caught:
-                loop_engine.load_spec(spec_path, root)
+                loop_engine.load_spec(spec_path, root, verify_owner_review=False)
             self.assertIn("must not repeat", str(caught.exception))
 
             spec["predecessor_prs"] = [binding]
             spec["predecessor_prs"][0]["reviewed_head"] = "a" * 7
             spec_path.write_text(json.dumps(spec), encoding="utf-8")
             with self.assertRaises(loop_engine.LoopError) as caught:
-                loop_engine.load_spec(spec_path, root)
+                loop_engine.load_spec(spec_path, root, verify_owner_review=False)
             self.assertIn("reviewed_head", str(caught.exception))
 
             spec["predecessor_prs"][0] = predecessor_binding()
@@ -343,7 +354,7 @@ class LoopEngineTests(unittest.TestCase):
             spec["mutations"]["comment_issue"] = False
             spec_path.write_text(json.dumps(spec), encoding="utf-8")
             with self.assertRaises(loop_engine.LoopError) as caught:
-                loop_engine.load_spec(spec_path, root)
+                loop_engine.load_spec(spec_path, root, verify_owner_review=False)
             self.assertIn("comment_issue", str(caught.exception))
 
     def test_attested_squash_predecessor_requires_exact_metadata_and_both_ancestors(self) -> None:
@@ -633,7 +644,7 @@ class LoopEngineTests(unittest.TestCase):
             import yaml
 
             spec_path.write_text(yaml.safe_dump(spec, sort_keys=False), encoding="utf-8")
-            loaded = loop_engine.load_spec(spec_path, root)
+            loaded = loop_engine.load_spec(spec_path, root, verify_owner_review=False)
             dependency_path = loop_engine.state_path(root, loaded, None, "test-chunk")
             loop_engine.write_json(
                 dependency_path,
@@ -678,7 +689,7 @@ class LoopEngineTests(unittest.TestCase):
             import yaml
 
             spec_path.write_text(yaml.safe_dump(spec, sort_keys=False), encoding="utf-8")
-            loaded = loop_engine.load_spec(spec_path, root)
+            loaded = loop_engine.load_spec(spec_path, root, verify_owner_review=False)
             dependency_path = loop_engine.state_path(root, loaded, None, "test-chunk")
             loop_engine.write_json(
                 dependency_path,
@@ -985,7 +996,7 @@ class LoopEngineTests(unittest.TestCase):
             spec["review"]["reviewers"] = [r for r in REVIEWERS if r != "mathlib-reviewer"]
             spec_path.write_text(json.dumps(spec), encoding="utf-8")
             with self.assertRaises(loop_engine.LoopError) as caught:
-                loop_engine.load_spec(spec_path, root)
+                loop_engine.load_spec(spec_path, root, verify_owner_review=False)
             self.assertIn("mathlib-reviewer", str(caught.exception))
 
 
@@ -1045,7 +1056,7 @@ class LoopEngineTests(unittest.TestCase):
             chunk["lift_targets"] = list(chunk["files"])[:1]
             spec_path.write_text(json.dumps(spec), encoding="utf-8")
             with self.assertRaises(loop_engine.LoopError) as caught:
-                loop_engine.load_spec(spec_path, root)
+                loop_engine.load_spec(spec_path, root, verify_owner_review=False)
             self.assertIn("lift_targets", str(caught.exception))
 
     def test_renaming_a_ledger_does_not_start_a_fresh_review(self) -> None:
@@ -1071,13 +1082,13 @@ class LoopEngineTests(unittest.TestCase):
             spec_path, _ = make_spec(root)
             (root / "openspec" / "changes" / "pilot-change" / "design.md").unlink()
             with self.assertRaises(loop_engine.LoopError):
-                loop_engine.load_spec(spec_path, root)
+                loop_engine.load_spec(spec_path, root, verify_owner_review=False)
 
     def test_merge_command_is_bound_to_reviewed_head_and_safe_by_default(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             spec_path, spec = make_spec(root)
-            loaded = loop_engine.load_spec(spec_path, root)
+            loaded = loop_engine.load_spec(spec_path, root, verify_owner_review=False)
             command = loop_engine.build_merge_command(
                 loaded, 42, "a" * 40, None, False, False, None
             )
@@ -1234,7 +1245,7 @@ def numbered_lines(count: int, changed: dict[int, str] | None = None) -> str:
 
 
 class OpenSpecDigestTests(unittest.TestCase):
-    def test_v2_ignores_checkbox_state_and_observation_logs_but_not_the_contract(self) -> None:
+    def test_v3_ignores_checkbox_state_and_observation_logs_but_not_the_contract(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             _, spec = make_spec(root)
@@ -1242,15 +1253,15 @@ class OpenSpecDigestTests(unittest.TestCase):
             (change / "agent-observations.md").write_text("# Observations\n", encoding="utf-8")
             spec["openspec"]["required_artifacts"].append("agent-observations.md")
             v1 = loop_engine.openspec_digest(root, spec, 1)
-            v2 = loop_engine.openspec_digest(root, spec)
+            v3 = loop_engine.openspec_digest(root, spec)
             legacy = {"openspec_digest": v1}
-            current = {"openspec_digest": v2, "openspec_digest_version": 2}
+            current = {"openspec_digest": v3, "openspec_digest_version": 3}
 
             tasks = change / "tasks.md"
             tasks.write_text(tasks.read_text(encoding="utf-8").replace("- [ ] 1.1", "- [x] 1.1"), encoding="utf-8")
             with (change / "agent-observations.md").open("a", encoding="utf-8") as log:
                 log.write("- OBS-001 the base moved during review\n")
-            self.assertEqual(loop_engine.openspec_digest(root, spec), v2)
+            self.assertEqual(loop_engine.openspec_digest(root, spec), v3)
             self.assertTrue(loop_engine.ledger_openspec_matches(root, spec, current))
             # A ledger written before v2 keeps its byte-for-byte meaning.
             self.assertNotEqual(loop_engine.openspec_digest(root, spec, 1), v1)
@@ -1260,7 +1271,39 @@ class OpenSpecDigestTests(unittest.TestCase):
                 tasks.read_text(encoding="utf-8").replace("Verify the test", "Verify a different test"),
                 encoding="utf-8",
             )
-            self.assertNotEqual(loop_engine.openspec_digest(root, spec), v2)
+            self.assertNotEqual(loop_engine.openspec_digest(root, spec), v3)
+
+    def test_v2_ledger_keeps_its_original_regex_and_newline_semantics(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            _, spec = make_spec(root)
+            tasks = root / "openspec" / "changes" / "pilot-change" / "tasks.md"
+            tasks.write_bytes(
+                b"# Tasks\r\n\r\n- [ ] 1.1 Real task\r\n\r\n```md\r\n- [ ] 9.1 Example\r\n```\r\n"
+            )
+            old_v2 = {
+                "openspec_digest": loop_engine.openspec_digest(root, spec, 2),
+                "openspec_digest_version": 2,
+            }
+
+            # Historical v2 normalized CRLF via read_text() and also normalized
+            # checkbox-shaped lines inside fenced examples.
+            tasks.write_text(
+                "# Tasks\n\n- [ ] 1.1 Real task\n\n```md\n- [x] 9.1 Example\n```\n",
+                encoding="utf-8",
+            )
+            self.assertTrue(loop_engine.ledger_openspec_matches(root, spec, old_v2))
+
+    def test_unknown_digest_versions_fail_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            _, spec = make_spec(root)
+            for version in (0, 4, -1, True, "3", 2.0):
+                with self.subTest(version=version):
+                    with self.assertRaisesRegex(loop_engine.LoopError, "unsupported OpenSpec digest version"):
+                        loop_engine.openspec_digest(root, spec, version)
+                    with self.assertRaisesRegex(loop_engine.LoopError, "unsupported OpenSpec digest version"):
+                        loop_engine.ledger_digest_version({"openspec_digest_version": version})
 
     def test_a_single_issue_manifest_may_omit_openspec(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -1297,6 +1340,128 @@ class OpenSpecDigestTests(unittest.TestCase):
             spec["openspec"] = {"change": "pilot-change", "required_artifacts": ["proposal.md"]}
             with self.assertRaises(loop_engine.LoopError):
                 loop_engine.validate_spec(spec)
+
+
+class CommonMarkBoundaryTests(unittest.TestCase):
+    def test_proposal_why_must_be_a_visible_root_level_atx_heading(self) -> None:
+        for proposal in (
+            "## Why\n",
+            "## **Why**\n",
+            "## *Why*\n",
+            "## `Why`\n",
+            "## Wh&#121;\n",
+            "## [Why](https://example.test)\n",
+            "# Proposal\n\n## Why ###\n",
+            "`<widget>` is inline code\n## Why\n",
+            "<widget>text</widget>\n## Why\n",
+        ):
+            with self.subTest(proposal=proposal):
+                self.assertTrue(loop_engine.has_visible_why_heading(proposal))
+
+        for proposal in (
+            "## WhyNot\n",
+            "## Why with extra text\n",
+            "Why\n---\n",
+            "```md\n## Why\n```\n",
+            "> ## Why\n",
+            "- ## Why\n",
+            "## Why *not*\n",
+            "## ![Why](https://example.test/image.png)\n",
+            "## ![icon](https://example.test/image.png)Why\n",
+            "## <span hidden>Why</span>\n",
+            "## <b>Why</b>\n",
+        ):
+            with self.subTest(proposal=proposal):
+                self.assertFalse(loop_engine.has_visible_why_heading(proposal))
+
+    def test_task_checkbox_normalization_follows_commonmark_blocks(self) -> None:
+        tasks = (
+            "- [x] 1.1 Parent\n"
+            "  - [X] 1.2 Nested\n"
+            "* [x] Unnumbered star item\n"
+            "+ [X] Unnumbered plus item\n"
+        )
+        self.assertEqual(
+            loop_engine.normalize_task_checkboxes(tasks),
+            "- [ ] 1.1 Parent\n"
+            "  - [ ] 1.2 Nested\n"
+            "* [ ] Unnumbered star item\n"
+            "+ [ ] Unnumbered plus item\n",
+        )
+
+        code_and_non_tasks = (
+            "```md\n- [x] Fenced example\n```\n"
+            "-     [x] Indented code block\n"
+            "- Parent paragraph\n\n  [x] Later paragraph\n"
+            "> - [x] Blockquote item\n"
+            "-[x] Malformed list marker\n"
+            "- [ ]literal text\n"
+            "- [x]literal text\n"
+        )
+        self.assertEqual(loop_engine.normalize_task_checkboxes(code_and_non_tasks), code_and_non_tasks)
+
+        links_and_inline_html = "- [x](https://example.test)\n- [ ](https://example.test)\n- [x] Render <tag>\n"
+        self.assertEqual(
+            loop_engine.normalize_task_checkboxes(links_and_inline_html),
+            "- [x](https://example.test)\n- [ ](https://example.test)\n- [ ] Render <tag>\n",
+        )
+        reference_link = "- [x] linked label\n\n[x]: https://example.test\n"
+        self.assertEqual(loop_engine.normalize_task_checkboxes(reference_link), reference_link)
+        soft_break = "- [x]\n  continued text\n"
+        self.assertEqual(
+            loop_engine.normalize_task_checkboxes(soft_break),
+            "- [ ]\n  continued text\n",
+        )
+
+    def test_v3_digest_ignores_only_actual_list_checkbox_state(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            _, spec = make_spec(root)
+            tasks = root / "openspec" / "changes" / "pilot-change" / "tasks.md"
+            tasks.write_text(
+                "# Tasks\n\n- [ ] 1.1 Real task\n\n```md\n- [ ] 9.1 Example\n```\n",
+                encoding="utf-8",
+            )
+            initial = loop_engine.openspec_digest(root, spec)
+            tasks.write_text(
+                tasks.read_text(encoding="utf-8").replace("- [ ] 1.1", "- [x] 1.1"),
+                encoding="utf-8",
+            )
+            self.assertEqual(loop_engine.openspec_digest(root, spec), initial)
+
+            tasks.write_text(
+                tasks.read_text(encoding="utf-8").replace("- [ ] 9.1", "- [x] 9.1"),
+                encoding="utf-8",
+            )
+            self.assertNotEqual(loop_engine.openspec_digest(root, spec), initial)
+
+            tasks.write_text("- [x](https://example.test)\n", encoding="utf-8")
+            checked_link = loop_engine.openspec_digest(root, spec)
+            tasks.write_text("- [ ](https://example.test)\n", encoding="utf-8")
+            self.assertNotEqual(loop_engine.openspec_digest(root, spec), checked_link)
+
+            tasks.write_text("# Tasks\n\n- [x]\n  continued description\n", encoding="utf-8")
+            checked_soft_break = loop_engine.openspec_digest(root, spec)
+            tasks.write_text("# Tasks\n\n- [ ]\n  continued description\n", encoding="utf-8")
+            self.assertEqual(loop_engine.openspec_digest(root, spec), checked_soft_break)
+
+            tasks.write_text("- [x] linked label\n\n[x]: https://example.test\n", encoding="utf-8")
+            reference_link = loop_engine.openspec_digest(root, spec)
+            tasks.write_text("- [ ] linked label\n\n[x]: https://example.test\n", encoding="utf-8")
+            self.assertNotEqual(loop_engine.openspec_digest(root, spec), reference_link)
+
+    def test_structural_proposal_validation_does_not_match_examples(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            _, spec = make_spec(root)
+            proposal = root / "openspec" / "changes" / "pilot-change" / "proposal.md"
+            proposal.write_text("The phrase ## Why appears in prose.\n", encoding="utf-8")
+            with self.assertRaisesRegex(loop_engine.LoopError, "proposal must contain"):
+                loop_engine.validate_openspec_artifacts(root, spec)
+
+            proposal.write_text("```md\n## Why\n```\n", encoding="utf-8")
+            with self.assertRaisesRegex(loop_engine.LoopError, "proposal must contain"):
+                loop_engine.validate_openspec_artifacts(root, spec)
 
 
 MANIFEST = ".claude/loop-specs/test-run.yaml"
@@ -1382,9 +1547,13 @@ class AuthorityTests(unittest.TestCase):
 
     def test_a_legacy_manifest_keeps_its_grants_and_obeys_the_kill_switch(self) -> None:
         self.spec["mutations"] = {"comment_issue": True, "merge_pr": True}
+        reviewed_digest = loop_engine.digest(self.spec)
         with mock.patch.object(
-            loop_engine, "LEGACY_REVIEWED_MANIFESTS", frozenset({loop_engine.digest(self.spec)})
+            loop_engine, "LEGACY_REVIEWED_MANIFESTS", frozenset()
         ):
+            self.default_branch["scripts/loop_engine.py"] = (
+                f"LEGACY_REVIEWED_MANIFESTS = frozenset({{{reviewed_digest!r}}})\n"
+            )
             effective = loop_engine.effective_mutations(self.root, self.spec)
             self.assertTrue(effective["comment_issue"] and effective["merge_pr"])
             self.assertFalse(effective["push_branch"])
@@ -1392,6 +1561,95 @@ class AuthorityTests(unittest.TestCase):
             effective = loop_engine.effective_mutations(self.root, self.spec)
             self.assertTrue(effective["comment_issue"] and effective["push_branch"])
             self.assertFalse(effective["merge_pr"])
+
+    def test_a_branch_local_legacy_digest_cannot_authorize_before_default_branch_merge(self) -> None:
+        self.spec["mutations"] = {"push_branch": True, "merge_pr": True}
+        with mock.patch.object(
+            loop_engine, "LEGACY_REVIEWED_MANIFESTS", frozenset({loop_engine.digest(self.spec)})
+        ):
+            # A digest newly added on the current planning branch is not in the
+            # controller fetched from the provider's default branch yet.
+            self.default_branch["scripts/loop_engine.py"] = (
+                "LEGACY_REVIEWED_MANIFESTS = frozenset(" + repr({"a" * 64}) + ")\n"
+            )
+            effective = loop_engine.effective_mutations(self.root, self.spec)
+            self.assertFalse(any(effective.values()))
+            self.default_branch["scripts/loop_engine.py"] = (
+                f"LEGACY_REVIEWED_MANIFESTS = frozenset({{{loop_engine.digest(self.spec)!r}}})\n"
+            )
+            effective = loop_engine.effective_mutations(self.root, self.spec)
+            self.assertTrue(effective["push_branch"] and effective["merge_pr"])
+
+    def test_branch_local_digest_does_not_skip_protected_path_validation(self) -> None:
+        self.spec["issues"][0]["chunks"][0]["files"] = ["scripts/loop_engine.py"]
+        with mock.patch.object(
+            loop_engine, "LEGACY_REVIEWED_MANIFESTS", frozenset({loop_engine.digest(self.spec)})
+        ):
+            self.default_branch["scripts/loop_engine.py"] = (
+                "LEGACY_REVIEWED_MANIFESTS = frozenset(" + repr({"b" * 64}) + ")\n"
+            )
+            owner_reviewed = loop_engine.owner_reviewed_legacy_manifest(self.root, self.spec)
+            self.assertFalse(owner_reviewed)
+            with self.assertRaisesRegex(loop_engine.LoopError, "protected"):
+                loop_engine.validate_spec(self.spec, owner_reviewed_legacy=owner_reviewed)
+
+    def test_branch_local_digest_does_not_skip_ledger_publication_guards(self) -> None:
+        spec_digest = loop_engine.digest(self.spec)
+        state = {"spec_id": self.spec["id"], "spec_digest": spec_digest, "plan_paths": []}
+        self.default_branch["scripts/loop_engine.py"] = (
+            "LEGACY_REVIEWED_MANIFESTS = frozenset(" + repr({"b" * 64}) + ")\n"
+        )
+        with mock.patch.object(loop_engine, "LEGACY_REVIEWED_MANIFESTS", frozenset({spec_digest})):
+            self.assertFalse(loop_engine.owner_reviewed_legacy_state(self.root, self.spec, state))
+            with self.assertRaisesRegex(loop_engine.LoopError, "protected"):
+                loop_engine.require_unprotected(self.root, self.spec, ["scripts/loop_engine.py"], state)
+            clean_diff = subprocess.CompletedProcess([], 0, stdout="", stderr="")
+            with mock.patch.object(loop_engine, "ensure_commit") as ensure_commit, mock.patch.object(
+                loop_engine, "trusted_base_commit", return_value="main"
+            ), mock.patch.object(loop_engine, "run_command", return_value=clean_diff) as run_command:
+                loop_engine.require_published_head_has_no_links(self.root, self.spec, state, "a" * 40)
+                ensure_commit.assert_called_once()
+                run_command.assert_called_once()
+
+    def test_branch_local_digest_does_not_authorize_force_push(self) -> None:
+        self.spec["mutations"] = {"push_branch": True}
+        self.spec["allow_force_push"] = True
+        with mock.patch.object(
+            loop_engine, "LEGACY_REVIEWED_MANIFESTS", frozenset({loop_engine.digest(self.spec)})
+        ):
+            self.default_branch["scripts/loop_engine.py"] = (
+                "LEGACY_REVIEWED_MANIFESTS = frozenset(" + repr({"b" * 64}) + ")\n"
+            )
+            self.grant({"push_branch": True})
+            with self.assertRaisesRegex(loop_engine.LoopError, "force-with-lease is not available"):
+                loop_engine.action_push(self.root, self.spec, None, True, True)
+
+    def test_branch_local_digest_does_not_authorize_administrator_merge(self) -> None:
+        self.spec["mutations"] = {"merge_pr": True}
+        with mock.patch.object(
+            loop_engine, "LEGACY_REVIEWED_MANIFESTS", frozenset({loop_engine.digest(self.spec)})
+        ):
+            self.default_branch["scripts/loop_engine.py"] = (
+                "LEGACY_REVIEWED_MANIFESTS = frozenset(" + repr({"b" * 64}) + ")\n"
+            )
+            self.grant({"merge_pr": True})
+            with self.assertRaisesRegex(loop_engine.LoopError, "administrator merge is never available"):
+                loop_engine.action_merge(
+                    self.root, self.spec, 1, self.root / "ledger.json", None, False, True, None, True
+                )
+
+    def test_branch_local_digest_does_not_enable_non_pr_issue_closure(self) -> None:
+        self.spec["mutations"] = {"close_issue": True}
+        self.spec["closure"]["allow_non_pr"] = True
+        with mock.patch.object(
+            loop_engine, "LEGACY_REVIEWED_MANIFESTS", frozenset({loop_engine.digest(self.spec)})
+        ):
+            self.default_branch["scripts/loop_engine.py"] = (
+                "LEGACY_REVIEWED_MANIFESTS = frozenset(" + repr({"b" * 64}) + ")\n"
+            )
+            self.grant({"close_issue": True})
+            with self.assertRaisesRegex(loop_engine.LoopError, "verified merged PR"):
+                loop_engine.action_close(self.root, self.spec, 1, None, None, True)
 
     def test_a_malformed_standing_file_fails_closed(self) -> None:
         self.default_branch[loop_engine.STANDING_AUTHORITY_PATH] = "mutations:\n  merge_pr: yes please\n"
@@ -1423,13 +1681,13 @@ class AuthorityTests(unittest.TestCase):
         with mock.patch.object(loop_engine, "issue_state", return_value={"state": "CLOSED"}) as state:
             loop_engine.require_legacy_issue_open(self.root, self.spec, 1)
             state.assert_not_called()
-            with mock.patch.object(
-                loop_engine, "LEGACY_REVIEWED_MANIFESTS", frozenset({loop_engine.digest(self.spec)})
-            ):
-                with self.assertRaisesRegex(loop_engine.LoopError, "CLOSED"):
-                    loop_engine.require_legacy_issue_open(self.root, self.spec, 1)
-                state.return_value = {"state": "OPEN"}
+            self.default_branch["scripts/loop_engine.py"] = (
+                f"LEGACY_REVIEWED_MANIFESTS = frozenset({{{loop_engine.digest(self.spec)!r}}})\n"
+            )
+            with self.assertRaisesRegex(loop_engine.LoopError, "CLOSED"):
                 loop_engine.require_legacy_issue_open(self.root, self.spec, 1)
+            state.return_value = {"state": "OPEN"}
+            loop_engine.require_legacy_issue_open(self.root, self.spec, 1)
 
     def test_an_unreadable_repository_is_not_an_absent_standing_file(self) -> None:
         not_found = subprocess.CompletedProcess([], 1, stdout="", stderr="gh: Not Found (HTTP 404)")
@@ -1449,6 +1707,9 @@ class BranchManifestPolicyTests(unittest.TestCase):
         self.addCleanup(self.directory.cleanup)
         self.root = Path(self.directory.name)
         _, self.spec = branch_spec(self.root, ["a.txt"])
+        patcher = mock.patch.object(loop_engine, "owner_reviewed_legacy_manifest", return_value=False)
+        patcher.start()
+        self.addCleanup(patcher.stop)
         patcher = mock.patch.object(
             loop_engine, "effective_mutations", return_value={key: True for key in loop_engine.MUTATION_KEYS}
         )
@@ -1518,10 +1779,10 @@ class BranchManifestPolicyTests(unittest.TestCase):
         head = commit_all(self.root, "an innocent-looking doc")
         state = {"spec_digest": loop_engine.digest(self.spec), "plan_paths": [MANIFEST]}
         with self.assertRaisesRegex(loop_engine.LoopError, "docs/notes.md"):
-            loop_engine.require_no_links(self.root, base, head, state)
+            loop_engine.require_no_links(self.root, self.spec, base, head, state)
         (self.root / "docs" / "notes.md").unlink()
         (self.root / "docs" / "notes.md").write_text("ordinary\n", encoding="utf-8")
-        loop_engine.require_no_links(self.root, base, commit_all(self.root, "a real doc"), state)
+        loop_engine.require_no_links(self.root, self.spec, base, commit_all(self.root, "a real doc"), state)
         lifted = json.loads(json.dumps(self.spec))
         lifted["issues"][0]["chunks"][0]["lift_targets"] = [".claude/skills"]
         with self.assertRaisesRegex(loop_engine.LoopError, "protected"):
@@ -1533,10 +1794,14 @@ class BranchManifestPolicyTests(unittest.TestCase):
             "plan_paths": [MANIFEST],
             "chunk": {"files": ["a.txt"]},
         }
-        loop_engine.verify_remote_chunk_files({"files": [{"path": "a.txt"}, {"path": MANIFEST}]}, state)
+        loop_engine.verify_remote_chunk_files(
+            self.root, self.spec, {"files": [{"path": "a.txt"}, {"path": MANIFEST}]}, state
+        )
         for path in (loop_engine.STANDING_AUTHORITY_PATH, "scripts/loop_recovery.py"):
             with self.assertRaisesRegex(loop_engine.LoopError, "protected"):
-                loop_engine.verify_remote_chunk_files({"files": [{"path": "a.txt"}, {"path": path}]}, state)
+                loop_engine.verify_remote_chunk_files(
+                    self.root, self.spec, {"files": [{"path": "a.txt"}, {"path": path}]}, state
+                )
 
     def test_admin_merge_force_push_and_non_pr_close_are_owner_policy(self) -> None:
         self.spec["merge"] = {**self.spec["merge"], "allow_admin": True}
@@ -1583,6 +1848,135 @@ class BranchManifestPolicyTests(unittest.TestCase):
         ):
             self.assertEqual(loop_engine.check_required_checks(self.root, self.spec, 12), "c" * 40)
 
+    def test_required_checks_fail_closed_when_live_protection_is_unavailable(self) -> None:
+        rollup = {
+            "headRefOid": "c" * 40,
+            "statusCheckRollup": [{"name": "ci", "conclusion": "SUCCESS"}],
+        }
+        with mock.patch.object(loop_engine, "gh_json", return_value=rollup), mock.patch.object(
+            loop_engine, "protected_check_names", side_effect=loop_engine.LoopError("protection unavailable")
+        ), self.assertRaisesRegex(loop_engine.LoopError, "protection unavailable"):
+            loop_engine.check_required_checks(self.root, self.spec, 12)
+
+    def test_required_checks_reject_a_malformed_protection_response(self) -> None:
+        rollup = {
+            "headRefOid": "c" * 40,
+            "statusCheckRollup": [{"name": "ci", "conclusion": "SUCCESS"}],
+        }
+        for protection in ({}, {"contexts": ["ci"], "checks": [{"context": None}]}, {"contexts": ["ci", None]}):
+            with self.subTest(protection=protection), mock.patch.object(
+                loop_engine, "gh_json", side_effect=[rollup, protection]
+            ), self.assertRaisesRegex(loop_engine.LoopError, "branch protection returned an unexpected response"):
+                loop_engine.check_required_checks(self.root, self.spec, 12)
+
+    def test_required_checks_reject_an_unbound_head(self) -> None:
+        rollup = {"statusCheckRollup": [{"name": "ci", "conclusion": "SUCCESS"}]}
+        with mock.patch.object(loop_engine, "gh_json", return_value=rollup), self.assertRaisesRegex(
+            loop_engine.LoopError, "missing a valid head commit"
+        ):
+            loop_engine.check_required_checks(self.root, self.spec, 12)
+
+    def test_live_required_failure_cannot_be_hidden_by_manifest(self) -> None:
+        rollup = {
+            "headRefOid": "c" * 40,
+            "statusCheckRollup": [
+                {"name": "ci", "conclusion": "SUCCESS"},
+                {"name": "trust-surface", "conclusion": "FAILURE"},
+            ],
+        }
+        with mock.patch.object(loop_engine, "gh_json", return_value=rollup), mock.patch.object(
+            loop_engine, "protected_check_names", return_value={"ci", "trust-surface"}
+        ), self.assertRaisesRegex(loop_engine.LoopError, "trust-surface=FAILURE"):
+            loop_engine.check_required_checks(self.root, self.spec, 12)
+
+    def test_newer_pending_check_is_not_hidden_by_older_late_completion(self) -> None:
+        rollup = {
+            "headRefOid": "c" * 40,
+            "statusCheckRollup": [
+                {
+                    "name": "ci", "conclusion": "SUCCESS",
+                    "startedAt": "2026-09-22T09:50:00Z", "completedAt": "2026-09-22T10:01:00Z",
+                },
+                {"name": "ci", "status": "IN_PROGRESS", "startedAt": "2026-09-22T10:00:00Z"},
+            ],
+        }
+        with mock.patch.object(loop_engine, "gh_json", return_value=rollup), mock.patch.object(
+            loop_engine, "protected_check_names", return_value={"ci"}
+        ), self.assertRaisesRegex(loop_engine.LoopError, "ci=IN_PROGRESS"):
+            loop_engine.check_required_checks(self.root, self.spec, 12)
+
+        rollup["statusCheckRollup"][1] = {
+            "name": "ci", "conclusion": "SUCCESS", "startedAt": "2026-09-22T10:00:00Z",
+        }
+        with mock.patch.object(loop_engine, "gh_json", return_value=rollup), mock.patch.object(
+            loop_engine, "protected_check_names", return_value={"ci"}
+        ):
+            self.assertEqual(loop_engine.check_required_checks(self.root, self.spec, 12), "c" * 40)
+
+        del rollup["statusCheckRollup"][1]["startedAt"]
+        with mock.patch.object(loop_engine, "gh_json", return_value=rollup), self.assertRaisesRegex(
+            loop_engine.LoopError, "cannot order duplicate check runs for ci"
+        ):
+            loop_engine.check_required_checks(self.root, self.spec, 12)
+
+    def test_approval_rejects_checks_for_a_different_head(self) -> None:
+        state = passing_ledger_state(self.root, self.spec)
+        pr = {
+            "state": "OPEN", "isDraft": False, "baseRefName": "main",
+            "headRefName": "agent/test-issue", "headRefOid": "a" * 40,
+            "body": "Closes #1\n", "files": [{"path": "a.txt"}],
+        }
+        with mock.patch.object(loop_engine, "authorize_action"), mock.patch.object(
+            loop_engine, "recovery_publication_state"
+        ), mock.patch.object(loop_engine, "require_predecessor_prs", return_value=[]), mock.patch.object(
+            loop_engine, "load_state", return_value=state
+        ), mock.patch.object(loop_engine, "ledger_openspec_matches", return_value=True), mock.patch.object(
+            loop_engine, "gh_json", return_value=pr
+        ), mock.patch.object(loop_engine, "require_pr_targets_base"), mock.patch.object(
+            loop_engine, "require_pr_matches_frozen_issue"
+        ), mock.patch.object(loop_engine, "require_predecessor_merges_ancestor"), mock.patch.object(
+            loop_engine, "reviewed_content_matches", return_value=True
+        ), mock.patch.object(loop_engine, "verify_remote_chunk_files"), mock.patch.object(
+            loop_engine, "require_published_head_has_no_links"
+        ), mock.patch.object(loop_engine, "check_required_checks", return_value="b" * 40), mock.patch.object(
+            loop_engine, "run_command"
+        ) as command, self.assertRaisesRegex(loop_engine.LoopError, "PR head moved between review verification"):
+            loop_engine.action_approve(self.root, self.spec, 12, self.root / "ledger.json", "body", False)
+        command.assert_not_called()
+
+    def test_approval_posts_a_commit_bound_review(self) -> None:
+        state = passing_ledger_state(self.root, self.spec)
+        head = "a" * 40
+        pr = {
+            "state": "OPEN", "isDraft": False, "baseRefName": "main",
+            "headRefName": "agent/test-issue", "headRefOid": head,
+            "body": "Closes #1\n", "files": [{"path": "a.txt"}],
+        }
+        response = {"commit_id": head, "state": "APPROVED"}
+        with mock.patch.object(loop_engine, "authorize_action"), mock.patch.object(
+            loop_engine, "recovery_publication_state"
+        ), mock.patch.object(loop_engine, "require_predecessor_prs", return_value=[]), mock.patch.object(
+            loop_engine, "load_state", return_value=state
+        ), mock.patch.object(loop_engine, "ledger_openspec_matches", return_value=True), mock.patch.object(
+            loop_engine, "gh_json", side_effect=[pr, response]
+        ) as provider, mock.patch.object(loop_engine, "require_pr_targets_base"), mock.patch.object(
+            loop_engine, "require_pr_matches_frozen_issue"
+        ), mock.patch.object(loop_engine, "require_predecessor_merges_ancestor"), mock.patch.object(
+            loop_engine, "reviewed_content_matches", return_value=True
+        ), mock.patch.object(loop_engine, "verify_remote_chunk_files"), mock.patch.object(
+            loop_engine, "require_published_head_has_no_links"
+        ), mock.patch.object(loop_engine, "check_required_checks", return_value=head):
+            self.assertEqual(
+                loop_engine.action_approve(self.root, self.spec, 12, self.root / "ledger.json", "body", False), 0
+            )
+        self.assertEqual(
+            provider.call_args_list[1].args[1],
+            [
+                "api", "--method", "POST", "repos/example/repository/pulls/12/reviews",
+                "-f", f"commit_id={head}", "-f", "body=body", "-f", "event=APPROVE",
+            ],
+        )
+
 
 class ContentBindingTests(unittest.TestCase):
     """A review binds the change it read, not the base the change sits on."""
@@ -1600,9 +1994,13 @@ class ContentBindingTests(unittest.TestCase):
         git_in(self.root, "checkout", "-q", "-b", "agent/test-issue")
         (self.root / "a.txt").write_text(numbered_lines(20, {2: "reviewed change"}), encoding="utf-8")
         self.reviewed = commit_all(self.root, "reviewed change")
+        patcher = mock.patch.object(loop_engine, "owner_reviewed_legacy_manifest", return_value=False)
+        patcher.start()
+        self.addCleanup(patcher.stop)
         self.state = {
             "plan_paths": [MANIFEST, "openspec/changes/pilot-change"],
             "openspec_change": "pilot-change",
+            "openspec_digest_version": 3,
             "chunk": {"files": ["a.txt"]},
         }
         # The provider's view of the base branch tip is local `main` here.
@@ -1673,6 +2071,24 @@ class ContentBindingTests(unittest.TestCase):
         ):
             with self.subTest(name):
                 self.assertFalse(self.matches(self.probe(name, edit)))
+
+    def test_v2_reviewed_head_uses_historical_task_normalization(self) -> None:
+        tasks = self.root / "openspec" / "changes" / "pilot-change" / "tasks.md"
+        tasks.write_text(
+            "# Tasks\n\n- [ ] 1.1 Real task\n\n```md\n- [ ] 9.1 Example\n```\n",
+            encoding="utf-8",
+        )
+        self.reviewed = commit_all(self.root, "reviewed v2 tasks")
+        state = {**self.state, "openspec_digest_version": 2}
+
+        def tick_example() -> None:
+            tasks.write_text(tasks.read_text(encoding="utf-8").replace("- [ ] 9.1", "- [x] 9.1"), encoding="utf-8")
+
+        head = self.probe("v2-example-progress", tick_example)
+        self.assertTrue(loop_engine.reviewed_content_matches(self.root, self.spec, state, self.reviewed, head))
+
+        state["openspec_digest_version"] = 3
+        self.assertFalse(loop_engine.reviewed_content_matches(self.root, self.spec, state, self.reviewed, head))
 
     def test_a_base_change_to_a_reviewed_file_requires_revalidation(self) -> None:
         self.move_base(touch_reviewed_file=True)
@@ -1819,6 +2235,9 @@ class PlanInPullRequestPreflightTests(unittest.TestCase):
         self.spec_path, self.spec = branch_spec(self.root, ["a.txt"])
         self.spec["roadmap_gate"] = "required"
         write_manifest(self.root, self.spec)
+        patcher = mock.patch.object(loop_engine, "owner_reviewed_legacy_manifest", return_value=False)
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
     def preflight(
         self, prs: list[dict] | None = None, protected: set[str] | None = None, labels: list[dict] | None = None
@@ -1839,6 +2258,33 @@ class PlanInPullRequestPreflightTests(unittest.TestCase):
     def test_an_uncommitted_plan_on_the_work_branch_passes(self) -> None:
         code, output = self.preflight()
         self.assertEqual(code, 0, output)
+
+    def test_missing_openspec_cli_respects_required_and_advisory_modes(self) -> None:
+        for mode, expected_code in (("cli-required", 1), ("cli-advisory", 0)):
+            with self.subTest(mode=mode):
+                self.spec["openspec"]["validation"] = mode
+                write_manifest(self.root, self.spec)
+                with mock.patch.object(loop_engine.shutil, "which", return_value=None):
+                    code, output = self.preflight()
+                self.assertEqual(code, expected_code, output)
+                self.assertIn("OpenSpec CLI is not installed; structural validation passed", output)
+
+    def test_required_openspec_cli_launch_race_fails_preflight(self) -> None:
+        self.spec["openspec"]["validation"] = "cli-required"
+        write_manifest(self.root, self.spec)
+        original = loop_engine.run_command
+
+        def launch_or_run(root: Path, args: list[str], *, check: bool = False) -> subprocess.CompletedProcess[str]:
+            if args[0] == "openspec":
+                raise loop_engine.LoopError("could not start command: openspec: not installed")
+            return original(root, args, check=check)
+
+        with mock.patch.object(loop_engine.shutil, "which", return_value="/usr/bin/openspec"), mock.patch.object(
+            loop_engine, "run_command", side_effect=launch_or_run
+        ):
+            code, output = self.preflight()
+        self.assertEqual(code, 1, output)
+        self.assertIn("OpenSpec CLI validation could not start", output)
 
     def test_unplanned_uncommitted_work_fails(self) -> None:
         (self.root / "stray.lean").write_text("-- unfinished\n", encoding="utf-8")
@@ -1893,6 +2339,73 @@ class PlanInPullRequestPreflightTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("ineligible labels: epic", output)
         self.assertIn("runs it as required", output)
+
+
+class ReadOnlyEvidenceCommandTests(unittest.TestCase):
+    def test_reports_collector_verdict_without_queue_admission(self) -> None:
+        result = {
+            "evidence": {
+                "repository": "owner/repo",
+                "base_commit": "a" * 40,
+                "head_commit": "b" * 40,
+                "candidate_commit": "c" * 40,
+                "run_id": 123,
+                "run_attempt": 1,
+            },
+            "validation": {"valid": True, "claims": {"required_ci_verified": True}},
+        }
+        output = io.StringIO()
+        with mock.patch.object(ci_github_evidence, "GitHubClient"), mock.patch.object(
+            ci_github_evidence, "collect", return_value=result
+        ) as collect, mock.patch.object(
+            loop_engine,
+            "check_required_checks",
+            side_effect=AssertionError("queue path reached"),
+        ), contextlib.redirect_stdout(output):
+            code = loop_engine.main(["evidence", "--repo", "owner/repo", "--pr", "7"])
+        self.assertEqual(code, 0)
+        self.assertEqual(json.loads(output.getvalue())["candidate"], "c" * 40)
+        collect.assert_called_once()
+
+    def test_denied_collector_response_is_nonzero(self) -> None:
+        output = io.StringIO()
+        with mock.patch.object(ci_github_evidence, "GitHubClient"), mock.patch.object(
+            ci_github_evidence,
+            "collect",
+            side_effect=ci_github_evidence.EvidenceError("candidate unavailable"),
+        ), contextlib.redirect_stdout(output):
+            code = loop_engine.main(["evidence", "--repo", "owner/repo", "--pr", "7"])
+        self.assertEqual(code, 1)
+        self.assertFalse(
+            json.loads(output.getvalue())["claims"]["required_ci_verified"]
+        )
+
+    def test_denied_validation_reports_exact_revision(self) -> None:
+        result = {
+            "evidence": {
+                "repository": "owner/repo",
+                "base_commit": "a" * 40,
+                "head_commit": "b" * 40,
+                "candidate_commit": "c" * 40,
+                "run_id": 123,
+                "run_attempt": 2,
+            },
+            "validation": {
+                "valid": True,
+                "claims": {"required_ci_verified": False},
+                "warnings": ["required check is red"],
+            },
+        }
+        output = io.StringIO()
+        with mock.patch.object(ci_github_evidence, "GitHubClient"), mock.patch.object(
+            ci_github_evidence, "collect", return_value=result
+        ), contextlib.redirect_stdout(output):
+            code = loop_engine.main(["evidence", "--repo", "owner/repo", "--pr", "7"])
+        reported = json.loads(output.getvalue())
+        self.assertEqual(code, 1)
+        self.assertEqual(reported["run_attempt"], 2)
+        self.assertEqual(reported["candidate"], "c" * 40)
+        self.assertFalse(reported["validation"]["claims"]["required_ci_verified"])
 
 
 if __name__ == "__main__":

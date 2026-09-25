@@ -66,15 +66,23 @@ transcripts, so the supervisor must inventory them rather than assume a new
 session is a fresh objective. Explicit legacy manifests retain their recorded
 caps and behavior until deliberately adopted under this policy.
 
-Validate and run the read-only preflight before initializing the ledger. Then:
+In each fresh worktree, install the pinned controller dependencies first:
+
+```bash
+python3 -m venv .loop-tools
+.loop-tools/bin/python -m pip install -r scripts/requirements-loop.txt
+```
+
+Validate and run the read-only preflight before initializing the ledger. Use
+`.loop-tools/bin/python` for each recovery command:
 
 ```text
-python3 scripts/loop_engine.py recovery next --ledger <ledger>
-python3 scripts/loop_engine.py recovery start-round --ledger <ledger> --commit <full-sha>
-python3 scripts/loop_engine.py recovery submit-plan --ledger <ledger> --file <plan.json>
-python3 scripts/loop_engine.py recovery review-plan --ledger <ledger> --file <review.json>
-python3 scripts/loop_engine.py recovery resume --ledger <ledger>
-python3 scripts/loop_engine.py recovery exhaust --ledger <ledger> --reason "<obstacle>"
+.loop-tools/bin/python scripts/loop_engine.py recovery next --ledger <ledger>
+.loop-tools/bin/python scripts/loop_engine.py recovery start-round --ledger <ledger> --commit <full-sha>
+.loop-tools/bin/python scripts/loop_engine.py recovery submit-plan --ledger <ledger> --file <plan.json>
+.loop-tools/bin/python scripts/loop_engine.py recovery review-plan --ledger <ledger> --file <review.json>
+.loop-tools/bin/python scripts/loop_engine.py recovery resume --ledger <ledger>
+.loop-tools/bin/python scripts/loop_engine.py recovery exhaust --ledger <ledger> --reason "<obstacle>"
 ```
 
 Execute the next applicable command, not this list unconditionally.

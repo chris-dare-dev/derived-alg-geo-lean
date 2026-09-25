@@ -7,6 +7,11 @@ one through typeclass inference makes that choice global and reintroduces the
 instance ambiguity removed by issue #602.  This source gate protects the
 boundary independently of whether today's examples happen to trigger an
 ambiguity during elaboration.
+
+Known limitation: the source masker below is not a Lean parser. In particular,
+interpolation containing nested raw strings can confuse it, so this gate is
+not a complete syntactic proof of the boundary. The umbrella gate uses Lean's
+header parser independently and does not reuse this masker.
 """
 
 from __future__ import annotations
