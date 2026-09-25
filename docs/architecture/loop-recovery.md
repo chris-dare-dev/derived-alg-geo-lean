@@ -1,5 +1,11 @@
 # Bounded automatic recovery
 
+> **Retired from the run path.** Loop runs follow
+> `.claude/skills/run-loop/SKILL.md`, which parks an issue after three review
+> rounds instead of recovering it. This document describes recovery for the
+> objectives the manifest controller (`scripts/loop_engine.py`) already
+> recorded.
+
 An exhausted three-round attempt is preserved as failed. For an explicitly
 opted-in objective, the supervising agent next investigates the obstacle and
 obtains independent review of a concrete recovery plan. An accepted plan permits
