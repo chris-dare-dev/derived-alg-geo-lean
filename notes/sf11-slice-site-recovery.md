@@ -1,7 +1,7 @@
 # SF11 slice-site open-square recovery (2026-09-24)
 
 Issue #1063 remains open. This bounded chunk is **underived**: it constructs the
-slice-site pushforward comparison and proves four transport identities in
+slice-site pushforward comparison and proves its transport identities in
 `Modules/Pullback/SliceSiteBaseChange.lean`. It does not prove the slice-site
 unit square, relative base-change invertibility, derived Hom localization, a
 heart statement, or Theorem 5.7(2).
