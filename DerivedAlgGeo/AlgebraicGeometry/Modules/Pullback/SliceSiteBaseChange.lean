@@ -150,6 +150,217 @@ theorem pushforwardOverIso_map_normal_form (f : X ⟶ Y) (M : X.Modules)
   rw [pushforwardOverFunctor_map_transport]
   rfl
 
+-- The two geometric isomorphisms and the inner equivalence cancel before the
+-- slice-site unit is compared.  Keeping this typed avoids unfolding the sheaf
+-- categories in the final diagram chase.
+private theorem cancel_two_isos {C : Type*} [Category C] {A B D E : C}
+    (i : A ≅ B) (j : B ≅ D) (h : D ⟶ E) :
+    j.inv ≫ i.inv ≫ i.hom ≫ j.hom ≫ h = h := by
+  simp only [Iso.inv_hom_id_assoc]
+
+set_option backward.isDefEq.respectTransparency false in
+private theorem adjunction_unit_iso_transport {C D : Type*}
+    [Category C] [Category D] (L : C ⥤ D) (R : D ⥤ C)
+    (a : L ⊣ R) {A B : C} (i : A ≅ B) {T : D} (h : L.obj A ⟶ T) :
+    i.hom ≫ a.unit.app B ≫ R.map (L.map i.inv ≫ h) =
+      a.unit.app A ≫ R.map h := by
+  have hn : i.hom ≫ a.unit.app B =
+      a.unit.app A ≫ R.map (L.map i.hom) := by
+    exact a.unit.naturality i.hom
+  have hi : L.map i.hom ≫ L.map i.inv = 𝟙 (L.obj A) :=
+    (Functor.map_comp L i.hom i.inv).symm.trans
+      ((congrArg L.map i.hom_inv_id).trans (L.map_id A))
+  have hc : L.map i.hom ≫ (L.map i.inv ≫ h) = h :=
+    (Category.assoc _ _ _).symm.trans
+      ((congrArg (fun t => t ≫ h) hi).trans (Category.id_comp h))
+  calc
+    _ = (i.hom ≫ a.unit.app B) ≫ R.map (L.map i.inv ≫ h) := by
+      exact (Category.assoc _ _ _).symm
+    _ = (a.unit.app A ≫ R.map (L.map i.hom)) ≫ R.map (L.map i.inv ≫ h) := by
+      exact congrArg (fun t => t ≫ R.map (L.map i.inv ≫ h)) hn
+    _ = a.unit.app A ≫ R.map (L.map i.hom ≫ (L.map i.inv ≫ h)) := by
+      exact (Category.assoc _ _ _).trans
+        (congrArg (fun t => a.unit.app A ≫ t) (Functor.map_comp R _ _).symm)
+    _ = a.unit.app A ≫ R.map h := by
+      exact congrArg (fun t => a.unit.app A ≫ R.map t) hc
+
+set_option backward.isDefEq.respectTransparency false in
+private theorem pullbackOverIso_cancellation (f : X ⟶ Y) (N : Y.Modules)
+    (U : Y.Opens) :
+    (AlgebraicGeometry.pullbackRestrictNatIso f U).inv.app N ≫
+      (overFunctorEquiv (f ⁻¹ᵁ U)).inv.app ((pullback f).obj N) ≫
+      (overEquiv (f ⁻¹ᵁ U)).functor.map (pullbackOverIso f N U).hom =
+    (pullback (f ∣_ U)).map ((overFunctorEquiv U).inv.app N) ≫
+      (overEquiv (f ⁻¹ᵁ U)).counitIso.inv.app
+        ((pullback (f ∣_ U)).obj ((overEquiv U).functor.obj (N.over U))) := by
+  rw [overEquiv_map_pullbackOverIso_hom]
+  exact cancel_two_isos
+    ((overFunctorEquiv (f ⁻¹ᵁ U)).app ((pullback f).obj N))
+    ((AlgebraicGeometry.pullbackRestrictNatIso f U).app N)
+    ((pullback (f ∣_ U)).map ((overFunctorEquiv U).inv.app N) ≫
+      (overEquiv (f ⁻¹ᵁ U)).counitIso.inv.app
+        ((pullback (f ∣_ U)).obj ((overEquiv U).functor.obj (N.over U))))
+
+set_option backward.isDefEq.respectTransparency false in
+/-- The actual global pullback unit and the composite slice-site unit agree
+after restriction and the independent open-square comparisons. -/
+theorem pullbackOverIso_unit_app (f : X ⟶ Y) (N : Y.Modules) (U : Y.Opens) :
+    (SheafOfModules.overFunctor Y.ringCatSheaf U).map
+        ((pullbackPushforwardAdjunction f).unit.app N) ≫
+      (pushforwardOverIso f ((pullback f).obj N) U).hom ≫
+      (pushforwardOverFunctor f U).map (pullbackOverIso f N U).hom =
+    (pullbackOverAdjunction f U).unit.app (N.over U) := by
+  have htransport :
+      (overFunctorEquiv U).hom.app N ≫
+        (pullbackPushforwardAdjunction (f ∣_ U)).unit.app
+          ((restrictFunctor U.ι).obj N) ≫
+        (pushforward (f ∣_ U)).map
+          ((AlgebraicGeometry.pullbackRestrictNatIso f U).inv.app N ≫
+            (overFunctorEquiv (f ⁻¹ᵁ U)).inv.app ((pullback f).obj N) ≫
+            (overEquiv (f ⁻¹ᵁ U)).functor.map (pullbackOverIso f N U).hom) =
+      (pullbackPushforwardAdjunction (f ∣_ U)).unit.app
+        ((overEquiv U).functor.obj (N.over U)) ≫
+        (pushforward (f ∣_ U)).map
+          ((overEquiv (f ⁻¹ᵁ U)).counitIso.inv.app
+            ((pullback (f ∣_ U)).obj ((overEquiv U).functor.obj (N.over U)))) := by
+    calc
+      _ = (overFunctorEquiv U).hom.app N ≫
+            (pullbackPushforwardAdjunction (f ∣_ U)).unit.app
+              ((restrictFunctor U.ι).obj N) ≫
+            (pushforward (f ∣_ U)).map
+              ((pullback (f ∣_ U)).map ((overFunctorEquiv U).inv.app N) ≫
+                (overEquiv (f ⁻¹ᵁ U)).counitIso.inv.app
+                  ((pullback (f ∣_ U)).obj ((overEquiv U).functor.obj (N.over U)))) := by
+          exact congrArg (fun t =>
+            (overFunctorEquiv U).hom.app N ≫
+              (pullbackPushforwardAdjunction (f ∣_ U)).unit.app
+                ((restrictFunctor U.ι).obj N) ≫
+              (pushforward (f ∣_ U)).map t)
+            (pullbackOverIso_cancellation f N U)
+      _ = _ := adjunction_unit_iso_transport
+        (pullback (f ∣_ U)) (pushforward (f ∣_ U))
+        (pullbackPushforwardAdjunction (f ∣_ U))
+        ((overFunctorEquiv U).app N)
+        ((overEquiv (f ⁻¹ᵁ U)).counitIso.inv.app
+          ((pullback (f ∣_ U)).obj ((overEquiv U).functor.obj (N.over U))))
+  have hnat :
+      (overEquiv U).functor.map
+          ((SheafOfModules.overFunctor Y.ringCatSheaf U).map
+            ((pullbackPushforwardAdjunction f).unit.app N)) ≫
+        (overFunctorEquiv U).hom.app ((pushforward f).obj ((pullback f).obj N)) =
+      (overFunctorEquiv U).hom.app N ≫
+        (restrictFunctor U.ι).map ((pullbackPushforwardAdjunction f).unit.app N) := by
+    exact (overFunctorEquiv U).hom.naturality
+      ((pullbackPushforwardAdjunction f).unit.app N)
+  let q := (overFunctorEquiv (f ⁻¹ᵁ U)).inv.app ((pullback f).obj N) ≫
+    (overEquiv (f ⁻¹ᵁ U)).functor.map (pullbackOverIso f N U).hom
+  have htail :
+      (restrictFunctor U.ι).map ((pullbackPushforwardAdjunction f).unit.app N) ≫
+        ((AlgebraicGeometry.pushforwardRestrictNatIso f U).hom.app
+            ((pullback f).obj N) ≫ (pushforward (f ∣_ U)).map q) =
+      (pullbackPushforwardAdjunction (f ∣_ U)).unit.app
+          ((restrictFunctor U.ι).obj N) ≫
+        (pushforward (f ∣_ U)).map
+          ((AlgebraicGeometry.pullbackRestrictNatIso f U).inv.app N ≫ q) := by
+    calc
+      _ = ((restrictFunctor U.ι).map
+            ((pullbackPushforwardAdjunction f).unit.app N) ≫
+          (AlgebraicGeometry.pushforwardRestrictNatIso f U).hom.app
+            ((pullback f).obj N)) ≫ (pushforward (f ∣_ U)).map q :=
+          (Category.assoc _ _ _).symm
+      _ = ((pullbackPushforwardAdjunction (f ∣_ U)).unit.app
+            ((restrictFunctor U.ι).obj N) ≫
+          (pushforward (f ∣_ U)).map
+            ((AlgebraicGeometry.pullbackRestrictNatIso f U).inv.app N)) ≫
+          (pushforward (f ∣_ U)).map q :=
+          congrArg (fun t => t ≫ (pushforward (f ∣_ U)).map q)
+            (AlgebraicGeometry.pullbackRestrictNatIso_unit_app f U N)
+      _ = (pullbackPushforwardAdjunction (f ∣_ U)).unit.app
+            ((restrictFunctor U.ι).obj N) ≫
+          (pushforward (f ∣_ U)).map
+            ((AlgebraicGeometry.pullbackRestrictNatIso f U).inv.app N ≫ q) :=
+          (Category.assoc _ _ _).trans
+            (congrArg (fun t =>
+              (pullbackPushforwardAdjunction (f ∣_ U)).unit.app
+                ((restrictFunctor U.ι).obj N) ≫ t)
+              ((pushforward (f ∣_ U)).map_comp
+                ((AlgebraicGeometry.pullbackRestrictNatIso f U).inv.app N) q).symm)
+  apply (overEquiv U).functor.map_injective
+  rw [← cancel_mono ((overEquiv U).counitIso.hom.app
+    ((pushforward (f ∣_ U)).obj
+      ((overEquiv (f ⁻¹ᵁ U)).functor.obj
+        ((pullbackOverFunctor f U).obj (N.over U)))))]
+  simp only [Functor.map_comp]
+  calc
+    _ = (overEquiv U).functor.map
+          ((SheafOfModules.overFunctor Y.ringCatSheaf U).map
+            ((pullbackPushforwardAdjunction f).unit.app N)) ≫
+        ((overEquiv U).functor.map
+            (pushforwardOverIso f ((pullback f).obj N) U).hom ≫
+          (overEquiv U).functor.map
+            ((pushforwardOverFunctor f U).map (pullbackOverIso f N U).hom) ≫
+          (overEquiv U).counitIso.hom.app
+            ((pushforward (f ∣_ U)).obj
+              ((overEquiv (f ⁻¹ᵁ U)).functor.obj
+                ((pullbackOverFunctor f U).obj (N.over U))))) := by
+          simp only [Category.assoc]
+    _ = (overEquiv U).functor.map
+          ((SheafOfModules.overFunctor Y.ringCatSheaf U).map
+            ((pullbackPushforwardAdjunction f).unit.app N)) ≫
+        ((overFunctorEquiv U).hom.app ((pushforward f).obj ((pullback f).obj N)) ≫
+          (AlgebraicGeometry.pushforwardRestrictNatIso f U).hom.app
+            ((pullback f).obj N) ≫
+          (pushforward (f ∣_ U)).map
+            ((overFunctorEquiv (f ⁻¹ᵁ U)).inv.app ((pullback f).obj N) ≫
+              (overEquiv (f ⁻¹ᵁ U)).functor.map (pullbackOverIso f N U).hom)) := by
+          exact congrArg (fun t =>
+            (overEquiv U).functor.map
+              ((SheafOfModules.overFunctor Y.ringCatSheaf U).map
+                ((pullbackPushforwardAdjunction f).unit.app N)) ≫ t)
+            (pushforwardOverIso_map_normal_form f ((pullback f).obj N) U
+              (pullbackOverIso f N U).hom)
+    _ = (overFunctorEquiv U).hom.app N ≫
+        ((restrictFunctor U.ι).map
+            ((pullbackPushforwardAdjunction f).unit.app N) ≫
+          (AlgebraicGeometry.pushforwardRestrictNatIso f U).hom.app
+            ((pullback f).obj N) ≫
+          (pushforward (f ∣_ U)).map
+            ((overFunctorEquiv (f ⁻¹ᵁ U)).inv.app ((pullback f).obj N) ≫
+              (overEquiv (f ⁻¹ᵁ U)).functor.map (pullbackOverIso f N U).hom)) := by
+          let k := (AlgebraicGeometry.pushforwardRestrictNatIso f U).hom.app
+              ((pullback f).obj N) ≫ (pushforward (f ∣_ U)).map q
+          change (overEquiv U).functor.map
+              ((SheafOfModules.overFunctor Y.ringCatSheaf U).map
+                ((pullbackPushforwardAdjunction f).unit.app N)) ≫
+                ((overFunctorEquiv U).hom.app
+                  ((pushforward f).obj ((pullback f).obj N)) ≫ k) =
+              (overFunctorEquiv U).hom.app N ≫
+                ((restrictFunctor U.ι).map
+                  ((pullbackPushforwardAdjunction f).unit.app N) ≫ k)
+          exact (Category.assoc _ _ _).symm.trans
+            ((congrArg (fun t => t ≫ k) hnat).trans (Category.assoc _ _ _))
+    _ = (overFunctorEquiv U).hom.app N ≫
+        ((pullbackPushforwardAdjunction (f ∣_ U)).unit.app
+            ((restrictFunctor U.ι).obj N) ≫
+          (pushforward (f ∣_ U)).map
+            ((AlgebraicGeometry.pullbackRestrictNatIso f U).inv.app N ≫
+              (overFunctorEquiv (f ⁻¹ᵁ U)).inv.app ((pullback f).obj N) ≫
+              (overEquiv (f ⁻¹ᵁ U)).functor.map (pullbackOverIso f N U).hom)) := by
+          exact congrArg (fun t => (overFunctorEquiv U).hom.app N ≫ t) htail
+    _ = (pullbackPushforwardAdjunction (f ∣_ U)).unit.app
+          ((overEquiv U).functor.obj (N.over U)) ≫
+        (pushforward (f ∣_ U)).map
+          ((overEquiv (f ⁻¹ᵁ U)).counitIso.inv.app
+            ((pullback (f ∣_ U)).obj ((overEquiv U).functor.obj (N.over U)))) :=
+          htransport
+    _ = (overEquiv U).functor.map
+          ((pullbackOverAdjunction f U).unit.app (N.over U)) ≫
+        (overEquiv U).counitIso.hom.app
+          ((pushforward (f ∣_ U)).obj
+            ((overEquiv (f ⁻¹ᵁ U)).functor.obj
+              ((pullbackOverFunctor f U).obj (N.over U)))) := by
+          exact (overEquiv_map_pullbackOverAdjunction_unit f U (N.over U)).symm
+
 end
 
 end AlgebraicGeometry.Scheme.Modules

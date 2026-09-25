@@ -1,10 +1,11 @@
 # SF11 slice-site open-square recovery (2026-09-24)
 
-Issue #1063 remains open. This bounded chunk is **underived**: it constructs the
-slice-site pushforward comparison and proves its transport identities in
-`Modules/Pullback/SliceSiteBaseChange.lean`. It does not prove the slice-site
-unit square, relative base-change invertibility, derived Hom localization, a
-heart statement, or Theorem 5.7(2).
+Issue #1063 remains open. This work is **underived**: it constructs the
+slice-site pushforward comparison, proves its transport identities, and now
+proves the component slice-site unit square in
+`Modules/Pullback/SliceSiteBaseChange.lean`. It does not prove relative
+base-change invertibility, derived Hom localization, a heart statement, or
+Theorem 5.7(2).
 
 ## Compiled boundary
 
@@ -21,7 +22,8 @@ heart statement, or Theorem 5.7(2).
   `pushforwardOverFunctor_map_transport` computes the image of a slice-site
   morphism through pushforward and the same counit.
 
-The desired component square was typechecked as a **statement**, not proved:
+At the original three-cycle freeze, the desired component square was
+typechecked as a **statement**, not proved:
 
 ```lean
 (SheafOfModules.overFunctor Y.ringCatSheaf U).map
@@ -69,7 +71,58 @@ slice morphism and the outer counit. Its right side is the direct
 of the corresponding inner-equivalence morphism. The scoped transparency
 relaxation is needed at this pinned sheaf-category API. This new lemma does
 **not** prove the final slice-site unit square, relative `IsIso`, or Theorem
-5.7(2); the frozen proof attempt was not resumed in this chunk.
+5.7(2); the frozen proof attempt was not resumed in that chunk. The separate
+research-derived continuation below proves the component square.
+
+## Research-derived component unit square
+
+After the typed normal form had compiled and been independently audited, a
+new bounded proof strategy established `pullbackOverIso_unit_app`. It applies
+the faithful outer `overEquiv U`, postcomposes its counit, uses the normal form
+for the pushforward comparison, then uses naturality of `overFunctorEquiv U`
+and the audited direct `pullbackRestrictNatIso_unit_app`. The inner counit and
+the geometric pullback comparison cancel through an explicitly typed
+`pullbackOverIso_cancellation` lemma; a generic
+`adjunction_unit_iso_transport` handles unit naturality across the remaining
+equivalence. No `sorry`, new axiom, global heartbeat increase, or broad
+simplification is used.
+
+This continuation took **two substantive proof revisions**, within the new
+three-revision cap. The first attempt tried `rw` directly in the large mapped
+goal. Lean reported `Tactic rewrite failed: Did not find an occurrence of the
+pattern` for both `(overFunctorEquiv U).hom.naturality` and
+`Functor.map_comp`; the expanded diagnostic again said that
+`Y.ringCatSheaf` had type
+`TopCat.Sheaf RingCat ↑Y.toPresheafedSpace` where Lean expected
+`Sheaf (Opens.grothendieckTopology ↥Y) RingCat` in
+`Sheaf.over Y.ringCatSheaf`. The second revision replaced these rewrites
+with typed `congrArg`/`Category.assoc` pasting and compiled. Earlier small
+generic-helper probes also showed that `simp only [Category.assoc]` can fail
+on an already expanded composite-adjunction target, even with scoped relaxed
+transparency; naming the morphism and using `exact` on equality transport
+worked. The failure is an elaboration seam, not a counterexample.
+
+The failed final `calc` steps used these exact rewrite commands after mapping
+by `overEquiv U` and postcomposing its counit:
+
+```lean
+rw [← (overFunctorEquiv U).hom.naturality
+  ((pullbackPushforwardAdjunction f).unit.app N)]
+rw [← Functor.map_comp,
+  AlgebraicGeometry.pullbackRestrictNatIso_unit_app f U N,
+  Functor.map_comp]
+```
+
+The second command failed first at `← Functor.map_comp`; the complete
+diagnostic included the sheaf-category instance mismatch above. Their
+replacement is the typed `hnat` and `htail` equalities in the compiled file.
+
+The result is the **component equation** at each `N` and `U`. It is not a
+natural-transformation comparison of the objectwise `pullbackOverIso`, and it
+does not make the unit invertible, establish an affine-chart comparison, or
+prove Theorem 5.7(2). The remaining relative obligation is to identify the
+actual chart unit with the algebraic tensor equivalence and then justify the
+gluing step under its correct hypotheses.
 
 API/documentation traps: `pullbackOverUnitIso` in `Pullback/Restriction.lean`
 identifies structure sheaves; it is **not** the adjunction unit. Lean accepts
