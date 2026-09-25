@@ -2645,6 +2645,7 @@ class CIFailureRepairTests(unittest.TestCase):
             loop_engine.check_required_checks(self.root, self.spec, 12)
 
     def test_approval_rejects_checks_for_a_different_head(self) -> None:
+        # Exercise the ordinary ledger path: a truthy recovery mock bypasses its checks.
         state = passing_ledger_state(self.root, self.spec)
         pr = {
             "state": "OPEN", "isDraft": False, "baseRefName": "main",
@@ -2652,22 +2653,22 @@ class CIFailureRepairTests(unittest.TestCase):
             "body": "Closes #1\n", "files": [{"path": "a.txt"}],
         }
         with mock.patch.object(loop_engine, "authorize_action"), mock.patch.object(
-            loop_engine, "recovery_publication_state"
+            loop_engine, "recovery_publication_state", return_value=None
         ), mock.patch.object(loop_engine, "require_predecessor_prs", return_value=[]), mock.patch.object(
             loop_engine, "load_state", return_value=state
         ), mock.patch.object(loop_engine, "ledger_openspec_matches", return_value=True), mock.patch.object(
             loop_engine, "gh_json", return_value=pr
-        ), mock.patch.object(loop_engine, "require_pr_targets_base"), mock.patch.object(
+        ) as provider, mock.patch.object(loop_engine, "require_pr_targets_base"), mock.patch.object(
             loop_engine, "require_pr_matches_frozen_issue"
         ), mock.patch.object(loop_engine, "require_predecessor_merges_ancestor"), mock.patch.object(
             loop_engine, "reviewed_content_matches", return_value=True
         ), mock.patch.object(loop_engine, "verify_remote_chunk_files"), mock.patch.object(
             loop_engine, "require_published_head_has_no_links"
-        ), mock.patch.object(loop_engine, "check_required_checks", return_value="b" * 40), mock.patch.object(
-            loop_engine, "run_command"
-        ) as command, self.assertRaisesRegex(loop_engine.LoopError, "PR head moved between review verification"):
-            loop_engine.action_approve(self.root, self.spec, 12, self.root / "ledger.json", "body", False)
-        command.assert_not_called()
+        ), mock.patch.object(loop_engine, "check_required_checks", return_value="b" * 40), self.assertRaisesRegex(
+            loop_engine.LoopError, "PR head moved between review verification"
+        ):
+            loop_engine.action_approve(self.root, self.spec, 12, self.state_file, "body", False)
+        self.assertEqual(provider.call_count, 1)  # PR read only; no approval POST.
 
     def test_approval_posts_a_commit_bound_review(self) -> None:
         state = passing_ledger_state(self.root, self.spec)
@@ -2679,7 +2680,7 @@ class CIFailureRepairTests(unittest.TestCase):
         }
         response = {"commit_id": head, "state": "APPROVED"}
         with mock.patch.object(loop_engine, "authorize_action"), mock.patch.object(
-            loop_engine, "recovery_publication_state"
+            loop_engine, "recovery_publication_state", return_value=None
         ), mock.patch.object(loop_engine, "require_predecessor_prs", return_value=[]), mock.patch.object(
             loop_engine, "load_state", return_value=state
         ), mock.patch.object(loop_engine, "ledger_openspec_matches", return_value=True), mock.patch.object(
@@ -2692,7 +2693,7 @@ class CIFailureRepairTests(unittest.TestCase):
             loop_engine, "require_published_head_has_no_links"
         ), mock.patch.object(loop_engine, "check_required_checks", return_value=head):
             self.assertEqual(
-                loop_engine.action_approve(self.root, self.spec, 12, self.root / "ledger.json", "body", False), 0
+                loop_engine.action_approve(self.root, self.spec, 12, self.state_file, "body", False), 0
             )
         self.assertEqual(
             provider.call_args_list[1].args[1],
