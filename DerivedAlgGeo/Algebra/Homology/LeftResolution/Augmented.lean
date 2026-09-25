@@ -7,10 +7,11 @@ import Mathlib.Algebra.Homology.LeftResolution.Basic
 /-!
 # The augmented initial segment of a left resolution
 
-The functorial chain complex attached to a `LeftResolution` is exact in positive
-degrees. This file also records exactness of its first two terms after augmentation
-to the object being resolved. The result is objectwise; it does not assert a
-totalization theorem or K-flatness for a bicomplex built from such resolutions.
+After applying `ι`, the functorial chain complex attached to a `LeftResolution`
+is exact in positive degrees. This file also records exactness of its first two
+terms after augmentation to the object being resolved. The result is objectwise;
+it does not assert a totalization theorem or K-flatness for a bicomplex built
+from such resolutions.
 -/
 
 open CategoryTheory Category Limits Preadditive ZeroObject
@@ -67,7 +68,9 @@ theorem augmentedShortComplex_exact : (Λ.augmentedShortComplex ι X).Exact := b
     epi_comp _ _
   exact epi_comp _ _
 
-/-- The augmentation of `augmentedShortComplex` is epimorphic. -/
+/-- The augmentation is epi because it composes the degree-zero identification
+isomorphism with the epimorphism `Λ.π.app X`. Together with exactness at the
+middle term, this records the right end of the augmented resolution. -/
 theorem augmentedShortComplex_epi_g : Epi (Λ.augmentedShortComplex ι X).g := by
   change Epi (ι.map (Λ.chainComplexXZeroIso X).hom ≫ Λ.π.app X)
   exact epi_comp' (by infer_instance) (Λ.epi_π_app X)
