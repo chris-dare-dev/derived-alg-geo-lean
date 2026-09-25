@@ -832,7 +832,7 @@ theorem freeYonedaSheafCoproductReducedLeftResolution_augmentedExact
 /-- The objectwise free-Yoneda left resolution has degree-zero homology `M`
 after inclusion into all module sheaves. This does not identify the totalized
 resolution of a complex with that complex. -/
-noncomputable def freeYonedaSheafCoproductReducedLeftResolution_homologyZeroIso
+noncomputable def freeYonedaSheafCoproductReducedLeftResolutionHomologyZeroIso
     (X : Scheme.{u}) (M : X.Modules) :
     (((ObjectProperty.ι (fun M : X.Modules => IsFlatOver (𝟙 X) M)).mapHomologicalComplex
       (ComplexShape.down ℕ)).obj
