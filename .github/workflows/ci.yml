@@ -594,6 +594,11 @@ jobs:
         continue-on-error: true
         run: python3 scripts/check_layering.py
 
+      - name: Neutral derived-category Stability import closure
+        id: neutral_stability_imports
+        continue-on-error: true
+        run: python3 scripts/check_neutral_stability_imports.py
+
       - name: Umbrella coverage
         id: umbrella_coverage
         continue-on-error: true
@@ -1187,6 +1192,7 @@ jobs:
             style_ratchet=${{ steps.style_ratchet.outcome }}
             source_independence=${{ steps.source_independence.outcome }}
             subject_layering=${{ steps.subject_layering.outcome }}
+            neutral_stability_imports=${{ steps.neutral_stability_imports.outcome }}
             umbrella_coverage=${{ steps.umbrella_coverage.outcome }}
             root_reachability=${{ steps.root_reachability.outcome }}
             coherent_families=${{ steps.coherent_families.outcome }}
@@ -1264,6 +1270,19 @@ jobs:
           # `--scope-to-diff=origin/main` resolves a merge base, so the
           # default single-commit checkout will not do.
           fetch-depth: 0
+
+      # The roadmap step runs every repository Python test, including the
+      # header-parser fixtures that compile tiny Lean clients. This job has no
+      # build, but it still needs the repository's pinned Lean executable.
+      - name: Install pinned Lean for parser fixtures
+        uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9 # v1
+        with:
+          auto-config: false
+          build: false
+          test: false
+          lint: false
+          use-mathlib-cache: false
+          use-github-cache: false
 
       - name: Roadmap and tracker agree
         env:

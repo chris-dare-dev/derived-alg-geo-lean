@@ -746,6 +746,8 @@ and classical versus derived moduli truncations.
 The policy is partly mechanical and partly a review obligation:
 
 - `scripts/check_layering.py` enforces the policy edges in `layers.md`;
+- `scripts/check_neutral_stability_imports.py` checks the neutral derived-category
+  umbrella's full internal import closure against the two Stability trees;
 - `scripts/check_umbrella_coverage.py` keeps every specialization in the public
   tree;
 - `scripts/check_single_instantiation.py` checks its configured paths for

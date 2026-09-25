@@ -9,6 +9,7 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Coherent
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.CartierDivisor
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.DivisorSequence
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.Linear
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.KFlatTensor
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.Comparison
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineIdentification
