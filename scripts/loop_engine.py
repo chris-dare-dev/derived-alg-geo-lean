@@ -546,15 +546,18 @@ def run_command(root: Path, args: list[str], *, check: bool = False) -> subproce
     # has the same behavior and is available wherever the CLI is installed.
     if sys.platform == "win32" and command and command[0] == "openspec":
         command[0] = "openspec.cmd"
-    result = subprocess.run(
-        command,
-        cwd=root,
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-        check=False,
-    )
+    try:
+        result = subprocess.run(
+            command,
+            cwd=root,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            check=False,
+        )
+    except OSError as exc:
+        raise LoopError(f"could not start command: {' '.join(command)}: {exc}") from exc
     if check and result.returncode != 0:
         detail = (result.stderr or result.stdout).strip()
         raise LoopError(f"command failed ({result.returncode}): {' '.join(command)}\n{detail}")
@@ -2003,20 +2006,30 @@ def preflight(root: Path, spec_path: Path) -> int:
     if openspec_validation is None:
         print("PASS no OpenSpec change: the issue body and manifest acceptance are the specification")
     elif openspec_validation in {"cli-advisory", "cli-required"} and shutil.which("openspec") is None:
-        # The structural check above already ran; a missing Node tool is a
-        # host gap to log, not a reason to stop an otherwise valid run.
-        warnings.append("OpenSpec CLI is not installed; structural validation passed and was used instead")
+        message = "OpenSpec CLI is not installed; structural validation passed but CLI validation did not run"
+        if openspec_validation == "cli-required":
+            failures.append(message)
+        else:
+            warnings.append(message)
     elif openspec_validation in {"cli-advisory", "cli-required"}:
-        cli = run_command(root, ["openspec", "validate", spec["openspec"]["change"], "--strict", "--no-interactive"], check=False)
-        if cli.returncode != 0:
-            detail = (cli.stdout or cli.stderr).strip().splitlines()
-            message = detail[-1] if detail else "OpenSpec CLI validation failed"
+        try:
+            cli = run_command(root, ["openspec", "validate", spec["openspec"]["change"], "--strict", "--no-interactive"], check=False)
+        except LoopError as exc:
+            message = f"OpenSpec CLI validation could not start: {exc}"
             if openspec_validation == "cli-required":
-                failures.append(f"OpenSpec CLI validation failed: {message}")
+                failures.append(message)
             else:
-                warnings.append(f"OpenSpec CLI validation advisory failure: {message}")
-        elif cli.stdout.strip():
-            print("PASS OpenSpec CLI validation")
+                warnings.append(message)
+        else:
+            if cli.returncode != 0:
+                detail = (cli.stdout or cli.stderr).strip().splitlines()
+                message = detail[-1] if detail else "OpenSpec CLI validation failed"
+                if openspec_validation == "cli-required":
+                    failures.append(f"OpenSpec CLI validation failed: {message}")
+                else:
+                    warnings.append(f"OpenSpec CLI validation advisory failure: {message}")
+            elif cli.stdout.strip():
+                print("PASS OpenSpec CLI validation")
     elif openspec_validation == "structural":
         print("PASS OpenSpec structural validation")
 
@@ -3416,12 +3429,19 @@ def protected_check_names(root: Path, spec: dict[str, Any]) -> set[str]:
     )
     if not isinstance(protection, dict):
         raise LoopError("branch protection returned an unexpected response")
-    names = {name for name in protection.get("contexts") or [] if isinstance(name, str)}
-    names.update(
-        item["context"]
-        for item in protection.get("checks") or []
-        if isinstance(item, dict) and isinstance(item.get("context"), str)
-    )
+    contexts = protection.get("contexts")
+    checks = protection.get("checks")
+    if (contexts is None and checks is None) or (contexts is not None and not isinstance(contexts, list)) or (
+        checks is not None and not isinstance(checks, list)
+    ):
+        raise LoopError("branch protection returned an unexpected response")
+    if any(not isinstance(name, str) or not name.strip() for name in contexts or []) or any(
+        not isinstance(item, dict) or not isinstance(item.get("context"), str) or not item["context"].strip()
+        for item in checks or []
+    ):
+        raise LoopError("branch protection returned an unexpected response")
+    names = set(contexts or [])
+    names.update(item["context"] for item in checks or [])
     return names
 
 
@@ -3432,6 +3452,21 @@ def check_required_checks(root: Path, spec: dict[str, Any], pr_number: int) -> s
         root,
         ["pr", "view", str(pr_number), "--repo", spec["repository"], "--json", "headRefOid,statusCheckRollup"],
     )
+    if not isinstance(data, dict) or not isinstance(data.get("headRefOid"), str) or not FULL_GIT_SHA_RE.fullmatch(
+        data["headRefOid"]
+    ):
+        raise LoopError("PR check rollup is missing a valid head commit")
+
+    def start_time(item: dict[str, Any]) -> datetime | None:
+        value = item.get("startedAt") or item.get("createdAt")
+        if not isinstance(value, str):
+            return None
+        try:
+            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError:
+            return None
+        return parsed if parsed.tzinfo is not None else None
+
     latest: dict[str, dict[str, Any]] = {}
     for check in data.get("statusCheckRollup") or []:
         if not isinstance(check, dict):
@@ -3439,21 +3474,24 @@ def check_required_checks(root: Path, spec: dict[str, Any], pr_number: int) -> s
         name = check.get("name") or check.get("context")
         if not isinstance(name, str):
             continue
-        timestamp = str(check.get("completedAt") or check.get("startedAt") or "")
         previous = latest.get(name)
-        if previous is None or timestamp >= str(previous.get("_timestamp", "")):
-            check = dict(check)
-            check["_timestamp"] = timestamp
+        if previous is None:
+            latest[name] = check
+            continue
+        # A completion time can be later than the start of a newer pending
+        # attempt. Compare starts only; an unorderable duplicate is not green.
+        current_start = start_time(check)
+        previous_start = start_time(previous)
+        if current_start is None or previous_start is None or current_start == previous_start:
+            raise LoopError(f"cannot order duplicate check runs for {name}")
+        if current_start > previous_start:
             latest[name] = check
     missing: list[str] = []
     failed: list[str] = []
     # Branch protection is the live list of required checks. A manifest check
     # still counts when the PR actually runs it; a name that neither the
     # protection nor the PR knows was retired after the manifest was written.
-    try:
-        live = protected_check_names(root, spec)
-    except LoopError:
-        live = set()
+    live = protected_check_names(root, spec)
     # With no live list, a manifest check that has not started must not drop out.
     required_names = (
         live | {name for name in spec["runner"]["required_checks"] if name in latest}
@@ -3475,7 +3513,7 @@ def check_required_checks(root: Path, spec: dict[str, Any], pr_number: int) -> s
         if failed:
             detail.append("not successful " + ", ".join(failed))
         raise LoopError("required checks are not green: " + "; ".join(detail))
-    return str(data.get("headRefOid") or "")
+    return data["headRefOid"]
 
 
 def action_approve(
@@ -3520,22 +3558,29 @@ def action_approve(
         raise LoopError("PR head does not carry the change reviewed by the passing ledger")
     verify_remote_chunk_files(root, spec, pr, state)
     require_published_head_has_no_links(root, spec, state, str(pr.get("headRefOid", "")))
-    check_required_checks(root, spec, pr_number)
+    checked_head = check_required_checks(root, spec, pr_number)
+    if checked_head.lower() != str(pr.get("headRefOid", "")).lower():
+        raise LoopError("PR head moved between review verification and check read; rerun the approval")
+    # `gh pr review` has no head pin. The REST endpoint binds this approval to
+    # the checked commit even if the PR branch moves after the final read.
     args = [
-        "gh",
-        "pr",
-        "review",
-        str(pr_number),
-        "--repo",
-        spec["repository"],
-        "--approve",
-        "--body",
-        body,
+        "api",
+        "--method",
+        "POST",
+        f"repos/{spec['repository']}/pulls/{pr_number}/reviews",
+        "-f",
+        f"commit_id={checked_head}",
+        "-f",
+        f"body={body}",
+        "-f",
+        "event=APPROVE",
     ]
     if dry_run:
-        print("DRY-RUN " + " ".join(args[:7]) + " <body>")
+        print("DRY-RUN gh " + " ".join(args[:6]) + " <body> -f event=APPROVE")
         return 0
-    run_command(root, args, check=True)
+    review = gh_json(root, args)
+    if not isinstance(review, dict) or review.get("commit_id") != checked_head or review.get("state") != "APPROVED":
+        raise LoopError("provider did not confirm approval on the checked PR head")
     print(f"PASS PR approved: #{pr_number}")
     return 0
 

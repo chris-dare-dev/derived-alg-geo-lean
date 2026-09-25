@@ -58,8 +58,10 @@ These are not stops. What to do instead:
 - **Round cap exhausted.** With `recovery` configured, run Phase 2.5. Without
   it, preserve the ledger, park the chunk, file a follow-up issue that carries
   the unresolved findings, and take the next issue.
-- **The OpenSpec CLI is missing.** Structural validation is used instead, and
-  preflight warns.
+- **The OpenSpec CLI is missing.** A manifest with `cli-required` fails
+  preflight; install the CLI or choose a different validation mode before
+  freezing the run. With `cli-advisory`, structural validation is used and
+  preflight warns. A `structural` run never needs the CLI.
 - **A reviewer returns nothing.** Re-dispatch that role on the same commit.
 
 ## Invariants
