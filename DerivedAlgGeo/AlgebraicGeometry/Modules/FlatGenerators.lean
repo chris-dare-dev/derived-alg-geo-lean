@@ -8,6 +8,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Stalk
 import DerivedAlgGeo.CategoryTheory.Limits.Preserves.Reflective
 import Mathlib.Algebra.Category.ModuleCat.Products
 import Mathlib.Algebra.Homology.LeftResolution.Basic
+import Mathlib.Algebra.Homology.LeftResolution.Reduced
 import Mathlib.CategoryTheory.ObjectProperty.FullSubcategory
 
 /-!
@@ -654,6 +655,163 @@ noncomputable def freeYonedaSheafCoproductLeftResolution (X : Scheme.{u}) :
     (fun M => freeYonedaSheafCoproduct_isFlatOver_id X M)
   π := SheafOfModules.freeYonedaSheafCoproductToIdentity X.ringCatSheaf
   epi_π_app := fromFreeYonedaSheafCoproduct_epi X
+
+private theorem isFlatOverId_iff_stalkwiseFlat
+    (X : Scheme.{u}) (M : X.Modules) :
+    IsFlatOver (𝟙 X) M ↔
+      ∀ x : X, Module.Flat (X.presheaf.stalk x) ((moduleStalkFunctor X x).obj M) := by
+  constructor
+  · intro h x
+    have h := h x
+    dsimp [IsFlatOver] at h
+    rw [Scheme.Hom.stalkMap_id] at h
+    change Module.Flat (X.presheaf.stalk x)
+      ((ModuleCat.restrictScalars (RingHom.id (X.presheaf.stalk x))).obj
+        ((moduleStalkFunctor X x).obj M)) at h
+    letI : Module.Flat (X.presheaf.stalk x)
+        ((ModuleCat.restrictScalars (RingHom.id (X.presheaf.stalk x))).obj
+          ((moduleStalkFunctor X x).obj M)) := h
+    exact Module.Flat.of_linearEquiv
+      (ModuleCat.restrictScalarsId'App (RingHom.id _) rfl
+        ((moduleStalkFunctor X x).obj M)).toLinearEquiv.symm
+  · intro h x
+    have h := h x
+    dsimp [IsFlatOver]
+    rw [Scheme.Hom.stalkMap_id]
+    change Module.Flat (X.presheaf.stalk x)
+      ((ModuleCat.restrictScalars (RingHom.id (X.presheaf.stalk x))).obj
+        ((moduleStalkFunctor X x).obj M))
+    letI : Module.Flat (X.presheaf.stalk x) ((moduleStalkFunctor X x).obj M) := h
+    exact Module.Flat.of_linearEquiv
+      (ModuleCat.restrictScalarsId'App (RingHom.id _) rfl
+        ((moduleStalkFunctor X x).obj M)).toLinearEquiv
+
+private theorem isIdempotentComplete_stalkwiseFlatSubcategory (X : Scheme.{u}) :
+    IsIdempotentComplete
+      (ObjectProperty.FullSubcategory
+        (fun M : X.Modules => IsFlatOver (𝟙 X) M)) := by
+  refine ⟨?_⟩
+  intro M p hp
+  have hp' : p.hom ≫ p.hom = p.hom := by
+    simpa using congrArg (fun f => f.hom) hp
+  obtain ⟨Y, i, r, hir, hri⟩ :=
+    IsIdempotentComplete.idempotents_split M.obj p.hom hp'
+  have hYStalk : ∀ x : X,
+      Module.Flat (X.presheaf.stalk x) ((moduleStalkFunctor X x).obj Y) := by
+    intro x
+    let F := moduleStalkFunctor X x
+    have hcomp : (F.map r).hom.comp (F.map i).hom = LinearMap.id := by
+      simpa using congrArg (fun f => (F.map f).hom) hir
+    letI : Module.Flat (X.presheaf.stalk x) (F.obj M.obj) :=
+      (isFlatOverId_iff_stalkwiseFlat X M.obj).mp M.property x
+    exact Module.Flat.of_retract (R := X.presheaf.stalk x)
+      (M := F.obj M.obj) (N := F.obj Y) (F.map i).hom (F.map r).hom hcomp
+  have hY : IsFlatOver (𝟙 X) Y :=
+    (isFlatOverId_iff_stalkwiseFlat X Y).mpr hYStalk
+  let Y' : ObjectProperty.FullSubcategory
+      (fun M : X.Modules => IsFlatOver (𝟙 X) M) := ⟨Y, hY⟩
+  refine ⟨Y', ObjectProperty.homMk i, ObjectProperty.homMk r, ?_, ?_⟩
+  · apply ObjectProperty.hom_ext
+    change i ≫ r = 𝟙 Y
+    exact hir
+  · apply ObjectProperty.hom_ext
+    change r ≫ i = p.hom
+    exact hri
+
+/-- The free-Yoneda resolution refined by Mathlib's
+`CategoryTheory.Abelian.LeftResolution.reduced`; its reduced functor preserves zero morphisms.
+This still gives an objectwise resolution, not a K-flat replacement on unbounded complexes. -/
+noncomputable def freeYonedaSheafCoproductReducedLeftResolution (X : Scheme.{u}) :
+    CategoryTheory.Abelian.LeftResolution
+      (ObjectProperty.ι (fun M : X.Modules =>
+        AlgebraicGeometry.Scheme.Modules.IsFlatOver (𝟙 X) M)) := by
+  letI : IsIdempotentComplete
+      (ObjectProperty.FullSubcategory
+        (fun M : X.Modules => AlgebraicGeometry.Scheme.Modules.IsFlatOver (𝟙 X) M)) :=
+    isIdempotentComplete_stalkwiseFlatSubcategory X
+  exact (freeYonedaSheafCoproductLeftResolution X).reduced
+
+/-- The zero-preserving refinement is the additive input needed to apply this
+objectwise resolution functor term-by-term to homological complexes. -/
+instance freeYonedaSheafCoproductReducedLeftResolution_preservesZeroMorphisms
+    (X : Scheme.{u}) :
+    (freeYonedaSheafCoproductReducedLeftResolution X).F.PreservesZeroMorphisms := by
+  letI : IsIdempotentComplete
+      (ObjectProperty.FullSubcategory
+        (fun M : X.Modules => AlgebraicGeometry.Scheme.Modules.IsFlatOver (𝟙 X) M)) :=
+    isIdempotentComplete_stalkwiseFlatSubcategory X
+  change ((freeYonedaSheafCoproductLeftResolution X).reduced).F.PreservesZeroMorphisms
+  infer_instance
+
+/-- This zero-map lemma supplies the preservation instance required by
+`CategoryTheory.Functor.mapHomologicalComplex` for the induced resolution functor. -/
+theorem freeYonedaSheafCoproductReducedLeftResolution_chainComplexMap_zero
+    (X : Scheme.{u}) {M N : X.Modules} :
+    (freeYonedaSheafCoproductReducedLeftResolution X).chainComplexMap
+      (0 : M ⟶ N) = 0 := by
+  exact CategoryTheory.Abelian.LeftResolution.chainComplexMap_zero
+    (Λ := freeYonedaSheafCoproductReducedLeftResolution X) M N
+
+/-- Applying the reduced free-Yoneda resolution to each term of an unbounded
+cochain complex gives a functorial complex of nonnegative flat resolutions.
+This records the bicomplex before totalization; it does not assert that the
+total complex is K-flat or that pullback preserves quasi-isomorphisms. -/
+noncomputable def freeYonedaSheafCoproductResolutionBicomplex (X : Scheme.{u}) :
+    CochainComplex X.Modules ℤ ⥤
+      HomologicalComplex
+        (ChainComplex
+          (ObjectProperty.FullSubcategory
+            (fun M : X.Modules => IsFlatOver (𝟙 X) M)) ℕ)
+        (ComplexShape.up ℤ) := by
+  let Λ := freeYonedaSheafCoproductReducedLeftResolution X
+  letI : Λ.chainComplexFunctor.PreservesZeroMorphisms := ⟨fun M N =>
+    freeYonedaSheafCoproductReducedLeftResolution_chainComplexMap_zero X⟩
+  exact Λ.chainComplexFunctor.mapHomologicalComplex (ComplexShape.up ℤ)
+
+/-- Every row of the resolution bicomplex is exact in positive resolution
+degrees after inclusion into all module sheaves. Degree zero is only the
+one-step free cover, so this result does not identify the total complex with
+the original complex. -/
+theorem freeYonedaSheafCoproductResolutionBicomplex_exactAt_succ
+    (X : Scheme.{u}) (K : CochainComplex X.Modules ℤ) (i : ℤ) (n : ℕ) :
+    (((ObjectProperty.ι (fun M : X.Modules => IsFlatOver (𝟙 X) M)).mapHomologicalComplex
+        (ComplexShape.down ℕ)).obj
+      (((freeYonedaSheafCoproductResolutionBicomplex X).obj K).X i)).ExactAt (n + 1) := by
+  let Λ := freeYonedaSheafCoproductReducedLeftResolution X
+  change (((ObjectProperty.ι (fun M : X.Modules => IsFlatOver (𝟙 X) M)).mapHomologicalComplex
+      (ComplexShape.down ℕ)).obj (Λ.chainComplexFunctor.obj (K.X i))).ExactAt (n + 1)
+  exact Λ.exactAt_map_chainComplex_succ (K.X i) n
+
+/-- Resolve each term of an unbounded cochain complex by the zero-preserving
+free-Yoneda flat cover. This is the degree-zero column of the resolution
+bicomplex; its natural map to the input is proved epi, but this does not
+establish a quasi-isomorphism. -/
+noncomputable def freeYonedaSheafCoproductDegreewiseEpiCover (X : Scheme.{u}) :
+    CochainComplex X.Modules ℤ ⥤ CochainComplex X.Modules ℤ := by
+  let Λ := freeYonedaSheafCoproductReducedLeftResolution X
+  let ι := ObjectProperty.ι (fun M : X.Modules => IsFlatOver (𝟙 X) M)
+  letI : Λ.F.PreservesZeroMorphisms := by infer_instance
+  letI : (Λ.F ⋙ ι).PreservesZeroMorphisms := by infer_instance
+  exact (Λ.F ⋙ ι).mapHomologicalComplex (ComplexShape.up ℤ)
+
+/-- The natural augmentation of the termwise flat cover, induced by the
+epimorphisms in the objectwise `CategoryTheory.Abelian.LeftResolution`. -/
+noncomputable def freeYonedaSheafCoproductDegreewiseEpiCoverMap
+    (X : Scheme.{u}) :
+    freeYonedaSheafCoproductDegreewiseEpiCover X ⟶
+      𝟭 (CochainComplex X.Modules ℤ) :=
+  NatTrans.mapHomologicalComplex
+    (freeYonedaSheafCoproductReducedLeftResolution X).π (ComplexShape.up ℤ)
+
+/-- The termwise augmentation is epi in every complex degree. It does not
+identify the termwise cover as a quasi-isomorphic replacement. -/
+theorem freeYonedaSheafCoproductDegreewiseEpiCoverMap_epi
+    (X : Scheme.{u}) (K : CochainComplex X.Modules ℤ) :
+    Epi ((freeYonedaSheafCoproductDegreewiseEpiCoverMap X).app K) := by
+  apply HomologicalComplex.epi_of_epi_f
+  intro i
+  change Epi ((freeYonedaSheafCoproductReducedLeftResolution X).π.app (K.X i))
+  infer_instance
 
 /-- Naturality of the specialized coproduct map follows from the generic naturality theorem. -/
 lemma fromFreeYonedaSheafCoproduct_natural (X : Scheme.{u})
