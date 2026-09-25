@@ -3741,12 +3741,15 @@ def strict_protected_check_map(root: Path, spec: dict[str, Any]) -> dict[str, in
     return required
 
 
-def provider_check_timestamp(check: dict[str, Any]) -> str:
-    for field in ("completed_at", "updated_at", "started_at", "created_at"):
+def provider_check_timestamp(check: dict[str, Any], *, check_run: bool) -> tuple[str, str]:
+    # A newer attempt may still be pending when an older failure completes.
+    # Completion/update time cannot order check-run attempts.
+    fields = ("started_at", "created_at") if check_run else ("created_at", "updated_at")
+    for field in fields:
         value = check.get(field)
         if isinstance(value, str) and value:
-            return value
-    return ""
+            return field, value
+    return "", ""
 
 
 def latest_provider_check(records: list[dict[str, Any]], name: str) -> dict[str, Any] | None:
@@ -3757,10 +3760,20 @@ def latest_provider_check(records: list[dict[str, Any]], name: str) -> dict[str,
         return None
     if len(matching) == 1:
         return matching[0]
-    if any(not record.get("timestamp") for record in matching):
+    # Check runs and commit statuses have distinct event clocks. Do not infer
+    # chronology by comparing their timestamps when protection names both.
+    if len({record.get("source") for record in matching}) != 1 or len(
+        {record.get("_timestamp_kind") for record in matching}
+    ) != 1 or any(not record.get("timestamp") for record in matching):
         raise LoopError(f"check {name!r} has duplicate same-head results without comparable timestamps")
-    newest_at = max(str(record["timestamp"]) for record in matching)
-    newest = [record for record in matching if record["timestamp"] == newest_at]
+    try:
+        times = [datetime.fromisoformat(str(record["timestamp"]).replace("Z", "+00:00")) for record in matching]
+    except ValueError as exc:
+        raise LoopError(f"check {name!r} has duplicate same-head results without comparable timestamps") from exc
+    if any(moment.tzinfo is None for moment in times):
+        raise LoopError(f"check {name!r} has duplicate same-head results without comparable timestamps")
+    newest_at = max(times)
+    newest = [record for record, moment in zip(matching, times) if moment == newest_at]
     if len(newest) != 1:
         raise LoopError(f"check {name!r} has ambiguous latest results on the current head")
     return newest[0]
@@ -3780,7 +3793,7 @@ def required_check_failure_evidence(
 
     check_response = gh_json(
         root,
-        ["api", f"repos/{spec['repository']}/commits/{head_sha}/check-runs?per_page=100"],
+        ["api", f"repos/{spec['repository']}/commits/{head_sha}/check-runs?filter=all&per_page=100"],
     )
     if not isinstance(check_response, dict):
         raise LoopError("check-run response is malformed")
@@ -3826,10 +3839,12 @@ def required_check_failure_evidence(
             raise LoopError(f"check-run {name!r} has no status")
         if conclusion is not None and not isinstance(conclusion, str):
             raise LoopError(f"check-run {name!r} has a malformed conclusion")
+        timestamp_kind, timestamp = provider_check_timestamp(check, check_run=True)
         records.append(
             {
                 "name": name,
-                "timestamp": provider_check_timestamp(check),
+                "timestamp": timestamp,
+                "_timestamp_kind": timestamp_kind,
                 "state": status.lower(),
                 "conclusion": conclusion.lower() if conclusion else None,
                 "source": "check_run",
@@ -3859,10 +3874,12 @@ def required_check_failure_evidence(
             raise LoopError(f"legacy status {name!r} has a malformed creator identity")
         if creator_login is not None and not isinstance(creator_login, str):
             raise LoopError(f"legacy status {name!r} has a malformed creator login")
+        timestamp_kind, timestamp = provider_check_timestamp(status, check_run=False)
         records.append(
             {
                 "name": name,
-                "timestamp": provider_check_timestamp(status),
+                "timestamp": timestamp,
+                "_timestamp_kind": timestamp_kind,
                 "state": "completed",
                 "conclusion": state.lower(),
                 "source": "commit_status",
@@ -3884,7 +3901,7 @@ def required_check_failure_evidence(
         else:
             failed = latest.get("conclusion") in {"failure", "error"}
         if failed:
-            failures.append(latest)
+            failures.append({key: value for key, value in latest.items() if key != "_timestamp_kind"})
     if not failures:
         raise LoopError("no current required check has a completed failure on the exact pull-request head")
     failures.sort(key=lambda item: (item["name"], item["source"], str(item.get("app_id") or ""), str(item.get("run_id") or "")))

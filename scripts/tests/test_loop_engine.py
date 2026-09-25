@@ -2043,7 +2043,8 @@ class CIFailureRepairTests(unittest.TestCase):
             return {"object": {"sha": value}}
         if "/protection/required_status_checks" in request:
             return self.protection_sequence.pop(0) if self.protection_sequence else self.protection
-        if "/check-runs?per_page=100" in request:
+        if "/check-runs?" in request:
+            self.assertIn("filter=all&per_page=100", request)
             check_runs = self.check_runs_sequence.pop(0) if self.check_runs_sequence else self.check_runs
             return {"total_count": len(check_runs), "check_runs": check_runs}
         if "/statuses?per_page=100" in request:
@@ -2110,11 +2111,44 @@ class CIFailureRepairTests(unittest.TestCase):
             [self.check_run(self.failed_head, "failure", "2026-09-24T01:00:00Z")],
             [
                 self.check_run(self.failed_head, "failure", "2026-09-24T01:00:00Z"),
-                {**self.check_run(self.failed_head, "success", "2026-09-24T02:00:00Z"), "id": 7002},
+                {
+                    **self.check_run(self.failed_head, "success", "2026-09-24T02:00:00Z"),
+                    "id": 7002,
+                    "started_at": "2026-09-24T01:30:00Z",
+                },
             ],
         ]
         original = self.state_file.read_bytes()
         with self.assertRaisesRegex(loop_engine.LoopError, "no current required check"):
+            self.admit(candidate)
+        self.assertEqual(self.state_file.read_bytes(), original)
+
+    def test_newer_pending_rerun_blocks_older_failure_even_if_failure_completed_later(self) -> None:
+        candidate = self.repair_candidate()
+        failed = self.check_run(self.failed_head, "failure", "2026-09-24T02:00:00Z")
+        pending = {
+            **self.check_run(self.failed_head, None, "", status="in_progress"),
+            "id": 7002,
+            "started_at": "2026-09-24T01:00:00Z",
+            "completed_at": None,
+        }
+        self.check_runs = [failed, pending]
+        original = self.state_file.read_bytes()
+        with self.assertRaisesRegex(loop_engine.LoopError, "no current required check"):
+            self.admit(candidate)
+        self.assertEqual(self.state_file.read_bytes(), original)
+
+        # A queued attempt with no start and no creation time is unorderable.
+        pending["status"] = "queued"
+        pending["started_at"] = None
+        pending["created_at"] = None
+        with self.assertRaisesRegex(loop_engine.LoopError, "without comparable timestamps"):
+            self.admit(candidate)
+        self.assertEqual(self.state_file.read_bytes(), original)
+
+        # Creation time from only the queued run cannot share a start-time clock.
+        pending["created_at"] = "2026-09-24T01:00:00Z"
+        with self.assertRaisesRegex(loop_engine.LoopError, "without comparable timestamps"):
             self.admit(candidate)
         self.assertEqual(self.state_file.read_bytes(), original)
 
@@ -2211,7 +2245,11 @@ class CIFailureRepairTests(unittest.TestCase):
             ("cancelled", {"contexts": ["ci"], "checks": []}, [self.check_run(self.failed_head, "cancelled", "2026-09-24T01:00:00Z")]),
             ("successful rerun", {"contexts": ["ci"], "checks": []}, [
                 self.check_run(self.failed_head, "failure", "2026-09-24T01:00:00Z"),
-                {**self.check_run(self.failed_head, "success", "2026-09-24T02:00:00Z"), "id": 7002},
+                {
+                    **self.check_run(self.failed_head, "success", "2026-09-24T02:00:00Z"),
+                    "id": 7002,
+                    "started_at": "2026-09-24T01:30:00Z",
+                },
             ]),
             ("wrong app", {"contexts": [], "checks": [{"context": "ci", "app_id": 99}]}, [self.check_run(self.failed_head, "failure", "2026-09-24T01:00:00Z")]),
             ("missing live protection", {"contexts": ["ci"]}, [self.check_run(self.failed_head, "failure", "2026-09-24T01:00:00Z")]),
