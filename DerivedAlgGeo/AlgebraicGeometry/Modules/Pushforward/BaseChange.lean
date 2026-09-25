@@ -327,7 +327,6 @@ private theorem restrictMateInv :
         (𝟙 (Scheme.Modules.pushforward U.ι)) := by
   simp [Scheme.Modules.restrictFunctorIsoPullback, Adjunction.leftAdjointUniq]
 
-set_option maxRecDepth 2048 in
 /-- Conjugating the directly assembled pullback comparison gives the direct
 pushforward-composite comparison. This proves the equality-transport factor
 pointwise, then pastes all five independent factors. -/
@@ -387,7 +386,6 @@ theorem pullbackRestrictNatIso_conjugate :
   simp only [Category.id_comp, Category.comp_id, squarePushforwardIso,
     Iso.trans_hom, Iso.symm_hom]
 
-set_option maxRecDepth 2048 in
 /-- The horizontal mate of the independent geometric pullback comparison is
 exactly the independently defined pushforward/restriction comparison. -/
 theorem pullbackRestrictNatIso_mate :

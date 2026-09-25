@@ -1,6 +1,7 @@
 # SF11 #1063 open-square mate research recovery
 
-Cutover: `6d966b64` on `agent/sf11-open-square-mate-research`.
+Cutover: `6d966b64`; proof revision: `1a433e7e` on
+`agent/sf11-open-square-mate-research`.
 Scope: the underived scheme-module open square. The formerly missing
 identification of two independently defined comparisons now compiles. This
 does not prove relative base change.
