@@ -1,6 +1,7 @@
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Affine.BasicOpen
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Affine.BasicOpenArrow
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Affine.BasicOpenLocalizedSubobject
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Affine.BasicOpenRestriction
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Affine.BasicOpenSubobject
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Affine.BasicOpenSubobjectClassification
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Affine.Comparison
@@ -17,5 +18,7 @@ finite submodules on the localized spectrum, using explicit global-sections
 transport. `Affine.BasicOpenLocalizedSubobject` transports that comparison to
 the actual affine basic open `D(r)`; `Affine.BasicOpenSubobjectClassification`
 classifies arbitrary coherent monos on that chart by finite submodules.
+`Affine.BasicOpenRestriction` compares the restriction of a chosen finite
+tilde subobject to `D(r*s)` with the span of its raw localized-module image.
 No union-of-opens gluing is asserted.
 -/

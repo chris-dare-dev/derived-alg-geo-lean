@@ -103,4 +103,44 @@ theorem localized'_comap_awayToAwayRight_eq_span
     rw [hscalar]
     exact hfrs
 
+/-- Localizing a chosen submodule first away from `r` and then mapping to the
+common localization gives the same `R[1/(r*s)]`-submodule as localizing it
+directly away from `r * s`. The image is spanned in the target ring, not used
+as a raw set. -/
+theorem localized'_awayToAwayRight_eq_span
+    {R : Type u} [CommRing R] {M : Type v} [AddCommGroup M] [Module R M]
+    (r s : R) (N : Submodule R M) :
+    N.localized' (Localization.Away (r * s)) (Submonoid.powers (r * s))
+        (LocalizedModule.mkLinearMap (Submonoid.powers (r * s)) M) =
+      Submodule.span (Localization.Away (r * s))
+        ((LocalizedModule.awayToAwayRightLinearMap (M := M) r s) ''
+          (N.localized' (Localization.Away r) (Submonoid.powers r)
+            (LocalizedModule.mkLinearMap (Submonoid.powers r) M) :
+              Set (LocalizedModule.Away r M))) := by
+  let fr := LocalizedModule.mkLinearMap (Submonoid.powers r) M
+  let frs := LocalizedModule.mkLinearMap (Submonoid.powers (r * s)) M
+  let α := LocalizedModule.awayToAwayRightLinearMap (M := M) r s
+  let Pr := N.localized' (Localization.Away r) (Submonoid.powers r) fr
+  let Q := N.localized' (Localization.Away (r * s)) (Submonoid.powers (r * s)) frs
+  change Q = Submodule.span (Localization.Away (r * s)) (α '' (Pr : Set _))
+  apply le_antisymm
+  · change N.localized' (Localization.Away (r * s)) (Submonoid.powers (r * s)) frs ≤ _
+    rw [Submodule.localized'_eq_span]
+    apply Submodule.span_le.mpr
+    rintro _ ⟨m, hm, rfl⟩
+    exact Submodule.subset_span ⟨fr m, ⟨m, hm, 1, by simp⟩,
+      LocalizedModule.awayToAwayRightLinearMap_mk r s m⟩
+  · apply Submodule.span_le.mpr
+    rintro _ ⟨p, hp, rfl⟩
+    obtain ⟨m, hm, t, ht⟩ := hp
+    have hmp : fr m = (t : R) • p := (IsLocalizedModule.mk'_eq_iff).mp ht
+    have hfrs : frs m ∈ Q := ⟨m, hm, 1, by simp⟩
+    have hscalar : (algebraMap R (Localization.Away (r * s)) (t : R)) • α p = frs m := by
+      rw [algebraMap_smul, ← map_smul, ← hmp]
+      exact LocalizedModule.awayToAwayRightLinearMap_mk r s m
+    apply (Q.smul_mem_iff_of_isUnit
+      (LocalizedModule.isUnit_awayToAwayRight r s t)).mp
+    rw [hscalar]
+    exact hfrs
+
 end Submodule

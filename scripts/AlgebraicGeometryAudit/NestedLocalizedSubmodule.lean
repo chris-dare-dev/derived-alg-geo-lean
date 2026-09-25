@@ -8,6 +8,7 @@ universe u v
 #print axioms LocalizedModule.awayToAwayRightLinearMap
 #print axioms LocalizedModule.awayToAwayRightLinearMap_mk
 #print axioms Submodule.localized'_comap_awayToAwayRight_eq_span
+#print axioms Submodule.localized'_awayToAwayRight_eq_span
 
 -- A direct owner-leaf import exposes both the canonical map and the exact span identity.
 example {R : Type u} [CommRing R]
@@ -21,6 +22,18 @@ example {R : Type u} [CommRing R]
       Submodule.span (Localization.Away (r * s))
         (α '' (P : Set (LocalizedModule.Away r M))) :=
   Submodule.localized'_comap_awayToAwayRight_eq_span r s P
+
+example {R : Type u} [CommRing R]
+    {M : Type v} [AddCommGroup M] [Module R M]
+    (r s : R) (N : Submodule R M) :
+    N.localized' (Localization.Away (r * s)) (Submonoid.powers (r * s))
+        (LocalizedModule.mkLinearMap (Submonoid.powers (r * s)) M) =
+      Submodule.span (Localization.Away (r * s))
+        ((LocalizedModule.awayToAwayRightLinearMap (M := M) r s) ''
+          (N.localized' (Localization.Away r) (Submonoid.powers r)
+            (LocalizedModule.mkLinearMap (Submonoid.powers r) M) :
+              Set (LocalizedModule.Away r M))) :=
+  Submodule.localized'_awayToAwayRight_eq_span r s N
 
 -- Neither the map nor the theorem assumes that the denominators are regular.
 example : (2 : ZMod 6) * 3 = 0 := by decide
