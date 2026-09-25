@@ -3,7 +3,9 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.Algebra.Homology.LeftResolution.Basic
+import Mathlib.Algebra.Homology.QuasiIso
 import Mathlib.Algebra.Homology.Single
+import Mathlib.Algebra.Homology.SingleHomology
 
 /-!
 # The augmented initial segment of a left resolution
@@ -119,5 +121,34 @@ noncomputable def chainComplexAugmentationNatTrans :
       ChainComplex.single₀ A where
   app X := Λ.chainComplexAugmentation ι X
   naturality _ _ f := Λ.chainComplexAugmentation_naturality ι f
+
+variable (X : A)
+
+private lemma chainComplexAugmentation_f_zero :
+    (Λ.chainComplexAugmentation ι X).f 0 = (Λ.augmentedShortComplex ι X).g := by
+  simp [chainComplexAugmentation]
+
+set_option backward.defeqAttrib.useBackward true in
+set_option backward.isDefEq.respectTransparency false in
+/-- The canonical augmentation of an individual mapped left resolution is a
+quasi-isomorphism. This objectwise result does not compare the totalization of
+resolutions of an unbounded complex with that complex. -/
+theorem chainComplexAugmentation_quasiIso :
+    QuasiIso (Λ.chainComplexAugmentation ι X) := by
+  refine ⟨fun n => ?_⟩
+  cases n with
+  | zero =>
+    rw [ChainComplex.quasiIsoAt₀_iff]
+    rw [ShortComplex.quasiIso_iff_of_zeros']
+    · refine (ShortComplex.exact_and_epi_g_iff_of_iso ?_).2
+        ⟨Λ.augmentedShortComplex_exact ι X, Λ.augmentedShortComplex_epi_g ι X⟩
+      exact ShortComplex.isoMk (Iso.refl _) (Iso.refl _) (Iso.refl _)
+        (by simp [augmentedShortComplex])
+        (by simpa using (chainComplexAugmentation_f_zero ι Λ X).symm)
+    all_goals simp [HomologicalComplex.shape]
+  | succ n =>
+    rw [quasiIsoAt_iff_exactAt']
+    · exact Λ.exactAt_map_chainComplex_succ X n
+    · apply ChainComplex.exactAt_succ_single_obj
 
 end CategoryTheory.Abelian.LeftResolution
