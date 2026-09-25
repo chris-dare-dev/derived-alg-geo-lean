@@ -126,6 +126,29 @@ theorem pushforwardOverFunctor_map_transport (f : X ⟶ Y) (U : Y.Opens)
   change e.counitInv.app _ ≫ e.functor.map (e.inverse.map h) ≫ e.counit.app _ = h
   exact counitInv_map_counit e h
 
+-- The pinned sheaf-category instances need this relaxation when rewriting the
+-- two transported morphisms; keep it local to the normal-form theorem.
+set_option backward.isDefEq.respectTransparency false in
+/-- The slice-site pushforward comparison followed by a slice morphism has
+this direct open-square normal form after applying the outer equivalence and
+its counit. This is not the slice-site unit square or a relative `IsIso`. -/
+theorem pushforwardOverIso_map_normal_form (f : X ⟶ Y) (M : X.Modules)
+    (U : Y.Opens)
+    {B : SheafOfModules (X.ringCatSheaf.over (f ⁻¹ᵁ U))}
+    (g : M.over (f ⁻¹ᵁ U) ⟶ B) :
+    (overEquiv U).functor.map (pushforwardOverIso f M U).hom ≫
+      (overEquiv U).functor.map ((pushforwardOverFunctor f U).map g) ≫
+      (overEquiv U).counitIso.hom.app
+        ((pushforward (f ∣_ U)).obj ((overEquiv (f ⁻¹ᵁ U)).functor.obj B)) =
+    (overFunctorEquiv U).hom.app ((pushforward f).obj M) ≫
+      (AlgebraicGeometry.pushforwardRestrictNatIso f U).hom.app M ≫
+      (pushforward (f ∣_ U)).map
+        ((overFunctorEquiv (f ⁻¹ᵁ U)).inv.app M ≫
+          (overEquiv (f ⁻¹ᵁ U)).functor.map g) := by
+  rw [overEquiv_map_pushforwardOverIso_hom]
+  simp only [Category.assoc]
+  rw [pushforwardOverFunctor_map_transport]
+  rfl
 
 end
 

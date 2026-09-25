@@ -30,6 +30,7 @@ variable {X Y : Scheme.{u}} (f : X ⟶ Y) (M : Y.Modules)
 #print axioms AlgebraicGeometry.Scheme.Modules.overEquiv_map_pullbackOverIso_hom
 #print axioms AlgebraicGeometry.Scheme.Modules.overEquiv_map_pullbackOverAdjunction_unit
 #print axioms AlgebraicGeometry.Scheme.Modules.pushforwardOverFunctor_map_transport
+#print axioms AlgebraicGeometry.Scheme.Modules.pushforwardOverIso_map_normal_form
 #print axioms AlgebraicGeometry.Scheme.Modules.pullbackTrivializationOver
 #print axioms AlgebraicGeometry.Scheme.Modules.isInvertible_pullback
 #print axioms AlgebraicGeometry.Scheme.Modules.pullbackLocalGeneratorsData

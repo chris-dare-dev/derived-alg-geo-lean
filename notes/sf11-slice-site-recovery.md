@@ -52,12 +52,24 @@ The desired component square was typechecked as a **statement**, not proved:
    were removed. The independently proved comparison and transport lemmas
    remain. No `sorry`, `admit`, or new axiom was committed.
 
-The next research step is to test a small, explicitly typed normal-form lemma
-for the final `overEquiv U` counit cancellation, keeping all sheaf-category
+At the three-cycle freeze, the next research step was to test a small,
+explicitly typed normal-form lemma for the final `overEquiv U` counit
+cancellation, keeping all sheaf-category
 instances fixed, and then use `exact` on that lemma instead of `simpa` over a
 large unfolded expression. The direct unit square
 `pullbackRestrictNatIso_unit_app` and the objectwise pullback bridge supply the
 mathematical ingredients, but their combination has not been compiled.
+
+## Bounded normal-form continuation
+
+`pushforwardOverIso_map_normal_form` now proves the typed normalization of
+`overEquiv U.map (pushforwardOverIso f M U).hom`, followed by a transported
+slice morphism and the outer counit. Its right side is the direct
+`pushforwardRestrictNatIso` comparison followed by the restricted pushforward
+of the corresponding inner-equivalence morphism. The scoped transparency
+relaxation is needed at this pinned sheaf-category API. This new lemma does
+**not** prove the final slice-site unit square, relative `IsIso`, or Theorem
+5.7(2); the frozen proof attempt was not resumed in this chunk.
 
 API/documentation traps: `pullbackOverUnitIso` in `Pullback/Restriction.lean`
 identifies structure sheaves; it is **not** the adjunction unit. Lean accepts
