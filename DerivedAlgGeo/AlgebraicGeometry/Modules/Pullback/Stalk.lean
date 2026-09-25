@@ -153,7 +153,8 @@ def moduleStalkForgetIso (X : Scheme.{u}) (x : X) :
           TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} x) :=
   CategoryTheory.Functor.associator _ _ _
 
-/-- The module-stalk functor preserves coproducts indexed by `I`. -/
+/-- Indexed sheaf coproducts are preserved by the underlying additive sheaf stalk;
+the forgetful module functor reflects and preserves these colimits. -/
 theorem moduleStalkFunctor_preservesColimitsOfShape
     (X : Scheme.{u}) (x : X) (I : Type u) :
     PreservesColimitsOfShape (Discrete I) (moduleStalkFunctor X x) := by

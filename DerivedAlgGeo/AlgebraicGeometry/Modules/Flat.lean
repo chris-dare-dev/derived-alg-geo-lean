@@ -2,8 +2,8 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import Mathlib.RingTheory.Flat.Basic
 import Mathlib.Algebra.Category.ModuleCat.Products
+import Mathlib.RingTheory.Flat.Basic
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Stalk
 
 /-!
@@ -86,7 +86,8 @@ theorem Modules.isFlatOverId_iff_stalkwiseFlat
       (ModuleCat.restrictScalarsId'App (RingHom.id _) rfl
         ((Modules.moduleStalkFunctor X x).obj M)).toLinearEquiv
 
-/-- A coproduct of module sheaves flat over the identity of `X` is flat over that identity. -/
+/-- The stalk of a sheaf coproduct is a direct sum of its module stalks.
+Direct sums of flat modules are flat, so identity-relative flatness is closed under coproducts. -/
 theorem Modules.isFlatOverId_coprod (X : Scheme.{u}) {I : Type u}
     (G : I → X.Modules) (hG : ∀ i, Modules.IsFlatOver (𝟙 X) (G i)) :
     Modules.IsFlatOver (𝟙 X) (∐ G) := by

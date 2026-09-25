@@ -549,57 +549,27 @@ theorem freeYonedaSheafCoproduct_summand_stalk_flat
           (R := X.ringCatSheaf) (M := M) m)) := by
   exact freeYonedaModuleSheaf_stalk_flat X m.1.unop x
 
-/-- The element-indexed free-Yoneda coproduct has flat stalks over every point.
-
-This proves stalkwise flatness only. It is not a global flatness or K-flat resolution result. -/
-theorem freeYonedaSheafCoproduct_stalk_flat
-    (X : Scheme.{u}) (M : X.Modules) (x : X) :
-    Module.Flat (X.presheaf.stalk x)
-      ((moduleStalkFunctor X x).obj (freeYonedaSheafCoproduct X M)) := by
-  letI : DecidableEq M.val.Elements := Classical.decEq _
-  let G : M.val.Elements → X.Modules := fun m =>
-    SheafOfModules.Elements.freeYonedaSheaf
-      (R := X.ringCatSheaf) (M := M) m
-  let F : Discrete M.val.Elements ⥤ X.Modules := Discrete.functor G
-  let Z : M.val.Elements → ModuleCat.{u} (X.presheaf.stalk x) :=
-    fun m => (moduleStalkFunctor X x).obj (G m)
-  haveI : PreservesColimitsOfShape (Discrete M.val.Elements) (moduleStalkFunctor X x) :=
-    moduleStalkFunctor_preservesColimitsOfShape X x M.val.Elements
-  let e₁ : (moduleStalkFunctor X x).obj (colimit F) ≅ colimit (F ⋙ moduleStalkFunctor X x) :=
-    preservesColimitIso (moduleStalkFunctor X x) F
-  let e₂ : colimit (F ⋙ moduleStalkFunctor X x) ≅ colimit (Discrete.functor Z) :=
-    HasColimit.isoOfNatIso (Discrete.compNatIsoDiscrete G (moduleStalkFunctor X x))
-  let e₃ := ModuleCat.coprodIsoDirectSum Z
-  let e : (moduleStalkFunctor X x).obj (colimit F) ≅
-      ModuleCat.of (X.presheaf.stalk x)
-        (DirectSum M.val.Elements (fun i => ↑(Z i))) := e₁ ≪≫ e₂ ≪≫ e₃
-  have hflat : Module.Flat (X.presheaf.stalk x)
-      (DirectSum M.val.Elements (fun i => ↑(Z i))) := by
-    apply Module.Flat.directSum_iff.mpr
-    intro m
-    simpa [Z, G] using freeYonedaSheafCoproduct_summand_stalk_flat X M m x
-  change Module.Flat (X.presheaf.stalk x)
-    ((moduleStalkFunctor X x).obj (colimit F))
-  letI : Module.Flat (X.presheaf.stalk x)
-      (DirectSum M.val.Elements (fun i => ↑(Z i))) := hflat
-  exact Module.Flat.of_linearEquiv e.toLinearEquiv
-
 private theorem freeYonedaSheafCoproduct_isFlatOver_id
     (X : Scheme.{u}) (M : X.Modules) :
     AlgebraicGeometry.Scheme.Modules.IsFlatOver (𝟙 X)
       (freeYonedaSheafCoproduct X M) := by
-  intro x
-  dsimp [AlgebraicGeometry.Scheme.Modules.IsFlatOver]
-  rw [AlgebraicGeometry.Scheme.Hom.stalkMap_id]
-  change Module.Flat (X.presheaf.stalk x)
-    ((ModuleCat.restrictScalars (RingHom.id (X.presheaf.stalk x))).obj
-      ((moduleStalkFunctor X x).obj (freeYonedaSheafCoproduct X M)))
-  haveI : Module.Flat (X.presheaf.stalk x)
+  let G : M.val.Elements → X.Modules := fun m =>
+    SheafOfModules.Elements.freeYonedaSheaf
+      (R := X.ringCatSheaf) (M := M) m
+  have hG : ∀ m, IsFlatOver (𝟙 X) (G m) := by
+    intro m
+    exact freeYonedaModuleSheaf_isFlatOver_id X m.1.unop
+  change IsFlatOver (𝟙 X) (∐ G)
+  exact isFlatOverId_coprod X G hG
+
+/-- The stalks of the element-indexed free-Yoneda coproduct are flat because its
+summands are flat over the identity and that property is closed under coproducts. -/
+theorem freeYonedaSheafCoproduct_stalk_flat
+    (X : Scheme.{u}) (M : X.Modules) (x : X) :
+    Module.Flat (X.presheaf.stalk x)
       ((moduleStalkFunctor X x).obj (freeYonedaSheafCoproduct X M)) :=
-    freeYonedaSheafCoproduct_stalk_flat X M x
-  exact Module.Flat.of_linearEquiv
-    (ModuleCat.restrictScalarsId'App (RingHom.id _) rfl
-      ((moduleStalkFunctor X x).obj (freeYonedaSheafCoproduct X M))).toLinearEquiv
+  (isFlatOverId_iff_stalkwiseFlat X (freeYonedaSheafCoproduct X M)).mp
+    (freeYonedaSheafCoproduct_isFlatOver_id X M) x
 
 /-- The element-indexed free-Yoneda coproduct defines a Mathlib left resolution of every
 module sheaf by sheaves flat over the identity of `X`.
