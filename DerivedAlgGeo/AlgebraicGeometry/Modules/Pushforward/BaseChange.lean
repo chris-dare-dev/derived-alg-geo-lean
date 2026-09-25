@@ -7,12 +7,10 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Restriction.Sections
 import Mathlib.AlgebraicGeometry.Modules.Sheaf
 
 /-!
-# The restriction square, read on opens
+# Pushforward and restriction across an open square
 
-`#572` step 2 globalizes `isCoherent_pushforward_of_surjective` along an affine cover, and the
-criterion it feeds (`Modules.isCoherent_iff_restrict_affineOpenCover`) asks for
-`(ι_* F).restrict (𝒰.f i)` while the affine theorem produces the pushforward along
-`ι ∣_ V`. Comparing the two is a base-change statement about the square
+For any scheme morphism `f : X ⟶ Y` and open `U` of `Y`, compare the two ways
+to push forward a module sheaf and restrict it across the square
 
 ```
   f ⁻¹ᵁ U  ──(f ⁻¹ᵁ U).ι──>  X
@@ -22,8 +20,7 @@ criterion it feeds (`Modules.isCoherent_iff_restrict_affineOpenCover`) asks for
      U   ─────U.ι─────────>   Y
 ```
 
-This file records the geometric half of that comparison: the two ways round the square agree
-as functors on opens.
+The comparison is independent of finiteness, affineness, and coherence.
 
 ## Why this is the whole geometric content
 
@@ -35,17 +32,10 @@ because the naturality squares live in a subsingleton.
 
 ## The comparison of module sheaves, object by object
 
-`pushforwardRestrictIso` is the comparison `#572` step 2 consumes: for one `M`, the two ways round
-the square agree. `Modules.isCoherent_iff_restrict_affineOpenCover` asks only for
-`IsFinitePresentation` of `(ι_* F).restrict (𝒰.f i)`, which transfers along an isomorphism, so an
-isomorphism of *objects* is what is needed and a natural isomorphism of functors is not.
-
-That is not only economy. The functor-level statement is the one
-`SheafOfModules.pushforwardNatIso` and `pushforwardCongr` are built for, and going through them
-means letting unification discover the two site functors underneath `Scheme.Modules.pushforward`
-and `Scheme.Modules.restrictFunctor`. **That does not terminate**: it runs `whnf` past 200000
-heartbeats, the same failure `ChartExtension.lean` records for `fromTildeΓ`. Naming the objects and
-comparing their sections avoids the search entirely.
+`pushforwardRestrictIso` compares the resulting module sheaves for one `M`.
+`pushforwardRestrictNatIso` assembles these isomorphisms into a functor comparison;
+its naturality is the naturality of a sheaf morphism on the same transported
+sections. The coherent pushforward chart argument consumes the object component.
 
 ## What the comparison rests on
 
@@ -80,11 +70,8 @@ The lesson generalises, and it is the opposite of the reflex: a large heartbeat 
 the use site only `exact` is available — `exact` unifies up to defeq and never has to match
 syntactically, which is what the defective goal rules out.
 
-## What this file does not do
-
-It does not build the *functor* comparison
-`pushforward f ⋙ restrictFunctor U.ι ≅ restrictFunctor (f ⁻¹ᵁ U).ι ⋙ pushforward (f ∣_ U)`.
-Naturality in `M` is not proved here, and the coherence criterion does not need it.
+The functor comparison is built from these explicit objectwise components;
+it does not use an adjunction mate or identify one with this comparison.
 -/
 
 universe u
@@ -199,32 +186,14 @@ noncomputable def restrictSquareSectionsEquiv (V : U.toScheme.Opens) :
   left_inv x := restrictSquareSectionsInv_restrictSquareSections f U M V x
   right_inv x := restrictSquareSections_restrictSquareSectionsInv f U M V x
 
-/-- **The base-change comparison, object by object.**
+/-- **The open-square comparison, object by object.**
 
 Pushing forward along `f` and then restricting to `U` is restricting to `f ⁻¹ᵁ U` and then pushing
-forward along `f ∣_ U`. This is what `#572` step 2 consumes:
-`isCoherent_iff_restrict_affineOpenCover` asks for `IsFinitePresentation` of the restriction, which
-transfers along an isomorphism, so the object-level statement suffices.
+forward along `f ∣_ U`. The coherent-pushforward chart argument uses this
+objectwise isomorphism to transport finite presentation.
 
-## The ceiling, and what lifting it would take
-
-This compares the two composites **at one `M`**. Naturality in `M` is not proved, so there is no
-natural isomorphism of functors
-
-    (pushforward f ⋙ restrict U.ι) ≅ (restrict (f ⁻¹ᵁ U).ι ⋙ pushforward (f ∣_ U))
-
-here — only its value at each object. That is enough for coherence, which needs a property
-transported along an iso and never needs the iso to vary coherently with `M`.
-
-It is not enough for a consumer that wants base change as a *square*: a projection formula, a
-derived base-change comparison, or anything that composes this with another natural transformation.
-Such a consumer will find the object-level iso, find it typechecks at each `M`, and only then
-discover there is no naturality to compose with. Lifting the ceiling means proving the square
-commutes for every `M ⟶ N`, which the component `restrictSquareSectionsEquiv` should support but
-nothing here does.
-
-`#572` step 3 asks for `Hⁱ(X, F) ≅ Hⁱ(Pⁿ, ι_* F)` *naturally in `F`*, so it is the likely first
-consumer to hit this. -/
+The component on every open is `restrictSquareSections`, transporting along
+`image_morphismRestrict_preimage`. -/
 noncomputable def pushforwardRestrictIso :
     ((Scheme.Modules.pushforward f).obj M).restrict U.ι ≅
       (Scheme.Modules.pushforward (f ∣_ U)).obj (M.restrict (f ⁻¹ᵁ U).ι) :=
@@ -239,5 +208,19 @@ noncomputable def pushforwardRestrictIso :
           ((f ⁻¹ᵁ U).ι.opensFunctor.map ((Opens.map (f ∣_ U).base).map i.unop)).op x))
 
 end Modules
+
+/-- The independent comparison of pushforward and restriction around an open square.
+Its component at `M` is `pushforwardRestrictIso f U M`, whose map on sections is
+`restrictSquareSections f U M`. -/
+noncomputable def pushforwardRestrictNatIso :
+    Scheme.Modules.pushforward f ⋙ Scheme.Modules.restrictFunctor U.ι ≅
+      Scheme.Modules.restrictFunctor (f ⁻¹ᵁ U).ι ⋙
+        Scheme.Modules.pushforward (f ∣_ U) :=
+  NatIso.ofComponents (pushforwardRestrictIso f U) (fun {M N} g ↦ by
+    apply Scheme.Modules.hom_ext
+    intro W
+    ext x
+    exact (NatTrans.naturality_apply g.mapPresheaf
+      (eqToHom (image_morphismRestrict_preimage f U W)).op x).symm)
 
 end AlgebraicGeometry
