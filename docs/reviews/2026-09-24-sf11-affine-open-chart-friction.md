@@ -10,11 +10,18 @@ restriction on arbitrary opens. For a localization map of affine spectra,
 `affineLocalizationTopNatIso_hom_localizedMk_square` identifies its value on a
 top-section tensor generator with the existing localization comparison.
 
-## Recovery point for an affine open
+## Resolved elementwise restriction probe
 
-A proposed elementwise restriction of the last identity from `⊤` to
-`W : (Spec R).Opens` was removed after three compile/revise cycles. The exact
-Lean diagnostics were:
+`affineLocalizationTopNatIso_hom_localizedMk_square_restrict` now proves the
+elementwise restriction of that identity to any chosen
+`W : (Spec R).Opens`. Its proof applies
+`fixedBasePullbackOpenOfIsPullback_restrict` with `(U := W)` to the identity
+localization square, evaluates the morphism equality on `1 ⊗ x`, and uses the
+top-section generator comparison. It only concerns sections restricted from
+`⊤` for `tilde M`; it asserts no isomorphism at `W`.
+
+The previous attempt was removed after three compile/revise cycles. Its exact
+Lean diagnostics and their resolutions were:
 
 1. `Unknown constant AlgebraicGeometry.Scheme.Opens.map` and
    `TopologicalSpace.Opens.leTop W` has type `W ⟶ ⊤` where `homOfLE` expects
@@ -23,8 +30,12 @@ Lean diagnostics were:
    `presheaf.map (homOfLE le_top).op`. The explicit annotation
    `(homOfLE le_top : W ⟶ ⊤).op` resolved this.
 3. `don't know how to synthesize implicit argument U` in the call
-   `fixedBasePullbackOpenOfIsPullback_restrict ... le_top`. The next probe
-   should pass `(U := W)` explicitly before checking the elementwise rewrite.
+   `fixedBasePullbackOpenOfIsPullback_restrict ... le_top`. Passing `(U := W)`
+   resolved this. The subsequent `rw [ModuleCat.comp_apply, ModuleCat.comp_apply]`
+   also failed with `Did not find an occurrence of the pattern
+   (ConcreteCategory.hom (?f ≫ ?g)) ?x`; an explicit `change` of the evaluated
+   restriction equation exposed the needed top-unit term and completed the
+   rewrite.
 
 The existing `affineLocalizationTopNatIso` is a comparison on top sections
 for `Spec (Localization S) ⟶ Spec R` and a tilde module. It does not by itself

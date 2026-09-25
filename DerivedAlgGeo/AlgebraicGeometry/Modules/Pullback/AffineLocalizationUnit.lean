@@ -18,7 +18,7 @@ generator to the actual scheme-module pullback unit.
 
 universe u
 
-open CategoryTheory AlgebraicGeometry
+open CategoryTheory AlgebraicGeometry TopologicalSpace
 open scoped TensorProduct
 
 noncomputable section
@@ -192,6 +192,51 @@ theorem affineLocalizationTopNatIso_hom_localizedMk_square
       exact (fixedBasePullbackOpenOfIsPullback_one_tmul
         (Spec.map f) (AlgebraicGeometry.tilde M) f
         (𝟙 (Spec R)) (𝟙 (Spec A)) IsPullback.of_id_snd ⊤ x).symm
+
+/-- For the identity localization square, the top-section localization
+generator comparison restricts to the actual pullback unit on any chosen open.
+The source section is restricted from `⊤`; no local isomorphism is asserted. -/
+theorem affineLocalizationTopNatIso_hom_localizedMk_square_restrict
+    (M : ModuleCat.{u} R) (W : (Spec R).Opens)
+    (x : (AlgebraicGeometry.fixedBaseSectionsFunctor (Spec R)
+      (Scheme.ΓSpecIso R).inv ⊤).obj (AlgebraicGeometry.tilde M)) :
+    let A := CommRingCat.of (Localization S)
+    let f : R ⟶ A := CommRingCat.ofHom (algebraMap R (Localization S))
+    let N := AlgebraicGeometry.tilde M
+    let rY := (((modulesToFixedBaseSheaf (Spec R) (Scheme.ΓSpecIso R).inv).obj N).presheaf.map
+      (homOfLE le_top : W ⟶ ⊤).op)
+    let rZ := (((modulesToFixedBaseSheaf (Spec A) (Scheme.ΓSpecIso A).inv).obj
+      ((pullback (Spec.map f)).obj N)).presheaf.map
+        ((Opens.map (Spec.map f).base).map (homOfLE le_top : W ⟶ ⊤)).op)
+    (((ModuleCat.extendScalars f.hom).map rY ≫
+      fixedBasePullbackOpenOfIsPullback (Spec.map f) N f
+        (𝟙 (Spec R)) (𝟙 (Spec A)) IsPullback.of_id_snd W).hom
+          ((1 : A) ⊗ₜ[R] x)) =
+      rZ.hom (((affineLocalizationTopNatIso S).hom.app M).hom
+        (((AlgebraicGeometry.fixedBaseSectionsFunctor (Spec R)
+          (Scheme.ΓSpecIso R).inv ⊤).obj N).localizedModuleMkLinearMap S x)) := by
+  let A := CommRingCat.of (Localization S)
+  let f : R ⟶ A := CommRingCat.ofHom (algebraMap R (Localization S))
+  let N := AlgebraicGeometry.tilde M
+  let rY := (((modulesToFixedBaseSheaf (Spec R) (Scheme.ΓSpecIso R).inv).obj N).presheaf.map
+    (homOfLE le_top : W ⟶ ⊤).op)
+  let rZ := (((modulesToFixedBaseSheaf (Spec A) (Scheme.ΓSpecIso A).inv).obj
+    ((pullback (Spec.map f)).obj N)).presheaf.map
+      ((Opens.map (Spec.map f).base).map (homOfLE le_top : W ⟶ ⊤)).op)
+  have h := fixedBasePullbackOpenOfIsPullback_restrict
+    (Spec.map f) N f (𝟙 (Spec R)) (𝟙 (Spec A)) IsPullback.of_id_snd
+    (U := W) le_top
+  have hx := congrArg (fun g => g.hom ((1 : A) ⊗ₜ[R] x)) h
+  change rZ.hom
+      ((fixedBasePullbackOpenOfIsPullback (Spec.map f) N f
+        (𝟙 (Spec R)) (𝟙 (Spec A)) IsPullback.of_id_snd ⊤).hom
+          ((1 : A) ⊗ₜ[R] x)) =
+    ((ModuleCat.extendScalars f.hom).map rY ≫
+      fixedBasePullbackOpenOfIsPullback (Spec.map f) N f
+        (𝟙 (Spec R)) (𝟙 (Spec A)) IsPullback.of_id_snd W).hom
+          ((1 : A) ⊗ₜ[R] x) at hx
+  rw [← affineLocalizationTopNatIso_hom_localizedMk_square S M x] at hx
+  exact hx.symm
 
 end AlgebraicGeometry.Scheme.Modules
 
