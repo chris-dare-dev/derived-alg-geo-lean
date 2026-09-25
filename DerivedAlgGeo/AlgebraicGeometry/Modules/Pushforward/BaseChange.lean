@@ -77,6 +77,10 @@ open-immersion direction is the direct pushforward-composite comparison.
 Pasting the five factors of the independent pullback iso gives the same
 pushforward-composite comparison under conjugation; the iterated-mate
 identity then identifies its horizontal mate with the independent comparison.
+The actual pullback/pushforward units obey the resulting natural open-square
+unit equation. Its ordinary-section form evaluates the pushforward comparison
+as `restrictSquareSections`; this is distinct from slice-site `pullbackOverIso`
+transport and does not assert relative base-change invertibility.
 -/
 
 universe u
@@ -409,5 +413,81 @@ theorem pullbackRestrictNatIso_mate :
   change mateEquiv av ai (mateEquiv af ag (pullbackRestrictNatIso f U).inv) =
     mateEquiv av ai (pushforwardRestrictNatIso f U).hom
   exact hi.trans (hc.trans hm.symm)
+
+/-- The actual pullback/pushforward units commute with the independent open-square
+comparisons. This is the component of the natural unit square at `N`. -/
+theorem pullbackRestrictNatIso_unit_app (N : Y.Modules) :
+    (Scheme.Modules.restrictFunctor U.ι).map
+        ((Scheme.Modules.pullbackPushforwardAdjunction f).unit.app N) ≫
+      (pushforwardRestrictNatIso f U).hom.app ((Scheme.Modules.pullback f).obj N) =
+    (Scheme.Modules.pullbackPushforwardAdjunction (f ∣_ U)).unit.app
+        ((Scheme.Modules.restrictFunctor U.ι).obj N) ≫
+      (Scheme.Modules.pushforward (f ∣_ U)).map
+        ((pullbackRestrictNatIso f U).inv.app N) := by
+  have hα : ((mateEquiv
+      (Scheme.Modules.pullbackPushforwardAdjunction f)
+      (Scheme.Modules.pullbackPushforwardAdjunction (f ∣_ U))).symm
+      (pushforwardRestrictNatIso f U).hom) = (pullbackRestrictNatIso f U).inv := by
+    rw [Equiv.symm_apply_eq]
+    exact (pullbackRestrictNatIso_mate f U).symm
+  have h := unit_mateEquiv_symm
+    (Scheme.Modules.pullbackPushforwardAdjunction f)
+    (Scheme.Modules.pullbackPushforwardAdjunction (f ∣_ U))
+    (pushforwardRestrictNatIso f U).hom N
+  rw [hα] at h
+  exact h
+
+set_option backward.isDefEq.respectTransparency false in
+/-- The natural unit square for the actual pullback/pushforward adjunctions.
+The upper route uses the independent pushforward/restriction comparison;
+the lower route uses the independent geometric pullback comparison. -/
+theorem pullbackRestrictNatIso_unit :
+    (Functor.leftUnitor (Scheme.Modules.restrictFunctor U.ι)).inv ≫
+      Functor.whiskerRight (Scheme.Modules.pullbackPushforwardAdjunction f).unit
+        (Scheme.Modules.restrictFunctor U.ι) ≫
+      (Functor.associator (Scheme.Modules.pullback f) (Scheme.Modules.pushforward f)
+        (Scheme.Modules.restrictFunctor U.ι)).hom ≫
+      Functor.whiskerLeft (Scheme.Modules.pullback f) (pushforwardRestrictNatIso f U).hom ≫
+      (Functor.associator (Scheme.Modules.pullback f)
+        (Scheme.Modules.restrictFunctor (f ⁻¹ᵁ U).ι)
+        (Scheme.Modules.pushforward (f ∣_ U))).inv =
+    (Functor.rightUnitor (Scheme.Modules.restrictFunctor U.ι)).inv ≫
+      Functor.whiskerLeft (Scheme.Modules.restrictFunctor U.ι)
+        (Scheme.Modules.pullbackPushforwardAdjunction (f ∣_ U)).unit ≫
+      (Functor.associator (Scheme.Modules.restrictFunctor U.ι)
+        (Scheme.Modules.pullback (f ∣_ U))
+        (Scheme.Modules.pushforward (f ∣_ U))).inv ≫
+      Functor.whiskerRight (pullbackRestrictNatIso f U).inv
+        (Scheme.Modules.pushforward (f ∣_ U)) := by
+  apply NatTrans.ext
+  funext N
+  convert pullbackRestrictNatIso_unit_app f U N using 1 <;>
+    simp only [NatTrans.comp_app, Functor.leftUnitor_inv_app, Functor.rightUnitor_inv_app,
+      Functor.whiskerLeft_app, Functor.whiskerRight_app, Functor.associator_hom_app,
+      Functor.associator_inv_app, Functor.comp_obj, Functor.id_obj,
+      Category.id_comp, Category.comp_id]
+
+/-- On ordinary sections over `W`, the independent pushforward comparison in
+the actual unit square is exactly `restrictSquareSections`. This is the direct
+open-square equation, not its slice-site `pullbackOverIso` transport. -/
+theorem pullbackRestrictNatIso_unit_sections (N : Y.Modules)
+    (W : U.toScheme.Opens) (x : Γ(N.restrict U.ι, W)) :
+    (restrictSquareSections f U ((Scheme.Modules.pullback f).obj N) W).hom
+      (((Scheme.Modules.restrictFunctor U.ι).map
+        ((Scheme.Modules.pullbackPushforwardAdjunction f).unit.app N)).app W x) =
+    ((Scheme.Modules.pushforward (f ∣_ U)).map
+      ((pullbackRestrictNatIso f U).inv.app N)).app W
+        (((Scheme.Modules.pullbackPushforwardAdjunction (f ∣_ U)).unit.app
+          (N.restrict U.ι)).app W x) := by
+  have h := pullbackRestrictNatIso_unit_app f U N
+  have hW := congrArg (fun ψ => ψ.app W x) h
+  change (restrictSquareSections f U ((Scheme.Modules.pullback f).obj N) W).hom
+      (((Scheme.Modules.restrictFunctor U.ι).map
+        ((Scheme.Modules.pullbackPushforwardAdjunction f).unit.app N)).app W x) =
+    ((Scheme.Modules.pushforward (f ∣_ U)).map
+      ((pullbackRestrictNatIso f U).inv.app N)).app W
+        (((Scheme.Modules.pullbackPushforwardAdjunction (f ∣_ U)).unit.app
+          (N.restrict U.ι)).app W x) at hW
+  exact hW
 
 end AlgebraicGeometry

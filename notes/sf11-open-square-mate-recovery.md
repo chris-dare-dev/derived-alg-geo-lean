@@ -1,6 +1,7 @@
 # SF11 #1063 open-square mate research recovery
 
-Cutover: `6d966b64`; proof revision: `1a433e7e` on
+Cutover: `6d966b64`; reviewed mate revision: `1a433e7e` and cleanup
+`0f323f7e` on
 `agent/sf11-open-square-mate-research`.
 Scope: the underived scheme-module open square. The formerly missing
 identification of two independently defined comparisons now compiles. This
@@ -54,6 +55,30 @@ mateEquiv (Scheme.Modules.pullbackPushforwardAdjunction f)
   (pullbackRestrictNatIso f U).inv = (pushforwardRestrictNatIso f U).hom
 ```
 
+## Compiled actual-unit square
+
+`pullbackRestrictNatIso_unit_app` applies pinned `unit_mateEquiv_symm` to that
+horizontal mate equality. For `N : Y.Modules`, it identifies the two routes
+from `N.restrict U.ι` to the pushforward of the pullback on the inverse-image
+open: restrict the actual `pullbackPushforwardAdjunction f` unit and then apply
+the independent β, or apply the actual `pullbackPushforwardAdjunction (f ∣_ U)`
+unit and then push forward the inverse of the independent geometric α.
+`pullbackRestrictNatIso_unit` packages this as an equality of natural
+transformations between functors, with the required unitor and associator
+factors explicit. No comparison is defined from `conjugateEquiv`.
+
+`pullbackRestrictNatIso_unit_sections` evaluates the same equality on an
+ordinary section `x : Γ(N.restrict U.ι, W)`. Its left route uses
+`(restrictSquareSections f U ((Scheme.Modules.pullback f).obj N) W).hom` to
+evaluate β at `W`; its right route evaluates the restricted unit followed by
+the pushforward of `α.inv.app N`. The module, audit, and ordinary-section
+client compile, and the three new axiom prints contain only `propext`,
+`Classical.choice`, and `Quot.sound`.
+
+This is a *direct* open-square unit equation for the actual adjunctions. It
+does not transport through the slice-site `pullbackOverIso` and is not a
+relative localization/base-change `IsIso` theorem.
+
 ## Proof and friction
 
 The conjugate proof names six adjunctions and splits the inverse geometric
@@ -74,6 +99,14 @@ finishes its component calculation. The final normal form uses
 give the horizontal equality. An explicit `change` aligns the iterated mate
 with the displayed conjugate equality at the pinned API's transparency level.
 
+For the unit step, `Equiv.symm_apply_eq` aligns the inverse mate with the
+geometric iso. A naive functor-level `simpa` did not normalize the explicit
+unitor/associator path; componentwise `NatTrans.ext`, `convert ... using 1`,
+and a small `simp only` did. At ordinary sections, `simpa only [Hom.comp_app]`
+hit the `ConcreteCategory.hom` versus `AddCommGrpCat.Hom.hom` elaboration
+seam; an explicit `change` on the component equality preserved the intended
+ordinary-section equation.
+
 The earlier direct pointwise attempt left the pullback unit, inverse
 geometric pullback comparison, and pullback counit in the section-level goal.
 The auxiliary pushforward mate initially failed with the exact Lean diagnostic:
@@ -88,7 +121,8 @@ no comparison defined from `conjugateEquiv` and no placeholder theorem.
 
 ## Remaining follow-up
 
-Transport the proved horizontal mate through the slice-site
-`pullbackOverIso` and state its pointwise section/unit consequence. The
-underived open-square mate alone does not establish relative or derived base
-change, Hom localization, or Theorem 5.7(2).
+Transport the proved direct open-square unit square through the slice-site
+`pullbackOverIso` and identify the transported ordinary-section map. That
+slice-site step remains unproved. Neither the direct mate nor this direct
+unit square establishes relative or derived base change, Hom localization,
+or Theorem 5.7(2).
