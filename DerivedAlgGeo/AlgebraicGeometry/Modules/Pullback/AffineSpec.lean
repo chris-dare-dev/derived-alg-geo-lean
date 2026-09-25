@@ -13,13 +13,15 @@ import Mathlib.LinearAlgebra.TensorProduct.Tower
 For a map of commutative rings, pulling back the tilde of a module along the
 induced map of affine schemes agrees with extension of scalars followed by
 tilde. The comparison is underived and is obtained from the two standard
-adjunctions and the affine global-sections comparison.
+adjunctions and the affine global-sections comparison. Its mate equation below
+identifies the actual pullback unit on top sections with the tensor generator.
 -/
 
 universe u
 
 open CategoryTheory
 open scoped ChangeOfRings
+open scoped TensorProduct
 
 namespace AlgebraicGeometry.Scheme.Modules
 
@@ -52,6 +54,67 @@ noncomputable def pullbackSpecMapTildeIso :
       (AlgebraicGeometry.tilde.adjunction (R := S))
   exact Adjunction.leftAdjointUniq
     (adjL.ofNatIsoRight (AlgebraicGeometry.gammaPushforwardNatIso f)) adjR
+
+/-- The affine tilde/pullback comparison is the mate of the *actual* scheme-module pullback
+unit. After identifying the two global-sections functors, this equation says that applying
+`pullbackSpecMapTildeIso` to the section obtained from that unit agrees with the tensor
+extension unit followed by the target tilde/Γ unit. No localization or derived claim enters. -/
+theorem pullbackSpecMapTildeIso_unit (M : ModuleCat.{u} R) :
+    (AlgebraicGeometry.tilde.isoTop M).hom ≫
+      (AlgebraicGeometry.moduleSpecΓFunctor (R := R)).map
+        ((pullbackPushforwardAdjunction (Spec.map f)).unit.app (AlgebraicGeometry.tilde M)) ≫
+      (AlgebraicGeometry.gammaPushforwardNatIso f).hom.app
+        ((pullback (Spec.map f)).obj (AlgebraicGeometry.tilde M)) ≫
+      (ModuleCat.restrictScalars f.hom).map
+        ((AlgebraicGeometry.moduleSpecΓFunctor (R := S)).map
+          ((pullbackSpecMapTildeIso f).hom.app M)) =
+    (ModuleCat.extendRestrictScalarsAdj f.hom).unit.app M ≫
+      (ModuleCat.restrictScalars f.hom).map
+        ((AlgebraicGeometry.tilde.adjunction (R := S)).unit.app
+          ((ModuleCat.extendScalars f.hom).obj M)) := by
+  let adjL := ((AlgebraicGeometry.tilde.adjunction (R := R)).comp
+    (pullbackPushforwardAdjunction (Spec.map f))).ofNatIsoRight
+      (AlgebraicGeometry.gammaPushforwardNatIso f)
+  let adjR := (ModuleCat.extendRestrictScalarsAdj f.hom).comp
+    (AlgebraicGeometry.tilde.adjunction (R := S))
+  have h := adjL.unit_leftAdjointUniq_hom_app adjR M
+  have he : pullbackSpecMapTildeIso f = adjL.leftAdjointUniq adjR := rfl
+  rw [← he] at h
+  simp only [adjL, adjR, Adjunction.ofNatIsoRight_unit, NatTrans.comp_app,
+    Functor.whiskerLeft_app, Functor.comp_map, Adjunction.comp_unit_app] at h
+  simp only [Category.assoc] at h ⊢
+  exact h
+
+/-- On a section `m`, the actual affine pullback unit becomes `1 ⊗ m` under the
+tilde/Γ and affine pullback comparisons. The right-hand side is the canonical section of the
+tilde of the scalar-extended module, not a chosen non-natural Γ isomorphism. -/
+theorem pullbackSpecMapTildeIso_unit_apply (M : ModuleCat.{u} R) (m : M) :
+    ((AlgebraicGeometry.tilde.isoTop M).hom ≫
+      (AlgebraicGeometry.moduleSpecΓFunctor (R := R)).map
+        ((pullbackPushforwardAdjunction (Spec.map f)).unit.app (AlgebraicGeometry.tilde M)) ≫
+      (AlgebraicGeometry.gammaPushforwardNatIso f).hom.app
+        ((pullback (Spec.map f)).obj (AlgebraicGeometry.tilde M)) ≫
+      (ModuleCat.restrictScalars f.hom).map
+        ((AlgebraicGeometry.moduleSpecΓFunctor (R := S)).map
+          ((pullbackSpecMapTildeIso f).hom.app M))).hom m =
+    (AlgebraicGeometry.tilde.isoTop ((ModuleCat.extendScalars f.hom).obj M)).hom
+      ((1 : S) ⊗ₜ[R] m) := by
+  have h := congrArg (fun g : M ⟶
+      (ModuleCat.restrictScalars f.hom).obj
+        ((AlgebraicGeometry.moduleSpecΓFunctor (R := S)).obj
+          (AlgebraicGeometry.tilde ((ModuleCat.extendScalars f.hom).obj M))) => g.hom m)
+      (pullbackSpecMapTildeIso_unit f M)
+  calc
+    _ = ((ModuleCat.extendRestrictScalarsAdj f.hom).unit.app M ≫
+          (ModuleCat.restrictScalars f.hom).map
+            ((AlgebraicGeometry.tilde.adjunction (R := S)).unit.app
+              ((ModuleCat.extendScalars f.hom).obj M))).hom m := h
+    _ = _ := by
+      rw [ModuleCat.hom_comp]
+      change (AlgebraicGeometry.tilde.isoTop ((ModuleCat.extendScalars f.hom).obj M)).hom
+        ((ModuleCat.extendRestrictScalarsAdj f.hom).unit.app M m) = _
+      rw [ModuleCat.extendRestrictScalarsAdj_unit_app_apply]
+      rfl
 
 /-- The affine tilde/pullback comparison induces the corresponding
 isomorphism on cochain complexes. -/

@@ -276,9 +276,10 @@ of an object to a truncation triangle of its image.
 This is the formal comparison used in Steps 2 and 3 of Polishchuk's Theorem
 A.17. It is constructed by uniqueness of truncation triangles, so it does not
 assume that the chosen truncation functors commute definitionally. -/
-noncomputable def mapTriangleLEGEIso (n : ℤ) (X : C) :
-    F.mapTriangle.obj ((t.triangleLEGE n (n + 1) rfl).obj X) ≅
-      (t'.triangleLEGE n (n + 1) rfl).obj (F.obj X) := by
+private theorem exists_mapTriangleLEGEIso (n : ℤ) (X : C) :
+    ∃ e : F.mapTriangle.obj ((t.triangleLEGE n (n + 1) rfl).obj X) ≅
+      (t'.triangleLEGE n (n + 1) rfl).obj (F.obj X),
+      e.hom.hom₂ = (Iso.refl _).hom := by
   let TC := (t.triangleLEGE n (n + 1) rfl).obj X
   let TD := (t'.triangleLEGE n (n + 1) rfl).obj (F.obj X)
   have hTC : TC ∈ distTriang C := t.triangleLEGE_distinguished n (n + 1) rfl X
@@ -302,12 +303,62 @@ noncomputable def mapTriangleLEGEIso (n : ℤ) (X : C) :
       t'.isGE_truncGE_obj (F.obj X) (n + 1) (n + 1)
   simpa only [TC, TD] using
     (t'.triangle_iso_exists hFTC hTD (Iso.refl _) n (n + 1)
-      hFTC₁ hFTC₃ hTD₁ hTD₃ (by omega)).choose
+      hFTC₁ hFTC₃ hTD₁ hTD₃ (by omega))
+
+/-- The triangle isomorphism comparing a t-exact functor applied to the
+canonical truncation triangle with the target truncation triangle. -/
+noncomputable def mapTriangleLEGEIso (n : ℤ) (X : C) :
+    F.mapTriangle.obj ((t.triangleLEGE n (n + 1) rfl).obj X) ≅
+      (t'.triangleLEGE n (n + 1) rfl).obj (F.obj X) :=
+  (exists_mapTriangleLEGEIso F t t' n X).choose
+
+/-- The middle component of the truncation-triangle comparison is the
+identity on the mapped object. -/
+@[simp] theorem mapTriangleLEGEIso_hom₂ (n : ℤ) (X : C) :
+    (mapTriangleLEGEIso F t t' n X).hom.hom₂ = (Iso.refl _).hom := by
+  exact (exists_mapTriangleLEGEIso F t t' n X).choose_spec
 
 /-- The coconnective truncation comparison of a t-exact functor. -/
 noncomputable def mapTruncLEIso (n : ℤ) (X : C) :
     F.obj ((t.truncLE n).obj X) ≅ (t'.truncLE n).obj (F.obj X) :=
   Triangle.π₁.mapIso (mapTriangleLEGEIso F t t' n X)
+
+set_option backward.defeqAttrib.useBackward true in
+set_option backward.isDefEq.respectTransparency false in
+@[reassoc]
+theorem mapTruncLEIso_hom_comp_ι (n : ℤ) (X : C) :
+    (mapTruncLEIso F t t' n X).hom ≫ (t'.truncLEι n).app (F.obj X) =
+      F.map ((t.truncLEι n).app X) := by
+  have h := (mapTriangleLEGEIso F t t' n X).hom.comm₁
+  rw [mapTriangleLEGEIso_hom₂] at h
+  dsimp [Functor.mapTriangle] at h
+  simpa [mapTruncLEIso, Functor.mapTriangle,
+    TStructure.triangleLEGE_obj_mor₁, TStructure.triangleLEGE_obj_obj₂] using h.symm
+
+/-- The coconnective truncation comparison is natural in the object. -/
+@[reassoc]
+theorem mapTruncLEIso_hom_naturality (n : ℤ) {X Y : C} (f : X ⟶ Y) :
+    F.map ((t.truncLE n).map f) ≫ (mapTruncLEIso F t t' n Y).hom =
+      (mapTruncLEIso F t t' n X).hom ≫ (t'.truncLE n).map (F.map f) := by
+  letI : t'.IsLE (F.obj ((t.truncLE n).obj X)) n :=
+    IsRightTExact.isLE_map _ n (t.isLE_truncLE_obj X n n)
+  apply t'.to_truncLE_obj_ext
+  calc
+    _ = F.map ((t.truncLE n).map f) ≫ F.map ((t.truncLEι n).app Y) := by
+      exact (Category.assoc _ _ _).trans
+        (congrArg (fun g => F.map ((t.truncLE n).map f) ≫ g)
+          (mapTruncLEIso_hom_comp_ι F t t' n Y))
+    _ = F.map ((t.truncLEι n).app X) ≫ F.map f := by
+      rw [← F.map_comp, ← F.map_comp]
+      exact congrArg F.map (by simpa using (t.truncLEι n).naturality f)
+    _ = (mapTruncLEIso F t t' n X).hom ≫
+        (t'.truncLEι n).app (F.obj X) ≫ F.map f := by
+      rw [← mapTruncLEIso_hom_comp_ι F t t' n X]
+      cat_disch
+    _ = _ := by
+      simpa [Category.assoc] using
+        congrArg (fun g => (mapTruncLEIso F t t' n X).hom ≫ g)
+          ((t'.truncLEι n).naturality (F.map f)).symm
 
 /-- The connective truncation comparison of a t-exact functor. -/
 noncomputable def mapTruncGEIso (n : ℤ) (X : C) :
@@ -316,6 +367,79 @@ noncomputable def mapTruncGEIso (n : ℤ) (X : C) :
     simpa only [Functor.mapTriangle_obj, Triangle.π₃, Triangle.mk,
       TStructure.triangleLEGE_obj_obj₃, sub_add_cancel] using
       Triangle.π₃.mapIso (mapTriangleLEGEIso F t t' (n - 1) X)
+
+@[reassoc]
+theorem mapTruncGEIso_π_comp_hom (n : ℤ) (X : C) :
+    F.map ((t.truncGEπ n).app X) ≫ (mapTruncGEIso F t t' n X).hom =
+      (t'.truncGEπ n).app (F.obj X) := by
+  have h₂ : F.map ((t.truncGEπ (n - 1 + 1)).app X) ≫
+      (mapTriangleLEGEIso F t t' (n - 1) X).hom.hom₃ =
+      (t'.truncGEπ (n - 1 + 1)).app (F.obj X) := by
+    have h := (mapTriangleLEGEIso F t t' (n - 1) X).hom.comm₂
+    rw [mapTriangleLEGEIso_hom₂] at h
+    change F.map ((t.truncGEπ (n - 1 + 1)).app X) ≫
+      (mapTriangleLEGEIso F t t' (n - 1) X).hom.hom₃ =
+      (Iso.refl _).hom ≫ (t'.truncGEπ (n - 1 + 1)).app (F.obj X) at h
+    simpa using h
+  have hHom : (mapTruncGEIso F t t' n X).hom ≍
+      (Triangle.π₃.mapIso (mapTriangleLEGEIso F t t' (n - 1) X)).hom := by
+    unfold mapTruncGEIso
+    congr! 1 <;> simp [Functor.mapTriangle, TStructure.triangleLEGE_obj_obj₃, sub_add_cancel]
+  have hn : n - 1 + 1 = n := sub_add_cancel n 1
+  have hπ : F.map ((t.truncGEπ n).app X) ≍
+      F.map ((t.truncGEπ (n - 1 + 1)).app X) := by
+    rw [hn]
+  have hπ' : (t'.truncGEπ n).app (F.obj X) ≍
+      (t'.truncGEπ (n - 1 + 1)).app (F.obj X) := by
+    rw [hn]
+  have hc : F.map ((t.truncGEπ n).app X) ≫ (mapTruncGEIso F t t' n X).hom ≍
+      F.map ((t.truncGEπ (n - 1 + 1)).app X) ≫
+        (mapTriangleLEGEIso F t t' (n - 1) X).hom.hom₃ := by
+    exact heq_comp (by rfl) (by simp only [sub_add_cancel])
+      (by simp only [TStructure.triangleLEGE_obj_obj₃, sub_add_cancel]) hπ hHom
+  exact eq_of_heq (hc.trans ((heq_of_eq h₂).trans hπ'.symm))
+
+set_option backward.defeqAttrib.useBackward true in
+set_option backward.isDefEq.respectTransparency false in
+/-- The connective truncation comparison is natural in the object. -/
+@[reassoc]
+theorem mapTruncGEIso_hom_naturality (n : ℤ) {X Y : C} (f : X ⟶ Y) :
+    F.map ((t.truncGE n).map f) ≫ (mapTruncGEIso F t t' n Y).hom =
+      (mapTruncGEIso F t t' n X).hom ≫ (t'.truncGE n).map (F.map f) := by
+  have hπX : (t'.truncGEπ n).app (F.obj X) ≫
+      (mapTruncGEIso F t t' n X).inv = F.map ((t.truncGEπ n).app X) := by
+    rw [← mapTruncGEIso_π_comp_hom F t t' n X]
+    simp
+  have h : (mapTruncGEIso F t t' n X).inv ≫
+      F.map ((t.truncGE n).map f) ≫ (mapTruncGEIso F t t' n Y).hom =
+        (t'.truncGE n).map (F.map f) := by
+    apply t'.from_truncGE_obj_ext (n := n)
+    calc
+      (t'.truncGEπ n).app (F.obj X) ≫
+          ((mapTruncGEIso F t t' n X).inv ≫
+            F.map ((t.truncGE n).map f) ≫ (mapTruncGEIso F t t' n Y).hom) =
+        F.map ((t.truncGEπ n).app X) ≫
+          F.map ((t.truncGE n).map f) ≫ (mapTruncGEIso F t t' n Y).hom := by
+            rw [← Category.assoc, hπX]
+      _ = F.map f ≫ F.map ((t.truncGEπ n).app Y) ≫
+          (mapTruncGEIso F t t' n Y).hom := by
+            have hnat := congrArg (fun g => F.map g ≫
+              (mapTruncGEIso F t t' n Y).hom) (t.truncGEπ_naturality n f)
+            simpa only [F.map_comp, Category.assoc] using hnat
+      _ = F.map f ≫ (t'.truncGEπ n).app (F.obj Y) := by
+            simpa only [Category.assoc] using
+              congrArg (fun g => F.map f ≫ g)
+                (mapTruncGEIso_π_comp_hom F t t' n Y)
+      _ = (t'.truncGEπ n).app (F.obj X) ≫
+          (t'.truncGE n).map (F.map f) := by
+            exact (t'.truncGEπ_naturality n (F.map f)).symm
+  calc
+    F.map ((t.truncGE n).map f) ≫ (mapTruncGEIso F t t' n Y).hom =
+      (mapTruncGEIso F t t' n X).hom ≫
+        ((mapTruncGEIso F t t' n X).inv ≫
+          F.map ((t.truncGE n).map f) ≫ (mapTruncGEIso F t t' n Y).hom) := by
+            simp
+    _ = _ := by rw [h]
 
 /-- A t-exact functor which reflects zero objects also reflects the
 coconnective half of a t-structure. This is formula (A.3)'s reverse

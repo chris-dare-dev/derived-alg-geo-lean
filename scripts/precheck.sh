@@ -36,7 +36,7 @@
 #
 # Usage:
 #   scripts/precheck.sh          the checks above, plus the targeted build
-#   scripts/precheck.sh --no-build   skip Lake entirely (no toolchain needed)
+#   scripts/precheck.sh --no-build   skip Lake build (header gates still need pinned Lean)
 #
 # Each check prints `GATE <name>: pass|FAIL`, in the order `scripts/gates.sh`
 # runs them. It does not stop at the first failure -- an unattended run wants
@@ -218,6 +218,7 @@ gate nolints-ratchet python3 scripts/check_nolints.py
 gate pin python3 scripts/check_pin.py
 gate source-independence python3 scripts/check_source_independence.py
 gate subject-layering python3 scripts/check_layering.py
+gate neutral-stability-imports python3 scripts/check_neutral_stability_imports.py
 gate umbrella-coverage python3 scripts/check_umbrella_coverage.py
 gate root-reachability python3 scripts/check_root_reachability.py
 gate coherent-families python3 scripts/check_coherent_families.py

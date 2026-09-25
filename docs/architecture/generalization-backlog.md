@@ -346,6 +346,15 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   joins, so the heart-level transfer needs only chainwise pointwise lifts.
   The bounded-component geometric pointwise lift is still not supplied by
   the existing `SLocal` owner-data fields.
+- progress note (2026-09-24): A mono/epi-preserving functor between the
+  abelian hearts maps image subobjects to image subobjects. Fixed-target
+  *mono* extension therefore implies pointwise subobject lifting, provided
+  the relevant target-heart object and its chosen source ambient lift are
+  paired. All-arrow extension
+  at every source-heart target is a stronger criterion: applying it to a zero
+  arrow supplies the target-object lift as well. Constructing even the
+  required mono extensions for the bounded coherent base-change component
+  remains `UNVERIFIED`.
 
 ### 2026-09-24 — `anchored_chain_of_pointwise_lifts` with local join structure
 - chunk:              sf11-4d-pointwise-anchored
@@ -398,4 +407,21 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   reflection restricted to monomorphisms may therefore suffice, but the
   weaker statement has not been compiled. This generic API change is outside
   the SF11.4a geometry chunk.
+- state:              UNVERIFIED
+
+### 2026-09-24 — compare the open free-Yoneda sheaf with extension by zero
+- chunk:              sf8-flat-generators
+- reviewing commit:   300a828ce99b9b7b02e7f77320bd1aacde3fc84
+- found by:           altitude-scout
+- proposed ancestor:  the extension-by-zero functor `j_!` for an open immersion
+- weaker hypotheses:  an open immersion of ringed spaces and a module sheaf on
+  its source; no scheme-specific free-Yoneda construction is needed for the
+  upstream stalk formula
+- pin status:         UPSTREAM-ONLY (Stacks Project Lemma 6.31.8, tag 00A7;
+  no pinned Lean comparison established)
+- source note:        Stacks gives zero stalks off the open and the original
+  stalk on it for `j_!`. This does not prove that the repository's canonical
+  `SheafOfModules.freeYonedaSheaf` is `j_!` of the restricted structure sheaf.
+  The current scheme-level result proves the stalk formula directly and makes
+  no such identification.
 - state:              UNVERIFIED

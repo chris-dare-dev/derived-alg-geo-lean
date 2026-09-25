@@ -75,7 +75,7 @@ private noncomputable def originalHeartH0ObjIsoH0prime
     (t : TStructure C) (X : C) :
     (originalHeartCohFunctor t 0).obj X ≅ originalHeartH0prime t X := by
   refine ObjectProperty.isoMk _ ?_
-  simpa [originalHeartCohFunctor, originalHeartH0prime] using
+  simpa [originalHeartCohFunctor, TStructure.heartCohFunctor, originalHeartH0prime] using
     ((shiftFunctorZero C ℤ).app ((t.truncGELE 0 0).obj X) ≪≫
       (t.truncGELEIsoLEGE 0 0).app X)
 
@@ -332,7 +332,7 @@ private theorem isIso_originalHeartH0primeFunctor_map_truncLEι
         (originalHeartCohFunctor t 0).obj ((t.truncLE 0).obj X) ≅
           (originalHeartCohFunctor t 0).obj X := by
       refine ObjectProperty.isoMk _ ?_
-      simpa [originalHeartCohFunctor] using
+      simpa [originalHeartCohFunctor, TStructure.heartCohFunctor] using
         (shiftFunctor C (0 : ℤ)).mapIso
           ((t.truncGE 0).mapIso
             (asIso ((t.truncLE 0).map ((t.truncLEι 0).app X))))
