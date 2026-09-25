@@ -22,11 +22,12 @@ site the goal carries a transparency defect and only `exact` works.
 ## Why they are here rather than where they were first needed
 
 `#824`. `resSection_trans`, `resSection_smul` and `homApp_res` were stated inside
-`Proj/Modules/Glue.lean` and `presheaf_map_square_eq` inside
-`CoherentSheaf/Pushforward/BaseChange.lean`, in each case because that was the proof that first
-wanted them. Three of the four were then stated over `Proj 𝒜` despite the proofs never using the
-grading — `resSection_smul` is `Scheme.Modules.map_smul` verbatim — so the next lane needing them
-elsewhere would have re-proved them rather than found them.
+`Proj/Modules/Glue.lean`; `presheaf_map_square_eq` was in the former
+`Modules/Coherent/Pushforward/BaseChange.lean`. Each was placed with its first consumer.
+The open-square comparison now lives in `Modules/Pushforward/BaseChange.lean`. Three of
+the four were then stated over `Proj 𝒜` despite the proofs never using the grading —
+`resSection_smul` is `Scheme.Modules.map_smul` verbatim — so another lane would have
+re-proved them rather than found them.
 -/
 
 universe u
