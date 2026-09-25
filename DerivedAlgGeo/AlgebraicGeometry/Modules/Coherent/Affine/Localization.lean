@@ -4,26 +4,29 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Module.Localization.FixedTargetArrow
 import DerivedAlgGeo.Algebra.Module.Localization.FixedTerminalThreeTerm
+import DerivedAlgGeo.Algebra.Homology.HomologicalComplexFiniteDescent
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Affine.Comparison
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pullback
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.AffineSpec
 import DerivedAlgGeo.CategoryTheory.SubobjectEquivalence
 import Mathlib.RingTheory.Localization.Submodule
 import Mathlib.CategoryTheory.Whiskering
+import Mathlib.Algebra.Homology.FullSubcategory
 
 /-!
-# Fixed-target arrows and three-term diagrams for affine coherent localization
+# Affine coherent localization
 
-This file transfers the fixed-target module arrow and zero-composite three-term theorems
-to coherent sheaves on affine noetherian schemes. It concerns ordinary coherent pullback,
-not derived pullback, a bounded component, or an arbitrary t-heart.
+This file transfers fixed-target arrows, zero-composite three-term diagrams, and
+finite-window complex-object descent to coherent sheaves on affine noetherian schemes.
+These concern ordinary coherent pullback, not derived arrows, bounded components,
+or an arbitrary t-heart.
 -/
 
 set_option autoImplicit false
 set_option relaxedAutoImplicit false
 
-open CategoryTheory CategoryTheory.Functor
-open scoped TensorProduct
+open CategoryTheory CategoryTheory.Functor CategoryTheory.Limits
+open scoped TensorProduct ChangeOfRings
 
 noncomputable section
 
@@ -36,7 +39,9 @@ variable {R A : Type u} [CommRing R] [CommRing A] [Algebra R A]
 private abbrev ringMap : CommRingCat.of R ⟶ CommRingCat.of A :=
   CommRingCat.ofHom (algebraMap R A)
 
-private noncomputable def finiteExtendScalars : FGModuleCat.{u} R ⥤ FGModuleCat.{u} A :=
+/-- Extension of scalars restricted to finite modules. This is defined for any ring map;
+flatness is only needed when subsequently passing to derived categories. -/
+noncomputable def finiteExtendScalars : FGModuleCat.{u} R ⥤ FGModuleCat.{u} A :=
   (ModuleCat.isFG A).lift
     ((ModuleCat.isFG R).ι ⋙ ModuleCat.extendScalars (algebraMap R A))
     (fun M => by
@@ -63,8 +68,9 @@ private noncomputable def affineTildePullbackCompιIso [IsNoetherianRing R]
   exact isoWhiskerLeft (ModuleCat.isFG R).ι
     (Scheme.Modules.pullbackSpecMapTildeIso (ringMap (R := R) (A := A)))
 
-/-- The affine tilde/pullback square restricted to coherent sheaves. -/
-private noncomputable def affineTildePullbackIso [IsNoetherianRing R]
+/-- Affine sheafification commutes with coherent pullback after finite-module
+extension of scalars. This is an isomorphism of ordinary functors. -/
+noncomputable def affineTildePullbackIso [IsNoetherianRing R]
     [IsNoetherianRing A] :
     FGModuleCat.affineTilde (R := CommRingCat.of R) ⋙
         Coh.pullback (Spec.map (ringMap (R := R) (A := A))) ≅
@@ -476,5 +482,142 @@ theorem exists_fixedTerminalThreeTerm_pullbackSpecMap_of_isLocalization
         cat_disch
       _ = β := by
         simp only [Iso.hom_inv_id_assoc]
+
+/-- A strictly finite-window complex of coherent sheaves on an affine localization has
+a strictly finite-window coherent model on the base affine scheme. The isomorphism is
+one of ordinary complexes under termwise coherent pullback, not a derived or
+component-level descent statement. -/
+theorem exists_finite_window_complex_model_pullbackSpecMap_of_isLocalization
+    [IsNoetherianRing R] (S : Submonoid R) [IsLocalization S A]
+    (lo hi : ℤ) (K : CochainComplex (Coh (Spec (CommRingCat.of A))) ℤ)
+    [K.IsStrictlyGE lo] [K.IsStrictlyLE hi] :
+    ∃ (L : CochainComplex (Coh (Spec (CommRingCat.of R))) ℤ),
+      L.IsStrictlyGE lo ∧ L.IsStrictlyLE hi ∧
+      Nonempty (K ≅ ((Coh.pullback
+        (Spec.map (CommRingCat.ofHom (algebraMap R A)))).mapHomologicalComplex
+          (.up ℤ)).obj L) := by
+  classical
+  letI : IsNoetherianRing A := IsLocalization.isNoetherianRing S A inferInstance
+  let ER := Coh.affineEquivalence (R := CommRingCat.of R)
+  let EA := Coh.affineEquivalence (R := CommRingCat.of A)
+  let FR := FGModuleCat.affineTilde (R := CommRingCat.of R)
+  let FA := FGModuleCat.affineTilde (R := CommRingCat.of A)
+  let F := Coh.pullback (Spec.map (ringMap (R := R) (A := A)))
+  let G := finiteExtendScalars (R := R) (A := A)
+  let ιR := (ModuleCat.isFG R).ι
+  let ιA := (ModuleCat.isFG A).ι
+  let Fmod := ModuleCat.extendScalars (algebraMap R A)
+  letI : Fmod.Additive := by
+    change (ModuleCat.extendScalars (algebraMap R A)).Additive
+    constructor
+    intro M N g h
+    apply ModuleCat.ExtendScalars.hom_ext
+    intro m
+    let φ : R →+* A := algebraMap R A
+    letI : Module R A := Module.compHom A φ
+    change (1 : A) ⊗ₜ[R,φ] (g m + h m) =
+      (1 : A) ⊗ₜ[R,φ] g m +
+        (1 : A) ⊗ₜ[R,φ] h m
+    rw [TensorProduct.tmul_add]
+  haveI : (G ⋙ ιA).Additive := by
+    change (ιR ⋙ Fmod).Additive
+    infer_instance
+  letI : G.Additive := by
+    exact Functor.additive_of_comp_faithful G ιA
+  have tildeAdditive (T : CommRingCat.{u}) :
+      (AlgebraicGeometry.tilde.functor T).Additive := by
+    letI : (AlgebraicGeometry.tilde.functor T).IsLeftAdjoint :=
+      (AlgebraicGeometry.tilde.adjunction (R := T)).isLeftAdjoint
+    haveI := Limits.preservesBinaryBiproducts_of_preservesBinaryCoproducts
+      (AlgebraicGeometry.tilde.functor T)
+    exact Functor.additive_of_preservesBinaryBiproducts _
+  letI : (AlgebraicGeometry.tilde.functor (CommRingCat.of R)).Additive :=
+    tildeAdditive _
+  letI : (AlgebraicGeometry.tilde.functor (CommRingCat.of A)).Additive :=
+    tildeAdditive _
+  haveI : (FR ⋙ Coh.ι (Spec (CommRingCat.of R))).Additive := by
+    change (ιR ⋙ AlgebraicGeometry.tilde.functor (CommRingCat.of R)).Additive
+    infer_instance
+  letI : FR.Additive := by
+    exact Functor.additive_of_comp_faithful FR (Coh.ι (Spec (CommRingCat.of R)))
+  haveI : (FA ⋙ Coh.ι (Spec (CommRingCat.of A))).Additive := by
+    change (ιA ⋙ AlgebraicGeometry.tilde.functor (CommRingCat.of A)).Additive
+    infer_instance
+  letI : FA.Additive := by
+    exact Functor.additive_of_comp_faithful FA (Coh.ι (Spec (CommRingCat.of A)))
+  haveI : ER.symm.functor.Additive := by
+    change FR.Additive
+    infer_instance
+  letI : ER.functor.Additive := by
+    exact Equivalence.inverse_additive ER.symm
+  haveI : EA.symm.functor.Additive := by
+    change FA.Additive
+    infer_instance
+  letI : EA.functor.Additive := by
+    exact Equivalence.inverse_additive EA.symm
+  let c : ComplexShape ℤ := .up ℤ
+  let Kfg : CochainComplex (FGModuleCat.{u} A) ℤ :=
+    (EA.functor.mapHomologicalComplex c).obj K
+  let KM : CochainComplex (ModuleCat.{u} A) ℤ :=
+    (ιA.mapHomologicalComplex c).obj Kfg
+  have hKMfinite (i : ℤ) : Module.Finite A (KM.X i) := by
+    change Module.Finite A (Kfg.X i).obj
+    exact (Kfg.X i).property
+  have hKMGE : KM.IsStrictlyGE lo := by
+    rw [CochainComplex.isStrictlyGE_iff]
+    intro i hi'
+    change IsZero (ιA.obj (EA.functor.obj (K.X i)))
+    exact ιA.map_isZero (EA.functor.map_isZero
+      (K.isZero_of_isStrictlyGE lo i hi'))
+  have hKMLE : KM.IsStrictlyLE hi := by
+    rw [CochainComplex.isStrictlyLE_iff]
+    intro i hi'
+    change IsZero (ιA.obj (EA.functor.obj (K.X i)))
+    exact ιA.map_isZero (EA.functor.map_isZero
+      (K.isZero_of_isStrictlyLE hi i hi'))
+  letI : KM.IsStrictlyGE lo := hKMGE
+  letI : KM.IsStrictlyLE hi := hKMLE
+  obtain ⟨M, hMfinite, hMGE, hMLE, ⟨eM⟩⟩ :=
+    CochainComplex.exists_finite_model_of_isLocalization S KM lo hi hKMfinite
+  let Mfg : CochainComplex (FGModuleCat.{u} R) ℤ :=
+    HomologicalComplex.liftObjectProperty (ModuleCat.isFG R) M hMfinite
+  have eR : M ≅ (ιR.mapHomologicalComplex c).obj Mfg := Iso.refl _
+  let eFG : Kfg ≅ (G.mapHomologicalComplex c).obj Mfg := by
+    apply (ιA.mapHomologicalComplex c).preimageIso
+    change KM ≅ (ιA.mapHomologicalComplex c).obj
+      ((G.mapHomologicalComplex c).obj Mfg)
+    exact eM ≪≫ (Fmod.mapHomologicalComplex c).mapIso eR
+  let α := affineTildePullbackIso (R := R) (A := A)
+  let αc : FR.mapHomologicalComplex c ⋙ F.mapHomologicalComplex c ≅
+      G.mapHomologicalComplex c ⋙ FA.mapHomologicalComplex c :=
+    (Functor.mapHomologicalComplexCompIso (Iso.refl (FR ⋙ F)) c) ≪≫
+      (NatIso.mapHomologicalComplex α c) ≪≫
+      (Functor.mapHomologicalComplexCompIso (Iso.refl (G ⋙ FA)) c).symm
+  let cA : K ≅ (FA.mapHomologicalComplex c).obj Kfg :=
+    (EA.mapHomologicalComplex c).unitIso.app K
+  let L : CochainComplex (Coh (Spec (CommRingCat.of R))) ℤ :=
+    (FR.mapHomologicalComplex c).obj Mfg
+  have hMfgGE : Mfg.IsStrictlyGE lo := by
+    apply (CochainComplex.isStrictlyGE_mapHomologicalComplex_obj_iff Mfg ιR lo).mp
+    change M.IsStrictlyGE lo
+    exact hMGE
+  have hMfgLE : Mfg.IsStrictlyLE hi := by
+    apply (CochainComplex.isStrictlyLE_mapHomologicalComplex_obj_iff Mfg ιR hi).mp
+    change M.IsStrictlyLE hi
+    exact hMLE
+  letI : Mfg.IsStrictlyGE lo := hMfgGE
+  letI : Mfg.IsStrictlyLE hi := hMfgLE
+  have hLGE : L.IsStrictlyGE lo := by
+    rw [CochainComplex.isStrictlyGE_iff]
+    intro i hi'
+    change IsZero (FR.obj (Mfg.X i))
+    exact FR.map_isZero (Mfg.isZero_of_isStrictlyGE lo i hi')
+  have hLLE : L.IsStrictlyLE hi := by
+    rw [CochainComplex.isStrictlyLE_iff]
+    intro i hi'
+    change IsZero (FR.obj (Mfg.X i))
+    exact FR.map_isZero (Mfg.isZero_of_isStrictlyLE hi i hi')
+  refine ⟨L, hLGE, hLLE, ⟨?_⟩⟩
+  exact cA ≪≫ (FA.mapHomologicalComplex c).mapIso eFG ≪≫ (αc.app Mfg).symm
 
 end AlgebraicGeometry.Coh

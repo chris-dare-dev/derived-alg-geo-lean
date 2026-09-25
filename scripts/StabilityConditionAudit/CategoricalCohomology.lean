@@ -23,6 +23,7 @@ import DerivedAlgGeo.CategoryTheory.Limits.Preserves.Shapes.Products
 import DerivedAlgGeo.CategoryTheory.Localization.Coproducts
 import DerivedAlgGeo.CategoryTheory.MorphismProperty.Limits
 import DerivedAlgGeo.Algebra.Homology.Subcomplex
+import DerivedAlgGeo.Algebra.Homology.HomologicalComplexFiniteDescent
 
 /-!
 Audit records for generic cohomological infrastructure on arbitrary categories.
@@ -47,6 +48,7 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex.homologyFunctor_preservesColimitsOfShape
 #print axioms Homotopy.sigma
 #print axioms CochainComplex.homologyModel
+#print axioms CochainComplex.exists_finite_model_of_isLocalization
 #print axioms CochainComplex.homologyModel_X
 #print axioms CochainComplex.homologyModel_d
 #print axioms CochainComplex.homotopyEquivHomologyModel
