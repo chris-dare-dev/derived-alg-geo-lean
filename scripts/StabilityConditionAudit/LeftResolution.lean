@@ -6,3 +6,5 @@ import DerivedAlgGeo.Algebra.Homology.LeftResolution
 #print axioms CategoryTheory.Abelian.LeftResolution.augmentedShortComplex_exact
 #print axioms CategoryTheory.Abelian.LeftResolution.augmentedShortComplex_epi_g
 #print axioms CategoryTheory.Abelian.LeftResolution.homologyZeroIso
+#print axioms CategoryTheory.Abelian.LeftResolution.homologyZeroIso_naturality
+#print axioms CategoryTheory.Abelian.LeftResolution.homologyZeroNatIso
