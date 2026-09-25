@@ -167,3 +167,20 @@ The three capped unit-square attempts left prose symptoms but not verbatim
 diagnostics or failed proof snippets in tracked files. Those cannot be
 reconstructed from this commit without rerunning an attempt; future loop
 tooling should retain a minimal failed probe before the recovery pivot.
+
+## Rebased-worktree cache trap
+
+After rebasing this branch onto the two-open gluing merge, the focused
+`Modules.Pullback` build still passed, but the broader `Modules` umbrella
+failed while importing the generic `Modules.Pushforward.BaseChange`: Lean said
+that `restrictSquareSections` had already been loaded from the retired
+`Modules.Coherent.Pushforward.BaseChange`. No tracked source imports the
+retired path, and that source file no longer exists. Its stale `.olean` was
+present in the copied worktree cache. Quarantining only that retired module's
+generated artifacts changed the error to a missing retired `.olean`, exposing
+a stale `Modules.Coherent.Pushforward.Finite.olean`. The current `Finite.lean`
+source checked without the retired artifact; rebuilding just `Finite` after
+quarantining its generated artifacts then allowed the full `Modules` umbrella
+to build (3539 jobs). Neither issue was a proof error. Future cache-copy
+tooling should invalidate compiled importers when a source module is retired,
+even if their build traces appear current.
