@@ -425,3 +425,29 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   The current scheme-level result proves the stalk formula directly and makes
   no such identification.
 - state:              UNVERIFIED
+
+### 2026-09-21 — `CommShift₂Int` output transport of `ObjectProperty.lift₂`
+- chunk:              dt1-928-exact-bifunctor-restriction
+- reviewing commit:   858ca700829706455ddc7ea3f4ca9fff4ffa951b
+- found by:           altitude-scout
+- proposed ancestor:  `CategoryTheory.Functor.CommShift₂` via a general fully faithful output-composition transport
+- weaker hypotheses:  coherence-only statement for arbitrary `C₁`, `C₂`, `D`, `D'`, additive-commutative shift monoid `M`, shifts, explicitly compatible `CommShift₂Setup` data, a fully faithful shift-compatible `H : D ⥤ D'`, a bifunctor postcomposition isomorphism, and a `CommShift₂` witness after postcomposition; no object property, closure witness, `Pretriangulated`, or `ExactBifunctor` fields
+- state:              UNVERIFIED
+
+### 2026-09-23 — `liftNatTrans_commShift`
+- chunk:              dt1-928-exact-bifunctor-restriction
+- reviewing commit:   8a61f0e94cd9c414f172d97535f62c1684a91c21
+- found by:           abstraction-adversary
+- proposed ancestor:  `DerivedAlgGeo/CategoryTheory/Shift/CommShift.lean`, as a general faithful-postcomposition reflection lemma for `NatTrans.CommShift`
+- weaker hypotheses:  arbitrary categories with shifts by an additive monoid; `F, G : E ⥤ D` and `H : D ⥤ E'` commute with shifts; `H` is faithful; and `τ : F ⟶ G` commutes with shifts after whiskering by `H`. No object property, closure, or triangulated hypotheses.
+- evidence:           the private `commShift_of_whiskerRight` proof uses only `H.map_injective`, `H`'s shift naturality, and the assumed shift compatibility of the whiskered transformation; `liftNatTrans_commShift` applies it to the restricted natural transformation.
+- state:              UNVERIFIED
+
+### 2026-09-23 — `ExactBifunctor.lift₂` with distinct full subcategories
+- chunk:              dt1-928-exact-bifunctor-restriction
+- reviewing commit:   ffb17b7b8cac3feecda2288845167f9470f79dd1
+- found by:           altitude-scout
+- proposed ancestor:  `CategoryTheory.Functor.ExactBifunctor.lift₂`, generalized to distinct domain, second-input, and output `ObjectProperty` full subcategories
+- weaker hypotheses:  an ambient bifunctor on three (possibly distinct) triangulated categories with a supplied `ExactBifunctor`, three object properties whose full subcategories inherit triangulated structures, and an explicit closure witness from the first two properties into the output property; no single-category or same-property identification among the three positions
+- source note:        This is a plausible API generalization inferred from the current restriction's use of one category and property for all three positions. The distinct-category coherence transport was not proved or compiled during this review.
+- state:              UNVERIFIED
