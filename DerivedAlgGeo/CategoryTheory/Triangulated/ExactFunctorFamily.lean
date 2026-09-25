@@ -5,6 +5,8 @@ Released under the MIT license.
 import Mathlib.CategoryTheory.ObjectProperty.FullSubcategory
 import Mathlib.CategoryTheory.Shift.CommShiftTwo
 import Mathlib.CategoryTheory.Triangulated.Functor
+import Mathlib.CategoryTheory.Triangulated.Subcategory
+import DerivedAlgGeo.CategoryTheory.ObjectProperty.Bifunctor
 import DerivedAlgGeo.CategoryTheory.Shift.FunctorCategory
 
 /-!
@@ -219,6 +221,52 @@ the bifunctor root. -/
 the bifunctor root. -/
 @[reducible] def secondCommShift (A : K) : (F.obj A).CommShift ℤ :=
   h.commShiftObj A
+
+section Restriction
+
+variable {G : Y ⥤ Y ⥤ Y} (hG : ExactBifunctor G)
+
+/-- Restrict a closed ambient exact bifunctor to a triangulated full
+subcategory.
+
+The supplied closure witness is retained explicitly.  This definition
+transports the full `CommShift₂Int` package (including its Koszul law) through
+`ObjectProperty.lift₂CommShift₂Int`, then uses Mathlib's canonical
+triangulatedness of `ObjectProperty.lift` in each variable.  It deliberately
+creates no global instance. -/
+noncomputable def lift₂ (P : ObjectProperty Y) [P.IsTriangulated]
+    (hP : ∀ A B, P A → P B → P ((G.obj A).obj B)) :
+    ExactBifunctor (P.lift₂ G hP) := by
+  letI : G.CommShift₂Int := hG.toCommShift₂
+  letI : (P.lift₂ G hP).CommShift₂Int := P.lift₂CommShift₂Int G hP
+  refine
+    { toCommShift₂ := P.lift₂CommShift₂Int G hP
+      firstTriangulated := fun B => ?_
+      secondTriangulated := fun A => ?_ }
+  · let hB : ∀ A : P.FullSubcategory,
+      P ((P.ι ⋙ G.flip.obj B.obj).obj A) :=
+        fun A => hP A.obj B.obj A.property B.property
+    letI : (G.flip.obj B.obj).CommShift ℤ := hG.firstCommShift B.obj
+    letI : (G.flip.obj B.obj).IsTriangulated := hG.firstTriangulated B.obj
+    letI : (P.ι ⋙ G.flip.obj B.obj).CommShift ℤ :=
+      Functor.CommShift.comp P.ι (G.flip.obj B.obj)
+    letI : (P.lift (P.ι ⋙ G.flip.obj B.obj) hB).CommShift ℤ :=
+      Functor.CommShift.ofComp (P.liftCompιIso (P.ι ⋙ G.flip.obj B.obj) hB) ℤ
+    change (P.lift (P.ι ⋙ G.flip.obj B.obj) hB).IsTriangulated
+    infer_instance
+  · let hA : ∀ B : P.FullSubcategory,
+      P ((P.ι ⋙ G.obj A.obj).obj B) :=
+        fun B => hP A.obj B.obj A.property B.property
+    letI : (G.obj A.obj).CommShift ℤ := hG.secondCommShift A.obj
+    letI : (G.obj A.obj).IsTriangulated := hG.secondTriangulated A.obj
+    letI : (P.ι ⋙ G.obj A.obj).CommShift ℤ :=
+      Functor.CommShift.comp P.ι (G.obj A.obj)
+    letI : (P.lift (P.ι ⋙ G.obj A.obj) hA).CommShift ℤ :=
+      Functor.CommShift.ofComp (P.liftCompιIso (P.ι ⋙ G.obj A.obj) hA) ℤ
+    change (P.lift (P.ι ⋙ G.obj A.obj) hA).IsTriangulated
+    infer_instance
+
+end Restriction
 
 end ExactBifunctor
 

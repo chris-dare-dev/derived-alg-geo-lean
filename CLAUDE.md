@@ -396,11 +396,13 @@ None of these is a reason to stop: a stale path or blocker in an issue body; a
 manifest that names a retired check; scope that needs one more audit or
 umbrella file before the ledger exists; an ambiguous design choice (take the
 smallest reading that meets the definition of done, and say so); `main` moving
-during review; a missing OpenSpec CLI; an exhausted round cap (recover when the
-manifest configures recovery, otherwise park that chunk, file a follow-up, and
-take the next issue); a question whose honest answer is "yes, continue". When a
-stop reason blocks one issue, record it and keep working the others; report
-every stop at the end instead of waiting on one.
+during review; a missing OpenSpec CLI (`cli-advisory` warns, while
+`cli-required` needs the CLI installed before preflight can pass); an exhausted
+round cap (recover when the manifest configures recovery, otherwise park that
+chunk, file a follow-up, and take the next issue); a question whose honest
+answer is "yes, continue". When a stop reason blocks one issue, record it and
+keep working the others; report every stop at the end instead of waiting on
+one.
 
 **The plan travels in the work PR.** Write the manifest under
 `.claude/loop-specs/` on the issue's `agent/<slug>` branch; it may be

@@ -278,6 +278,49 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   duplicate the geometric declaration to implement it.
 - state:              UNVERIFIED
 
+### 2026-09-23 — `SerreFunctorData.fullyFaithful` without Hom-finiteness
+- chunk:              srf1-897-full-faithfulness
+- reviewing commit:   74a05e716502cd3034958530c8134021fd2688c1
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `CategoryTheory.Linear.SerreFunctor.Equivalence`
+- weaker hypotheses:  retain `[Field k] [Category C] [Preadditive C] [Linear k C]`
+  and the Serre duality data, but omit `[HomFinite k C]` and all replacement
+  reflexivity hypotheses.
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/LinearAlgebra/Dual/Defs.lean:229` and
+  `.lake/packages/mathlib/Mathlib/LinearAlgebra/Dual/Lemmas.lean:288-306`
+- source note:        `/tmp/srf1-hypothesis-probes.lean` attempted the double-dual
+  Hom equivalence without `HomFinite`; Mathlib failed to synthesize
+  `Module.IsReflexive k (A ⟶ B)` for `Module.evalEquiv`. The full-faithfulness
+  chain needs reflexivity of each Hom module. A probe replacing Hom-finiteness
+  by `[∀ A B, Module.IsReflexive k (A ⟶ B)]` compiled, but over the existing
+  `[Field k]` root Mathlib infers `FiniteDimensional` from reflexivity, so that
+  is not a genuine weakening. The adjunction from both duality structures does
+  not itself use Hom-finiteness; this row concerns the double-dual step.
+- state:              FALSIFIED compiler witness: without Hom-finiteness or
+  reflexivity, `Module.evalEquiv k (A ⟶ B)` has no `Module.IsReflexive` instance.
+
+### 2026-09-23 — `SerreFunctorData.fullyFaithful` over a commutative ring
+- chunk:              srf1-897-full-faithfulness
+- reviewing commit:   74a05e716502cd3034958530c8134021fd2688c1
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `CategoryTheory.Linear.SerreFunctor`, if its existing
+  scalar binder is ever generalized
+- weaker hypotheses:  replace `[Field k]` by `[CommRing k]` while retaining
+  finite generation `[Module.Finite k (A ⟶ B)]` for each Hom module.
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/LinearAlgebra/Dual/Defs.lean:229` and
+  `.lake/packages/mathlib/Mathlib/LinearAlgebra/Dual/Lemmas.lean:258-288`
+- source note:        `/tmp/srf1-hypothesis-probes.lean` attempted
+  `Module.evalEquiv R M` with `[CommRing R] [Module.Finite R M]`; pinned Mathlib
+  could not synthesize `Module.IsReflexive R M`. Finite generation over a
+  commutative ring does not supply the finite-projective/free reflexivity
+  hypotheses used by the available instances. This falsifies the weakening
+  with finite generation alone; an explicit reflexivity or finite-projective
+  condition is a different hypothesis set. The existing Serre root is
+  field-based, and this finding is outside the frozen #897 chunk.
+- state:              FALSIFIED compiler witness: `Module.evalEquiv R M` fails
+  with `failed to synthesize Module.IsReflexive R M`.
 ### 2026-09-24 — stabilization of a lifted localization-heart filtration (planned)
 - chunk:              sf11-4a-1496-noetherian-cover
 - reviewing commit:   ce58cc9e44340c07c89836ba2a81fdd07aaee6b4
@@ -381,4 +424,30 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   `SheafOfModules.freeYonedaSheaf` is `j_!` of the restricted structure sheaf.
   The current scheme-level result proves the stalk formula directly and makes
   no such identification.
+- state:              UNVERIFIED
+
+### 2026-09-21 — `CommShift₂Int` output transport of `ObjectProperty.lift₂`
+- chunk:              dt1-928-exact-bifunctor-restriction
+- reviewing commit:   858ca700829706455ddc7ea3f4ca9fff4ffa951b
+- found by:           altitude-scout
+- proposed ancestor:  `CategoryTheory.Functor.CommShift₂` via a general fully faithful output-composition transport
+- weaker hypotheses:  coherence-only statement for arbitrary `C₁`, `C₂`, `D`, `D'`, additive-commutative shift monoid `M`, shifts, explicitly compatible `CommShift₂Setup` data, a fully faithful shift-compatible `H : D ⥤ D'`, a bifunctor postcomposition isomorphism, and a `CommShift₂` witness after postcomposition; no object property, closure witness, `Pretriangulated`, or `ExactBifunctor` fields
+- state:              UNVERIFIED
+
+### 2026-09-23 — `liftNatTrans_commShift`
+- chunk:              dt1-928-exact-bifunctor-restriction
+- reviewing commit:   8a61f0e94cd9c414f172d97535f62c1684a91c21
+- found by:           abstraction-adversary
+- proposed ancestor:  `DerivedAlgGeo/CategoryTheory/Shift/CommShift.lean`, as a general faithful-postcomposition reflection lemma for `NatTrans.CommShift`
+- weaker hypotheses:  arbitrary categories with shifts by an additive monoid; `F, G : E ⥤ D` and `H : D ⥤ E'` commute with shifts; `H` is faithful; and `τ : F ⟶ G` commutes with shifts after whiskering by `H`. No object property, closure, or triangulated hypotheses.
+- evidence:           the private `commShift_of_whiskerRight` proof uses only `H.map_injective`, `H`'s shift naturality, and the assumed shift compatibility of the whiskered transformation; `liftNatTrans_commShift` applies it to the restricted natural transformation.
+- state:              UNVERIFIED
+
+### 2026-09-23 — `ExactBifunctor.lift₂` with distinct full subcategories
+- chunk:              dt1-928-exact-bifunctor-restriction
+- reviewing commit:   ffb17b7b8cac3feecda2288845167f9470f79dd1
+- found by:           altitude-scout
+- proposed ancestor:  `CategoryTheory.Functor.ExactBifunctor.lift₂`, generalized to distinct domain, second-input, and output `ObjectProperty` full subcategories
+- weaker hypotheses:  an ambient bifunctor on three (possibly distinct) triangulated categories with a supplied `ExactBifunctor`, three object properties whose full subcategories inherit triangulated structures, and an explicit closure witness from the first two properties into the output property; no single-category or same-property identification among the three positions
+- source note:        This is a plausible API generalization inferred from the current restriction's use of one category and property for all three positions. The distinct-category coherence transport was not proved or compiled during this review.
 - state:              UNVERIFIED
