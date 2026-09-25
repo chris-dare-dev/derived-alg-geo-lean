@@ -86,6 +86,9 @@ the geometric pullback comparison cancel through an explicitly typed
 `adjunction_unit_iso_transport` handles unit naturality across the remaining
 equivalence. No `sorry`, new axiom, global heartbeat increase, or broad
 simplification is used.
+Independent API review showed that the two generic helper proofs elaborate
+without relaxed transparency, so their scoped options were removed. The
+final sheaf-category component theorem still needs its own scoped option.
 
 This continuation took **two substantive proof revisions**, within the new
 three-revision cap. The first attempt tried `rw` directly in the large mapped

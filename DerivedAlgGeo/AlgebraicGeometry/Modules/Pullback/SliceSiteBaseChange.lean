@@ -158,7 +158,6 @@ private theorem cancel_two_isos {C : Type*} [Category C] {A B D E : C}
     j.inv ≫ i.inv ≫ i.hom ≫ j.hom ≫ h = h := by
   simp only [Iso.inv_hom_id_assoc]
 
-set_option backward.isDefEq.respectTransparency false in
 private theorem adjunction_unit_iso_transport {C D : Type*}
     [Category C] [Category D] (L : C ⥤ D) (R : D ⥤ C)
     (a : L ⊣ R) {A B : C} (i : A ≅ B) {T : D} (h : L.obj A ⟶ T) :
@@ -184,7 +183,6 @@ private theorem adjunction_unit_iso_transport {C D : Type*}
     _ = a.unit.app A ≫ R.map h := by
       exact congrArg (fun t => a.unit.app A ≫ R.map t) hc
 
-set_option backward.isDefEq.respectTransparency false in
 private theorem pullbackOverIso_cancellation (f : X ⟶ Y) (N : Y.Modules)
     (U : Y.Opens) :
     (AlgebraicGeometry.pullbackRestrictNatIso f U).inv.app N ≫
