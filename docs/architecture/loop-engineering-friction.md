@@ -257,6 +257,8 @@ entry records a prevention step for later runs.
 
 | 2026-09-25 | On the cold quasi-isomorphism worktree, `lake exe runLinter DerivedAlgGeo` stopped because an unrelated all-library `.olean` was absent; a targeted build of the changed generic umbrella had succeeded. The module-scoped `runLinter DerivedAlgGeo.Algebra.Homology.LeftResolution.Augmented` then passed. | Use the module-scoped linter as local feedback on the changed declaration; require the PR's full environment-linter job for the complete library, without running a prohibited full local build just to warm its cache. |
 
+| 2026-09-25 | A fresh worktree's tracked `scripts/seed_worktree_cache.sh` lacked an executable bit, so the documented direct invocation failed with permission denied; `bash scripts/seed_worktree_cache.sh` seeded the cache. In the H₀ agreement proof, `rw` failed to match maps through let-bound complexes and the short-complex source even when their types were definitionally equal; explicit complex objects, composition association, and `change` at the owner lemma made the comparison compile. | Invoke the non-executable seed script through `bash` and record the documentation mismatch. In later generic comparisons, state the source and target complex types explicitly before rewriting canonical homology and augmentation maps; do not infer totalization or K-flatness from this degree-zero agreement. |
+
 These entries are process evidence, not proof evidence. The concrete affine
 Tor comparison is proved, audited, and reviewed in merged PR #1464. The broader
 abstract Tor generalization remains unverified in

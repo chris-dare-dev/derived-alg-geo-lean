@@ -12,4 +12,5 @@ import DerivedAlgGeo.Algebra.Homology.LeftResolution
 #print axioms CategoryTheory.Abelian.LeftResolution.chainComplexAugmentation_quasiIso
 #print axioms CategoryTheory.Abelian.LeftResolution.homologyZeroIso
 #print axioms CategoryTheory.Abelian.LeftResolution.homologyZeroIso_naturality
+#print axioms CategoryTheory.Abelian.LeftResolution.homologyZeroIso_eq_augmentationHomologyMap
 #print axioms CategoryTheory.Abelian.LeftResolution.homologyZeroNatIso

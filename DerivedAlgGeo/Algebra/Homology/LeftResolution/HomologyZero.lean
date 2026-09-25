@@ -104,4 +104,49 @@ noncomputable def homologyZeroNatIso :
     intro X Y f
     exact Λ.homologyZeroIso_naturality ι X f)
 
+set_option backward.defeqAttrib.useBackward true in
+set_option backward.isDefEq.respectTransparency false in
+/-- The degree-zero homology identification agrees with the homology map induced
+by the canonical chain augmentation. -/
+theorem homologyZeroIso_eq_augmentationHomologyMap :
+    HomologicalComplex.homologyMap (Λ.chainComplexAugmentation ι X) 0 ≫
+      (HomologicalComplex.singleObjHomologySelfIso (ComplexShape.down ℕ) 0 X).hom =
+      (Λ.homologyZeroIso ι X).hom := by
+  let K : ChainComplex A ℕ :=
+    (ι.mapHomologicalComplex (ComplexShape.down ℕ)).obj (Λ.chainComplex X)
+  let L : ChainComplex A ℕ := (ChainComplex.single₀ A).obj X
+  let α : K ⟶ L := Λ.chainComplexAugmentation ι X
+  let S := HomologicalComplex.singleObjHomologySelfIso (ComplexShape.down ℕ) 0 X
+  let O := HomologicalComplex.singleObjOpcyclesSelfIso (ComplexShape.down ℕ) 0 X
+  have hι : L.isoHomologyι₀.inv ≫ L.homologyι 0 = 𝟙 (L.opcycles 0) := by
+    change L.isoHomologyι₀.inv ≫ L.isoHomologyι₀.hom = _
+    simp
+  have hSingle : (L.pOpcycles 0 ≫ L.isoHomologyι₀.inv) ≫ S.hom = 𝟙 X := by
+    rw [← HomologicalComplex.homologyι_singleObjOpcyclesSelfIso_inv]
+    change (L.pOpcycles 0 ≫ L.isoHomologyι₀.inv) ≫ (L.homologyι 0 ≫ O.inv) = 𝟙 X
+    calc
+      _ = (L.pOpcycles 0 ≫ (L.isoHomologyι₀.inv ≫ L.homologyι 0)) ≫ O.inv := by
+        simp only [Category.assoc]
+      _ = L.pOpcycles 0 ≫ O.inv := by rw [hι]; simp
+      _ = 𝟙 X := by simp [L, O, HomologicalComplex.pOpcycles_singleObjOpcyclesSelfIso_inv]
+  change HomologicalComplex.homologyMap α 0 ≫ S.hom = (Λ.homologyZeroIso ι X).hom
+  apply (cancel_epi (K.pOpcycles 0 ≫ K.isoHomologyι₀.inv)).1
+  calc
+    (K.pOpcycles 0 ≫ K.isoHomologyι₀.inv) ≫
+        (HomologicalComplex.homologyMap α 0 ≫ S.hom) =
+      α.f 0 ≫ ((L.pOpcycles 0 ≫ L.isoHomologyι₀.inv) ≫ S.hom) := by
+        simp only [Category.assoc, ChainComplex.isoHomologyι₀_inv_naturality_assoc,
+          HomologicalComplex.p_opcyclesMap_assoc]
+    _ = (Λ.augmentedShortComplex ι X).g := by
+      have hAug : α.f 0 = (Λ.augmentedShortComplex ι X).g := by
+        simp only [α, chainComplexAugmentation,
+          ChainComplex.toSingle₀Equiv_symm_apply_f_zero]
+      rw [hSingle]
+      change α.f 0 ≫ 𝟙 (L.X 0) = (Λ.augmentedShortComplex ι X).g
+      simpa only [Category.comp_id] using hAug
+    _ = (K.pOpcycles 0 ≫ K.isoHomologyι₀.inv) ≫ (Λ.homologyZeroIso ι X).hom := by
+      change ι.map (Λ.chainComplexXZeroIso X).hom ≫ Λ.π.app X = _
+      simpa only [K, Category.assoc] using
+        (homologyZeroIso_hom_eq ι Λ X).symm
+
 end CategoryTheory.Abelian.LeftResolution
