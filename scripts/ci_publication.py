@@ -225,6 +225,11 @@ def build_receipt(
         if str(check.get("id")) not in observed_provider_ids
     )
     unclassified_status_ids = sorted(str(item.get("id")) for item in statuses)
+    all_pipelines_green = (
+        claims.get("all_pipelines_green") is True
+        and not unclassified_check_ids
+        and not unclassified_status_ids
+    )
     run_identity_fields = (
         "id", "run_attempt", "check_suite_id", "head_sha", "event", "path",
         "status", "conclusion", "html_url",
@@ -256,6 +261,10 @@ def build_receipt(
             "head_commit": head,
             "candidate_commit": candidate,
             "candidate_tree": candidate_tree,
+            # Preserve the CI1.01 contract record so an independent verifier
+            # can re-run the canonical inventory/evidence validation instead
+            # of treating this receipt's flattened gate list as its authority.
+            "contract_evidence": premerge_evidence,
             "run_id": premerge_evidence.get("run_id"),
             "run_attempt": premerge_evidence.get("run_attempt"),
             "producer": premerge_evidence.get("producer"),
@@ -393,6 +402,26 @@ def verify_receipt(receipt: dict[str, Any]) -> None:
         "all_pipelines_green"
     ):
         raise PublicationError("receipt changed the all-pipelines claim")
+    contract_evidence = premerge.get("contract_evidence")
+    if not isinstance(contract_evidence, dict):
+        raise PublicationError("receipt is missing its CI1.01 contract evidence")
+    if any(
+        contract_evidence.get(field) != premerge.get(receipt_field)
+        for field, receipt_field in (
+            ("base_commit", "base_commit"),
+            ("head_commit", "head_commit"),
+            ("candidate_commit", "candidate_commit"),
+            ("candidate_tree", "candidate_tree"),
+            ("run_id", "run_id"),
+            ("run_attempt", "run_attempt"),
+            ("event", "event"),
+            ("ref", "ref"),
+            ("producer", "producer"),
+        )
+    ):
+        raise PublicationError("receipt CI1.01 revisions or producer are inconsistent")
+    if contract_evidence.get("provider_binding") != provider_binding:
+        raise PublicationError("receipt CI1.01 provider binding is inconsistent")
     health = receipt.get("post_merge_health", {}).get("status")
     if health not in POST_MERGE_HEALTH or claims.get("post_merge_health") != health:
         raise PublicationError("receipt post-merge health claim is inconsistent")

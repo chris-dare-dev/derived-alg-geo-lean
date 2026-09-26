@@ -175,6 +175,152 @@
       ],
       "run_attempt": 1,
       "status": "completed"
+    },
+    "contract_evidence": {
+      "artifacts": [
+        {
+          "commit": "b976a833906972338987f51c30f8962a97a4cfe8",
+          "id": "github-check-run-107542777862",
+          "kind": "check-run:build",
+          "media_type": "application/json",
+          "path": "results/check-run-107542777862.json",
+          "producer": "github-actions/CI",
+          "run_attempt": 1,
+          "run_id": 35971612896,
+          "sha256": "21cc3ee54da458bf99ae70d53e3bc679af258dbffbc5b14c13307081b38ffd56",
+          "size_bytes": 10394,
+          "subject": "build"
+        },
+        {
+          "commit": "b976a833906972338987f51c30f8962a97a4cfe8",
+          "id": "github-check-run-107542777415",
+          "kind": "check-run:roadmap",
+          "media_type": "application/json",
+          "path": "results/check-run-107542777415.json",
+          "producer": "github-actions/CI",
+          "run_attempt": 1,
+          "run_id": 35971612896,
+          "sha256": "4444210fdcf25b498380f2eb46362df7447f983953c0d935388a47a41e71076d",
+          "size_bytes": 5532,
+          "subject": "roadmap"
+        },
+        {
+          "commit": "b976a833906972338987f51c30f8962a97a4cfe8",
+          "id": "github-check-run-107550753092",
+          "kind": "check-run:ci",
+          "media_type": "application/json",
+          "path": "results/check-run-107550753092.json",
+          "producer": "github-actions/CI",
+          "run_attempt": 1,
+          "run_id": 35971612896,
+          "sha256": "97cf172ae562cf01a932c26a6ff1914a9afff3b9be9ac1afaa6e460603605640",
+          "size_bytes": 5192,
+          "subject": "ci"
+        }
+      ],
+      "base_commit": "8018746ca89a0816c01de80cf9387f9e12c8cb60",
+      "candidate_commit": "b976a833906972338987f51c30f8962a97a4cfe8",
+      "candidate_tree": "3f997549ff2c3ae629cd1136f9a0f218a9279225",
+      "event": "pull_request",
+      "gates": [
+        {
+          "applicable": true,
+          "artifact_refs": [
+            "github-check-run-107542777862"
+          ],
+          "commit": "b976a833906972338987f51c30f8962a97a4cfe8",
+          "conclusion": "success",
+          "id": "build",
+          "name": "build",
+          "platform": "github-actions",
+          "prerequisites": [],
+          "producer": "github-actions/CI",
+          "provider_id": "107542777862",
+          "run_attempt": 1,
+          "run_id": 35971612896,
+          "status": "passed"
+        },
+        {
+          "applicable": true,
+          "artifact_refs": [
+            "github-check-run-107542777415"
+          ],
+          "commit": "b976a833906972338987f51c30f8962a97a4cfe8",
+          "conclusion": "success",
+          "id": "roadmap",
+          "name": "roadmap",
+          "platform": "github-actions",
+          "prerequisites": [],
+          "producer": "github-actions/CI",
+          "provider_id": "107542777415",
+          "run_attempt": 1,
+          "run_id": 35971612896,
+          "status": "passed"
+        },
+        {
+          "applicable": true,
+          "artifact_refs": [
+            "github-check-run-107550753092"
+          ],
+          "commit": "b976a833906972338987f51c30f8962a97a4cfe8",
+          "conclusion": "success",
+          "id": "ci",
+          "name": "ci",
+          "platform": "github-actions",
+          "prerequisites": [
+            "build",
+            "roadmap"
+          ],
+          "producer": "github-actions/CI",
+          "provider_id": "107550753092",
+          "run_attempt": 1,
+          "run_id": 35971612896,
+          "status": "passed"
+        }
+      ],
+      "head_commit": "cdde9046c0ae29a62f0ddc127ccc724f85aa34f5",
+      "pins": {
+        "lake-manifest.json": "24ff70a633f078d26c198fa4497b39500dd2af18f2aba09b92a15f8b286ccec2",
+        "lean-toolchain": "8e3538e0ab5f81a3ee04927d8838c8c674e0e112838b4b3ce87ec218143276af",
+        "pins.json": "ac899f26a5b4590fba6bd661dfe2156ac2bd2a39cc4397f6fdc4dc614b1aec3c"
+      },
+      "platform": "github-actions",
+      "policy_binding": {
+        "commit": "8018746ca89a0816c01de80cf9387f9e12c8cb60",
+        "inventory_sha256": "512d4d06f0dd93705c4c5961e670b88985cb2ea53b6a719f959a29f6b4a4a8f6",
+        "source": "protected-base"
+      },
+      "producer": "github-actions/CI",
+      "provider_binding": {
+        "commit": "b976a833906972338987f51c30f8962a97a4cfe8",
+        "event": "pull_request",
+        "parents": [
+          "8018746ca89a0816c01de80cf9387f9e12c8cb60",
+          "cdde9046c0ae29a62f0ddc127ccc724f85aa34f5"
+        ],
+        "producer": "github-actions/CI",
+        "proof_sha256": "08d0c5cbd108b63d03cb54a9261bd33d81d90473e75c096ff8cd901c7e61789e",
+        "ref": "refs/pull/1500/merge",
+        "repository": "chris-dare-dev/derived-alg-geo-lean",
+        "run_attempt": 1,
+        "run_id": 35971612896,
+        "source": "github-api",
+        "tree": "3f997549ff2c3ae629cd1136f9a0f218a9279225"
+      },
+      "ref": "refs/pull/1500/merge",
+      "repository": "chris-dare-dev/derived-alg-geo-lean",
+      "revision_binding": {
+        "base_commit": "8018746ca89a0816c01de80cf9387f9e12c8cb60",
+        "candidate_commit": "b976a833906972338987f51c30f8962a97a4cfe8",
+        "candidate_tree": "3f997549ff2c3ae629cd1136f9a0f218a9279225",
+        "event": "pull_request",
+        "head_commit": "cdde9046c0ae29a62f0ddc127ccc724f85aa34f5",
+        "ref": "refs/pull/1500/merge"
+      },
+      "run_attempt": 1,
+      "run_id": 35971612896,
+      "schema_version": 4,
+      "toolchain": "leanprover/lean4:v4.32.1"
     }
   },
   "publication": {
@@ -191,7 +337,7 @@
     "number": 1500,
     "url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1500"
   },
-  "receipt_sha256": "34f6934954003b75cc13ea482a8bfa01ef3fc708220cc167ce7ea3321cd66d02",
+  "receipt_sha256": "aadcb6305c601a9ff6acc0a357a2ae2a787a29a2450e39d21c91abec2d376494",
   "repository": "chris-dare-dev/derived-alg-geo-lean",
   "review": {
     "commit": "cdde9046c0ae29a62f0ddc127ccc724f85aa34f5",
