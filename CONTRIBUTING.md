@@ -186,60 +186,29 @@ the library elaborated and run on the runners.
 
 ### Unattended issue loops
 
-An unattended run takes a GitHub issue or a milestone and follows
-[the run-loop protocol](.claude/skills/run-loop/SKILL.md) to merged PRs without
-owner input. Write issues so that works: state the goal, the definition of done
-as checkable statements, the deliverables (leaf paths, audits, umbrellas),
-dependencies as GitHub "blocked by" links, and whether the issue closes in one
-PR (complete) or several (progress). The run restates the definition of done
-as its manifest's acceptance statements. The four independent reviewers judge
-the work against them.
+An unattended run takes GitHub issues or a milestone and follows
+[the run-loop skill](.claude/skills/run-loop/SKILL.md) to merged PRs without
+owner input. The issue body is its specification, so write issues so that
+works:
+- state the goal;
+- give the definition of done as checkable statements;
+- list the deliverables: leaf paths, audits, umbrellas;
+- give dependencies as GitHub "blocked by" links;
+- say whether the issue closes in one PR (complete) or several (progress).
 
-The run writes its manifest on the issue's `agent/<slug>` branch, and the
-manifest ships in that PR; nothing merges to `main` first. From that branch:
+The run researches each issue and writes its plan into the PR description. Four
+independent reviewers must pass it on the same commit, with at most three
+rounds per PR. It merges once the required `ci` check passes, then takes the
+next issue. An issue it cannot finish is parked as a draft PR with its open
+findings, not waited on.
 
-```bash
-python3 scripts/loop_engine.py validate --spec .claude/loop-specs/<slug>.yaml
-python3 scripts/loop_engine.py preflight --spec .claude/loop-specs/<slug>.yaml
-```
-
-A manifest selects one to three issues and freezes file-level chunks. It names
-the four independent reviewers and caps review/improve at three rounds per
-attempt for new work; explicit legacy manifests keep their recorded caps. An
-OpenSpec change is optional for a single issue and expected for a multi-issue
-batch. Task checkboxes and `agent-observations.md` may change freely, because
-the ledger's plan digest excludes them.
-
-Reviews bind to the change, not to its base. A rebase onto a moved `main`
-keeps a passed review; a moved change needs one revalidation round. Opting into
-`recovery` schedules research after exhaustion. Without it, the run parks the
-chunk, files a follow-up issue, and moves on. See
-[the recovery protocol](docs/architecture/loop-recovery.md).
-
-These grants govern unattended controller runs. An explicit owner request in
-the active task to maintain an existing PR authorizes the named action without
-a new manifest or standing grant; required CI and branch protection still
-govern merges.
-
-Provider actions need grants from `.claude/loop-authority.yaml` on the default
-branch, which the controller reads through the GitHub API rather than a local
-ref. A run's manifest can narrow those grants, never widen them. It also cannot
-touch the loop's own authority, controller or instructions; those change only
-through owner-reviewed PRs. The manifests reviewed through planning
-PRs before this protocol keep their own grants for their open issues, and an explicit `false` in the
-standing file revokes an action for every run. Issue closure for code work
-requires a merged PR.
-
-For these planning-PR manifests, a matching digest in the local worktree is not
-enough to activate provider grants or legacy-only policy exceptions: the
-controller also checks that the exact digest is present in
-`LEGACY_REVIEWED_MANIFESTS` from the provider's current default-branch copy of
-`scripts/loop_engine.py`. Thus a planning branch can validate and preflight its
-proposal, but cannot use its own not-yet-merged allowlist entry to authorize
-pushes, PR creation, ready-for-review, merge, or relaxed scope/publication
-checks.
-Progress chunks use non-closing issue references; complete chunks require a
-closing keyword. Keep run ledgers in ignored `.loop-runs/`.
+The request that starts a run authorizes its pushes, PRs and merges. The owner
+withdraws any of these with an explicit `false` in `.claude/loop-authority.yaml`
+on the default branch. A run never changes the loop's own tooling or
+instructions, and it uses no OpenSpec change, loop manifest or review ledger.
+The manifest controller (`scripts/loop_engine.py`, `.claude/loop-specs/`) is off
+the run path, and is kept only for the ledgers it already wrote. Issue closure
+for code work requires a merged PR.
 
 This section previously read "Build the stable root while developing:
 `lake build`", and told you to run the fast gate before review and the full gate

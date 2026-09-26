@@ -1,28 +1,16 @@
-# Issue-first loops and optional manifests
+# Loop manifests (retired from the run path)
 
-## Default: work from the issue list
+Loop runs follow [the run-loop skill](../skills/run-loop/SKILL.md). They take
+issue numbers or a milestone as input and use no manifest, preflight, OpenSpec
+plan or review ledger. The request that starts a run authorizes it; the owner
+withdraws an action with an explicit `false` in `.claude/loop-authority.yaml`
+on the default branch.
 
-For a user-initiated Codex task, the issue number or numbers are the input. Read
-their live bodies and repository guidance, then start the scoped work. The issue
-acceptance criteria are the definition of done. A generated manifest,
-per-repository OpenSpec plan, standing authority file, or preflight is not
-required to begin. One optional OpenSpec record can track a multi-issue batch
-across repositories; do not duplicate it just because code lives in more than
-one repository.
+The rest of this file documents the manifest controller,
+`scripts/loop_engine.py`, for the manifests and ledgers it already produced. Do
+not start a new run with it.
 
-The user's request to complete named issues authorizes issue-scoped branches,
-commits, pull requests, and closure after merge. Continue independent issues if
-one hits a real external constraint. Run the checks that apply to the changed
-code and honor hosted CI, branch protection, and the trust review for protected
-paths. Do not pause over missing planning artifacts, issue labels, or contact
-information that the issue does not require.
-
-Use the controller below only when a bounded review ledger or a controlled
-unattended multi-agent run adds value. Its manifest, authority, frozen-chunk,
-and review-ledger rules apply when the controller is used; they are not
-prerequisites for the default issue-first path.
-
-## Optional controller manifests
+## Controller manifests
 
 A manifest is the plan for one unattended run: which issues it takes, how each
 is cut into frozen chunks, which files each chunk may touch, what "done" means
