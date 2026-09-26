@@ -9,6 +9,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Stalk
 #print axioms AlgebraicGeometry.Scheme.Modules.presheafModuleStalkToSheafificationApp_isIso
 #print axioms AlgebraicGeometry.Scheme.Modules.presheafModuleStalkSheafificationIso
 #print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkForgetIso
+#print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor_preservesColimitsOfShape
 #print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor_preservesFiniteLimits
 #print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkFunctors_jointlyReflectIsomorphisms
 #print axioms AlgebraicGeometry.Scheme.Modules.preservesFiniteLimits_of_stalkwise

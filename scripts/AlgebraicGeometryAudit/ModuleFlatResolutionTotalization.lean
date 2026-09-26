@@ -1,0 +1,5 @@
+import DerivedAlgGeo.AlgebraicGeometry.Modules.FlatResolutionTotalization
+
+#print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaSheafCoproductResolutionBicomplexUpInt
+#print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaSheafCoproductTotalComplexFunctor
+#print axioms AlgebraicGeometry.Scheme.Modules.freeYonedaSheafCoproductTotalComplexFunctor_obj_X_isFlatOverId
