@@ -106,8 +106,8 @@ noncomputable def homologyZeroNatIso :
 
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
-/-- The degree-zero homology identification agrees with the homology map induced
-by the canonical chain augmentation. -/
+/-- Both maps descend the same degree-zero augmentation; cancellation against
+the epimorphic projection to homology identifies them. -/
 theorem homologyZeroIso_eq_augmentationHomologyMap :
     HomologicalComplex.homologyMap (Λ.chainComplexAugmentation ι X) 0 ≫
       (HomologicalComplex.singleObjHomologySelfIso (ComplexShape.down ℕ) 0 X).hom =

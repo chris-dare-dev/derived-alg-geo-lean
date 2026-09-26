@@ -8,13 +8,14 @@ import Mathlib.Algebra.Homology.Single
 import Mathlib.Algebra.Homology.SingleHomology
 
 /-!
-# The augmented initial segment of a left resolution
+# Augmentation of a left resolution
 
 After applying `ι`, the functorial chain complex attached to a `LeftResolution`
 is exact in positive degrees. This file also records exactness of its first two
-terms after augmentation to the object being resolved. The result is objectwise;
-it does not assert a totalization theorem or K-flatness for a bicomplex built
-from such resolutions.
+terms after augmentation to the object being resolved. The augmentation is a
+natural chain map and an objectwise quasi-isomorphism. These statements do not
+assert a totalization theorem or K-flatness for a bicomplex built from such
+resolutions.
 -/
 
 open CategoryTheory Category Limits Preadditive ZeroObject
@@ -96,7 +97,8 @@ noncomputable def chainComplexAugmentation (X : A) :
   refine (ChainComplex.toSingle₀Equiv K X).symm ⟨(Λ.augmentedShortComplex ι X).g, ?_⟩
   exact (Λ.augmentedShortComplex ι X).zero
 
-/-- The chain augmentation commutes with a morphism of resolved objects. -/
+/-- Maps to the degree-zero single complex are determined in degree zero, where
+this square follows from naturality of the resolution epimorphism. -/
 @[reassoc]
 lemma chainComplexAugmentation_naturality {X Y : A} (f : X ⟶ Y) :
     (ι.mapHomologicalComplex (ComplexShape.down ℕ)).map (Λ.chainComplexMap f) ≫
@@ -115,7 +117,8 @@ lemma chainComplexAugmentation_naturality {X Y : A} (f : X ⟶ Y) :
           ι.map (Λ.F.map f) ≫ Λ.π.app Y := by cat_disch
     _ = _ := by rw [Λ.π_naturality]; simp only [Category.assoc]; rfl
 
-/-- The augmentation is natural in the resolved object. -/
+/-- The components come from `ChainComplex.toSingle₀Equiv` applied to the
+augmented short complex. -/
 noncomputable def chainComplexAugmentationNatTrans :
     Λ.chainComplexFunctor ⋙ ι.mapHomologicalComplex (ComplexShape.down ℕ) ⟶
       ChainComplex.single₀ A where

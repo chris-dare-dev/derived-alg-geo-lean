@@ -53,7 +53,8 @@ def Modules.IsFlatOver {X S : Scheme.{u}} (p : X ⟶ S)
     ((ModuleCat.restrictScalars (p.stalkMap x).hom).obj
       ((Scheme.Modules.moduleStalkFunctor X x).obj M))
 
-/-- Flatness over the identity morphism is ordinary flatness at every module stalk. -/
+/-- The identity morphism induces identity maps on stalk rings, and
+`ModuleCat.restrictScalarsId'App` removes the scalar-restriction bookkeeping. -/
 theorem Modules.isFlatOverId_iff_stalkwiseFlat
     (X : Scheme.{u}) (M : X.Modules) :
     Modules.IsFlatOver (𝟙 X) M ↔
