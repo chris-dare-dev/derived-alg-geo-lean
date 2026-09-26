@@ -829,6 +829,22 @@ theorem freeYonedaSheafCoproductReducedLeftResolution_augmentedExact
     (ι := ObjectProperty.ι (fun M : X.Modules => IsFlatOver (𝟙 X) M))
     (Λ := freeYonedaSheafCoproductReducedLeftResolution X) (X := M)
 
+/-- The objectwise free-Yoneda left resolution has degree-zero homology `M`
+after inclusion into all module sheaves. This does not identify the totalized
+resolution of a complex with that complex. -/
+noncomputable def freeYonedaSheafCoproductReducedLeftResolutionHomologyZeroIso
+    (X : Scheme.{u}) (M : X.Modules) :
+    (((ObjectProperty.ι (fun M : X.Modules => IsFlatOver (𝟙 X) M)).mapHomologicalComplex
+      (ComplexShape.down ℕ)).obj
+        ((freeYonedaSheafCoproductReducedLeftResolution X).chainComplex M)).homology 0 ≅ M := by
+  letI : IsIdempotentComplete
+      (ObjectProperty.FullSubcategory
+        (fun M : X.Modules => IsFlatOver (𝟙 X) M)) :=
+    isIdempotentComplete_stalkwiseFlatSubcategory X
+  exact CategoryTheory.Abelian.LeftResolution.homologyZeroIso
+    (ι := ObjectProperty.ι (fun M : X.Modules => IsFlatOver (𝟙 X) M))
+    (Λ := freeYonedaSheafCoproductReducedLeftResolution X) (X := M)
+
 /-- Naturality of the specialized coproduct map follows from the generic naturality theorem. -/
 lemma fromFreeYonedaSheafCoproduct_natural (X : Scheme.{u})
     {M N : X.Modules} (f : M ⟶ N) :
