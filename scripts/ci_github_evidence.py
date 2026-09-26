@@ -980,6 +980,20 @@ def collect_publication(
         merge_readiness=merge_readiness,
         post_merge_health=post_merge,
     )
+    payloads = premerge.get("payloads")
+    if not isinstance(payloads, dict):
+        raise EvidenceError("premerge evidence bundle does not retain provider artifact payloads")
+    artifact_payloads: dict[str, str] = {}
+    for artifact in evidence.get("artifacts", []):
+        path = artifact.get("path") if isinstance(artifact, dict) else None
+        content = payloads.get(path) if isinstance(path, str) else None
+        if not isinstance(content, bytes):
+            raise EvidenceError("premerge provider artifact payload is missing")
+        artifact_payloads[path] = content.decode("utf-8")
+    if set(artifact_payloads) != {artifact["path"] for artifact in evidence["artifacts"]}:
+        raise EvidenceError("premerge provider artifact payload set is incomplete")
+    receipt["premerge"]["artifact_payloads"] = artifact_payloads
+    receipt["receipt_sha256"] = ci_publication.receipt_digest(receipt)
     verify_publication_provider_evidence(client, receipt)
     return receipt
 
@@ -1149,6 +1163,18 @@ def verify_premerge_provider_evidence(
         errors = validation.get("errors")
         detail = "; ".join(errors) if isinstance(errors, list) else "unknown validation error"
         raise EvidenceError("receipt CI1.01 evidence is invalid: " + detail)
+    try:
+        candidate_toolchain = _blob(client, candidate, "lean-toolchain").decode("utf-8").strip()
+    except UnicodeDecodeError as exc:
+        raise EvidenceError("candidate lean-toolchain is not UTF-8") from exc
+    if not candidate_toolchain or contract_evidence.get("toolchain") != candidate_toolchain:
+        raise EvidenceError("receipt toolchain differs from the candidate Git blob")
+    candidate_pins = {
+        path: hashlib.sha256(_blob(client, candidate, path)).hexdigest()
+        for path in sorted(ci_contract.REQUIRED_PINS)
+    }
+    if contract_evidence.get("pins") != candidate_pins:
+        raise EvidenceError("receipt pin digests differ from candidate Git blobs")
     definitions = {gate["id"]: gate for gate in inventory["gates"]}
     applicable_auxiliary_ids = sorted(
         gate_id
@@ -1167,6 +1193,8 @@ def verify_premerge_provider_evidence(
         raise EvidenceError("receipt does not establish required CI")
 
     expected_contract_gate_records = []
+    expected_artifacts: dict[str, dict[str, Any]] = {}
+    provider_payload_facts: dict[str, dict[str, Any]] = {}
     for gate in contract_evidence.get("gates", []):
         definition = definitions.get(gate.get("id"))
         if not isinstance(definition, dict):
@@ -1358,6 +1386,8 @@ def verify_premerge_provider_evidence(
             primary_app = _required_object(primary_suite.get("app"), "primary suite app")
             if app.get("id") != primary_app.get("id") or app.get("slug") != "github-actions":
                 raise EvidenceError(f"primary gate {gate['id']!r} has the wrong provider")
+            artifact_commit = candidate
+            artifact_run_fields = {"run_id": run_id, "run_attempt": attempt}
         elif binding == "check":
             matches = [
                 (check_id, check)
@@ -1369,6 +1399,8 @@ def verify_premerge_provider_evidence(
             if len(matches) != 1 or matches[0][0] != provider_id:
                 raise EvidenceError(f"check gate {gate['id']!r} differs from its live provider run")
             actual = matches[0][1]
+            artifact_commit = head
+            artifact_run_fields = {}
         else:
             raise EvidenceError(
                 f"receipt claims unsupported PR publication evidence for {binding!r} gate {gate['id']!r}"
@@ -1376,6 +1408,98 @@ def verify_premerge_provider_evidence(
         status, conclusion = _conclusion(actual)
         if gate.get("status") != status or gate.get("conclusion") != conclusion:
             raise EvidenceError(f"receipt gate {gate['id']!r} differs from provider outcome")
+        artifact_id = f"github-check-run-{provider_id}"
+        artifact_path = f"results/check-run-{provider_id}.json"
+        if gate.get("artifact_refs") != [artifact_id]:
+            raise EvidenceError(f"receipt gate {gate['id']!r} does not reference its canonical provider artifact")
+        expected_artifacts[artifact_id] = {
+            "id": artifact_id,
+            "path": artifact_path,
+            "media_type": "application/json",
+            "producer": definition["producer"],
+            "kind": definition["artifact"],
+            "subject": gate["id"],
+            "commit": artifact_commit,
+            **artifact_run_fields,
+        }
+        provider_payload_facts[artifact_id] = {
+            "binding": binding,
+            "check_run": actual,
+            "job": job if binding == "primary" else None,
+            "candidate": candidate,
+            "head": head,
+            "run_id": run_id,
+            "run_attempt": attempt,
+        }
+
+    artifacts = contract_evidence.get("artifacts")
+    if not isinstance(artifacts, list):
+        raise EvidenceError("receipt CI1.01 artifacts are malformed")
+    payload_texts = premerge.get("artifact_payloads")
+    if not isinstance(payload_texts, dict):
+        raise EvidenceError("receipt does not retain CI1.01 provider artifact payloads")
+    if set(payload_texts) != {item["path"] for item in expected_artifacts.values()}:
+        raise EvidenceError("receipt provider artifact payload set is incomplete")
+    recorded_artifacts = {
+        artifact.get("id"): artifact
+        for artifact in artifacts
+        if isinstance(artifact, dict)
+    }
+    if len(recorded_artifacts) != len(artifacts) or set(recorded_artifacts) != set(expected_artifacts):
+        raise EvidenceError("receipt CI1.01 artifact records differ from live provider gates")
+    for artifact_id, expected in expected_artifacts.items():
+        artifact = recorded_artifacts[artifact_id]
+        facts = provider_payload_facts[artifact_id]
+        metadata = {key: value for key, value in artifact.items() if key not in {"sha256", "size_bytes"}}
+        if metadata != expected:
+            raise EvidenceError("receipt CI1.01 artifact metadata differs from live provider gates")
+        payload_text = payload_texts.get(expected["path"])
+        if not isinstance(payload_text, str):
+            raise EvidenceError("receipt CI1.01 artifact payload is not retained text")
+        payload_bytes = payload_text.encode("utf-8")
+        if (
+            hashlib.sha256(payload_bytes).hexdigest() != artifact.get("sha256")
+            or len(payload_bytes) != artifact.get("size_bytes")
+        ):
+            raise EvidenceError("receipt CI1.01 artifact digest or size differs from retained bytes")
+        try:
+            payload_value = json.loads(payload_text)
+        except json.JSONDecodeError as exc:
+            raise EvidenceError("receipt CI1.01 artifact payload is invalid JSON") from exc
+        if not isinstance(payload_value, dict) or _canonical(payload_value).decode("utf-8") != payload_text:
+            raise EvidenceError("receipt CI1.01 artifact payload is not canonical JSON")
+        if facts["binding"] == "primary":
+            expected_keys = {"check_run", "job", "candidate", "run_id", "run_attempt"}
+            snapshot_job = payload_value.get("job")
+            job_fields = (
+                "id", "name", "head_sha", "run_id", "run_attempt", "check_run_url",
+                "status", "conclusion",
+            )
+            if not isinstance(snapshot_job, dict) or any(
+                snapshot_job.get(field) != facts["job"].get(field) for field in job_fields
+            ):
+                raise EvidenceError("retained primary artifact job differs from its live workflow job")
+            if (
+                payload_value.get("candidate") != facts["candidate"]
+                or payload_value.get("run_id") != facts["run_id"]
+                or payload_value.get("run_attempt") != facts["run_attempt"]
+            ):
+                raise EvidenceError("retained primary artifact has a different candidate or workflow run")
+        else:
+            expected_keys = {"check_run", "head", "candidate"}
+            if (
+                payload_value.get("head") != facts["head"]
+                or payload_value.get("candidate") != facts["candidate"]
+            ):
+                raise EvidenceError("retained check artifact has a different head or candidate")
+        snapshot_check = payload_value.get("check_run")
+        if (
+            set(payload_value) != expected_keys
+            or not isinstance(snapshot_check, dict)
+            or ci_publication._provider_check_summary(snapshot_check)
+            != ci_publication._provider_check_summary(facts["check_run"])
+        ):
+            raise EvidenceError("retained CI1.01 artifact check differs from its live provider run")
 
 
 def write_bundle(result: dict[str, Any], directory: Path) -> None:

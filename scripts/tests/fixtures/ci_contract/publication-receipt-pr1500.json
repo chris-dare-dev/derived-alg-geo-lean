@@ -35,6 +35,11 @@
     "applicable_auxiliary_gate_ids": [
       "github-advanced-security"
     ],
+    "artifact_payloads": {
+      "results/check-run-107542777415.json": "{\"candidate\":\"b976a833906972338987f51c30f8962a97a4cfe8\",\"check_run\":{\"app\":{\"client_id\":\"Iv1.05c79e9ad1f6bdfa\",\"created_at\":\"2018-07-30T09:30:17Z\",\"description\":\"Automate your workflow from idea to production\",\"events\":[\"branch_protection_rule\",\"check_run\",\"check_suite\",\"create\",\"delete\",\"deployment\",\"deployment_status\",\"discussion\",\"discussion_comment\",\"fork\",\"gollum\",\"issues\",\"issue_comment\",\"label\",\"merge_group\",\"milestone\",\"page_build\",\"public\",\"pull_request\",\"pull_request_review\",\"pull_request_review_comment\",\"push\",\"registry_package\",\"release\",\"repository\",\"repository_dispatch\",\"status\",\"watch\",\"workflow_dispatch\",\"workflow_run\"],\"external_url\":\"https://help.github.com/en/actions\",\"html_url\":\"https://github.com/apps/github-actions\",\"id\":15368,\"name\":\"GitHub Actions\",\"node_id\":\"MDM6QXBwMTUzNjg=\",\"owner\":{\"avatar_url\":\"https://avatars.githubusercontent.com/u/9919?v=4\",\"events_url\":\"https://api.github.com/users/github/events{/privacy}\",\"followers_url\":\"https://api.github.com/users/github/followers\",\"following_url\":\"https://api.github.com/users/github/following{/other_user}\",\"gists_url\":\"https://api.github.com/users/github/gists{/gist_id}\",\"gravatar_id\":\"\",\"html_url\":\"https://github.com/github\",\"id\":9919,\"login\":\"github\",\"node_id\":\"MDEyOk9yZ2FuaXphdGlvbjk5MTk=\",\"organizations_url\":\"https://api.github.com/users/github/orgs\",\"received_events_url\":\"https://api.github.com/users/github/received_events\",\"repos_url\":\"https://api.github.com/users/github/repos\",\"site_admin\":false,\"starred_url\":\"https://api.github.com/users/github/starred{/owner}{/repo}\",\"subscriptions_url\":\"https://api.github.com/users/github/subscriptions\",\"type\":\"Organization\",\"url\":\"https://api.github.com/users/github\",\"user_view_type\":\"public\"},\"permissions\":{\"actions\":\"write\",\"administration\":\"read\",\"artifact_metadata\":\"write\",\"attestations\":\"write\",\"checks\":\"write\",\"code_quality\":\"write\",\"contents\":\"write\",\"copilot_requests\":\"write\",\"deployments\":\"write\",\"discussions\":\"write\",\"drives\":\"write\",\"issues\":\"write\",\"merge_queues\":\"write\",\"metadata\":\"read\",\"models\":\"read\",\"packages\":\"write\",\"pages\":\"write\",\"pull_requests\":\"write\",\"repository_hooks\":\"write\",\"repository_projects\":\"write\",\"security_events\":\"write\",\"statuses\":\"write\",\"vulnerability_alerts\":\"read\"},\"slug\":\"github-actions\",\"updated_at\":\"2026-06-18T16:17:48Z\"},\"check_suite\":{\"id\":97404405856},\"completed_at\":\"2026-09-24T07:50:05Z\",\"conclusion\":\"success\",\"details_url\":\"https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35971612896/job/107542777415\",\"external_id\":\"b4652feb-f844-5671-ad80-20acb0ee20ee\",\"head_sha\":\"cdde9046c0ae29a62f0ddc127ccc724f85aa34f5\",\"html_url\":\"https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35971612896/job/107542777415\",\"id\":107542777415,\"name\":\"roadmap\",\"node_id\":\"CR_kwDOTwwn788AAAAZCgyORw\",\"output\":{\"annotations_count\":2,\"annotations_url\":\"https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/check-runs/107542777415/annotations\",\"summary\":null,\"text\":null,\"title\":null},\"pull_requests\":[{\"base\":{\"ref\":\"main\",\"repo\":{\"id\":1326196719,\"name\":\"derived-alg-geo-lean\",\"url\":\"https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean\"},\"sha\":\"8018746ca89a0816c01de80cf9387f9e12c8cb60\"},\"head\":{\"ref\":\"codex/ci1-evidence-collector\",\"repo\":{\"id\":1326196719,\"name\":\"derived-alg-geo-lean\",\"url\":\"https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean\"},\"sha\":\"cdde9046c0ae29a62f0ddc127ccc724f85aa34f5\"},\"id\":4621563445,\"number\":1500,\"url\":\"https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/pulls/1500\"}],\"started_at\":\"2026-09-24T07:49:37Z\",\"status\":\"completed\",\"url\":\"https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/check-runs/107542777415\"},\"job\":{\"check_run_url\":\"https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/check-runs/107542777415\",\"completed_at\":\"2026-09-24T07:50:05Z\",\"conclusion\":\"success\",\"created_at\":\"2026-09-24T07:49:34Z\",\"head_branch\":\"codex/ci1-evidence-collector\",\"head_sha\":\"cdde9046c0ae29a62f0ddc127ccc724f85aa34f5\",\"html_url\":\"https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35971612896/job/107542777415\",\"id\":107542777415,\"labels\":[\"ubuntu-latest\"],\"name\":\"roadmap\",\"node_id\":\"CR_kwDOTwwn788AAAAZCgyORw\",\"run_attempt\":1,\"run_id\":35971612896,\"run_url\":\"https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/actions/runs/35971612896\",\"runner_group_id\":0,\"runner_group_name\":\"GitHub Actions\",\"runner_id\":1000014294,\"runner_name\":\"GitHub Actions 1000014294\",\"started_at\":\"2026-09-24T07:49:37Z\",\"status\":\"completed\",\"steps\":[{\"completed_at\":\"2026-09-24T07:49:38Z\",\"conclusion\":\"success\",\"name\":\"Set up job\",\"number\":1,\"started_at\":\"2026-09-24T07:49:37Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T07:49:40Z\",\"conclusion\":\"success\",\"name\":\"Run actions/checkout@v4\",\"number\":2,\"started_at\":\"2026-09-24T07:49:38Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T07:50:03Z\",\"conclusion\":\"success\",\"name\":\"Roadmap and tracker agree\",\"number\":3,\"started_at\":\"2026-09-24T07:49:40Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T07:50:03Z\",\"conclusion\":\"success\",\"name\":\"Post Run actions/checkout@v4\",\"number\":6,\"started_at\":\"2026-09-24T07:50:03Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T07:50:03Z\",\"conclusion\":\"success\",\"name\":\"Complete job\",\"number\":7,\"started_at\":\"2026-09-24T07:50:03Z\",\"status\":\"completed\"}],\"url\":\"https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/actions/jobs/107542777415\",\"workflow_name\":\"CI\"},\"run_attempt\":1,\"run_id\":35971612896}\n",
+      "results/check-run-107542777862.json": "{\"candidate\":\"b976a833906972338987f51c30f8962a97a4cfe8\",\"check_run\":{\"app\":{\"client_id\":\"Iv1.05c79e9ad1f6bdfa\",\"created_at\":\"2018-07-30T09:30:17Z\",\"description\":\"Automate your workflow from idea to production\",\"events\":[\"branch_protection_rule\",\"check_run\",\"check_suite\",\"create\",\"delete\",\"deployment\",\"deployment_status\",\"discussion\",\"discussion_comment\",\"fork\",\"gollum\",\"issues\",\"issue_comment\",\"label\",\"merge_group\",\"milestone\",\"page_build\",\"public\",\"pull_request\",\"pull_request_review\",\"pull_request_review_comment\",\"push\",\"registry_package\",\"release\",\"repository\",\"repository_dispatch\",\"status\",\"watch\",\"workflow_dispatch\",\"workflow_run\"],\"external_url\":\"https://help.github.com/en/actions\",\"html_url\":\"https://github.com/apps/github-actions\",\"id\":15368,\"name\":\"GitHub Actions\",\"node_id\":\"MDM6QXBwMTUzNjg=\",\"owner\":{\"avatar_url\":\"https://avatars.githubusercontent.com/u/9919?v=4\",\"events_url\":\"https://api.github.com/users/github/events{/privacy}\",\"followers_url\":\"https://api.github.com/users/github/followers\",\"following_url\":\"https://api.github.com/users/github/following{/other_user}\",\"gists_url\":\"https://api.github.com/users/github/gists{/gist_id}\",\"gravatar_id\":\"\",\"html_url\":\"https://github.com/github\",\"id\":9919,\"login\":\"github\",\"node_id\":\"MDEyOk9yZ2FuaXphdGlvbjk5MTk=\",\"organizations_url\":\"https://api.github.com/users/github/orgs\",\"received_events_url\":\"https://api.github.com/users/github/received_events\",\"repos_url\":\"https://api.github.com/users/github/repos\",\"site_admin\":false,\"starred_url\":\"https://api.github.com/users/github/starred{/owner}{/repo}\",\"subscriptions_url\":\"https://api.github.com/users/github/subscriptions\",\"type\":\"Organization\",\"url\":\"https://api.github.com/users/github\",\"user_view_type\":\"public\"},\"permissions\":{\"actions\":\"write\",\"administration\":\"read\",\"artifact_metadata\":\"write\",\"attestations\":\"write\",\"checks\":\"write\",\"code_quality\":\"write\",\"contents\":\"write\",\"copilot_requests\":\"write\",\"deployments\":\"write\",\"discussions\":\"write\",\"drives\":\"write\",\"issues\":\"write\",\"merge_queues\":\"write\",\"metadata\":\"read\",\"models\":\"read\",\"packages\":\"write\",\"pages\":\"write\",\"pull_requests\":\"write\",\"repository_hooks\":\"write\",\"repository_projects\":\"write\",\"security_events\":\"write\",\"statuses\":\"write\",\"vulnerability_alerts\":\"read\"},\"slug\":\"github-actions\",\"updated_at\":\"2026-06-18T16:17:48Z\"},\"check_suite\":{\"id\":97404405856},\"completed_at\":\"2026-09-24T08:15:51Z\",\"conclusion\":\"success\",\"details_url\":\"https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35971612896/job/107542777862\",\"external_id\":\"7c08ba3e-61d9-5640-a5ce-3a12b5a263d3\",\"head_sha\":\"cdde9046c0ae29a62f0ddc127ccc724f85aa34f5\",\"html_url\":\"https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35971612896/job/107542777862\",\"id\":107542777862,\"name\":\"build\",\"node_id\":\"CR_kwDOTwwn788AAAAZCgyQBg\",\"output\":{\"annotations_count\":4,\"annotations_url\":\"https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/check-runs/107542777862/annotations\",\"summary\":null,\"text\":null,\"title\":null},\"pull_requests\":[{\"base\":{\"ref\":\"main\",\"repo\":{\"id\":1326196719,\"name\":\"derived-alg-geo-lean\",\"url\":\"https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean\"},\"sha\":\"8018746ca89a0816c01de80cf9387f9e12c8cb60\"},\"head\":{\"ref\":\"codex/ci1-evidence-collector\",\"repo\":{\"id\":1326196719,\"name\":\"derived-alg-geo-lean\",\"url\":\"https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean\"},\"sha\":\"cdde9046c0ae29a62f0ddc127ccc724f85aa34f5\"},\"id\":4621563445,\"number\":1500,\"url\":\"https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/pulls/1500\"}],\"started_at\":\"2026-09-24T07:49:37Z\",\"status\":\"completed\",\"url\":\"https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/check-runs/107542777862\"},\"job\":{\"check_run_url\":\"https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/check-runs/107542777862\",\"completed_at\":\"2026-09-24T08:15:51Z\",\"conclusion\":\"success\",\"created_at\":\"2026-09-24T07:49:34Z\",\"head_branch\":\"codex/ci1-evidence-collector\",\"head_sha\":\"cdde9046c0ae29a62f0ddc127ccc724f85aa34f5\",\"html_url\":\"https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35971612896/job/107542777862\",\"id\":107542777862,\"labels\":[\"ubuntu-latest\"],\"name\":\"build\",\"node_id\":\"CR_kwDOTwwn788AAAAZCgyQBg\",\"run_attempt\":1,\"run_id\":35971612896,\"run_url\":\"https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/actions/runs/35971612896\",\"runner_group_id\":0,\"runner_group_name\":\"GitHub Actions\",\"runner_id\":1000014295,\"runner_name\":\"GitHub Actions 1000014295\",\"started_at\":\"2026-09-24T07:49:37Z\",\"status\":\"completed\",\"steps\":[{\"completed_at\":\"2026-09-24T07:49:40Z\",\"conclusion\":\"success\",\"name\":\"Set up job\",\"number\":1,\"started_at\":\"2026-09-24T07:49:39Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T07:49:40Z\",\"conclusion\":\"success\",\"name\":\"Cap Lake's concurrency on the self-hosted lane\",\"number\":2,\"started_at\":\"2026-09-24T07:49:40Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T07:49:42Z\",\"conclusion\":\"success\",\"name\":\"Run actions/checkout@v4\",\"number\":3,\"started_at\":\"2026-09-24T07:49:40Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T07:49:43Z\",\"conclusion\":\"success\",\"name\":\"Reset the tree, keeping .lake\",\"number\":4,\"started_at\":\"2026-09-24T07:49:42Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T07:49:43Z\",\"conclusion\":\"success\",\"name\":\"What changed\",\"number\":5,\"started_at\":\"2026-09-24T07:49:43Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T07:49:43Z\",\"conclusion\":\"success\",\"name\":\"Foundation import boundary\",\"number\":6,\"started_at\":\"2026-09-24T07:49:43Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T07:49:53Z\",\"conclusion\":\"success\",\"name\":\"Restore build output\",\"number\":7,\"started_at\":\"2026-09-24T07:49:43Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T07:49:53Z\",\"conclusion\":\"success\",\"name\":\"Prune orphaned build artifacts\",\"number\":8,\"started_at\":\"2026-09-24T07:49:53Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T07:53:44Z\",\"conclusion\":\"success\",\"name\":\"Run leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9\",\"number\":9,\"started_at\":\"2026-09-24T07:49:53Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T07:53:45Z\",\"conclusion\":\"success\",\"name\":\"Pin and coverage records\",\"number\":10,\"started_at\":\"2026-09-24T07:53:44Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T07:57:19Z\",\"conclusion\":\"success\",\"name\":\"Algebraic-geometry axiom audit\",\"number\":11,\"started_at\":\"2026-09-24T07:53:45Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:00:18Z\",\"conclusion\":\"success\",\"name\":\"Stability-condition axiom audit\",\"number\":12,\"started_at\":\"2026-09-24T07:57:19Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:00:22Z\",\"conclusion\":\"success\",\"name\":\"DG axiom audit\",\"number\":13,\"started_at\":\"2026-09-24T08:00:18Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:01:43Z\",\"conclusion\":\"success\",\"name\":\"Audit completeness\",\"number\":14,\"started_at\":\"2026-09-24T08:00:22Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:02:59Z\",\"conclusion\":\"success\",\"name\":\"Single instantiation\",\"number\":15,\"started_at\":\"2026-09-24T08:01:43Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:04:17Z\",\"conclusion\":\"success\",\"name\":\"Environment linters\",\"number\":16,\"started_at\":\"2026-09-24T08:02:59Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:04:20Z\",\"conclusion\":\"success\",\"name\":\"Compiler warning ratchet\",\"number\":17,\"started_at\":\"2026-09-24T08:04:17Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:04:20Z\",\"conclusion\":\"success\",\"name\":\"Gate console encoding\",\"number\":18,\"started_at\":\"2026-09-24T08:04:20Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:04:20Z\",\"conclusion\":\"success\",\"name\":\"Mathlib-style known-answer fixtures\",\"number\":19,\"started_at\":\"2026-09-24T08:04:20Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:04:25Z\",\"conclusion\":\"success\",\"name\":\"Mathlib-style baseline ratchet\",\"number\":20,\"started_at\":\"2026-09-24T08:04:20Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:04:25Z\",\"conclusion\":\"success\",\"name\":\"Stability source independence\",\"number\":21,\"started_at\":\"2026-09-24T08:04:25Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:04:27Z\",\"conclusion\":\"success\",\"name\":\"Subject ownership layering\",\"number\":22,\"started_at\":\"2026-09-24T08:04:25Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:04:27Z\",\"conclusion\":\"success\",\"name\":\"Umbrella coverage\",\"number\":23,\"started_at\":\"2026-09-24T08:04:27Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:04:28Z\",\"conclusion\":\"success\",\"name\":\"Root reachability\",\"number\":24,\"started_at\":\"2026-09-24T08:04:27Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:04:28Z\",\"conclusion\":\"success\",\"name\":\"Coherent families architecture\",\"number\":25,\"started_at\":\"2026-09-24T08:04:28Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:04:32Z\",\"conclusion\":\"success\",\"name\":\"Explicit numerical data architecture\",\"number\":26,\"started_at\":\"2026-09-24T08:04:28Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:04:49Z\",\"conclusion\":\"success\",\"name\":\"No declaration uses sorry\",\"number\":27,\"started_at\":\"2026-09-24T08:04:32Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:09:34Z\",\"conclusion\":\"success\",\"name\":\"Emit combined environment\",\"number\":28,\"started_at\":\"2026-09-24T08:04:49Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:11:01Z\",\"conclusion\":\"success\",\"name\":\"Contract gates\",\"number\":29,\"started_at\":\"2026-09-24T08:09:34Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:15:45Z\",\"conclusion\":\"success\",\"name\":\"Emitter reproducibility\",\"number\":30,\"started_at\":\"2026-09-24T08:11:01Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:15:45Z\",\"conclusion\":\"success\",\"name\":\"Every gate passed\",\"number\":31,\"started_at\":\"2026-09-24T08:15:45Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:15:48Z\",\"conclusion\":\"success\",\"name\":\"Upload trust artifacts\",\"number\":32,\"started_at\":\"2026-09-24T08:15:45Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:15:49Z\",\"conclusion\":\"success\",\"name\":\"Post Run actions/checkout@v4\",\"number\":64,\"started_at\":\"2026-09-24T08:15:48Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:15:49Z\",\"conclusion\":\"success\",\"name\":\"Complete job\",\"number\":65,\"started_at\":\"2026-09-24T08:15:49Z\",\"status\":\"completed\"}],\"url\":\"https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/actions/jobs/107542777862\",\"workflow_name\":\"CI\"},\"run_attempt\":1,\"run_id\":35971612896}\n",
+      "results/check-run-107550753092.json": "{\"candidate\":\"b976a833906972338987f51c30f8962a97a4cfe8\",\"check_run\":{\"app\":{\"client_id\":\"Iv1.05c79e9ad1f6bdfa\",\"created_at\":\"2018-07-30T09:30:17Z\",\"description\":\"Automate your workflow from idea to production\",\"events\":[\"branch_protection_rule\",\"check_run\",\"check_suite\",\"create\",\"delete\",\"deployment\",\"deployment_status\",\"discussion\",\"discussion_comment\",\"fork\",\"gollum\",\"issues\",\"issue_comment\",\"label\",\"merge_group\",\"milestone\",\"page_build\",\"public\",\"pull_request\",\"pull_request_review\",\"pull_request_review_comment\",\"push\",\"registry_package\",\"release\",\"repository\",\"repository_dispatch\",\"status\",\"watch\",\"workflow_dispatch\",\"workflow_run\"],\"external_url\":\"https://help.github.com/en/actions\",\"html_url\":\"https://github.com/apps/github-actions\",\"id\":15368,\"name\":\"GitHub Actions\",\"node_id\":\"MDM6QXBwMTUzNjg=\",\"owner\":{\"avatar_url\":\"https://avatars.githubusercontent.com/u/9919?v=4\",\"events_url\":\"https://api.github.com/users/github/events{/privacy}\",\"followers_url\":\"https://api.github.com/users/github/followers\",\"following_url\":\"https://api.github.com/users/github/following{/other_user}\",\"gists_url\":\"https://api.github.com/users/github/gists{/gist_id}\",\"gravatar_id\":\"\",\"html_url\":\"https://github.com/github\",\"id\":9919,\"login\":\"github\",\"node_id\":\"MDEyOk9yZ2FuaXphdGlvbjk5MTk=\",\"organizations_url\":\"https://api.github.com/users/github/orgs\",\"received_events_url\":\"https://api.github.com/users/github/received_events\",\"repos_url\":\"https://api.github.com/users/github/repos\",\"site_admin\":false,\"starred_url\":\"https://api.github.com/users/github/starred{/owner}{/repo}\",\"subscriptions_url\":\"https://api.github.com/users/github/subscriptions\",\"type\":\"Organization\",\"url\":\"https://api.github.com/users/github\",\"user_view_type\":\"public\"},\"permissions\":{\"actions\":\"write\",\"administration\":\"read\",\"artifact_metadata\":\"write\",\"attestations\":\"write\",\"checks\":\"write\",\"code_quality\":\"write\",\"contents\":\"write\",\"copilot_requests\":\"write\",\"deployments\":\"write\",\"discussions\":\"write\",\"drives\":\"write\",\"issues\":\"write\",\"merge_queues\":\"write\",\"metadata\":\"read\",\"models\":\"read\",\"packages\":\"write\",\"pages\":\"write\",\"pull_requests\":\"write\",\"repository_hooks\":\"write\",\"repository_projects\":\"write\",\"security_events\":\"write\",\"statuses\":\"write\",\"vulnerability_alerts\":\"read\"},\"slug\":\"github-actions\",\"updated_at\":\"2026-06-18T16:17:48Z\"},\"check_suite\":{\"id\":97404405856},\"completed_at\":\"2026-09-24T08:15:56Z\",\"conclusion\":\"success\",\"details_url\":\"https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35971612896/job/107550753092\",\"external_id\":\"4a7eb301-891d-532d-925e-924f9c2f5c54\",\"head_sha\":\"cdde9046c0ae29a62f0ddc127ccc724f85aa34f5\",\"html_url\":\"https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35971612896/job/107550753092\",\"id\":107550753092,\"name\":\"ci\",\"node_id\":\"CR_kwDOTwwn788AAAAZCoZBRA\",\"output\":{\"annotations_count\":1,\"annotations_url\":\"https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/check-runs/107550753092/annotations\",\"summary\":null,\"text\":null,\"title\":null},\"pull_requests\":[{\"base\":{\"ref\":\"main\",\"repo\":{\"id\":1326196719,\"name\":\"derived-alg-geo-lean\",\"url\":\"https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean\"},\"sha\":\"8018746ca89a0816c01de80cf9387f9e12c8cb60\"},\"head\":{\"ref\":\"codex/ci1-evidence-collector\",\"repo\":{\"id\":1326196719,\"name\":\"derived-alg-geo-lean\",\"url\":\"https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean\"},\"sha\":\"cdde9046c0ae29a62f0ddc127ccc724f85aa34f5\"},\"id\":4621563445,\"number\":1500,\"url\":\"https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/pulls/1500\"}],\"started_at\":\"2026-09-24T08:15:54Z\",\"status\":\"completed\",\"url\":\"https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/check-runs/107550753092\"},\"job\":{\"check_run_url\":\"https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/check-runs/107550753092\",\"completed_at\":\"2026-09-24T08:15:56Z\",\"conclusion\":\"success\",\"created_at\":\"2026-09-24T08:15:51Z\",\"head_branch\":\"codex/ci1-evidence-collector\",\"head_sha\":\"cdde9046c0ae29a62f0ddc127ccc724f85aa34f5\",\"html_url\":\"https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35971612896/job/107550753092\",\"id\":107550753092,\"labels\":[\"ubuntu-latest\"],\"name\":\"ci\",\"node_id\":\"CR_kwDOTwwn788AAAAZCoZBRA\",\"run_attempt\":1,\"run_id\":35971612896,\"run_url\":\"https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/actions/runs/35971612896\",\"runner_group_id\":0,\"runner_group_name\":\"GitHub Actions\",\"runner_id\":1000014301,\"runner_name\":\"GitHub Actions 1000014301\",\"started_at\":\"2026-09-24T08:15:54Z\",\"status\":\"completed\",\"steps\":[{\"completed_at\":\"2026-09-24T08:15:55Z\",\"conclusion\":\"success\",\"name\":\"Set up job\",\"number\":1,\"started_at\":\"2026-09-24T08:15:55Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:15:55Z\",\"conclusion\":\"success\",\"name\":\"Every required job succeeded\",\"number\":2,\"started_at\":\"2026-09-24T08:15:55Z\",\"status\":\"completed\"},{\"completed_at\":\"2026-09-24T08:15:55Z\",\"conclusion\":\"success\",\"name\":\"Complete job\",\"number\":3,\"started_at\":\"2026-09-24T08:15:55Z\",\"status\":\"completed\"}],\"url\":\"https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/actions/jobs/107550753092\",\"workflow_name\":\"CI\"},\"run_attempt\":1,\"run_id\":35971612896}\n"
+    },
     "base_commit": "8018746ca89a0816c01de80cf9387f9e12c8cb60",
     "candidate_commit": "b976a833906972338987f51c30f8962a97a4cfe8",
     "candidate_tree": "3f997549ff2c3ae629cd1136f9a0f218a9279225",
@@ -94,87 +99,6 @@
       "all_pipelines_green": false,
       "auxiliary_checks_healthy": false,
       "required_ci_verified": true
-    },
-    "event": "pull_request",
-    "gates": [
-      {
-        "class": "required_ci",
-        "commit": "b976a833906972338987f51c30f8962a97a4cfe8",
-        "conclusion": "success",
-        "id": "build",
-        "name": "build",
-        "provider_id": "107542777862",
-        "required": true,
-        "status": "passed"
-      },
-      {
-        "class": "required_ci",
-        "commit": "b976a833906972338987f51c30f8962a97a4cfe8",
-        "conclusion": "success",
-        "id": "roadmap",
-        "name": "roadmap",
-        "provider_id": "107542777415",
-        "required": true,
-        "status": "passed"
-      },
-      {
-        "class": "merge_readiness",
-        "commit": "b976a833906972338987f51c30f8962a97a4cfe8",
-        "conclusion": "success",
-        "id": "ci",
-        "name": "ci",
-        "provider_id": "107550753092",
-        "required": true,
-        "status": "passed"
-      }
-    ],
-    "head_commit": "cdde9046c0ae29a62f0ddc127ccc724f85aa34f5",
-    "producer": "github-actions/CI",
-    "provider_binding": {
-      "commit": "b976a833906972338987f51c30f8962a97a4cfe8",
-      "event": "pull_request",
-      "parents": [
-        "8018746ca89a0816c01de80cf9387f9e12c8cb60",
-        "cdde9046c0ae29a62f0ddc127ccc724f85aa34f5"
-      ],
-      "producer": "github-actions/CI",
-      "proof_sha256": "08d0c5cbd108b63d03cb54a9261bd33d81d90473e75c096ff8cd901c7e61789e",
-      "ref": "refs/pull/1500/merge",
-      "repository": "chris-dare-dev/derived-alg-geo-lean",
-      "run_attempt": 1,
-      "run_id": 35971612896,
-      "source": "github-api",
-      "tree": "3f997549ff2c3ae629cd1136f9a0f218a9279225"
-    },
-    "provider_proof_sha256": "08d0c5cbd108b63d03cb54a9261bd33d81d90473e75c096ff8cd901c7e61789e",
-    "ref": "refs/pull/1500/merge",
-    "required_gate_ids": [
-      "build",
-      "ci",
-      "roadmap"
-    ],
-    "run_attempt": 1,
-    "run_id": 35971612896,
-    "statuses": [],
-    "unclassified_check_ids": [],
-    "unclassified_status_ids": [],
-    "workflow_run": {
-      "check_suite_id": 97404405856,
-      "conclusion": "success",
-      "event": "pull_request",
-      "head_sha": "cdde9046c0ae29a62f0ddc127ccc724f85aa34f5",
-      "html_url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35971612896",
-      "id": 35971612896,
-      "path": ".github/workflows/ci.yml",
-      "pull_requests": [
-        {
-          "base_sha": "8018746ca89a0816c01de80cf9387f9e12c8cb60",
-          "head_sha": "cdde9046c0ae29a62f0ddc127ccc724f85aa34f5",
-          "number": 1500
-        }
-      ],
-      "run_attempt": 1,
-      "status": "completed"
     },
     "contract_evidence": {
       "artifacts": [
@@ -321,6 +245,87 @@
       "run_id": 35971612896,
       "schema_version": 4,
       "toolchain": "leanprover/lean4:v4.32.1"
+    },
+    "event": "pull_request",
+    "gates": [
+      {
+        "class": "required_ci",
+        "commit": "b976a833906972338987f51c30f8962a97a4cfe8",
+        "conclusion": "success",
+        "id": "build",
+        "name": "build",
+        "provider_id": "107542777862",
+        "required": true,
+        "status": "passed"
+      },
+      {
+        "class": "required_ci",
+        "commit": "b976a833906972338987f51c30f8962a97a4cfe8",
+        "conclusion": "success",
+        "id": "roadmap",
+        "name": "roadmap",
+        "provider_id": "107542777415",
+        "required": true,
+        "status": "passed"
+      },
+      {
+        "class": "merge_readiness",
+        "commit": "b976a833906972338987f51c30f8962a97a4cfe8",
+        "conclusion": "success",
+        "id": "ci",
+        "name": "ci",
+        "provider_id": "107550753092",
+        "required": true,
+        "status": "passed"
+      }
+    ],
+    "head_commit": "cdde9046c0ae29a62f0ddc127ccc724f85aa34f5",
+    "producer": "github-actions/CI",
+    "provider_binding": {
+      "commit": "b976a833906972338987f51c30f8962a97a4cfe8",
+      "event": "pull_request",
+      "parents": [
+        "8018746ca89a0816c01de80cf9387f9e12c8cb60",
+        "cdde9046c0ae29a62f0ddc127ccc724f85aa34f5"
+      ],
+      "producer": "github-actions/CI",
+      "proof_sha256": "08d0c5cbd108b63d03cb54a9261bd33d81d90473e75c096ff8cd901c7e61789e",
+      "ref": "refs/pull/1500/merge",
+      "repository": "chris-dare-dev/derived-alg-geo-lean",
+      "run_attempt": 1,
+      "run_id": 35971612896,
+      "source": "github-api",
+      "tree": "3f997549ff2c3ae629cd1136f9a0f218a9279225"
+    },
+    "provider_proof_sha256": "08d0c5cbd108b63d03cb54a9261bd33d81d90473e75c096ff8cd901c7e61789e",
+    "ref": "refs/pull/1500/merge",
+    "required_gate_ids": [
+      "build",
+      "ci",
+      "roadmap"
+    ],
+    "run_attempt": 1,
+    "run_id": 35971612896,
+    "statuses": [],
+    "unclassified_check_ids": [],
+    "unclassified_status_ids": [],
+    "workflow_run": {
+      "check_suite_id": 97404405856,
+      "conclusion": "success",
+      "event": "pull_request",
+      "head_sha": "cdde9046c0ae29a62f0ddc127ccc724f85aa34f5",
+      "html_url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35971612896",
+      "id": 35971612896,
+      "path": ".github/workflows/ci.yml",
+      "pull_requests": [
+        {
+          "base_sha": "8018746ca89a0816c01de80cf9387f9e12c8cb60",
+          "head_sha": "cdde9046c0ae29a62f0ddc127ccc724f85aa34f5",
+          "number": 1500
+        }
+      ],
+      "run_attempt": 1,
+      "status": "completed"
     }
   },
   "publication": {
@@ -337,7 +342,7 @@
     "number": 1500,
     "url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1500"
   },
-  "receipt_sha256": "aadcb6305c601a9ff6acc0a357a2ae2a787a29a2450e39d21c91abec2d376494",
+  "receipt_sha256": "370d27b98537ed1fa74240fcc97d189fc0440a6e989582d2b997e5eef6ec90f8",
   "repository": "chris-dare-dev/derived-alg-geo-lean",
   "review": {
     "commit": "cdde9046c0ae29a62f0ddc127ccc724f85aa34f5",

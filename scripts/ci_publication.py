@@ -111,11 +111,63 @@ def evaluate_merge_readiness(
         "status": status,
         "reasons": reasons,
         "merge_state": merge_state,
+        "pull_request_state": pr.get("state"),
+        "is_draft": pr.get("isDraft"),
+        "base_ref_oid": pr.get("baseRefOid"),
+        "head_ref_oid": pr.get("headRefOid"),
+        "review_decision": pr.get("reviewDecision"),
+        "required_ci_verified": required_ci_verified,
         "checked_base": checked_base,
         "checked_head": checked_head,
         "reviewed_tree": reviewed_tree,
         "head_tree": head_tree,
     }
+
+
+def _validate_merge_readiness(
+    readiness: Any, *, checked_base: str, checked_head: str, reviewed_tree: str
+) -> None:
+    """Check that a ready claim is a coherent evaluation of the receipt revisions."""
+
+    if not isinstance(readiness, dict):
+        raise PublicationError("merge readiness is missing or malformed")
+    status = readiness.get("status")
+    if status == "not_evaluated":
+        # Historical receipts predate the readiness adapter. If they retained
+        # any revision fields, keep those fields honest without requiring a
+        # historical PR snapshot that was never recorded.
+        for field, expected in (
+            ("checked_base", checked_base),
+            ("checked_head", checked_head),
+            ("reviewed_tree", reviewed_tree),
+        ):
+            if field in readiness and readiness[field] != expected:
+                raise PublicationError("unevaluated merge readiness has conflicting revisions")
+        return
+    if status != "ready":
+        raise PublicationError("publication receipt has blocked or stale merge readiness")
+
+    if any(
+        readiness.get(field) != expected
+        for field, expected in (
+            ("checked_base", checked_base),
+            ("checked_head", checked_head),
+            ("reviewed_tree", reviewed_tree),
+            ("head_tree", reviewed_tree),
+            ("base_ref_oid", checked_base),
+            ("head_ref_oid", checked_head),
+        )
+    ):
+        raise PublicationError("ready merge readiness is bound to different revisions or trees")
+    if (
+        readiness.get("pull_request_state") != "OPEN"
+        or readiness.get("is_draft") is not False
+        or readiness.get("required_ci_verified") is not True
+        or readiness.get("merge_state") not in {"CLEAN", "UNSTABLE"}
+        or readiness.get("review_decision") in {"CHANGES_REQUESTED", "REVIEW_REQUIRED"}
+        or readiness.get("reasons") != []
+    ):
+        raise PublicationError("ready merge readiness contains contradictory evaluation data")
 
 
 def build_receipt(
@@ -152,9 +204,6 @@ def build_receipt(
         raise PublicationError("premerge CI evidence is not valid")
     if claims.get("required_ci_verified") is not True:
         raise PublicationError("required premerge CI is not verified")
-    if merge_readiness.get("status") != "ready":
-        if merge_readiness.get("status") != "not_evaluated":
-            raise PublicationError("publication receipt has blocked or stale merge readiness")
     health = post_merge_health.get("status")
     if health not in POST_MERGE_HEALTH:
         raise PublicationError("post-merge health status is malformed")
@@ -164,10 +213,12 @@ def build_receipt(
         raise PublicationError(
             "published tree differs from the final reviewed tree; renewed review is required"
         )
-    if merge_readiness.get("checked_head") != head or merge_readiness.get("checked_base") != base:
-        raise PublicationError("merge readiness is bound to different revisions")
-    if merge_readiness.get("reviewed_tree") != reviewed_tree:
-        raise PublicationError("merge readiness is bound to a different reviewed tree")
+    _validate_merge_readiness(
+        merge_readiness,
+        checked_base=base,
+        checked_head=head,
+        reviewed_tree=reviewed_tree,
+    )
 
     auxiliary_healthy = claims.get("auxiliary_checks_healthy") is True
     all_pipelines_green = claims.get("all_pipelines_green") is True
@@ -427,9 +478,16 @@ def verify_receipt(receipt: dict[str, Any]) -> None:
         raise PublicationError("receipt post-merge health claim is inconsistent")
     if claims.get("operationally_verified") is not (health == "passed"):
         raise PublicationError("receipt overstates operational verification")
-    readiness = receipt.get("merge_readiness", {}).get("status")
+    merge_readiness = receipt.get("merge_readiness")
+    readiness = merge_readiness.get("status") if isinstance(merge_readiness, dict) else None
     if readiness not in {"ready", "not_evaluated"} or claims.get("merge_readiness") != readiness:
         raise PublicationError("receipt overstates or misbinds merge readiness")
+    _validate_merge_readiness(
+        merge_readiness,
+        checked_base=base,
+        checked_head=_sha(premerge.get("head_commit"), "premerge head"),
+        reviewed_tree=reviewed_tree,
+    )
     gate_records = premerge.get("gates")
     if not isinstance(gate_records, list):
         raise PublicationError("receipt has no premerge gate records")

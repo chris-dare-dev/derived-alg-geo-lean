@@ -2805,8 +2805,12 @@ class CIFailureRepairTests(unittest.TestCase):
             ]
         }
         readiness = {
-            "status": "ready", "checked_base": base, "checked_head": head,
-            "reviewed_tree": tree,
+            "status": "ready", "reasons": [], "merge_state": "CLEAN",
+            "pull_request_state": "OPEN", "is_draft": False,
+            "base_ref_oid": base, "head_ref_oid": head,
+            "review_decision": "APPROVED", "required_ci_verified": True,
+            "checked_base": base, "checked_head": head,
+            "reviewed_tree": tree, "head_tree": tree,
         }
         receipt = ci_publication.build_receipt(
             repository="example/repo", pr_number=10, pr_url="https://github.com/example/repo/pull/10",

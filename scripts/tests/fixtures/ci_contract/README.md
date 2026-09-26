@@ -18,7 +18,7 @@ identities, so a fixture failure is reproducible without a GitHub API call.
 
 `publication-receipt-pr1500.json` is a live, exact-revision example. It binds
 PR #1500's reviewed tree to GitHub's merge commit and both parents, retains the
-CI1.01 contract evidence and check-run IDs, and records the separate
+CI1.01 contract evidence, canonical provider artifact payloads and check-run IDs, and records the separate
 post-merge CI run. The historical PR predates the merge-readiness adapter, so that claim remains
 `not_evaluated`; required CI passed while auxiliary health and the
 all-pipelines claim remained false. `test_ci_github_evidence.py` validates its
@@ -26,7 +26,11 @@ receipt digest and claim relationships without network access. The fixture was
 also passed to `verify_publication_provider_evidence` against the live GitHub
 API, which re-read its protected inventory, merge candidate artifact, candidate
 commit, PR identity, workflow run, check suites/runs, commit statuses and
-post-merge run. GitHub clears the run's `pull_requests` field after merge; the
+post-merge run. The verifier checks retained artifact hashes and sizes, then
+binds each snapshot's check identity and outcome (and primary workflow job) to
+the current provider records. GitHub may add fields to historical API payloads,
+so the snapshot preserves the exact collected bytes while the verifier checks
+the fields that carry the CI claim. GitHub clears the run's `pull_requests` field after merge; the
 verifier can still establish this historical association from the exact merged
 PR base/head and the run-bound candidate's ordered parents. A conflicting
 nonempty live association is rejected.

@@ -340,17 +340,27 @@ def publication_inputs(client: PublicationClient) -> tuple[dict, dict]:
         "check_runs": collected["observations"]["check_runs"],
         "statuses": collected["observations"]["statuses"],
     }
-    readiness = {
-        "status": "ready",
-        "checked_base": client.base,
-        "checked_head": client.head,
-        "reviewed_tree": SHA_TREE,
-    }
+    readiness = ci_publication.evaluate_merge_readiness(
+        {
+            "state": "OPEN",
+            "isDraft": False,
+            "baseRefOid": client.base,
+            "headRefOid": client.head,
+            "mergeStateStatus": "CLEAN",
+            "reviewDecision": "APPROVED",
+        },
+        checked_base=client.base,
+        checked_head=client.head,
+        reviewed_tree=SHA_TREE,
+        head_tree=SHA_TREE,
+        required_ci_verified=True,
+    )
     return {
         "evidence": collected["evidence"],
         "validation": collected["validation"],
         "observations": observations,
         "inventory": collected["inventory"],
+        "payloads": collected["payloads"],
     }, readiness
 
 
@@ -899,6 +909,68 @@ class PublicationTests(unittest.TestCase):
         self.resign_receipt(associated_receipt)
         with self.assertRaisesRegex(EvidenceError, "associated with a different"):
             verify_publication_provider_evidence(associated, associated_receipt)
+
+    def test_provider_verifier_rejects_forged_toolchain_pins_and_artifact_digests(self) -> None:
+        fields = ("toolchain", "pins", "artifact-sha256", "artifact-size", "artifact-payload")
+        for field in fields:
+            with self.subTest(field=field):
+                client = PublicationClient()
+                receipt = self.collect(client)
+                evidence = receipt["premerge"]["contract_evidence"]
+                if field == "toolchain":
+                    evidence["toolchain"] = "forged toolchain"
+                elif field == "pins":
+                    evidence["pins"] = {
+                        path: "0" * 64 for path in ci_contract.REQUIRED_PINS
+                    }
+                elif field == "artifact-sha256":
+                    for artifact in evidence["artifacts"]:
+                        artifact["sha256"] = "0" * 64
+                elif field == "artifact-size":
+                    for artifact in evidence["artifacts"]:
+                        artifact["size_bytes"] = 1
+                else:
+                    artifact = evidence["artifacts"][0]
+                    payloads = receipt["premerge"]["artifact_payloads"]
+                    payload = json.loads(payloads[artifact["path"]])
+                    payload["check_run"]["conclusion"] = "failure"
+                    content = (
+                        json.dumps(
+                            payload,
+                            sort_keys=True,
+                            separators=(",", ":"),
+                            ensure_ascii=False,
+                        )
+                        + "\n"
+                    ).encode("utf-8")
+                    payloads[artifact["path"]] = content.decode("utf-8")
+                    artifact["sha256"] = hashlib.sha256(content).hexdigest()
+                    artifact["size_bytes"] = len(content)
+                self.resign_receipt(receipt)
+
+                message = (
+                    "candidate Git blob|candidate Git blobs|CI1.01 artifact|"
+                    "retained CI1.01 artifact"
+                )
+                with self.assertRaisesRegex(EvidenceError, message):
+                    verify_publication_provider_evidence(client, receipt)
+
+    def test_provider_verifier_rejects_rehashed_contradictory_ready_claim(self) -> None:
+        client = PublicationClient()
+        receipt = self.collect(client)
+        receipt["merge_readiness"].update(
+            {
+                "checked_base": "9" * 40,
+                "checked_head": "8" * 40,
+                "head_tree": "7" * 40,
+                "merge_state": "BLOCKED",
+                "reasons": ["merge is blocked"],
+            }
+        )
+        self.resign_receipt(receipt)
+
+        with self.assertRaisesRegex(ci_publication.PublicationError, "ready merge readiness"):
+            verify_publication_provider_evidence(client, receipt)
 
     def test_post_merge_health_is_not_inferred_from_a_pr_check_or_missing_run(self) -> None:
         client = PublicationClient()
