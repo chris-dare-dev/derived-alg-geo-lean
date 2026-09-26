@@ -4,6 +4,8 @@ import contextlib
 import hashlib
 import io
 import json
+import os
+import stat
 import subprocess
 import sys
 import tempfile
@@ -17,6 +19,7 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 import ci_github_evidence  # noqa: E402
+import ci_publication  # noqa: E402
 import loop_engine  # noqa: E402
 
 
@@ -158,6 +161,28 @@ def predecessor_pr(binding: dict, comments: list[dict] | None = None) -> dict:
         "body": f"Refs #{binding['issue_number']}\n",
         "mergeCommit": {"oid": binding["merge_commit"]},
         "comments": comments or [],
+    }
+
+
+def required_ci_result(base: str, head: str, tree: str, *, auxiliary_healthy: bool = True) -> dict:
+    return {
+        "evidence": {
+            "base_commit": base,
+            "head_commit": head,
+            "candidate_commit": "c" * 40,
+            "candidate_tree": tree,
+            "run_id": 123,
+            "run_attempt": 1,
+            "provider_binding": {"proof_sha256": "d" * 64},
+        },
+        "validation": {
+            "valid": True,
+            "claims": {
+                "required_ci_verified": True,
+                "auxiliary_checks_healthy": auxiliary_healthy,
+                "all_pipelines_green": auxiliary_healthy,
+            },
+        },
     }
 
 
@@ -533,8 +558,11 @@ class LoopEngineTests(unittest.TestCase):
                 "state": "OPEN",
                 "isDraft": False,
                 "baseRefName": "main",
+                "baseRefOid": "b" * 40,
                 "headRefName": "agent/test-issue",
                 "headRefOid": "a" * 40,
+                "mergeStateStatus": "CLEAN",
+                "reviewDecision": "APPROVED",
                 "body": "Refs #1\n",
                 "files": [{"path": "scripts/loop_engine.py"}],
                 "comments": [],
@@ -568,7 +596,12 @@ class LoopEngineTests(unittest.TestCase):
                 loop_engine, "gh_json", return_value=pr
             ), mock.patch.object(
                 loop_engine, "reviewed_commit_matches_head", return_value=True
-            ), mock.patch.object(loop_engine, "check_required_checks"), mock.patch.object(
+            ), mock.patch.object(
+                loop_engine, "collect_required_check_evidence",
+                return_value=required_ci_result("b" * 40, "a" * 40, "c" * 40),
+            ), mock.patch.object(loop_engine, "git", return_value="c" * 40), mock.patch.object(
+                loop_engine, "verify_remote_chunk_files"
+            ), mock.patch.object(loop_engine, "require_published_head_has_no_links"), mock.patch.object(
                 loop_engine, "run_command"
             ):
                 self.assertEqual(
@@ -601,7 +634,12 @@ class LoopEngineTests(unittest.TestCase):
                 loop_engine, "gh_json", return_value=missing_marker
             ), mock.patch.object(
                 loop_engine, "reviewed_commit_matches_head", return_value=True
-            ), mock.patch.object(loop_engine, "check_required_checks"), self.assertRaises(
+            ), mock.patch.object(
+                loop_engine, "collect_required_check_evidence",
+                return_value=required_ci_result("b" * 40, "a" * 40, "c" * 40),
+            ), mock.patch.object(loop_engine, "git", return_value="c" * 40), mock.patch.object(
+                loop_engine, "verify_remote_chunk_files"
+            ), mock.patch.object(loop_engine, "require_published_head_has_no_links"), self.assertRaises(
                 loop_engine.LoopError
             ) as caught:
                 loop_engine.action_merge(
@@ -1312,6 +1350,19 @@ def publish_base(root: Path) -> None:
 def numbered_lines(count: int, changed: dict[int, str] | None = None) -> str:
     changed = changed or {}
     return "".join(f"{changed.get(line, f'line {line}')}\n" for line in range(1, count + 1))
+
+
+class ExecutableAuditCheckerTests(unittest.TestCase):
+    @unittest.skipUnless(os.name == "posix", "executable mode and shebang invocation are Linux/POSIX checks")
+    def test_audit_completeness_checker_is_executable_without_content_changes(self) -> None:
+        root = SCRIPT_DIR.parent
+        script = root / "scripts" / "check_audit_complete.py"
+        self.assertTrue(script.stat().st_mode & stat.S_IXUSR)
+        direct = subprocess.run(
+            [str(script)], cwd=root, text=True, capture_output=True, check=False
+        )
+        self.assertEqual(direct.returncode, 1)
+        self.assertIn("Usage:", direct.stderr)
 
 
 class OpenSpecDigestTests(unittest.TestCase):
@@ -2027,6 +2078,10 @@ class CIFailureRepairTests(unittest.TestCase):
         (self.root / "a.txt").write_text(content, encoding="utf-8")
         return commit_all(self.root, "repair build")
 
+    def checked_ci(self, head: str) -> dict:
+        tree = git_in(self.root, "rev-parse", f"{head}^{{tree}}")
+        return required_ci_result(self.base_sha, head, tree, auxiliary_healthy=False)
+
     def provider_api(self, _root: Path, args: list[str]):
         request = next((arg for arg in args if arg.startswith("repos/")), "")
         if "/pulls?state=open" in request:
@@ -2337,13 +2392,18 @@ class CIFailureRepairTests(unittest.TestCase):
             "headRefName": "agent/test-issue",
             "headRefOid": candidate,
             "baseRefName": "main",
+            "baseRefOid": self.base_sha,
+            "mergeStateStatus": "UNSTABLE",
+            "reviewDecision": "APPROVED",
             "body": "Closes #1\n",
             "files": [{"path": "a.txt"}],
             "comments": [],
         }
         with mock.patch.object(loop_engine, "authorize_action"), mock.patch.object(
             loop_engine, "require_predecessor_prs", return_value=[]
-        ), mock.patch.object(loop_engine, "check_required_checks", return_value=candidate) as checks, mock.patch.object(
+        ), mock.patch.object(
+            loop_engine, "collect_required_check_evidence", return_value=self.checked_ci(candidate)
+        ) as checks, mock.patch.object(
             loop_engine, "gh_json", return_value=pr
         ), mock.patch.object(loop_engine, "reviewed_content_matches", return_value=True), mock.patch.object(
             loop_engine, "verify_remote_chunk_files"
@@ -2361,20 +2421,22 @@ class CIFailureRepairTests(unittest.TestCase):
         with mock.patch.object(loop_engine, "authorize_action"), mock.patch.object(
             loop_engine, "require_predecessor_prs", return_value=[]
         ), mock.patch.object(
-            loop_engine, "check_required_checks", side_effect=loop_engine.LoopError("required checks are not green")
-        ), self.assertRaisesRegex(loop_engine.LoopError, "required checks are not green"):
+            loop_engine, "collect_required_check_evidence", side_effect=loop_engine.LoopError("required CI evidence is not verified")
+        ), self.assertRaisesRegex(loop_engine.LoopError, "required CI evidence is not verified"):
             loop_engine.action_merge(
                 self.root, self.spec, 42, self.state_file, None, False, False, None, True
             )
 
         with mock.patch.object(loop_engine, "authorize_action"), mock.patch.object(
             loop_engine, "require_predecessor_prs", return_value=[]
-        ), mock.patch.object(loop_engine, "check_required_checks", return_value=self.failed_head), mock.patch.object(
+        ), mock.patch.object(
+            loop_engine, "collect_required_check_evidence", return_value=self.checked_ci(self.failed_head)
+        ), mock.patch.object(
             loop_engine, "gh_json", return_value=pr
         ), mock.patch.object(loop_engine, "reviewed_content_matches", return_value=True), mock.patch.object(
             loop_engine, "verify_remote_chunk_files"
         ), mock.patch.object(loop_engine, "require_published_head_has_no_links"), self.assertRaisesRegex(
-            loop_engine.LoopError, "moved between the check read"
+            loop_engine.LoopError, "head moved between the check read"
         ):
             loop_engine.action_merge(
                 self.root, self.spec, 42, self.state_file, None, False, False, None, True
@@ -2622,92 +2684,201 @@ class CIFailureRepairTests(unittest.TestCase):
             )
         self.assertIn("--draft", output.getvalue())
 
-    def test_required_checks_fall_back_to_the_manifest_and_report_the_checked_head(self) -> None:
-        self.spec["runner"]["required_checks"] = ["ci", "build"]
-        rollup = {
-            "headRefOid": "c" * 40,
-            "statusCheckRollup": [{"name": "ci", "conclusion": "SUCCESS", "completedAt": "2026-09-22T00:00:00Z"}],
-        }
-        with mock.patch.object(loop_engine, "gh_json", return_value=rollup), mock.patch.object(
-            loop_engine, "protected_check_names", return_value=set()
-        ):
-            with self.assertRaisesRegex(loop_engine.LoopError, "missing build"):
-                loop_engine.check_required_checks(self.root, self.spec, 12)
-        with mock.patch.object(loop_engine, "gh_json", return_value=rollup), mock.patch.object(
-            loop_engine, "protected_check_names", return_value={"ci"}
-        ):
-            self.assertEqual(loop_engine.check_required_checks(self.root, self.spec, 12), "c" * 40)
-
-    def test_required_checks_fail_closed_when_live_protection_is_unavailable(self) -> None:
-        rollup = {
-            "headRefOid": "c" * 40,
-            "statusCheckRollup": [{"name": "ci", "conclusion": "SUCCESS"}],
-        }
-        with mock.patch.object(loop_engine, "gh_json", return_value=rollup), mock.patch.object(
-            loop_engine, "protected_check_names", side_effect=loop_engine.LoopError("protection unavailable")
-        ), self.assertRaisesRegex(loop_engine.LoopError, "protection unavailable"):
-            loop_engine.check_required_checks(self.root, self.spec, 12)
-
-    def test_required_checks_reject_a_malformed_protection_response(self) -> None:
-        rollup = {
-            "headRefOid": "c" * 40,
-            "statusCheckRollup": [{"name": "ci", "conclusion": "SUCCESS"}],
-        }
-        for protection in ({}, {"contexts": ["ci"], "checks": [{"context": None}]}, {"contexts": ["ci", None]}):
-            with self.subTest(protection=protection), mock.patch.object(
-                loop_engine, "gh_json", side_effect=[rollup, protection]
-            ), self.assertRaisesRegex(loop_engine.LoopError, "branch protection returned an unexpected response"):
-                loop_engine.check_required_checks(self.root, self.spec, 12)
-
-    def test_required_checks_reject_an_unbound_head(self) -> None:
-        rollup = {"statusCheckRollup": [{"name": "ci", "conclusion": "SUCCESS"}]}
-        with mock.patch.object(loop_engine, "gh_json", return_value=rollup), self.assertRaisesRegex(
-            loop_engine.LoopError, "missing a valid head commit"
-        ):
-            loop_engine.check_required_checks(self.root, self.spec, 12)
-
-    def test_live_required_failure_cannot_be_hidden_by_manifest(self) -> None:
-        rollup = {
-            "headRefOid": "c" * 40,
-            "statusCheckRollup": [
-                {"name": "ci", "conclusion": "SUCCESS"},
-                {"name": "trust-surface", "conclusion": "FAILURE"},
-            ],
-        }
-        with mock.patch.object(loop_engine, "gh_json", return_value=rollup), mock.patch.object(
-            loop_engine, "protected_check_names", return_value={"ci", "trust-surface"}
-        ), self.assertRaisesRegex(loop_engine.LoopError, "trust-surface=FAILURE"):
-            loop_engine.check_required_checks(self.root, self.spec, 12)
-
-    def test_newer_pending_check_is_not_hidden_by_older_late_completion(self) -> None:
-        rollup = {
-            "headRefOid": "c" * 40,
-            "statusCheckRollup": [
-                {
-                    "name": "ci", "conclusion": "SUCCESS",
-                    "startedAt": "2026-09-22T09:50:00Z", "completedAt": "2026-09-22T10:01:00Z",
+    def test_required_checks_use_paginated_evidence_and_keep_optional_red_separate(self) -> None:
+        result = {
+            "evidence": {"head_commit": "c" * 40},
+            "validation": {
+                "valid": True,
+                "claims": {
+                    "required_ci_verified": True,
+                    "auxiliary_checks_healthy": False,
+                    "all_pipelines_green": False,
                 },
-                {"name": "ci", "status": "IN_PROGRESS", "startedAt": "2026-09-22T10:00:00Z"},
-            ],
+            },
         }
-        with mock.patch.object(loop_engine, "gh_json", return_value=rollup), mock.patch.object(
-            loop_engine, "protected_check_names", return_value={"ci"}
-        ), self.assertRaisesRegex(loop_engine.LoopError, "ci=IN_PROGRESS"):
-            loop_engine.check_required_checks(self.root, self.spec, 12)
-
-        rollup["statusCheckRollup"][1] = {
-            "name": "ci", "conclusion": "SUCCESS", "startedAt": "2026-09-22T10:00:00Z",
-        }
-        with mock.patch.object(loop_engine, "gh_json", return_value=rollup), mock.patch.object(
-            loop_engine, "protected_check_names", return_value={"ci"}
-        ):
+        with mock.patch.object(ci_github_evidence, "collect", return_value=result):
             self.assertEqual(loop_engine.check_required_checks(self.root, self.spec, 12), "c" * 40)
 
-        del rollup["statusCheckRollup"][1]["startedAt"]
-        with mock.patch.object(loop_engine, "gh_json", return_value=rollup), self.assertRaisesRegex(
-            loop_engine.LoopError, "cannot order duplicate check runs for ci"
+    def test_required_checks_reject_invalid_or_missing_required_claims(self) -> None:
+        for result in (
+            {"evidence": {"head_commit": "c" * 40}, "validation": {"valid": False, "errors": ["required gate failed"]}},
+            {"evidence": {"head_commit": "c" * 40}, "validation": {"valid": True, "claims": {"required_ci_verified": False}}},
+            {"evidence": {"head_commit": "bad"}, "validation": {"valid": True, "claims": {"required_ci_verified": True}}},
         ):
-            loop_engine.check_required_checks(self.root, self.spec, 12)
+            with self.subTest(result=result), mock.patch.object(
+                ci_github_evidence, "collect", return_value=result
+            ), self.assertRaises(loop_engine.LoopError):
+                loop_engine.check_required_checks(self.root, self.spec, 12)
+
+    def test_required_check_evidence_fails_closed_when_provider_collection_fails(self) -> None:
+        with mock.patch.object(
+            ci_github_evidence,
+            "collect",
+            side_effect=ci_github_evidence.EvidenceError("base changed during collection"),
+        ), self.assertRaisesRegex(loop_engine.LoopError, "base changed during collection"):
+            loop_engine.collect_required_check_evidence(self.root, self.spec, 12)
+
+    def test_merge_readiness_rejects_draft_behind_new_push_stale_review_and_changed_base(self) -> None:
+        base, head, tree = "a" * 40, "b" * 40, "c" * 40
+        pr = {
+            "state": "OPEN", "isDraft": False, "baseRefOid": base, "headRefOid": head,
+            "mergeStateStatus": "CLEAN", "reviewDecision": "APPROVED",
+        }
+        ready = ci_publication.evaluate_merge_readiness(
+            pr, checked_base=base, checked_head=head, reviewed_tree=tree, head_tree=tree,
+            required_ci_verified=True,
+        )
+        self.assertEqual(ready["status"], "ready")
+        cases = (
+            ({**pr, "isDraft": True}, tree, "draft"),
+            ({**pr, "mergeStateStatus": "BEHIND"}, tree, "behind"),
+            ({**pr, "headRefOid": "d" * 40}, tree, "head moved"),
+            (pr, "d" * 40, "reviewed tree"),
+            ({**pr, "baseRefOid": "e" * 40}, tree, "base moved"),
+            ({**pr, "reviewDecision": "CHANGES_REQUESTED"}, tree, "CHANGES_REQUESTED"),
+        )
+        for candidate, candidate_review_tree, expected in cases:
+            with self.subTest(expected=expected):
+                decision = ci_publication.evaluate_merge_readiness(
+                    candidate, checked_base=base, checked_head=head,
+                    reviewed_tree=candidate_review_tree, head_tree=tree,
+                    required_ci_verified=True,
+                )
+                self.assertNotEqual(decision["status"], "ready")
+                self.assertIn(expected.lower(), "; ".join(decision["reasons"]).lower())
+
+    def test_publication_receipt_binds_reviewed_tree_commit_parent_and_health_claims(self) -> None:
+        base, head, candidate, tree = "a" * 40, "b" * 40, "c" * 40, "d" * 40
+        reviewed, published = "e" * 40, "f" * 40
+        provider_binding = {
+            "source": "github-api", "repository": "example/repo", "producer": "github-actions/CI",
+            "run_id": 123, "run_attempt": 1, "event": "pull_request",
+            "ref": "refs/pull/10/merge", "commit": candidate, "tree": tree,
+            "parents": [base, head],
+        }
+        provider_binding["proof_sha256"] = hashlib.sha256(
+            json.dumps(provider_binding, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
+        ).hexdigest()
+        evidence = {
+            "base_commit": base, "head_commit": head, "candidate_commit": candidate,
+            "candidate_tree": tree, "run_id": 123, "run_attempt": 1,
+            "provider_binding": provider_binding,
+            "event": "pull_request", "ref": "refs/pull/10/merge", "producer": "github-actions/CI",
+            "gates": [
+                {"id": "ci", "name": "ci", "provider_id": "123", "commit": candidate,
+                 "status": "passed", "conclusion": "success"},
+                {"id": "security", "name": "security", "provider_id": "456", "commit": head,
+                 "status": "failed", "conclusion": "failure"},
+            ],
+        }
+        validation = {
+            "valid": True,
+            "required_gates": ["ci"],
+            "claims": {
+                "required_ci_verified": True,
+                "auxiliary_checks_healthy": False,
+                "all_pipelines_green": False,
+            },
+        }
+        observations = {
+            "workflow_run": {
+                "id": 123, "run_attempt": 1, "check_suite_id": 789, "head_sha": head,
+                "event": "pull_request", "path": ".github/workflows/ci.yml",
+                "status": "completed", "conclusion": "success",
+                "pull_requests": [{"number": 10, "base": {"sha": base}, "head": {"sha": head}}],
+            },
+            "suites": [{"id": 789, "head_sha": head, "app": {"id": 77, "slug": "github-actions"}}],
+            "check_runs": [
+                {"id": 123, "name": "ci", "head_sha": head, "status": "completed",
+                 "conclusion": "success", "app": {"id": 77, "slug": "github-actions"}},
+                {"id": 456, "name": "security", "head_sha": head, "status": "completed",
+                 "conclusion": "failure", "app": {"id": 88, "slug": "github-advanced-security"}},
+            ],
+            "statuses": [],
+        }
+        inventory = {
+            "gates": [
+                {"id": "ci", "name": "ci", "class": "required_ci", "required": True,
+                 "run_binding": "primary", "applies_to": ["pull_request"]},
+                {"id": "security", "name": "security", "class": "auxiliary", "required": False,
+                 "run_binding": "check", "applies_to": ["pull_request"]},
+            ]
+        }
+        readiness = {
+            "status": "ready", "checked_base": base, "checked_head": head,
+            "reviewed_tree": tree,
+        }
+        receipt = ci_publication.build_receipt(
+            repository="example/repo", pr_number=10, pr_url="https://github.com/example/repo/pull/10",
+            reviewed_commit=reviewed, reviewed_tree=tree, premerge_evidence=evidence,
+            premerge_validation=validation, premerge_observations=observations,
+            premerge_inventory=inventory, published_commit=published, published_tree=tree,
+            published_parents=[base, head], published_base_is_ancestor=True,
+            merge_readiness=readiness,
+            post_merge_health={"status": "failed", "commit": published, "run": {"id": 999}},
+        )
+        ci_publication.verify_receipt(receipt)
+        self.assertFalse(receipt["claims"]["auxiliary_checks_healthy"])
+        self.assertFalse(receipt["claims"]["all_pipelines_green"])
+        self.assertFalse(receipt["claims"]["operationally_verified"])
+
+        changed_tree = {**receipt, "publication": {**receipt["publication"], "tree": "9" * 40}}
+        changed_tree["receipt_sha256"] = ci_publication.receipt_digest(changed_tree)
+        with self.assertRaisesRegex(ci_publication.PublicationError, "reviewed tree"):
+            ci_publication.verify_receipt(changed_tree)
+        corrupted = {**receipt, "publication": {**receipt["publication"], "parents": ["8" * 40]}}
+        with self.assertRaisesRegex(ci_publication.PublicationError, "digest mismatch"):
+            ci_publication.verify_receipt(corrupted)
+
+    def test_mode_symlink_and_deletion_changes_are_part_of_reviewed_tree_identity(self) -> None:
+        (self.root / "publish.sh").write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+        (self.root / "link").symlink_to("publish.sh")
+        base = commit_all(self.root, "publication baseline")
+        git_in(self.root, "checkout", "-q", "-b", "reviewed-publication")
+        (self.root / "publish.sh").chmod(0o755)
+        reviewed = commit_all(self.root, "review mode and symlink")
+        reviewed_tree = git_in(self.root, "rev-parse", f"{reviewed}^{{tree}}")
+        self.assertEqual(
+            git_in(self.root, "rev-parse", f"{base}:publish.sh"),
+            git_in(self.root, "rev-parse", f"{reviewed}:publish.sh"),
+        )
+        self.assertNotEqual(
+            git_in(self.root, "ls-tree", base, "publish.sh").split()[0],
+            git_in(self.root, "ls-tree", reviewed, "publish.sh").split()[0],
+        )
+        mode_only_readiness = ci_publication.evaluate_merge_readiness(
+            {
+                "state": "OPEN", "isDraft": False, "baseRefOid": base,
+                "headRefOid": base, "mergeStateStatus": "CLEAN",
+            },
+            checked_base=base,
+            checked_head=base,
+            reviewed_tree=reviewed_tree,
+            head_tree=git_in(self.root, "rev-parse", f"{base}^{{tree}}"),
+            required_ci_verified=True,
+        )
+        self.assertEqual(mode_only_readiness["status"], "stale")
+        self.assertIn("renew review", "; ".join(mode_only_readiness["reasons"]))
+        git_in(self.root, "checkout", "-q", "-b", "published-publication", base)
+        (self.root / "publish.sh").chmod(0o755)
+        (self.root / "link").unlink()
+        (self.root / "publish.sh").unlink()
+        published = commit_all(self.root, "incomplete published tree")
+        published_tree = git_in(self.root, "rev-parse", f"{published}^{{tree}}")
+        self.assertNotEqual(reviewed_tree, published_tree)
+        incomplete_readiness = ci_publication.evaluate_merge_readiness(
+            {
+                "state": "OPEN", "isDraft": False, "baseRefOid": base,
+                "headRefOid": published, "mergeStateStatus": "CLEAN",
+            },
+            checked_base=base,
+            checked_head=published,
+            reviewed_tree=reviewed_tree,
+            head_tree=published_tree,
+            required_ci_verified=True,
+        )
+        self.assertEqual(incomplete_readiness["status"], "stale")
+        self.assertIn("renew review", "; ".join(incomplete_readiness["reasons"]))
 
     def test_approval_rejects_checks_for_a_different_head(self) -> None:
         # Exercise the ordinary ledger path: a truthy recovery mock bypasses its checks.

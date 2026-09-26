@@ -24,8 +24,10 @@ from urllib.parse import urlencode, urlsplit
 
 if __package__:
     from . import ci_contract
+    from . import ci_publication
 else:  # Imported by the standalone loop_engine.py entry point.
     import ci_contract
+    import ci_publication
 
 
 API_ROOT = "https://api.github.com"
@@ -818,6 +820,391 @@ def collect(client: GitHubClient, pr_number: int) -> dict[str, Any]:
         "payloads": payloads,
         "protection": protection["raw"],
     }
+
+
+def collect_post_merge_health(client: GitHubClient, commit: str) -> dict[str, Any]:
+    """Observe the protected CI workflow on the exact published commit.
+
+    This is deliberately a separate claim from premerge required CI. A merge
+    receipt made before the main-branch workflow finishes stays pending and
+    cannot claim operational verification.
+    """
+
+    commit = _sha(commit, "published commit")
+    runs = client.get_all(f"/actions/runs?head_sha={commit}", key="workflow_runs")
+    matches = [
+        run
+        for run in runs
+        if run.get("head_sha") == commit
+        and run.get("name") == "CI"
+        and run.get("path") == ".github/workflows/ci.yml"
+        and run.get("event") == "push"
+    ]
+    if not matches:
+        return {"status": "pending", "commit": commit, "run": None}
+    if len(matches) != 1:
+        return {
+            "status": "unknown",
+            "commit": commit,
+            "run": None,
+            "reason": "multiple post-merge CI runs are ambiguous",
+        }
+    listed = matches[0]
+    run_id = _positive(listed.get("id"), "post-merge CI run ID")
+    run = client.get_object(f"/actions/runs/{run_id}")
+    if _run_identity(run) != _run_identity(listed):
+        raise EvidenceError("post-merge CI run changed between listing and direct read")
+    if run.get("head_sha") != commit or run.get("event") != "push" or run.get(
+        "path"
+    ) != ".github/workflows/ci.yml":
+        raise EvidenceError("post-merge CI run is not bound to the published commit")
+    if run.get("status") != "completed":
+        status = "pending"
+    elif run.get("conclusion") == "success":
+        status = "passed"
+    elif run.get("conclusion") in {"failure", "cancelled", "timed_out", "action_required"}:
+        status = "failed"
+    else:
+        status = "unknown"
+    return {
+        "status": status,
+        "commit": commit,
+        "run": {
+            "id": run_id,
+            "attempt": _positive(run.get("run_attempt"), "post-merge CI run attempt"),
+            "url": run.get("html_url"),
+            "status": run.get("status"),
+            "conclusion": run.get("conclusion"),
+        },
+    }
+
+
+def collect_publication(
+    client: GitHubClient,
+    pr_number: int,
+    *,
+    reviewed_commit: str,
+    reviewed_tree: str,
+    premerge: dict[str, Any],
+    merge_readiness: dict[str, Any],
+) -> dict[str, Any]:
+    """Verify a merged PR's actual Git object and return an exact receipt."""
+
+    pr_number = _positive(pr_number, "pull request number")
+    evidence = premerge.get("evidence")
+    validation = premerge.get("validation")
+    observations = premerge.get("observations")
+    inventory = premerge.get("inventory")
+    if not all(isinstance(value, dict) for value in (evidence, validation, observations, inventory)):
+        raise EvidenceError("premerge evidence bundle is malformed")
+    base = _sha(evidence.get("base_commit"), "checked base")
+    head = _sha(evidence.get("head_commit"), "checked head")
+    candidate_tree = _sha(evidence.get("candidate_tree"), "CI candidate tree")
+    reviewed_commit = _sha(reviewed_commit, "reviewed commit")
+    reviewed_tree = _sha(reviewed_tree, "reviewed tree")
+
+    pr = client.get_object(f"/pulls/{pr_number}")
+    if pr.get("number") != pr_number or pr.get("state") != "closed" or pr.get("merged") is not True:
+        raise EvidenceError("pull request is not confirmed merged by GitHub")
+    pr_base = _sha(_required_object(pr.get("base"), "PR base").get("sha"), "PR base")
+    pr_head = _sha(_required_object(pr.get("head"), "PR head").get("sha"), "PR head")
+    published = _sha(pr.get("merge_commit_sha"), "published merge commit")
+    if pr_base != base or pr_head != head:
+        raise EvidenceError("merged PR base or head differs from the checked revisions")
+
+    reviewed_commit_tree, _ = _commit(client, reviewed_commit)
+    head_tree, _ = _commit(client, head)
+    published_tree, parents = _commit(client, published)
+    if reviewed_commit_tree != reviewed_tree or head_tree != reviewed_tree:
+        raise EvidenceError("PR head tree differs from the final reviewed tree; renew review")
+    if published_tree != reviewed_tree or published_tree != candidate_tree:
+        raise EvidenceError(
+            "published tree differs from the final reviewed tree; renew review"
+        )
+    if not parents:
+        raise EvidenceError("published commit has no parent")
+    if len(parents) == 2:
+        if parents != [base, head]:
+            raise EvidenceError(
+                "published merge commit parents differ from the checked base and head"
+            )
+        base_is_ancestor = True
+    elif len(parents) == 1 and parents[0] == base:
+        base_is_ancestor = True
+    elif len(parents) == 1:
+        # A rebase merge may publish a new final commit whose direct parent is
+        # another commit from the PR. The compare endpoint gives the provider's
+        # complete ancestry classification without treating a separate GET and
+        # ref update as an atomic CAS.
+        comparison_url = f"{client._prefix}compare/{base}...{published}"
+        comparison, _ = client._get(comparison_url)
+        if not isinstance(comparison, dict):
+            raise EvidenceError("provider ancestry comparison is malformed")
+        if (
+            _required_object(comparison.get("base_commit"), "comparison base").get("sha")
+            != base
+            or comparison.get("status") not in {"ahead", "identical"}
+        ):
+            raise EvidenceError("published commit is not based on the checked base")
+        base_is_ancestor = True
+    else:
+        raise EvidenceError("published commit has an unsupported parent set")
+
+    # Re-read immutable PR identity after collecting Git objects. The provider
+    # merge call uses --match-head-commit; this check records what actually
+    # landed and does not claim that separate reads are an atomic CAS.
+    final_pr = client.get_object(f"/pulls/{pr_number}")
+    if (
+        final_pr.get("state") != "closed"
+        or final_pr.get("merged") is not True
+        or _sha(final_pr.get("merge_commit_sha"), "final published commit") != published
+        or _sha(_required_object(final_pr.get("head"), "final PR head").get("sha"), "final PR head") != head
+    ):
+        raise EvidenceError("publication identity changed during receipt collection")
+
+    post_merge = collect_post_merge_health(client, published)
+    receipt = ci_publication.build_receipt(
+        repository=client.repository,
+        pr_number=pr_number,
+        pr_url=str(pr.get("html_url") or ""),
+        reviewed_commit=reviewed_commit,
+        reviewed_tree=reviewed_tree,
+        premerge_evidence=evidence,
+        premerge_validation=validation,
+        premerge_observations=observations,
+        premerge_inventory=inventory,
+        published_commit=published,
+        published_tree=published_tree,
+        published_parents=parents,
+        published_base_is_ancestor=base_is_ancestor,
+        merge_readiness=merge_readiness,
+        post_merge_health=post_merge,
+    )
+    verify_publication_provider_evidence(client, receipt)
+    return receipt
+
+
+def verify_publication_provider_evidence(
+    client: GitHubClient, receipt: dict[str, Any]
+) -> None:
+    """Independently re-read the published commit and both CI evidence phases."""
+
+    ci_publication.verify_receipt(receipt)
+    if receipt.get("repository") != client.repository:
+        raise EvidenceError("publication receipt names another repository")
+    pr_number = _positive(receipt.get("pull_request", {}).get("number"), "receipt PR number")
+    premerge = _required_object(receipt.get("premerge"), "receipt premerge")
+    base = _sha(premerge.get("base_commit"), "receipt checked base")
+    head = _sha(premerge.get("head_commit"), "receipt checked head")
+    review = _required_object(receipt.get("review"), "receipt review")
+    publication = _required_object(receipt.get("publication"), "receipt publication")
+    reviewed_commit = _sha(review.get("commit"), "receipt reviewed commit")
+    published_commit = _sha(publication.get("commit"), "receipt published commit")
+
+    pr = client.get_object(f"/pulls/{pr_number}")
+    if (
+        pr.get("state") != "closed"
+        or pr.get("merged") is not True
+        or _sha(pr.get("merge_commit_sha"), "provider merge commit") != published_commit
+        or _sha(_required_object(pr.get("base"), "provider PR base").get("sha"), "provider PR base") != base
+        or _sha(_required_object(pr.get("head"), "provider PR head").get("sha"), "provider PR head") != head
+    ):
+        raise EvidenceError("provider PR identity differs from the publication receipt")
+    reviewed_tree, _ = _commit(client, reviewed_commit)
+    head_tree, _ = _commit(client, head)
+    published_tree, parents = _commit(client, published_commit)
+    expected_parents = [_sha(parent, "receipt parent") for parent in publication["parents"]]
+    if (
+        reviewed_tree != review.get("tree")
+        or head_tree != review.get("tree")
+        or published_tree != publication.get("tree")
+        or parents != expected_parents
+    ):
+        raise EvidenceError("provider Git tree or parent list differs from the publication receipt")
+    if not parents or parents[0] != base:
+        compare_url = f"{client._prefix}compare/{base}...{published_commit}"
+        comparison, _ = client._get(compare_url)
+        if (
+            not isinstance(comparison, dict)
+            or _required_object(comparison.get("base_commit"), "comparison base").get("sha") != base
+            or comparison.get("status") not in {"ahead", "identical"}
+        ):
+            raise EvidenceError("provider no longer proves the checked base is an ancestor")
+
+    verify_premerge_provider_evidence(client, receipt)
+    observed_post = collect_post_merge_health(client, published_commit)
+    recorded_post = receipt.get("post_merge_health")
+    if not isinstance(recorded_post, dict) or recorded_post.get("commit") != published_commit:
+        raise EvidenceError("receipt post-merge observation is not bound to the published commit")
+    if recorded_post.get("status") == "pending" and recorded_post.get("run") is None:
+        # A run can start after the receipt was written; a pending snapshot is
+        # conservative and must never be promoted to operational verification.
+        return
+    if observed_post != recorded_post:
+        raise EvidenceError("provider post-merge CI differs from the publication receipt")
+
+
+def verify_premerge_provider_evidence(
+    client: GitHubClient, receipt: dict[str, Any]
+) -> None:
+    """Re-read the receipt's PR run, enumerated checks, and statuses by ID."""
+
+    ci_publication.verify_receipt(receipt)
+    premerge = receipt["premerge"]
+    pr_number = receipt["pull_request"]["number"]
+    base = _sha(premerge.get("base_commit"), "receipt base")
+    head = _sha(premerge.get("head_commit"), "receipt head")
+    run_summary = _required_object(premerge.get("workflow_run"), "receipt workflow run")
+    run_id = _positive(premerge.get("run_id"), "receipt workflow run ID")
+    run = client.get_object(f"/actions/runs/{run_id}")
+    expected_run = (
+        run_id,
+        _positive(premerge.get("run_attempt"), "receipt workflow run attempt"),
+        _positive(run_summary.get("check_suite_id"), "receipt primary suite ID"),
+        head,
+        "pull_request",
+        "completed",
+        "success",
+    )
+    if _run_identity(run) != expected_run or run.get("path") != ".github/workflows/ci.yml" or any(
+        run.get(field) != run_summary.get(field)
+        for field in (
+            "id", "run_attempt", "check_suite_id", "head_sha", "event", "path",
+            "status", "conclusion", "html_url",
+        )
+    ):
+        raise EvidenceError("receipt premerge workflow run differs from GitHub")
+    associations = run_summary.get("pull_requests")
+    if not isinstance(associations, list) or not any(
+        isinstance(item, dict)
+        and item.get("number") == pr_number
+        and item.get("base_sha") == base
+        and item.get("head_sha") == head
+        for item in associations
+    ):
+        raise EvidenceError("receipt CI run is not associated with its PR/base/head")
+
+    suites = client.get_all(f"/commits/{head}/check-suites", key="check_suites")
+    suite_map = {
+        _positive(suite.get("id"), "live check suite ID"): suite for suite in suites
+    }
+    for expected in premerge.get("check_suites", []):
+        if not isinstance(expected, dict):
+            raise EvidenceError("receipt contains a malformed check-suite observation")
+        suite_id = _positive(expected.get("id"), "receipt check suite ID")
+        actual = suite_map.get(suite_id)
+        if actual is None or actual.get("head_sha") != head:
+            raise EvidenceError("receipt check suite is missing or on another head")
+        app = actual.get("app") if isinstance(actual.get("app"), dict) else {}
+        if app.get("id") != expected.get("app_id") or app.get("slug") != expected.get("app_slug"):
+            raise EvidenceError("receipt check-suite producer differs from GitHub")
+
+    live_checks: dict[int, dict[str, Any]] = {}
+    for suite_id in sorted(suite_map):
+        checks = client.get_all(
+            f"/check-suites/{suite_id}/check-runs?filter=all", key="check_runs"
+        )
+        for check in checks:
+            check_id = _positive(check.get("id"), "live check run ID")
+            if check_id in live_checks:
+                raise EvidenceError("duplicate live check-run ID across suites")
+            if check.get("head_sha") != head:
+                raise EvidenceError("live check run moved off the receipt head")
+            live_checks[check_id] = check
+    recorded_checks = premerge.get("check_runs")
+    if not isinstance(recorded_checks, list):
+        raise EvidenceError("receipt check-run observations are malformed")
+    for expected in recorded_checks:
+        if not isinstance(expected, dict):
+            raise EvidenceError("receipt contains a malformed check-run observation")
+        check_id = _positive(expected.get("id"), "receipt check run ID")
+        actual = live_checks.get(check_id)
+        if actual is None or ci_publication._provider_check_summary(actual) != expected:
+            raise EvidenceError(f"receipt check run {check_id} differs from GitHub")
+
+    statuses = client.get_all(f"/commits/{head}/statuses")
+    status_map = {
+        _positive(item.get("id"), "live commit status ID"): item for item in statuses
+    }
+    recorded_statuses = premerge.get("statuses")
+    if not isinstance(recorded_statuses, list):
+        raise EvidenceError("receipt commit-status observations are malformed")
+    for expected in recorded_statuses:
+        if not isinstance(expected, dict):
+            raise EvidenceError("receipt contains a malformed commit-status observation")
+        status_id = _positive(expected.get("id"), "receipt commit status ID")
+        actual = status_map.get(status_id)
+        summary = {
+            "id": actual.get("id") if actual else None,
+            "sha": actual.get("sha") if actual else None,
+            "context": actual.get("context") if actual else None,
+            "state": actual.get("state") if actual else None,
+            "updated_at": actual.get("updated_at") if actual else None,
+            "target_url": actual.get("target_url") if actual else None,
+        }
+        if actual is None or summary != expected or actual.get("sha") != head:
+            raise EvidenceError(f"receipt commit status {status_id} differs from GitHub")
+
+    gate_records = premerge.get("gates")
+    required_ids = premerge.get("required_gate_ids")
+    if not isinstance(gate_records, list) or not isinstance(required_ids, list):
+        raise EvidenceError("receipt gate list is malformed")
+    gate_by_id = {gate.get("id"): gate for gate in gate_records if isinstance(gate, dict)}
+    inventory = json.loads(_blob(client, base, "scripts/ci_gate_inventory.json"))
+    if ci_contract.validate_inventory(inventory):
+        raise EvidenceError("receipt base gate inventory is invalid")
+    definitions = {gate["id"]: gate for gate in inventory["gates"]}
+    for gate_id, gate in gate_by_id.items():
+        definition = definitions.get(gate_id)
+        if not isinstance(definition, dict):
+            raise EvidenceError("receipt gate is absent from the protected inventory")
+        try:
+            provider_id = int(gate.get("provider_id"))
+        except (TypeError, ValueError) as exc:
+            raise EvidenceError(f"receipt gate {gate_id!r} has a malformed provider ID") from exc
+        if definition.get("run_binding") == "status":
+            actual_status = status_map.get(provider_id)
+            normalized = "passed" if actual_status and actual_status.get("state") == "success" else (
+                "failed" if actual_status and actual_status.get("state") in {"failure", "error"}
+                else "pending"
+            )
+            raw_conclusion = actual_status.get("state") if actual_status else "missing"
+        else:
+            actual_check = live_checks.get(provider_id)
+            if actual_check is None:
+                raise EvidenceError(f"receipt gate {gate_id!r} check run is missing")
+            normalized, raw_conclusion = _conclusion(actual_check)
+        if (
+            gate.get("name") != definition.get("name")
+            or gate.get("class") != definition.get("class")
+            or gate.get("required") != definition.get("required")
+            or gate.get("status") != normalized
+            or gate.get("conclusion") != raw_conclusion
+        ):
+            raise EvidenceError(f"receipt gate {gate_id!r} differs from provider evidence")
+    for gate_id in required_ids:
+        gate = gate_by_id.get(gate_id)
+        definition = definitions.get(gate_id)
+        if not isinstance(gate, dict) or not isinstance(definition, dict) or not definition.get("required"):
+            raise EvidenceError("receipt omits a required gate from the protected inventory")
+        try:
+            provider_id = int(gate.get("provider_id"))
+        except (TypeError, ValueError) as exc:
+            raise EvidenceError("receipt required gate has a malformed provider ID") from exc
+        if definition.get("run_binding") == "status":
+            actual = status_map.get(provider_id)
+            if gate.get("status") != "passed" or actual is None or actual.get("state") != "success":
+                raise EvidenceError(f"required commit status {gate_id!r} is not green")
+        else:
+            actual = live_checks.get(provider_id)
+            if (
+                gate.get("status") != "passed"
+                or actual is None
+                or actual.get("name") != definition.get("name")
+                or actual.get("status") != "completed"
+                or actual.get("conclusion") != "success"
+            ):
+                raise EvidenceError(f"required check run {gate_id!r} is not green")
 
 
 def write_bundle(result: dict[str, Any], directory: Path) -> None:
