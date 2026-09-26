@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Abelian.Basic
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward.Affine
-import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward.BaseChange
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Pushforward.BaseChange
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward.Iso
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pushforward.Affine
 import Mathlib.AlgebraicGeometry.Morphisms.Finite
@@ -41,8 +41,8 @@ fitted the next one without a bridge, and the same three bridges serve the finit
 * `isCoherent_pushforward_of_finite` (`Pushforward/Affine.lean`) is the mathematics, and it is
   stated about `Spec.map φ : Spec S ⟶ Spec R` — a map **of spectra**.  An affine open cover
   supplies affine **schemes**, so it cannot be applied to a cover member directly.
-* `pushforwardRestrictIso` (`Pushforward/BaseChange.lean`) compares the two ways round the
-  restriction square.  Its own docstring says it is what the chart step *consumes*.
+* `pushforwardRestrictIso` (`Modules/Pushforward/BaseChange.lean`) compares the two ways round the
+  restriction square. The chart step consumes this objectwise isomorphism.
 * `isCoherent_pushforward_of_iso` (`Pushforward/Iso.lean`) closes the first gap.
 
 The affine case is a factorisation, not an induction: `Scheme.isoSpec_inv_naturality` gives

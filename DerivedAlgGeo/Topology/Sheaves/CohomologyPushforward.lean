@@ -43,8 +43,7 @@ Four instances that exist but that search will not find or cannot afford:
 
 * `PreservesFiniteLimits` of the pullback. The instance is
   `Functor.sheafPullbackConstruction.preservesFiniteLimits`; searching for it instead runs `whnf`
-  past 200000 heartbeats, the same non-termination `CoherentSheaf/Pushforward/BaseChange.lean`
-  records for unification through site functors. **Name it.**
+  past 200000 heartbeats while unifying through site functors. **Name it.**
 * `Additive` of the pushforward — `rfl` per morphism, but not found.
 * `Additive` of the pullback — from the pushforward's, through `Adjunction.left_adjoint_additive`.
 * `IsLeftAdjoint`/`IsRightAdjoint` of the two, to get the remaining exactness halves.

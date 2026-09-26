@@ -1912,6 +1912,33 @@ class BranchManifestPolicyTests(unittest.TestCase):
             self.assertEqual(loop_engine.action_push(self.root, self.spec, None, False, True, ledger_file), 0)
         self.assertIn("DRY-RUN git push", output.getvalue())
 
+    def test_push_does_not_follow_tags_from_git_configuration(self) -> None:
+        init_repo(self.root)
+        self.spec["issues"][0]["chunks"][0]["files"] = ["a.txt"]
+        (self.root / "a.txt").write_text("base\n", encoding="utf-8")
+        commit_all(self.root, "base")
+        publish_base(self.root)
+        git_in(self.root, "checkout", "-q", "-b", "agent/test-issue")
+        (self.root / "a.txt").write_text("chunk\n", encoding="utf-8")
+        head = commit_all(self.root, "chunk")
+        git_in(self.root, "tag", "-a", "unexpected-release", "-m", "reachable tag")
+        git_in(self.root, "config", "push.followTags", "true")
+        ledger = passing_ledger_state(self.root, self.spec)
+        ledger["rounds"][-1]["commit"] = head
+        ledger_file = persist_test_ledger(self.root, ledger)
+        with tempfile.TemporaryDirectory() as remote_directory:
+            remote = Path(remote_directory) / "remote.git"
+            git_in(self.root, "init", "--bare", "-q", str(remote))
+            git_in(self.root, "remote", "add", "origin", str(remote))
+            # Remote identity is covered by the separate authorization test.
+            with mock.patch.object(loop_engine, "require_manifest_remote"):
+                self.assertEqual(loop_engine.action_push(self.root, self.spec, None, False, False, ledger_file), 0)
+            self.assertEqual(
+                git_in(self.root, "ls-remote", "--heads", "origin", "refs/heads/agent/test-issue").split()[0],
+                head,
+            )
+            self.assertEqual(git_in(self.root, "ls-remote", "--tags", "origin"), "")
+
 
 class CIFailureRepairTests(unittest.TestCase):
     """CI repair evidence is exact-head, append-only, cap-charged, and ledger-bound."""
