@@ -45,4 +45,4 @@ and transfer finite extension-product bounds to generation time. -/
 #print axioms CategoryTheory.Triangulated.ExtensionClosure.le_triangEnvelope
 #print axioms CategoryTheory.Triangulated.ExtensionClosure.eq_iSup_extensionProductIter
 #print axioms CategoryTheory.Triangulated.ExtensionClosure.extensionProductIter_le_triangEnvelopeIter
-#print axioms CategoryTheory.Triangulated.ExtensionClosure.generationTime_singleton_le
+#print axioms CategoryTheory.Triangulated.ExtensionClosure.generationTime_singleton_le_of_mem_extensionProductIter

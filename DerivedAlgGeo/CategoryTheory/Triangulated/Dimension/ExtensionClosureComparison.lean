@@ -8,24 +8,58 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.ExtensionClosure
 /-!
 # Extension closure and triangulated envelopes
 
-This file compares the repository's inductive `ExtensionClosure` with
-Mathlib's `extensionProductIter` and `triangEnvelope` without adding closure
-operations or strengthening `ExtensionClosure` itself. Every finite iterate
-of `extensionProduct` lies in the owner extension closure. Conversely, the
-whole owner extension closure lies in `triangEnvelope` when the generators are
-nonempty and the category is triangulated.
+This file compares `CategoryTheory.Triangulated.ExtensionClosure` with
+Mathlib's `CategoryTheory.ObjectProperty.extensionProductIter` and
+`CategoryTheory.ObjectProperty.triangEnvelope` without adding closure
+operations or strengthening the owner extension closure. Every finite iterate
+of `CategoryTheory.ObjectProperty.extensionProduct` lies in the owner
+extension closure. Conversely, the whole owner extension closure lies in the
+triangulated envelope when the generators are nonempty and the category is
+triangulated.
 
-The nonemptiness assumption is essential: for `P = ⊥`, `ExtensionClosure P`
-contains every zero object by its `.zero` constructor, while Mathlib's
-`triangEnvelope ⊥` is bottom. Also, the finite generation-time bound below is
-proved by placing an `extensionProductIter n` directly in the `n`th
-`triangEnvelopeIter`; passing through the whole `triangEnvelope` would lose
-the numerical bound.
+## Main definitions
 
-The typeclass restatement of `ExtensionClosure.le_of_closed` uses
-`ContainsZero` together with closure under isomorphisms: `ContainsZero` gives
-one zero object, and isomorphism closure transfers membership to every zero
-object. -/
+This file introduces no definitions. It reuses the owner extension closure
+and Mathlib's extension-product and triangulated-envelope constructions.
+
+## Main results
+
+| Declaration | Role |
+|---|---|
+| `CategoryTheory.Triangulated.ExtensionClosure.extensionProductIter_le` | Finite iterates lie in the owner closure. |
+| `CategoryTheory.Triangulated.ExtensionClosure.le_triangEnvelope` | Compares the owner closure and Mathlib's envelope under nonemptiness. |
+| `CategoryTheory.Triangulated.ExtensionClosure.eq_iSup_extensionProductIter` | Identifies the owner closure with the supremum after adjoining zero objects. |
+| `CategoryTheory.Triangulated.ExtensionClosure.extensionProductIter_le_triangEnvelopeIter` | Preserves the finite stage index. |
+| `CategoryTheory.Triangulated.ExtensionClosure.generationTime_singleton_le_of_mem_extensionProductIter` | Converts a finite stage into a generation-time bound. |
+
+## Implementation notes
+
+The nonemptiness assumption in the envelope comparison is essential: for
+`P = ⊥`, `CategoryTheory.Triangulated.ExtensionClosure P` contains every zero
+object by its zero constructor, while
+`CategoryTheory.ObjectProperty.triangEnvelope ⊥` is bottom. The supremum
+equality adjoins `IsZero` because the owner closure contains zero objects even
+when `P` is empty. For the numerical bound, a direct inclusion into
+`triangEnvelopeIter n` preserves the stage index; passing through the whole
+triangulated envelope would lose that bound.
+
+The typeclass restatement of
+`CategoryTheory.Triangulated.ExtensionClosure.le_of_closed` uses
+`CategoryTheory.ObjectProperty.ContainsZero` together with closure under
+isomorphisms: `ContainsZero` gives one zero object, and
+`CategoryTheory.ObjectProperty.IsClosedUnderIsomorphisms` transfers membership
+to every zero object.
+
+## References
+
+* `Mathlib.CategoryTheory.Triangulated.Subcategory`
+* `Mathlib.CategoryTheory.Triangulated.Generators`
+* `Mathlib.CategoryTheory.ObjectProperty.ContainsZero`
+
+## Tags
+
+extension closure, triangulated envelope, generation time
+-/
 
 universe v u
 
@@ -39,8 +73,9 @@ variable {C : Type u} [Category.{v} C] [HasZeroObject C] [HasShift C ℤ] [Pread
 namespace ExtensionClosure
 
 /-- Every finite iterate of Mathlib's extension product is contained in the
-repository's owner extension closure. The triangle in `extensionProduct` has
-the orientation used by `ExtensionClosure.ext`, so no rotation is needed. -/
+repository's owner extension closure. The triangle in
+`CategoryTheory.ObjectProperty.extensionProduct` has the orientation used by
+`CategoryTheory.Triangulated.ExtensionClosure.ext`, so no rotation is needed. -/
 theorem extensionProductIter_le (P : ObjectProperty C) (n : ℕ) :
     P.extensionProductIter n ≤ ExtensionClosure P := by
   induction n with
@@ -55,8 +90,10 @@ theorem extensionProductIter_le (P : ObjectProperty C) (n : ℕ) :
       exact .ext hT (.mem hX) (ih Y hY)
 
 /-- Induction into an isomorphism-closed property containing a zero object and
-closed under distinguished extensions. The `ContainsZero` witness is enough
-because isomorphism closure transfers it to every zero object. -/
+closed under distinguished extensions. The
+`CategoryTheory.ObjectProperty.ContainsZero` witness is enough because
+`CategoryTheory.ObjectProperty.IsClosedUnderIsomorphisms` transfers it to every
+zero object. -/
 theorem le_of_closed_under_isomorphisms {P Q : ObjectProperty C}
     [Q.ContainsZero] [Q.IsClosedUnderIsomorphisms] [Q.IsTriangulatedClosed₂]
     (hPQ : P ≤ Q) : ExtensionClosure P ≤ Q := by
@@ -68,10 +105,10 @@ theorem le_of_closed_under_isomorphisms {P Q : ObjectProperty C}
 
 /-- If the generators are nonempty and the category is triangulated, the owner
 extension closure is contained in Mathlib's triangulated envelope. The
-triangulated hypothesis supplies closure under distinguished extensions, and
-nonemptiness supplies zero objects to that envelope. Nonemptiness is
-essential: for `P = ⊥`, the owner closure contains zero objects, but
-`triangEnvelope ⊥ = ⊥`. -/
+`CategoryTheory.IsTriangulated` hypothesis supplies closure under distinguished
+extensions, and nonemptiness supplies zero objects to that envelope.
+Nonemptiness is essential: for `P = ⊥`, the owner closure contains zero
+objects, but `CategoryTheory.ObjectProperty.triangEnvelope ⊥ = ⊥`. -/
 theorem le_triangEnvelope (P : ObjectProperty C) [P.Nonempty] [IsTriangulated C] :
     ExtensionClosure P ≤ P.triangEnvelope := by
   exact le_of_closed_under_isomorphisms (P := P) (Q := P.triangEnvelope)
@@ -79,7 +116,8 @@ theorem le_triangEnvelope (P : ObjectProperty C) [P.Nonempty] [IsTriangulated C]
 
 /-- The owner extension closure is exactly the supremum of Mathlib extension
 iterates generated by `P` together with the zero-object property. The zero
-property is needed because `ExtensionClosure` contains zero objects even when
+property is needed because
+`CategoryTheory.Triangulated.ExtensionClosure` contains zero objects even when
 the original generator property is empty. -/
 theorem eq_iSup_extensionProductIter (P : ObjectProperty C) [IsTriangulated C] :
     ExtensionClosure P =
@@ -131,7 +169,7 @@ theorem eq_iSup_extensionProductIter (P : ObjectProperty C) [IsTriangulated C] :
 
 /-- Mathlib's extension iterate at stage `n` lies in the corresponding
 triangulated-envelope stage. This direct comparison preserves the finite step
-bound used by `generationTime`. -/
+bound used by `CategoryTheory.ObjectProperty.generationTime`. -/
 theorem extensionProductIter_le_triangEnvelopeIter (P : ObjectProperty C) (n : ℕ) :
     P.extensionProductIter n ≤ P.triangEnvelopeIter n := by
   rw [ObjectProperty.triangEnvelopeIter]
@@ -145,7 +183,8 @@ theorem extensionProductIter_le_triangEnvelopeIter (P : ObjectProperty C) (n : �
 
 /-- An object in the `n`th extension-product iterate has generation time at
 most `n`, by its direct inclusion into the `n`th triangulated-envelope stage. -/
-theorem generationTime_singleton_le (P : ObjectProperty C) {X : C} (n : ℕ)
+theorem generationTime_singleton_le_of_mem_extensionProductIter
+    (P : ObjectProperty C) {X : C} (n : ℕ)
     (hX : P.extensionProductIter n X) :
     P.generationTime (ObjectProperty.singleton X) ≤ (n : ℕ∞) := by
   apply (ObjectProperty.generationTime_le_coe_iff P (ObjectProperty.singleton X) n).2
