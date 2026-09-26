@@ -27,6 +27,7 @@ and Mathlib's extension-product and triangulated-envelope constructions.
 | Declaration | Role |
 |---|---|
 | `CategoryTheory.Triangulated.ExtensionClosure.extensionProductIter_le` | Finite iterates lie in the owner closure. |
+| `CategoryTheory.Triangulated.ExtensionClosure.le_of_closed_under_isomorphisms` | Restates closure induction using Mathlib's typeclass hypotheses. |
 | `CategoryTheory.Triangulated.ExtensionClosure.le_triangEnvelope` | Compares the owner closure and Mathlib's envelope under nonemptiness. |
 | `CategoryTheory.Triangulated.ExtensionClosure.eq_iSup_extensionProductIter` | Identifies the owner closure with the supremum after adjoining zero objects. |
 | `CategoryTheory.Triangulated.ExtensionClosure.extensionProductIter_le_triangEnvelopeIter` | Preserves the finite stage index. |
@@ -34,19 +35,19 @@ and Mathlib's extension-product and triangulated-envelope constructions.
 
 ## Implementation notes
 
-The nonemptiness assumption in the envelope comparison is essential: for
-`P = ⊥`, `CategoryTheory.Triangulated.ExtensionClosure P` contains every zero
-object by its zero constructor, while
-`CategoryTheory.ObjectProperty.triangEnvelope ⊥` is bottom. The supremum
-equality adjoins `IsZero` because the owner closure contains zero objects even
-when `P` is empty. For the numerical bound, a direct inclusion into
-`triangEnvelopeIter n` preserves the stage index; passing through the whole
-triangulated envelope would lose that bound.
+The nonemptiness assumption in the envelope comparison is essential: when
+`P = ⊥`, `CategoryTheory.Triangulated.ExtensionClosure` contains every zero
+object by its zero constructor, while `CategoryTheory.ObjectProperty.triangEnvelope`
+sends `⊥` to `⊥`. The supremum equality adjoins
+`CategoryTheory.Limits.IsZero`: the owner closure contains zero objects even
+when its generator property is empty. The numerical bound uses a direct
+inclusion into each `CategoryTheory.ObjectProperty.triangEnvelopeIter` stage;
+passing through the whole triangulated envelope would lose the count.
 
 The typeclass restatement of
 `CategoryTheory.Triangulated.ExtensionClosure.le_of_closed` uses
 `CategoryTheory.ObjectProperty.ContainsZero` together with closure under
-isomorphisms: `ContainsZero` gives one zero object, and
+isomorphisms: its witness gives one zero object, and
 `CategoryTheory.ObjectProperty.IsClosedUnderIsomorphisms` transfers membership
 to every zero object.
 
@@ -108,7 +109,7 @@ extension closure is contained in Mathlib's triangulated envelope. The
 `CategoryTheory.IsTriangulated` hypothesis supplies closure under distinguished
 extensions, and nonemptiness supplies zero objects to that envelope.
 Nonemptiness is essential: for `P = ⊥`, the owner closure contains zero
-objects, but `CategoryTheory.ObjectProperty.triangEnvelope ⊥ = ⊥`. -/
+objects, but `CategoryTheory.ObjectProperty.triangEnvelope` sends `⊥` to `⊥`. -/
 theorem le_triangEnvelope (P : ObjectProperty C) [P.Nonempty] [IsTriangulated C] :
     ExtensionClosure P ≤ P.triangEnvelope := by
   exact le_of_closed_under_isomorphisms (P := P) (Q := P.triangEnvelope)
