@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.FixedBaseOpenSections
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.ScalarExtendedSections
 import Mathlib.Algebra.Category.ModuleCat.ChangeOfRings
 
 /-!
@@ -145,5 +146,16 @@ theorem fixedBasePullbackOpenAfterExtension_restrict
     Adjunction.mk'_homEquiv,
     ModuleCat.ExtendRestrictScalarsAdj.homEquiv_symm_apply] at hA
   convert hA.symm using 1 <;> rfl
+
+/-- At the top open, the arbitrary-open scalar-extended unit is the previously
+defined scalar-extended global-section unit. -/
+theorem fixedBasePullbackOpenAfterExtension_top
+    (compat : φ ≫ f.appTop = a ≫ ψ) :
+    fixedBasePullbackOpenAfterExtension φ f M a ψ ⊤ compat =
+      fixedBasePullbackTopAfterExtension φ f M a ψ compat := by
+  apply ModuleCat.ExtendScalars.hom_ext
+  intro x
+  exact (fixedBasePullbackOpenAfterExtension_one_tmul φ f M a ψ ⊤ compat x).trans
+    (fixedBasePullbackTopAfterExtension_one_tmul φ f M a ψ compat x).symm
 
 end AlgebraicGeometry.Scheme.Modules

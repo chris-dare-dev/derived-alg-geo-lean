@@ -306,6 +306,10 @@ RETIRED_BY_CUTOVER: dict[str, tuple[str, ...]] = {
         "CategoryTheory/Triangulated/StabilityCondition/"
         "WeakCompatibility",
     ),
+    "2026-09-25 sf11-pushforward-open-square": (
+        # The generic open-square comparison moved to Modules/Pushforward/BaseChange.lean.
+        "AlgebraicGeometry/Modules/Coherent/Pushforward/BaseChange.lean",
+    ),
     "MO1.02": (
         # 2026-09-13 MO1.02: charge construction moved upstream of wall loci.
         "LinearAlgebra/QuadraticForm/CentralCharge.lean",

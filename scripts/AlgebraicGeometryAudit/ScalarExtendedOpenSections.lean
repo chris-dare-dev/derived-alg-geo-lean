@@ -12,6 +12,7 @@ noncomputable section
 #print axioms AlgebraicGeometry.Scheme.Modules.fixedBasePullbackOpenAfterExtension
 #print axioms AlgebraicGeometry.Scheme.Modules.fixedBasePullbackOpenAfterExtension_one_tmul
 #print axioms AlgebraicGeometry.Scheme.Modules.fixedBasePullbackOpenAfterExtension_restrict
+#print axioms AlgebraicGeometry.Scheme.Modules.fixedBasePullbackOpenAfterExtension_top
 
 -- The map is A-linear for an arbitrary scheme morphism and arbitrary open.
 example {R A : CommRingCat.{u}} {Y Z : Scheme.{u}}
@@ -47,5 +48,14 @@ example {R A : CommRingCat.{u}} {Y Z : Scheme.{u}}
           (((modulesToFixedBaseSheaf Y φ).obj M).presheaf.map (homOfLE h).op) ≫
         Scheme.Modules.fixedBasePullbackOpenAfterExtension φ f M a ψ U compat :=
   Scheme.Modules.fixedBasePullbackOpenAfterExtension_restrict φ f M a ψ h compat
+
+-- The all-open construction recovers the existing global-section map at top.
+example {R A : CommRingCat.{u}} {Y Z : Scheme.{u}}
+    (φ : R ⟶ Γ(Y, ⊤)) (f : Z ⟶ Y) (M : Y.Modules)
+    (a : R ⟶ A) (ψ : A ⟶ Γ(Z, ⊤))
+    (compat : φ ≫ f.appTop = a ≫ ψ) :
+    Scheme.Modules.fixedBasePullbackOpenAfterExtension φ f M a ψ ⊤ compat =
+      Scheme.Modules.fixedBasePullbackTopAfterExtension φ f M a ψ compat :=
+  Scheme.Modules.fixedBasePullbackOpenAfterExtension_top φ f M a ψ compat
 
 end
