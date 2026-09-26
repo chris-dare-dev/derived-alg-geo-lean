@@ -3,15 +3,19 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.Algebra.Homology.LeftResolution.Basic
+import Mathlib.Algebra.Homology.QuasiIso
+import Mathlib.Algebra.Homology.Single
+import Mathlib.Algebra.Homology.SingleHomology
 
 /-!
-# The augmented initial segment of a left resolution
+# Augmentation of a left resolution
 
 After applying `ι`, the functorial chain complex attached to a `LeftResolution`
 is exact in positive degrees. This file also records exactness of its first two
-terms after augmentation to the object being resolved. The result is objectwise;
-it does not assert a totalization theorem or K-flatness for a bicomplex built
-from such resolutions.
+terms after augmentation to the object being resolved. The augmentation is a
+natural chain map and an objectwise quasi-isomorphism. These statements do not
+assert a totalization theorem or K-flatness for a bicomplex built from such
+resolutions.
 -/
 
 open CategoryTheory Category Limits Preadditive ZeroObject
@@ -74,5 +78,80 @@ middle term, this records the right end of the augmented resolution. -/
 theorem augmentedShortComplex_epi_g : Epi (Λ.augmentedShortComplex ι X).g := by
   change Epi (ι.map (Λ.chainComplexXZeroIso X).hom ≫ Λ.π.app X)
   exact epi_comp' (by infer_instance) (Λ.epi_π_app X)
+
+end CategoryTheory.Abelian.LeftResolution
+
+namespace CategoryTheory.Abelian.LeftResolution
+
+variable {A C : Type*} [Category C] [Category A]
+variable (ι : C ⥤ A) [ι.Full] [ι.Faithful] [HasZeroMorphisms C] [Abelian A]
+variable (Λ : LeftResolution ι)
+
+/-- The canonical augmentation from the mapped chain complex of a left resolution
+to its degree-zero single complex. Its defining degree-zero map is the augmented
+short complex's epimorphism. -/
+noncomputable def chainComplexAugmentation (X : A) :
+    ((ι.mapHomologicalComplex (ComplexShape.down ℕ)).obj (Λ.chainComplex X)) ⟶
+      (ChainComplex.single₀ A).obj X := by
+  let K := ((ι.mapHomologicalComplex (ComplexShape.down ℕ)).obj (Λ.chainComplex X))
+  refine (ChainComplex.toSingle₀Equiv K X).symm ⟨(Λ.augmentedShortComplex ι X).g, ?_⟩
+  exact (Λ.augmentedShortComplex ι X).zero
+
+/-- Maps to the degree-zero single complex are determined in degree zero, where
+this square follows from naturality of the resolution epimorphism. -/
+@[reassoc]
+lemma chainComplexAugmentation_naturality {X Y : A} (f : X ⟶ Y) :
+    (ι.mapHomologicalComplex (ComplexShape.down ℕ)).map (Λ.chainComplexMap f) ≫
+      Λ.chainComplexAugmentation ι Y =
+    Λ.chainComplexAugmentation ι X ≫ (ChainComplex.single₀ A).map f := by
+  apply HomologicalComplex.to_single_hom_ext
+  dsimp [chainComplexAugmentation]
+  simp only [ChainComplex.toSingle₀Equiv_symm_apply_f_zero,
+    Functor.mapHomologicalComplex_map_f, ChainComplex.single₀_map_f_zero]
+  change ι.map ((Λ.chainComplexMap f).f 0) ≫
+      (ι.map (Λ.chainComplexXZeroIso Y).hom ≫ Λ.π.app Y) =
+    (ι.map (Λ.chainComplexXZeroIso X).hom ≫ Λ.π.app X) ≫ f
+  rw [Λ.chainComplexMap_f_0]
+  calc
+    _ = ι.map (Λ.chainComplexXZeroIso X).hom ≫
+          ι.map (Λ.F.map f) ≫ Λ.π.app Y := by cat_disch
+    _ = _ := by rw [Λ.π_naturality]; simp only [Category.assoc]; rfl
+
+/-- The components come from `ChainComplex.toSingle₀Equiv` applied to the
+augmented short complex. -/
+noncomputable def chainComplexAugmentationNatTrans :
+    Λ.chainComplexFunctor ⋙ ι.mapHomologicalComplex (ComplexShape.down ℕ) ⟶
+      ChainComplex.single₀ A where
+  app X := Λ.chainComplexAugmentation ι X
+  naturality _ _ f := Λ.chainComplexAugmentation_naturality ι f
+
+variable (X : A)
+
+private lemma chainComplexAugmentation_f_zero :
+    (Λ.chainComplexAugmentation ι X).f 0 = (Λ.augmentedShortComplex ι X).g := by
+  simp [chainComplexAugmentation]
+
+set_option backward.defeqAttrib.useBackward true in
+set_option backward.isDefEq.respectTransparency false in
+/-- The canonical augmentation of an individual mapped left resolution is a
+quasi-isomorphism. This objectwise result does not compare the totalization of
+resolutions of an unbounded complex with that complex. -/
+theorem chainComplexAugmentation_quasiIso :
+    QuasiIso (Λ.chainComplexAugmentation ι X) := by
+  refine ⟨fun n => ?_⟩
+  cases n with
+  | zero =>
+    rw [ChainComplex.quasiIsoAt₀_iff]
+    rw [ShortComplex.quasiIso_iff_of_zeros']
+    · refine (ShortComplex.exact_and_epi_g_iff_of_iso ?_).2
+        ⟨Λ.augmentedShortComplex_exact ι X, Λ.augmentedShortComplex_epi_g ι X⟩
+      exact ShortComplex.isoMk (Iso.refl _) (Iso.refl _) (Iso.refl _)
+        (by simp [augmentedShortComplex])
+        (by simpa using (chainComplexAugmentation_f_zero ι Λ X).symm)
+    all_goals simp [HomologicalComplex.shape]
+  | succ n =>
+    rw [quasiIsoAt_iff_exactAt']
+    · exact Λ.exactAt_map_chainComplex_succ X n
+    · apply ChainComplex.exactAt_succ_single_obj
 
 end CategoryTheory.Abelian.LeftResolution

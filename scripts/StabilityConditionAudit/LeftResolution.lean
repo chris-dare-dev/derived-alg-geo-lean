@@ -5,6 +5,12 @@ import DerivedAlgGeo.Algebra.Homology.LeftResolution
 #print axioms CategoryTheory.Abelian.LeftResolution.augmentedShortComplex
 #print axioms CategoryTheory.Abelian.LeftResolution.augmentedShortComplex_exact
 #print axioms CategoryTheory.Abelian.LeftResolution.augmentedShortComplex_epi_g
+#print axioms CategoryTheory.Abelian.LeftResolution.chainComplexAugmentation
+#print axioms CategoryTheory.Abelian.LeftResolution.chainComplexAugmentation_naturality
+#print axioms CategoryTheory.Abelian.LeftResolution.chainComplexAugmentation_naturality_assoc
+#print axioms CategoryTheory.Abelian.LeftResolution.chainComplexAugmentationNatTrans
+#print axioms CategoryTheory.Abelian.LeftResolution.chainComplexAugmentation_quasiIso
 #print axioms CategoryTheory.Abelian.LeftResolution.homologyZeroIso
 #print axioms CategoryTheory.Abelian.LeftResolution.homologyZeroIso_naturality
+#print axioms CategoryTheory.Abelian.LeftResolution.homologyZeroIso_eq_augmentationHomologyMap
 #print axioms CategoryTheory.Abelian.LeftResolution.homologyZeroNatIso
