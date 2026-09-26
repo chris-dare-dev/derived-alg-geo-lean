@@ -33,3 +33,16 @@ classical-generator, and zero-stage characterisations.
 #print axioms CategoryTheory.Triangulated.rouquierDim_ne_top_iff_exists_strong
 #print axioms CategoryTheory.Triangulated.exists_isClassicalTriangulatedGenerator_of_rouquierDim_ne_top
 #print axioms CategoryTheory.Triangulated.rouquierDim_eq_zero_iff
+
+/-! ## Extension closure comparison (#918)
+
+Comparison lemmas place Mathlib's extension-product iterates in the owner's
+inductive extension closure, compare that closure with triangulated envelopes,
+and transfer finite extension-product bounds to generation time. -/
+
+#print axioms CategoryTheory.Triangulated.ExtensionClosure.extensionProductIter_le
+#print axioms CategoryTheory.Triangulated.ExtensionClosure.le_of_closed_under_isomorphisms
+#print axioms CategoryTheory.Triangulated.ExtensionClosure.le_triangEnvelope
+#print axioms CategoryTheory.Triangulated.ExtensionClosure.eq_iSup_extensionProductIter
+#print axioms CategoryTheory.Triangulated.ExtensionClosure.extensionProductIter_le_triangEnvelopeIter
+#print axioms CategoryTheory.Triangulated.ExtensionClosure.generationTime_singleton_le
