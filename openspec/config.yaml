@@ -16,12 +16,11 @@ context: |
   sorry, admit, axioms that bypass the stated construction, or a postulated
   representability/algebraicity conclusion.
 
-  The repository also has a bounded loop controller in
-  scripts/loop_engine.py for runs that need frozen chunks and a review ledger.
-  It is optional for a user-initiated issue task: the user request naming issue
-  IDs authorizes work within those issue scopes, and the live issue bodies are
-  sufficient acceptance criteria. When OpenSpec is useful, use one shared
-  batch change and continue into implementation in the same task.
+  Loop runs follow .claude/skills/run-loop/SKILL.md. They use neither OpenSpec
+  nor the retired loop controller in scripts/loop_engine.py. The user request
+  naming issue IDs authorizes work within those issue scopes, and the live issue
+  bodies are sufficient acceptance criteria. OpenSpec is for interactive design
+  work; when it is useful there, use one shared batch change.
 
 rules:
   proposal:
@@ -46,8 +45,8 @@ operations:
       - Work from the live issue bodies and repository guidance; do not invent scope beyond the user-named issues.
       - Resolve ordinary ambiguity by taking the smallest reading that meets acceptance and recording it; do not pause for confirmation.
       - Keep working independent issues when one has a real blocker.
-      - Use an OpenSpec change or loop-controller ledger only when it materially helps the work; do not require either to begin.
-      - Respect actual required checks, branch protection, and protected-path review.
+      - Use an OpenSpec change only when it materially helps the work; do not require one to begin.
+      - Respect the actual required checks and branch protection.
   archive:
     guidance:
       - Archive an OpenSpec change only after its requirements are satisfied and applicable repository checks pass.

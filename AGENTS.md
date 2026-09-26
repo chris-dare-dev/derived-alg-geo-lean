@@ -365,28 +365,30 @@ the script does not reproduce. The script runs `workflows`, `local-build`,
 appear in any workflow. Say "N gates pass", naming them; never say
 "CI is green" for a local run. See `CONTRIBUTING.md` for the verified table.
 
-### Issue-first loops
+### Unattended loops
 
-For a user-initiated Codex task, the GitHub issue number or numbers are enough
-to start. Read the live issue bodies and repository guidance; they define scope
-and acceptance. The user's request naming those issues authorizes scoped
-implementation, branch commits, pull requests, and closure after the requested
-work is merged. Do not require a generated manifest, a separate OpenSpec plan
-in each repository, a standing authority file, or preflight before coding.
-One optional progress record can cover a batch across repositories.
+A loop run takes GitHub issues, or a milestone, and works them to merged pull
+requests without asking the owner anything. The issue body is the
+specification, the run's own research fills in the rest, and four independent
+reviewers are the check. Claude Code and Codex follow the same
+[run-loop skill](.claude/skills/run-loop/SKILL.md).
 
-Run checks that apply to the changed code, honor hosted CI, branch protection,
-and protected-path trust review, and never approve your own PR. Use independent
-mathematical review when a change adds or materially alters a mathematical claim.
-If an issue has a real external blocker, record it and continue independent
-issues. A missing planning artifact, issue label, or contact email that the
-acceptance criteria do not require is not a reason to stop.
+A run stops only when:
+- it needs something only the owner has (a password, a token, `sudo`);
+- every remaining issue needs an action the owner has withdrawn;
+- its queue is empty.
 
-The bounded controller protocol in `.claude/skills/run-loop/SKILL.md` is for
-standalone unattended runs not started by an active user request. Those runs
-use a manifest, default-branch provider grants, and the review ledger described
-in `.claude/loop-specs/README.md`; a branch-authored manifest cannot grant itself
-provider actions. Those controls do not gate the user-started issue-first path.
+Everything else it decides, records in the PR, and continues past. An issue it
+cannot finish is parked, not waited on.
+
+The request that starts a run authorizes pushing `agent/*` branches, opening PRs
+and merging them once required checks pass. The owner withdraws an action by
+setting it to `false` in `.claude/loop-authority.yaml` on `main`.
+
+A run never changes the loop's own tooling or instructions. It uses no OpenSpec
+change, loop manifest, review ledger or `scripts/loop_engine.py`: those are
+retired from the run path. `.claude/loop-specs/README.md` and
+`docs/architecture/loop-recovery.md` describe them for their existing ledgers.
 
 `scripts/loop_tokens.py` reports what a run cost, for either runtime. It reads
 the transcripts both already write -- Claude Code's
@@ -405,11 +407,11 @@ sentence is why `single-instantiation` ran nowhere for months: the hook made the
 script unrunnable, the summary said CI had it covered, and `bb8a1278` records the
 24 abstractions that drifted past its baseline with nothing going red.
 
-**For a local pre-flight the hook allows**, install the loop controller's pinned
-Python dependencies in each fresh worktree, then put that environment first on
-`PATH` when running precheck. It runs every gate that needs no Lean build, plus
-a targeted build of the modules you changed, in seconds. It is a cheap green,
-not a green.
+**For a local pre-flight the hook allows**, install the pinned Python
+dependencies the gates use (`scripts/requirements-loop.txt`) in each fresh
+worktree, then put that environment first on `PATH` when running precheck. It
+runs every gate that needs no Lean build, plus a targeted build of the modules
+you changed, in seconds. It is a cheap green, not a green.
 
 ```bash
 python3 -m venv .loop-tools
