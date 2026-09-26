@@ -46,3 +46,17 @@ and transfer finite extension-product bounds to generation time. -/
 #print axioms CategoryTheory.Triangulated.ExtensionClosure.eq_iSup_extensionProductIter
 #print axioms CategoryTheory.Triangulated.ExtensionClosure.extensionProductIter_le_triangEnvelopeIter
 #print axioms CategoryTheory.Triangulated.ExtensionClosure.generationTime_singleton_le_of_mem_extensionProductIter
+
+/-! ## Composition of iterated envelopes (#920)
+
+The multiplicative composition law, generation-time inequality, bounded Stacks 0FXA form, and
+Rouquier-dimension consequence. -/
+
+#print axioms CategoryTheory.ObjectProperty.triangEnvelopeIter_zero_le
+#print axioms CategoryTheory.ObjectProperty.triangEnvelopeIter_compose
+#print axioms CategoryTheory.ObjectProperty.le_triangEnvelopeIter_of_le_triangEnvelopeIter
+#print axioms CategoryTheory.ObjectProperty.generationTime_add_one_submultiplicative
+#print axioms CategoryTheory.ObjectProperty.isStrongTriangulatedGenerator_of_strong_le_iter
+#print axioms CategoryTheory.ObjectProperty.isStrongTriangulatedGenerator_of_singleton_strong_of_isClassical
+#print axioms CategoryTheory.Triangulated.isStrongTriangulatedGenerator_of_classical_of_rouquierDim_ne_top
+#print axioms CategoryTheory.Triangulated.generationTime_ne_top_of_classical_of_rouquierDim_ne_top

@@ -451,3 +451,23 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
 - weaker hypotheses:  an ambient bifunctor on three (possibly distinct) triangulated categories with a supplied `ExactBifunctor`, three object properties whose full subcategories inherit triangulated structures, and an explicit closure witness from the first two properties into the output property; no single-category or same-property identification among the three positions
 - source note:        This is a plausible API generalization inferred from the current restriction's use of one category and property for all three positions. The distinct-category coherence transport was not proved or compiled during this review.
 - state:              UNVERIFIED
+
+### 2026-09-26 — generation-time `+1` submultiplicativity without `P.Nonempty`
+- chunk:              rou1-920-envelope-composition
+- reviewing commit:   b674a436dd002da2487d744531f804ddbb795628
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `CategoryTheory.ObjectProperty.generationTime` and the
+  planned envelope-composition API
+- weaker hypotheses:  the scalar inequality
+  `P.generationTime R + 1 ≤ (P.generationTime Q + 1) *
+  (Q.generationTime R + 1)` needs no separate `[P.Nonempty]` binder, provided
+  the iterated-envelope composition lemma is available for nonempty `P`.
+- pin status:         PIN-CONFIRMED for the corollary proof route
+- source note:        `/tmp/rou1-920-plusone.lean` compiled the scalar
+  inequality from a parameterized composition lemma under `[P.Nonempty]`.
+  When `P` is empty, all its envelope stages are bottom; finite generation
+  time then forces the intermediate and target properties to be bottom, and
+  the `+1` inequality closes. Otherwise the proof obtains finite natural
+  witnesses and applies composition. This probe did not prove the separate
+  iterated-envelope composition lemma.
+- state:              L (proof-witness verified)
