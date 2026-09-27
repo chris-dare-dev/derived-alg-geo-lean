@@ -46,6 +46,7 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex.ι_f_sigmaXDesc_assoc
 #print axioms HomologicalComplex.shortComplexFunctor_preservesColimitsOfShape
 #print axioms HomologicalComplex.homologyFunctor_preservesColimitsOfShape
+#print axioms HomologicalComplex.quasiIso_colimMap
 #print axioms Homotopy.sigma
 #print axioms CochainComplex.homologyModel
 #print axioms CochainComplex.exists_finite_model_of_isLocalization

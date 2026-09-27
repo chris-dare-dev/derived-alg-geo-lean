@@ -2,8 +2,10 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.Algebra.Homology.ShortComplex.Limits
 import Mathlib.Algebra.Homology.HomologicalComplexLimits
 import Mathlib.Algebra.Homology.ShortComplex.HomologicalComplex
+import Mathlib.Algebra.Homology.QuasiIso
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Products
 
 /-!
@@ -35,6 +37,8 @@ of short complexes does (which is the case when colimits of shape `J` are exact)
   restrictions to the summands.
 * `HomologicalComplex.homologyFunctor_preservesColimitsOfShape`: homology in degree `i`
   preserves colimits of shape `J` when homology of short complexes does.
+* `HomologicalComplex.quasiIso_colimMap`: an exact colimit of componentwise
+  quasi-isomorphisms is a quasi-isomorphism.
 
 ## Implementation notes
 
@@ -114,5 +118,47 @@ instance homologyFunctor_preservesColimitsOfShape [CategoryWithHomology C] (i : 
   preservesColimitsOfShape_of_natIso (homologyFunctorIso C c i).symm
 
 end Colimits
+
+end HomologicalComplex
+
+namespace HomologicalComplex
+
+section ExactColimits
+
+variable {C : Type u} [Category.{v} C] [Abelian C]
+  {J : Type w'} [Category.{w''} J]
+  [HasColimitsOfShape J C] [HasExactColimitsOfShape J C]
+  {ι : Type*} {c : ComplexShape ι}
+
+/-- Exact colimits preserve quasi-isomorphisms of diagrams of complexes. In particular,
+this applies to filtered colimits in an AB5 category. -/
+theorem quasiIso_colimMap {F G : J ⥤ HomologicalComplex C c} (α : F ⟶ G)
+    (hα : ∀ j, QuasiIso (α.app j)) : QuasiIso (colim.map α) := by
+  rw [quasiIso_iff]
+  intro i
+  rw [quasiIsoAt_iff_isIso_homologyMap]
+  let H := homologyFunctor C c i
+  haveI hαH (j : J) : IsIso ((Functor.whiskerRight α H).app j) := by
+    change IsIso (homologyMap (α.app j) i)
+    letI : QuasiIso (α.app j) := hα j
+    rw [← quasiIsoAt_iff_isIso_homologyMap]
+    infer_instance
+  haveI : IsIso (Functor.whiskerRight α H) :=
+    NatIso.isIso_of_isIso_app _
+  haveI : IsIso (colim.map (Functor.whiskerRight α H)) := inferInstance
+  let β := preservesColimitNatIso (J := J) H
+  have h := β.hom.naturality α
+  haveI : IsIso (β.hom.app F) := inferInstance
+  haveI : IsIso (β.hom.app G) := inferInstance
+  have hH : IsIso ((colim ⋙ H).map α ≫ β.hom.app G) := by
+    rw [h]
+    change IsIso (β.hom.app F ≫ colim.map (Functor.whiskerRight α H))
+    exact IsIso.comp_isIso' (inferInstance : IsIso (β.hom.app F))
+      (inferInstance : IsIso (colim.map (Functor.whiskerRight α H)))
+  have hmap : IsIso ((colim ⋙ H).map α) :=
+    IsIso.of_isIso_comp_right _ (β.hom.app G)
+  exact hmap
+
+end ExactColimits
 
 end HomologicalComplex
