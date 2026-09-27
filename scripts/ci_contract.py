@@ -485,7 +485,7 @@ def validate_evidence(
             errors.append(f"{prefix}.commit must be a full SHA")
         else:
             allowed_commits = {str(evidence.get("candidate_commit", "")).lower()}
-            if version == SCHEMA_VERSION:
+            if version in (5, SCHEMA_VERSION):
                 allowed_commits.add(str(evidence.get("head_commit", "")).lower())
             if _is_sha(artifact.get("commit")) and artifact["commit"].lower() not in allowed_commits:
                 errors.append(

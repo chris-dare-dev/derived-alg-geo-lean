@@ -695,6 +695,29 @@ class CollectorTests(unittest.TestCase):
                 self.assertFalse(result["validation"]["claims"]["auxiliary_checks_healthy"])
                 self.assertTrue(result["validation"]["claims"]["required_ci_verified"])
 
+    def test_queued_dynamic_run_without_check_is_visible_and_optional(self) -> None:
+        fixture = ProviderFixture()
+        fixture.add_dynamic_scan()
+        fixture.security_setting = {"pr_scan": "enabled"}
+        fixture.security_check = None
+        fixture.security_jobs = []
+        fixture.dynamic_run.update(status="queued", conclusion=None)
+
+        result = collect(fixture.client(), 7)
+        scan = result["observations"]["security_scan"]
+        self.assertEqual(scan["state"], "pending")
+        self.assertEqual(scan["run_id"], 77777)
+        self.assertEqual(scan["matching_check_ids"], [])
+        self.assertTrue(result["validation"]["claims"]["required_ci_verified"])
+        self.assertFalse(result["validation"]["claims"]["auxiliary_checks_healthy"])
+        self.assertFalse(any(
+            gate["id"] == "github-advanced-security" for gate in result["evidence"]["gates"]
+        ))
+
+        fixture.dynamic_run.update(status="completed", conclusion="success")
+        with self.assertRaisesRegex(EvidenceError, "missing or ambiguous"):
+            collect(fixture.client(), 7)
+
     def test_wrong_dynamic_workflow_does_not_bind_same_named_check(self) -> None:
         fixture = ProviderFixture()
         fixture.add_dynamic_scan()
@@ -1000,6 +1023,29 @@ class PublicationTests(unittest.TestCase):
         receipt = self.collect(client)
         client.pre_provider.dynamic_run["actor"]["id"] = 1
         with self.assertRaisesRegex(EvidenceError, "no unique live workflow"):
+            verify_publication_provider_evidence(client, receipt)
+
+    def test_dynamic_publication_rejects_retained_setting_contradiction(self) -> None:
+        client = PublicationClient()
+        receipt = self.collect(client)
+        artifact = next(
+            item for item in receipt["premerge"]["contract_evidence"]["artifacts"]
+            if item["subject"] == "github-advanced-security"
+        )
+        payloads = receipt["premerge"]["artifact_payloads"]
+        payload = json.loads(payloads[artifact["path"]])
+        self.assertEqual(payload["setting"]["response"]["pr_scan"], "disabled")
+        payload["setting"]["state"] = "enabled"
+        content = (
+            json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+            + "\n"
+        ).encode("utf-8")
+        payloads[artifact["path"]] = content.decode("utf-8")
+        artifact["sha256"] = hashlib.sha256(content).hexdigest()
+        artifact["size_bytes"] = len(content)
+        self.resign_receipt(receipt)
+
+        with self.assertRaisesRegex(EvidenceError, "contradicts its raw provider response"):
             verify_publication_provider_evidence(client, receipt)
 
     def test_provider_verifier_rejects_forged_candidate_and_copied_pr_association(self) -> None:

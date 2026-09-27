@@ -580,6 +580,23 @@ def _ai_scan_setting(client: GitHubClient, head: str) -> dict[str, Any]:
     return result
 
 
+def _validate_ai_scan_setting(setting: dict[str, Any]) -> None:
+    """Require a retained state to agree with the raw response or API error."""
+    state = setting.get("state")
+    response = setting.get("response")
+    error = setting.get("error")
+    if response is None:
+        if state != "unknown" or not isinstance(error, str):
+            raise EvidenceError("AI Scan setting state contradicts its API error")
+        return
+    if not isinstance(response, dict) or error is not None:
+        raise EvidenceError("AI Scan setting response and error disagree")
+    raw = response.get("pr_scan")
+    expected = raw if raw in {"enabled", "disabled"} else "unknown"
+    if state != expected:
+        raise EvidenceError("AI Scan setting state contradicts its raw provider response")
+
+
 def _dynamic_security_gate(
     client: GitHubClient,
     pr_number: int,
@@ -633,6 +650,21 @@ def _dynamic_security_gate(
             "enabled": "missing", "disabled": "disabled_by_setting"
         }.get(setting["state"], "provider_state_unknown")
         return None, None, None, scan
+    if not checks and len(matches) == 1:
+        pending_run = matches[0]
+        if (
+            pending_run.get("status") in {"requested", "waiting", "pending", "queued", "in_progress"}
+            and pending_run.get("conclusion") is None
+        ):
+            scan.update({
+                "state": "pending",
+                "run_id": _positive(pending_run.get("id"), "pending security workflow run ID"),
+                "run_attempt": _positive(
+                    pending_run.get("run_attempt"), "pending security workflow attempt"
+                ),
+                "run_status": pending_run["status"],
+            })
+            return None, None, None, scan
     if len(checks) != 1 or len(matches) != 1:
         raise EvidenceError("dynamic security check/run is missing or ambiguous")
     check, run = checks[0], matches[0]
@@ -1813,6 +1845,7 @@ def verify_premerge_provider_evidence(
                 or payload_value.get("scan_state") != facts["scan_state"]
             ):
                 raise EvidenceError("retained dynamic artifact setting or scan state is inconsistent")
+            _validate_ai_scan_setting(setting)
             snapshot_run = payload_value.get("workflow_run")
             run_fields = (
                 "id", "workflow_id", "name", "path", "event", "head_sha",

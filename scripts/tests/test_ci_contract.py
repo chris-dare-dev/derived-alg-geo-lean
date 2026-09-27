@@ -211,6 +211,48 @@ class ContractTests(unittest.TestCase):
             any("run_binding" in error for error in ci_contract.validate_inventory(legacy))
         )
 
+    def test_v5_head_bound_check_artifact_remains_valid(self) -> None:
+        legacy = copy.deepcopy(INVENTORY)
+        legacy["schema_version"] = 5
+        security = next(
+            gate for gate in legacy["gates"] if gate["id"] == "github-advanced-security"
+        )
+        security.update(
+            run_binding="check",
+            platforms=["github-checks"],
+            producer="github-advanced-security",
+        )
+        self.assertEqual(ci_contract.validate_inventory(legacy), [])
+
+        candidate = evidence()
+        candidate["schema_version"] = 5
+        candidate["policy_binding"]["inventory_sha256"] = ci_contract._canonical_sha256(legacy)
+        check_gate = next(
+            gate for gate in candidate["gates"] if gate["id"] == "github-advanced-security"
+        )
+        check_gate.update(
+            platform="github-checks",
+            producer="github-advanced-security",
+            status="passed",
+        )
+        check_gate.pop("run_id")
+        check_gate.pop("run_attempt")
+        check_artifact = next(
+            artifact for artifact in candidate["artifacts"]
+            if artifact["subject"] == "github-advanced-security"
+        )
+        check_artifact.update(
+            producer="github-advanced-security",
+            kind=security["artifact"],
+        )
+        check_artifact.pop("run_id")
+        check_artifact.pop("run_attempt")
+        bind_provider_proof(candidate)
+
+        result = self.evaluate(candidate, legacy)
+        self.assertTrue(result["valid"], result)
+        self.assertEqual(check_artifact["commit"], SHA_B)
+
     def test_inventory_rejects_unknown_scope_and_platform(self) -> None:
         inventory = copy.deepcopy(INVENTORY)
         inventory["gates"][0]["applies_to"].append("workflow_dispatch:Unknown")
