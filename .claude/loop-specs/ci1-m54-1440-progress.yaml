@@ -1,0 +1,93 @@
+schema: derived-alg-geo-lean.loop-run/v1
+id: ci1-m54-1440-progress
+repository: chris-dare-dev/derived-alg-geo-lean
+actor: chris-dare-dev
+remote: origin
+base_branch: main
+base_ref: origin/main
+mode: independent
+enabled: true
+allow_force_push: false
+state_dir: .loop-runs
+roadmap_gate: required
+
+openspec:
+  change: ci1-1440-profile-study
+  validation: cli-required
+  required_artifacts:
+    - .openspec.yaml
+    - proposal.md
+    - design.md
+    - tasks.md
+    - specs/ci1-live-profile/spec.md
+
+limits:
+  min_issues: 1
+  max_issues: 1
+  max_review_rounds_per_chunk: 3
+
+review:
+  independent: true
+  reviewers:
+    - mathematics-adversary
+    - repository-boundary-adversary
+    - abstraction-adversary
+    - mathlib-reviewer
+
+runner:
+  required_checks:
+    - ci
+
+merge:
+  method: squash
+  delete_branch: false
+  allow_method_override: false
+  allow_delete_branch_override: false
+  allow_auto: false
+  allow_admin: false
+
+closure:
+  code_issue: pr_merge_keyword
+  allow_non_pr: false
+  allow_progress_pr: true
+
+mutations:
+  comment_issue: true
+  close_issue: false
+  push_branch: true
+  create_pr: true
+  approve_pr: false
+  merge_pr: true
+
+issues:
+  - number: 1440
+    slug: ci1-1440-profile-implementation
+    depends_on: []
+    chunks:
+      - id: ci1-1440-live-study
+        scope: Add read-only CI performance evidence collection, a bounded same-commit cache parity experiment, and a current progress report; leave required workflows and production cache policy unchanged.
+        requirements:
+          - Collection SHALL preserve exact run and attempt evidence
+          - Phase profiles SHALL separate work and disclose comparisons
+          - The bounded cache experiment SHALL use an independent cold reference
+          - Replay SHALL fail closed across dependency and trust boundaries
+          - CI1.11 SHALL preserve rollout and sample limits
+        files:
+          - scripts/ci_performance/collect_actions.py
+          - scripts/ci_performance/sample_host_pressure.py
+          - scripts/ci_performance/profile_actions.py
+          - scripts/tests/test_collect_actions.py
+          - scripts/tests/test_profile_actions.py
+          - scripts/ci_performance/README.md
+          - docs/ci/ci1-11-performance-study.md
+          - openspec/changes/ci1-1440-profile-study/.openspec.yaml
+          - openspec/changes/ci1-1440-profile-study/proposal.md
+          - openspec/changes/ci1-1440-profile-study/design.md
+          - openspec/changes/ci1-1440-profile-study/tasks.md
+          - openspec/changes/ci1-1440-profile-study/specs/ci1-live-profile/spec.md
+        acceptance:
+          - The collector and tests preserve run/attempt/commit/event/runner identity, distinguish explicit cache markers from unknown state, and classify provider failures separately from verification failures.
+          - A bounded cold/warm target experiment on one exact source/pin/toolchain set records elapsed times and compares the same target artifact digest.
+          - The report names source run links, sample size, queue/phase timings, cache/host evidence and gaps, and a go/no-go; it does not claim one-week or post-rollout verification.
+          - The progress PR changes no workflow, cache policy, runner service, production audit entrypoint, or Lean source and does not close #1440.
+        closure: progress
