@@ -20,7 +20,18 @@
         "url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36326370842/job/108652048829"
       }
     ],
-    "state": "passed"
+    "reason": "published check and exact push workflow agree",
+    "state": "passed",
+    "workflow_runs": [
+      {
+        "check_suite_id": 98363011851,
+        "conclusion": "success",
+        "html_url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36326370842",
+        "id": 36326370842,
+        "run_attempt": 1,
+        "status": "completed"
+      }
+    ]
   },
   "premerge_ci": {
     "checks": [
@@ -60,7 +71,7 @@
   "published_tree": "d152c495e9e0e09a91660b7541f6c4984d784c3a",
   "pull_request": 1580,
   "pull_request_url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1580",
-  "receipt_sha256": "f63b2eef911386014f4159b5a69c471b0c13d446edfb0cfdb81a0f8f9df4623a",
+  "receipt_sha256": "81f92862b43c4aac8cbd70c2b554ac35d9ab42bd32ac321bacf1aeee16428030",
   "recorded_base": "b2afad9aa6ff68fbb60db61e2eb281d3fa10d864",
   "recorded_base_equals_published_parent": true,
   "repository": "chris-dare-dev/derived-alg-geo-lean",

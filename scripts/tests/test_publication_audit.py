@@ -48,12 +48,16 @@ class Provider:
             "name": "CI", "path": ".github/workflows/ci.yml",
             "event": "pull_request", "head_sha": HEAD,
             "status": "completed", "conclusion": "success", "updated_at": "2026-09-27T09:59:01Z",
+            "pull_requests": [{"number": 7, "base": {"sha": BASE}, "head": {"sha": HEAD}}],
         }
         self.checks = {HEAD: [self.ci], PUBLISHED: []}
         self.statuses = {HEAD: [], PUBLISHED: []}
         self.runs = [self.workflow]
 
     def get_object(self, path: str):
+        if path.startswith("/actions/runs/"):
+            run_id = int(path.rsplit("/", 1)[1])
+            return copy.deepcopy(next(run for run in self.runs if run["id"] == run_id))
         return copy.deepcopy(self.objects[path])
 
     def get_all(self, path: str, *, key=None):
@@ -62,7 +66,8 @@ class Provider:
         if path.startswith("/commits/") and path.endswith("/statuses"):
             return copy.deepcopy(self.statuses[path.split("/")[2]])
         if path.startswith("/actions/runs?head_sha="):
-            return copy.deepcopy(self.runs)
+            head = path.split("=", 1)[1]
+            return copy.deepcopy([run for run in self.runs if run.get("head_sha") == head])
         raise AssertionError(path)
 
 
@@ -116,6 +121,16 @@ class PublicationAuditTest(unittest.TestCase):
         provider.workflow["updated_at"] = "2026-09-27T10:01:00Z"
         self.assertEqual(collect(provider, 7)["premerge_ci"]["state"], UNKNOWN)
 
+    def test_same_head_other_pr_cannot_authorize_pr_ci(self):
+        provider = Provider()
+        provider.workflow["pull_requests"] = [{"number": 8, "base": {"sha": BASE}, "head": {"sha": HEAD}}]
+        self.assertEqual(collect(provider, 7)["premerge_ci"]["state"], UNKNOWN)
+        provider.workflow["pull_requests"] = []
+        self.assertEqual(
+            collect(provider, 7)["premerge_ci"]["state"],
+            "observed_head_success_before_merge_unassociated",
+        )
+
     def test_bad_provider_identity_fails_closed(self):
         provider = Provider()
         provider.checks[HEAD].append(copy.deepcopy(provider.ci))
@@ -128,10 +143,34 @@ class PublicationAuditTest(unittest.TestCase):
 
     def test_postmerge_failure_is_separate(self):
         provider = Provider()
-        provider.checks[PUBLISHED] = [{**provider.ci, "id": 31, "head_sha": PUBLISHED, "conclusion": "failure"}]
+        provider.checks[PUBLISHED] = [{**provider.ci, "id": 31, "head_sha": PUBLISHED, "conclusion": "failure", "check_suite": {"id": 199}}]
+        provider.runs.append({
+            "id": 41, "run_attempt": 1, "check_suite_id": 199,
+            "name": "CI", "path": ".github/workflows/ci.yml",
+            "event": "push", "head_sha": PUBLISHED,
+            "status": "completed", "conclusion": "failure",
+        })
         receipt = collect(provider, 7, REVIEWED)
         self.assertEqual(receipt["postmerge_ci"]["state"], "failed")
         self.assertEqual(receipt["premerge_ci"]["state"], "observed_success_before_merge")
+
+    def test_postmerge_same_name_foreign_workflow_and_neutral(self):
+        provider = Provider()
+        provider.checks[PUBLISHED] = [{**provider.ci, "id": 31, "head_sha": PUBLISHED, "check_suite": {"id": 199}}]
+        provider.runs.append({
+            "id": 41, "run_attempt": 1, "check_suite_id": 199,
+            "name": "CI", "path": ".github/workflows/other.yml",
+            "event": "push", "head_sha": PUBLISHED,
+            "status": "completed", "conclusion": "success",
+        })
+        self.assertEqual(collect(provider, 7)["postmerge_ci"]["state"], UNKNOWN)
+        provider.runs[-1]["path"] = ".github/workflows/ci.yml"
+        for conclusion in ("cancelled", "skipped", "neutral", "timed_out"):
+            provider.checks[PUBLISHED][0]["conclusion"] = conclusion
+            provider.runs[-1]["conclusion"] = conclusion
+            receipt = collect(provider, 7)
+            self.assertEqual(receipt["postmerge_ci"]["state"], "not_passed")
+            self.assertEqual(receipt["postmerge_ci"]["checks"][0]["conclusion"], conclusion)
 
     def test_forged_saved_claim_or_digest_cannot_verify_itself(self):
         provider = Provider()

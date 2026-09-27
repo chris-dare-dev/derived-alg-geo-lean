@@ -24,8 +24,8 @@ python3 scripts/publication_audit.py chris-dare-dev/derived-alg-geo-lean 1580 \
 
 | PR | Published commit | Observation |
 | --- | --- | --- |
-| [#1577](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1577) | `788f89a56793377a9d09b07a35799446f1e6a975` | Published and supplied trees match; `ci` succeeded on the head before merge; postmerge `ci` passed. Tested candidate, final review provenance and historical required policy remain unknown. |
-| [#1554](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1554) | `8e44470b48f3f9e72c3f0e68795219ea0b793d0d` | Published and supplied trees differ; the PR's recorded base differs from the published parent despite an observed premerge `ci` success on the head. |
+| [#1577](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1577) | `788f89a56793377a9d09b07a35799446f1e6a975` | Published and supplied trees match; `ci` succeeded on the head before merge, but the merged workflow has no PR association; exact postmerge push `ci` passed. Tested candidate, final review provenance and historical required policy remain unknown. |
+| [#1554](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1554) | `8e44470b48f3f9e72c3f0e68795219ea0b793d0d` | Published and supplied trees differ; the PR's recorded base differs from the published parent despite observed unassociated premerge `ci` success on the head. |
 | [#1580](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1580) | `349ea8a0e08d5d42bfca859aac65abb17f66d12a` | Trees match, but the observed `ci` check completed after the merge. This does not establish applicable required CI at merge time. |
 
 The 60-merge replay and transcript extracts remain in the owner-only

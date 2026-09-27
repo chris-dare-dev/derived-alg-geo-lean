@@ -84,8 +84,22 @@ def _checks(client: GitHubClient, commit: str) -> tuple[list[dict[str, Any]], li
     return checks, statuses
 
 
+def _verify_run(client: GitHubClient, run: dict[str, Any]) -> None:
+    run_id = run.get("id")
+    if not isinstance(run_id, int) or isinstance(run_id, bool) or run_id < 1:
+        raise EvidenceError("workflow run has invalid ID")
+    direct = client.get_object(f"/actions/runs/{run_id}")
+    for field in (
+        "id", "name", "path", "event", "head_sha", "run_attempt",
+        "check_suite_id", "status", "conclusion", "updated_at", "pull_requests",
+    ):
+        if direct.get(field) != run.get(field):
+            raise EvidenceError(f"workflow run changed during audit: {field}")
+
+
 def _ci_observation(
-    client: GitHubClient, head: str, merged_at: datetime, checks: list[dict[str, Any]]
+    client: GitHubClient, number: int, base: str, head: str,
+    merged_at: datetime, checks: list[dict[str, Any]]
 ) -> dict[str, Any]:
     """Report a CI observation, never historical required-check compliance."""
     matches = [
@@ -119,6 +133,7 @@ def _ci_observation(
     if len(matches) != 1 or len(ci_runs) != 1:
         return result
     check, run = matches[0], ci_runs[0]
+    _verify_run(client, run)
     suite = check.get("check_suite")
     attempt = run.get("run_attempt")
     if (
@@ -145,11 +160,83 @@ def _ci_observation(
         and run.get("status") == "completed"
         and run.get("conclusion") == "success"
     ):
-        result["state"] = "observed_success_before_merge"
-        result["reason"] = "head check and CI workflow agree; tested merge candidate is unverified"
+        associations = run.get("pull_requests")
+        if not isinstance(associations, list):
+            result["reason"] = "workflow PR associations are unavailable"
+        elif any(
+            isinstance(item, dict)
+            and item.get("number") == number
+            and isinstance(item.get("base"), dict)
+            and item["base"].get("sha") == base
+            and isinstance(item.get("head"), dict)
+            and item["head"].get("sha") == head
+            for item in associations
+        ):
+            result["state"] = "observed_success_before_merge"
+            result["reason"] = "PR/base/head association and head CI agree; tested merge candidate is unverified"
+        elif associations:
+            result["reason"] = "workflow is associated with a different PR or revision"
+        else:
+            result["state"] = "observed_head_success_before_merge_unassociated"
+            result["reason"] = "head CI succeeded before merge, but workflow PR association is unavailable"
     else:
         result["state"] = "not_successful_before_merge"
         result["reason"] = "head check or CI workflow did not succeed"
+    return result
+
+
+def _postmerge_observation(
+    client: GitHubClient, published: str, checks: list[dict[str, Any]]
+) -> dict[str, Any]:
+    """Bind a postmerge check to the exact push workflow and suite."""
+    matches = [
+        check for check in checks
+        if check.get("name") == "ci" and isinstance(check.get("app"), dict)
+        and check["app"].get("slug") == "github-actions"
+    ]
+    runs = client.get_all(f"/actions/runs?head_sha={published}", key="workflow_runs")
+    ci_runs = [
+        run for run in runs
+        if run.get("name") == "CI"
+        and run.get("path") == ".github/workflows/ci.yml"
+        and run.get("event") == "push"
+        and run.get("head_sha") == published
+    ]
+    result: dict[str, Any] = {
+        "state": UNKNOWN,
+        "reason": "published-revision CI check or push workflow is missing or ambiguous",
+        "checks": [_check_summary(check) for check in matches],
+        "workflow_runs": [
+            {key: run.get(key) for key in ("id", "run_attempt", "check_suite_id", "status", "conclusion", "html_url")}
+            for run in ci_runs
+        ],
+    }
+    if len(matches) != 1 or len(ci_runs) != 1:
+        return result
+    check, run = matches[0], ci_runs[0]
+    _verify_run(client, run)
+    suite = check.get("check_suite")
+    if (
+        not isinstance(suite, dict)
+        or suite.get("id") != run.get("check_suite_id")
+        or not isinstance(run.get("run_attempt"), int)
+        or isinstance(run.get("run_attempt"), bool)
+        or run["run_attempt"] != 1
+    ):
+        result["reason"] = "published check suite or run attempt is ambiguous"
+        return result
+    if check.get("status") != run.get("status") or check.get("conclusion") != run.get("conclusion"):
+        result["reason"] = "published check and push workflow outcomes conflict"
+        return result
+    if check.get("status") != "completed":
+        result["state"] = "pending"
+    elif check.get("conclusion") == "success":
+        result["state"] = "passed"
+    elif check.get("conclusion") == "failure":
+        result["state"] = "failed"
+    else:
+        result["state"] = "not_passed"
+    result["reason"] = "published check and exact push workflow agree"
     return result
 
 
@@ -180,24 +267,14 @@ def collect(
     reviewed_tree = _commit(client, reviewed)[0] if reviewed else None
     head_checks, head_statuses = _checks(client, head)
     published_checks, published_statuses = _checks(client, published)
-    ci = _ci_observation(client, head, merged_at, head_checks)
+    ci = _ci_observation(client, number, base, head, merged_at, head_checks)
     auxiliary = [
         _check_summary(check) for check in head_checks
         if check.get("name") != "ci" and check.get("conclusion") in {"failure", "timed_out", "cancelled", "action_required"}
         and _date(check.get("completed_at")) is not None
         and _date(check["completed_at"]) <= merged_at
     ]
-    post_ci = [
-        _check_summary(check) for check in published_checks
-        if check.get("name") == "ci" and isinstance(check.get("app"), dict)
-        and check["app"].get("slug") == "github-actions"
-    ]
-    post_state = UNKNOWN
-    if len(post_ci) == 1:
-        if post_ci[0]["status"] == "completed":
-            post_state = "passed" if post_ci[0]["conclusion"] == "success" else "failed"
-        else:
-            post_state = "pending"
+    post_ci = _postmerge_observation(client, published, published_checks)
     receipt: dict[str, Any] = {
         "schema": SCHEMA,
         "repository": client.repository,
@@ -219,7 +296,7 @@ def collect(
         "premerge_ci": ci,
         "auxiliary_failed_checks": auxiliary,
         "head_commit_statuses": head_statuses,
-        "postmerge_ci": {"state": post_state, "checks": post_ci},
+        "postmerge_ci": post_ci,
         "published_commit_statuses": published_statuses,
         "merge_time_readiness": UNKNOWN,
         "operationally_verified": False,

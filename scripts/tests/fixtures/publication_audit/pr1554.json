@@ -20,7 +20,18 @@
         "url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36090549618/job/107946288010"
       }
     ],
-    "state": "passed"
+    "reason": "published check and exact push workflow agree",
+    "state": "passed",
+    "workflow_runs": [
+      {
+        "check_suite_id": 97732878253,
+        "conclusion": "success",
+        "html_url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36090549618",
+        "id": 36090549618,
+        "run_attempt": 1,
+        "status": "completed"
+      }
+    ]
   },
   "premerge_ci": {
     "checks": [
@@ -37,8 +48,8 @@
       }
     ],
     "historical_required_policy": "not_evaluable",
-    "reason": "head check and CI workflow agree; tested merge candidate is unverified",
-    "state": "observed_success_before_merge",
+    "reason": "head CI succeeded before merge, but workflow PR association is unavailable",
+    "state": "observed_head_success_before_merge_unassociated",
     "tested_candidate": "not_evaluable",
     "workflow_runs": [
       {
@@ -60,7 +71,7 @@
   "published_tree": "7f0e922772a9266196d2ffb3d30b8c9e1ecec4a0",
   "pull_request": 1554,
   "pull_request_url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1554",
-  "receipt_sha256": "b025f74670d7ac9243a08d2aaf115481edafd732640dadb81db9c509ce3746ae",
+  "receipt_sha256": "c78b476cadbf78c54d00425de361e8f904ed50196f1191d15f6173e3b5590f1e",
   "recorded_base": "519da376d180fe113bcd44f5db809dac46cb53b4",
   "recorded_base_equals_published_parent": false,
   "repository": "chris-dare-dev/derived-alg-geo-lean",
