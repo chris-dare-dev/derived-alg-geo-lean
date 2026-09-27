@@ -164,7 +164,9 @@ does not mean every listed path existed or
 that the runner used those locations. A complete actual eight-root inventory
 remains part of the live acceptance demonstration. Cleanup waits for the scope
 to empty and the GitHub registration to
-disappear. Diagnostics and metadata are staged in a private directory and then
+disappear. Diagnostics must resolve inside the job root, including through
+their parent components. Diagnostics and metadata are staged in a private
+directory and then
 published together below host `logs/<namespace>/` before the root is removed.
 A failed diagnostic copy leaves no incomplete published archive, so explicit
 `recover` can retry while retaining the lease. An unresolved registration,

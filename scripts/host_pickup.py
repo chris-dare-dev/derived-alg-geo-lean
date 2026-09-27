@@ -519,8 +519,10 @@ def _archive_runner_logs(base: Path, root: Path, namespace: str,
             raise ValueError("runner log archive identity or inventory is invalid")
         return
     source = root / "runner/_diag"
-    if source.is_symlink():
-        raise ValueError("runner diagnostic directory is a symlink; lease retained")
+    resolved_source = source.resolve(strict=False)
+    if (source.is_symlink() or
+            (resolved_source != root and root not in resolved_source.parents)):
+        raise ValueError("runner diagnostic directory escapes job root; lease retained")
     checkout = root / "runner/_work/derived-alg-geo-lean/derived-alg-geo-lean"
     actual_paths = {
         "checkout": checkout,

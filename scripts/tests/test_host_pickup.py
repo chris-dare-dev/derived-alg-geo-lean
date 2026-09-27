@@ -93,6 +93,20 @@ class HostPickupTests(unittest.TestCase):
             self.assertTrue((archive / "diag/pickup.json").is_symlink())
             self.assertTrue((archive / "pickup.json").is_file())
 
+    def test_runner_parent_symlink_cannot_copy_external_diagnostics(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            base, _, _ = fixture(Path(directory))
+            root, _ = host_pickup._prepare(base, "abc123")
+            outside = Path(directory) / "outside"
+            (outside / "_diag").mkdir(parents=True)
+            (outside / "_diag/trace.log").write_text("keep\n", encoding="utf-8")
+            (root / "runner").symlink_to(outside, target_is_directory=True)
+            record = host_pickup._record("abc123", root, "build", kind="runner")
+            with self.assertRaisesRegex(ValueError, "diagnostic directory escapes"):
+                host_pickup._archive_runner_logs(base, root, "abc123", record)
+            self.assertEqual(list((base / "logs").iterdir()), [])
+            self.assertEqual((outside / "_diag/trace.log").read_text(), "keep\n")
+
     def test_failed_runner_configuration_keeps_token_out_of_argv_and_error(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             base, _, _ = fixture(Path(directory))
