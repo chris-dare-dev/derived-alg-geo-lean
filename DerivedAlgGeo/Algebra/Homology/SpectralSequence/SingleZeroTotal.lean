@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.Algebra.Homology.HomologicalBicomplex
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence.TotalFlipNaturality
 import Mathlib.Algebra.Homology.Single
 import Mathlib.Algebra.Homology.TotalComplex
@@ -15,6 +16,9 @@ bicomplex whose total is naturally isomorphic to the original complex.
 Exchanging axes gives the corresponding vertical-degree-zero comparison.
 Under an ambient total-existence assumption, the signed flipped comparison
 is natural in the input integer-indexed cochain complex.
+For any source complex shape embedded into integer cochains with a chosen
+degree mapping to zero, the total of its extended single is naturally the
+input integer-indexed cochain complex.
 
 ## Main definitions
 
@@ -31,6 +35,8 @@ is natural in the input integer-indexed cochain complex.
   comparison after exchanging axes.
 * `HomologicalComplex₂.singleZeroFlipTotalNatIso` assembles the signed
   flipped degree-zero comparisons into a natural isomorphism.
+* `HomologicalComplex₂.singleExtendMapFlipTotalIso` compares the total of an
+  extended single with the original complex when the selected degree maps to zero.
 
 ## Implementation notes
 
@@ -39,12 +45,14 @@ cofan supplies the required total in any preadditive category with a zero
 object. The flipped comparison uses Mathlib's signed total symmetry, so its
 sign agrees with the existing totalization convention.
 The natural isomorphism uses these component isomorphisms and their proved
-naturality, rather than changing the sign convention.
+naturality, rather than changing the sign convention. The extended-single
+comparison first normalizes the bicomplex, then applies that signed isomorphism.
 
 ## References
 
 The construction uses Mathlib's `HomologicalComplex.single` and
-`HomologicalComplex₂.totalFlipIso`. It introduces no geometric assumptions.
+`HomologicalComplex₂.totalFlipIso` and the repository's
+`HomologicalComplex₂.singleExtendMapFlipIso`. It introduces no geometric assumptions.
 -/
 
 open CategoryTheory Category Limits
@@ -304,10 +312,10 @@ lemma singleZeroFlipTotalIso_naturality (f : A ⟶ B) :
   rw [Category.assoc, singleZeroTotalIso_naturality]
   simp only [Category.assoc]
 
-/-- The signed total of the flip of a bicomplex originally supported at outer
-degree zero is naturally the input cochain complex. After flipping, the
-support lies at inner degree zero. Its components are
-`HomologicalComplex₂.singleZeroFlipTotalIso`, with naturality proved above. -/
+/-- Packages `HomologicalComplex₂.singleZeroFlipTotalIso` into a natural
+isomorphism. Mathlib's `totalFunctor` requires totals for every bicomplex;
+the objectwise single-zero totals alone do not construct that functor.
+Flipping moves support from outer to inner degree zero. -/
 noncomputable def singleZeroFlipTotalNatIso
     [∀ K : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ),
       K.HasTotal (ComplexShape.up ℤ)] :
@@ -320,5 +328,22 @@ noncomputable def singleZeroFlipTotalNatIso
     (by
       intro K L f
       exact singleZeroFlipTotalIso_naturality f)
+
+/-- Extend a single along any complex-shape embedding whose chosen degree
+maps to integer degree zero. The pre-total bicomplex isomorphism identifies
+its target with the flipped single-zero bicomplex; the signed total natural
+isomorphism then recovers the input cochain complex. -/
+noncomputable def singleExtendMapFlipTotalIso
+    [∀ K : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ),
+      K.HasTotal (ComplexShape.up ℤ)]
+    {ι : Type*} [DecidableEq ι] {c : ComplexShape ι}
+    (e : c.Embedding (ComplexShape.up ℤ)) (i : ι) (h : e.f i = 0) :
+    ((HomologicalComplex.single C c i ⋙ e.extendFunctor C).mapHomologicalComplex
+      (ComplexShape.up ℤ)) ⋙
+        totalFunctor C (ComplexShape.up ℤ) (ComplexShape.up ℤ) (ComplexShape.up ℤ) ≅
+      𝟭 (CochainComplex C ℤ) :=
+  (Functor.isoWhiskerRight
+    (singleExtendMapFlipIso (C := C) (ComplexShape.up ℤ) e i 0 h) _).trans
+    (singleZeroFlipTotalNatIso (C := C))
 
 end HomologicalComplex₂

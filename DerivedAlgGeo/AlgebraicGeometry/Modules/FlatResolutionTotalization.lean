@@ -34,6 +34,9 @@ quasi-isomorphism or K-flatness claim.
 
 * `AlgebraicGeometry.Scheme.Modules.normalizedBicomplexAugmentation_row_quasiIso`
   proves each resolution-direction row is a quasi-isomorphism.
+* `AlgebraicGeometry.Scheme.Modules.freeYonedaSheafCoproductTotalAugmentation_eq_toSingleZero`
+  identifies the normalized total map with the earlier total-to-single-zero map
+  followed by the target isomorphism.
 
 ## Implementation notes
 
@@ -161,9 +164,9 @@ noncomputable def freeYonedaSheafCoproductTotalAugmentationToSingleZero
     (HomologicalComplex₂.totalFunctor X.Modules (ComplexShape.up ℤ)
       (ComplexShape.up ℤ) (ComplexShape.up ℤ))
 
-/-- The original resolution-degree-zero total target is naturally the input.
-First normalize the bicomplex target, then apply the signed flipped
-single-zero total comparison. -/
+/-- The original resolution-degree-zero total target is naturally the input,
+by specializing the generic extended-single total isomorphism at the
+resolution-degree embedding and degree zero. -/
 noncomputable def freeYonedaSheafCoproductTotalTargetIso (X : Scheme.{u}) :
     (((ChainComplex.single₀ X.Modules) ⋙
         ComplexShape.embeddingDownNat.extendFunctor X.Modules).mapHomologicalComplex
@@ -171,10 +174,8 @@ noncomputable def freeYonedaSheafCoproductTotalTargetIso (X : Scheme.{u}) :
         HomologicalComplex₂.totalFunctor X.Modules (ComplexShape.up ℤ)
           (ComplexShape.up ℤ) (ComplexShape.up ℤ) ≅
     𝟭 (CochainComplex X.Modules ℤ) :=
-  (CategoryTheory.Functor.isoWhiskerRight
-    (HomologicalComplex₂.singleExtendMapFlipIso
-      (C := X.Modules) (ComplexShape.up ℤ) ComplexShape.embeddingDownNat 0 0 rfl) _).trans
-    (HomologicalComplex₂.singleZeroFlipTotalNatIso (C := X.Modules))
+  HomologicalComplex₂.singleExtendMapFlipTotalIso
+    (C := X.Modules) ComplexShape.embeddingDownNat 0 rfl
 
 /-- The natural augmentation of the total free-Yoneda resolution into the
 input complex. It totalizes the normalized bicomplex map and follows it by
@@ -187,6 +188,22 @@ noncomputable def freeYonedaSheafCoproductTotalAugmentation (X : Scheme.{u}) :
       (HomologicalComplex₂.totalFunctor X.Modules (ComplexShape.up ℤ)
         (ComplexShape.up ℤ) (ComplexShape.up ℤ)) ≫
     (HomologicalComplex₂.singleZeroFlipTotalNatIso (C := X.Modules)).hom
+
+/-- The normalized total augmentation agrees with the earlier total map to
+the resolution-degree-zero bicomplex, followed by the generic target
+identification specialized to module sheaves. This connects both public
+presentations by an equality of natural transformations. -/
+theorem freeYonedaSheafCoproductTotalAugmentation_eq_toSingleZero (X : Scheme.{u}) :
+    freeYonedaSheafCoproductTotalAugmentation X =
+      freeYonedaSheafCoproductTotalAugmentationToSingleZero X ≫
+        (freeYonedaSheafCoproductTotalTargetIso X).hom := by
+  simp only [freeYonedaSheafCoproductTotalAugmentation,
+    normalizedBicomplexAugmentation,
+    freeYonedaSheafCoproductTotalAugmentationToSingleZero,
+    freeYonedaSheafCoproductTotalTargetIso,
+    HomologicalComplex₂.singleExtendMapFlipTotalIso,
+    Functor.isoWhiskerRight_hom, Iso.trans_hom, Functor.whiskerRight_comp]
+  rfl
 
 private theorem isFlatOverId_of_iso (X : Scheme.{u}) {M N : X.Modules}
     (e : M ≅ N) (hM : IsFlatOver (𝟙 X) M) : IsFlatOver (𝟙 X) N := by
