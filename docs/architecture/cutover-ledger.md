@@ -2534,6 +2534,19 @@ or exactness was strengthened by relocation.
 
 ## Confirmed next lanes
 
+The SF8 #554 integer-tail cutover moves the existing
+`HomologicalComplex.stupidTruncGEι` and `stupidTruncGEMap` API, including its
+mono instances and map laws, from the filtered-total consumer to
+`Algebra/Homology/Embedding/StupidTruncGE.lean`. The names and hypotheses are
+unchanged; `FilteredTotalComplex.lean` imports that owner. This source move
+does not complete the distinct normalized component comparison:
+`HomologicalComplex₂.stupidTruncGEXIso` and its companion lemmas still live in
+`SpectralSequence/FilteredTotalComplexAdjacent.lean`. Their target is the
+embedding owner, after a separate declaration-level generalization review.
+The neutral adjacent short exact construction and finite-strip total
+quasi-isomorphism are further SF8 proof obligations, not consequences of the
+tail owner move.
+
 Every path lane confirmed by the 2026-09-01 audit has landed, and so have
 both lanes recorded after it: the `ObjectProperty` lift block (2026-09-02)
 and the left-orthogonal colimit closure (2026-09-03). Both are entries under
