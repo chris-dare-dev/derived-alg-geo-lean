@@ -12,8 +12,9 @@ Raw commands, generated Lean sources, stdout/stderr, timestamped pressure
 samples, and SHA-256 checksums are in the owner-local archive
 `~/.loop-runs/transcripts/analysis/2026-09-27-m54-recovery/probes/1440-final-audit/`.
 Its `summary.json` has SHA-256
-`0a7ec6b5b92947bab4d8e2753989f594dcb679ad048a363aaa5ffc6e97ba4e93`.
-Run `sha256sum -c SHA256SUMS` there to verify all 123 files. The archive's
+`f1d9b919b08cff76f81623c5052a43d73b0d7a34521df801d0b0980f3884a06e`.
+Run
+`sha256sum -c SHA256SUMS` there to verify the archive. The archive's
 `generate_batch.py --repo-root <checkout-at-the-recorded-revision>` recreates
 the exact aggregate sources from `metadata.json` and the repository files.
 The separate-file commands use
@@ -43,13 +44,24 @@ importing the audit files would replay their output. `#print axioms` emits
 records only when elaborated in the current file.
 
 The prototype therefore put each file's full body in its own `section` after
-one deduplicated import list, preserving the `#print axioms` commands. A
-ten-file aggregate exceeded a **40-second cap** after outputting 65,536 of
-70,166 expected bytes; its process tree reached 5.69 GB RSS. One separate-file
-pass took 17.0–17.3 seconds. The ten-file grouping is a **no-go** on this
-measurement: it was slower even at the cap and did not complete. The archived
-run has the termination reason and samples; it was not counted as a parser
-pass.
+one deduplicated import list, preserving the `#print axioms` commands. The
+first ten-file run hit its 40-second cap because the probe captured stdout in
+a 65,536-byte pipe and drained it only after the child exited. Its output
+stopped at exactly that capacity, midway through the 70,166 expected bytes;
+its flat RSS samples are consistent with the child blocked on output. **That
+run measures a probe defect, not Lean execution time.** It remains in the raw
+archive with its diagnosis.
+
+The corrected probe redirected stdout and stderr to files while Lean ran. It
+completed twice, in 2.957 and 2.689 seconds, against 17.275 and 17.025
+seconds for the separate-file passes. Its output was byte-identical to the
+concatenated independent output on both passes. `scripts/check_audit.py`
+accepted all 470 records against 470 `#print axioms` commands. Peak sampled
+process-tree RSS was 5.63 and 5.60 GB. The warm descriptive time saving was
+82.9–84.2%; this is an experiment result, not a production CI speed claim.
+The rerun used a later commit with no changes in `DerivedAlgGeo/`, the selected
+audit sources, Lean/Lake pins or the audit parser; the archive records the
+exact revisions and checked path set.
 
 Two smaller groups completed twice. The independent reference in each row is
 the sum of separate, fresh Lean processes on the same sources and revision.
@@ -75,18 +87,21 @@ During the separate-file runs, host-wide PSI `some avg10` ranged from
 0–0.18% CPU, 0–0.38% memory and 0% IO. Those timestamped values are tied to
 the named host and probe commands, but reflect all host processes and cannot
 be assigned to this experiment alone. This environment exposed no
-`/sys/fs/cgroup/memory.current`; the capped batch's process-tree RSS is the
-specific memory observation. Hosted PR runner pressure remains unknown.
+`/sys/fs/cgroup/memory.current`; process-tree RSS is the specific memory
+observation for both the invalid capped run and the corrected runs. Hosted
+PR runner pressure remains unknown.
 
 ## Decision and remaining evidence
 
-Do not batch ten area files or activate any batching in required CI. Two-file
-grouping is a candidate for a separately scoped, cold/full parity study. That
-study must compare normalised records, order, count, parser verdict, exit
-status and elapsed time across the complete affected audit, including a cold
-build and warm rerun on a matched revision, with concurrent host work and
-memory use recorded. A mismatch or a memory/time regression is a no-go. The
-current pairwise result is a reason to study that scope, not a production go.
+Do not activate batching in required CI yet. Ten-file and two-file groups both
+merit a separately scoped, cold/full parity study. The ten-file grouping has
+the larger warm saving but uses about 5.6 GB RSS in one process, so its
+concurrent host budget must be measured. The study must compare normalized
+records, order, count, parser verdict, exit status and elapsed time across the
+complete affected audit, including a cold build and warm rerun on a matched
+revision, with concurrent host work and memory use recorded. A mismatch or a
+memory/time regression is a no-go. These bounded warm results support further
+measurement, not production activation.
 
 The earlier [CI baseline](performance-baseline-2026-09-27.md) ranks audits and
 emitter work, but does not isolate reset subcommands or emitter costs on

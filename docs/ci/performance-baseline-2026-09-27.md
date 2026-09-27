@@ -93,12 +93,15 @@ explicit scenarios, not measured arrivals.
 ## Bounded experiment and limits
 
 The [bounded audit batching probe](audit-batch-probe-2026-09-27.md) measured
-import-only and full elaboration on ten matched slices. A ten-file batch was a
-no-go on time and memory; two-file groups reproduced the audit output and
-parser verdict with lower elapsed time in a prebuilt-cache sample. The paired
-result remains an experiment candidate, not a production optimization. It
-needs independent cold/full verification, including direct and transitive
-imports, instances and exported axioms, before any required gate can change.
+import-only and full elaboration on ten matched slices. Its initial ten-file
+timeout was an output-pipe deadlock in the probe. With output redirected
+during execution, that group completed in 2.7–3.0 seconds, reproduced all
+470 records and the parser verdict, and reached about 5.6 GB process-tree
+RSS. Two-file groups also reproduced their output and parser verdict with
+lower elapsed time in a prebuilt-cache sample. Both sizes remain experiment
+candidates, not production optimizations. They need independent cold/full
+verification, including direct and transitive imports, instances and exported
+axioms, and a concurrent memory budget before any required gate can change.
 The replay harness is likewise offline and cannot replace that parity test.
 Rerun this baseline after #1436 and #1438, which are still open. This progress
 slice does not close #1440.
