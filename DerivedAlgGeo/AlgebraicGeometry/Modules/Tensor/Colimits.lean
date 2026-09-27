@@ -9,9 +9,12 @@ import DerivedAlgGeo.CategoryTheory.Limits.Preserves.Reflective
 # Colimits of tensor products of scheme-module sheaves
 
 Presheaf tensor preserves colimits objectwise. The arbitrary-sheaf tensor/sheafification
-comparisons transfer that property to the sheafified tensor in both slots. The historical
-finite-colimit instance for `tensorLeftFunctor` is recovered from the size-bounded theorem
-without an invertibility hypothesis.
+comparisons transfer that property to the sheafified tensor in both slots.
+
+The main results are `tensorLeft_preservesColimitsOfShape` and
+`tensorRight_preservesColimitsOfShape`. Their index categories have the same universe as
+the underlying scheme site, matching the available presheaf tensor instance. The historical
+finite-colimit instance for `tensorLeftFunctor` follows without an invertibility hypothesis.
 -/
 
 open CategoryTheory CategoryTheory.Limits TopologicalSpace MonoidalCategory
