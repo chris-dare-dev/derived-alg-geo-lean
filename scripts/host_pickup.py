@@ -21,6 +21,7 @@ import stat
 import subprocess
 import sys
 import tarfile
+import tempfile
 from typing import Any
 
 if __package__ in (None, ""):
@@ -445,11 +446,13 @@ def _runner_worker_started(archive: Path, digest: str, label: str, root: Path,
     if not token:
         raise ValueError("registration token is missing")
     name = f"dag-{root.name}"
-    subprocess.run([
+    configured = subprocess.run([
         "./config.sh", "--unattended", "--ephemeral", "--disableupdate",
-        "--url", f"https://github.com/{REPOSITORY}", "--token", token,
+        "--url", f"https://github.com/{REPOSITORY}",
         "--name", name, "--labels", label, "--work", "_work",
-    ], cwd=runner_dir, check=True)
+    ], cwd=runner_dir, env={**os.environ, "ACTIONS_RUNNER_INPUT_TOKEN": token}, check=False)
+    if configured.returncode != 0:
+        raise ValueError(f"runner configuration failed with exit code {configured.returncode}")
     return subprocess.run(["./run.sh"], cwd=runner_dir, check=False).returncode
 
 
@@ -496,7 +499,7 @@ def _archive_runner_logs(base: Path, root: Path, namespace: str,
     try:
         archived_info = destination.lstat()
     except FileNotFoundError:
-        destination.mkdir(mode=0o700)
+        pass
     else:
         if (not stat.S_ISDIR(archived_info.st_mode) or archived_info.st_uid != os.getuid() or
                 stat.S_IMODE(archived_info.st_mode) != 0o700):
@@ -515,8 +518,6 @@ def _archive_runner_logs(base: Path, root: Path, namespace: str,
     source = root / "runner/_diag"
     if source.is_symlink():
         raise ValueError("runner diagnostic directory is a symlink; lease retained")
-    if source.is_dir():
-        shutil.copytree(source, destination / "diag", symlinks=True)
     checkout = root / "runner/_work/derived-alg-geo-lean/derived-alg-geo-lean"
     actual_paths = {
         "checkout": checkout,
@@ -541,8 +542,8 @@ def _archive_runner_logs(base: Path, root: Path, namespace: str,
         else:
             entry.update({"exists": True, "device": info.st_dev, "inode": info.st_ino,
                           "symlink": stat.S_ISLNK(info.st_mode)})
-            if observed != root and root not in observed.parents:
-                escaped.append(key)
+        if observed != root and root not in observed.parents:
+            escaped.append(key)
         inventory[key] = entry
     checkout_observed = bool(inventory["checkout"]["exists"])
     inventory_valid = not escaped
@@ -554,16 +555,26 @@ def _archive_runner_logs(base: Path, root: Path, namespace: str,
         "reservation": record["resources"],
         "host_capacity_at_admission": record.get("host_capacity_at_admission"),
     }, sort_keys=True, indent=2) + "\n"
-    descriptor = os.open(destination, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    stage = Path(tempfile.mkdtemp(prefix=f".{namespace}.", dir=logs))
     try:
-        metadata_fd = os.open("pickup.json", os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW,
-                              0o600, dir_fd=descriptor)
-        with os.fdopen(metadata_fd, "w", encoding="utf-8") as stream:
-            stream.write(metadata)
-            stream.flush()
-            os.fsync(stream.fileno())
-    finally:
-        os.close(descriptor)
+        if source.is_dir():
+            shutil.copytree(source, stage / "diag", symlinks=True)
+        descriptor = os.open(stage, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        try:
+            metadata_fd = os.open("pickup.json", os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW,
+                                  0o600, dir_fd=descriptor)
+            with os.fdopen(metadata_fd, "w", encoding="utf-8") as stream:
+                stream.write(metadata)
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.fsync(descriptor)
+        finally:
+            os.close(descriptor)
+        stage.rename(destination)
+    except BaseException:
+        if stage.exists():
+            shutil.rmtree(stage)
+        raise
     if escaped:
         raise ValueError(f"runner writable paths escaped job root: {', '.join(escaped)}")
     if require_checkout and not checkout_observed:
