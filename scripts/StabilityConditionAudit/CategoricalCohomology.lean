@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence
+import DerivedAlgGeo.Algebra.Homology.HomologicalBicomplex
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Coproducts
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyClassLocalization
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyHomotopy
@@ -34,6 +35,7 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex.extendCyclesIso_naturality_assoc
 #print axioms HomologicalComplex.extendHomologyIso_naturality
 #print axioms HomologicalComplex.extendHomologyIso_naturality_assoc
+#print axioms HomologicalComplex₂.singleMapHomologicalComplexFlipIso
 #print axioms CategoryTheory.Triangulated.SpectralObject.mapHomologicalFunctor
 #print axioms HomologicalComplex.sigmaXIso
 #print axioms HomologicalComplex.ι_sigmaXIso_inv
