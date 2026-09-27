@@ -62,7 +62,8 @@ of `chiHom` as evidence that a category has an Euler form.
   `GrothendieckGroup/HomFiniteWitness.lean` (#543).
 * No relation to any geometric Euler characteristic, to `chi₂`, or to
   Riemann--Roch. Those comparisons remain supplied in the numerical track.
-* Nothing about Serre duality, or about `χ` being symmetric, or non-degenerate.
+* Serre duality's twisted `χ` identity is in `SerreFunctor/Euler.lean`;
+  no unconditional symmetry or non-degeneracy is asserted here.
 -/
 
 universe w u v u' v'
