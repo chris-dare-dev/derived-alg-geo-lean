@@ -16,7 +16,7 @@ This file is the neutral exact-functor owner for tensoring module sheaves by a l
 construction belongs under `Modules/Tensor`: divisor sequences, filtrations, and future moduli
 constructions are consumers of the same exact functor rather than separate owners of it.
 
-The generic `tensorLeftFunctor L`, its colimit preservation, additivity, and finite-free
+The generic `tensorLeftFunctor L`, its colimit preservation, additivity, and free-sheaf
 comparison come from `Monoidal` and `Colimits`. For an invertible `L`, local rank-one
 trivializations show that it also preserves monomorphisms; hence it preserves homology and all
 finite limits.
