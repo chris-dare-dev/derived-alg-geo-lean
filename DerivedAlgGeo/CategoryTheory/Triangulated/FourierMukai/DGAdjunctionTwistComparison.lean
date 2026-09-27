@@ -251,7 +251,8 @@ abbrev twistCommShift : S.twist.CommShift ℤ := h.targetCommShift
 
 /-- The twist comparison respects its selected source and target shift
 structures. -/
-abbrev transportedTwistIsoCommShift :
+@[nolint defsWithUnderscore]
+abbrev transportedTwistIso_commShift :
     letI : S.twist.CommShift ℤ := h.twistCommShift
     NatTrans.CommShift N.transportedTwistIso.hom ℤ := h.hom_commShift
 

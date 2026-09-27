@@ -198,7 +198,7 @@ theorem transportedDualCotwistIso_commShift :
       K.twist.transportedH0CommShift
     letI : T.dualCotwist.CommShift ℤ := h.dualCotwistCommShift
     NatTrans.CommShift N.transportedDualCotwistIso.hom ℤ :=
-  h.transportedTwistIsoCommShift
+  h.transportedTwistIso_commShift
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The selected Fourier--Mukai dual cotwist is triangulated when the

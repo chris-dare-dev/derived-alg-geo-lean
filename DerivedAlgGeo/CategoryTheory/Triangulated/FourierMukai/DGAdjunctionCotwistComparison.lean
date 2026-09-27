@@ -325,7 +325,8 @@ abbrev cotwistCommShift : S.cotwist.CommShift ℤ := h.targetCommShift
 
 /-- The conventional cotwist comparison respects its selected source and
 target shift structures. -/
-abbrev transportedCotwistIsoCommShift :
+@[nolint defsWithUnderscore]
+abbrev transportedCotwistIso_commShift :
     letI : S.cotwist.CommShift ℤ := h.cotwistCommShift
     NatTrans.CommShift N.transportedCotwistIso.hom ℤ := h.hom_commShift
 
@@ -346,7 +347,7 @@ theorem transportedDGCotwistIso_commShift [eA.functor.Additive] :
   letI : NatTrans.CommShift (K.transportedCotwistH0Iso (eC := eA)).hom ℤ :=
     K.transportedCotwistH0Iso_commShift (eC := eA)
   letI : NatTrans.CommShift N.transportedCotwistIso.hom ℤ :=
-    h.transportedCotwistIsoCommShift
+    h.transportedCotwistIso_commShift
   change NatTrans.CommShift
     ((K.transportedCotwistH0Iso (eC := eA)).hom ≫
       N.transportedCotwistIso.hom) ℤ

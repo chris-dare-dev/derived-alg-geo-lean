@@ -246,7 +246,7 @@ theorem transportedDualTwistIso_commShift :
       K.transportedCotwistCommShift (eC := eB)
     letI : T.dualTwist.CommShift ℤ := h.dualTwistCommShift
     NatTrans.CommShift N.transportedDualTwistIso.hom ℤ :=
-  h.transportedCotwistIsoCommShift
+  h.transportedCotwistIso_commShift
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The comparison from the actual shifted dg unit cone respects the canonical
