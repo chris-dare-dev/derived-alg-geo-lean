@@ -15,7 +15,10 @@ The main results are `AlgebraicGeometry.Scheme.Modules.tensorLeft_preservesColim
 `AlgebraicGeometry.Scheme.Modules.tensorRight_preservesColimitsOfShape`.
 Their index categories have the same universe as
 the underlying scheme site, matching the available presheaf tensor instance.
-The historical functor and its invertible instances remain in `Tensor/Invertible.lean`.
+The historical `AlgebraicGeometry.Scheme.Modules.tensorLeftFunctor` is the canonical
+`tensorLeft`, so its finite-colimit and additive instances and
+`AlgebraicGeometry.Scheme.Modules.tensorLeftFreeIso` follow here without an invertibility
+hypothesis.
 -/
 
 open CategoryTheory CategoryTheory.Limits TopologicalSpace MonoidalCategory
@@ -146,5 +149,34 @@ theorem tensorRight_preservesColimitsOfShape (L : X.Modules)
   exact (PresheafOfModules.sheafificationAdjunction
     (𝟙 X.ringCatSheaf.obj)).preservesColimitsOfShape_of_comp_left
       (tensorRight (C := X.Modules) L)
+
+/-- Finite colimit preservation used by exact tensoring with an invertible sheaf
+follows from the all-shapes result, with no invertibility assumption. -/
+noncomputable instance tensorLeftFunctor_preservesFiniteColimits (L : X.Modules) :
+    PreservesFiniteColimits (tensorLeftFunctor L) := by
+  haveI : PreservesColimitsOfSize.{u, u}
+      (tensorLeft (C := X.Modules) L) := by
+    constructor
+    exact tensorLeft_preservesColimitsOfShape L _
+  change PreservesFiniteColimits (tensorLeft (C := X.Modules) L)
+  infer_instance
+
+/-- Tensoring by any module sheaf is additive, since it preserves finite coproducts. -/
+noncomputable instance tensorLeftFunctor_additive (L : X.Modules) :
+    (tensorLeftFunctor L).Additive := by
+  letI := preservesBinaryBiproducts_of_preservesBinaryCoproducts
+    (tensorLeftFunctor L)
+  exact Functor.additive_of_preservesBinaryBiproducts (tensorLeftFunctor L)
+
+/-- The free sheaf on any index type is a coproduct of units. Tensoring with a module sheaf
+preserves this coproduct, and the right unitor identifies each summand. -/
+noncomputable def tensorLeftFreeIso (L : X.Modules) (I : Type u) :
+    tensorObj L (show X.Modules from SheafOfModules.free.{u} I) ≅ ∐ (fun _ : I => L) := by
+  classical
+  letI : PreservesColimitsOfShape (Discrete I) (tensorLeftFunctor L) :=
+    tensorLeft_preservesColimitsOfShape L (Discrete I)
+  exact PreservesCoproduct.iso (tensorLeftFunctor L)
+      (fun _ : I => (SheafOfModules.unit X.ringCatSheaf : X.Modules)) ≪≫
+    Sigma.mapIso (fun _ => tensorUnitRightIso L)
 
 end AlgebraicGeometry.Scheme.Modules
