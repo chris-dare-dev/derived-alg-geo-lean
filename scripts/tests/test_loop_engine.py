@@ -724,12 +724,17 @@ class LoopEngineTests(unittest.TestCase):
                     "status": "passed",
                 },
             )
-            with mock.patch.object(loop_engine, "issue_state", return_value={"state": "open"}) as issue_state:
+            with mock.patch.object(loop_engine, "issue_state", return_value={"number": 1, "state": "OPEN"}) as issue_state:
                 with contextlib.redirect_stdout(io.StringIO()) as output:
                     result = loop_engine.ledger_init(root, spec_path, 2, "downstream-chunk", None)
             issue_state.assert_called_once_with(root, spec["repository"], 1)
             self.assertNotEqual(result, 0)
             self.assertIn("remaining open", output.getvalue())
+            with mock.patch.object(loop_engine, "issue_state", return_value={"number": 999, "state": "CLOSED"}):
+                with contextlib.redirect_stdout(io.StringIO()) as output:
+                    result = loop_engine.ledger_init(root, spec_path, 2, "downstream-chunk", None)
+            self.assertNotEqual(result, 0)
+            self.assertIn("does not identify the requested issue", output.getvalue())
 
     def test_ledger_requires_all_reviewers_and_stops_after_five_rounds(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -1747,7 +1752,7 @@ class AuthorityTests(unittest.TestCase):
             loop_engine.validate_spec(historical)
 
     def test_a_legacy_grant_covers_only_open_issues(self) -> None:
-        with mock.patch.object(loop_engine, "issue_state", return_value={"state": "CLOSED"}) as state:
+        with mock.patch.object(loop_engine, "issue_state", return_value={"number": 1, "state": "CLOSED"}) as state:
             loop_engine.require_legacy_issue_open(self.root, self.spec, 1)
             state.assert_not_called()
             self.default_branch["scripts/loop_engine.py"] = (
@@ -1755,8 +1760,11 @@ class AuthorityTests(unittest.TestCase):
             )
             with self.assertRaisesRegex(loop_engine.LoopError, "CLOSED"):
                 loop_engine.require_legacy_issue_open(self.root, self.spec, 1)
-            state.return_value = {"state": "OPEN"}
+            state.return_value = {"number": 1, "state": "OPEN"}
             loop_engine.require_legacy_issue_open(self.root, self.spec, 1)
+            state.return_value = {"number": 999, "state": "OPEN"}
+            with self.assertRaisesRegex(loop_engine.LoopError, "does not identify the requested issue"):
+                loop_engine.require_legacy_issue_open(self.root, self.spec, 1)
 
     def test_an_unreadable_repository_is_not_an_absent_standing_file(self) -> None:
         not_found = subprocess.CompletedProcess([], 1, stdout="", stderr="gh: Not Found (HTTP 404)")
@@ -3042,18 +3050,22 @@ class PlanInPullRequestPreflightTests(unittest.TestCase):
     def preflight(
         self, prs: list[dict] | None = None, protected: set[str] | None = None,
         labels: list[dict] | None = None, issue_payload: dict | None = None,
+        dependency_payload: dict | None = None,
     ) -> tuple[int, str]:
         output = io.StringIO()
         live = issue_payload if issue_payload is not None else {
             "number": 1, "state": "OPEN", "labels": labels if labels is not None else [],
             "blockedBy": {"nodes": [], "totalCount": 0},
         }
+        def issue_for_number(_root: Path, _repository: str, number: int) -> dict:
+            return live if number == 1 else (dependency_payload if dependency_payload is not None else live)
+
         with mock.patch.object(loop_engine, "gh_authenticated", return_value=self.spec["actor"]), mock.patch.object(
             loop_engine, "existing_prs", return_value=prs or []
         ), mock.patch.object(
             loop_engine, "protected_check_names", return_value=protected if protected is not None else {"ci"}
         ), mock.patch.object(
-            loop_engine, "issue_state", return_value=live
+            loop_engine, "issue_state", side_effect=issue_for_number
         ), mock.patch.object(loop_engine, "require_predecessor_prs", return_value=[]), mock.patch.object(
             loop_engine, "roadmap_gate_args", return_value=[sys.executable, "-c", "pass"]
         ), contextlib.redirect_stdout(output):
@@ -3091,6 +3103,7 @@ class PlanInPullRequestPreflightTests(unittest.TestCase):
             "wrong issue identity": {**valid, "number": 2},
             "missing labels": {**valid, "labels": None},
             "malformed label": {**valid, "labels": [{}]},
+            "labels at provider cap": {**valid, "labels": [{"name": f"label-{n}"} for n in range(100)]},
             "missing blocker number": {**valid, "blockedBy": {"nodes": [{"state": "CLOSED"}], "totalCount": 1}},
             "zero blocker number": {**valid, "blockedBy": {"nodes": [{"number": 0, "state": "CLOSED"}], "totalCount": 1}},
             "boolean blocker number": {**valid, "blockedBy": {"nodes": [{"number": True, "state": "CLOSED"}], "totalCount": 1}},
@@ -3107,6 +3120,16 @@ class PlanInPullRequestPreflightTests(unittest.TestCase):
                 self.assertEqual(code, 1, output)
                 self.assertIn("provider", output)
                 self.assertFalse((self.root / ".loop-runs").exists())
+
+    def test_declared_dependency_must_identify_the_issue_it_closes(self) -> None:
+        self.spec["issues"][0]["depends_on"] = [1495]
+        write_manifest(self.root, self.spec)
+        code, output = self.preflight(dependency_payload={"number": 1495, "state": "CLOSED"})
+        self.assertEqual(code, 0, output)
+
+        code, output = self.preflight(dependency_payload={"number": 999, "state": "CLOSED"})
+        self.assertEqual(code, 1, output)
+        self.assertIn("dependency #1495: provider response does not identify", output)
 
     def test_missing_openspec_cli_respects_required_and_advisory_modes(self) -> None:
         for mode, expected_code in (("cli-required", 1), ("cli-advisory", 0)):

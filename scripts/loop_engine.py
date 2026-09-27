@@ -1346,23 +1346,31 @@ class PreflightIssue:
     blockers: tuple[tuple[int, str], ...]
 
 
-def decode_preflight_issue(raw: Any, requested_number: int) -> PreflightIssue:
-    """Reject partial issue data before closed blockers can be disregarded.
-
-    gh 2.101.0 documents blockedBy as a connection with nodes capped at 50
-    (cli/cli, skills/gh/SKILL.md at v2.101.0). A truncated connection is
-    ineligible; it cannot prove that every blocker is closed.
-    """
-
+def decode_issue_identity_state(raw: Any, requested_number: int) -> str:
+    """Validate the identity and state shared by every issue-state consumer."""
     if (not isinstance(raw, dict) or type(raw.get("number")) is not int
             or raw["number"] <= 0 or raw["number"] != requested_number):
         raise LoopError("provider response does not identify the requested issue")
     state = raw.get("state")
     if not isinstance(state, str) or state not in {"OPEN", "CLOSED"}:
         raise LoopError("provider response has an unrecognized issue state")
+    return state
+
+
+def decode_preflight_issue(raw: Any, requested_number: int) -> PreflightIssue:
+    """Reject partial issue data before closed blockers can be disregarded.
+
+    gh 2.101.0 caps blockedBy nodes at 50 (cli/cli, skills/gh/SKILL.md)
+    and labels at 100 (cli/cli, api/query_builder.go). A truncated response
+    cannot establish eligibility.
+    """
+
+    state = decode_issue_identity_state(raw, requested_number)
     labels = raw.get("labels")
     if not isinstance(labels, list):
         raise LoopError("provider response has no valid labels list")
+    if len(labels) >= 100:
+        raise LoopError("provider labels list reaches the 100-label cap; completeness is unverified")
     names: set[str] = set()
     for label in labels:
         if not isinstance(label, dict) or not isinstance(label.get("name"), str) or not label["name"]:
@@ -1449,7 +1457,7 @@ def require_legacy_issue_open(root: Path, spec: dict[str, Any], number: int) -> 
 
     if not owner_reviewed_legacy_manifest(root, spec):
         return
-    state = str(issue_state(root, spec["repository"], number).get("state", "")).upper()
+    state = decode_issue_identity_state(issue_state(root, spec["repository"], number), number)
     if state != "OPEN":
         raise LoopError(
             f"issue #{number} is {state or 'unknown'}; a legacy manifest's grants cover only its open issues"
@@ -2065,11 +2073,13 @@ def preflight(root: Path, spec_path: Path) -> int:
             if dependency in selected_numbers:
                 continue
             try:
-                dependency_state = issue_state(root, repository, dependency)
+                dependency_state = decode_issue_identity_state(
+                    issue_state(root, repository, dependency), dependency
+                )
             except LoopError as exc:
-                failures.append(str(exc))
+                failures.append(f"dependency #{dependency}: {exc}")
                 continue
-            if dependency_state.get("state") != "CLOSED":
+            if dependency_state != "CLOSED":
                 failures.append(f"issue #{number} depends on open issue #{dependency}")
         expected_branch = f"agent/{issue['slug']}"
         # An open PR on the planned branch is this run's own PR being resumed.
@@ -2245,8 +2255,10 @@ def require_selected_dependencies_passed(
                     f"issue #{issue['number']} depends on progress chunk {dependency_chunk['id']!r}; "
                     "a progress ledger cannot unlock a downstream issue"
                 )
-            dependency_live = issue_state(root, spec["repository"], dependency)
-            if str(dependency_live.get("state", "")).upper() != "CLOSED":
+            dependency_state = decode_issue_identity_state(
+                issue_state(root, spec["repository"], dependency), dependency
+            )
+            if dependency_state != "CLOSED":
                 raise LoopError(
                     f"issue #{issue['number']} depends on issue #{dependency} remaining open; "
                     "the upstream complete chunk must be merged and closed first"
