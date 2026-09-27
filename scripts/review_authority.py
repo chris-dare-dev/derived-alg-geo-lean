@@ -11,6 +11,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+from datetime import datetime
 from typing import Any
 
 
@@ -50,6 +51,16 @@ def _nonempty(value: Any) -> bool:
     return isinstance(value, str) and bool(value.strip())
 
 
+def _submitted_at(value: Any) -> datetime | None:
+    if not isinstance(value, str):
+        return None
+    try:
+        submitted = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return submitted if submitted.tzinfo is not None else None
+
+
 def _complete_page(snapshot: dict[str, Any], name: str, errors: list[str]) -> list[Any]:
     page = snapshot.get(name)
     if not isinstance(page, dict):
@@ -59,8 +70,11 @@ def _complete_page(snapshot: dict[str, Any], name: str, errors: list[str]) -> li
     if not isinstance(items, list):
         errors.append(f"snapshot.{name}.items must be an array")
         return []
-    if page.get("complete") is not True or page.get("truncated") is not False:
+    if (page.get("complete") is not True or page.get("truncated") is not False
+            or page.get("next_page") is not False):
         errors.append(f"snapshot.{name} is incomplete or truncated")
+    if name == "files" and len(items) >= 3000:
+        errors.append("snapshot.files reached the provider's 3000-file cap")
     if not isinstance(page.get("fetched_count"), int) or isinstance(page.get("fetched_count"), bool) or page["fetched_count"] != len(items):
         errors.append(f"snapshot.{name}.fetched_count does not match items")
     return items
@@ -124,6 +138,8 @@ def validate_receipt(policy: Any, receipt: Any, snapshot: Any) -> dict[str, Any]
 
     if snapshot.get("source") != "trusted-read-only-adapter":
         errors.append("snapshot must come from a trusted read-only adapter")
+    if not _positive_int(snapshot.get("author_actor_id")):
+        errors.append("snapshot.author_actor_id must be a provider-observed actor ID")
     if not isinstance(snapshot.get("from_fork"), bool):
         errors.append("snapshot.from_fork must be a provider-observed boolean")
     if snapshot.get("event") != "pull_request":
@@ -163,12 +179,24 @@ def validate_receipt(policy: Any, receipt: Any, snapshot: Any) -> dict[str, Any]
         by_id[record["id"]] = record
     latest_role: dict[str, dict[str, Any]] = {}
     latest_identity: dict[str, dict[str, Any]] = {}
+    sequences = set()
     for record in records:
         if isinstance(record, dict):
-            if isinstance(record.get("role"), str):
-                latest_role[record["role"]] = record
-            if isinstance(record.get("reviewer_identity"), str):
-                latest_identity[record["reviewer_identity"]] = record
+            sequence = record.get("sequence")
+            if not _positive_int(sequence) or sequence in sequences:
+                errors.append("technical review sequence is missing or duplicated")
+                continue
+            sequences.add(sequence)
+            role = record.get("role")
+            identity = record.get("reviewer_identity")
+            if isinstance(role, str) and (
+                role not in latest_role or sequence > latest_role[role]["sequence"]
+            ):
+                latest_role[role] = record
+            if isinstance(identity, str) and (
+                identity not in latest_identity or sequence > latest_identity[identity]["sequence"]
+            ):
+                latest_identity[identity] = record
     roles: dict[str, str] = {}
     for review_id in selected:
         record = by_id.get(review_id)
@@ -210,10 +238,18 @@ def validate_receipt(policy: Any, receipt: Any, snapshot: Any) -> dict[str, Any]
         if not isinstance(review, dict) or not _positive_int(review.get("id")) or not _positive_int(review.get("actor_id")):
             errors.append(f"snapshot.provider_reviews[{index}] has invalid identity")
             continue
+        submitted = _submitted_at(review.get("submitted_at"))
+        if submitted is None:
+            errors.append(f"snapshot.provider_reviews[{index}] has no trusted submitted_at")
+            continue
         if review["id"] in seen_ids:
             errors.append(f"snapshot.provider_reviews[{index}] duplicates an ID")
         seen_ids.add(review["id"])
-        latest[review["actor_id"]] = review
+        previous = latest.get(review["actor_id"])
+        if previous is None or (submitted, review["id"]) > (
+            _submitted_at(previous["submitted_at"]), previous["id"]
+        ):
+            latest[review["actor_id"]] = review
     approvals = set()
     for review_id in provider_ids:
         match = next((review for review in provider_reviews if isinstance(review, dict) and review.get("id") == review_id), None)
@@ -233,8 +269,8 @@ def validate_receipt(policy: Any, receipt: Any, snapshot: Any) -> dict[str, Any]
         approvals.add(actor)
     if len(approvals) < required_approvals:
         errors.append("trusted policy requires additional current provider approvals")
-    if receipt.get("independent_human_approval") is True:
-        errors.append("shared-credential evidence cannot assert independent human approval")
+    if receipt.get("independent_human_approval") is not False:
+        errors.append("receipt must explicitly deny independent human approval")
 
     valid = not errors
     claims["technical_reviews_recorded"] = valid and not missing

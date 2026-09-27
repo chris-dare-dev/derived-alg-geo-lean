@@ -33,7 +33,9 @@ changed-file digest; four technical review IDs; optional GitHub review IDs;
 and an explicit false `independent_human_approval` claim. Each technical
 review in the trusted live snapshot has a distinct role and runtime identity,
 passing verdict, active status, exact head/base/policy/file digests and an
-artifact SHA-256. The artifact digest binds the recorded review text; it does
+artifact SHA-256. A trusted runtime supplies a unique positive review sequence;
+the validator selects the greatest sequence for each role and identity, so
+reordering a fetched array cannot revive an earlier pass. The artifact digest binds the recorded review text; it does
 not authenticate who wrote it. The runtime that creates these records must
 retain the full reviewer output and authenticate its own agent/session identity
 independently of PR-controlled text. `technical_reviews_recorded` means these
@@ -50,7 +52,7 @@ must keep that constructor outside untrusted PR code.
 
 The adapter must fetch every page of PR files and provider reviews, preserve
 rename source and destination and removals, and mark a collection complete
-only after its final page. GitHub's PR file API caps responses at 3,000 files;
+only after its final page and must retain the absence of a `next` link. GitHub's PR file API caps responses at 3,000 files;
 a cap or unknown continuation is incomplete. The adapter must read the live
 PR/base/head and current review states both before and after collection. Any
 change, missing page, truncated result, deleted/renamed file mismatch,
@@ -64,7 +66,10 @@ rule before admission.
 The validator can observe a current GitHub `APPROVED` review by a distinct
 provider actor on the exact head when a future owner-approved policy requires
 one. It rejects an author or shared-credential actor, a dismissed/superseded
-approval, and incomplete provider results. Even this observation is labeled
+approval, and incomplete provider results. The adapter supplies the
+provider-observed author actor ID and each review's `submitted_at`; the
+validator selects the latest review per actor by submission time and review
+ID, regardless of array order. Even this observation is labeled
 `github_approval_observed`, not `independent_human_approval`. The current
 policy requires zero such reviews. A new required GitHub review setting,
 independent account, or trust-surface check is an owner decision, not an

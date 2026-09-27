@@ -31,6 +31,7 @@ def fixture() -> tuple[dict, dict, dict]:
             "id": f"review-{index}",
             "role": role,
             "reviewer_identity": f"agent-{index}",
+            "sequence": index,
             "state": "active",
             "verdict": "PASS",
             "head_commit": HEAD,
@@ -64,9 +65,9 @@ def fixture() -> tuple[dict, dict, dict]:
         "policy_sha256": review_authority.digest(policy),
         "author_actor_id": 234062931,
         "from_fork": False,
-        "files": {"items": files, "fetched_count": 1, "complete": True, "truncated": False},
-        "technical_reviews": {"items": records, "fetched_count": 4, "complete": True, "truncated": False},
-        "provider_reviews": {"items": [], "fetched_count": 0, "complete": True, "truncated": False},
+        "files": {"items": files, "fetched_count": 1, "complete": True, "truncated": False, "next_page": False},
+        "technical_reviews": {"items": records, "fetched_count": 4, "complete": True, "truncated": False, "next_page": False},
+        "provider_reviews": {"items": [], "fetched_count": 0, "complete": True, "truncated": False, "next_page": False},
     }
     return policy, receipt, snapshot
 
@@ -115,11 +116,20 @@ class ReviewAuthorityTests(unittest.TestCase):
 
     def test_truncated_or_incomplete_provider_results_fail(self) -> None:
         for collection in ("files", "technical_reviews", "provider_reviews"):
-            for defect in ({"complete": False}, {"truncated": True}, {"fetched_count": 99}):
+            for defect in ({"complete": False}, {"truncated": True}, {"next_page": True},
+                           {"fetched_count": 99}):
                 with self.subTest(collection=collection, defect=defect):
                     policy, receipt, snapshot = fixture()
                     snapshot[collection].update(defect)
                     self.assert_rejected(policy, receipt, snapshot, f"snapshot.{collection}")
+
+    def test_provider_file_cap_fails_closed(self) -> None:
+        policy, receipt, snapshot = fixture()
+        snapshot["files"]["items"] = [
+            {"path": f"file-{index}.txt", "status": "added"} for index in range(3000)
+        ]
+        snapshot["files"]["fetched_count"] = 3000
+        self.assert_rejected(policy, receipt, snapshot, "3000-file cap")
 
     def test_revoked_technical_review_fails(self) -> None:
         policy, receipt, snapshot = fixture()
@@ -129,10 +139,17 @@ class ReviewAuthorityTests(unittest.TestCase):
     def test_later_failed_technical_review_supersedes_an_earlier_pass(self) -> None:
         policy, receipt, snapshot = fixture()
         later = dict(snapshot["technical_reviews"]["items"][0])
-        later.update(id="review-5", verdict="NEEDS_CHANGES")
-        snapshot["technical_reviews"]["items"].append(later)
+        later.update(id="review-5", sequence=5, verdict="NEEDS_CHANGES")
+        snapshot["technical_reviews"]["items"].insert(0, later)
         snapshot["technical_reviews"]["fetched_count"] = 5
         self.assert_rejected(policy, receipt, snapshot, "superseded by a later technical review")
+
+    def test_duplicate_or_missing_technical_sequence_fails(self) -> None:
+        for bad in (None, 2):
+            with self.subTest(sequence=bad):
+                policy, receipt, snapshot = fixture()
+                snapshot["technical_reviews"]["items"][0]["sequence"] = bad
+                self.assert_rejected(policy, receipt, snapshot, "technical review sequence")
 
     def test_label_only_claim_has_no_review_evidence(self) -> None:
         policy, receipt, snapshot = fixture()
@@ -163,8 +180,9 @@ class ReviewAuthorityTests(unittest.TestCase):
         for record in snapshot["technical_reviews"]["items"]:
             record["policy_sha256"] = current_policy_digest
         snapshot["provider_reviews"] = {
-            "items": [{"id": 17, "actor_id": 900, "state": "APPROVED", "commit_id": HEAD}],
-            "fetched_count": 1, "complete": True, "truncated": False,
+            "items": [{"id": 17, "actor_id": 900, "state": "APPROVED", "commit_id": HEAD,
+                       "submitted_at": "2026-09-27T01:00:00Z"}],
+            "fetched_count": 1, "complete": True, "truncated": False, "next_page": False,
         }
         receipt["provider_review_ids"] = [17]
         result = review_authority.validate_receipt(policy, receipt, snapshot)
@@ -172,8 +190,9 @@ class ReviewAuthorityTests(unittest.TestCase):
         self.assertTrue(result["claims"]["github_approval_observed"])
         self.assertFalse(result["claims"]["independent_human_approval"])
 
-        snapshot["provider_reviews"]["items"].append(
-            {"id": 18, "actor_id": 900, "state": "DISMISSED", "commit_id": HEAD}
+        snapshot["provider_reviews"]["items"].insert(
+            0, {"id": 18, "actor_id": 900, "state": "DISMISSED", "commit_id": HEAD,
+                "submitted_at": "2026-09-27T02:00:00Z"}
         )
         snapshot["provider_reviews"]["fetched_count"] = 2
         self.assert_rejected(policy, receipt, snapshot, "revoked, superseded or stale")
@@ -186,8 +205,9 @@ class ReviewAuthorityTests(unittest.TestCase):
         for record in snapshot["technical_reviews"]["items"]:
             record["policy_sha256"] = current_policy_digest
         snapshot["provider_reviews"] = {
-            "items": [{"id": 17, "actor_id": 234062931, "state": "APPROVED", "commit_id": HEAD}],
-            "fetched_count": 1, "complete": True, "truncated": False,
+            "items": [{"id": 17, "actor_id": 234062931, "state": "APPROVED", "commit_id": HEAD,
+                       "submitted_at": "2026-09-27T01:00:00Z"}],
+            "fetched_count": 1, "complete": True, "truncated": False, "next_page": False,
         }
         receipt["provider_review_ids"] = [17]
         self.assert_rejected(policy, receipt, snapshot, "shared credential")
@@ -196,6 +216,21 @@ class ReviewAuthorityTests(unittest.TestCase):
         policy, receipt, snapshot = fixture()
         snapshot["event"] = "merge_group"
         self.assert_rejected(policy, receipt, snapshot, "merge-group")
+
+    def test_missing_author_actor_identity_fails_closed(self) -> None:
+        policy, receipt, snapshot = fixture()
+        del snapshot["author_actor_id"]
+        self.assert_rejected(policy, receipt, snapshot, "author_actor_id")
+
+    def test_human_approval_claim_must_be_explicitly_false(self) -> None:
+        for bad in (None, "yes", 1, True):
+            with self.subTest(value=bad):
+                policy, receipt, snapshot = fixture()
+                receipt["independent_human_approval"] = bad
+                self.assert_rejected(policy, receipt, snapshot, "explicitly deny")
+        policy, receipt, snapshot = fixture()
+        del receipt["independent_human_approval"]
+        self.assert_rejected(policy, receipt, snapshot, "explicitly deny")
 
     def test_untrusted_snapshot_source_fails(self) -> None:
         policy, receipt, snapshot = fixture()
