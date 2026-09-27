@@ -895,6 +895,25 @@ is not closed. -/
 #print axioms AlgebraicGeometry.Duality.Serre.BilinearData.surface_selfEuler_eq
 #print axioms AlgebraicGeometry.Duality.Serre.BilinearData.surface_selfEuler_le
 
+-- Abstract derived Serre duality is identified with the geometric twist,
+-- compared to sheaf duality for `i ≤ n`, and used to derive bounded Hom-finiteness.
+#print axioms AlgebraicGeometry.Duality.Serre.extSpaceAddEquiv
+#print axioms AlgebraicGeometry.Duality.Serre.sheafComparison
+#print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData
+#print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.canonicalTwistFunctor
+#print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.bilinear
+#print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.serre
+#print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.serreTwistIso
+#print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.extComparison_scalar
+#print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.twistOnSheaves
+#print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.serreDuality
+#print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.compat
+#print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.mk.inj
+#print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.mk.sizeOf_spec
+#print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.toSerreFunctorData
+#print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.finrank_eq_from_abstract
+#print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.homFiniteBoundedFromRest
+
 /- The `BilinearData` and `TrivialCanonical` fields, and the `HasExt` instance the file needs.
 
 These were unaudited not by omission but because `Bilinear.lean` did not elaborate: the sweep
