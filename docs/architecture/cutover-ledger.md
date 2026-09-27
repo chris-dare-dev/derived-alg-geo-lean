@@ -2373,7 +2373,7 @@ or exactness was strengthened by relocation.
   owner without a forbidden `Algebra -> Topology` edge.
 - Basic-open covers on prime spectra:
   `RingTheory/Spectrum/Prime/CoversTop.lean` owns
-  `PrimeSpectrum.basicOpen_coversTop_of_span_eq_top` for arbitrary
+  `PrimeSpectrum.coversTop_basicOpen_of_span_eq_top` for arbitrary
   commutative semirings, bridging a unit-ideal generating family to a cover
   of the open-set site. Its proof composes the prime-spectrum supremum
   criterion with `TopCat.Opens.grothendieckTopology_coversTop`. The former

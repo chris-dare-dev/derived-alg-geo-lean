@@ -14,7 +14,7 @@ the unit ideal. This translates the algebraic criterion for a cover into
 
 ## Main results
 
-* `PrimeSpectrum.basicOpen_coversTop_of_span_eq_top` converts a unit-ideal generating family into
+* `PrimeSpectrum.coversTop_basicOpen_of_span_eq_top` converts a unit-ideal generating family into
   a covering family on the open-set site.
 
 ## Implementation notes
@@ -43,7 +43,7 @@ namespace PrimeSpectrum
 
 The algebraic criterion `Ideal.span (Set.range g) = ⊤` is equivalent to the opens having supremum
 `⊤`; a topological open cover then gives a covering family on the open-set site. -/
-lemma basicOpen_coversTop_of_span_eq_top {R : Type u} [CommSemiring R] {I : Type v}
+lemma coversTop_basicOpen_of_span_eq_top {R : Type u} [CommSemiring R] {I : Type v}
     (g : I → R) (hg : Ideal.span (Set.range g) = ⊤) :
     (_root_.Opens.grothendieckTopology (TopCat.of (PrimeSpectrum R))).CoversTop
       (fun i => PrimeSpectrum.basicOpen (g i)) :=

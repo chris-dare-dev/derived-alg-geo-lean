@@ -12,14 +12,14 @@ import Mathlib.CategoryTheory.Sites.Spaces
 `CategoryTheory.GrothendieckTopology.CoversTop` is the site-theoretic form of a covering family.
 For the open-set site of a topological space, an open family whose supremum is `⊤` covers the
 terminal object. On a prime spectrum, the separate lemma
-`PrimeSpectrum.basicOpen_coversTop_of_span_eq_top` translates
+`PrimeSpectrum.coversTop_basicOpen_of_span_eq_top` translates
 the algebraic criterion that a family generates the unit ideal.
 
 ## Main results
 
 * `TopCat.Opens.grothendieckTopology_coversTop` — a family of opens with `⨆ i, U i = ⊤` covers
   the terminal object.
-* `PrimeSpectrum.basicOpen_coversTop_of_span_eq_top` — in
+* `PrimeSpectrum.coversTop_basicOpen_of_span_eq_top` — in
   `RingTheory/Spectrum/Prime/CoversTop.lean`, a unit-ideal generating family gives a cover of the
   prime spectrum by basic opens.
 

@@ -1252,7 +1252,7 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms Coh.faithful_ι
 #print axioms Scheme.coherent_isClosedUnderIsomorphisms
 #print axioms TopCat.Opens.grothendieckTopology_coversTop
-#print axioms PrimeSpectrum.basicOpen_coversTop_of_span_eq_top
+#print axioms PrimeSpectrum.coversTop_basicOpen_of_span_eq_top
 #print axioms Scheme.Hom.opensRangeEquivalence
 #print axioms Scheme.Hom.opensRangeModulesEquivalence
 #print axioms Scheme.Hom.restrictFunctorIsoOver

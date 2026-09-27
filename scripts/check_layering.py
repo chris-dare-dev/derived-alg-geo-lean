@@ -1815,23 +1815,23 @@ def _rule_prime_spectrum_covers_top(
                 "prime-spectrum topology must remain scheme-free"
             )
         if not re.search(
-            r"(?m)^lemma basicOpen_coversTop_of_span_eq_top\b", text
+            r"(?m)^lemma coversTop_basicOpen_of_span_eq_top\b", text
         ):
             failures.append(
-                f"{owner}: must declare basicOpen_coversTop_of_span_eq_top at the canonical owner"
+                f"{owner}: must declare coversTop_basicOpen_of_span_eq_top at the canonical owner"
             )
 
     declaration_sites = [
         module
         for module, (path, _imports, _namespaces) in modules.items()
         if re.search(
-            r"(?m)^lemma basicOpen_coversTop_of_span_eq_top\b",
+            r"(?m)^lemma coversTop_basicOpen_of_span_eq_top\b",
             path.read_text(encoding="utf-8"),
         )
     ]
     if declaration_sites != [owner]:
         failures.append(
-            "basicOpen_coversTop_of_span_eq_top must be declared exactly once at "
+            "coversTop_basicOpen_of_span_eq_top must be declared exactly once at "
             f"{owner}; found {declaration_sites}"
         )
     return failures, (

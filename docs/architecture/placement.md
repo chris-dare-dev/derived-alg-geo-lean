@@ -50,7 +50,7 @@ than choosing the weakest type appearing in the statement.
 in the lattice of opens of a prime spectrum, but `PrimeSpectrum.basicOpen` is defined in
 `RingTheory/Spectrum/Prime/Topology.lean`, so it lives there and not in
 `Topology/` or `Algebra/`. The basic-open cover bridge
-`PrimeSpectrum.basicOpen_coversTop_of_span_eq_top` also lives under
+`PrimeSpectrum.coversTop_basicOpen_of_span_eq_top` also lives under
 `RingTheory/Spectrum/Prime/`: it uses only a commutative semiring and
 `PrimeSpectrum.basicOpen`, then composes the prime-spectrum supremum criterion with the
 topological open-site cover theorem. Stalks of module presheaves are stated with
