@@ -189,6 +189,7 @@ class ProfileActionTests(unittest.TestCase):
         run = {
             "id": 36334136413, "run_attempt": 2, "head_sha": SAMPLE["head_sha"],
             "event": "pull_request", "status": "completed", "conclusion": "success",
+            "path": ".github/workflows/ci.yml",
             "created_at": "2026-09-27T17:27:02Z", "run_started_at": "2026-09-27T17:27:02Z",
         }
         old = {
@@ -218,6 +219,7 @@ class ProfileActionTests(unittest.TestCase):
         self.assertIsNone(result["jobs"][0]["duration_seconds"])
         self.assertEqual(result["phase_durations_seconds"]["lake_build"], 0.0)
         self.assertEqual(result["wall_clock_seconds"], 92.0)
+        self.assertEqual(result["selected_job_active_seconds"], 92.0)
         self.assertEqual(result["run"]["platform"], "github-hosted-ubuntu")
 
         # GitHub may report the attempt start one second before created_at.
@@ -259,6 +261,8 @@ class ProfileActionTests(unittest.TestCase):
         self.assertEqual(ci["dependency_wait_seconds"], 2820.0)
         self.assertEqual(ci["scheduler_gap_seconds"], 1.0)
         self.assertEqual(ci["runner_queue_seconds"], 2.0)
+        self.assertEqual(result["wall_clock_seconds"], 2704.0)
+        self.assertEqual(result["selected_job_active_seconds"], 2701.0)
 
     def test_duplicate_job_name_rejected_when_graph_is_ambiguous(self) -> None:
         payload = copy.deepcopy(SAMPLE)
@@ -272,6 +276,7 @@ class ProfileActionTests(unittest.TestCase):
         run = {
             "id": SAMPLE["id"], "run_attempt": 1,
             "head_sha": SAMPLE["head_sha"], "event": SAMPLE["event"],
+            "path": ".github/workflows/ci.yml",
             "status": "completed", "conclusion": "success",
             "created_at": SAMPLE["created_at"],
             "run_started_at": SAMPLE["run_started_at"],
@@ -301,6 +306,7 @@ class ProfileActionTests(unittest.TestCase):
         run = {
             "id": SAMPLE["id"], "run_attempt": 1,
             "head_sha": SAMPLE["head_sha"], "event": SAMPLE["event"],
+            "path": ".github/workflows/ci.yml",
             "status": "completed", "conclusion": "success",
             "created_at": SAMPLE["created_at"],
             "run_started_at": SAMPLE["run_started_at"],
@@ -325,6 +331,15 @@ class ProfileActionTests(unittest.TestCase):
         altered["jobs_pages"][0]["response"]["jobs"] = []
         with self.assertRaisesRegex(ValueError, "differ from flattened"):
             profile_actions.profile_bundle(altered)
+
+        for field, value in (("event", "pull_request"),
+                             ("path", ".github/workflows/other.yml")):
+            with self.subTest(field=field):
+                altered = copy.deepcopy(bundle)
+                altered["attempt"] = copy.deepcopy(altered["attempt"])
+                altered["attempt"][field] = value
+                with self.assertRaisesRegex(ValueError, "identity is inconsistent"):
+                    profile_actions.profile_bundle(altered)
 
 
 if __name__ == "__main__":

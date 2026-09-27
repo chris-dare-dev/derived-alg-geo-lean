@@ -454,8 +454,13 @@ def profile_run(payload: Any) -> dict[str, Any]:
         "attribution_uncertain_failures": uncertain_failures,
         "pending_jobs": pending_jobs,
         "wall_clock_seconds": (
-            _union_seconds(job_intervals) if job_intervals and not incomplete_job_interval
-            else None
+            round((max(end for _, end in job_intervals) -
+                   min(start for start, _ in job_intervals)).total_seconds(), 3)
+            if job_intervals and not incomplete_job_interval else None
+        ),
+        "selected_job_active_seconds": (
+            _union_seconds(job_intervals)
+            if job_intervals and not incomplete_job_interval else None
         ),
         "workflow_start_delay_seconds": run_start_delay,
         "terminal_job_count": terminal_jobs,
@@ -518,6 +523,10 @@ def profile_bundle(bundle: Any, job_needs: dict[str, list[str]] | None = None) -
     if (
         run.get("id") != attempt.get("id")
         or run.get("head_sha") != attempt.get("head_sha")
+        or run.get("event") != attempt.get("event")
+        or not isinstance(run.get("path"), str)
+        or not run["path"]
+        or run.get("path") != attempt.get("path")
         or not isinstance(attempt.get("run_attempt"), int)
         or any(
             not isinstance(job, dict)

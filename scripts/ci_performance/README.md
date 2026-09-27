@@ -6,8 +6,10 @@ and [attempt-jobs](https://docs.github.com/en/rest/actions/workflow-jobs#list-jo
 endpoints. It requires a completed run and attempt, fetches every page of attempt
 jobs, then re-reads the run to reject a changing identity or status. Schema 2
 retains each response envelope with its request URL, headers, Link relations,
-advertised count, and job objects alongside the flattened inventory. It stores
-the provider JSON and a SHA-256 sidecar. The digest detects accidental edits;
+advertised count, and job objects alongside the flattened inventory. It
+requires the selected attempt's event and workflow path to agree with the
+parent run during collection and profile normalization. It stores the provider
+JSON and a SHA-256 sidecar. The digest detects accidental edits;
 it is not a signature or a CI verdict. Choose a new output path for every
 capture. A GitHub token with Actions read permission is required.
 
@@ -34,8 +36,11 @@ from a failed job conclusion.
 `profile_actions.py profile <run.json>` accepts a normalized offline fixture.
 The normalized profile is schema 3; the raw provider capture remains schema 2.
 For both entry points, phase times are unions of intervals: concurrent phases
-can overlap, and they must not be summed as a partition of wall time. Workflow
-start delay, prerequisite wait, scheduler gap after a job is eligible, and
+can overlap, and they must not be summed as a partition of wall time.
+`wall_clock_seconds` spans the first selected job start through the last
+selected job completion, including idle gaps; `selected_job_active_seconds`
+is the union of selected job execution intervals and excludes those gaps.
+Workflow start delay, prerequisite wait, scheduler gap after a job is eligible, and
 runner queue are distinct. A negative timestamp interval is retained as an
 anomaly with unknown duration for its phase. Before aggregation, each job is
 classified `selected`, `carried` or `uncertain` using its execution interval
