@@ -716,3 +716,174 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   additive-shift assumptions. The proposed owner is outside the frozen #921
   file list, so this lift is deferred.
 - state:              UNVERIFIED
+
+
+### 2026-09-27 — extension of the resolution-degree-zero augmentation target (planned)
+- chunk:              sf8-554-total-zero-comparison
+- reviewing commit:   1d29d6696bb048fc2a3e648fab4b39931d836488
+- found by:           altitude-scout
+- proposed ancestor:  `HomologicalComplex.extendSingleIso` in
+  `Mathlib.Algebra.Homology.Embedding.Extend`
+- weaker hypotheses:  an arbitrary category with zero morphisms and a zero
+  object, decidable equality on both complex index types, an embedding of
+  arbitrary complex shapes, and an equality identifying the image of the
+  single supported degree; no schemes, abelianness, or flatness
+- pin status:         PIN-CONFIRMED .lake/packages/mathlib/Mathlib/Algebra/Homology/Embedding/Extend.lean:293
+- source note:        At Mathlib pin `520045ab14e26149ee970e2e617ca04b09bde5d6`,
+  `extendSingleIso e X i i' h` identifies the extension of the single complex
+  at `i` with the single complex at `i'`. Specializing to
+  `embeddingDownNat`, `i = 0`, and `i' = 0` supplies the objectwise
+  identification of the inner complexes in the target of
+  `freeYonedaSheafCoproductTotalAugmentationToSingleZero`. It does not
+  identify a total complex with the input, and its declaration is an
+  objectwise isomorphism rather than the required natural isomorphism of
+  totalization functors. The functorial assembly and total comparison are
+  still obligations; no proof was compiled by this research scout.
+- state:              UNVERIFIED
+
+### 2026-09-27 — exchanging the supported axis before a single-zero total comparison (planned)
+- chunk:              sf8-554-total-zero-comparison
+- reviewing commit:   1d29d6696bb048fc2a3e648fab4b39931d836488
+- found by:           altitude-scout
+- proposed ancestor:  `HomologicalComplex₂.totalFlipIso` in
+  `Mathlib.Algebra.Homology.TotalComplexSymmetry`
+- weaker hypotheses:  a preadditive category, arbitrary input and output
+  complex shapes with total-shape structures in both orders and compatible
+  symmetry signs, existence of the chosen bicomplex total, and decidable
+  equality on the output indices; no schemes, flatness, or abelianness
+- pin status:         PIN-CONFIRMED .lake/packages/mathlib/Mathlib/Algebra/Homology/TotalComplexSymmetry.lean:114
+- source note:        This is the canonical isomorphism
+  `K.flip.total c ≅ K.total c`. The repository already proves its generic
+  naturality in `Algebra/Homology/SpectralSequence/TotalFlipNaturality.lean:47`.
+  It permits a second-axis support comparison to reuse a first-axis
+  comparison, but does not itself collapse a single supported axis.
+  The existing `singleZeroTotalIso` in
+  `Algebra/Homology/SpectralSequence/FilteredTotalComplexAdjacent.lean:410`
+  and its naturality in `TotalQuasiIso.lean:248` are explicitly restricted
+  to `AddCommGrpCat`, so they do not instantiate directly for `X.Modules`.
+  `CategoryTheory/Sites/SheafCohomology/Cech/TotalComparison.lean:154`
+  demonstrates composition through this flip and the existing single-zero
+  comparison for abelian groups. A generic extraction and the required
+  bicomplex adapter remain to be checked; none was compiled by this scout.
+- state:              UNVERIFIED
+
+### 2026-09-27 — natural recovery of the supported term of a single complex (planned)
+- chunk:              sf8-554-total-zero-comparison
+- reviewing commit:   1d29d6696bb048fc2a3e648fab4b39931d836488
+- found by:           altitude-scout
+- proposed ancestor:  `HomologicalComplex.singleCompEvalIsoSelf` in
+  `Mathlib.Algebra.Homology.Single`
+- weaker hypotheses:  an arbitrary category with zero morphisms and a zero
+  object, an arbitrary complex shape, decidable equality on its indices,
+  and a chosen supported degree; no preadditivity or geometric assumptions
+- pin status:         PIN-CONFIRMED .lake/packages/mathlib/Mathlib/Algebra/Homology/Single.lean:103
+- source note:        The natural isomorphism
+  `single V c j ⋙ eval V c j ≅ 𝟭 V` recovers the surviving degree,
+  while the adjacent `isZero_single_comp_eval` treats all other degrees.
+  This supplies canonical component data for the single-axis comparison;
+  it is an evaluation theorem and does not subsume the direct-sum total
+  comparison or its differential compatibility. The related pinned
+  `singleMapHomologicalComplex` in `Algebra/Homology/Additive.lean:266`
+  already makes single-complex formation commute with any functor
+  preserving zero morphisms, but likewise contains no totalization result.
+  Source inspection did not find a general single-complex total theorem
+  at the pin. The three-candidate cap was reached on disk, so no external
+  sources were fetched. No proof was compiled by this scout.
+- state:              UNVERIFIED
+
+
+### 2026-09-27 — single-zero total comparison outside abelian groups (planned)
+- chunk:              sf8-554-total-zero-comparison
+- reviewing commit:   1d29d6696bb048fc2a3e648fab4b39931d836488
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  the canonical `HomologicalComplex₂.singleZeroTotalIso`
+  and `singleZeroTotalIso_naturality` beside Mathlib's total-complex API,
+  extracted from the current spectral-sequence consumers
+- weaker hypotheses:  `{C : Type u} [Category.{v} C] [Preadditive C]
+  [HasZeroObject C]`, an arbitrary `A : CochainComplex C ℤ`, and only
+  `[(singleZeroBicomplex A).HasTotal (ComplexShape.up ℤ)]`; naturality also
+  takes an arbitrary `B`, its selected-total instance, and `f : A ⟶ B`.
+  No `Abelian C`, all-coproducts, boundedness, flatness, or scheme assumption.
+- pin status:         PIN-CONFIRMED Mathlib
+  `520045ab14e26149ee970e2e617ca04b09bde5d6`
+- source note:        `.lake/sf8_hypothesis_minimal.lean` copied the existing
+  comparison and naturality proof into a scratch namespace, replacing
+  `AddCommGrpCat` with `C`. The only proof adjustment was to expose generic
+  componentwise cancellation for an isomorphism of complexes, proved by
+  `HomologicalComplex.comp_f` and the iso identities. The complete proof,
+  naturality, and the composite `totalFlipIso ≪≫ singleZeroTotalIso` compiled
+  with `LEAN_NUM_THREADS=2 /home/chris-dare/.elan/bin/lake env lean
+  .lake/sf8_hypothesis_minimal.lean`. The printed axiom sets for the comparison
+  and naturality contain only `propext`, `Classical.choice`, and `Quot.sound`.
+  The subsequent support witness below removes even the selected-total
+  assumptions. These are scratch witnesses, not merged public declarations.
+- state:              L (proof-witness verified)
+
+### 2026-09-27 — single support supplies the required total coproducts (planned)
+- chunk:              sf8-554-total-zero-comparison
+- reviewing commit:   1d29d6696bb048fc2a3e648fab4b39931d836488
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  the same canonical single-zero bicomplex comparison
+  beside Mathlib's total-complex API
+- weaker hypotheses:  `{C : Type u} [Category.{v} C] [Preadditive C]
+  [HasZeroObject C]` and an arbitrary `A : CochainComplex C ℤ`; no supplied
+  `HasTotal`, countable coproducts, finite biproducts, or arbitrary coproducts.
+  Naturality adds only `B : CochainComplex C ℤ` and `f : A ⟶ B`.
+- pin status:         PIN-CONFIRMED Mathlib
+  `520045ab14e26149ee970e2e617ca04b09bde5d6`
+- source note:        `.lake/sf8_hypothesis_support.lean` reorganizes the
+  existing surviving-summand/inverse calculation into a cofan with point
+  `A.X n`. Its universal property selects the `(0,n)` summand; every other
+  summand is zero. `GradedObject.CofanMapObjFun.hasMap` then supplies
+  `singleZeroHasTotal`. The comparison, its naturality, and the second-axis
+  comparison through `totalFlipIso` compile without any colimit assumption.
+  `.lake/sf8_hypothesis_narrow.lean` additionally compiles the same witness
+  with only `Mathlib.Algebra.Homology.Single` and
+  `Mathlib.Algebra.Homology.TotalComplexSymmetry` imports, using the underlying
+  `HomologicalComplex.single` instead of the definitionally equal
+  `CochainComplex.singleFunctor` spelling. Command:
+  `LEAN_NUM_THREADS=2 /home/chris-dare/.elan/bin/lake env lean
+  .lake/sf8_hypothesis_narrow.lean`. Exit code 0; comparison and naturality
+  depend only on `propext`, `Classical.choice`, and `Quot.sound`. No stable
+  Lean source was edited. This records the support argument for the planned
+  extraction, not a general coproduct-existence theorem for arbitrary totals.
+- state:              L (proof-witness verified)
+
+### 2026-09-27 — drop the zero object from the single-zero comparison (attempted)
+- chunk:              sf8-554-total-zero-comparison
+- reviewing commit:   1d29d6696bb048fc2a3e648fab4b39931d836488
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  the canonical single-zero bicomplex constructor
+- weaker hypotheses:  `{C : Type u} [Category.{v} C] [Preadditive C]` and
+  `A : CochainComplex C ℤ`, deliberately omitting `HasZeroObject C`
+- pin status:         PIN-CONFIRMED Mathlib
+  `520045ab14e26149ee970e2e617ca04b09bde5d6`
+- source note:        `.lake/sf8_hypothesis_nozero.lean`, compiled with
+  `LEAN_NUM_THREADS=1 /home/chris-dare/.elan/bin/lake env lean`, fails at
+  `(CochainComplex.singleFunctor (CochainComplex C ℤ) 0).obj A` with the exact
+  diagnostic `failed to synthesize instance of type class
+  HasZeroObject (CochainComplex C ℤ)`. The canonical single complex needs an
+  actual zero object to populate every unsupported degree. This is a boundary
+  of the current construction, not a claim about all possible alternate APIs.
+- state:              FALSIFIED compiler witness: the current single-complex
+  constructor does not accept this hypothesis deletion.
+
+### 2026-09-27 — replace preadditivity by zero morphisms for totalization (attempted)
+- chunk:              sf8-554-total-zero-comparison
+- reviewing commit:   1d29d6696bb048fc2a3e648fab4b39931d836488
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `HomologicalComplex₂.total`
+- weaker hypotheses:  `{C : Type u} [Category.{v} C] [HasZeroMorphisms C]
+  [HasZeroObject C]`, deliberately omitting `Preadditive C`
+- pin status:         PIN-CONFIRMED Mathlib
+  `520045ab14e26149ee970e2e617ca04b09bde5d6`
+- source note:        `.lake/sf8_hypothesis_nopreadditive.lean`, compiled with
+  `LEAN_NUM_THREADS=1 /home/chris-dare/.elan/bin/lake env lean`, fails at
+  `HomologicalComplex₂.total (C := C)` with the exact diagnostic
+  `failed to synthesize instance of type class Preadditive C`. The existing
+  proof also explicitly uses `Preadditive.comp_add`, `Preadditive.add_comp`,
+  and the integer-unit signs in the total differential. Single support does
+  not remove the preadditive parameter from this canonical total API. A
+  different construction would be outside this proof-based scout's scope.
+- state:              FALSIFIED compiler witness: zero morphisms alone do not
+  support Mathlib's existing total-complex construction.

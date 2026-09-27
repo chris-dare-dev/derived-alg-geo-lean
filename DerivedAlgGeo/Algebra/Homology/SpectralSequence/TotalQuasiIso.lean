@@ -233,37 +233,6 @@ private noncomputable def singleColumnBicomplexMap (f : K ⟶ L) (p : ℤ) :
     singleColumnBicomplex K p ⟶ singleColumnBicomplex L p :=
   (CochainComplex.singleFunctor (CochainComplex AddCommGrpCat.{w} ℤ) p).map (f.f p)
 
-variable {A B : CochainComplex AddCommGrpCat.{w} ℤ}
-
-/-- Naturality map for a bicomplex supported in horizontal degree zero. -/
-noncomputable def singleZeroBicomplexMap (f : A ⟶ B) :
-    singleZeroBicomplex A ⟶ singleZeroBicomplex B :=
-  (CochainComplex.singleFunctor (CochainComplex AddCommGrpCat.{w} ℤ) 0).map f
-
-set_option backward.defeqAttrib.useBackward true in
-set_option backward.isDefEq.respectTransparency false in
-/-- The total-complex identification for a bicomplex supported in horizontal degree zero is
-natural. -/
-@[reassoc]
-lemma singleZeroTotalIso_naturality (f : A ⟶ B) :
-    total.map (singleZeroBicomplexMap f) (ComplexShape.up ℤ) ≫
-        (singleZeroTotalIso B).hom =
-      (singleZeroTotalIso A).hom ≫ f := by
-  apply HomologicalComplex.Hom.ext
-  funext n
-  rw [← cancel_epi (singleZeroTotalXIso A n).inv]
-  dsimp [singleZeroTotalIso]
-  simp [singleZeroTotalXIso, singleZeroBicomplexMap, singleZeroBicomplex,
-    singleZeroXIso]
-  change (HomologicalComplex.singleObjXSelf (ComplexShape.up ℤ) 0 A).inv.f n ≫
-      (((HomologicalComplex.single (CochainComplex AddCommGrpCat.{w} ℤ)
-        (ComplexShape.up ℤ) 0).map f).f 0).f n ≫
-        (HomologicalComplex.singleObjXSelf (ComplexShape.up ℤ) 0 B).hom.f n = f.f n
-  rw [HomologicalComplex.single_map_f_self]
-  simp
-
-set_option backward.defeqAttrib.useBackward true in
-set_option backward.isDefEq.respectTransparency false in
 /-- The identification of a single column with a shifted degree-zero column is natural. -/
 @[reassoc]
 private lemma singleColumnShiftIso_naturality (f : K ⟶ L) (p : ℤ) :
