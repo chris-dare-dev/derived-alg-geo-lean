@@ -25,9 +25,17 @@ would ask them, decide yourself, and write the decision down.
    work the others meanwhile.
 4. A `blocked` label is stale when every blocker the body names is closed. Work
    the issue, and say so in its PR.
-5. Work an epic through its open child issues. If it has none, work its next
+5. A `research` label is a triage signal, not proof that the research remains
+   open. Compare the issue's stated research criterion with its comments and
+   recorded findings. If the criterion is complete and the label is the sole
+   preflight blocker, reconcile only that stale label when the active run
+   authorization or an explicit owner direction permits it; record the evidence
+   and rerun preflight. If label changes are not authorized, continue other
+   queued work rather than stopping the run. Keep unresolved research findings
+   blocking.
+6. Work an epic through its open child issues. If it has none, work its next
    well-defined slice as a progress PR.
-6. The run ends when the queue is empty. For a milestone, look once more for
+7. The run ends when the queue is empty. For a milestone, look once more for
    issues added while you worked.
 
 While one PR waits on CI you may start the next issue in its own worktree. Keep
