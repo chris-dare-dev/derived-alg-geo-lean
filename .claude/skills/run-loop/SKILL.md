@@ -260,6 +260,24 @@ no more than two issues in flight.
      worktree. For a progress PR, the next item is the next slice of the same
      issue, until its definition of done is met.
 
+## Milestone retrospective
+
+After each PR merges or is parked, and again when an issue closes, post a
+separate `Loop retrospective` comment on the issue. Keep the short loop-state
+comment for resumption. Run `python3 scripts/loop_transcripts.py sync` so the
+latest transcript is present. Name the root and subagent transcript archive run,
+the redacted command table, and the successful and failed tool calls that
+matter to the milestone. Supplement the archive when it omits nested tool
+calls or their outcomes. Record tool, documentation, stale-state and reviewer
+friction, the recovery taken, and exact commits or links. Raw transcripts stay
+in the owner-only local archive, never in Git.
+
+Examine the agents and tools actually used. Name one or two additional or
+differently scoped agents or tools that would have saved work, the concrete
+bottleneck, and the expected benefit. State whether to use them in the next
+slice. A research agent is not a substitute for any of the four independent
+same-commit reviewers, and a retrospective does not reset a review budget.
+
 ## Loop state
 
 Your context will be compacted, and the run may be cut off or moved to another
