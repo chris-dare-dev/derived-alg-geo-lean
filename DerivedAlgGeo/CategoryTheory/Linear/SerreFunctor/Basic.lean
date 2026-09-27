@@ -40,6 +40,9 @@ No shift or triangulation is needed for the definition.  Hom-finiteness is a
 separate property and appears only where double-dual or dimension arguments
 actually spend it.
 
+The naturality fields alone imply that the Serre endofunctor is additive;
+`SerreFunctorData.additive` provides this fact without a global instance.
+
 The would-be functor-level packaging has variance `C × Cᵒᵖ`: dualising
 reverses the contravariance/covariance of `Hom(A,B)`.  It is deliberately not
 exported at these general universes.  If `k : Type w` and morphisms live in
@@ -119,6 +122,21 @@ end SerreCategoryData
 namespace SerreFunctorData
 
 variable {k C} (D : SerreFunctorData k C)
+
+/-- Naturality of Serre duality makes its endofunctor additive, without a
+Hom-finiteness or equivalence assumption. -/
+theorem additive : D.S.Additive where
+  map_add := by
+    intro A B f g
+    let φ : Module.Dual k (A ⟶ D.S.obj A) :=
+      (D.eta A (D.S.obj A)).symm (𝟙 (D.S.obj A))
+    have hmap (q : A ⟶ B) : D.S.map q =
+        D.eta B (D.S.obj A) (φ.comp (Linear.leftComp k (D.S.obj A) q)) := by
+      simpa [φ] using (D.naturality_left q φ).symm
+    rw [hmap (f + g), hmap f, hmap g, ← map_add]
+    congr 1
+    ext h
+    simp [Linear.leftComp, Preadditive.add_comp]
 
 /-- The Serre pairing `Hom(A,B) × Hom(B,S A) → k`. -/
 noncomputable def pairing (A B : C) :

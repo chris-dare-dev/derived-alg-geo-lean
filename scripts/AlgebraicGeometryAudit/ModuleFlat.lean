@@ -7,3 +7,5 @@ predicate concerns one module sheaf and one morphism and now lives in
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Flat
 
 #print axioms AlgebraicGeometry.Scheme.Modules.IsFlatOver
+#print axioms AlgebraicGeometry.Scheme.Modules.isFlatOverId_iff_stalkwiseFlat
+#print axioms AlgebraicGeometry.Scheme.Modules.isFlatOverId_coprod

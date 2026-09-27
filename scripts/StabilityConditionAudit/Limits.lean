@@ -7,4 +7,6 @@ import DerivedAlgGeo.CategoryTheory.Limits
 /-! ## Preservation through composition and reflective targets -/
 
 #print axioms CategoryTheory.Limits.preservesColimit_comp_left
+#print axioms CategoryTheory.preservesColimitIso_naturality
+#print axioms CategoryTheory.preservesColimitIso_naturality_assoc
 #print axioms CategoryTheory.Adjunction.preservesColimitsOfShape_of_comp_left

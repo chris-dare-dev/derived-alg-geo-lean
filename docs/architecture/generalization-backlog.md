@@ -28,7 +28,7 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
 
 | State | Meaning |
 |---|---|
-| `UNVERIFIED` | Proposed. The general statement has not been compiled. |
+| `UNVERIFIED` | The lift is not yet confirmed in merged canonical code. A proof may have been compiled in a scratch probe or an unmerged candidate; record that evidence in the source note. |
 | `CONFIRMED <PR>` | The lift was implemented and merged. |
 | `FALSIFIED <counterexample>` | The general statement is false. Leaves stay separate. |
 
@@ -450,4 +450,250 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
 - proposed ancestor:  `CategoryTheory.Functor.ExactBifunctor.lift₂`, generalized to distinct domain, second-input, and output `ObjectProperty` full subcategories
 - weaker hypotheses:  an ambient bifunctor on three (possibly distinct) triangulated categories with a supplied `ExactBifunctor`, three object properties whose full subcategories inherit triangulated structures, and an explicit closure witness from the first two properties into the output property; no single-category or same-property identification among the three positions
 - source note:        This is a plausible API generalization inferred from the current restriction's use of one category and property for all three positions. The distinct-category coherence transport was not proved or compiled during this review.
+- state:              UNVERIFIED
+
+### 2026-09-26 — generation-time `+1` submultiplicativity without `P.Nonempty`
+- chunk:              rou1-920-envelope-composition
+- reviewing commit:   b674a436dd002da2487d744531f804ddbb795628
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `CategoryTheory.ObjectProperty.generationTime` and the
+  planned envelope-composition API
+- weaker hypotheses:  the scalar inequality
+  `P.generationTime R + 1 ≤ (P.generationTime Q + 1) *
+  (Q.generationTime R + 1)` needs no separate `[P.Nonempty]` binder. The
+  iterated-envelope composition law and zero-stage fixed-point statement also
+  hold without `[P.Nonempty]`; the fixed-point statement additionally needs no
+  `[IsTriangulated C]`.
+- pin status:         PIN-CONFIRMED for the corollary proof route
+- source note:        `CategoryTheory.ObjectProperty.generationTime_add_one_submultiplicative`
+  proves the scalar inequality by splitting the empty-generator case from
+  finite generation-time witnesses. `triangEnvelopeIter_compose` handles an
+  empty property by showing all its iterates are bottom; the nonempty branch
+  uses the fixed-point lemma. The fixed-point proof uses
+  `triangEnvelopeIter_succ`, which needs only the shared pretriangulated
+  context, while the composition proof uses the triangulated stage-addition
+  API.
+- state:              L (proof-witness verified)
+
+### 2026-09-26 — products of retract-closed object properties
+- chunk:              rou1-920-envelope-composition
+- reviewing commit:   12b1f252d33ca17406fc85197fa060c33794fc78
+- found by:           abstraction-adversary
+- proposed ancestor:  `Mathlib.CategoryTheory.ObjectProperty.Retract`
+- weaker hypotheses:  a category with binary products and an object property
+  `Q` closed under binary products; no additive, shift, or triangulated
+  structure
+- pin status:         UPSTREAM-ONLY (the pinned
+  `ObjectProperty/Retract.lean` and `ObjectProperty/FiniteProducts.lean`
+  provide no such closure instance)
+- source note:        The private `retractClosure_isClosedUnderBinaryProducts`
+  proof constructs products of two retracts componentwise and transfers the
+  product property across an isomorphism. Whether this belongs as a general
+  closure API in Mathlib's retract module remains to be confirmed.
+- state:              UNVERIFIED
+
+### 2026-09-26 — products of extension-closed object properties
+- chunk:              rou1-920-envelope-composition
+- reviewing commit:   12b1f252d33ca17406fc85197fa060c33794fc78
+- found by:           abstraction-adversary
+- proposed ancestor:  `Mathlib.CategoryTheory.Triangulated.Subcategory`
+- weaker hypotheses:  the existing pretriangulated context, binary products,
+  and binary-product closure of both input properties; no `IsTriangulated`
+  or nonemptiness assumption
+- pin status:         UPSTREAM-ONLY (the pinned `Subcategory.lean` has only
+  the more restrictive closure instance requiring a triangulated object
+  property)
+- source note:        The private `extensionProduct_prop_prod` and
+  `extensionProduct_isClosedUnderBinaryProducts` proofs form products of the
+  input distinguished triangles using Mathlib's
+  `productTriangle_distinguished`. Whether to expose this weaker closure
+  result as general Subcategory API remains to be confirmed.
+- state:              UNVERIFIED
+
+### 2026-09-26 — exact-functor transport of finite triangulated-generation stages
+- chunk:              rou1-921-generation-functor-transport
+- reviewing commit:   e83b614078d491b7f1d8dab085bf494fddb32ebc
+- found by:           altitude-scout
+- proposed ancestor:  `CategoryTheory.Triangulated.Generators`, for pointwise
+  transport of `ObjectProperty.triangEnvelopeIter`; the generation-time and
+  Rouquier-dimension consequences remain downstream
+- weaker hypotheses:  an exact functor between triangulated categories and an
+  object property with a finite generation-stage bound; essential
+  surjectivity is needed only for the category-level Rouquier-dimension
+  inequality, and full faithfulness is not needed
+- pin status:         UPSTREAM-ONLY (the transport and dimension statements
+  are absent at the pinned revision)
+- source note:        Olander, *Ample line bundles and generation time*, §4,
+  uses that finite-stage generated subcategories are preserved by exact
+  functors (published PDF p. 304, lines 324-328). Its Lemma 7 proves that an
+  essentially-surjective exact functor does not increase countable Rouquier
+  dimension (PDF p. 303, lines 224-230); specializing its stage argument to a
+  singleton gives the planned ordinary Rouquier-dimension inequality. This
+  is a literature precedent, not a pinned Lean API. At the pin,
+  `triangEnvelopeIter` and its stage recurrence are defined at
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Triangulated/Generators.lean:62-80`,
+  while `Functor.IsTriangulated` and its additive/product-preservation
+  instances are at
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Triangulated/Functor.lean:181-235`;
+  the searched Mathlib tree has no functor transport of these stages or
+  Rouquier-dimension API. The quasi-inverse triangulated structure is already
+  supplied for `Equivalence.IsTriangulated` at
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Triangulated/Adjunction.lean:186-198`.
+  Source: [Olander, published PDF](https://pure.uva.nl/ws/files/174469947/Ample_line_bundles_and_generation_time.pdf).
+- state:              UNVERIFIED
+
+### 2026-09-26 — generation transport needs only pretriangulated categories (planned)
+- chunk:              rou1-921-generation-functor-transport
+- reviewing commit:   e83b614078d491b7f1d8dab085bf494fddb32ebc
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `CategoryTheory.ObjectProperty` envelope transport and
+  `CategoryTheory.Triangulated.Dimension.Functor` numerical consequences
+- weaker hypotheses:  independently universe-polymorphic `C` and `D`, each
+  with `Category`, `HasZeroObject`, `HasShift _ ℤ`, `Preadditive`, additive
+  shifts, and `Pretriangulated`; `F : C ⥤ D` with `F.CommShift ℤ` and
+  `F.IsTriangulated`. Neither category needs `IsTriangulated` (octahedral).
+  Pointwise transport additionally binds `P : ObjectProperty C`, `n : ℕ`,
+  `X : C`, and the source stage-membership proof; the `map` inequality binds
+  only `P,n`; generation-time monotonicity binds arbitrary `P,Q`. None needs
+  property nonemptiness, `ContainsZero`, closure under isomorphisms,
+  `F.Full`, `F.Faithful`, or `F.EssSurj`. Additivity and binary-product
+  preservation of `F` are inferred, not additional assumptions. Dimension
+  monotonicity adds `F.EssSurj`; strong-generator transport adds `G : C`
+  and `(singleton G).IsStrongTriangulatedGenerator`.
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Triangulated/Functor.lean:181-235`
+  and `Triangulated/Generators.lean:62-74`
+- source note:        `/tmp/rou1-921-hypothesis-probes.lean` compiled complete
+  proofs of pointwise tower transport, the `ObjectProperty.map` inequality,
+  generation-time monotonicity, Rouquier-dimension monotonicity and equivalence
+  invariance, generation-time equivalence invariance, and strong-generator
+  transport with the above category hypotheses. The tower proof follows the
+  left-associated `triangEnvelopeIter_succ`, so never uses the octahedral
+  recurrence or the composition law. Verified using
+  `LEAN_NUM_THREADS=2 ~/.elan/bin/lake env lean`; only unused-section-variable
+  warnings in three scratch helper lemmas remain. No implementation module
+  was changed by this scout.
+- state:              UNVERIFIED
+
+### 2026-09-26 — equivalence transport can construct the inverse's exact data (planned)
+- chunk:              rou1-921-generation-functor-transport
+- reviewing commit:   e83b614078d491b7f1d8dab085bf494fddb32ebc
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `CategoryTheory.Triangulated.Dimension.Functor`
+- weaker hypotheses:  the pretriangulated category context recorded above,
+  `E : C ≌ D`, `[E.functor.CommShift ℤ]`, and
+  `[E.functor.IsTriangulated]`; omit separate inverse-shift, inverse-exactness,
+  and `E.CommShift` assumptions. Generation-time invariance additionally binds
+  arbitrary `P,Q : ObjectProperty C`, without either being replete.
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Shift/Adjunction.lean:617-624`
+  and `Triangulated/Adjunction.lean:61`
+- source note:        `/tmp/rou1-921-hypothesis-probes.lean` compiled
+  `dim_equivalence` and `time_equivalence` using
+  `letI := E.commShiftInverse ℤ`, `letI := E.commShift_of_functor ℤ`, and
+  `letI := E.toAdjunction.isTriangulated_rightAdjoint`. The proof constructs
+  the compatible inverse shift, rather than claiming an independently chosen
+  inverse shift is automatically compatible. The generation-time proof also
+  compiled `P.isoClosure.triangEnvelopeIter n = P.triangEnvelopeIter n`,
+  accounting for the isomorphism closure of `ObjectProperty.map`.
+- state:              UNVERIFIED
+
+### 2026-09-26 — Rouquier dimension and strong generators under retract-dense functors (planned)
+- chunk:              rou1-921-generation-functor-transport
+- reviewing commit:   e83b614078d491b7f1d8dab085bf494fddb32ebc
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `CategoryTheory.Triangulated.Dimension.Functor`
+- weaker hypotheses:  the pretriangulated category and exact-functor context
+  recorded above, replacing `[F.EssSurj]` by
+  `∀ Y : D, ∃ X : C, Nonempty (Retract Y (F.obj X))`; strong-generator
+  transport also binds `G : C` and its singleton strong-generation proof.
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/ObjectProperty/Retract.lean:34`
+- source note:        `/tmp/rou1-921-hypothesis-probes.lean` compiled
+  `dim_retract_dense` and `strong_retract_dense` with complete proofs.
+  Apply pointwise singleton-stage transport and then `prop_of_retract` to
+  the target envelope stage. Essential surjectivity supplies this premise
+  using `(F.objObjPreimageIso Y).symm.retract`; that specialization also
+  compiled. This proposes an explicit hypothesis, not a new carrier or
+  typeclass; whether to expose the stronger API in #921 remains an
+  implementation scope decision.
+- state:              UNVERIFIED
+
+### 2026-09-26 — replace exactness by additivity and shift compatibility (planned)
+- chunk:              rou1-921-generation-functor-transport
+- reviewing commit:   e83b614078d491b7f1d8dab085bf494fddb32ebc
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  distinguished-triangle step of finite-stage transport
+- weaker hypotheses:  retain the pretriangulated category context,
+  `[F.CommShift ℤ]`, and `[F.Additive]`; omit `[F.IsTriangulated]`.
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Triangulated/Functor.lean:185`
+- source note:        `/tmp/rou1-921-failed-hypothesis-probes.lean` attempted
+  `F.map_distinguished T hT` with exactly these assumptions. The compiler
+  reports `failed to synthesize instance of type class F.IsTriangulated`.
+  This falsifies deleting exactness from this proof route; it is not a
+  compiler-produced mathematical counterexample to every alternate statement.
+- state:              UNVERIFIED
+
+### 2026-09-26 — omit compatibility for a separately chosen inverse shift (planned)
+- chunk:              rou1-921-generation-functor-transport
+- reviewing commit:   e83b614078d491b7f1d8dab085bf494fddb32ebc
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `Equivalence` inverse triangulated-functor derivation
+- weaker hypotheses:  retain `[E.functor.CommShift ℤ]`,
+  `[E.functor.IsTriangulated]`, and an independently supplied
+  `[E.inverse.CommShift ℤ]`; omit `[E.CommShift ℤ]`.
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Triangulated/Adjunction.lean:53-61`
+- source note:        `/tmp/rou1-921-failed-hypothesis-probes.lean` attempted
+  `E.toAdjunction.isTriangulated_rightAdjoint` for that inverse shift. The
+  compiler reports `failed to synthesize instance of type class
+  E.toAdjunction.CommShift ℤ`. The verified construction above avoids this
+  failure by choosing the compatible inverse shift locally; it does not
+  erase compatibility from the adjunction theorem.
+- state:              UNVERIFIED
+
+### 2026-09-26 — transport of shift-closed properties for arbitrary additive shifts (planned)
+- chunk:              rou1-921-triangulated-functor-transport
+- reviewing commit:   65b2dff1ef8aaa5a986c8695f9e59dcc3b236c56
+- found by:           abstraction-adversary (review round 1)
+- proposed ancestor:  `DerivedAlgGeo/CategoryTheory/ObjectProperty/Shift.lean`
+- weaker hypotheses:  categories with shifts by an additive monoid `A`,
+  `[F.CommShift A]`, and pointwise transport of the generating property; no
+  preadditivity, zero object, or triangulated structure
+- pin status:         PIN-CONFIRMED
+- source note:        Replacing `ℤ` by `A` in the complete shift-closure
+  transport proof compiles unchanged; only `F.mapIso` and
+  `F.commShiftIso` are used. The proposed owner is outside the frozen #921
+  file list, so this lift is deferred.
+- state:              UNVERIFIED
+
+### 2026-09-26 — transport of arbitrary-shape limit closures (planned)
+- chunk:              rou1-921-triangulated-functor-transport
+- reviewing commit:   65b2dff1ef8aaa5a986c8695f9e59dcc3b236c56
+- found by:           abstraction-adversary (review round 1)
+- proposed ancestor:  `DerivedAlgGeo/CategoryTheory/ObjectProperty/LimitsClosure.lean`
+- weaker hypotheses:  an arbitrary family `J : α → Type`, categories on each
+  `J a`, preservation of each `J a`-shaped limit by `F`, and pointwise
+  transport of the generating property; no `WalkingPair` specialization
+- pin status:         PIN-CONFIRMED
+- source note:        The complete `limitsClosure_le` proof compiles for
+  `P.limitsClosure J`; no proof step uses the binary-product shape. The
+  proposed owner is outside the frozen #921 file list, so this lift is
+  deferred.
+- state:              UNVERIFIED
+
+### 2026-09-26 — shift closure commutes with isomorphism closure for arbitrary additive shifts (planned)
+- chunk:              rou1-921-triangulated-functor-transport
+- reviewing commit:   65b2dff1ef8aaa5a986c8695f9e59dcc3b236c56
+- found by:           abstraction-adversary (review round 1)
+- proposed ancestor:  `DerivedAlgGeo/CategoryTheory/ObjectProperty/Shift.lean`
+- weaker hypotheses:  one category with shifts by any additive monoid `A` and
+  an arbitrary object property `P`; no preadditivity, zero object, or
+  triangulation
+- pin status:         PIN-CONFIRMED
+- source note:        The existing three-line argument for
+  `P.isoClosure.shiftClosure A = P.shiftClosure A` compiles with only the
+  additive-shift assumptions. The proposed owner is outside the frozen #921
+  file list, so this lift is deferred.
 - state:              UNVERIFIED

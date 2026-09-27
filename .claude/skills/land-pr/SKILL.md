@@ -1,21 +1,22 @@
 ---
 name: land-pr
-description: Run one unattended landing iteration — select an eligible open PR, update it against main, pre-flight it with scripts/precheck.sh, review it, take the PR CI verdict, then stop. Never merges. Pair with /loop.
+description: Not for loop runs (use run-loop). Run one standalone landing iteration — select an eligible open PR, update it against main, pre-flight it with scripts/precheck.sh, review it, take the exact-head PR CI verdict, then stop before merging.
 ---
 
 # One landing iteration
 
-This is **one** iteration against an eligible open PR and it **halts** before
-the merge. Merging is a human action, always. Read the issue tracker and native
-blockers before selecting a PR; an open PR is not by itself admission-ready.
+**Not for loop runs: use run-loop.** A run that works issues or a milestone to
+merged PRs follows `.claude/skills/run-loop/SKILL.md`, which has its own
+reviewed-head, branch-update and merge procedure; do not pair this standalone
+rebase/force-push procedure with that loop.
 
-When called by a bounded loop manifest, the controller's OpenSpec change and
-review ledger remain authoritative. Landing may act only on the reviewed head;
-the three adversarial lenses plus `mathlib-reviewer` must already have been
-recorded for the frozen chunk, and the controller's maximum of three
-review/improve rounds still applies, at whatever number the manifest's
-`limits.max_review_rounds_per_chunk` sets. This skill's normal one-PR stop behavior
-is unchanged.
+This standalone skill performs **one** iteration against an eligible open PR
+and **halts** before the merge. Read the issue tracker and native blockers
+before selecting a PR; an open PR is not by itself admission-ready.
+
+The manifest controller (`scripts/loop_engine.py`), its OpenSpec changes and
+its review ledgers are retired from every run path; none of them scopes this
+skill.
 
 ## What the queue actually is
 
@@ -151,7 +152,7 @@ python3 -m venv .loop-tools
 PATH="$PWD/.loop-tools/bin:$PATH" scripts/precheck.sh
 ```
 
-Seconds, not minutes. It runs every gate that needs no Lean build — workflows,
+About a minute, not the twenty of CI. It runs every gate that needs no Lean build — workflows,
 style on this branch's own lines, source-independence, layering, umbrella
 coverage, root reachability, coherent families, coverage map, pin, nolints,
 roadmap, and the two hook tests — then a **targeted** `lake build` of the
@@ -201,18 +202,33 @@ and over the 195 commits both lanes used to build, the faster of the two
 the push below still starts it.
 
 ```bash
+reviewed_sha=$(git rev-parse HEAD)
 git push --force-with-lease
-gh run list --branch "$(git branch --show-current)" --workflow ci.yml \
-  --limit 1 --json databaseId,url --jq '.[0]'
+gh pr view <N> --json headRefOid --jq '.headRefOid'
+gh run list --branch "$(git branch --show-current)" --commit "$reviewed_sha" \
+  --event pull_request --workflow ci.yml --limit 20 \
+  --json databaseId,event,headSha,url --jq '.[0] // empty'
 ```
 
-Then wait on it:
+The PR's `headRefOid` must equal `reviewed_sha`; if GitHub has not reflected the
+push yet, wait for it to do so. An empty run listing means the exact-head PR
+run has not appeared; wait for that run or halt at the bounded wait below.
+Never substitute an older-head run or a manual `workflow_dispatch` run.
+Then wait on the returned run ID:
 
 ```bash
 gh run watch <databaseId> -R chris-dare-dev/derived-alg-geo-lean --exit-status
 gh run view <databaseId> -R chris-dare-dev/derived-alg-geo-lean \
-  --json status,conclusion --jq '"\(.status)/\(.conclusion)"'
+  --json event,headSha,status,conclusion,url
+gh pr view <N> --json headRefOid,mergeStateStatus
+gh pr checks <N> --required --json name,state,bucket,link
 ```
+
+Require `event=pull_request`, `headSha=reviewed_sha`,
+`status=completed/conclusion=success`, the unchanged PR `headRefOid`, and a
+passing required `ci` check on that PR. A `BEHIND` or otherwise unmergeable PR
+must be refreshed and reviewed at its new head. A run listed for the right
+branch is insufficient on its own.
 
 **Read the conclusion, not the exit code.** `gh run watch --exit-status` exits
 **0 on a cancelled run**, and cancellation is the normal outcome here: `ci.yml`'s

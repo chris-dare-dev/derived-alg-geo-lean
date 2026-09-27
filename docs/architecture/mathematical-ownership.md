@@ -5,7 +5,7 @@ applications. Read it before adding a public root, extending a known mixed
 module, or moving declarations. It complements the decision procedure in
 [placement.md](placement.md), the reuse contract in
 [abstraction-tree.md](abstraction-tree.md), and the implemented import rules in
-[layers.md](layers.md). `CLAUDE.md` and `AGENTS.md` carry the same short checklist.
+[layers.md](layers.md). `AGENTS.md`, which `CLAUDE.md` imports, carries the short checklist.
 
 The policy applies to new work. Existing violations are tracked in the
 [cutover ledger](cutover-ledger.md) and

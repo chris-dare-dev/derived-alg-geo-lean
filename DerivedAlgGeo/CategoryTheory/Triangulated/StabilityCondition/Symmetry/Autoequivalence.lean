@@ -6,6 +6,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.Aut
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.Autoequivalence.Slicing
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.Autoequivalence.Stability
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.Autoequivalence.FourierMukai
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.Autoequivalence.SerreFunctor
 
 /-!
 # Autoequivalence symmetries
