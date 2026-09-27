@@ -9,9 +9,10 @@ import Mathlib.CategoryTheory.Sites.Spaces
 /-!
 # Covering the terminal object of an open-set site
 
-`GrothendieckTopology.CoversTop` is the site-theoretic form of a covering family. For the open-set
-site of a topological space, an open family with supremum `⊤` covers the terminal object. On a
-prime spectrum, the separate lemma `PrimeSpectrum.basicOpen_coversTop_of_span_eq_top` translates
+`CategoryTheory.GrothendieckTopology.CoversTop` is the site-theoretic form of a covering family.
+For the open-set site of a topological space, an open family whose supremum is `⊤` covers the
+terminal object. On a prime spectrum, the separate lemma
+`PrimeSpectrum.basicOpen_coversTop_of_span_eq_top` translates
 the algebraic criterion that a family generates the unit ideal.
 
 ## Main results
@@ -24,7 +25,7 @@ the algebraic criterion that a family generates the unit ideal.
 
 ## Why this is its own file
 
-`grothendieckTopology_coversTop` previously lived in
+`TopCat.Opens.grothendieckTopology_coversTop` previously lived in
 `DerivedAlgGeo/AlgebraicGeometry/Modules/Coherent/Descent/Locality.lean`. It is a statement about
 topological spaces with no reference to coherence, sheaves of modules, or schemes, and its position
 there made it unreachable from the lower-level topology and algebraic-geometry infrastructure

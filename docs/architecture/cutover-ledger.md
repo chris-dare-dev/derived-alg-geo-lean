@@ -2376,7 +2376,7 @@ or exactness was strengthened by relocation.
   `PrimeSpectrum.basicOpen_coversTop_of_span_eq_top` for arbitrary
   commutative semirings, bridging a unit-ideal generating family to a cover
   of the open-set site. Its proof composes the prime-spectrum supremum
-  criterion with the generic topological `CoversTop` bridge. The former
+  criterion with `TopCat.Opens.grothendieckTopology_coversTop`. The former
   `AlgebraicGeometry/Spec/` leaf and umbrella are retired; they held no
   scheme-level construction. The new root reaches no geometry, including
   transitively.

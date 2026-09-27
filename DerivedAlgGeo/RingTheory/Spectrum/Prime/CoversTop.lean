@@ -8,8 +8,8 @@ import Mathlib.RingTheory.Spectrum.Prime.Topology
 /-!
 # Covering the prime spectrum by basic opens
 
-The Zariski-open family `D(g i)` covers `Spec R` exactly when the elements `g i` generate the
-unit ideal. This translates the algebraic criterion for a cover into
+The opens from `PrimeSpectrum.basicOpen` cover `PrimeSpectrum R` when the elements `g i` generate
+the unit ideal. This translates the algebraic criterion for a cover into
 `CategoryTheory.GrothendieckTopology.CoversTop`, used by Grothendieck-topology arguments.
 
 ## Main results
