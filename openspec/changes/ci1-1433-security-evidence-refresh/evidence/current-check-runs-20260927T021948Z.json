@@ -1,0 +1,172 @@
+{
+  "repository": "chris-dare-dev/derived-alg-geo-lean",
+  "captured_at": "2026-09-27T02:19:48Z",
+  "open_prs": [
+    {
+      "number": 1571,
+      "head_sha": "54f7afb99d411fb51dafe2c50175b18a55a71911",
+      "draft": true
+    },
+    {
+      "number": 1570,
+      "head_sha": "b03e2a5b54b2af28a279049e5803e3ee79d76c8e",
+      "draft": false
+    },
+    {
+      "number": 1566,
+      "head_sha": "06079755b65fb71c14d8f655832829e4b8bf65fd",
+      "draft": false
+    }
+  ],
+  "check_runs_requests": [
+    {
+      "pull_request": 1571,
+      "candidate_sha": "54f7afb99d411fb51dafe2c50175b18a55a71911",
+      "method": "GET",
+      "endpoint": "https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/commits/54f7afb99d411fb51dafe2c50175b18a55a71911/check-runs",
+      "query": {
+        "per_page": 100,
+        "page": 1
+      },
+      "total_count": 3,
+      "returned": [
+        {
+          "name": "ci",
+          "app": "github-actions",
+          "status": "completed",
+          "conclusion": "success",
+          "completed_at": "2026-09-27T01:43:58Z",
+          "url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36285293310/job/108527933823"
+        },
+        {
+          "name": "roadmap",
+          "app": "github-actions",
+          "status": "completed",
+          "conclusion": "success",
+          "completed_at": "2026-09-27T01:23:09Z",
+          "url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36285293310/job/108524817540"
+        },
+        {
+          "name": "build",
+          "app": "github-actions",
+          "status": "completed",
+          "conclusion": "success",
+          "completed_at": "2026-09-27T01:43:51Z",
+          "url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36285293310/job/108524817407"
+        }
+      ]
+    },
+    {
+      "pull_request": 1570,
+      "candidate_sha": "b03e2a5b54b2af28a279049e5803e3ee79d76c8e",
+      "method": "GET",
+      "endpoint": "https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/commits/b03e2a5b54b2af28a279049e5803e3ee79d76c8e/check-runs",
+      "query": {
+        "per_page": 100,
+        "page": 1
+      },
+      "total_count": 6,
+      "returned": [
+        {
+          "name": "ci",
+          "app": "github-actions",
+          "status": "completed",
+          "conclusion": "success",
+          "completed_at": "2026-09-27T01:33:02Z",
+          "url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36284578168/job/108526407044"
+        },
+        {
+          "name": "roadmap",
+          "app": "github-actions",
+          "status": "completed",
+          "conclusion": "success",
+          "completed_at": "2026-09-27T01:09:17Z",
+          "url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36284578168/job/108522782951"
+        },
+        {
+          "name": "build",
+          "app": "github-actions",
+          "status": "completed",
+          "conclusion": "success",
+          "completed_at": "2026-09-27T01:32:56Z",
+          "url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36284578168/job/108522782863"
+        },
+        {
+          "name": "ci",
+          "app": "github-actions",
+          "status": "completed",
+          "conclusion": "success",
+          "completed_at": "2026-09-27T01:04:40Z",
+          "url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36283645520/job/108522345659"
+        },
+        {
+          "name": "build",
+          "app": "github-actions",
+          "status": "completed",
+          "conclusion": "success",
+          "completed_at": "2026-09-27T01:04:34Z",
+          "url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36283645520/job/108520159479"
+        },
+        {
+          "name": "roadmap",
+          "app": "github-actions",
+          "status": "completed",
+          "conclusion": "success",
+          "completed_at": "2026-09-27T00:50:47Z",
+          "url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36283645520/job/108520159415"
+        }
+      ]
+    },
+    {
+      "pull_request": 1566,
+      "candidate_sha": "06079755b65fb71c14d8f655832829e4b8bf65fd",
+      "method": "GET",
+      "endpoint": "https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/commits/06079755b65fb71c14d8f655832829e4b8bf65fd/check-runs",
+      "query": {
+        "per_page": 100,
+        "page": 1
+      },
+      "total_count": 3,
+      "returned": [
+        {
+          "name": "ci",
+          "app": "github-actions",
+          "status": "completed",
+          "conclusion": "success",
+          "completed_at": "2026-09-26T21:59:32Z",
+          "url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36273289044/job/108495274027"
+        },
+        {
+          "name": "build",
+          "app": "github-actions",
+          "status": "completed",
+          "conclusion": "success",
+          "completed_at": "2026-09-26T21:59:26Z",
+          "url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36273289044/job/108491200286"
+        },
+        {
+          "name": "roadmap",
+          "app": "github-actions",
+          "status": "completed",
+          "conclusion": "success",
+          "completed_at": "2026-09-26T21:34:17Z",
+          "url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36273289044/job/108491200155"
+        }
+      ]
+    }
+  ],
+  "required_status_checks": {
+    "method": "GET",
+    "endpoint": "https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/branches/main/protection/required_status_checks",
+    "strict": true,
+    "contexts": [
+      "ci"
+    ],
+    "checks": [
+      {
+        "context": "ci",
+        "app_id": 15368
+      }
+    ]
+  }
+}
