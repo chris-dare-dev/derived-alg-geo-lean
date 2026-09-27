@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import io
+import json
 from pathlib import Path
 import subprocess
 import tarfile
@@ -72,7 +73,25 @@ class HostPickupTests(unittest.TestCase):
             self.assertEqual(list((base / "leases").glob("*.json")), [])
             logs = list((base / "logs").iterdir())
             self.assertEqual(len(logs), 1)
-            self.assertEqual((logs[0] / "trace.log").read_text(encoding="utf-8"), "kept\n")
+            self.assertEqual((logs[0] / "diag/trace.log").read_text(encoding="utf-8"), "kept\n")
+
+    def test_runner_diagnostic_symlink_cannot_overwrite_archive_metadata_target(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            base, _, _ = fixture(Path(directory))
+            root, _ = host_pickup._prepare(base, "abc123")
+            checkout = root / "runner/_work/derived-alg-geo-lean/derived-alg-geo-lean"
+            checkout.mkdir(parents=True)
+            diagnostics = root / "runner/_diag"
+            diagnostics.mkdir()
+            sentinel = Path(directory) / "sentinel"
+            sentinel.write_text("keep", encoding="utf-8")
+            (diagnostics / "pickup.json").symlink_to(sentinel)
+            record = host_pickup._record("abc123", root, "build", kind="runner")
+            host_pickup._archive_runner_logs(base, root, "abc123", record)
+            self.assertEqual(sentinel.read_text(encoding="utf-8"), "keep")
+            archive = base / "logs/abc123"
+            self.assertTrue((archive / "diag/pickup.json").is_symlink())
+            self.assertTrue((archive / "pickup.json").is_file())
 
     def test_registered_runner_retains_lease_and_recovery_denies(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -91,6 +110,32 @@ class HostPickupTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "still registered"):
                     host_pickup.recover(base, leases[0].stem)
             self.assertEqual(len(list((base / "jobs").iterdir())), 1)
+
+    def test_recovery_rejects_replacement_root_with_forged_local_marker(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            base, repo, revision = fixture(Path(directory))
+            with patch.object(host_pickup, "_capacity", side_effect=capacity), \
+                 patch.object(host_pickup, "_run_scope", return_value=130), \
+                 patch.object(host_pickup, "_scope_cleared", return_value=False):
+                with self.assertRaisesRegex(ValueError, "still active"):
+                    host_pickup.pickup(base, repo, revision, "probe", ["true"])
+            lease = next((base / "leases").glob("*.json"))
+            root = base / "jobs" / lease.stem
+            moved = base / "jobs/original"
+            root.rename(moved)
+            root.mkdir(mode=0o700)
+            replacement = root.stat()
+            (root / ".owner.json").write_text(json.dumps({
+                "namespace": root.name, "dev": replacement.st_dev, "ino": replacement.st_ino,
+            }), encoding="utf-8")
+            (root / ".owner.json").chmod(0o600)
+            (root / "sentinel").write_text("keep", encoding="utf-8")
+            with patch.object(host_pickup, "_scope_cleared", return_value=True):
+                with self.assertRaisesRegex(ValueError, "differs from recorded inode"):
+                    host_pickup.recover(base, lease.stem)
+            self.assertEqual((root / "sentinel").read_text(encoding="utf-8"), "keep")
+            self.assertTrue(moved.is_dir())
+            self.assertTrue(lease.is_file())
 
     def test_enabled_idle_legacy_runner_keeps_its_reservation(self) -> None:
         def show(unit: str, *properties: str) -> dict[str, str]:
@@ -172,6 +217,20 @@ class HostPickupTests(unittest.TestCase):
             host_pickup._cleanup(base, "abc123", identity)
             self.assertFalse(root.exists())
             self.assertEqual((sibling / "sentinel").read_text(encoding="utf-8"), "keep")
+
+    def test_cleanup_rejects_rename_before_recursive_delete(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            base, _, _ = fixture(Path(directory))
+            root, identity = host_pickup._prepare(base, "abc123")
+            (root / "sentinel").write_text("keep", encoding="utf-8")
+            moved = base / "jobs/moved"
+            def rename_during_check() -> list[Path]:
+                root.rename(moved)
+                return []
+            with patch.object(host_pickup, "_mount_points", side_effect=rename_during_check):
+                with self.assertRaises(FileNotFoundError):
+                    host_pickup._cleanup(base, "abc123", identity)
+            self.assertEqual((moved / "sentinel").read_text(encoding="utf-8"), "keep")
 
     def test_worker_rejects_shared_package_symlink(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

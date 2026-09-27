@@ -110,7 +110,8 @@ a unique systemd user scope with a private checkout, Git index, `.lake/build`,
 is cloned using Git transport rather than shared local object links. A tracked
 `.lake` build/package symlink is rejected before the command starts. The scope
 must be empty before cleanup. Cleanup opens the exact marked root without
-following symlinks, checks its device/inode and mount points, removes only
+following symlinks, checks its device/inode against a host lease sidecar and
+checks mount points, removes only
 entries below that descriptor, and then releases the exact lease. Other job
 roots and existing worktrees are never cleanup targets.
 
@@ -120,7 +121,8 @@ the lease and root remain for evidence and recovery. Inspect
 and its cgroup before stopping it. Preserve needed output/logs from the root,
 then run `python3 /home/chris-dare/.local/lib/dag-pickup/scripts/host_pickup.py recover --base
 /home/chris-dare/.local/state/dag-pickup <namespace>`. Recovery refuses a live
-scope, mismatched lease, symlinked/replaced root, unexpected mount or owner
+scope, mismatched lease, missing or mismatched host root identity,
+symlinked/replaced root, unexpected mount or owner
 marker. If interrupted midway through cleanup, preserve the lease and inspect
 the partially cleaned root manually; do not create a replacement directory at
 the same path to coerce recovery.
@@ -140,7 +142,7 @@ job. The runner's `_work` directory is a conservative reservation envelope;
 `logs/<namespace>/pickup.json` records the actual resolved checkout, Git
 index, Lake build/package, elan, temp, output and artifact locations after the
 job. Cleanup waits for the scope to empty and the GitHub registration to
-disappear. Diagnostics are copied to the host `logs/` directory before the
+disappear. Diagnostics are copied below host `logs/<namespace>/diag/` before the
 root is removed. An unresolved registration, missing checkout, path outside
 the root, or failed command retains root and lease for investigation.
 

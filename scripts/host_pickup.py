@@ -185,6 +185,62 @@ def _prepare(base: Path, namespace: str) -> tuple[Path, tuple[int, int]]:
         os.close(base_fd)
 
 
+def _root_identity_name(namespace: str) -> str:
+    runner_state._lease_name({"namespace": namespace})
+    return f"{namespace}.root"
+
+
+def _store_root_identity(base: Path, record: dict[str, Any],
+                         expected: tuple[int, int]) -> None:
+    """Bind the job root inode outside the job's writable tree."""
+    lease_dir = base / "leases"
+    name = _root_identity_name(record["namespace"])
+    with runner_state._locked_lease_dir(lease_dir) as directory_fd:
+        runner_state._assert_lease_path(directory_fd, lease_dir)
+        lease = runner_state._read_lease(
+            directory_fd, runner_state._lease_name(record)
+        )
+        if (not isinstance(lease, dict) or lease.get("record") != record or
+                lease.get("owner_digest") != runner_state._record_digest(record)):
+            raise ValueError("lease changed before root identity was stored")
+        payload = {"owner_digest": lease["owner_digest"],
+                   "device": expected[0], "inode": expected[1]}
+        descriptor = os.open(name, os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW,
+                             0o600, dir_fd=directory_fd)
+        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+            json.dump(payload, stream, sort_keys=True)
+            stream.flush()
+            os.fsync(stream.fileno())
+
+
+def _read_root_identity(base: Path, record: dict[str, Any]) -> tuple[int, int]:
+    lease_dir = base / "leases"
+    with runner_state._locked_lease_dir(lease_dir) as directory_fd:
+        runner_state._assert_lease_path(directory_fd, lease_dir)
+        payload = runner_state._read_lease(
+            directory_fd, _root_identity_name(record["namespace"])
+        )
+    if (not isinstance(payload, dict) or
+            payload.get("owner_digest") != runner_state._record_digest(record) or
+            not isinstance(payload.get("device"), int) or
+            not isinstance(payload.get("inode"), int)):
+        raise ValueError("stored root identity is invalid")
+    return payload["device"], payload["inode"]
+
+
+def _remove_root_identity(base: Path, record: dict[str, Any]) -> None:
+    lease_dir = base / "leases"
+    with runner_state._locked_lease_dir(lease_dir) as directory_fd:
+        runner_state._assert_lease_path(directory_fd, lease_dir)
+        payload = runner_state._read_lease(
+            directory_fd, _root_identity_name(record["namespace"])
+        )
+        if (not isinstance(payload, dict) or
+                payload.get("owner_digest") != runner_state._record_digest(record)):
+            raise ValueError("stored root identity owner changed")
+        os.unlink(_root_identity_name(record["namespace"]), dir_fd=directory_fd)
+
+
 def _rmtree_fd(fd: int) -> None:
     """Remove entries relative to a verified directory, never following links."""
     with os.scandir(fd) as entries:
@@ -233,9 +289,15 @@ def _cleanup(base: Path, namespace: str, expected: tuple[int, int]) -> None:
                 raise ValueError("job root no longer has a reachable path; lease retained")
             if any(point == root_path or root_path in point.parents for point in _mount_points()):
                 raise ValueError("mount inside job root; lease retained")
+            named = os.stat(namespace, dir_fd=jobs_fd, follow_symlinks=False)
+            if (named.st_dev, named.st_ino) != expected:
+                raise ValueError("job root name changed identity; lease retained")
             _rmtree_fd(root_fd)
         finally:
             os.close(root_fd)
+        named = os.stat(namespace, dir_fd=jobs_fd, follow_symlinks=False)
+        if (named.st_dev, named.st_ino) != expected:
+            raise ValueError("job root name changed during cleanup; lease retained")
         os.rmdir(namespace, dir_fd=jobs_fd)
     finally:
         os.close(jobs_fd)
@@ -368,22 +430,33 @@ def _runner_worker(archive: Path, digest: str, label: str, root: Path,
 def _archive_runner_logs(base: Path, root: Path, namespace: str,
                          record: dict[str, Any]) -> None:
     logs = base / "logs"
-    if not logs.is_dir() or logs.is_symlink():
+    if (not logs.is_dir() or logs.is_symlink() or
+            logs.stat().st_uid != os.getuid() or stat.S_IMODE(logs.stat().st_mode) != 0o700):
         raise ValueError("host logs directory is absent or unsafe; lease retained")
     destination = logs / namespace
-    if destination.exists():
+    try:
+        archived_info = destination.lstat()
+    except FileNotFoundError:
+        destination.mkdir(mode=0o700)
+    else:
+        if (not stat.S_ISDIR(archived_info.st_mode) or archived_info.st_uid != os.getuid() or
+                stat.S_IMODE(archived_info.st_mode) != 0o700):
+            raise ValueError("runner log archive directory is unsafe")
+        descriptor = os.open(destination, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
         try:
-            archived = json.loads((destination / "pickup.json").read_text(encoding="utf-8"))
-        except (FileNotFoundError, json.JSONDecodeError) as exc:
+            archived = runner_state._read_lease(descriptor, "pickup.json")
+        except (FileNotFoundError, ValueError) as exc:
             raise ValueError("incomplete runner log archive; lease retained") from exc
+        finally:
+            os.close(descriptor)
         if archived.get("namespace") != namespace or archived.get("inventory_valid") is not True:
             raise ValueError("runner log archive identity or inventory is invalid")
         return
     source = root / "runner/_diag"
-    if source.is_dir() and not source.is_symlink():
-        shutil.copytree(source, destination, symlinks=True)
-    else:
-        destination.mkdir(mode=0o700)
+    if source.is_symlink():
+        raise ValueError("runner diagnostic directory is a symlink; lease retained")
+    if source.is_dir():
+        shutil.copytree(source, destination / "diag", symlinks=True)
     checkout = root / "runner/_work/derived-alg-geo-lean/derived-alg-geo-lean"
     actual_paths = {
         "checkout": checkout,
@@ -412,13 +485,23 @@ def _archive_runner_logs(base: Path, root: Path, namespace: str,
                 escaped.append(key)
         inventory[key] = entry
     inventory_valid = not escaped and bool(inventory["checkout"]["exists"])
-    (destination / "pickup.json").write_text(json.dumps({
+    metadata = json.dumps({
         "namespace": namespace, "runner_name": f"dag-{namespace}",
         "repository": REPOSITORY, "writable_path_inventory": inventory,
         "inventory_valid": inventory_valid,
         "reservation": record["resources"],
         "host_capacity_at_admission": record.get("host_capacity_at_admission"),
-    }, sort_keys=True, indent=2) + "\n", encoding="utf-8")
+    }, sort_keys=True, indent=2) + "\n"
+    descriptor = os.open(destination, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        metadata_fd = os.open("pickup.json", os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW,
+                              0o600, dir_fd=descriptor)
+        with os.fdopen(metadata_fd, "w", encoding="utf-8") as stream:
+            stream.write(metadata)
+            stream.flush()
+            os.fsync(stream.fileno())
+    finally:
+        os.close(descriptor)
     if escaped:
         raise ValueError(f"runner writable paths escaped job root: {', '.join(escaped)}")
     if not inventory["checkout"]["exists"]:
@@ -439,6 +522,7 @@ def runner_once(base: Path, archive: Path, digest: str, label: str) -> None:
     record["host_capacity_at_admission"] = capacity[_host_id()]
     runner_state.acquire_lease(record, base / "leases", capacity)
     root, identity = _prepare(base, namespace)
+    _store_root_identity(base, record, identity)
     token = _registration_token()
     token_path = root / "registration-token"
     descriptor = os.open(token_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW, 0o600)
@@ -457,6 +541,7 @@ def runner_once(base: Path, archive: Path, digest: str, label: str) -> None:
         raise ValueError("ephemeral runner remains registered; lease and root retained")
     _archive_runner_logs(base, root, namespace, record)
     _cleanup(base, namespace, identity)
+    _remove_root_identity(base, record)
     runner_state.release_lease(record, base / "leases")
 
 
@@ -476,6 +561,7 @@ def pickup(base: Path, repo: Path, revision: str, profile: str, command: list[st
     # The lease precedes even the first writable workspace operation. If
     # preparation fails or the controller crashes, recovery sees the lease.
     root, identity = _prepare(base, namespace)
+    _store_root_identity(base, record, identity)
     unit = f"dag-pickup-{namespace}.scope"
     result = _run_scope(unit, root, profile, [
         sys.executable, str(Path(__file__).resolve()), "_worker", str(repo), revision,
@@ -486,6 +572,7 @@ def pickup(base: Path, repo: Path, revision: str, profile: str, command: list[st
     if result != 0:
         raise ValueError(f"pickup command failed ({result}); lease and root retained for recovery")
     _cleanup(base, namespace, identity)
+    _remove_root_identity(base, record)
     runner_state.release_lease(record, base / "leases")
     return result
 
@@ -520,13 +607,23 @@ def recover(base: Path, namespace: str) -> None:
     try:
         info = root.lstat()
     except FileNotFoundError:
-        pass  # Admission may have succeeded before root creation.
+        # Only admission before root creation can safely lack an identity.
+        try:
+            _read_root_identity(base, record)
+        except FileNotFoundError:
+            pass
+        else:
+            raise ValueError("recorded root is missing; lease retained for manual recovery")
     else:
         if not stat.S_ISDIR(info.st_mode):
             raise ValueError("recovery root is not an owned directory")
+        identity = _read_root_identity(base, record)
+        if (info.st_dev, info.st_ino) != identity:
+            raise ValueError("recovery root differs from recorded inode; lease retained")
         if record["kind"] == "runner":
             _archive_runner_logs(base, root, namespace, record)
-        _cleanup(base, namespace, (info.st_dev, info.st_ino))
+        _cleanup(base, namespace, identity)
+        _remove_root_identity(base, record)
     runner_state.release_lease(record, base / "leases")
 
 
