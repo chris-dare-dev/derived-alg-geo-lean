@@ -1,0 +1,1971 @@
+# The stacks-and-moduli plan (ADR-0014, drafted in MO2.1). gh_milestone and gh_issue are the
+# live GitHub numbers assigned when the plan was filed on 2026-09-27.
+schema: roadmap/1
+slug: stacks-and-moduli
+project: derived-alg-geo-lean
+title: "Stacks and moduli — a stability-free substrate for the moduli theorems"
+status: active
+phase: sequenced
+brief: |
+  The owner-approved stacks-and-moduli plan of 2026-09-27, filed as milestones MO2, STK1-STK4, ASP1,
+  DQ1, PJ1, GM1, GM2, MOD1-MOD3, ART1, SF13 and SF14 (SF9, milestone #30, is re-scoped and stays in
+  stability-families.yaml). ADR-0014 (MO2.1) fixes owners and conventions: the carrier is
+  StackInGroupoids over Mathlib's Pseudofunctor.IsStack, fibres live in independent universes,
+  relative stacks are over Over S, representability is natural, and every moduli-of-objects stack is
+  one construction. Hard theorems (0DLN algebraicity, AHLH existence, Quot representability) enter
+  consumers as typed hypotheses over genuine definitions, never as fields, instances or roadmap statuses.
+goal:
+  objective: "Build stacks, descent, algebraic spaces and stacks, derived pushforward, projective morphisms, good moduli spaces and the moduli of sheaves and complexes as stability-free roots, then state and prove the BLMNPS/LLLMPSZ moduli consequences on them."
+  key_results:
+    - "Generic stacks and moduli never import the stability tree (MO2.2, MO2.3)."
+    - "Representability, algebraicity and boundedness are natural notions with proved projections to the renamed pointwise records (MO2.4, STK1.4, STK3.1, STK3.4)."
+    - "Coh_{X/S} and M_pug(X/S) are genuine stacks with representable diagonals, and M_pug's algebraicity is a typed proposition (MOD1, MOD2)."
+    - "Good moduli spaces, the AHLH existence theorem and Theorem 22.2 are stated on genuine definitions (GM1, GM2, SF14)."
+  wont:
+    - "No algebraicity, descent, boundedness or properness result as a structure field, instance or roadmap status."
+    - "No second stack carrier, fibred-category root or moduli-problem hierarchy."
+    - "No derived moduli (Toën-Vaquié) construction."
+generated_by: { agent: claude, at: "2026-09-27" }
+generations:
+  - { rev: 1, at: "2026-09-27", note: "Created with the filing of the stacks-and-moduli plan: one milestone entry per new milestone and one milestone-direct task per filed issue; blocked_by mirrors the native blocked-by links set at filing." }
+  - { rev: 2, at: "2026-09-27", note: "SF9.5-SF9.8 (#1757, #1758, #1774, #1759) were filed without a milestone. Milestone #30 is roadmap-owned by stability-families.yaml, so they join it, and that roadmap, in the same change as the SF9 re-scope (#516, #522, #524, #525) that MO2.6 carries; until then they are listed nowhere, which RM-06 permits for milestone-less issues." }
+items:
+
+  # ============ MO2 ============
+  - id: stacks-and-moduli-mo2
+    gh_milestone: 55
+    kind: milestone
+    title: "MO2 — Stacks and moduli: a stability-free boundary"
+    status: planned
+    lane: now
+    acceptance:
+      - "a layering rule keeps generic stacks, neutral moduli interfaces, pseudofunctor constructions, geometric stacks and moduli problems out of the stability tree, and keeps stacks upstream of moduli problems;"
+      - "the AlgebraicGeometry.Moduli umbrella stops importing stability;"
+      - "pointwise representability, presentation, Quot and boundedness names say what they define;"
+      - "the neutral family probes leave the stability tree, and the vacuous finite-type openness theorems get satisfiable hypotheses;"
+      - "the tracker, roadmaps and loop queue follow the plan."
+      - "The non-claims of the milestone description hold: no algebraicity, descent, boundedness, properness or existence result is carried by a structure field, instance or unproved hypothesis."
+
+  # ============ STK1 ============
+  - id: stacks-and-moduli-stk1
+    gh_milestone: 56
+    kind: milestone
+    title: "STK1 — Stacks on a site"
+    status: planned
+    lane: now
+    acceptance:
+      - "fibres in independent universes, universe lifts, and representable stacks in every fibre universe (STK1.1, STK1.7);"
+      - "invariance of the stack condition under pseudonatural equivalence (STK1.2);"
+      - "2-fibre products, the diagonal and the Isom sheaves (STK1.3a, STK1.3);"
+      - "representable morphisms natural in the test object. They agree with Mathlib's MorphismProperty.presheaf on discrete stacks, are stable under base change and composition, and a representable diagonal is the same as representable Isom sheaves (STK1.4, STK1.8, STK1.9);"
+      - "substacks cut out by local properties, the core, and the single moduli-of-objects constructor (STK1.5);"
+      - "optionally, the comparison with Mathlib's fibred categories and the 2-Yoneda lemma (STK1.6)."
+      - "The non-claims of the milestone description hold: no algebraicity, descent, boundedness, properness or existence result is carried by a structure field, instance or unproved hypothesis."
+
+  # ============ STK2 ============
+  - id: stacks-and-moduli-stk2
+    gh_milestone: 57
+    kind: milestone
+    title: "STK2 — Descent on the big sites of schemes"
+    status: planned
+    lane: now
+    acceptance:
+      - "one representable stack for every subcanonical topology, with fppf and étale as quasi-compact topologies (STK2.1);"
+      - "the stack criterion: a Zariski stack with descent along faithfully flat maps of affine schemes is an fpqc stack (STK2.2, STK2.7);"
+      - "effective descent of modules along faithfully flat ring maps, through the Bénabou–Roubaud comparison of Mathlib's TODOs (STK2.3, STK2.8);"
+      - "Zariski gluing of module sheaves, and the fpqc stack of quasi-coherent sheaves (Stacks 023T; STK2.9, STK2.4);"
+      - "fpqc descent of flatness over a base and of finite presentation (STK2.5, STK2.10);"
+      - "stacks on Over S against stacks on schemes, pullback of stacks along continuous functors, and limit-preserving stacks (07XL; STK2.6)."
+      - "The non-claims of the milestone description hold: no algebraicity, descent, boundedness, properness or existence result is carried by a structure field, instance or unproved hypothesis."
+
+  # ============ ASP1 ============
+  - id: stacks-and-moduli-asp1
+    gh_milestone: 58
+    kind: milestone
+    title: "ASP1 — Algebraic spaces as moduli targets"
+    status: planned
+    lane: now
+    acceptance:
+      - "schemes as algebraic spaces, fibre products, and algebraic spaces as sheaves and discrete stacks (ASP1.1);"
+      - "morphisms representable by algebraic spaces, for presheaves and for stacks (ASP1.2);"
+      - "points and their topology, open subspaces, and quasi-compact, separated, finite type, universally closed and proper morphisms (ASP1.3);"
+      - "valuative criteria, and their Noetherian refinement with DVRs (ASP1.4), after a research verdict on the missing Krull–Akizuki input (ASP1.7);"
+      - "stacks in setoids with an étale atlas are algebraic spaces (0432; ASP1.5), with a research verdict on the smooth-atlas case (04SZ; ASP1.6);"
+      - "global functions, and maps to affine schemes (05Z1; ASP1.8)."
+      - "The non-claims of the milestone description hold: no algebraicity, descent, boundedness, properness or existence result is carried by a structure field, instance or unproved hypothesis."
+
+  # ============ DQ1 ============
+  - id: stacks-and-moduli-dq1
+    gh_milestone: 59
+    kind: milestone
+    title: "DQ1 — Derived pushforward and base change on schemes"
+    status: planned
+    lane: now
+    acceptance:
+      - "Rf_* is right adjoint to resolution-built Lf^*."
+      - "For qcqs f: it preserves Dqc, commutes with sums, satisfies the projection formula, and satisfies flat and Tor-independent base change."
+      - "Dqc(X) carries its standard t-structure with heart QCoh(X)."
+      - "Module-sheaf pullback is strong monoidal, with the projection formula for invertible sheaves."
+      - "For flat projective families: the Grothendieck complex, semicontinuity, local constancy of χ, coherence and perfectness of Rf_*."
+      - "The non-claims of the milestone description hold: no algebraicity, descent, boundedness, properness or existence result is carried by a structure field, instance or unproved hypothesis."
+
+  # ============ PJ1 ============
+  - id: stacks-and-moduli-pj1
+    gh_milestone: 60
+    kind: milestone
+    title: "PJ1 — Projective morphisms over a base"
+    status: planned
+    lane: now
+    acceptance:
+      - "Delivers projective geometry over an arbitrary base scheme: projective space ℙ(n; S) with its twisting sheaves and base change; closed immersions of Proj from graded surjections; relative Proj and projective bundles P(E); ample and relatively ample invertible sheaves; H-projective, projective and quasi-projective morphisms, with the bridge between them over a base with an ample line bundle (LLLMPSZ Setup 8.1). It proves Serre finiteness, Serre vanishing and global generation over a Noetherian base, Hilbert polynomials on projective space over any field, and their local constancy in flat families. The existing field-level Čech and finiteness lanes are generalized in place, not copied."
+      - "The non-claims of the milestone description hold: no algebraicity, descent, boundedness, properness or existence result is carried by a structure field, instance or unproved hypothesis."
+
+  # ============ STK3 ============
+  - id: stacks-and-moduli-stk3
+    gh_milestone: 61
+    kind: milestone
+    title: "STK3 — Algebraic stacks"
+    status: planned
+    lane: next
+    acceptance:
+      - "fibre products; separated, quasi-separated and affine morphisms and affine diagonals; chart properties (06FL);"
+      - "points and their topology (04XE);"
+      - "open substacks as the openness root (04YK), replacing OpenLocusProbe;"
+      - "quasi-compactness and finite type;"
+      - "bounded families as the boundedness root (BLMNPS Definition 9.4, Lemma 9.5);"
+      - "torsors, the quotient stacks [X/G] and BG for smooth affine group schemes, and the group scheme G_m."
+      - "The non-claims of the milestone description hold: no algebraicity, descent, boundedness, properness or existence result is carried by a structure field, instance or unproved hypothesis."
+
+  # ============ STK4 ============
+  - id: stacks-and-moduli-stk4
+    gh_milestone: 62
+    kind: milestone
+    title: "STK4 — Properness and test stacks"
+    status: planned
+    lane: next
+    acceptance:
+      - "categories of dotted arrows in any bicategory (Stacks 0H17);"
+      - "the valuative criterion's uniqueness and existence parts (0CL9) and BLMNPS's strong existence part (Def 11.8);"
+      - "universally closed and proper morphisms, the valuative criteria (0CLV, 0CLY), and the DVR refinement over a locally Noetherian base (0CQL);"
+      - "BLMNPS Lemma 11.21 at the stack level (gap F2), with AHLH v5 Lemma A.11 recorded (gap F1)."
+      - "The non-claims of the milestone description hold: no algebraicity, descent, boundedness, properness or existence result is carried by a structure field, instance or unproved hypothesis."
+
+  # ============ GM1 ============
+  - id: stacks-and-moduli-gm1
+    gh_milestone: 63
+    kind: milestone
+    title: "GM1 — Good moduli spaces"
+    status: planned
+    lane: next
+    acceptance:
+      - "cohomologically affine stacks and morphisms;"
+      - "good moduli spaces (Alper Def 4.1 = BLMNPS Def 21.23), stated on affine test schemes and equal to Def 4.1 over affine targets, with base change, surjectivity, universal closedness, and universality for maps to schemes over an affine base;"
+      - "categorical moduli spaces as the neutral root;"
+      - "linear reductivity and affine GIT, with B𝔾_m, Θ and ST as unconditional examples;"
+      - "one genuine proper-good-moduli predicate in place of the stability file's ProperGoodModuli : Prop."
+      - "The non-claims of the milestone description hold: no algebraicity, descent, boundedness, properness or existence result is carried by a structure field, instance or unproved hypothesis."
+
+  # ============ GM2 ============
+  - id: stacks-and-moduli-gm2
+    gh_milestone: 64
+    kind: milestone
+    title: "GM2 — Existence of good moduli spaces, stated honestly"
+    status: planned
+    lane: later
+    acceptance:
+      - "the formal half of AHLH Prop 3.48(3): with a separated finite-type target, the good moduli space is proper iff the stack is quasi-compact and universally closed;"
+      - "AHLH §7's lemmas for the moduli stack M_A of flat, finitely presented objects of a locally noetherian abelian category: Artin–Zhang base change, flat descent, Θ- and ST_R-points as filtrations and modifications, and Θ-reductivity, S-completeness and the existence part for DVRs essentially of finite type. This is the heart half of BLMNPS gap F3."
+      - "The non-claims of the milestone description hold: no algebraicity, descent, boundedness, properness or existence result is carried by a structure field, instance or unproved hypothesis."
+
+  # ============ MOD1 ============
+  - id: stacks-and-moduli-mod1
+    gh_milestone: 65
+    kind: milestone
+    title: "MOD1 — Moduli of coherent sheaves"
+    status: planned
+    lane: next
+    acceptance:
+      - "limit preservation (Stacks 08KD), from finitely presented modules over filtered colimits and a research verdict on flatness at a finite stage;"
+      - "the open substack of vector bundles for universally closed X/S, by Nakayama;"
+      - "representability of Hom functors of flat coherent families for projective X over a locally Noetherian S (EGA III 7.7.6), hence the affine, finitely presented diagonal (Stacks 0DLY);"
+      - "a fibrewise-locus constructor, with Gieseker- and slope-semistable families as substacks."
+      - "The non-claims of the milestone description hold: no algebraicity, descent, boundedness, properness or existence result is carried by a structure field, instance or unproved hypothesis."
+
+  # ============ MOD2 ============
+  - id: stacks-and-moduli-mod2
+    gh_milestone: 66
+    kind: milestone
+    title: "MOD2 — Lieblich's stack of complexes"
+    status: planned
+    lane: next
+    acceptance:
+      - "relative perfection, by bounded, finitely presented, flat local models (Lieblich Def 2.1.1), because the Noetherian criterion is not base-change stable;"
+      - "universal gluability, at field-valued points."
+      - "base change of relative perfection (Stacks 0DI5);"
+      - "Hom representability over the locus where negative Ext vanishes (0DLC), once DQ1 lands;"
+      - "a separated diagonal representable by schemes, with affine automorphism groups (0DLG), and hence the fppf prestack property;"
+      - "limit preservation for projective X (0DLJ);"
+      - "algebraicity (0DLN), stated as the typed proposition Mpug.IsAlgebraic that #522 assumes."
+      - "The non-claims of the milestone description hold: no algebraicity, descent, boundedness, properness or existence result is carried by a structure field, instance or unproved hypothesis."
+
+  # ============ MOD3 ============
+  - id: stacks-and-moduli-mod3
+    gh_milestone: 67
+    kind: milestone
+    title: "MOD3 — Quot, Hilbert and Grassmannian schemes"
+    status: planned
+    lane: later
+    acceptance:
+      - "#1742: the Quot functor."
+      - "#1743, #1744: the Grassmannian."
+      - "#1745–#1747: regularity."
+      - "#1748, #1749: flattening."
+      - "#1750: existence (epic)."
+      - "#1751: Hilbert schemes."
+      - "Quot for non-projective morphisms or algebraic spaces (Stacks 09TU; #1752)."
+      - "Quot in a t-structure heart (BLMNPS Def 11.3; SF14)."
+      - "The non-claims of the milestone description hold: no algebraicity, descent, boundedness, properness or existence result is carried by a structure field, instance or unproved hypothesis."
+
+  # ============ ART1 ============
+  - id: stacks-and-moduli-art1
+    gh_milestone: 68
+    kind: milestone
+    title: "ART1 — Artin's axioms for the moduli of complexes"
+    status: planned
+    lane: later
+    acceptance:
+      - "#1752: which route to take;"
+      - "#1753: the Artin approximation dependency."
+      - "#1752: the route (research)."
+      - "#1753: approximation (research)."
+      - "#1754: (RS\\*) and strong effectiveness."
+      - "#1755: tangent spaces and openness of versality."
+      - "#1756: the criterion and algebraicity (epic)."
+      - "Derived moduli (Toën–Vaquié), excluded by the projective-families roadmap's wont."
+      - "The non-claims of the milestone description hold: no algebraicity, descent, boundedness, properness or existence result is carried by a structure field, instance or unproved hypothesis."
+
+  # ============ SF13 ============
+  - id: stacks-and-moduli-sf13
+    gh_milestone: 69
+    kind: milestone
+    title: "SF13 — Harder–Narasimhan structures over a curve, as theorems (BLMNPS Part III)"
+    status: planned
+    lane: next
+    acceptance:
+      - "central charges and (weak) HN structures over C (Defs 13.1, 13.3, 15.1), with one-directional C-linearity;"
+      - "the fibre lemmas (13.11–13.12, 15.5–15.7, 16.2);"
+      - "heart ⟺ HN structure (Props 13.14, 15.9) and the HN criterion (Props 13.16, 15.10, 15.14);"
+      - "the C-torsion theory from openness of flatness (Thm 17.1) and §17.2–§18.1;"
+      - "stability conditions on the fibres integrate to an HN structure (Thm 18.7);"
+      - "tilting weak HN structures (Prop 19.5), plus Remark 12.3 and Lemmas 14.8/14.11."
+      - "The non-claims of the milestone description hold: no algebraicity, descent, boundedness, properness or existence result is carried by a structure field, instance or unproved hypothesis."
+
+  # ============ SF14 ============
+  - id: stacks-and-moduli-sf14
+    gh_milestone: 70
+    kind: milestone
+    title: "SF14 — Stability conditions over a base and Theorem 22.2 (BLMNPS §§20–22)"
+    status: planned
+    lane: later
+    acceptance:
+      - "collections σ = (σ_s) of fibrewise numerical stability conditions over every point of S (Def 20.1);"
+      - "flat families (Def 20.5) as the existing OrdinaryDefinition20_5Conditions root at genuine probes, with generic openness (Lemma 20.4);"
+      - "semicontinuity of extreme phases and universal openness of P(I) (Lemma 20.9, Prop 20.8, Cor 20.10);"
+      - "stability conditions over S (Def 21.15) and boundedness of P_σ(I; v) (Lemma 21.20);"
+      - "the universally closed Quot^{≤φ} (Lemma 21.21);"
+      - "the absolute support-property deformation theorem (Thm 12.11);"
+      - "Stab_Λ(𝒟/S) with Def 22.1's topology, and Theorem 22.2: Z is a local homeomorphism, a covering over P_Z."
+      - "The non-claims of the milestone description hold: no algebraicity, descent, boundedness, properness or existence result is carried by a structure field, instance or unproved hypothesis."
+
+  # ------------ MO2 tasks ------------
+  - id: stacks-and-moduli-mo2-1
+    gh_issue: 1624
+    kind: task
+    parent: stacks-and-moduli-mo2
+    title: "MO2.1: ADR-0014 fixes the owners and conventions for stacks and moduli"
+    status: planned
+    priority: must
+    size: S
+    summary: "ADR-0014 fixes, once, the conventions every stacks and moduli issue in this plan builds on: one stack carrier, fibres in independent universes, relative stacks over Over S, representability natural in the test object, one moduli-of-objects construction, typed hypotheses over genuine definitions, and the paths in its placement table. It supersedes ADR-0013's paths. The architecture documents and AGENTS.md are brought into agreement with it in the same change."
+    labels: [area:governance, area:moduli, area:docs, type:docs, prerequisite, gate:owner]
+    blocked_by: []
+  - id: stacks-and-moduli-mo2-2
+    gh_issue: 1625
+    kind: task
+    parent: stacks-and-moduli-mo2
+    title: "MO2.2: A layering rule keeps generic stacks and moduli out of the stability tree"
+    status: planned
+    priority: must
+    size: S
+    summary: "A layering rule, registered in MILESTONE_RULES under the key \"MO2.2\", makes ADR-0014's dependency direction mechanical: the site-generic stack, neutral moduli and pseudofunctor subjects (CategoryTheory/Sites/Descent, CategoryTheory/Moduli, CategoryTheory/Bicategory) reach no module of the stability tree;"
+    labels: [area:governance, arch:layering, type:infra, area:moduli, prerequisite, gate:owner]
+    blocked_by: [1624]
+  - id: stacks-and-moduli-mo2-4
+    gh_issue: 1626
+    kind: task
+    parent: stacks-and-moduli-mo2
+    title: "MO2.4: Pointwise stack representability, presentation, Quot and boundedness names say what they define"
+    status: planned
+    priority: must
+    size: M
+    summary: "Every stack-representability, stack-presentation, Quot and boundedness name in the repository says what its definition gives. No definition changes; declarations are renamed, and their docstrings state the counterexamples that make the old names wrong."
+    labels: [area:moduli, area:algebraic-geometry, arch:api-hygiene, type:refactor, source:1902.08184v4]
+    blocked_by: [1624]
+  - id: stacks-and-moduli-mo2-5
+    gh_issue: 1627
+    kind: task
+    parent: stacks-and-moduli-mo2
+    title: "MO2.5: Neutral family probes leave the stability tree, and finite-type openness stops being vacuous"
+    status: planned
+    priority: must
+    size: M
+    summary: "Two corrections to the stability-in-families interfaces, in one PR."
+    labels: [area:moduli, area:stability, area:families, arch:layering, type:refactor, source:1902.08184v4]
+    blocked_by: [1624, 1625]
+  - id: stacks-and-moduli-mo2-3
+    gh_issue: 1628
+    kind: task
+    parent: stacks-and-moduli-mo2
+    title: "MO2.3: The AlgebraicGeometry.Moduli umbrella no longer imports stability"
+    status: planned
+    priority: must
+    size: M
+    summary: "import DerivedAlgGeo.AlgebraicGeometry.Moduli stops importing Bridgeland stability. The two stability-consuming subcomponents Moduli/Semistability/ and Moduli/HarderNarasimhan/ move below one new subcomponent, Moduli/StabilityCondition/. The Moduli umbrella omits it and the top-level AlgebraicGeometry umbrella imports it directly, which is the shape DerivedCategory already has with DerivedCategory/Stability/."
+    labels: [area:moduli, area:stability, arch:layering, type:refactor, gate:owner]
+    blocked_by: [1624, 1627]
+  - id: stacks-and-moduli-mo2-6
+    gh_issue: 1629
+    kind: task
+    parent: stacks-and-moduli-mo2
+    title: "MO2.6: Tracker, roadmap and loop queue follow the stacks-and-moduli plan"
+    status: planned
+    priority: must
+    size: M
+    summary: "The tracker, the roadmap files and the loop queue describe the stacks-and-moduli plan, and nothing stale is left in them: the plan's milestones exist; SF9 is re-scoped to its stability consumers, and #522, #524 and #525 leave the live loop queue until their new blockers close; PF2's e4 and e6 and PF5's e13 roadmap epics are disposed of; the stale items the plan names are resolved; every roadmap entry agrees with the tracker under scripts/check_roadmap.py; the optional neutral audit lane is decided."
+    labels: [area:governance, type:task, gate:owner]
+    blocked_by: []
+
+  # ------------ STK1 tasks ------------
+  - id: stacks-and-moduli-stk1-2
+    gh_issue: 1630
+    kind: task
+    parent: stacks-and-moduli-stk1
+    title: "STK1.2: Being a stack is invariant under pseudonatural equivalence"
+    status: planned
+    priority: must
+    size: M
+    summary: "Let F G : LocallyDiscrete Cᵒᵖ ⥤ᵖ Cat.{v', u'} and let α : F ⟶ G be a strong transformation all of whose components (α.app X).toFunctor are equivalences of categories. Then: descent data map functorially along α; restriction to descent data commutes with α up to a natural isomorphism; F is a prestack (a stack) for J if and only if G is."
+    labels: [area:moduli, type:feature, arch:coherence, prerequisite, upstream-candidate, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-stk1-1
+    gh_issue: 1631
+    kind: task
+    parent: stacks-and-moduli-stk1
+    title: "STK1.1: Stacks in groupoids with fibres in independent universes"
+    status: planned
+    priority: must
+    size: M
+    summary: "The carrier CategoryTheory.StackInGroupoids gets fibres in independent universes Cat.{v', u'}, as in Mathlib's Pseudofunctor.IsStack. Today it ties them as Cat.{w, w}."
+    labels: [area:moduli, type:refactor, arch:data-model, gate:owner, prerequisite]
+    blocked_by: [1624, 1630]
+  - id: stacks-and-moduli-stk1-3a
+    gh_issue: 1632
+    kind: task
+    parent: stacks-and-moduli-stk1
+    title: "STK1.3a: Two-fibre products of Cat-valued pseudofunctors, with projections, lifts and the diagonal"
+    status: planned
+    priority: must
+    size: M
+    summary: "Given strong transformations α : F ⟶ H and β : G ⟶ H between pseudofunctors LocallyDiscrete B₀ ⥤ᵖ Cat, this issue builds their 2-fibre product Pseudofunctor.fiberProduct α β. Its fibre over X is Mathlib's categorical pullback (α.app X).toFunctor ⊡ (β.app X).toFunctor. It comes with: the two projections and the 2-commutativity isomorphism; the lift of any 2-commutative square; the relative diagonal F ⟶ fiberProduct α α;"
+    labels: [area:moduli, type:feature, arch:coherence, prerequisite, upstream-candidate, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-stk1-3
+    gh_issue: 1633
+    kind: task
+    parent: stacks-and-moduli-stk1
+    title: "STK1.3: Two-fibre products of stacks in groupoids, the diagonal, and its Isom sheaves"
+    status: planned
+    priority: must
+    size: M
+    summary: "This issue has four results."
+    labels: [area:moduli, type:feature, arch:coherence, upstream-candidate]
+    blocked_by: [1632, 1630]
+  - id: stacks-and-moduli-stk1-5
+    gh_issue: 1634
+    kind: task
+    parent: stacks-and-moduli-stk1
+    title: "STK1.5: A local, pullback-stable object property of a stack cuts out a substack"
+    status: planned
+    priority: must
+    size: M
+    summary: "Let F : LocallyDiscrete Cᵒᵖ ⥤ᵖ Cat be a stack of categories for J, and let P : F.ObjectProperty be closed under isomorphisms and local for J. Local means stable under pullback, and such that an object whose pullbacks along a covering sieve satisfy P satisfies P. Then: P.fullsubcategory is a stack. This is the Mathlib TODO at Mathlib/CategoryTheory/Bicategory/Functor/Cat/ObjectProperty.lean:19. The core (maximal sub-groupoid) of a stack of categories is a stack in groupoids."
+    labels: [area:moduli, type:feature, arch:data-model, upstream-candidate]
+    blocked_by: [1624, 1630]
+  - id: stacks-and-moduli-stk1-4
+    gh_issue: 1636
+    kind: task
+    parent: stacks-and-moduli-stk1
+    title: "STK1.4: Representable morphisms of stacks, natural in the test object"
+    status: planned
+    priority: must
+    size: M
+    summary: "A morphism f : F ⟶ G of stacks in groupoids is representable when two things hold: every fibre functor f.app T is faithful; for every S and y ∈ G(S), the presheaf on Over S of isomorphism classes of the fibre of f over y is representable. The fibre is that of the 2-fibre product (C/S) ×_{y, G, f} F, so the sections of the presheaf over T are the classes of pairs (x, φ : y|_T ≅ f(x))."
+    labels: [area:moduli, type:feature, arch:data-model, arch:api-hygiene, upstream-candidate]
+    blocked_by: [1626, 1633, 1635]
+  - id: stacks-and-moduli-stk1-7
+    gh_issue: 1637
+    kind: task
+    parent: stacks-and-moduli-stk1
+    title: "STK1.7: Universe lifts of stacks, and representable stacks in every fibre universe"
+    status: planned
+    priority: must
+    size: M
+    summary: "Every Cat-valued pseudofunctor F on a locally discrete base has a universe lift F.ulift.{w₁, w₂}, with fibres ULiftHom.{w₁} (ULift.{w₂} (F.obj X)). The lift is a stack exactly when F is. So every stack in groupoids can be lifted to larger fibre universes."
+    labels: [area:moduli, type:feature, arch:data-model, prerequisite, upstream-candidate]
+    blocked_by: [1631, 1635]
+  - id: stacks-and-moduli-stk1-6
+    gh_issue: 1638
+    kind: task
+    parent: stacks-and-moduli-stk1
+    title: "STK1.6: Stacks in groupoids are categories fibred in groupoids; the 2-Yoneda lemma"
+    status: planned
+    priority: should
+    size: M
+    summary: "This issue connects stacks in groupoids to Mathlib's fibred categories and proves the 2-Yoneda lemma."
+    labels: [area:moduli, type:feature, arch:coherence, upstream-candidate]
+    blocked_by: [1637, 1631]
+  - id: stacks-and-moduli-stk1-8
+    gh_issue: 1639
+    kind: task
+    parent: stacks-and-moduli-stk1
+    title: "STK1.8: Representable morphisms of stacks are stable under base change and composition"
+    status: planned
+    priority: must
+    size: M
+    summary: "Representable morphisms of stacks in groupoids, in the natural sense of #1636, are stable under base change and composition: If f : X ⟶ Y is representable and g : Y' ⟶ Y is arbitrary, the second projection X ×_Y Y' ⟶ Y' is representable. It has the same representing objects, so it keeps every property P of the representing morphisms. If f : X ⟶ Y and g : Y ⟶ Z are representable, so is f ≫ g. It keeps P when P is stable under composition and respects isomorphisms."
+    labels: [area:moduli, type:feature, upstream-candidate]
+    blocked_by: [1633, 1636]
+  - id: stacks-and-moduli-stk1-9
+    gh_issue: 1640
+    kind: task
+    parent: stacks-and-moduli-stk1
+    title: "STK1.9: The diagonal of a stack is representable exactly when its Isom sheaves are"
+    status: planned
+    priority: must
+    size: S
+    summary: "For a stack in groupoids X, the fibre of the diagonal X ⟶ X × X over a pair (x, y) of objects over S is the Isom sheaf of x and y (Stacks 04SI). Consequently: the diagonal is representable in the natural sense of #1636 exactly when every Isom sheaf is representable (Stacks 045G, (1)⇔(2)); #1636's HasRepresentableDiagonal, stated through Isom sheaves, is equivalent to representability of the diagonal morphism of #1633."
+    labels: [area:moduli, type:feature, upstream-candidate]
+    blocked_by: [1633, 1636]
+
+  # ------------ STK2 tasks ------------
+  - id: stacks-and-moduli-stk2-1
+    gh_issue: 1635
+    kind: task
+    parent: stacks-and-moduli-stk2
+    title: "STK2.1: One representable stack for every subcanonical topology, collapsing the scheme-level copies"
+    status: planned
+    priority: must
+    size: S
+    summary: "Every subcanonical Grothendieck topology J on a category C gives one stack in groupoids StackInGroupoids.representable J X for each object X, and one stack morphism StackInGroupoids.representableMap J f for each arrow f : X ⟶ Y. Both are the discrete stack of yoneda.obj X and the map induced by yoneda.map f."
+    labels: [area:algebraic-geometry, type:refactor, arch:api-hygiene, prerequisite, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-stk2-7
+    gh_issue: 1641
+    kind: task
+    parent: stacks-and-moduli-stk2
+    title: "STK2.7: Sheaves on a slice are sheaves over the representable, and effective descent is local on the base"
+    status: planned
+    priority: must
+    size: M
+    summary: "Two site-generic tools that the stack criterion of #1642 and the base comparison of #1645 both need. Neither mentions schemes."
+    labels: [area:algebraic-geometry, type:feature, upstream-candidate, prerequisite, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-stk2-2
+    gh_issue: 1642
+    kind: task
+    parent: stacks-and-moduli-stk2
+    title: "STK2.2: An fpqc, fppf or étale stack is a Zariski stack with descent along faithfully flat maps of affine schemes"
+    status: planned
+    priority: must
+    size: M
+    summary: "Let P be a morphism property of schemes that is stable under base change, multiplicative and Zariski-local on the source, and suppose the quasi-compact topology Scheme.propQCTopology P is subcanonical. A pseudofunctor F : LocallyDiscrete Scheme.{u}ᵒᵖ ⥤ᵖ Cat is a stack for Scheme.propQCTopology P if and only if both of the following hold: - F is a stack for the big Zariski topology; - F has effective descent along every surjective P-morphism of affine schemes Spec S → Spec R."
+    labels: [area:algebraic-geometry, type:feature, prerequisite]
+    blocked_by: [1641, 1635]
+  - id: stacks-and-moduli-stk2-8
+    gh_issue: 1643
+    kind: task
+    parent: stacks-and-moduli-stk2
+    title: "STK2.8: Descent data along one morphism are comonad coalgebras, and descent survives pullback-preserving reindexing"
+    status: planned
+    priority: must
+    size: M
+    summary: "Two changes of presentation for descent data along a single morphism f : X ⟶ S. Both are needed to turn Mathlib's comonadicity of extension of scalars into effective descent."
+    labels: [area:algebraic-geometry, type:feature, upstream-candidate, prerequisite, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-stk2-3
+    gh_issue: 1644
+    kind: task
+    parent: stacks-and-moduli-stk2
+    title: "STK2.3: Modules have effective descent along faithfully flat ring maps"
+    status: planned
+    priority: must
+    size: M
+    summary: "Modules have effective descent along faithfully flat ring maps. If φ : A ⟶ B is a faithfully flat map of commutative rings, the module pseudofunctor (extension of scalars) on CommRingCatᵒᵖ is a stack for the singleton {φ.op}. Equivalently, ModuleCat A is equivalent to the category of B-modules with descent data along A → B."
+    labels: [area:algebra, type:feature, upstream-candidate, prerequisite]
+    blocked_by: [1643]
+  - id: stacks-and-moduli-stk2-6
+    gh_issue: 1645
+    kind: task
+    parent: stacks-and-moduli-stk2
+    title: "STK2.6: Stacks on Over S against stacks on schemes, and limit-preserving stacks (04WC, 07XL)"
+    status: planned
+    priority: must
+    size: L
+    summary: "Stacks over a scheme S live on Over S (ADR-0014, decision 3). This issue relates them to stacks on the whole site and defines limit-preserving stacks. Nothing below is specific to schemes except the last deliverable."
+    labels: [area:algebraic-geometry, area:moduli, type:feature, prerequisite]
+    blocked_by: [1643, 1641, 1635]
+  - id: stacks-and-moduli-stk2-9
+    gh_issue: 1647
+    kind: task
+    parent: stacks-and-moduli-stk2
+    title: "STK2.9: Module sheaves glue along Zariski covers, and quasi-coherent sheaves form a Zariski substack"
+    status: planned
+    priority: must
+    size: L
+    summary: "Sheaves of modules on schemes glue along Zariski covers, and quasi-coherent ones form a Zariski substack. Precisely: - X ↦ X.Modules, with pullback, is a stack for the big Zariski topology Scheme.zariskiTopology. This is Mathlib's Scheme.Modules.pseudofunctor followed by Adj.forget₁. - Quasi-coherence is stable under pullback along every morphism (Stacks 01BG) and is Zariski-local."
+    labels: [area:algebraic-geometry, type:feature, prerequisite]
+    blocked_by: [1634]
+  - id: stacks-and-moduli-stk2-4
+    gh_issue: 1648
+    kind: task
+    parent: stacks-and-moduli-stk2
+    title: "STK2.4: Quasi-coherent sheaves form a stack for the fpqc topology (Stacks 023T)"
+    status: planned
+    priority: must
+    size: M
+    summary: "Quasi-coherent sheaves form a stack for the fpqc topology (Stacks 023T). Scheme.qcohPseudofunctor, the pseudofunctor X ↦ QCoh(X) with pullback from #1647, satisfies IsStack Scheme.fpqcTopology, and hence is a stack for the fppf, étale and Zariski topologies."
+    labels: [area:algebraic-geometry, type:feature, prerequisite]
+    blocked_by: [1642, 1644, 1643, 1647, 1630]
+  - id: stacks-and-moduli-stk2-10
+    gh_issue: 1649
+    kind: task
+    parent: stacks-and-moduli-stk2
+    title: "STK2.10: Finite presentation and flatness over a third ring descend along faithfully flat ring maps"
+    status: planned
+    priority: must
+    size: S
+    summary: "Two statements of commutative algebra that the fpqc-locality of #1650 reduces to. Both are absent at the pin, and both are natural additions beside Mathlib's Module.Finite.of_finite_tensorProduct_of_faithfullyFlat."
+    labels: [area:algebra, type:feature, upstream-candidate, prerequisite, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-stk2-5
+    gh_issue: 1650
+    kind: task
+    parent: stacks-and-moduli-stk2
+    title: "STK2.5: Flatness over a base and finite presentation descend along fpqc coverings"
+    status: planned
+    priority: must
+    size: L
+    summary: "Flatness over a base, and finite presentation, descend along fpqc coverings. - Flatness. Let q : Y ⟶ T be a morphism of schemes and M : Y.Modules. - M is flat over T if its pullback to Y ×_T Tᵢ is flat over Tᵢ for every member of a flat, jointly surjective family {Tᵢ ⟶ T} (Stacks 02JZ with 01U6). - Along a flat morphism of the source, flatness over the base ascends. Along a flat surjection it also descends. - Finite presentation."
+    labels: [area:algebraic-geometry, type:feature, prerequisite]
+    blocked_by: [1649, 1647, 1634, 1648]
+
+  # ------------ ASP1 tasks ------------
+  - id: stacks-and-moduli-asp1-1
+    gh_issue: 1651
+    kind: task
+    parent: stacks-and-moduli-asp1
+    title: "ASP1.1: Algebraic spaces over a scheme, and schemes as algebraic spaces (025Y, 025Z)"
+    status: planned
+    priority: must
+    size: M
+    summary: "Algebraic spaces over a base scheme S, in the sense of Stacks 025Y. An algebraic space over S is a presheaf of sets F on Over S such that: - F is an fppf sheaf; - its diagonal is representable (by schemes), in the sense of Mathlib's Functor.relativelyRepresentable yoneda; - some scheme U over S admits a map yoneda U ⟶ F whose base changes to schemes are étale and surjective. This is Mathlib's MorphismProperty.presheaf for (@Etale ⊓ @Surjective).over."
+    labels: [area:algebraic-geometry, area:moduli, type:feature, arch:data-model]
+    blocked_by: [1624]
+  - id: stacks-and-moduli-asp1-2
+    gh_issue: 1652
+    kind: task
+    parent: stacks-and-moduli-asp1
+    title: "ASP1.2: Morphisms representable by algebraic spaces, for presheaves and for stacks (02YQ, 02ZW)"
+    status: planned
+    priority: must
+    size: L
+    summary: "Morphisms representable by algebraic spaces, and their properties, at two levels."
+    labels: [area:algebraic-geometry, type:feature]
+    blocked_by: [1651, 1636]
+  - id: stacks-and-moduli-asp1-3
+    gh_issue: 1653
+    kind: task
+    parent: stacks-and-moduli-asp1
+    title: "ASP1.3: Points, open subspaces, and quasi-compact, separated, finite-type and proper morphisms of algebraic spaces"
+    status: planned
+    priority: must
+    size: L
+    summary: "The topological space of an algebraic space, its open subspaces, and the first properties of morphisms of algebraic spaces over S: - Points. |X| is the set of field-valued points Spec K → X up to common field extension (Stacks 03BU). Its topology is the quotient topology of any étale surjective atlas |U| → |X| (03BX, 03BY). For a scheme, |X| is the underlying space (03BV). A morphism from a scheme is surjective iff it is surjective on points (03H5). - Open subspaces."
+    labels: [area:algebraic-geometry, type:feature]
+    blocked_by: [1651, 1652]
+  - id: stacks-and-moduli-asp1-6
+    gh_issue: 1654
+    kind: task
+    parent: stacks-and-moduli-asp1
+    title: "ASP1.6: Research: an étale atlas from a smooth one, for stacks in setoids (04SZ)"
+    status: planned
+    priority: should
+    size: M
+    summary: "A written verdict on how this repository will prove the remaining half of Stacks 04SZ. The statement is: a stack in setoids on (Over S, fppf.over S) whose diagonal is representable by schemes, and which has a smooth surjective atlas from a scheme, has an étale surjective atlas, hence is an algebraic space."
+    labels: [area:algebraic-geometry, research, type:spike, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-asp1-7
+    gh_issue: 1655
+    kind: task
+    parent: stacks-and-moduli-asp1
+    title: "ASP1.7: Research: DVRs suffice in the valuative criteria over a locally Noetherian base (Limits §32.15)"
+    status: planned
+    priority: should
+    size: S
+    summary: "A written verdict on how to prove, for schemes, that discrete valuation rings suffice in the valuative criteria over a locally Noetherian base. This is Stacks Section 32.15, four lemmas: - Stacks 0CM2 (Limits, Lemma 32.15.1): for f of finite type over a locally Noetherian Y, a point in the closure of the image of f is reached by a DVR, with the generic point mapping to a generic point of an irreducible component of X."
+    labels: [area:algebraic-geometry, area:algebra, research, type:spike, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-asp1-4
+    gh_issue: 1656
+    kind: task
+    parent: stacks-and-moduli-asp1
+    title: "ASP1.4: Valuative criteria for morphisms of algebraic spaces, and DVRs over a locally Noetherian base"
+    status: planned
+    priority: must
+    size: L
+    summary: "Valuative criteria for morphisms of algebraic spaces, and their Noetherian refinement with discrete valuation rings. For a morphism f : X ⟶ Y of algebraic spaces over S: - Definitions (67.41.1). The existence and uniqueness parts of the valuative criterion. As in Stacks, the existence part may pass to an extension K'/K with a valuation ring A' ⊆ K' dominating A. - They are stable under base change (03IY) and composition (03IZ)."
+    labels: [area:algebraic-geometry, type:feature]
+    blocked_by: [1653, 1655]
+  - id: stacks-and-moduli-asp1-8
+    gh_issue: 1657
+    kind: task
+    parent: stacks-and-moduli-asp1
+    title: "ASP1.8: Global functions of an algebraic space, and maps to affine schemes (05Z1)"
+    status: planned
+    priority: must
+    size: M
+    summary: "The ring of global functions of an algebraic space, and the fact that morphisms into an affine scheme are ring maps into it (Stacks 05Z1). For an algebraic space X over S: - Global functions. Γ(X, 𝒪_X) is a commutative ring in CommRingCat.{u}, computed from any étale atlas U → X as the equalizer of Γ(U) ⇉ Γ(U ×_X U). It is contravariantly functorial, and on a scheme it is Γ(T, ⊤). - Maps to affine schemes."
+    labels: [area:algebraic-geometry, type:feature]
+    blocked_by: [1651]
+  - id: stacks-and-moduli-asp1-5
+    gh_issue: 1685
+    kind: task
+    parent: stacks-and-moduli-asp1
+    title: "ASP1.5: Algebraic spaces are the algebraic stacks in setoids with an étale atlas (0432, 04SZ)"
+    status: planned
+    priority: must
+    size: M
+    summary: "Algebraic spaces are exactly the algebraic stacks in setoids that admit an étale atlas. This is the part of Stacks 04SZ that needs no slicing theorem. Precisely: Stacks in setoids are sheaves (Stacks 0432). A stack in groupoids whose fibres are setoids (thin groupoids) is equivalent to the discrete stack of its sheaf of isomorphism classes. This is site-generic. Spaces are algebraic stacks."
+    labels: [area:algebraic-geometry, area:moduli, type:feature]
+    blocked_by: [1651, 1684, 1636, 1630, 1635]
+
+  # ------------ DQ1 tasks ------------
+  - id: stacks-and-moduli-dq1-1a
+    gh_issue: 1658
+    kind: task
+    parent: stacks-and-moduli-dq1
+    title: "DQ1.1a: K-injective resolutions in Grothendieck abelian categories"
+    status: planned
+    priority: must
+    size: L
+    summary: "In a Grothendieck abelian category every cochain complex M admits a quasi-isomorphism M ⟶ I that is a monomorphism in each degree, with I K-injective and termwise injective. The construction is functorial in M."
+    labels: [area:algebra, area:derived, type:feature, prerequisite, upstream-candidate, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-dq1-1b
+    gh_issue: 1659
+    kind: task
+    parent: stacks-and-moduli-dq1
+    title: "DQ1.1b: Unbounded right-derived functors from K-injective resolutions"
+    status: planned
+    priority: must
+    size: M
+    summary: "Let C be an abelian category in which every complex has a K-injective resolution, and let F : C ⥤ D be an additive functor. Then F has an unbounded right-derived functor RF : D(C) ⥤ D(D). It is computed by applying F to K-injective representatives, it is triangulated, and it stays a right-derived functor after post-composition with any functor."
+    labels: [area:algebra, area:derived, type:feature, prerequisite, upstream-candidate]
+    blocked_by: [1658]
+  - id: stacks-and-moduli-dq1-1c
+    gh_issue: 1660
+    kind: task
+    parent: stacks-and-moduli-dq1
+    title: "DQ1.1c: The total direct image Rf_* of module sheaves along any morphism"
+    status: planned
+    priority: must
+    size: M
+    summary: "Every morphism f : T ⟶ U of scheme base changes gets its total direct image Rf_* : D(T.Modules) ⥤ D(U.Modules). It is the genuine right-derived functor of module-sheaf pushforward, inhabiting the repository's existing RightDerivedPushforward f with no supplied data."
+    labels: [area:derived, area:algebraic-geometry, type:feature]
+    blocked_by: [1658, 1659]
+  - id: stacks-and-moduli-dq1-1d
+    gh_issue: 1661
+    kind: task
+    parent: stacks-and-moduli-dq1
+    title: "DQ1.1d: Lf^* ⊣ Rf_*, composition, and the base-change morphism"
+    status: planned
+    priority: must
+    size: M
+    summary: "Derived pullback is left adjoint to total direct image (Stacks 079W): Lf^* ⊣ Rf_* on the unbounded derived categories of module sheaves. Here Lf^* is any pullback built from a pullback-acyclic resolution, i.e. the repository's PullbackAcyclicResolution f, and Rf_* is the construction of #1660."
+    labels: [area:derived, area:families, type:feature]
+    blocked_by: [1659, 1660]
+  - id: stacks-and-moduli-dq1-1e
+    gh_issue: 1662
+    kind: task
+    parent: stacks-and-moduli-dq1
+    title: "DQ1.1e: Higher direct images of quasi-coherent sheaves along qcqs morphisms"
+    status: planned
+    priority: must
+    size: L
+    summary: "Let f be quasi-compact and quasi-separated, and let F be a quasi-coherent sheaf. Then every higher direct image R^p f_* F := H^p(Rf_* F) is quasi-coherent (Stacks 01XJ). When the target is quasi-compact, they vanish above a bound independent of F (Stacks 01XJ(2)), and over an affine open V of the target their sections are the cohomology groups H^p(f⁻¹V, F) (Stacks 01XK)."
+    labels: [area:algebraic-geometry, area:derived, type:feature]
+    blocked_by: [1659, 1660]
+  - id: stacks-and-moduli-dq1-1f
+    gh_issue: 1663
+    kind: task
+    parent: stacks-and-moduli-dq1
+    title: "DQ1.1f: Rf_* preserves Dqc and direct sums for qcqs morphisms"
+    status: planned
+    priority: must
+    size: L
+    summary: "For a quasi-compact quasi-separated morphism f, the total direct image Rf_* sends the unbounded category Dqc of the source into Dqc of the target (Stacks 08D5) and commutes with arbitrary direct sums there (Stacks 08DZ). This inhabits the repository's DqcRightDerivedPushforward f with a proved mapsQuasicoherent field, where today every inhabitant takes it as input."
+    labels: [area:derived, area:algebraic-geometry, type:feature]
+    blocked_by: [1659, 1662]
+  - id: stacks-and-moduli-dq1-2a
+    gh_issue: 1664
+    kind: task
+    parent: stacks-and-moduli-dq1
+    title: "DQ1.2a: Module-sheaf pullback is strong monoidal; the projection formula for invertible sheaves"
+    status: planned
+    priority: must
+    size: M
+    summary: "Pullback of module sheaves along any morphism of schemes is strong monoidal for the sheafified tensor product: f^*(M ⊗ N) ≅ f^*M ⊗ f^*N and f^*𝒪_Y ≅ 𝒪_X, coherently (Stacks 01CD)."
+    labels: [area:algebraic-geometry, type:feature, prerequisite, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-dq1-2b
+    gh_issue: 1665
+    kind: task
+    parent: stacks-and-moduli-dq1
+    title: "DQ1.2b: The derived projection formula for qcqs morphisms"
+    status: planned
+    priority: must
+    size: L
+    summary: "The projection formula. For a quasi-compact quasi-separated morphism f : X → Y, E ∈ Dqc(X) and K ∈ Dqc(Y), the canonical map"
+    labels: [area:derived, area:families, type:feature]
+    blocked_by: [1661, 1663, 1664]
+  - id: stacks-and-moduli-dq1-3a
+    gh_issue: 1666
+    kind: task
+    parent: stacks-and-moduli-dq1
+    title: "DQ1.3a: Flat base change for Rf_* and higher direct images"
+    status: planned
+    priority: must
+    size: M
+    summary: "Flat base change. Take a cartesian square"
+    labels: [area:derived, area:families, type:feature]
+    blocked_by: [1661, 1662, 1663]
+  - id: stacks-and-moduli-dq1-3b
+    gh_issue: 1667
+    kind: task
+    parent: stacks-and-moduli-dq1
+    title: "DQ1.3b: Tor-independent base change, replacing the supplied DqcFlatBaseChangeTheorem"
+    status: planned
+    priority: must
+    size: M
+    summary: "Tor-independent base change (Stacks 08IB). Take a cartesian square with f : X → S quasi-compact and quasi-separated, where X and S' are Tor independent over S. Then for every E ∈ Dqc(X) the canonical map Lg^* Rf_* E ⟶ Rf'_* Lg'^* E of #1661 is an isomorphism. Flatness of either f or g implies Tor independence."
+    labels: [area:derived, area:families, type:feature, arch:api-hygiene]
+    blocked_by: [1661, 1663, 1665, 1666]
+  - id: stacks-and-moduli-dq1-4
+    gh_issue: 1668
+    kind: task
+    parent: stacks-and-moduli-dq1
+    title: "DQ1.4: The standard t-structure on Dqc(X), with heart QCoh(X)"
+    status: planned
+    priority: must
+    size: M
+    summary: "The standard t-structure on Dqc(X), with heart QCoh(X)."
+    labels: [area:derived, area:algebraic-geometry, type:feature, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-dq1-6
+    gh_issue: 1669
+    kind: task
+    parent: stacks-and-moduli-dq1
+    title: "DQ1.6: Pin HasDerivedPushforward to the total direct image"
+    status: planned
+    priority: must
+    size: S
+    summary: "HasDerivedPushforward f is pinned to the genuine total direct image, and finite morphisms inhabit it."
+    labels: [area:derived, arch:api-hygiene, type:refactor]
+    blocked_by: [1660, 1662]
+  - id: stacks-and-moduli-dq1-5a
+    gh_issue: 1678
+    kind: task
+    parent: stacks-and-moduli-dq1
+    title: "DQ1.5a: The Grothendieck complex for H-projective families"
+    status: planned
+    priority: must
+    size: M
+    summary: "Cohomology and base change for projective families: the Grothendieck complex. Let A be a Noetherian ring, f : X → Spec A an H-projective morphism, and F a coherent sheaf on X, flat over A. There is a bounded complex K of finite projective A-modules with isomorphisms"
+    labels: [area:algebraic-geometry, area:families, type:feature]
+    blocked_by: [1674, 1676, 1677]
+  - id: stacks-and-moduli-dq1-5b
+    gh_issue: 1679
+    kind: task
+    parent: stacks-and-moduli-dq1
+    title: "DQ1.5b: Semicontinuity and local constancy of χ in flat projective families"
+    status: planned
+    priority: must
+    size: M
+    summary: "Semicontinuity, and local constancy of the Euler characteristic, in flat projective families. Let S be locally Noetherian, f : X → S locally H-projective, and F a coherent sheaf on X, flat over S. Then: 1. for each i, the function s ↦ dim_{κ(s)} H^i(X_s, F_s) is upper semicontinuous on S (Hartshorne III.12.8; Stacks 0BDN(2)); 2. s ↦ χ(X_s, F_s) = Σ_i (-1)^i dim_{κ(s)} H^i(X_s, F_s) is locally constant on S (Stacks 0B9T)."
+    labels: [area:algebraic-geometry, area:families, type:feature]
+    blocked_by: [1678, 1674, 1676]
+  - id: stacks-and-moduli-dq1-5c
+    gh_issue: 1680
+    kind: task
+    parent: stacks-and-moduli-dq1
+    title: "DQ1.5c: Coherence of R^i f_* and perfectness of Rf_* in flat projective families"
+    status: planned
+    priority: must
+    size: M
+    summary: "Coherence of higher direct images, and perfectness of Rf_* in flat projective families. Let S be locally Noetherian and f : X → S locally projective. 1. For every coherent F on X, each R^i f_* F is coherent (Stacks 02O4). 2. If F is moreover flat over S, then Rf_* F is perfect on S, i.e. relatively perfect over 𝟙 S in the repository's sense, and its formation commutes with base change (the projective case of Stacks 0B91)."
+    labels: [area:derived, area:families, type:feature, source:2607.28411]
+    blocked_by: [1661, 1662, 1663, 1666, 1678, 1674, 1677]
+
+  # ------------ PJ1 tasks ------------
+  - id: stacks-and-moduli-pj1-1
+    gh_issue: 1670
+    kind: task
+    parent: stacks-and-moduli-pj1
+    title: "PJ1.1: Projective space ℙ(n; S) over a base scheme, its twisting sheaves, and base change of Proj"
+    status: planned
+    priority: must
+    size: M
+    summary: "Projective space over a base scheme, its twisting sheaves, and base change of Proj. For a type n of homogeneous coordinates and a scheme S, define"
+    labels: [area:algebraic-geometry, type:feature, prerequisite, upstream-candidate, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-pj1-1b
+    gh_issue: 1671
+    kind: task
+    parent: stacks-and-moduli-pj1
+    title: "PJ1.1b: Proj of a surjective graded map is a closed immersion; hyperplane sections of Proj"
+    status: planned
+    priority: must
+    size: M
+    summary: "Proj of a surjective graded map is a closed immersion, and hyperplane sections of Proj. For a surjective graded ring map ψ : 𝒜 →+*ᵍ ℬ, Mathlib's Proj.map ψ : Proj ℬ ⟶ Proj 𝒜 is a closed immersion (Stacks 01N0 (2)). When 𝒜 is generated over 𝒜₀ by elements of degree one, it pulls 𝒪(d) back to 𝒪(d) (Stacks 01N1). For a general surjection θ is only surjective (01N0 (3))."
+    labels: [area:algebraic-geometry, type:feature, prerequisite, upstream-candidate, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-pj1-2a
+    gh_issue: 1672
+    kind: task
+    parent: stacks-and-moduli-pj1
+    title: "PJ1.2a: Relative Proj of a quasi-coherent graded algebra"
+    status: planned
+    priority: must
+    size: M
+    summary: "Relative Proj of a quasi-coherent graded algebra: the construction. Let 𝒜 be a quasi-coherent sheaf of graded 𝒪_S-algebras on a scheme S. Then Proj_S(𝒜) → S is a scheme over S with, for every affine open U ⊆ S, an isomorphism π⁻¹(U) ≅ Proj 𝒜(U) over U, compatible with inclusions (Stacks 01NQ)."
+    labels: [area:algebraic-geometry, arch:data-model, type:feature]
+    blocked_by: [1670]
+  - id: stacks-and-moduli-pj1-2b
+    gh_issue: 1673
+    kind: task
+    parent: stacks-and-moduli-pj1
+    title: "PJ1.2b: Relative Proj: base change, functoriality, twisting sheaves and projective bundles"
+    status: planned
+    priority: must
+    size: M
+    summary: "Relative Proj: base change, functoriality, twisting sheaves, and projective bundles. For a quasi-coherent graded 𝒪_S-algebra 𝒜 (#1672): - Proj_S(𝒜) commutes with arbitrary base change S' → S (Stacks 01NT/01NZ); - a graded map 𝒜 → ℬ that is surjective in large degrees induces a closed immersion Proj_S(ℬ) → Proj_S(𝒜) when 𝒜 is generated in degree one (Stacks 07ZK); - when 𝒜 is generated in degree one, Proj_S(𝒜) carries invertible twisting sheaves 𝒪(d) (Stacks 01NR); - Proj_S(𝒜) → S is separated (Stacks 01OD)."
+    labels: [area:algebraic-geometry, type:feature]
+    blocked_by: [1670, 1671, 1672]
+  - id: stacks-and-moduli-pj1-3a
+    gh_issue: 1674
+    kind: task
+    parent: stacks-and-moduli-pj1
+    title: "PJ1.3a: Ample and relatively ample invertible sheaves; H-projective and locally projective morphisms"
+    status: planned
+    priority: must
+    size: M
+    summary: "Ample and relatively ample invertible sheaves; H-projective and locally projective morphisms. This issue defines: 1. the non-vanishing locus X_s of a section of an invertible sheaf (Stacks 01CY); 2. ampleness (Stacks 01PS); 3. relative ampleness for a quasi-compact morphism (Stacks 01VH); 4. H-projective morphisms, those admitting a closed immersion into ℙ(n; S) over S (Stacks 01W8), and locally projective morphisms, locally H-projective over an open cover (Stacks 01WB)."
+    labels: [area:algebraic-geometry, type:feature, prerequisite]
+    blocked_by: [1670]
+  - id: stacks-and-moduli-pj1-3b
+    gh_issue: 1675
+    kind: task
+    parent: stacks-and-moduli-pj1
+    title: "PJ1.3b: Projective and quasi-projective morphisms, and when they are H-projective"
+    status: planned
+    priority: must
+    size: M
+    summary: "Projective and quasi-projective morphisms in the Stacks/EGA sense, and when they are H-projective. This issue defines: - relatively very ample invertible sheaves: an immersion into some P(E) over S pulling 𝒪(1) back to L (Stacks 01VM); - projective morphisms: closed subschemes of P(E) for E quasi-coherent of finite type (Stacks 01W8); - quasi-projective morphisms: finite type with an f-ample invertible sheaf (Stacks 01VW)."
+    labels: [area:algebraic-geometry, type:feature, source:2607.28411, source:1902.08184v4]
+    blocked_by: [1672, 1673, 1674]
+  - id: stacks-and-moduli-pj1-4a
+    gh_issue: 1676
+    kind: task
+    parent: stacks-and-moduli-pj1
+    title: "PJ1.4a: Cohomology of 𝒪(d) on projective space over any ring, base-ring linearly"
+    status: planned
+    priority: must
+    size: L
+    summary: "Cohomology of the twisting sheaves on projective space over any ring, with its base-ring-linear structure. For a commutative ring R and a finite nonempty type n of homogeneous coordinates, N := |n| − 1: - H^0(ℙ(n; Spec R), 𝒪(d)) is the degree-d part of R[n] (zero for d < 0); - H^q(ℙ(n; Spec R), 𝒪(d)) = 0 for 0 < q < N and for q > N; - H^N(ℙ(n; Spec R), 𝒪(d)) is a finite free R-module, zero for d > −|n|."
+    labels: [area:algebraic-geometry, type:refactor]
+    blocked_by: [1670]
+  - id: stacks-and-moduli-pj1-4b
+    gh_issue: 1677
+    kind: task
+    parent: stacks-and-moduli-pj1
+    title: "PJ1.4b: Serre finiteness for H-projective schemes over a Noetherian ring"
+    status: planned
+    priority: must
+    size: M
+    summary: "Serre finiteness over a Noetherian ring. Let A be a Noetherian ring and f : X → Spec A an H-projective morphism. Then for every coherent F on X and every p, H^p(X, F) is a finite A-module (Stacks 01YS (3), Hartshorne III.5.2 (a))."
+    labels: [area:algebraic-geometry, type:feature]
+    blocked_by: [1670, 1674, 1676]
+  - id: stacks-and-moduli-pj1-4c
+    gh_issue: 1681
+    kind: task
+    parent: stacks-and-moduli-pj1
+    title: "PJ1.4c: Serre vanishing and global generation for H-projective morphisms"
+    status: planned
+    priority: must
+    size: M
+    summary: "Serre vanishing and global generation for H-projective morphisms over a Noetherian base. Let i : X → ℙ(n; S) be a closed immersion over a locally Noetherian S, with 𝒪_X(m) := i^*𝒪(m), and let F be coherent on X. Then: 1. over an affine base S = Spec A with A Noetherian, H^p(X, F ⊗ 𝒪_X(m)) = 0 for every p > 0 and every m ≫ 0 (Stacks 01YS (4); Hartshorne III.5.2 (b)); 2. over the same affine base, F ⊗ 𝒪_X(m) is a quotient of a finite free sheaf for every m ≫ 0, not only for one m (Hartshorne II.5.17); 3."
+    labels: [area:algebraic-geometry, type:feature]
+    blocked_by: [1664, 1670, 1676, 1677]
+  - id: stacks-and-moduli-pj1-5a
+    gh_issue: 1682
+    kind: task
+    parent: stacks-and-moduli-pj1
+    title: "PJ1.5a: Hilbert polynomials of coherent sheaves on projective space over a field"
+    status: planned
+    priority: must
+    size: L
+    summary: "Hilbert polynomials of coherent sheaves on projective space over a field. For a field k, a finite nonempty type ι of homogeneous coordinates (n := |ι| − 1) and a coherent F on ℙⁿ_k = Proj k[ι]: - m ↦ χ(ℙⁿ_k, F(m)) is a numerical polynomial of degree at most n (Stacks 08AC); - it equals dim_k H^0(F(m)) for m ≫ 0 (Stacks 08AE); - it is the evaluation of a unique P_F ∈ ℚ[X] of degree at most n (Stacks 08AD)."
+    labels: [area:algebraic-geometry, type:feature]
+    blocked_by: [1664, 1670, 1671, 1681]
+  - id: stacks-and-moduli-pj1-5b
+    gh_issue: 1683
+    kind: task
+    parent: stacks-and-moduli-pj1
+    title: "PJ1.5b: Hilbert polynomials are locally constant in flat projective families"
+    status: planned
+    priority: must
+    size: S
+    summary: "Hilbert polynomials are locally constant in flat projective families. Let S be locally Noetherian and i : X → ℙ(n; S) a closed immersion, with f := i ≫ (ℙ(n; S) → S), and let F be coherent on X and flat over S. For s ∈ S the fibre X_s is a closed subscheme of ℙ(n; κ(s)) through the base change i_s of i. Write P_s ∈ ℚ[X] for the Hilbert polynomial of F_s with respect to i_s^*𝒪(1) (#1682). Then s ↦ P_s is locally constant on S, and constant on a connected S (Hartshorne III.9.9, the direction \"flat ⇒ constant\")."
+    labels: [area:algebraic-geometry, area:families, type:feature, source:2607.28411]
+    blocked_by: [1664, 1679, 1670, 1674, 1681, 1682]
+
+  # ------------ STK3 tasks ------------
+  - id: stacks-and-moduli-stk3-1
+    gh_issue: 1684
+    kind: task
+    parent: stacks-and-moduli-stk3
+    title: "STK3.1: Algebraic stacks with diagonal representable by schemes, schemes as algebraic stacks, and the proved map to the pointwise presentations"
+    status: planned
+    priority: must
+    size: M
+    summary: "A stack in groupoids X on the big fppf site of schemes over S is an algebraic stack with scheme diagonal when: - its diagonal is representable, naturally in the test scheme, by schemes; and - some scheme U over S has a smooth surjective morphism U → X in the same natural sense."
+    labels: [area:algebraic-geometry, area:moduli, type:feature, arch:data-model]
+    blocked_by: [1631, 1633, 1636, 1637, 1635, 1645, 1626]
+  - id: stacks-and-moduli-stk3-2
+    gh_issue: 1686
+    kind: task
+    parent: stacks-and-moduli-stk3
+    title: "STK3.2: Fibre products of algebraic stacks and properties of their morphisms, through the diagonal and smooth charts"
+    status: planned
+    priority: must
+    size: L
+    summary: "Algebraic stacks with scheme diagonal (#1684) are closed under 2-fibre products, and their morphisms acquire the standard properties in the standard way: Representable morphisms. A property of scheme morphisms that is stable under base change is measured on base changes to schemes (Stacks 04XB). Diagonal properties. Quasi-separated and separated morphisms, and morphisms with affine diagonal, are defined by the relative diagonal, which is representable by schemes (Stacks 04YW)."
+    labels: [area:algebraic-geometry, type:feature]
+    blocked_by: [1684, 1633, 1636, 1639, 1645]
+  - id: stacks-and-moduli-stk3-3
+    gh_issue: 1687
+    kind: task
+    parent: stacks-and-moduli-stk3
+    title: "STK3.3: Open substacks as the openness root, and points of an algebraic stack with their topology"
+    status: planned
+    priority: must
+    size: L
+    summary: "For algebraic stacks with scheme diagonal (#1684), this issue builds points and their topology, and makes open substacks the openness root: Open substacks (the openness root). Let P be an iso-closed, pullback-stable, fppf-local object property. P is open when the inclusion of its substack (#1634) is representable, naturally in the test scheme, by open immersions (Stacks 04YL, 04YM). Pointwise criterion: P is open iff every family x over T has an open U ⊆ T with P(g^* x) ↔ g factoring through U."
+    labels: [area:algebraic-geometry, area:moduli, type:feature, arch:data-model]
+    blocked_by: [1633, 1636, 1634, 1684, 1686, 1628, 1627]
+  - id: stacks-and-moduli-stk3-5a
+    gh_issue: 1688
+    kind: task
+    parent: stacks-and-moduli-stk3
+    title: "STK3.5a: Sheaves form a stack, torsors, and the quotient stacks [X/G] and BG"
+    status: planned
+    priority: must
+    size: L
+    summary: "On any site (C, J), fix: - a group object G in Sheaf J (Type w), which is cartesian monoidal in Mathlib; - a G-object X, a Mathlib ModObj G X."
+    labels: [area:algebraic-geometry, type:feature, upstream-candidate]
+    blocked_by: [1631, 1634, 1637]
+  - id: stacks-and-moduli-stk3-5b
+    gh_issue: 1689
+    kind: task
+    parent: stacks-and-moduli-stk3
+    title: "STK3.5b: The multiplicative group scheme, and [X/G] and BG algebraic for smooth affine group schemes"
+    status: planned
+    priority: must
+    size: L
+    summary: "Let G be a group scheme over S that is affine, flat and locally of finite presentation, acting on an S-scheme X. Then: 1. Torsors are schemes. Every fppf G-torsor sheaf over a test scheme T is represented by a scheme affine over T (Stacks 049C via 0245). 2. The chart is representable. Consequently X → [X/G] (#1688) is representable by schemes. 3. The chart is an atlas when G is smooth. It is smooth and surjective (Stacks 04X0). 4. The diagonal is affine."
+    labels: [area:algebraic-geometry, type:feature]
+    blocked_by: [1688, 1684, 1686, 1636]
+  - id: stacks-and-moduli-stk3-6
+    gh_issue: 1690
+    kind: task
+    parent: stacks-and-moduli-stk3
+    title: "STK3.6: Algebraic stacks with diagonal representable by algebraic spaces (Stacks 026O), with STK3.1's notion as a special case"
+    status: planned
+    priority: must
+    size: M
+    summary: "Stacks 026O exactly: an algebraic stack over S is a stack in groupoids on (Over S, fppf.over S) with: - a diagonal representable by algebraic spaces (#1652); and - a smooth surjective morphism from a scheme."
+    labels: [area:algebraic-geometry, type:feature, arch:data-model]
+    blocked_by: [1684, 1651, 1652, 1685, 1633, 1636]
+  - id: stacks-and-moduli-stk3-7
+    gh_issue: 1691
+    kind: task
+    parent: stacks-and-moduli-stk3
+    title: "STK3.7: Quasi-compact, finite-type and Noetherian algebraic stacks and morphisms"
+    status: planned
+    priority: must
+    size: M
+    summary: "For algebraic stacks with scheme diagonal (#1684), this issue defines the finiteness notions of the Stacks project: Quasi-compact stacks (|X| quasi-compact, Stacks 04YB), with the atlas characterizations of 04YC: an affine atlas exists iff a surjection from a quasi-compact algebraic stack exists. Quasi-compact morphisms (every base change to a quasi-compact algebraic stack is quasi-compact, 050U), with Stacks 050X. Finite type and finite presentation (06FS, 06Q2)."
+    labels: [area:algebraic-geometry, type:feature]
+    blocked_by: [1684, 1686, 1687]
+  - id: stacks-and-moduli-stk3-4
+    gh_issue: 1692
+    kind: task
+    parent: stacks-and-moduli-stk3
+    title: "STK3.4: Bounded families as the boundedness root: a bounded algebraic stack locally of finite type is of finite type (BLMNPS Def 9.4, Lemma 9.5)"
+    status: planned
+    priority: must
+    size: M
+    summary: "A stack X over S is bounded when a finite-type S-scheme B carries an object E ∈ X(B) whose pullbacks along the κ-points of B reach every geometric point of X. This is BLMNPS Definition 9.4 (= LLLMPSZ Definition 8.6), stated for the stack itself. The pullback E_b is the stack's own transition functor, which is exactly the tie between fibre and universal family that the current witness lacks (soundness finding d2). This issue proves: Lemma 9.5, general form."
+    labels: [area:algebraic-geometry, area:moduli, type:feature, arch:data-model, source:1902.08184v4, source:2607.28411]
+    blocked_by: [1686, 1687, 1691, 1638, 1626]
+
+  # ------------ STK4 tasks ------------
+  - id: stacks-and-moduli-stk4-1
+    gh_issue: 1693
+    kind: task
+    parent: stacks-and-moduli-stk4
+    title: "STK4.1: Dotted arrows, valuative squares, and universally closed and proper morphisms of algebraic stacks"
+    status: planned
+    priority: must
+    size: L
+    summary: "In any bicategory, a 2-commutative square has a category of dotted arrows (Stacks 0H18). It is a groupoid when the bicategory is locally groupoidal. For squares of stacks in groupoids it is invariant, up to equivalence, under base change along a 2-fibre product (Stacks 0H1A)."
+    labels: [area:algebraic-geometry, type:feature, upstream-candidate, source:1902.08184v4]
+    blocked_by: [1632, 1633, 1635, 1686, 1687, 1691]
+  - id: stacks-and-moduli-stk4-2
+    gh_issue: 1694
+    kind: task
+    parent: stacks-and-moduli-stk4
+    title: "STK4.2: Valuative criteria for universal closedness, separatedness and properness of algebraic stacks"
+    status: planned
+    priority: must
+    size: L
+    summary: "The valuative criteria of the Stacks project hold for morphisms of algebraic stacks with scheme diagonal (#1684), stated with the dotted-arrow categories of #1693: Universal closedness. A quasi-compact f satisfying the existence part is universally closed (0CLW). Conversely, a quasi-separated universally closed f satisfies it (0CLX). Separatedness. A quasi-separated f satisfying the uniqueness part is separated (0CLT), and separated morphisms satisfy it (0CLU). Properness."
+    labels: [area:algebraic-geometry, type:feature]
+    blocked_by: [1693, 1686, 1687, 1691]
+  - id: stacks-and-moduli-stk4-7
+    gh_issue: 1695
+    kind: task
+    parent: stacks-and-moduli-stk4
+    title: "STK4.7: Nagata and universally Japanese rings and schemes, and BLMNPS's essentially-finite-type DVR lemmas (11.15, 11.16, 11.19)"
+    status: planned
+    priority: must
+    size: L
+    summary: "The commutative algebra and scheme theory behind BLMNPS §11.4 (Nagata valuative criteria), for rings and schemes. Stack-level statements are #1697's."
+    labels: [area:algebra, area:algebraic-geometry, type:feature, prerequisite, upstream-candidate, source:1902.08184v4, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-stk4-8
+    gh_issue: 1696
+    kind: task
+    parent: stacks-and-moduli-stk4
+    title: "STK4.8: Universal closedness tested on base changes locally of finite presentation (Stacks 05BD, 05JX)"
+    status: planned
+    priority: must
+    size: M
+    summary: "For schemes, universal closedness of a quasi-compact morphism can be tested on base changes along morphisms locally of finite presentation from affine schemes. Precisely, for f : X ⟶ S quasi-compact: Limit lemma (Stacks 05BD, Limits Lemma 32.14.1). Let g : T ⟶ S, t ∈ T, and Z ⊂ X_T closed and disjoint from the fibre X_t. Then the situation descends to a finitely presented base: there are an affine open neighbourhood V ∋ t, an affine T' locally of finite presentation over S, and a : V ⟶ T' over S;"
+    labels: [area:algebraic-geometry, type:feature, prerequisite, upstream-candidate, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-stk4-3
+    gh_issue: 1697
+    kind: task
+    parent: stacks-and-moduli-stk4
+    title: "STK4.3: DVRs suffice over a locally Noetherian base, and BLMNPS Lemma 11.21 at the stack level"
+    status: planned
+    priority: must
+    size: L
+    summary: "For a morphism f : X → Y of algebraic stacks with scheme diagonal (#1684), with Y locally Noetherian and f of finite type, discrete valuation rings suffice: A point in the closure of |f|'s image is reached along a DVR (Stacks 0H2B). The existence part for DVRs, after extension, implies that f is universally closed (0H2C). For f locally of finite type and quasi-separated, the uniqueness part for DVRs implies that f is separated (0E80)."
+    labels: [area:algebraic-geometry, area:moduli, type:feature, source:1902.08184v4]
+    blocked_by: [1693, 1694, 1687, 1691, 1695, 1696, 1655]
+  - id: stacks-and-moduli-stk4-4
+    gh_issue: 1699
+    kind: task
+    parent: stacks-and-moduli-stk4
+    title: "STK4.4: The test stacks B𝔾_m, Θ_B and ST_{B,π} by functors of points, with their punctured open substacks"
+    status: planned
+    priority: must
+    size: L
+    summary: "The three test stacks of AHLH, as stacks in groupoids on (Over S, fppf.over S), defined by their functors of points: | Stack | Objects over T | AHLH model | |---|---|---| | B𝔾_m | invertible sheaves L on T | [pt/𝔾_m] | | Θ_B | (u : T → B, L, s : 𝒪_T → L) | [𝔸¹/𝔾_m] ×_S B | | ST_{B,π} | (u, L, s : 𝒪_T → L, t : L → 𝒪_T) with t ∘ s = u^*π | [Spec R[s, t]/(st − π) / 𝔾_m] for B = Spec R |"
+    labels: [area:algebraic-geometry, area:moduli, type:feature]
+    blocked_by: [1632, 1634, 1648, 1650, 1645, 1687, 1698]
+  - id: stacks-and-moduli-stk4-5
+    gh_issue: 1700
+    kind: task
+    parent: stacks-and-moduli-stk4
+    title: "STK4.5: Θ-reductive and S-complete morphisms, with examples outside Bridgeland stability"
+    status: planned
+    priority: must
+    size: M
+    summary: "A morphism f : X → Y of stacks on (Over S, fppf.over S) is Θ-reductive (AHLH v5 Definition 3.10) when, for every DVR R over S with uniformizer π, every 2-commutative square has a contractible groupoid of fillings. The square is - Θ_R ∖ 0 → X on top, and - Θ_R → Y below,"
+    labels: [area:algebraic-geometry, area:moduli, type:feature]
+    blocked_by: [1699, 1693, 1635]
+  - id: stacks-and-moduli-stk4-6
+    gh_issue: 1701
+    kind: task
+    parent: stacks-and-moduli-stk4
+    title: "STK4.6: The test stacks as quotient stacks by the multiplicative group, and their algebraicity"
+    status: planned
+    priority: must
+    size: M
+    summary: "The line-bundle models of #1699 are the quotient stacks of #1688, and so they are algebraic (#1689): | Model (#1699) | Quotient stack | |---|---| | B𝔾_m (lineBundleStack S) | [S/𝔾_{m,S}] | | Θ_B (thetaStack B) | [𝔸¹_B/𝔾_m], weight one | | ST_{B,π} (stStack B π) | [Spec_B 𝒪_B[s, t]/(st − π) / 𝔾_m], weights (1, −1) | | thetaPunctured 𝔸¹_S y (#1700) | [(𝔸² ∖ 0)/𝔾_m], weights (1, 0) |"
+    labels: [area:algebraic-geometry, type:feature]
+    blocked_by: [1699, 1688, 1689, 1630]
+
+  # ------------ GM1 tasks ------------
+  - id: stacks-and-moduli-gm1-1a
+    gh_issue: 1698
+    kind: task
+    parent: stacks-and-moduli-gm1
+    title: "GM1.1a: Quasi-coherent sheaves on a stack are cartesian sections of the quasi-coherent stack"
+    status: planned
+    priority: must
+    size: M
+    summary: "A quasi-coherent sheaf on a stack 𝒳 over a base scheme S is a *cartesian section* of the stack of quasi-coherent modules over 𝒳. It assigns to every S-scheme T and object x ∈ 𝒳(T) a quasi-coherent 𝒪_T-module F_x, with coherent isomorphisms f^* F_x ≅ F_{f^* x}. In the repository's carrier this is exactly a strong transformation 𝒳 ⟶ 𝒬_S into the quasi-coherent pseudofunctor on Over S, and a morphism is a modification."
+    labels: [area:algebraic-geometry, area:moduli, arch:data-model, type:feature, prerequisite]
+    blocked_by: [1647, 1631, 1637, 1638, 1632]
+  - id: stacks-and-moduli-gm1-1b
+    gh_issue: 1702
+    kind: task
+    parent: stacks-and-moduli-gm1
+    title: "GM1.1b: Morphisms descend along covering morphisms; global sections are an equalizer on an atlas"
+    status: planned
+    priority: must
+    size: M
+    summary: "Morphisms out of a stack can be computed on a cover. Let 𝒬 be a J-prestack of categories, and let u : 𝒰 ⟶ 𝒳 be a morphism of pseudofunctors that is *locally essentially surjective*: every object of 𝒳(T) becomes isomorphic to an image of u after pulling back along the arrows of some J-covering sieve. Then: restriction along u, Bicategory.precomp 𝒬 u : (𝒳 ⟶ 𝒬) ⥤ (𝒰 ⟶ 𝒬), is faithful; its image on morphisms is exactly the morphisms whose two pullbacks to the 2-fibre product 𝒰 ×_𝒳 𝒰 of #1632 agree."
+    labels: [area:algebraic-geometry, type:feature, prerequisite, upstream-candidate]
+    blocked_by: [1698, 1632, 1633, 1684, 1648, 1645, 1691, 1686]
+  - id: stacks-and-moduli-gm1-1c
+    gh_issue: 1703
+    kind: task
+    parent: stacks-and-moduli-gm1
+    title: "GM1.1c: Objects of a stack of categories descend along covering morphisms (Stacks 06WT)"
+    status: planned
+    priority: must
+    size: M
+    summary: "Objects of a stack of categories descend along covering 1-morphisms. Let 𝒬 be a J-stack of categories (Mathlib Pseudofunctor.IsStack) and u : 𝒰 ⟶ 𝒳 a locally essentially surjective morphism of pseudofunctors (#1702). Then F ↦ (u ≫ F, α_F) is an equivalence"
+    labels: [area:algebraic-geometry, type:feature, prerequisite, upstream-candidate]
+    blocked_by: [1698, 1702, 1632, 1684, 1648, 1638]
+  - id: stacks-and-moduli-gm1-1d
+    gh_issue: 1704
+    kind: task
+    parent: stacks-and-moduli-gm1
+    title: "GM1.1d: Quasi-coherent sheaves on an algebraic stack form an abelian category (Stacks 06WV)"
+    status: planned
+    priority: must
+    size: M
+    summary: "Quasi-coherent sheaves on an algebraic stack form an abelian category, and exactness is detected on a smooth atlas. For an algebraic stack 𝒳 over S (h𝒳 : AlgebraicStack.IsAlgebraicWithSchemeDiagonal 𝒳, #1684) with atlas a, write u := a.toHom : h_U → 𝒳: QCoh 𝒳 has kernels. The kernel of p : F ⟶ G is the descent of ker(u^* p), which carries a descent datum because the two projections R ⇉ U are flat. QCoh 𝒳 is abelian (Stacks Lemma 96.15.1(2), Tag 06WV)."
+    labels: [area:algebraic-geometry, type:feature, prerequisite]
+    blocked_by: [1698, 1702, 1703, 1684]
+  - id: stacks-and-moduli-gm1-1e
+    gh_issue: 1705
+    kind: task
+    parent: stacks-and-moduli-gm1
+    title: "GM1.1e: Cohomologically affine stacks and morphisms (Alper §3)"
+    status: planned
+    priority: must
+    size: M
+    summary: "Cohomologically affine stacks and morphisms are the non-representable analogue of affineness, and half of the definition of a good moduli space. For stacks over a base scheme S: A quasi-compact algebraic stack 𝒳 is *cohomologically affine* if Γ(𝒳, -) is exact on QCoh 𝒳. This is Alper Def 3.6 in the form of Remark 3.7. A morphism f : 𝒳 → 𝒴 is *cohomologically affine* if 𝒳 ×_𝒴 h_V is a cohomologically affine stack for every affine S-scheme V and every V → 𝒴. This is the form of Alper's Corollary 3.12."
+    labels: [area:algebraic-geometry, area:moduli, type:feature, prerequisite]
+    blocked_by: [1698, 1702, 1704, 1691, 1686, 1630, 1633, 1636, 1638]
+  - id: stacks-and-moduli-gm1-2a
+    gh_issue: 1706
+    kind: task
+    parent: stacks-and-moduli-gm1
+    title: "GM1.2a: Good moduli spaces: definition, base change, Alper Remark 4.3 and Prop 4.5"
+    status: planned
+    priority: must
+    size: L
+    summary: "The definition of a good moduli space, with the algebraic properties that follow from it without any topology. A quasi-separated morphism π : 𝒳 → Y from an algebraic stack over S to an algebraic space over S is a *good moduli space* when: π is cohomologically affine, and 𝒪_Y → π_* 𝒪_𝒳 is an isomorphism."
+    labels: [area:moduli, area:algebraic-geometry, arch:data-model, type:feature, source:1902.08184v4]
+    blocked_by: [1698, 1702, 1703, 1704, 1705, 1651, 1686, 1691, 1637, 1639, 1624]
+  - id: stacks-and-moduli-gm1-2b
+    gh_issue: 1707
+    kind: task
+    parent: stacks-and-moduli-gm1
+    title: "GM1.2b: Closed substacks from quasi-coherent ideals and reduced structures (Stacks 04YM, 0509)"
+    status: planned
+    priority: must
+    size: M
+    summary: "Closed substacks of an algebraic stack over S are cut out by quasi-coherent ideal sheaves. For a quasi-coherent ideal I ⊆ 𝒪_𝒳, i.e. a subobject of QCoh.unit 𝒳 in the abelian category of #1704: the vanishing locus V(I) is the substack of objects x ∈ 𝒳(T) for which I_x → 𝒪_T is zero, built by #1634's StackInGroupoids.ofObjectProperty. It is a closed substack (Stacks Definition 100.9.9, Tag 04YM): its inclusion i : V(I) → 𝒳 is representable by closed immersions, and V(I) is again algebraic;"
+    labels: [area:algebraic-geometry, type:feature, prerequisite]
+    blocked_by: [1702, 1703, 1704, 1636, 1634, 1684, 1687]
+  - id: stacks-and-moduli-gm1-2c
+    gh_issue: 1708
+    kind: task
+    parent: stacks-and-moduli-gm1
+    title: "GM1.2c: Good moduli spaces are surjective and universally closed (Alper Lemmas 4.9, 4.14; Thm 4.16)"
+    status: planned
+    priority: must
+    size: M
+    summary: "A good moduli space π : 𝒳 → Y is surjective, universally closed and universally submersive, and it separates disjoint closed substacks. This is Alper's Theorem 4.16 (i), (ii), (iii) and (v), together with the two lemmas they rest on: Nagata's fundamental lemmas (Alper Lemma 4.9). Over every affine V = Spec A → Y, with 𝒳_V := 𝒳 ×_Y V: A / Γ(𝒳_V, I) ≅ Γ(𝒳_V, 𝒪/I); Γ(𝒳_V, I₁) + Γ(𝒳_V, I₂) = Γ(𝒳_V, I₁ + I₂) as ideals of A. Closed substacks (Alper Lemma 4.14, affine form)."
+    labels: [area:moduli, area:algebraic-geometry, type:feature]
+    blocked_by: [1706, 1707, 1687, 1653, 1685, 1693]
+  - id: stacks-and-moduli-gm1-3a
+    gh_issue: 1709
+    kind: task
+    parent: stacks-and-moduli-gm1
+    title: "GM1.3a: Categorical moduli spaces; good moduli spaces are universal for maps to schemes; Alper Thm 6.6 stated"
+    status: planned
+    priority: must
+    size: M
+    summary: "The neutral root for \"universal map to a space\", with the part of Alper's uniqueness theory that is within reach. Stacks and algebraic spaces are over a base scheme S (ADR-0014 decision 3)."
+    labels: [area:moduli, area:algebraic-geometry, arch:data-model, type:feature]
+    blocked_by: [1708, 1706, 1705, 1651, 1635, 1687, 1691]
+  - id: stacks-and-moduli-gm1-3b
+    gh_issue: 1710
+    kind: task
+    parent: stacks-and-moduli-gm1
+    title: "GM1.3b: Research: the route to Alper's Theorem 6.6 (universality for algebraic spaces)"
+    status: planned
+    priority: should
+    size: M
+    summary: "A decision, backed by a dependency inventory at the pins, on how the repository proves Alper's Theorem 6.6: *a good moduli space π : 𝒳 → Y of a locally noetherian algebraic stack is universal for maps to algebraic spaces*. Until then it is the named statement AlperTheorem66 of #1709, taken as an explicit hypothesis by its consumers. Its immediate consumer is the separatedness half of AHLH v5 Prop 3.48(2), which needs ST_R → Spec R to be universal for maps to algebraic spaces."
+    labels: [area:moduli, research, type:spike]
+    blocked_by: [1709]
+  - id: stacks-and-moduli-gm1-4a
+    gh_issue: 1711
+    kind: task
+    parent: stacks-and-moduli-gm1
+    title: "GM1.4a: Linear reductivity and affine GIT (Alper Def 12.1, Thm 13.2)"
+    status: planned
+    priority: must
+    size: M
+    summary: "Affine GIT, as the first consumer of good moduli spaces outside Bridgeland stability. The definition and the theorem: Linearly reductive (Alper Definition 12.1). A smooth affine group scheme G → S is *linearly reductive* if BG → S is cohomologically affine. Affine GIT (Alper Theorem 13.2 / Example 12.9, via Remark 4.3). Let S be affine, let G → S be linearly reductive, and let G act on an affine S-scheme X. Then [X/G] → Spec(A^G) is a good moduli space."
+    labels: [area:moduli, area:algebraic-geometry, type:feature, source:2607.28411]
+    blocked_by: [1688, 1689, 1702, 1703, 1704, 1705, 1706]
+  - id: stacks-and-moduli-gm1-4b
+    gh_issue: 1712
+    kind: task
+    parent: stacks-and-moduli-gm1
+    title: "GM1.4b: 𝔾_m is linearly reductive: B𝔾_m, Θ and ST have good moduli spaces"
+    status: planned
+    priority: must
+    size: M
+    summary: "The first unconditional good moduli spaces. The multiplicative group 𝔾_m is linearly reductive over every base, by the Reynolds operator. A comodule over A[t^{±1}] is a ℤ-graded A-module, and taking invariants is projection onto degree 0, a natural retract of the forgetful functor. With #1711, over an affine base S, this gives: B𝔾_{m,S} → S is a good moduli space (Alper Remark 12.2); Θ_S = [𝔸¹_S/𝔾_m] → S is a good moduli space (Alper Example 8.2;"
+    labels: [area:moduli, area:algebraic-geometry, area:algebra, type:feature]
+    blocked_by: [1711, 1702, 1703, 1705, 1706, 1688, 1689, 1701]
+  - id: stacks-and-moduli-gm1-5
+    gh_issue: 1713
+    kind: task
+    parent: stacks-and-moduli-gm1
+    title: "GM1.5: Replace ProperGoodModuli : Prop by a genuine proper-good-moduli predicate"
+    status: planned
+    priority: must
+    size: S
+    summary: "The stability consumers stop carrying a placeholder for \"admits a proper good moduli space\", and the repository gets one genuine predicate for it."
+    labels: [area:moduli, area:stability, type:refactor, arch:api-hygiene, source:1902.08184v4, source:2607.28411]
+    blocked_by: [1706, 1651, 1653, 1712]
+
+  # ------------ GM2 tasks ------------
+  - id: stacks-and-moduli-gm2-1
+    gh_issue: 1714
+    kind: task
+    parent: stacks-and-moduli-gm2
+    title: "GM2.1: State AHLH Theorem A and Theorem 5.4 exactly, pinned to arXiv:1812.01128v5, with a coverage map"
+    status: planned
+    priority: must
+    size: M
+    summary: "The Alper–Halpern-Leistner–Heinloth existence theorem enters the repository as an exact, version-pinned statement, never as an assumption hidden in a structure. Three closed propositions are defined over genuine definitions: AHLH.TheoremA, AHLH v5 Theorem A. Let 𝒳 → S be of finite presentation, with affine stabilizers and separated diagonal, over a noetherian base S of characteristic 0. Then 𝒳 admits a good moduli space separated over S if and only if 𝒳 → S is Θ-reductive and S-complete."
+    labels: [area:moduli, type:feature, arch:coherence, source:1902.08184v4]
+    blocked_by: [1706, 1707, 1705, 1712, 1700, 1693, 1697, 1684, 1687, 1691, 1633, 1651, 1653]
+  - id: stacks-and-moduli-gm2-2
+    gh_issue: 1715
+    kind: task
+    parent: stacks-and-moduli-gm2
+    title: "GM2.2: The formal half of AHLH Prop 3.48(3): properness of a good moduli space"
+    status: planned
+    priority: must
+    size: M
+    summary: "The formal half of AHLH v5 Proposition 3.48(3) (\"X → S is proper if and only if 𝒳 → S is of finite type, universally closed and S-complete\"). \"Formal\" means provable from Alper's formal properties of good moduli spaces (#1706, #1708) and the valuative criteria of #1694, without Alper's Theorem 6.6 and without the local structure theorem."
+    labels: [area:moduli, type:feature, source:1902.08184v4]
+    blocked_by: [1706, 1708, 1712, 1713, 1693, 1694, 1686, 1691, 1653, 1685]
+  - id: stacks-and-moduli-gm2-3a
+    gh_issue: 1716
+    kind: task
+    parent: stacks-and-moduli-gm2
+    title: "GM2.3a: Artin–Zhang base change: R-module objects of a k-linear abelian category"
+    status: planned
+    priority: must
+    size: M
+    summary: "The base-change formalism that AHLH §7 uses to talk about families of objects of an abstract abelian category. It comes from Artin–Zhang, *Abstract Hilbert schemes*, 2001 (\"AZ01\"). For a cocomplete k-linear abelian category A and a commutative k-algebra R: A_R, the category of R-module objects of A: pairs (E, ξ_E : R →ₐ[k] End_A(E)) (AHLH v5 Definition 7.3), with morphisms compatible with ξ. It is R-linear, and abelian when A is."
+    labels: [area:algebra, type:feature, prerequisite, upstream-candidate]
+    blocked_by: [1624]
+  - id: stacks-and-moduli-gm2-3b
+    gh_issue: 1717
+    kind: task
+    parent: stacks-and-moduli-gm2
+    title: "GM2.3b: Flat descent for Artin–Zhang categories and the moduli stack M_A (AHLH Lemma 7.9)"
+    status: planned
+    priority: must
+    size: L
+    summary: "For a locally noetherian, cocomplete k-linear abelian category A, the categories A_R of #1716 satisfy fpqc descent. As a consequence AHLH's moduli functor of flat, finitely presented objects is a stack in groupoids on the big fpqc site of k-schemes (AHLH v5 Definition 7.8, Lemma 7.9). Concretely: Flat descent ([AZ01, Thm. C8.6] as cited by AHLH v5 §7.1). For a faithfully flat φ : R → S, φ^* : A_R → A_S is comonadic, so A_R is equivalent to descent data in A_S."
+    labels: [area:moduli, area:algebra, type:feature, prerequisite]
+    blocked_by: [1716, 1642, 1644, 1634, 1638, 1631, 1637, 1645]
+  - id: stacks-and-moduli-gm2-3c
+    gh_issue: 1718
+    kind: task
+    parent: stacks-and-moduli-gm2
+    title: "GM2.3c: Θ- and ST_R-points of M_A are filtrations and modifications (AHLH Prop 7.12, Cors 7.13–7.14)"
+    status: planned
+    priority: must
+    size: L
+    summary: "The \"heart adapters\": maps from the test stacks Θ_R and ST_R into AHLH's moduli stack M_A (#1717) are explicit filtered and modified families of objects of A_R. This is the translation that turns AHLH's valuative conditions (Θ-reductive, S-complete) into statements about filtrations and elementary modifications: Prop 7.12. For a ℤ-graded k-algebra B, A_{[Spec B/𝔾_m]} is equivalent to the category of ℤ-graded B-module objects of A. Flat, finitely presented objects on both sides correspond. Cor 7.13."
+    labels: [area:moduli, type:feature]
+    blocked_by: [1716, 1717, 1703, 1712, 1699, 1701, 1688, 1689]
+  - id: stacks-and-moduli-gm2-4a
+    gh_issue: 1719
+    kind: task
+    parent: stacks-and-moduli-gm2
+    title: "GM2.4a: Pushforward, Hartogs and flatness for Artin–Zhang categories (AHLH Lemmas 7.6, 7.15)"
+    status: planned
+    priority: must
+    size: L
+    summary: "The analytic toolkit for AHLH's valuative lemmas about M_A: pushforward of A-valued objects along quasi-compact morphisms with affine diagonal, flatness criteria in A_R, finiteness of A_R over essentially-finite-type rings, and the codimension-2 extension property of flat objects. Concretely: Pushforward in A (AHLH v5 Lemma 7.6)."
+    labels: [area:moduli, area:algebra, type:feature]
+    blocked_by: [1716, 1717, 1702, 1703, 1684, 1686, 1691]
+  - id: stacks-and-moduli-gm2-4b
+    gh_issue: 1720
+    kind: task
+    parent: stacks-and-moduli-gm2
+    title: "GM2.4b: M_A is Θ-reductive, S-complete and satisfies the existence part (AHLH Lemmas 7.16–7.18)"
+    status: planned
+    priority: must
+    size: M
+    summary: "The valuative properties of AHLH's moduli stack of objects. If A is a locally noetherian, cocomplete k-linear abelian category, then M_A → Spec k (#1717), with respect to every DVR R essentially of finite type over k: is S-complete (AHLH v5 Lemma 7.16): every ST_R ∖ 0 → M_A extends uniquely to ST_R; is Θ-reductive (AHLH v5 Lemma 7.17): every Θ_R ∖ 0 → M_A extends uniquely to Θ_R; satisfies the existence part of the valuative criterion (AHLH v5 Lemma 7.18)."
+    labels: [area:moduli, type:feature, source:1902.08184v4]
+    blocked_by: [1716, 1717, 1718, 1719, 1700, 1693, 1697]
+  - id: stacks-and-moduli-gm2-5
+    gh_issue: 1721
+    kind: task
+    parent: stacks-and-moduli-gm2
+    title: "GM2.5: Research: the route to proving the AHLH existence theorem"
+    status: planned
+    priority: should
+    size: M
+    summary: "A written verdict on whether, and along which route, the repository proves the AHLH existence theorem that #1714 states as AHLH.TheoremA (and Theorem54, TheoremAEssentiallyFiniteType). The verdict has two parts: a dependency inventory at the pins of every input of AHLH's proof, each with path:line or \"absent at the pin\"; a decomposition of the proof into milestones whose issues fit the repository's S/M sizes."
+    labels: [area:moduli, research, type:spike]
+    blocked_by: [1714]
+
+  # ------------ MOD1 tasks ------------
+  - id: stacks-and-moduli-mod1-1a
+    gh_issue: 1722
+    kind: task
+    parent: stacks-and-moduli-mod1
+    title: "MOD1.1a: Flatness of a quasi-coherent module over the base is affine-local and stable under base change"
+    status: planned
+    priority: must
+    size: M
+    summary: "Flatness of a quasi-coherent module sheaf over a base is stable under base change, and it can be checked on affine opens. Precisely, for q : Y ⟶ T, h : T' ⟶ T and the base-change projection h' : Y ×_T T' ⟶ Y: if a quasi-coherent M : Y.Modules is flat over T in the sense of Scheme.Modules.IsFlatOver q, then (Scheme.Modules.pullback h').obj M is flat over T'. For quasi-coherent M, IsFlatOver q M holds iff Γ(U, M) is a flat Γ(V, 𝒪_T)-module for all affine opens U ⊆ Y, V ⊆ T with q(U) ⊆ V."
+    labels: [area:algebraic-geometry, type:feature, prerequisite, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-mod1-1
+    gh_issue: 1723
+    kind: task
+    parent: stacks-and-moduli-mod1
+    title: "MOD1.1: The stack Coh_{X/S} of flat, finitely presented quasi-coherent sheaves"
+    status: planned
+    priority: must
+    size: M
+    summary: "For a scheme X over S (an object of SchemeBaseChange S = Over S), the finitely presented quasi-coherent modules on the base changes X_T = X ×_S T that are flat over T form a stack in groupoids CohStack X over Over S for the fpqc topology. Its fibre over T is the groupoid of such modules and their isomorphisms; its transition along f : T' ⟶ T is module pullback along X ×_S f."
+    labels: [area:moduli, area:algebraic-geometry, type:feature, arch:data-model]
+    blocked_by: [1722, 1631, 1634, 1648, 1650, 1645]
+  - id: stacks-and-moduli-mod1-2a
+    gh_issue: 1724
+    kind: task
+    parent: stacks-and-moduli-mod1
+    title: "MOD1.2a: Finitely presented modules and their maps descend through filtered colimits of rings"
+    status: planned
+    priority: must
+    size: M
+    summary: "Finitely presented modules over a filtered colimit of commutative rings descend to a finite stage, together with their homomorphisms (Stacks, Algebra, Lemma 10.127.6, Tag 05N7). Let R : J ⥤ CommRingCat be a filtered diagram with colimit cocone c, and write R∞ = c.pt. Then: every finitely presented R∞-module is isomorphic to R∞ ⊗_{R j} N for some j and some finitely presented R j-module N; every R∞-linear map between two such extended modules comes from an R j'-linear map at some later stage j ⟶ j';"
+    labels: [area:algebra, type:feature, prerequisite, upstream-candidate, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-mod1-2b
+    gh_issue: 1725
+    kind: task
+    parent: stacks-and-moduli-mod1
+    title: "MOD1.2b: Research: the route to flatness at a finite stage (EGA IV 11.2.6, Stacks 02JO)"
+    status: planned
+    priority: should
+    size: XL
+    summary: "Research: find and fix the route to \"flatness descends to a finite stage\" (EGA IV 11.2.6; Stacks, Algebra, Lemma 10.168.1 (3), Tag 02JO; Limits, Lemma 32.10.4, Tag 05LY)."
+    labels: [area:algebra, research, type:spike, prerequisite, upstream-candidate, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-mod1-2
+    gh_issue: 1726
+    kind: task
+    parent: stacks-and-moduli-mod1
+    title: "MOD1.2: Coh_{X/S} is limit preserving"
+    status: planned
+    priority: must
+    size: M
+    summary: "If X ⟶ S is of finite presentation, the stack CohStack X of #1723 is limit preserving (Stacks, Quot, Lemma 99.5.6, Tag 08KD). For every affine T over S written as a directed limit of affine S-schemes T_i, the functor colim_i CohStack X (T_i) ⟶ CohStack X (T) is an equivalence. That is: - every flat, finitely presented module on X_T comes from some X_{T_i}; - isomorphisms between pulled-back objects come from, and are determined at, a finite stage."
+    labels: [area:moduli, area:algebraic-geometry, type:feature]
+    blocked_by: [1723, 1724, 1725, 1645]
+  - id: stacks-and-moduli-mod1-3
+    gh_issue: 1727
+    kind: task
+    parent: stacks-and-moduli-mod1
+    title: "MOD1.3: Vector bundles form an open substack of Coh_{X/S} for universally closed X/S"
+    status: planned
+    priority: must
+    size: M
+    summary: "For X ⟶ S universally closed (in particular proper), the flat, finitely presented families that are locally free form an open substack VectorBundleStack X ⊆ CohStack X."
+    labels: [area:moduli, area:algebraic-geometry, type:feature]
+    blocked_by: [1723, 1687, 1634]
+  - id: stacks-and-moduli-mod1-4a
+    gh_issue: 1728
+    kind: task
+    parent: stacks-and-moduli-mod1
+    title: "MOD1.4a: The solution scheme of a finite linear system over a base is affine and of finite presentation"
+    status: planned
+    priority: must
+    size: S
+    summary: "The solutions of a finite linear system over a base scheme form a scheme that is affine and of finite presentation over the base. For A : Matrix n m Γ(S, ⊤) with m, n finite, there is a closed subscheme linearKernel A of 𝔸(m; S). Its S-morphisms from any X over S are exactly the vectors v : m → Γ(X, ⊤) with A · v = 0, where A is pulled back along X ↘ S. The structure morphism linearKernel A ↘ S is affine and locally of finite presentation."
+    labels: [area:algebraic-geometry, type:feature, prerequisite, upstream-candidate, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-mod1-4b
+    gh_issue: 1729
+    kind: task
+    parent: stacks-and-moduli-mod1
+    title: "MOD1.4b: Hom functors of flat coherent families on a projective morphism are representable"
+    status: planned
+    priority: must
+    size: L
+    summary: "Let X ⟶ S be projective over a locally Noetherian S. Let 𝓕, 𝓖 be quasi-coherent modules on X_T for a test scheme T over S, with 𝓕 finitely presented and 𝓖 finitely presented and flat over T. Then the presheaf T' ↦ Hom_{X_{T'}}(𝓕_{T'}, 𝓖_{T'}) on Over T is representable by a T-scheme that is affine and of finite presentation."
+    labels: [area:moduli, area:algebraic-geometry, type:feature]
+    blocked_by: [1723, 1728, 1678, 1675, 1681, 1724, 1725]
+  - id: stacks-and-moduli-mod1-4
+    gh_issue: 1730
+    kind: task
+    parent: stacks-and-moduli-mod1
+    title: "MOD1.4: The diagonal of Coh_{X/S} is affine and of finite presentation"
+    status: planned
+    priority: must
+    size: M
+    summary: "For X ⟶ S projective over a locally Noetherian S, the diagonal of CohStack X is representable by schemes that are affine and of finite presentation (Stacks, Moduli Stacks, Lemma 108.4.1, Tag 0DLY). Concretely: for every test scheme T and two families 𝓕, 𝓖 over T, the presheaf of isomorphisms T' ↦ Isom(𝓕_{T'}, 𝓖_{T'}) on Over T is represented by a T-scheme that is affine and of finite presentation."
+    labels: [area:moduli, type:feature]
+    blocked_by: [1729, 1634, 1633, 1636]
+  - id: stacks-and-moduli-mod1-5a
+    gh_issue: 1731
+    kind: task
+    parent: stacks-and-moduli-mod1
+    title: "MOD1.5a: Field-pointwise properties that descend along field extensions cut out substacks"
+    status: planned
+    priority: must
+    size: M
+    summary: "A property of objects over field-valued points defines a pullback-stable, fpqc-local object property of any category-valued pseudofunctor on Over S, provided it descends along field extensions."
+    labels: [area:moduli, area:algebraic-geometry, type:feature, prerequisite, source:1902.08184v4]
+    blocked_by: [1634]
+  - id: stacks-and-moduli-mod1-5
+    gh_issue: 1732
+    kind: task
+    parent: stacks-and-moduli-mod1
+    title: "MOD1.5: Families of Gieseker- and slope-semistable sheaves form substacks of Coh_{X/S}"
+    status: planned
+    priority: must
+    size: M
+    summary: "Let X ⟶ S be flat and projective, with geometrically integral fibres and a relatively ample line bundle 𝓛. The families in 𝒞oh_{X/S} whose fibres at every field-valued point are Gieseker-semistable form a substack of CohStack X, and likewise for slope (μ-)semistable fibres. Semistability is taken with respect to the restriction of 𝓛."
+    labels: [area:moduli, area:algebraic-geometry, type:feature]
+    blocked_by: [1723, 1731, 1674, 1666]
+
+  # ------------ MOD2 tasks ------------
+  - id: stacks-and-moduli-mod2-1a
+    gh_issue: 1733
+    kind: task
+    parent: stacks-and-moduli-mod2
+    title: "MOD2.1a: Relative perfection is defined by finitely presented flat local models"
+    status: planned
+    priority: must
+    size: M
+    summary: "Relative perfection is redefined so that derived base change can preserve it. It becomes Lieblich's definition: E ∈ Dqc(X) is perfect relative to p : X ⟶ S iff every point of X has an open neighbourhood on which E is represented by a bounded complex of finitely presented module sheaves that are flat over S (Lieblich, math/0502198, Def 2.1.1). For p flat and locally of finite presentation, this is Stacks' condition (A) of Remark 36.35.14 (Tag 0DI9), which Stacks shows agrees with its Definition 0DI0."
+    labels: [area:derived, area:algebraic-geometry, type:refactor, arch:data-model, prerequisite, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-mod2-1b
+    gh_issue: 1734
+    kind: task
+    parent: stacks-and-moduli-mod2
+    title: "MOD2.1b: Relative perfection is stable under derived base change of a flat family"
+    status: planned
+    priority: must
+    size: M
+    summary: "Relative perfection, in the corrected sense of #1733, is stable under derived base change for a flat family. This is Stacks, Derived Categories of Schemes, Lemma 36.35.6 (Tag 0DI5), and BLMNPS Lemma 8.4."
+    labels: [area:derived, area:families, type:feature, prerequisite, source:1902.08184v4]
+    blocked_by: [1733, 1722]
+  - id: stacks-and-moduli-mod2-1
+    gh_issue: 1735
+    kind: task
+    parent: stacks-and-moduli-mod2
+    title: "MOD2.1: M_pug(X/S) as a groupoid-valued pseudofunctor along arbitrary pullback"
+    status: planned
+    priority: must
+    size: L
+    summary: "For a flat family X ⟶ S, M_pug(X/S) exists as a groupoid-valued pseudofunctor on Over S: Lieblich's moduli of universally gluable, relatively perfect complexes. Its fibre over T is the groupoid of E ∈ Dqc(X ×_S T) that are perfect relative to T and whose derived fibres at every field-valued point of T have no negative self-extensions. Its transitions are derived pullback along X ×_S f. This is Stacks Situation 99.16.3 (Tag 0DLE) and Lemma 99.16.4 (Tag 0DLF), and BLMNPS Definitions 8.5–8.6."
+    labels: [area:moduli, area:derived, type:feature, arch:data-model, source:1902.08184v4]
+    blocked_by: [554, 1733, 1734, 1634, 1626]
+  - id: stacks-and-moduli-mod2-2
+    gh_issue: 1736
+    kind: task
+    parent: stacks-and-moduli-mod2
+    title: "MOD2.2: Research: the route to fppf descent for M_pug(X/S)"
+    status: planned
+    priority: should
+    size: XL
+    summary: "Research: fix the route by which M_pug(X/S) becomes an fppf stack in groupoids (Stacks, Quot, Lemma 99.16.6, Tag 0DLH; Lieblich Prop 2.1.10). Then file the implementation issues."
+    labels: [area:moduli, area:derived, research, type:spike, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-mod2-3
+    gh_issue: 1737
+    kind: task
+    parent: stacks-and-moduli-mod2
+    title: "MOD2.3: Hom functors between relatively perfect complexes are representable where negative Ext vanishes"
+    status: planned
+    priority: must
+    size: L
+    summary: "Hom functors between relatively perfect complexes on a proper, flat, finitely presented family are representable where negative Exts vanish (Stacks, Quot, Lemma 99.16.1, Tag 0DLC; BLMNPS Lemma 8.9, second part)."
+    labels: [area:moduli, area:derived, type:feature, source:1902.08184v4]
+    blocked_by: [1661, 1663, 1665, 1667, 1680, 1679, 1728, 1735]
+  - id: stacks-and-moduli-mod2-4
+    gh_issue: 1738
+    kind: task
+    parent: stacks-and-moduli-mod2
+    title: "MOD2.4: The diagonal of M_pug is representable, separated and of finite presentation, with affine automorphism groups"
+    status: planned
+    priority: must
+    size: M
+    summary: "For X ⟶ S proper, flat and of finite presentation, the diagonal of M_pug(X/S) is representable by schemes of finite presentation and is separated, and its automorphism groups are affine. Consequently M_pug is an fppf prestack: its Isom presheaves are fppf sheaves."
+    labels: [area:moduli, type:feature, source:1902.08184v4]
+    blocked_by: [1735, 1737, 1730, 1636]
+  - id: stacks-and-moduli-mod2-4a
+    gh_issue: 1739
+    kind: task
+    parent: stacks-and-moduli-mod2
+    title: "MOD2.4a: Research: is the diagonal of M_pug affine over the test scheme?"
+    status: planned
+    priority: should
+    size: M
+    summary: "Research: decide whether the diagonal of M_pug(X/S) is affine over the test scheme, as Stacks Lemma 108.12.1 (Tag 0DPW) states, and supply a correct proof or a counterexample."
+    labels: [area:moduli, research, type:spike, source:1902.08184v4, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-mod2-5
+    gh_issue: 1740
+    kind: task
+    parent: stacks-and-moduli-mod2
+    title: "MOD2.5: Lieblich's algebraicity of M_pug is stated as a typed proposition"
+    status: planned
+    priority: must
+    size: S
+    summary: "Lieblich's algebraicity theorem is stated as a genuine proposition over genuine definitions, so that consumers can assume it as a typed hypothesis. The proposition is: M_pug(X/S) is an fppf stack in groupoids, and that stack is algebraic in the sense of #1684 (Stacks, Quot, Theorem 99.16.12, Tag 0DLN; Lieblich Theorem 4.2.1; BLMNPS Theorem 8.7)."
+    labels: [area:moduli, type:feature, source:1902.08184v4]
+    blocked_by: [1735, 1684, 1630]
+  - id: stacks-and-moduli-mod2-5a
+    gh_issue: 1741
+    kind: task
+    parent: stacks-and-moduli-mod2
+    title: "MOD2.5a: M_pug is limit preserving for projective families"
+    status: planned
+    priority: must
+    size: L
+    summary: "For X ⟶ S flat, projective and of finite presentation, M_pug(X/S) is limit preserving (Stacks, Quot, Lemma 99.16.8, Tag 0DLJ; Lieblich Proposition 2.2.1). For an affine T = lim Tᵢ over S, every universally gluable relatively perfect complex on X_T comes from some X_{Tᵢ}, and isomorphisms descend and are determined at a finite stage."
+    labels: [area:moduli, area:derived, type:feature]
+    blocked_by: [1735, 1724, 1726, 1725, 1737, 1675, 1681, 1645]
+
+  # ------------ MOD3 tasks ------------
+  - id: stacks-and-moduli-mod3-1
+    gh_issue: 1742
+    kind: task
+    parent: stacks-and-moduli-mod3
+    title: "MOD3.1: The Quot functor of flat, finitely presented quotients"
+    status: planned
+    priority: should
+    size: M
+    summary: "For a morphism of schemes p : X ⟶ S and a module sheaf F : X.Modules, define quotFunctor p F : (Over S)ᵒᵖ ⥤ Type u. It sends T to the isomorphism classes of quotients F_T ↠ Q, where X_T = X ×_S T, F_T is the pullback of F, and Q is finitely presented and flat over T. Base change acts by pullback."
+    labels: [area:moduli, area:algebraic-geometry, arch:data-model, type:feature]
+    blocked_by: [1624, 1626, 1722]
+  - id: stacks-and-moduli-mod3-2a
+    gh_issue: 1743
+    kind: task
+    parent: stacks-and-moduli-mod3
+    title: "MOD3.2a: Affine charts of Mathlib's Grassmannian functor are open and corepresentable"
+    status: planned
+    priority: should
+    size: M
+    summary: "Mathlib's Grassmannian functor Module.Grassmannian.functor R M k (quotients that are locally free of rank k) gets its affine charts. For x : Fin k → M, the chart of x is the subfunctor of points N for which A^k → (A ⊗[R] M) ⧸ N is bijective. This issue proves four things about it."
+    labels: [area:algebra, type:feature, upstream-candidate, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-mod3-2b
+    gh_issue: 1744
+    kind: task
+    parent: stacks-and-moduli-mod3
+    title: "MOD3.2b: The Grassmannian scheme represents the Grassmannian functor"
+    status: planned
+    priority: should
+    size: L
+    summary: "The Grassmannian functor on schemes is representable. For n k : ℕ, Grassmannian.functor n k : Scheme.{u}ᵒᵖ ⥤ Type u sends T to the isomorphism classes of quotients 𝒪_T^n ↠ Q with Q locally free of rank k. It is a Zariski sheaf, covered by open affine charts, and hence represented by a scheme Grassmannian n k."
+    labels: [area:algebraic-geometry, area:moduli, type:feature, upstream-candidate]
+    blocked_by: [1743, 1742, 1624]
+  - id: stacks-and-moduli-mod3-3a
+    gh_issue: 1745
+    kind: task
+    parent: stacks-and-moduli-mod3
+    title: "MOD3.3a: Hyperplane sections avoiding the associated points of a coherent sheaf on ℙⁿ"
+    status: planned
+    priority: should
+    size: M
+    summary: "A coherent sheaf on a Noetherian scheme has finitely many associated points. On projective space ℙⁿ_k over an infinite field this gives a hyperplane H = V(h) containing none of them. Multiplication by h is then injective, and there is a short exact sequence"
+    labels: [area:algebraic-geometry, type:feature, prerequisite, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-mod3-3b
+    gh_issue: 1746
+    kind: task
+    parent: stacks-and-moduli-mod3
+    title: "MOD3.3b: Castelnuovo–Mumford regularity and Castelnuovo's lemma on ℙⁿ over a field"
+    status: planned
+    priority: should
+    size: L
+    summary: "Castelnuovo–Mumford regularity on projective space over a field, with Castelnuovo's lemma. A coherent sheaf F on ℙⁿ_k is m-regular if Hⁱ(ℙⁿ, F(m−i)) = 0 for all i ≥ 1. If F is m-regular, then for every r ≥ m: (a) H⁰(𝒪(1)) ⊗ H⁰(F(r)) → H⁰(F(r+1)) is surjective; (b) F is r-regular; (c) F(r) is generated by finitely many global sections, and Hⁱ(F(r)) = 0 for i ≥ 1."
+    labels: [area:algebraic-geometry, type:feature]
+    blocked_by: [1745, 1681, 1664]
+  - id: stacks-and-moduli-mod3-3c
+    gh_issue: 1747
+    kind: task
+    parent: stacks-and-moduli-mod3
+    title: "MOD3.3c: Quotients of 𝒪^r with a fixed Hilbert polynomial have uniformly regular kernels"
+    status: planned
+    priority: should
+    size: L
+    summary: "This issue proves boundedness of quotients by uniform regularity (Stacks Tag 08AG, Varieties Lemma 33.35.18). Fix n, r and P ∈ ℚ[t]. Then there is an m such that for every field k and every exact sequence 0 → K → 𝒪^{⊕r} → F → 0 of coherent sheaves on ℙⁿ_k in which F has Hilbert polynomial P, the kernel K is m-regular."
+    labels: [area:algebraic-geometry, area:moduli, type:feature]
+    blocked_by: [1746, 1745, 1681, 1682]
+  - id: stacks-and-moduli-mod3-4a
+    gh_issue: 1748
+    kind: task
+    parent: stacks-and-moduli-mod3
+    title: "MOD3.4a: Generic freeness, generic flatness and the generic-flatness stratification"
+    status: planned
+    priority: must
+    size: M
+    summary: "This issue proves generic freeness, generic flatness and the set-theoretic flattening stratification that follows from them."
+    labels: [area:algebra, area:algebraic-geometry, type:feature, prerequisite, upstream-candidate, source:2607.28411, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-mod3-4b
+    gh_issue: 1749
+    kind: task
+    parent: stacks-and-moduli-mod3
+    title: "MOD3.4b: The flattening stratification of a coherent sheaf on ℙⁿ_S"
+    status: planned
+    priority: should
+    size: L
+    summary: "This is Mumford's flattening stratification (Nitsure, Theorem 4.3). Let S be Noetherian and F coherent on ℙⁿ_S."
+    labels: [area:algebraic-geometry, area:moduli, type:feature]
+    blocked_by: [1748, 1670, 1681, 1683, 1678, 1722]
+  - id: stacks-and-moduli-mod3-5
+    gh_issue: 1750
+    kind: task
+    parent: stacks-and-moduli-mod3
+    title: "MOD3.5: Quot is representable by a projective scheme for projective morphisms (Grothendieck)"
+    status: planned
+    priority: should
+    size: XL
+    summary: "Grothendieck's existence theorem for Quot schemes, in Altman–Kleiman's Noetherian form (Nitsure, Theorems 5.3 and 5.1)."
+    labels: [area:moduli, area:algebraic-geometry, type:feature]
+    blocked_by: [1742, 1744, 1746, 1747, 1749, 1670, 1675, 1681, 1683, 1678, 1648, 1645]
+  - id: stacks-and-moduli-mod3-6
+    gh_issue: 1751
+    kind: task
+    parent: stacks-and-moduli-mod3
+    title: "MOD3.6: Hilbert functors are Quot of the structure sheaf, with closed subschemes as points"
+    status: planned
+    priority: should
+    size: M
+    summary: "The Hilbert functor of p : X ⟶ S is the Quot functor of the structure sheaf: hilbFunctor p := quotFunctor p 𝒪_X, together with its Hilbert-polynomial pieces. This issue proves three things about it."
+    labels: [area:moduli, area:algebraic-geometry, type:feature]
+    blocked_by: [1742, 1750, 1670]
+
+  # ------------ ART1 tasks ------------
+  - id: stacks-and-moduli-art1-1
+    gh_issue: 1752
+    kind: task
+    parent: stacks-and-moduli-art1
+    title: "ART1.1: Research: the route to algebraicity of Coh_{X/S} and M_pug for projective X/S"
+    status: planned
+    priority: should
+    size: M
+    summary: "A written verdict that fixes how this repository will prove two algebraicity statements, for X ⟶ S flat, projective and of finite presentation over a Noetherian S: - the stack Coh_{X/S} of flat, finitely presented sheaves (#1723) is algebraic; - Lieblich's stack M_pug(X/S) of universally gluable relatively perfect complexes (#1735–#1736) is algebraic."
+    labels: [research, type:spike, area:moduli, area:algebraic-geometry, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-art1-2
+    gh_issue: 1753
+    kind: task
+    parent: stacks-and-moduli-art1
+    title: "ART1.2: Research: Artin approximation as a dependency, with a genuine statement layer"
+    status: planned
+    priority: should
+    size: M
+    summary: "A scope verdict and a statement layer for Artin approximation, the one input of Artin's criterion that the M_pug axiom checks do not need."
+    labels: [research, type:spike, area:algebra, upstream-candidate]
+    blocked_by: [1752]
+  - id: stacks-and-moduli-art1-3
+    gh_issue: 1754
+    kind: task
+    parent: stacks-and-moduli-art1
+    title: "ART1.3: Rim–Schlessinger and strong formal effectiveness for M_pug"
+    status: planned
+    priority: should
+    size: L
+    summary: "Two of Artin's axioms hold for Lieblich's stack M_pug(X/S), for X ⟶ S proper, flat and of finite presentation. Both are stated over genuine definitions introduced here for any stack in groupoids over an affine Noetherian base."
+    labels: [area:moduli, area:derived, type:feature]
+    blocked_by: [1752, 1735, 1736, 1737, 1635]
+  - id: stacks-and-moduli-art1-4
+    gh_issue: 1755
+    kind: task
+    parent: stacks-and-moduli-art1
+    title: "ART1.4: Finite tangent spaces and openness of versality for M_pug"
+    status: planned
+    priority: should
+    size: L
+    summary: "The two remaining Artin axioms hold for Lieblich's stack M_pug(X/S), for X ⟶ S projective and flat over an affine Noetherian base S = Spec Λ."
+    labels: [area:moduli, area:derived, type:feature]
+    blocked_by: [1752, 1754, 1636, 1645, 1738, 1740]
+  - id: stacks-and-moduli-art1-5
+    gh_issue: 1756
+    kind: task
+    parent: stacks-and-moduli-art1
+    title: "ART1.5: Artin's criterion, and M_pug is an algebraic stack"
+    status: planned
+    priority: should
+    size: XL
+    summary: "This issue proves Artin's criterion for algebraic stacks (Stacks Lemma 98.17.1, Tag 07Y4) and applies it to Lieblich's stack M_pug(X/S), for X ⟶ S projective, flat and of finite presentation over a Noetherian S. The result is Stacks Theorem 99.16.12 (Tag 0DLN) in its projective case."
+    labels: [area:moduli, area:algebraic-geometry, type:feature, source:1902.08184v4]
+    blocked_by: [1752, 1753, 1754, 1755, 1684, 1651, 1636, 1645, 1736, 1738, 1740, 1675]
+
+  # ------------ SF13 tasks ------------
+  - id: stacks-and-moduli-sf13-0a
+    gh_issue: 1760
+    kind: task
+    parent: stacks-and-moduli-sf13
+    title: "SF13.0a: Finitely many classes under the support property, and local finiteness from support (BLMNPS Remark 12.3)"
+    status: planned
+    priority: must
+    size: M
+    summary: "Two absolute facts about the support property that the repository has not stated, and that Parts III–IV use constantly: Remark 12.3, first sentence. If a quadratic form Q is negative definite on ker Z, then for every c > 0 only finitely many lattice classes v satisfy |Z(v)| < c and Q(v) ≥ 0. Remark 12.3, second paragraph. A pre-stability condition with the support property is locally finite (Slicing.IsLocallyFinite), hence a Bridgeland StabilityCondition.WithClassMap."
+    labels: [area:stability, type:feature, prerequisite, source:1902.08184v4, ready]
+    blocked_by: []
+  - id: stacks-and-moduli-sf13-0b
+    gh_issue: 1761
+    kind: task
+    parent: stacks-and-moduli-sf13
+    title: "SF13.0b: Noetherian torsion subcategories and terminating chains for weak stability functions (BLMNPS Lemmas 14.8, 14.11)"
+    status: planned
+    priority: must
+    size: M
+    summary: "Two chain-termination results for weak hearts that the repository explicitly leaves undeclared. Weak/Heart/Noetherian.lean calls them \"statable but left undeclared\" and names the missing inputs, which #1760 supplies."
+    labels: [area:stability, type:feature, prerequisite, source:1902.08184v4]
+    blocked_by: [1760]
+  - id: stacks-and-moduli-sf13-1
+    gh_issue: 1762
+    kind: task
+    parent: stacks-and-moduli-sf13
+    title: "SF13.1: Dedekind schemes and Harder–Narasimhan structures over them (BLMNPS Defs 13.1, 13.3, 15.1)"
+    status: planned
+    priority: must
+    size: M
+    summary: "Setup III.1 of BLMNPS is g : X → C flat and projective over a Dedekind scheme C, with 𝒟 ⊂ Dᵇ(X) a C-linear strong semiorthogonal component of finite cohomological amplitude. This issue defines the objects that Part III proves theorems about, so the later SF13 issues state genuine results rather than probes: Dedekind schemes: integral, Noetherian, regular and one-dimensional. This is a neutral scheme property with a proved projection to the existing RegularCurveBaseChange."
+    labels: [area:stability, area:families, arch:data-model, type:feature, source:1902.08184v4, source:2607.28411]
+    blocked_by: [1066, 1063]
+  - id: stacks-and-moduli-sf13-2a
+    gh_issue: 1763
+    kind: task
+    parent: stacks-and-moduli-sf13
+    title: "SF13.2a: Weak stability functions over a Dedekind scheme and their fibres (BLMNPS §15.1, Lemmas 13.11–13.12, 16.2)"
+    status: planned
+    priority: must
+    size: M
+    summary: "The slope calculus of a (weak) stability function over a Dedekind scheme C, the three facts that tie a (weak) HN structure over C to its fibres, and the flatness criterion over Artinian neighbourhoods of a closed point: Definitions (BLMNPS Defs 13.5, 13.7, 13.9, 13.10, 15.2, 15.4): (weak) stability functions on a C-local heart 𝒜_C; the piecewise charge Z_C and slope μ_C; Z_C-semistability and the HN property."
+    labels: [area:stability, area:families, type:feature, source:1902.08184v4]
+    blocked_by: [1762, 1063, 1066]
+  - id: stacks-and-moduli-sf13-2b
+    gh_issue: 1764
+    kind: task
+    parent: stacks-and-moduli-sf13
+    title: "SF13.2b: Hearts with a weak stability function over C are HN structures (BLMNPS Props 13.14, 15.9)"
+    status: planned
+    priority: must
+    size: M
+    summary: "The relative form of Bridgeland's Proposition 5.3 over a Dedekind scheme C (BLMNPS Prop 15.9, and Prop 13.14 for the ordinary case). To give a (weak) HN structure on 𝒟 over C is equivalent to giving: - the heart 𝒜_C of a bounded C-local t-structure on 𝒟, and - a (weak) stability function (Z_K, Z_{C-tor}) on 𝒜_C over C with the HN property (Defs 13.10, 15.2)."
+    labels: [area:stability, area:families, type:feature, source:1902.08184v4]
+    blocked_by: [1762, 1763]
+  - id: stacks-and-moduli-sf13-2c
+    gh_issue: 1765
+    kind: task
+    parent: stacks-and-moduli-sf13
+    title: "SF13.2c: The HN property over C: criterion, semistable reduction and noetherianity (BLMNPS Props 13.16, 15.10, 15.14)"
+    status: planned
+    priority: must
+    size: M
+    summary: "The criterion that reduces the HN property over a Dedekind scheme C to three pieces (BLMNPS Props 15.10 and 13.16): 1. the HN property on the generic fibre (𝒜_K, Z_K); 2. the HN property on the torsion part (𝒜_{C-tor}, Z_{C-tor}); 3. semistable reduction: every C-torsion-free E with E_K semistable has a Z_C-semistable subobject F ⊂ E with E/F torsion."
+    labels: [area:stability, area:families, type:feature, source:1902.08184v4]
+    blocked_by: [1763, 1764, 1761, 1066]
+  - id: stacks-and-moduli-sf13-3a
+    gh_issue: 1766
+    kind: task
+    parent: stacks-and-moduli-sf13
+    title: "SF13.3a: Openness of flatness gives a C-torsion theory (BLMNPS Thm 17.1)"
+    status: planned
+    priority: must
+    size: L
+    summary: "BLMNPS Thm 17.1. Let 𝒜_C be the heart of a C-local t-structure on 𝒟 over a Dedekind scheme C, and suppose: 1. 𝒜_C universally satisfies openness of flatness; 2. every closed point p carries a (weak) stability condition σ_p = (𝒜_p, Z_p), with 𝒜⁰_p a noetherian torsion subcategory in the weak case."
+    labels: [area:stability, area:moduli, area:families, type:feature, source:1902.08184v4]
+    blocked_by: [1761, 1762, 1763, 1066, 1740, 1687, 1753, 1737]
+  - id: stacks-and-moduli-sf13-3b
+    gh_issue: 1767
+    kind: task
+    parent: stacks-and-moduli-sf13
+    title: "SF13.3b: C-torsion theories and the support property over C (BLMNPS §§17.2, 18.1)"
+    status: planned
+    priority: must
+    size: M
+    summary: "Two short sections of BLMNPS that everything after Part III uses."
+    labels: [area:stability, area:families, type:feature, source:1902.08184v4, source:2607.28411]
+    blocked_by: [1762, 1763, 1765, 1066]
+  - id: stacks-and-moduli-sf13-4
+    gh_issue: 1768
+    kind: task
+    parent: stacks-and-moduli-sf13
+    title: "SF13.4: HN structures over C from HN structures on the fibres (BLMNPS Thm 18.7)"
+    status: planned
+    priority: must
+    size: M
+    summary: "BLMNPS Thm 18.7. Fix a C-local heart 𝒜_C ⊂ 𝒟 that universally satisfies openness of flatness, Z : Λ → ℂ, a quadratic form Q on Λ_ℝ, and a Mukai homomorphism (v_K, v_{C-tor}) whose charge satisfies condition (0) of Thm 16.1. Then: σ_C = (𝒜_C, Z∘v_K, Z∘v_{C-tor}) is an HN structure with a C-torsion theory and support with respect to Q iff σ_c = (𝒜_c, Z∘v_c) is a pre-stability condition on 𝒟_c for every point c; all σ_c satisfy support with respect to Q; generic openness of semistability holds (Def 16.3). Weak case."
+    labels: [area:stability, area:moduli, area:families, type:feature, source:1902.08184v4]
+    blocked_by: [1760, 1764, 1765, 1766, 1767, 525]
+  - id: stacks-and-moduli-sf13-5
+    gh_issue: 1769
+    kind: task
+    parent: stacks-and-moduli-sf13
+    title: "SF13.5: The G̃L⁺(2,ℝ) action on HN structures over C, and tilting (BLMNPS Remark 13.15, Prop 19.5)"
+    status: planned
+    priority: must
+    size: M
+    summary: "Rotating and tilting HN structures over a Dedekind scheme C."
+    labels: [area:stability, area:families, type:feature, source:1902.08184v4]
+    blocked_by: [1762, 1763, 1764, 1765, 1767, 1768, 1766]
+
+  # ------------ SF14 tasks ------------
+  - id: stacks-and-moduli-sf14-1a
+    gh_issue: 1770
+    kind: task
+    parent: stacks-and-moduli-sf14
+    title: "SF14.1a: Fibrewise collections of stability conditions over a base, with the openness predicates of Def 20.1 (BLMNPS Def 20.1, Remark 21.4)"
+    status: planned
+    priority: must
+    size: M
+    summary: "The object BLMNPS Part IV starts from, built on genuine fibres: a collection of numerical stability conditions σ = (σ_s)_{s∈S} on the fibres 𝒟_s, one for every (closed or non-closed) point s of the base (Def 20.1, preamble). All share one central charge Z : Λ → ℂ through a relative Mukai homomorphism v : K_num(𝒟/S) → Λ (Def 21.3). Also defined here: σ_t for every point t of every T → S, as the Thm 12.17 base change of σ_{f(t)}, and geometric stability (Def 12.18);"
+    labels: [area:stability, area:families, arch:data-model, type:feature, source:1902.08184v4, source:2607.28411]
+    blocked_by: [851, 1067, 554, 1735, 1627, 722]
+  - id: stacks-and-moduli-sf14-1b
+    gh_issue: 1771
+    kind: task
+    parent: stacks-and-moduli-sf14
+    title: "SF14.1b: Flat families of stability conditions over a base (BLMNPS Def 20.5, Lemmas 20.3–20.4)"
+    status: planned
+    priority: must
+    size: M
+    summary: "Flat families of fibrewise stability conditions (BLMNPS Def 20.5), stated on the genuine collection of #1770, with the two lemmas that make the definition usable."
+    labels: [area:stability, area:families, type:feature, source:1902.08184v4]
+    blocked_by: [1770, 1762, 1763, 1695, 1740, 1064]
+  - id: stacks-and-moduli-sf14-1c
+    gh_issue: 1772
+    kind: task
+    parent: stacks-and-moduli-sf14
+    title: "SF14.1c: Semicontinuity of phases and openness of lying in P(I) for flat families (BLMNPS Lemma 20.9, Prop 20.8, Cor 20.10)"
+    status: planned
+    priority: must
+    size: M
+    summary: "BLMNPS Prop 20.8. A flat family of fibrewise stability conditions universally satisfies openness of lying in P(I) for every interval I ⊂ ℝ. It is proved through: Lemma 20.9. For T → S of finite type and a T-perfect E ∈ 𝒟_T, the extreme HN phases φ⁺_E : T → ℝ ∪ {−∞} and φ⁻_E : T → ℝ ∪ {+∞} are upper and lower semicontinuous and constructible. Cor 20.10. For every Dedekind C → S essentially of finite type, the heart 𝒜_C of the HN structure on 𝒟_C has a C-torsion theory (Prop 20.8 with Thm 17.1)."
+    labels: [area:stability, area:families, type:feature, source:1902.08184v4, source:2607.28411]
+    blocked_by: [1771, 1762, 1763, 1766, 1695, 1067]
+  - id: stacks-and-moduli-sf14-2
+    gh_issue: 1773
+    kind: task
+    parent: stacks-and-moduli-sf14
+    title: "SF14.2: Stability conditions over a base, and boundedness and finite type of P_σ(I; v) (BLMNPS Defs 21.13, 21.15, Lemma 21.20)"
+    status: planned
+    priority: must
+    size: M
+    summary: "The definition BLMNPS build Part IV around, and its first moduli consequence."
+    labels: [area:stability, area:moduli, type:feature, source:1902.08184v4, source:2607.28411]
+    blocked_by: [1770, 1771, 1772, 522, 1758, 1692, 1760, 1740, 1067]
+  - id: stacks-and-moduli-sf14-3
+    gh_issue: 1775
+    kind: task
+    parent: stacks-and-moduli-sf14
+    title: "SF14.3: Quot^{≤φ}_S(E) is an algebraic space of finite type, universally closed over S (BLMNPS Lemma 21.21)"
+    status: planned
+    priority: must
+    size: M
+    summary: "BLMNPS Lemma 21.21 (\"Grothendieck lemma\"). Let σ be a stability condition on 𝒟 over S, and E ∈ M_τ(S) an S-flat family for the fibrewise t-structure τ underlying σ. For φ ∈ (0, 1), the subfunctor Quot^{≤φ}_S(E) of quotients E_T ↠ Q with φ(Q_t) ≤ φ for all t is: - an algebraic space of finite type over S; - universally closed over S."
+    labels: [area:moduli, area:stability, type:feature, source:1902.08184v4, source:2607.28411]
+    blocked_by: [1772, 1773, 1760, 1737, 1740, 1651, 1653, 1656, 1697, 1695]
+  - id: stacks-and-moduli-sf14-4
+    gh_issue: 1776
+    kind: task
+    parent: stacks-and-moduli-sf14
+    title: "SF14.4: The space of stability conditions over S, and the statement of Theorem 22.2 (BLMNPS Def 22.1)"
+    status: planned
+    priority: must
+    size: S
+    summary: "BLMNPS Thm 22.2, stated with its genuine conclusion. This issue does not prove it; it builds the objects and pins the exact statement: Stab_Λ(𝒟/S): the set of stability conditions on 𝒟 over S with respect to a fixed relative Mukai homomorphism v : K_num(𝒟/S) → Λ (#1773's IsStabilityConditionOver). Def 22.1. Its topology: the coarsest making every σ ↦ σ_s ∈ Stab_Λ(𝒟_s) continuous, for the repository's absolute stability topology on each fibre."
+    labels: [area:stability, area:moduli, type:feature, source:1902.08184v4, source:2607.28411]
+    blocked_by: [1773, 1770, 1760]
+  - id: stacks-and-moduli-sf14-5a
+    gh_issue: 1777
+    kind: task
+    parent: stacks-and-moduli-sf14
+    title: "SF14.5a: Bridgeland deformation with the support property is a covering map (BLMNPS Thm 12.11)"
+    status: planned
+    priority: must
+    size: L
+    summary: "BLMNPS Thm 12.11, the support-property form of Bridgeland's deformation theorem ([BMS16, Prop A.5], [Bay19])."
+    labels: [area:stability, type:feature, source:1902.08184v4]
+    blocked_by: [1760]
+  - id: stacks-and-moduli-sf14-5b
+    gh_issue: 1778
+    kind: task
+    parent: stacks-and-moduli-sf14
+    title: "SF14.5b: Deforming a stability condition over S along its central charge (BLMNPS Remark 21.19, Lemma 22.3)"
+    status: planned
+    priority: must
+    size: M
+    summary: "The analytic heart of BLMNPS Thm 22.2: small deformations of a stability condition over S are again stability conditions over S."
+    labels: [area:stability, area:moduli, type:feature, source:1902.08184v4]
+    blocked_by: [1777, 1775, 1773, 1772, 1776, 1768, 1769, 1740, 1695, 1697]
+  - id: stacks-and-moduli-sf14-5c
+    gh_issue: 1779
+    kind: task
+    parent: stacks-and-moduli-sf14
+    title: "SF14.5c: Theorem 22.2, the central charge map on Stab(D/S) is a local homeomorphism (BLMNPS Thm 22.2)"
+    status: planned
+    priority: must
+    size: L
+    summary: "BLMNPS Thm 22.2, proved: Theorem22_2 𝒟 S Λ v (#1776). The forgetful map Z : Stab_Λ(𝒟/S) → Hom(Λ, ℂ) is a local homeomorphism, and for σ with support form Q, some open U ∋ σ has Z|_U : U → P_Z a covering map."
+    labels: [area:stability, area:moduli, type:feature, source:1902.08184v4, source:2607.28411]
+    blocked_by: [1776, 1778, 1777, 1768, 1771, 1740, 1695, 1697, 1775]
