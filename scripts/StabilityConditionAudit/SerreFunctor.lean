@@ -244,6 +244,7 @@ natural in B by `naturality_right`, and `uniqueIso` is natural in A by `naturali
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.transportIso_isoCompat
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.transportIso_trans
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.commShiftIso
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.commShift
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.chiHom_eq_chiHom_swap_serre
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.chiHom_eq_chiHom_swap_serre_of_bounded
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.chiHom_eq_negOnePow_mul_chiHom_of_serre_shift
