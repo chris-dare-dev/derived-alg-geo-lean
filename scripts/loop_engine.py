@@ -26,6 +26,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from importlib.metadata import PackageNotFoundError, version as package_version
 from pathlib import Path
@@ -1336,22 +1337,59 @@ def require_manifest_remote(root: Path, spec: dict[str, Any]) -> None:
                 raise LoopError(f"remote {remote!r} resolves to {target!r}, not {spec['repository']!r}")
 
 
-def blocked_by_entries(issue: dict[str, Any]) -> list[Any]:
-    """Normalize GitHub's blockedBy connection without treating an empty mapping as truthy."""
+@dataclass(frozen=True)
+class PreflightIssue:
+    """A complete, identified provider response, before eligibility is decided."""
 
-    blocked_by = issue.get("blockedBy")
-    if isinstance(blocked_by, dict):
-        nodes = blocked_by.get("nodes")
-        if isinstance(nodes, list):
-            if nodes:
-                return nodes
-            total = blocked_by.get("totalCount")
-            return [{}] if isinstance(total, int) and total > 0 else []
-        total = blocked_by.get("totalCount")
-        return [{}] if isinstance(total, int) and total > 0 else []
-    if isinstance(blocked_by, list):
-        return blocked_by
-    return []
+    state: str
+    labels: frozenset[str]
+    blockers: tuple[tuple[int, str], ...]
+
+
+def decode_preflight_issue(raw: Any, requested_number: int) -> PreflightIssue:
+    """Reject partial issue data before closed blockers can be disregarded.
+
+    gh 2.101.0 documents blockedBy as a connection with nodes capped at 50
+    (cli/cli, skills/gh/SKILL.md at v2.101.0). A truncated connection is
+    ineligible; it cannot prove that every blocker is closed.
+    """
+
+    if (not isinstance(raw, dict) or type(raw.get("number")) is not int
+            or raw["number"] <= 0 or raw["number"] != requested_number):
+        raise LoopError("provider response does not identify the requested issue")
+    state = raw.get("state")
+    if not isinstance(state, str) or state not in {"OPEN", "CLOSED"}:
+        raise LoopError("provider response has an unrecognized issue state")
+    labels = raw.get("labels")
+    if not isinstance(labels, list):
+        raise LoopError("provider response has no valid labels list")
+    names: set[str] = set()
+    for label in labels:
+        if not isinstance(label, dict) or not isinstance(label.get("name"), str) or not label["name"]:
+            raise LoopError("provider response contains a malformed label")
+        names.add(label["name"].lower())
+
+    connection = raw.get("blockedBy")
+    if not isinstance(connection, dict):
+        raise LoopError("provider response has no blockedBy connection")
+    nodes = connection.get("nodes")
+    total = connection.get("totalCount")
+    if not isinstance(nodes, list) or type(total) is not int or total < 0 or len(nodes) != total:
+        raise LoopError("provider blockedBy connection is malformed or incomplete")
+    blockers: list[tuple[int, str]] = []
+    seen: set[int] = set()
+    for node in nodes:
+        if not isinstance(node, dict) or type(node.get("number")) is not int or node["number"] <= 0:
+            raise LoopError("provider blockedBy node has no valid issue number")
+        number = node["number"]
+        if number in seen:
+            raise LoopError("provider blockedBy connection contains a duplicate issue number")
+        seen.add(number)
+        blocker_state = node.get("state")
+        if not isinstance(blocker_state, str) or blocker_state not in {"OPEN", "CLOSED"}:
+            raise LoopError("provider blockedBy node has an unrecognized state")
+        blockers.append((number, blocker_state))
+    return PreflightIssue(state, frozenset(names), tuple(blockers))
 
 
 def gh_authenticated(root: Path) -> str:
@@ -1999,18 +2037,13 @@ def preflight(root: Path, spec_path: Path) -> int:
     for issue in spec["issues"]:
         number = issue["number"]
         try:
-            live = issue_state(root, repository, number)
+            live = decode_preflight_issue(issue_state(root, repository, number), number)
         except LoopError as exc:
-            failures.append(str(exc))
+            failures.append(f"issue #{number}: {exc}")
             continue
-        if live.get("state") != "OPEN":
-            failures.append(f"issue #{number} is not open (state={live.get('state')})")
-        labels = {
-            label.get("name", "").lower()
-            for label in live.get("labels", [])
-            if isinstance(label, dict)
-        }
-        forbidden = labels & {"blocked", "epic", "research", "type:spike"}
+        if live.state != "OPEN":
+            failures.append(f"issue #{number} is not open (state={live.state})")
+        forbidden = set(live.labels) & {"blocked", "epic", "research", "type:spike"}
         # An epic opt-in is an owner's eligibility decision; a branch-authored
         # manifest cannot make it for itself.
         allow_epic_issues = (
@@ -2023,9 +2056,11 @@ def preflight(root: Path, spec_path: Path) -> int:
             print(f"PASS issue #{number}: epic label explicitly authorized by manifest")
         if forbidden:
             failures.append(f"issue #{number} has ineligible labels: {', '.join(sorted(forbidden))}")
-        blocked_by = blocked_by_entries(live)
-        if blocked_by:
-            failures.append(f"issue #{number} has live blocked-by dependencies")
+        open_blockers = [blocker for blocker, state in live.blockers if state == "OPEN"]
+        if open_blockers:
+            failures.append(f"issue #{number} has open blocked-by dependencies: {open_blockers}")
+        elif live.blockers:
+            print(f"PASS issue #{number}: all {len(live.blockers)} blocked-by dependencies are closed")
         for dependency in issue.get("depends_on", []):
             if dependency in selected_numbers:
                 continue

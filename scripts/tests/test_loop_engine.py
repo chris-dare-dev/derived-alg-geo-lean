@@ -218,23 +218,19 @@ class LoopEngineTests(unittest.TestCase):
             patcher.start()
             self.addCleanup(patcher.stop)
 
-    def test_remote_and_blocker_normalization_match_github_shapes(self) -> None:
+    def test_remote_and_preflight_decoder_match_github_shapes(self) -> None:
         self.assertEqual(
             loop_engine.normalize_remote("git@github.com:owner/repo.git"),
             "owner/repo",
         )
-        self.assertEqual(
-            loop_engine.blocked_by_entries({"blockedBy": {"nodes": [], "totalCount": 0}}),
-            [],
+        decoded = loop_engine.decode_preflight_issue(
+            {
+                "number": 554, "state": "OPEN", "labels": [],
+                "blockedBy": {"nodes": [{"number": 1495, "state": "CLOSED"}], "totalCount": 1},
+            },
+            554,
         )
-        self.assertEqual(
-            loop_engine.blocked_by_entries({"blockedBy": {"nodes": [], "totalCount": 1}}),
-            [{}],
-        )
-        self.assertEqual(
-            loop_engine.blocked_by_entries({"blockedBy": {"nodes": [{"number": 7}], "totalCount": 1}}),
-            [{"number": 7}],
-        )
+        self.assertEqual(decoded.blockers, ((1495, "CLOSED"),))
 
     def test_windows_openspec_command_uses_cmd_shim(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -468,7 +464,10 @@ class LoopEngineTests(unittest.TestCase):
             ), mock.patch.object(loop_engine, "existing_prs", return_value=[]), mock.patch.object(
                 loop_engine, "gh_json", return_value={"contexts": ["ci"]}
             ), mock.patch.object(
-                loop_engine, "issue_state", return_value={"state": "OPEN", "labels": [], "blockedBy": []}
+                loop_engine, "issue_state", return_value={
+                    "number": 1, "state": "OPEN", "labels": [],
+                    "blockedBy": {"nodes": [], "totalCount": 0},
+                }
             ), mock.patch.object(
                 loop_engine,
                 "require_predecessor_prs",
@@ -3041,15 +3040,20 @@ class PlanInPullRequestPreflightTests(unittest.TestCase):
         self.addCleanup(patcher.stop)
 
     def preflight(
-        self, prs: list[dict] | None = None, protected: set[str] | None = None, labels: list[dict] | None = None
+        self, prs: list[dict] | None = None, protected: set[str] | None = None,
+        labels: list[dict] | None = None, issue_payload: dict | None = None,
     ) -> tuple[int, str]:
         output = io.StringIO()
+        live = issue_payload if issue_payload is not None else {
+            "number": 1, "state": "OPEN", "labels": labels if labels is not None else [],
+            "blockedBy": {"nodes": [], "totalCount": 0},
+        }
         with mock.patch.object(loop_engine, "gh_authenticated", return_value=self.spec["actor"]), mock.patch.object(
             loop_engine, "existing_prs", return_value=prs or []
         ), mock.patch.object(
             loop_engine, "protected_check_names", return_value=protected if protected is not None else {"ci"}
         ), mock.patch.object(
-            loop_engine, "issue_state", return_value={"state": "OPEN", "labels": labels or [], "blockedBy": []}
+            loop_engine, "issue_state", return_value=live
         ), mock.patch.object(loop_engine, "require_predecessor_prs", return_value=[]), mock.patch.object(
             loop_engine, "roadmap_gate_args", return_value=[sys.executable, "-c", "pass"]
         ), contextlib.redirect_stdout(output):
@@ -3059,6 +3063,50 @@ class PlanInPullRequestPreflightTests(unittest.TestCase):
     def test_an_uncommitted_plan_on_the_work_branch_passes(self) -> None:
         code, output = self.preflight()
         self.assertEqual(code, 0, output)
+
+    def test_closed_blocker_passes_but_open_blocker_stops_preflight(self) -> None:
+        live = {
+            "number": 1, "state": "OPEN", "labels": [],
+            "blockedBy": {"nodes": [{"number": 1495, "state": "CLOSED"}], "totalCount": 1},
+        }
+        code, output = self.preflight(issue_payload=live)
+        self.assertEqual(code, 0, output)
+        self.assertIn("all 1 blocked-by dependencies are closed", output)
+
+        live["blockedBy"]["nodes"][0]["state"] = "OPEN"
+        code, output = self.preflight(issue_payload=live)
+        self.assertEqual(code, 1, output)
+        self.assertIn("open blocked-by dependencies: [1495]", output)
+
+    def test_incomplete_or_unidentified_provider_data_rejects_preflight(self) -> None:
+        valid = {
+            "number": 1, "state": "OPEN", "labels": [],
+            "blockedBy": {"nodes": [{"number": 1495, "state": "CLOSED"}], "totalCount": 1},
+        }
+        cases = {
+            "bare closed list": {**valid, "blockedBy": [{"number": 1495, "state": "CLOSED"}]},
+            "truncated connection": {**valid, "blockedBy": {"nodes": [], "totalCount": 1}},
+            "boolean count": {**valid, "blockedBy": {"nodes": [{"number": 1495, "state": "CLOSED"}], "totalCount": True}},
+            "missing issue identity": {**valid, "number": None},
+            "wrong issue identity": {**valid, "number": 2},
+            "missing labels": {**valid, "labels": None},
+            "malformed label": {**valid, "labels": [{}]},
+            "missing blocker number": {**valid, "blockedBy": {"nodes": [{"state": "CLOSED"}], "totalCount": 1}},
+            "zero blocker number": {**valid, "blockedBy": {"nodes": [{"number": 0, "state": "CLOSED"}], "totalCount": 1}},
+            "boolean blocker number": {**valid, "blockedBy": {"nodes": [{"number": True, "state": "CLOSED"}], "totalCount": 1}},
+            "unknown blocker state": {**valid, "blockedBy": {"nodes": [{"number": 1495, "state": "DONE"}], "totalCount": 1}},
+            "duplicate blocker": {**valid, "blockedBy": {"nodes": [
+                {"number": 1495, "state": "CLOSED"}, {"number": 1495, "state": "CLOSED"}
+            ], "totalCount": 2}},
+        }
+        for name, payload in cases.items():
+            with self.subTest(name=name), mock.patch.object(
+                loop_engine, "atomic_json", side_effect=AssertionError("preflight wrote a ledger")
+            ):
+                code, output = self.preflight(issue_payload=payload)
+                self.assertEqual(code, 1, output)
+                self.assertIn("provider", output)
+                self.assertFalse((self.root / ".loop-runs").exists())
 
     def test_missing_openspec_cli_respects_required_and_advisory_modes(self) -> None:
         for mode, expected_code in (("cli-required", 1), ("cli-advisory", 0)):
