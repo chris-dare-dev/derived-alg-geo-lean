@@ -48,7 +48,7 @@ class HostPickupTests(unittest.TestCase):
             with tarfile.open(archive, "w:gz") as bundle:
                 for name, body in (
                     ("config.sh", "#!/bin/sh\nexit 0\n"),
-                    ("run.sh", "#!/bin/sh\nmkdir -p _diag _work/derived-alg-geo-lean/derived-alg-geo-lean\necho kept > _diag/trace.log\n"),
+                    ("run.sh", "#!/bin/sh\ntest ! -e ../registration-token || exit 42\nmkdir -p _diag _work/derived-alg-geo-lean/derived-alg-geo-lean\necho kept > _diag/trace.log\n"),
                 ):
                     data = body.encode()
                     member = tarfile.TarInfo(name)

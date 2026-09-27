@@ -446,11 +446,14 @@ def _runner_worker_started(archive: Path, digest: str, label: str, root: Path,
     if not token:
         raise ValueError("registration token is missing")
     name = f"dag-{root.name}"
-    configured = subprocess.run([
-        "./config.sh", "--unattended", "--ephemeral", "--disableupdate",
-        "--url", f"https://github.com/{REPOSITORY}",
-        "--name", name, "--labels", label, "--work", "_work",
-    ], cwd=runner_dir, env={**os.environ, "ACTIONS_RUNNER_INPUT_TOKEN": token}, check=False)
+    try:
+        configured = subprocess.run([
+            "./config.sh", "--unattended", "--ephemeral", "--disableupdate",
+            "--url", f"https://github.com/{REPOSITORY}",
+            "--name", name, "--labels", label, "--work", "_work",
+        ], cwd=runner_dir, env={**os.environ, "ACTIONS_RUNNER_INPUT_TOKEN": token}, check=False)
+    finally:
+        _unlink_registration_token(root, expected)
     if configured.returncode != 0:
         raise ValueError(f"runner configuration failed with exit code {configured.returncode}")
     return subprocess.run(["./run.sh"], cwd=runner_dir, check=False).returncode

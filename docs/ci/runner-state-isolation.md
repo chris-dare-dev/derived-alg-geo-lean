@@ -184,8 +184,9 @@ list APIs, and `gh` authentication outside the isolated job environment. No
 token is printed or passed in process arguments; the pinned runner reads
 `ACTIONS_RUNNER_INPUT_TOKEN` from its configuration environment and removes it
 after registering it with its secret masker. The token is removed from the
-job root after configuration. The host account must be trusted against
-same-UID process-environment inspection during configuration. Rotate/update
+job root immediately after configuration and before `run.sh` starts. The host
+account must be trusted against same-UID inspection of the short-lived token
+file and process environment during configuration. Rotate/update
 the pinned archive deliberately
 because `--disableupdate` prevents an in-job self-update.
 
