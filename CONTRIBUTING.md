@@ -196,16 +196,23 @@ works:
 - give dependencies as GitHub "blocked by" links;
 - say whether the issue closes in one PR (complete) or several (progress).
 
-The run researches each issue and writes its plan into the PR description. Four
-independent reviewers must pass it on the same commit, with at most three
-rounds per PR. It merges once the required `ci` check passes, then takes the
-next issue. An issue it cannot finish is parked as a draft PR with its open
-findings, not waited on.
+The run researches each issue and writes its plan into the PR description.
+Four independent reviewers must pass it on the same commit. Each frozen
+implementation attempt has at most three reserved review rounds. At exhaustion
+the run preserves the failed attempt, starts a separate read-only R&D
+examination and gets independent review of a changed plan. A bounded successor
+under the same issue/objective inherits all findings; a renamed PR or branch
+cannot reset its history. A draft PR or issue comment records the terminal
+findings, and marked issue comments reserve rounds before reviewer dispatch.
+Merge still requires required checks on the exact live PR head and the
+reviewed change. Dependent issues wait for the original issue's definition
+of done.
 
 The request that starts a run authorizes its pushes, PRs and merges. The owner
 withdraws any of these with an explicit `false` in `.claude/loop-authority.yaml`
-on the default branch. A run never changes the loop's own tooling or
-instructions, and it uses no OpenSpec change, loop manifest or review ledger.
+on the default branch. A run changes the loop's own tooling or instructions
+only when the owner explicitly asks for loop engineering. It uses no
+controller OpenSpec change, loop manifest or controller review ledger.
 The manifest controller (`scripts/loop_engine.py`, `.claude/loop-specs/`) is off
 the run path, and is kept only for the ledgers it already wrote. Issue closure
 for code work requires a merged PR.
