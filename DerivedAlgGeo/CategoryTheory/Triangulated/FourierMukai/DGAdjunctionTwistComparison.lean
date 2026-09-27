@@ -240,6 +240,7 @@ abbrev ShiftCompatibility :=
 
 namespace ShiftCompatibility
 
+/-- The selected transported `H⁰` shift structure on the dg twist. -/
 noncomputable local instance : (K.transportedTwist eB).CommShift ℤ :=
   K.twist.transportedH0CommShift
 
@@ -250,7 +251,7 @@ abbrev twistCommShift : S.twist.CommShift ℤ := h.targetCommShift
 
 /-- The twist comparison respects its selected source and target shift
 structures. -/
-abbrev transportedTwistIso_commShift :
+abbrev transportedTwistIsoCommShift :
     letI : S.twist.CommShift ℤ := h.twistCommShift
     NatTrans.CommShift N.transportedTwistIso.hom ℤ := h.hom_commShift
 

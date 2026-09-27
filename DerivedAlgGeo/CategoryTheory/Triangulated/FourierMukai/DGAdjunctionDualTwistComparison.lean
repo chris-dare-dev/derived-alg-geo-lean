@@ -214,6 +214,7 @@ namespace ShiftCompatibility
 
 open AdjunctionUnitKernelConeData.PresentedUnitComparisonData.ShiftCompatibility
 
+/-- The sign-correct pointwise `[-1]` source shift used by the dual twist. -/
 noncomputable local instance : (K.transportedCotwist eB).CommShift ℤ :=
   K.transportedCotwistCommShift (eC := eB)
 
@@ -245,7 +246,7 @@ theorem transportedDualTwistIso_commShift :
       K.transportedCotwistCommShift (eC := eB)
     letI : T.dualTwist.CommShift ℤ := h.dualTwistCommShift
     NatTrans.CommShift N.transportedDualTwistIso.hom ℤ :=
-  h.transportedCotwistIso_commShift
+  h.transportedCotwistIsoCommShift
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The comparison from the actual shifted dg unit cone respects the canonical

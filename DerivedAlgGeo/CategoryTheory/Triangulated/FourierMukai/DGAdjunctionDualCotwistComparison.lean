@@ -166,6 +166,7 @@ namespace ShiftCompatibility
 
 open CounitKernelConeData.PresentedCounitComparisonData.ShiftCompatibility
 
+/-- The transported `H⁰` twist shift structure used by the dual cotwist. -/
 noncomputable local instance : (K.transportedTwist eA).CommShift ℤ :=
   K.twist.transportedH0CommShift
 
@@ -197,7 +198,7 @@ theorem transportedDualCotwistIso_commShift :
       K.twist.transportedH0CommShift
     letI : T.dualCotwist.CommShift ℤ := h.dualCotwistCommShift
     NatTrans.CommShift N.transportedDualCotwistIso.hom ℤ :=
-  h.transportedTwistIso_commShift
+  h.transportedTwistIsoCommShift
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The selected Fourier--Mukai dual cotwist is triangulated when the

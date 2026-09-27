@@ -314,6 +314,7 @@ abbrev ShiftCompatibility :=
 
 namespace ShiftCompatibility
 
+/-- The sign-correct shift structure on the conventional pointwise `[-1]` cotwist. -/
 noncomputable local instance : (K.transportedCotwist eA).CommShift ℤ :=
   K.transportedCotwistCommShift (eC := eA)
 
@@ -324,7 +325,7 @@ abbrev cotwistCommShift : S.cotwist.CommShift ℤ := h.targetCommShift
 
 /-- The conventional cotwist comparison respects its selected source and
 target shift structures. -/
-abbrev transportedCotwistIso_commShift :
+abbrev transportedCotwistIsoCommShift :
     letI : S.cotwist.CommShift ℤ := h.cotwistCommShift
     NatTrans.CommShift N.transportedCotwistIso.hom ℤ := h.hom_commShift
 
@@ -345,7 +346,7 @@ theorem transportedDGCotwistIso_commShift [eA.functor.Additive] :
   letI : NatTrans.CommShift (K.transportedCotwistH0Iso (eC := eA)).hom ℤ :=
     K.transportedCotwistH0Iso_commShift (eC := eA)
   letI : NatTrans.CommShift N.transportedCotwistIso.hom ℤ :=
-    h.transportedCotwistIso_commShift
+    h.transportedCotwistIsoCommShift
   change NatTrans.CommShift
     ((K.transportedCotwistH0Iso (eC := eA)).hom ≫
       N.transportedCotwistIso.hom) ℤ
