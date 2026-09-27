@@ -26,6 +26,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from importlib.metadata import PackageNotFoundError, version as package_version
 from pathlib import Path
@@ -133,6 +134,7 @@ LEGACY_REVIEWED_MANIFESTS = frozenset(
         "38d0d07e7f4e237af5e13c96149caa7e0b6926ddf6a051270a9c0fc8ae10e5fa",  # sf8-5-task12-kflat-pullback (#554)
         "315637cf2347791dce3abb9fdd1b57a6fcf83f63f5c0cb5ffab986ef9cb57419",  # rou1-919-rouquier-dimension (#1478)
         "b9c85b5909a68b5fc120d8be3073e5f391288b08beb4ef2319cd9ed3cfb6ff37",  # controller-publication-integrity-repair (#1482; zero provider grants)
+        "f329fd1e1b8136c5e9fc508441ee2daa14fe9d240f4c2a4f58c682d4c973b436",  # ci1-m54-1440-progress (#1440; profiling progress only)
     }
 )
 # A branch-authored run's frozen chunk may never touch its own authority, the
@@ -1336,22 +1338,67 @@ def require_manifest_remote(root: Path, spec: dict[str, Any]) -> None:
                 raise LoopError(f"remote {remote!r} resolves to {target!r}, not {spec['repository']!r}")
 
 
-def blocked_by_entries(issue: dict[str, Any]) -> list[Any]:
-    """Normalize GitHub's blockedBy connection without treating an empty mapping as truthy."""
+@dataclass(frozen=True)
+class PreflightIssue:
+    """A complete, identified provider response, before eligibility is decided."""
 
-    blocked_by = issue.get("blockedBy")
-    if isinstance(blocked_by, dict):
-        nodes = blocked_by.get("nodes")
-        if isinstance(nodes, list):
-            if nodes:
-                return nodes
-            total = blocked_by.get("totalCount")
-            return [{}] if isinstance(total, int) and total > 0 else []
-        total = blocked_by.get("totalCount")
-        return [{}] if isinstance(total, int) and total > 0 else []
-    if isinstance(blocked_by, list):
-        return blocked_by
-    return []
+    state: str
+    labels: frozenset[str]
+    blockers: tuple[tuple[int, str], ...]
+
+
+def decode_issue_identity_state(raw: Any, requested_number: int) -> str:
+    """Validate the identity and state shared by every issue-state consumer."""
+    if (not isinstance(raw, dict) or type(raw.get("number")) is not int
+            or raw["number"] <= 0 or raw["number"] != requested_number):
+        raise LoopError("provider response does not identify the requested issue")
+    state = raw.get("state")
+    if not isinstance(state, str) or state not in {"OPEN", "CLOSED"}:
+        raise LoopError("provider response has an unrecognized issue state")
+    return state
+
+
+def decode_preflight_issue(raw: Any, requested_number: int) -> PreflightIssue:
+    """Reject partial issue data before closed blockers can be disregarded.
+
+    gh 2.101.0 caps blockedBy nodes at 50 (cli/cli, skills/gh/SKILL.md)
+    and labels at 100 (cli/cli, api/query_builder.go). A truncated response
+    cannot establish eligibility.
+    """
+
+    state = decode_issue_identity_state(raw, requested_number)
+    labels = raw.get("labels")
+    if not isinstance(labels, list):
+        raise LoopError("provider response has no valid labels list")
+    if len(labels) >= 100:
+        raise LoopError("provider labels list reaches the 100-label cap; completeness is unverified")
+    names: set[str] = set()
+    for label in labels:
+        if not isinstance(label, dict) or not isinstance(label.get("name"), str) or not label["name"]:
+            raise LoopError("provider response contains a malformed label")
+        names.add(label["name"].lower())
+
+    connection = raw.get("blockedBy")
+    if not isinstance(connection, dict):
+        raise LoopError("provider response has no blockedBy connection")
+    nodes = connection.get("nodes")
+    total = connection.get("totalCount")
+    if not isinstance(nodes, list) or type(total) is not int or total < 0 or len(nodes) != total:
+        raise LoopError("provider blockedBy connection is malformed or incomplete")
+    blockers: list[tuple[int, str]] = []
+    seen: set[int] = set()
+    for node in nodes:
+        if not isinstance(node, dict) or type(node.get("number")) is not int or node["number"] <= 0:
+            raise LoopError("provider blockedBy node has no valid issue number")
+        number = node["number"]
+        if number in seen:
+            raise LoopError("provider blockedBy connection contains a duplicate issue number")
+        seen.add(number)
+        blocker_state = node.get("state")
+        if not isinstance(blocker_state, str) or blocker_state not in {"OPEN", "CLOSED"}:
+            raise LoopError("provider blockedBy node has an unrecognized state")
+        blockers.append((number, blocker_state))
+    return PreflightIssue(state, frozenset(names), tuple(blockers))
 
 
 def gh_authenticated(root: Path) -> str:
@@ -1411,7 +1458,7 @@ def require_legacy_issue_open(root: Path, spec: dict[str, Any], number: int) -> 
 
     if not owner_reviewed_legacy_manifest(root, spec):
         return
-    state = str(issue_state(root, spec["repository"], number).get("state", "")).upper()
+    state = decode_issue_identity_state(issue_state(root, spec["repository"], number), number)
     if state != "OPEN":
         raise LoopError(
             f"issue #{number} is {state or 'unknown'}; a legacy manifest's grants cover only its open issues"
@@ -1999,18 +2046,13 @@ def preflight(root: Path, spec_path: Path) -> int:
     for issue in spec["issues"]:
         number = issue["number"]
         try:
-            live = issue_state(root, repository, number)
+            live = decode_preflight_issue(issue_state(root, repository, number), number)
         except LoopError as exc:
-            failures.append(str(exc))
+            failures.append(f"issue #{number}: {exc}")
             continue
-        if live.get("state") != "OPEN":
-            failures.append(f"issue #{number} is not open (state={live.get('state')})")
-        labels = {
-            label.get("name", "").lower()
-            for label in live.get("labels", [])
-            if isinstance(label, dict)
-        }
-        forbidden = labels & {"blocked", "epic", "research", "type:spike"}
+        if live.state != "OPEN":
+            failures.append(f"issue #{number} is not open (state={live.state})")
+        forbidden = set(live.labels) & {"blocked", "epic", "research", "type:spike"}
         # An epic opt-in is an owner's eligibility decision; a branch-authored
         # manifest cannot make it for itself.
         allow_epic_issues = (
@@ -2023,18 +2065,22 @@ def preflight(root: Path, spec_path: Path) -> int:
             print(f"PASS issue #{number}: epic label explicitly authorized by manifest")
         if forbidden:
             failures.append(f"issue #{number} has ineligible labels: {', '.join(sorted(forbidden))}")
-        blocked_by = blocked_by_entries(live)
-        if blocked_by:
-            failures.append(f"issue #{number} has live blocked-by dependencies")
+        open_blockers = [blocker for blocker, state in live.blockers if state == "OPEN"]
+        if open_blockers:
+            failures.append(f"issue #{number} has open blocked-by dependencies: {open_blockers}")
+        elif live.blockers:
+            print(f"PASS issue #{number}: all {len(live.blockers)} blocked-by dependencies are closed")
         for dependency in issue.get("depends_on", []):
             if dependency in selected_numbers:
                 continue
             try:
-                dependency_state = issue_state(root, repository, dependency)
+                dependency_state = decode_issue_identity_state(
+                    issue_state(root, repository, dependency), dependency
+                )
             except LoopError as exc:
-                failures.append(str(exc))
+                failures.append(f"dependency #{dependency}: {exc}")
                 continue
-            if dependency_state.get("state") != "CLOSED":
+            if dependency_state != "CLOSED":
                 failures.append(f"issue #{number} depends on open issue #{dependency}")
         expected_branch = f"agent/{issue['slug']}"
         # An open PR on the planned branch is this run's own PR being resumed.
@@ -2210,8 +2256,10 @@ def require_selected_dependencies_passed(
                     f"issue #{issue['number']} depends on progress chunk {dependency_chunk['id']!r}; "
                     "a progress ledger cannot unlock a downstream issue"
                 )
-            dependency_live = issue_state(root, spec["repository"], dependency)
-            if str(dependency_live.get("state", "")).upper() != "CLOSED":
+            dependency_state = decode_issue_identity_state(
+                issue_state(root, spec["repository"], dependency), dependency
+            )
+            if dependency_state != "CLOSED":
                 raise LoopError(
                     f"issue #{issue['number']} depends on issue #{dependency} remaining open; "
                     "the upstream complete chunk must be merged and closed first"
@@ -3631,75 +3679,48 @@ def protected_check_names(root: Path, spec: dict[str, Any]) -> set[str]:
     return names
 
 
-def check_required_checks(root: Path, spec: dict[str, Any], pr_number: int) -> str:
-    """Require green checks and return the PR head they were read for."""
+def _ci_evidence_modules() -> tuple[Any, Any]:
+    if __package__:
+        from . import ci_github_evidence, ci_publication
+    else:  # Standalone scripts/loop_engine.py invocation.
+        import ci_github_evidence
+        import ci_publication
+    return ci_github_evidence, ci_publication
 
-    data = gh_json(
-        root,
-        ["pr", "view", str(pr_number), "--repo", spec["repository"], "--json", "headRefOid,statusCheckRollup"],
-    )
-    if not isinstance(data, dict) or not isinstance(data.get("headRefOid"), str) or not FULL_GIT_SHA_RE.fullmatch(
-        data["headRefOid"]
+
+def collect_required_check_evidence(
+    root: Path, spec: dict[str, Any], pr_number: int
+) -> dict[str, Any]:
+    """Collect complete provider evidence and require its CI1.01 claim."""
+
+    ci_github_evidence, _ = _ci_evidence_modules()
+    try:
+        result = ci_github_evidence.collect(
+            ci_github_evidence.GitHubClient(spec["repository"]), pr_number
+        )
+    except ci_github_evidence.EvidenceError as exc:
+        raise LoopError(f"cannot verify required CI evidence: {exc}") from exc
+    validation = result.get("validation")
+    if not isinstance(validation, dict) or validation.get("valid") is not True:
+        errors = validation.get("errors", []) if isinstance(validation, dict) else []
+        detail = "; ".join(str(error) for error in errors) or "validator returned no valid claim"
+        raise LoopError(f"required CI evidence is not valid: {detail}")
+    claims = validation.get("claims")
+    if not isinstance(claims, dict) or claims.get("required_ci_verified") is not True:
+        raise LoopError("required CI evidence is not verified")
+    evidence = result.get("evidence")
+    if not isinstance(evidence, dict) or not FULL_GIT_SHA_RE.fullmatch(
+        str(evidence.get("head_commit", ""))
     ):
-        raise LoopError("PR check rollup is missing a valid head commit")
+        raise LoopError("CI evidence is not bound to a valid PR head")
+    return result
 
-    def start_time(item: dict[str, Any]) -> datetime | None:
-        value = item.get("startedAt") or item.get("createdAt")
-        if not isinstance(value, str):
-            return None
-        try:
-            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
-        except ValueError:
-            return None
-        return parsed if parsed.tzinfo is not None else None
 
-    latest: dict[str, dict[str, Any]] = {}
-    for check in data.get("statusCheckRollup") or []:
-        if not isinstance(check, dict):
-            continue
-        name = check.get("name") or check.get("context")
-        if not isinstance(name, str):
-            continue
-        previous = latest.get(name)
-        if previous is None:
-            latest[name] = check
-            continue
-        # A completion time can be later than the start of a newer pending
-        # attempt. Compare starts only; an unorderable duplicate is not green.
-        current_start = start_time(check)
-        previous_start = start_time(previous)
-        if current_start is None or previous_start is None or current_start == previous_start:
-            raise LoopError(f"cannot order duplicate check runs for {name}")
-        if current_start > previous_start:
-            latest[name] = check
-    missing: list[str] = []
-    failed: list[str] = []
-    # Branch protection is the live list of required checks. A manifest check
-    # still counts when the PR actually runs it; a name that neither the
-    # protection nor the PR knows was retired after the manifest was written.
-    live = protected_check_names(root, spec)
-    # With no live list, a manifest check that has not started must not drop out.
-    required_names = (
-        live | {name for name in spec["runner"]["required_checks"] if name in latest}
-        if live
-        else set(spec["runner"]["required_checks"])
-    )
-    for required in sorted(required_names):
-        check = latest.get(required)
-        if check is None:
-            missing.append(required)
-            continue
-        conclusion = check.get("conclusion") or check.get("state") or check.get("status")
-        if conclusion not in SUCCESS_CONCLUSIONS:
-            failed.append(f"{required}={conclusion}")
-    if missing or failed:
-        detail = []
-        if missing:
-            detail.append("missing " + ", ".join(missing))
-        if failed:
-            detail.append("not successful " + ", ".join(failed))
-        raise LoopError("required checks are not green: " + "; ".join(detail))
-    return data["headRefOid"]
+def check_required_checks(root: Path, spec: dict[str, Any], pr_number: int) -> str:
+    """Require complete CI1.01 evidence and return its checked PR head."""
+
+    result = collect_required_check_evidence(root, spec, pr_number)
+    return str(result["evidence"]["head_commit"])
 
 
 def strict_protected_check_map(root: Path, spec: dict[str, Any]) -> dict[str, int | None]:
@@ -4500,11 +4521,8 @@ def action_merge(
         raise LoopError("merge requires a passing adjudicated review round")
     # Refuse a disallowed method, auto or admin request before any provider call.
     build_merge_command(spec, pr_number, str(current["commit"]), method, auto, admin, delete_branch)
-    checked_head = (
-        None
-        if admin and not state.get("ci_failure_repairs")
-        else check_required_checks(root, spec, pr_number)
-    )
+    premerge_evidence = collect_required_check_evidence(root, spec, pr_number)
+    checked_head = str(premerge_evidence["evidence"]["head_commit"])
     pr = gh_json(
         root,
         [
@@ -4514,23 +4532,44 @@ def action_merge(
             "--repo",
             spec["repository"],
             "--json",
-            "state,isDraft,headRefName,headRefOid,baseRefName,body,files,comments",
+            "state,isDraft,headRefName,headRefOid,baseRefName,baseRefOid,mergeStateStatus,reviewDecision,body,files,comments",
         ],
     )
     if pr.get("state") != "OPEN" or pr.get("isDraft"):
         raise LoopError("merge requires an open, non-draft PR")
     require_pr_targets_base(pr, spec)
+    if checked_head.lower() != str(pr.get("headRefOid", "")).lower():
+        raise LoopError("PR head moved between the check read and verification; rerun the merge")
     require_pr_matches_frozen_issue(pr, state)
     require_repair_pr_binding(state, pr_number, str(pr.get("headRefOid") or ""))
     require_predecessor_merges_ancestor(root, predecessor_proofs, pr.get("headRefOid", ""), "PR head")
     if not reviewed_content_matches(root, spec, state, str(current.get("commit", "")), str(pr.get("headRefOid", ""))):
         raise LoopError("PR head does not carry the change reviewed by the passing ledger")
+    ci_github_evidence, ci_publication = _ci_evidence_modules()
+    reviewed_commit = str(current.get("commit", ""))
+    reviewed_tree = git(root, "rev-parse", f"{reviewed_commit}^{{tree}}").lower()
+    head_tree = git(root, "rev-parse", f"{pr['headRefOid']}^{{tree}}").lower()
+    candidate_tree = str(premerge_evidence["evidence"].get("candidate_tree", "")).lower()
+    if candidate_tree != reviewed_tree or head_tree != reviewed_tree:
+        raise LoopError("CI candidate or PR head tree differs from the final reviewed tree; renew review")
+    readiness = ci_publication.evaluate_merge_readiness(
+        pr,
+        checked_base=str(premerge_evidence["evidence"]["base_commit"]),
+        checked_head=checked_head,
+        reviewed_tree=reviewed_tree,
+        head_tree=head_tree,
+        required_ci_verified=premerge_evidence["validation"]["claims"]["required_ci_verified"],
+    )
+    if readiness["status"] != "ready":
+        raise LoopError(
+            "PR is not merge-ready: " + "; ".join(readiness["reasons"])
+        )
     verify_remote_chunk_files(root, spec, pr, state)
     require_published_head_has_no_links(root, spec, state, str(pr.get("headRefOid", "")))
     if predecessor_attestation_policy(spec)["emit"]:
         payload = predecessor_attestation_from_state(state, pr["headRefOid"])
         require_exact_predecessor_attestation(pr, payload, spec["actor"], pr_number)
-    if isinstance(checked_head, str) and checked_head and checked_head.lower() != str(pr.get("headRefOid", "")).lower():
+    if checked_head.lower() != str(pr.get("headRefOid", "")).lower():
         raise LoopError("PR head moved between the check read and verification; rerun the merge")
     # Pin the head just verified to carry the reviewed change: a push after
     # this point makes the provider refuse the merge instead of landing it.
@@ -4541,10 +4580,31 @@ def action_merge(
     run_command(root, args, check=True)
     if auto:
         print(f"PASS PR queued for auto-merge: #{pr_number}")
-    elif admin:
-        print(f"PASS PR admin-merged: #{pr_number}")
-    else:
-        print(f"PASS PR merged: #{pr_number}")
+        return 0
+    try:
+        receipt = ci_github_evidence.collect_publication(
+            ci_github_evidence.GitHubClient(spec["repository"]),
+            pr_number,
+            reviewed_commit=reviewed_commit,
+            reviewed_tree=reviewed_tree,
+            premerge=premerge_evidence,
+            merge_readiness=readiness,
+        )
+        ci_publication.verify_receipt(receipt)
+    except (ci_github_evidence.EvidenceError, ci_publication.PublicationError) as exc:
+        raise LoopError(
+            f"PR #{pr_number} merged, but its exact publication receipt could not be verified: {exc}"
+        ) from exc
+    receipt_path = ledger_file.parent / f"publication-receipt-pr{pr_number}.json"
+    receipt_path.parent.mkdir(parents=True, exist_ok=True)
+    receipt_path.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    print(
+        f"PASS PR merged: #{pr_number}; receipt={receipt_path}; "
+        f"required_ci_verified=true; auxiliary_checks_healthy={receipt['claims']['auxiliary_checks_healthy']}; "
+        f"merge_readiness={receipt['claims']['merge_readiness']}; "
+        f"post_merge_health={receipt['claims']['post_merge_health']}; "
+        f"operationally_verified={receipt['claims']['operationally_verified']}"
+    )
     return 0
 
 

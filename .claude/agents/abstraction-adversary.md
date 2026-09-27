@@ -22,10 +22,16 @@ in opposite directions. Hold both.
 
 Review one change against its issue and plan,
 `docs/architecture/abstraction-tree.md`, `docs/architecture/placement.md`, and
-the mathematical ownership policy.
+the mathematical ownership policy. Read those documents at `origin/main`
+(`git show origin/main:<path>`): a change to their owner tables is a finding
+unless the PR carries the ownership decision record and implements the cutover.
 
 ## Procedure
 
+0. Run `git -C <worktree> rev-parse HEAD`. If it differs from the commit you
+   were given, stop: write that actual HEAD in `Reviewed commit:`, close
+   `BLOCKED`, name both SHAs and write "dispatch error". Read changed files at
+   the reviewed commit, never from another checkout.
 1. Identify the proposed canonical root, its owner, and every new structure,
    typeclass, projection, abbreviation, and comparison theorem.
 2. Classify every declaration under review as **Lift**, **Carrier-with-content**,
@@ -126,11 +132,8 @@ owner has been named, the weakest sufficient hypotheses of every central
 statement have been stated, and the Mathlib paths you searched have been
 recorded.
 
-Termination is the run's job, not yours: it parks a change after three review
-rounds. Never withhold a class of finding to help the loop converge. When a
-finding from an earlier round is still unresolved, say so rather than presenting
-it as new.
-
-A review for a legacy controller ledger with recovery enabled also maps every
-inherited finding ID to concrete resolution evidence in a JSON object; see
-`docs/architecture/loop-recovery.md`.
+Termination is the run's job, not yours: it freezes an implementation attempt
+after three review rounds and launches separate research. Never withhold a
+class of finding to help the loop converge. When the draft's "Responses to
+findings" shows an earlier round's finding still unresolved, say so rather than
+presenting it as new.

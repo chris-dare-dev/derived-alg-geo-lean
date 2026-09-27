@@ -34,6 +34,9 @@
 #
 #   gh workflow run ci.yml --ref <branch>
 #
+# Not in loop runs: there the pull request's CI is the gate, and a reviewer
+# never dispatches or waits for a workflow (see the run-loop skill).
+#
 # Usage:
 #   scripts/precheck.sh          the checks above, plus the targeted build
 #   scripts/precheck.sh --no-build   skip Lake build (header gates still need pinned Lean)
@@ -198,7 +201,7 @@ targeted_build() {
 }
 
 echo "== precheck =="
-echo "(not a CI verdict -- see the header, and gh workflow run ci.yml --ref <branch>)"
+echo "(not a CI verdict -- see the header, and gh workflow run ci.yml --ref <branch>; loop runs never dispatch: the PR's CI is the gate)"
 echo
 
 # First and cheapest, and the one whose failure is otherwise invisible: an
@@ -206,6 +209,7 @@ echo
 # cannot be a CI gate at all; see scripts/check_workflows.sh.
 gate workflows scripts/check_workflows.sh
 gate output-encoding python3 scripts/_output.py
+gate codex-entrypoint python3 scripts/check_codex_entrypoint.py
 gate loop-spec bash scripts/validate_loop_specs.sh
 gate loop-engine-tests python3 -m unittest discover -s scripts/tests -p "test_*.py"
 # Tests a PreToolUse hook, which has no ci.yml counterpart and cannot have one:
@@ -239,7 +243,7 @@ fi
 echo
 if [ ${#FAILED[@]} -eq 0 ]; then
   echo "precheck clean -- this is NOT a CI verdict."
-  echo "Open the pull request for the verdict, or dispatch the self-hosted lane:"
+  echo "Open the pull request for the verdict, or dispatch the self-hosted lane (never in a loop run):"
   echo "  gh workflow run ci.yml --ref \$(git branch --show-current)"
   exit 0
 fi
