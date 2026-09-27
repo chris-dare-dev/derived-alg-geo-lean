@@ -187,8 +187,10 @@ def validate_record(record: Any) -> list[str]:
     for name in WRITABLE_PATHS:
         if name not in paths:
             errors.append(f"paths.{name} is required")
+    for name, value in paths.items():
+        if not isinstance(name, str) or not name or name != name.strip():
+            errors.append("paths keys must be nonempty literal names")
             continue
-        value = paths[name]
         if not isinstance(value, dict):
             errors.append(f"paths.{name} must be an object")
             continue
@@ -196,9 +198,9 @@ def validate_record(record: Any) -> list[str]:
             _path_identity(value)
         except ValueError as exc:
             errors.append(f"paths.{name}.path: {exc}")
-        # These are mandatory mutable roots. In particular, Lake may update a
-        # package tree originally linked by the seed helper. Letting a caller
-        # mark any one of these read-only would skip collision detection.
+        # This record describes job-owned writable state. An additional root
+        # such as controller_temp must be checked just like the eight required
+        # roots; marking it read-only would skip collision detection.
         if value.get("writable") is not True:
             errors.append(f"paths.{name} must be job-owned writable state")
         has_device = "observed_device" in value

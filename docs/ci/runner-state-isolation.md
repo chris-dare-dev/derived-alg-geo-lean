@@ -35,7 +35,8 @@ roots after admission and must not install a hard link to another job.
 Path fields are literal absolute paths: the validator does not expand `~` or
 environment variables, and rejects leading or trailing whitespace. Spaces
 inside a path are preserved. This keeps report identity, local resolution and
-inode checks on the same spelling.
+inode checks on the same spelling. Additional reported writable roots, such as
+`controller_temp`, receive the same validation and collision checks.
 
 `admit` takes a fresh physical-host capacity document and holds one exclusive
 lock in a host-owned lease directory while it reads **all** active leases,

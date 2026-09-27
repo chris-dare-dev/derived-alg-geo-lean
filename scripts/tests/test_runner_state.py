@@ -371,6 +371,30 @@ class RunnerStateTests(unittest.TestCase):
         self.assertTrue(any("literal nonempty" in error
                             for error in runner_state.validate_record(candidate)))
 
+    def test_extra_writable_root_is_validated_and_compared(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            shared = Path(directory) / "controller-temp"
+            shared.mkdir()
+            first = record("job-a")
+            second = record("job-b", root=r"C:\actions\runner-b")
+            first["paths"]["controller_temp"] = path_entry(str(shared), True)
+            second["paths"]["controller_temp"] = path_entry(str(shared), True)
+            collision = runner_state.validate_snapshot(snapshot(first, second))
+            self.assertFalse(collision["valid"])
+            self.assertTrue(any("writable path collision" in error
+                                for error in collision["errors"]))
+            second["paths"]["controller_temp"] = {
+                "path": " " + str(shared), "resolved_path": str(shared / "fictional"),
+                "writable": True,
+            }
+            malformed = runner_state.validate_snapshot(snapshot(first, second))
+            self.assertFalse(malformed["valid"])
+            self.assertTrue(any("controller_temp.path" in error and "literal nonempty" in error
+                                for error in malformed["errors"]))
+            second["paths"]["controller_temp"] = path_entry(str(shared), False)
+            self.assertTrue(any("controller_temp must be job-owned writable state" in error
+                                for error in runner_state.validate_record(second)))
+
     def test_candidate_temp_root_cannot_contain_host_lease_directory(self) -> None:
         candidate = record("job-a")
         with tempfile.TemporaryDirectory() as directory:
