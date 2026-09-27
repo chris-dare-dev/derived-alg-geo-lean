@@ -192,12 +192,76 @@ the library elaborated and run on the runners.
 An unattended run takes GitHub issues or a milestone and follows
 [the run-loop skill](.claude/skills/run-loop/SKILL.md) to merged PRs without
 owner input. The issue body is its specification, so write issues so that
-works:
-- state the goal;
-- give the definition of done as checkable statements;
-- list the deliverables: leaf paths, audits, umbrellas;
-- give dependencies as GitHub "blocked by" links;
-- say whether the issue closes in one PR (complete) or several (progress).
+works. Use the [formalization issue template](.github/ISSUE_TEMPLATE/formalization.md);
+an agent fills in a copy, deletes its front matter, and files it with
+`gh issue create --title <title> --body-file <file>`, because
+`gh issue create --body` ignores templates. Each field prevents a failure seen
+in loop runs:
+
+| Field | What it prevents |
+| --- | --- |
+| Outcome, first consumer, complete or progress | losing the big picture across PRs |
+| Versioned source, theorem numbers, proof route, conventions | re-derived or invented routes, repeated unversioned fetches |
+| API verified at the pin (path:line), or "absent at the pin" | guessed names |
+| Each hypothesis load-bearing (with a witness) or weakenable | false "X fails" claims, over-hypothesis rounds |
+| Placement tier, files, namespaces, shared files | refactor rounds, cross-issue coupling |
+| Definition of done as named declarations, docstrings or gates | dropped acceptance items |
+| Non-goals and trust boundaries | conclusions smuggled in as fields or hypotheses |
+| Dependencies as issue numbers | misread blockers |
+| Known traps | repeating a failed route |
+| No process text | runs reverting to retired process |
+
+Before filing, check what the run's readiness step will check: dependencies
+resolve to issue numbers, every path and name the issue cites exists at the pin
+(or is marked absent), and the placement agrees with
+`docs/architecture/placement.md`. The filing agent does this, not the owner.
+
+On a roadmap-owned milestone, a new issue needs its `.claude/roadmap/*.yaml`
+entry, and a native blocked-by link must match its entry's `blocked_by`. CI's
+`roadmap` job reads the live tracker (RM-05, RM-06) and fails every open pull
+request until the two agree, so open the roadmap PR immediately after filing
+or linking, and merge it first.
+
+Labels never gate a loop run. `blocked` follows the blocked-by links;
+`research` means the first deliverable is a written verdict in the issue
+thread; `in-progress` expires when no PR is open.
+
+A milestone description carries the context its issues share. Paste this and
+fill it in:
+
+```markdown
+**Goal.** <What exists when this milestone closes, and its first consumer; or
+"foundational vocabulary: nothing is blocked on it".>
+
+**Source.** <Versioned reference(s), sections and theorem range, conventions
+every issue shares.> Pins: the Mathlib revision in `lake-manifest.json`.
+
+**Roadmap.** `.claude/roadmap/<file>.yaml`, entry `<id>` (or "none").
+
+**Issues.** GitHub blocked-by links decide the order; this list only
+summarises them.
+1. #A <title>
+2. #B <title>: needs #A
+3. #C <title>: independent of #B
+Shared files: `<umbrella>` and `<audit slice>` are created by #A; later issues
+append.
+
+**Out of scope.** <Each excluded result, and where it lives or why it cannot be
+done at the pin.>
+
+**Traps for every issue here.** <Shared conventions, false routes, hypotheses
+that look droppable but are not.>
+
+**Done when.** <All issues closed, plus any milestone-level statement.>
+
+**State.** Not kept here. Each issue's loop-state comment, and the latest run
+report on the tracking issue (#<n>, if any), hold it. Put no dated baselines,
+SHAs or "run X before Y" instructions in this description.
+```
+
+Start a run with one line: "Run the run-loop skill from origin/main on
+<milestone URL, or issues #a #b>." The runtime re-sends the kickoff message
+after every compaction, so keep rules and state out of it.
 
 The run researches each issue and writes its plan into the PR description. Four
 independent reviewers must pass it on the same commit, with at most three
