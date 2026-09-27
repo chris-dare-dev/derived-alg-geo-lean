@@ -131,8 +131,9 @@ variable {C : Type u} [Category.{v} C] [HasZeroMorphisms C] [CategoryWithHomolog
   [HasColimitsOfShape J C]
   {ι : Type*} {c : ComplexShape ι}
 
-/-- A colimit of pointwise quasi-isomorphisms is a quasi-isomorphism when homology
-in every degree preserves colimits of that shape. -/
+/-- Commuting degreewise homology with this colimit identifies the homology map
+of `colim.map α` with the colimit of the pointwise homology maps, which are
+isomorphisms. -/
 theorem quasiIso_colimMap_of_preservesHomology
     [∀ i, PreservesColimitsOfShape J (homologyFunctor C c i)]
     {F G : J ⥤ HomologicalComplex C c} (α : F ⟶ G)
@@ -173,8 +174,9 @@ variable {C : Type u} [Category.{v} C] [Abelian C]
   [HasColimitsOfShape J C] [HasExactColimitsOfShape J C]
   {ι : Type*} {c : ComplexShape ι}
 
-/-- Exact colimits preserve quasi-isomorphisms of diagrams of complexes. In particular,
-this applies to filtered colimits in an AB5 category. -/
+/-- Exact colimits commute with homology through the short-complex comparison, so the
+homology-preserving criterion above applies. This includes filtered colimits in an
+AB5 category. -/
 theorem quasiIso_colimMap {F G : J ⥤ HomologicalComplex C c} (α : F ⟶ G)
     (hα : ∀ j, QuasiIso (α.app j)) : QuasiIso (colim.map α) := by
   letI : ∀ i, PreservesColimitsOfShape J (homologyFunctor C c i) :=
