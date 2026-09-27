@@ -72,10 +72,12 @@ issues:
           - The bounded cache experiment SHALL use an independent cold reference
           - Replay SHALL fail closed across dependency and trust boundaries
           - CI1.11 SHALL preserve rollout and sample limits
+          - Producer-capacity implications SHALL be evidence-bounded
         files:
           - scripts/ci_performance/collect_actions.py
           - scripts/ci_performance/sample_host_pressure.py
           - scripts/ci_performance/profile_actions.py
+          - scripts/ci_performance/fixtures/replay-cases.json
           - scripts/tests/test_collect_actions.py
           - scripts/tests/test_profile_actions.py
           - scripts/ci_performance/README.md
