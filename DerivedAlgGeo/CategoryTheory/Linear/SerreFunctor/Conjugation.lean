@@ -351,6 +351,250 @@ theorem transportIso_refl (D : SerreFunctorData k C) :
   erw [D.S.map_id]
   erw [Category.id_comp, Category.id_comp, Category.id_comp]
 
+section TransportFunctoriality
+
+set_option backward.defeqAttrib.useBackward true
+set_option backward.isDefEq.respectTransparency false
+
+variable (D : SerreFunctorData k C) (Φ : C ≌ C)
+  [Φ.functor.Additive] [Φ.functor.Linear k]
+
+private theorem transport_component (X : C) :
+    (D.transportIso Φ).inv.app X ≫
+      (D.uniqueIso (D.conj Φ)).hom.app (Φ.functor.obj X) =
+    Φ.functor.map (D.S.map (Φ.unitIso.hom.app X)) := by
+  unfold SerreFunctorData.transportIso
+  simp only [Iso.trans_inv, NatTrans.comp_app,
+    Equivalence.funInvIdAssoc_inv_app, Functor.isoWhiskerLeft_inv,
+    Functor.associator_inv_app, Functor.whiskerLeft_app,
+    Category.assoc, D.uniqueIso_hom_app]
+  rw [← D.uniqueIso_hom_app]
+  simp only [Iso.inv_hom_id_app]
+  simp only [Iso.symm_inv, Functor.associator_hom_app, Functor.comp_map,
+    Category.id_comp]
+  dsimp only [SerreFunctorData.conj, Functor.comp_obj]
+  simp only [Category.comp_id]
+
+omit [Preadditive C] [Φ.functor.Additive] in
+private theorem counit_inv_eq_map_unit (X : C) :
+    (Φ.counitIso.app (Φ.functor.obj X)).inv =
+      Φ.functor.map (Φ.unitIso.hom.app X) := by
+  have h := (Φ.counitIso.app (Φ.functor.obj X)).eq_comp_inv.mpr
+    (Φ.functor_unitIso_comp X)
+  simpa only [Category.id_comp] using h.symm
+
+private theorem homEquivCounit_symm_map (X : C) (x : X ⟶ D.S.obj X) :
+    (homEquivCounit (k := k) Φ (Φ.functor.obj X)
+      (D.S.obj (Φ.inverse.obj (Φ.functor.obj X)))).symm
+        (Φ.functor.map (x ≫ D.S.map (Φ.unitIso.hom.app X))) =
+    (Φ.unitIso.app X).inv ≫ x ≫ D.S.map (Φ.unitIso.hom.app X) := by
+  apply (homEquivCounit (k := k) Φ (Φ.functor.obj X)
+    (D.S.obj (Φ.inverse.obj (Φ.functor.obj X)))).injective
+  rw [LinearEquiv.apply_symm_apply]
+  simp only [homEquivCounit, LinearEquiv.trans_apply, Linear.homCongr_apply,
+    homEquivOfFullyFaithful, Iso.refl_hom, Category.comp_id]
+  rw [counit_inv_eq_map_unit Φ X]
+  change Φ.functor.map (x ≫ D.S.map (Φ.unitIso.hom.app X)) =
+    Φ.functor.map (Φ.unitIso.hom.app X) ≫
+      Φ.functor.map ((Φ.unitIso.app X).inv ≫ x ≫ D.S.map (Φ.unitIso.hom.app X))
+  have hmor : Φ.unitIso.hom.app X ≫
+      ((Φ.unitIso.app X).inv ≫ x ≫ D.S.map (Φ.unitIso.hom.app X)) =
+      x ≫ D.S.map (Φ.unitIso.hom.app X) := by
+    change (Φ.unitIso.app X).hom ≫
+      ((Φ.unitIso.app X).inv ≫ x ≫ D.S.map (Φ.unitIso.hom.app X)) =
+      x ≫ D.S.map (Φ.unitIso.hom.app X)
+    simp only [Iso.hom_inv_id_assoc]
+  calc
+    Φ.functor.map (x ≫ D.S.map (Φ.unitIso.hom.app X)) =
+        Φ.functor.map (Φ.unitIso.hom.app X ≫
+          ((Φ.unitIso.app X).inv ≫ x ≫ D.S.map (Φ.unitIso.hom.app X))) :=
+      congrArg Φ.functor.map hmor.symm
+    _ = Φ.functor.map (Φ.unitIso.hom.app X) ≫
+          Φ.functor.map ((Φ.unitIso.app X).inv ≫ x ≫ D.S.map (Φ.unitIso.hom.app X)) :=
+      Φ.functor.map_comp _ _
+
+private theorem etaConj_eval (X : C) (x : X ⟶ D.S.obj X) :
+    ((D.conj Φ).eta (Φ.functor.obj X) (Φ.functor.obj X)).symm
+      (Φ.functor.map (x ≫ D.S.map (Φ.unitIso.hom.app X)))
+      (𝟙 (Φ.functor.obj X)) = D.trace X x := by
+  change (etaConj D Φ (Φ.functor.obj X) (Φ.functor.obj X)).symm
+    (Φ.functor.map (x ≫ D.S.map (Φ.unitIso.hom.app X)))
+    (𝟙 (Φ.functor.obj X)) = D.trace X x
+  simp only [etaConj, LinearEquiv.symm_trans_apply]
+  letI : Φ.inverse.Additive := inferInstance
+  letI : Φ.inverse.Linear k := CategoryTheory.Equivalence.inverseLinear k Φ
+  let e := homEquivOfFullyFaithful (k := k) Φ.inverse Φ.fullyFaithfulInverse
+    (Φ.functor.obj X) (Φ.functor.obj X)
+  let f := D.eta (Φ.inverse.obj (Φ.functor.obj X))
+    (Φ.inverse.obj (Φ.functor.obj X))
+  let c := homEquivCounit (k := k) Φ (Φ.functor.obj X)
+    (D.S.obj (Φ.inverse.obj (Φ.functor.obj X)))
+  change ((e.symm.dualMap).symm
+      (f.symm (c.symm (Φ.functor.map (x ≫ D.S.map (Φ.unitIso.hom.app X))))))
+      (𝟙 (Φ.functor.obj X)) = D.trace X x
+  have hh := homEquivCounit_symm_map D Φ X x
+  have hstep : ((e.symm.dualMap).symm
+      (f.symm (c.symm (Φ.functor.map (x ≫ D.S.map (Φ.unitIso.hom.app X))))))
+      (𝟙 (Φ.functor.obj X)) =
+    ((e.symm.dualMap).symm
+      (f.symm ((Φ.unitIso.app X).inv ≫ x ≫ D.S.map (Φ.unitIso.hom.app X))))
+      (𝟙 (Φ.functor.obj X)) := by
+    exact congrArg (fun q => ((e.symm.dualMap).symm (f.symm q)) (𝟙 _)) hh
+  rw [hstep]
+  simp only [LinearEquiv.dualMap_symm, LinearEquiv.symm_symm,
+    LinearEquiv.dualMap_apply, e, homEquivOfFullyFaithful]
+  change (f.symm ((Φ.unitIso.app X).inv ≫ x ≫ D.S.map (Φ.unitIso.hom.app X)))
+      (Φ.inverse.map (𝟙 (Φ.functor.obj X))) = D.trace X x
+  rw [Φ.inverse.map_id]
+  change D.trace (Φ.inverse.obj (Φ.functor.obj X))
+      ((Φ.unitIso.app X).inv ≫ x ≫ D.S.map (Φ.unitIso.hom.app X)) =
+    D.trace X x
+  have htrace := D.trace_comp (Φ.unitIso.hom.app X) ((Φ.unitIso.app X).inv ≫ x)
+  have hunit : Φ.unitIso.hom.app X ≫ (Φ.unitIso.app X).inv = 𝟙 X := by
+    change (Φ.unitIso.app X).hom ≫ (Φ.unitIso.app X).inv = 𝟙 X
+    exact (Φ.unitIso.app X).hom_inv_id
+  simpa only [Functor.comp_obj, Functor.id_obj, ← Category.assoc,
+    hunit, Category.id_comp] using htrace
+
+/-- Transport by a linear autoequivalence preserves the Serre trace. The inverse
+component sends the mapped endomorphism into the Serre target at the image. -/
+theorem trace_transport (X : C) (x : X ⟶ D.S.obj X) :
+    D.trace (Φ.functor.obj X)
+      (Φ.functor.map x ≫ (D.transportIso Φ).inv.app X) = D.trace X x := by
+  let y : Φ.functor.obj X ⟶ D.S.obj (Φ.functor.obj X) :=
+    Φ.functor.map x ≫ (D.transportIso Φ).inv.app X
+  let ψ : Module.Dual k (Φ.functor.obj X ⟶ Φ.functor.obj X) :=
+    (D.eta (Φ.functor.obj X) (Φ.functor.obj X)).symm y
+  have hu := D.uniqueIso_compat (D.conj Φ) ψ
+  simp only [ψ, LinearEquiv.apply_symm_apply] at hu
+  dsimp only [y] at hu
+  have hu' : (D.conj Φ).eta (Φ.functor.obj X) (Φ.functor.obj X) ψ =
+      Φ.functor.map (x ≫ D.S.map (Φ.unitIso.hom.app X)) := by
+    rw [← hu]
+    change (Φ.functor.map x ≫ (D.transportIso Φ).inv.app X) ≫
+      (D.uniqueIso (D.conj Φ)).hom.app (Φ.functor.obj X) = _
+    rw [Category.assoc, transport_component D Φ X, ← Φ.functor.map_comp]
+  have hψ : ψ =
+      ((D.conj Φ).eta (Φ.functor.obj X) (Φ.functor.obj X)).symm
+        (Φ.functor.map (x ≫ D.S.map (Φ.unitIso.hom.app X))) := by
+    apply ((D.conj Φ).eta (Φ.functor.obj X) (Φ.functor.obj X)).injective
+    simpa only [LinearEquiv.apply_symm_apply] using hu'
+  calc
+    D.trace (Φ.functor.obj X)
+        (Φ.functor.map x ≫ (D.transportIso Φ).inv.app X) =
+        ψ (𝟙 (Φ.functor.obj X)) := rfl
+    _ = ((D.conj Φ).eta (Φ.functor.obj X) (Φ.functor.obj X)).symm
+        (Φ.functor.map (x ≫ D.S.map (Φ.unitIso.hom.app X)))
+        (𝟙 (Φ.functor.obj X)) := congrArg (fun q => q (𝟙 _)) hψ
+    _ = D.trace X x := etaConj_eval D Φ X x
+
+private theorem pairing_eq_trace (A B : C) (f : A ⟶ B) (h : B ⟶ D.S.obj A) :
+    D.pairing A B f h = D.trace A (f ≫ h) := by
+  let φ := (D.eta A B).symm h
+  have hn := D.naturality_right f φ
+  simp only [φ, LinearEquiv.apply_symm_apply] at hn
+  change (D.eta A A) (φ.comp (Linear.rightComp k A f)) = f ≫ h at hn
+  change (D.eta A B).symm h f = (D.eta A A).symm (f ≫ h) (𝟙 A)
+  rw [← hn]
+  simp [φ, Linear.rightComp]
+
+/-- Transport is natural in an isomorphism of linear equivalence functors.
+The comparison is detected by the nondegenerate Serre pairing and trace. -/
+theorem transportIso_isoCompat (Ψ : C ≌ C)
+    [Ψ.functor.Additive] [Ψ.functor.Linear k]
+    (e : Φ.functor ≅ Ψ.functor) (A : C) :
+    e.hom.app (D.S.obj A) ≫ (D.transportIso Ψ).inv.app A =
+      (D.transportIso Φ).inv.app A ≫ D.S.map (e.hom.app A) := by
+  let z (x : Ψ.functor.obj A ⟶ Φ.functor.obj (D.S.obj A)) : A ⟶ D.S.obj A :=
+    Φ.fullyFaithfulFunctor.preimage (e.hom.app A ≫ x)
+  have hΦ (x : Ψ.functor.obj A ⟶ Φ.functor.obj (D.S.obj A)) :
+      Φ.functor.map (z x) = e.hom.app A ≫ x :=
+    Φ.fullyFaithfulFunctor.map_preimage _
+  have hΨ (x : Ψ.functor.obj A ⟶ Φ.functor.obj (D.S.obj A)) :
+      Ψ.functor.map (z x) = x ≫ e.hom.app (D.S.obj A) := by
+    rw [← cancel_epi (e.hom.app A)]
+    rw [← e.hom.naturality (z x), hΦ]
+    simp only [Category.assoc]
+  apply (D.eta (Ψ.functor.obj A) (Φ.functor.obj (D.S.obj A))).symm.injective
+  apply LinearMap.ext
+  intro x
+  change D.pairing (Ψ.functor.obj A) (Φ.functor.obj (D.S.obj A)) x
+      (e.hom.app (D.S.obj A) ≫ (D.transportIso Ψ).inv.app A) =
+    D.pairing (Ψ.functor.obj A) (Φ.functor.obj (D.S.obj A)) x
+      ((D.transportIso Φ).inv.app A ≫ D.S.map (e.hom.app A))
+  rw [pairing_eq_trace D, pairing_eq_trace D]
+  have htrace : D.trace (Ψ.functor.obj A)
+      ((x ≫ e.hom.app (D.S.obj A)) ≫ (D.transportIso Ψ).inv.app A) =
+      D.trace (Ψ.functor.obj A)
+      ((x ≫ (D.transportIso Φ).inv.app A) ≫ D.S.map (e.hom.app A)) := by
+    calc
+      D.trace (Ψ.functor.obj A)
+        ((x ≫ e.hom.app (D.S.obj A)) ≫ (D.transportIso Ψ).inv.app A) =
+      D.trace (Ψ.functor.obj A)
+        (Ψ.functor.map (z x) ≫ (D.transportIso Ψ).inv.app A) := by
+          rw [hΨ]
+    _ = D.trace A (z x) := trace_transport D Ψ A (z x)
+    _ = D.trace (Φ.functor.obj A)
+        (Φ.functor.map (z x) ≫ (D.transportIso Φ).inv.app A) :=
+          (trace_transport D Φ A (z x)).symm
+    _ = D.trace (Φ.functor.obj A)
+        ((e.hom.app A ≫ x) ≫ (D.transportIso Φ).inv.app A) := by rw [hΦ]
+    _ = D.trace (Ψ.functor.obj A)
+        ((x ≫ (D.transportIso Φ).inv.app A) ≫ D.S.map (e.hom.app A)) := by
+          rw [D.trace_comp]
+          rw [Category.assoc]
+  simpa only [Category.assoc] using htrace
+
+/-- Compare both transports through the Serre pairing: trace preservation
+and full faithfulness determine their inverse components without expanding
+composite unit and counit maps. -/
+theorem transportIso_trans (Ψ : C ≌ C)
+    [Ψ.functor.Additive] [Ψ.functor.Linear k]
+    [(Φ.trans Ψ).functor.Additive] [(Φ.trans Ψ).functor.Linear k]
+    (A : C) :
+    (D.transportIso (Φ.trans Ψ)).inv.app A =
+      Ψ.functor.map ((D.transportIso Φ).inv.app A) ≫
+        (D.transportIso Ψ).inv.app (Φ.functor.obj A) := by
+  let Q := Φ.trans Ψ
+  apply (D.eta (Q.functor.obj A) (Q.functor.obj (D.S.obj A))).symm.injective
+  apply LinearMap.ext
+  intro x
+  change D.pairing (Q.functor.obj A) (Q.functor.obj (D.S.obj A)) x
+      ((D.transportIso Q).inv.app A) =
+    D.pairing (Q.functor.obj A) (Q.functor.obj (D.S.obj A)) x
+      (Ψ.functor.map ((D.transportIso Φ).inv.app A) ≫
+        (D.transportIso Ψ).inv.app (Φ.functor.obj A))
+  rw [pairing_eq_trace D, pairing_eq_trace D]
+  let y := Q.fullyFaithfulFunctor.preimage x
+  have hy : Q.functor.map y = x := Q.fullyFaithfulFunctor.map_preimage x
+  rw [← hy]
+  calc
+    D.trace (Q.functor.obj A)
+        (Q.functor.map y ≫ (D.transportIso Q).inv.app A) =
+      D.trace A y := trace_transport D Q A y
+    _ = D.trace (Φ.functor.obj A)
+        (Φ.functor.map y ≫ (D.transportIso Φ).inv.app A) :=
+      (trace_transport D Φ A y).symm
+    _ = D.trace (Q.functor.obj A)
+        (Ψ.functor.map (Φ.functor.map y ≫ (D.transportIso Φ).inv.app A) ≫
+          (D.transportIso Ψ).inv.app (Φ.functor.obj A)) :=
+      (trace_transport D Ψ (Φ.functor.obj A)
+        (Φ.functor.map y ≫ (D.transportIso Φ).inv.app A)).symm
+    _ = D.trace (Q.functor.obj A)
+        (Q.functor.map y ≫ Ψ.functor.map ((D.transportIso Φ).inv.app A) ≫
+          (D.transportIso Ψ).inv.app (Φ.functor.obj A)) := by
+      change D.trace (Q.functor.obj A)
+          (Ψ.functor.map (Φ.functor.map y ≫ (D.transportIso Φ).inv.app A) ≫
+            (D.transportIso Ψ).inv.app (Φ.functor.obj A)) =
+        D.trace (Q.functor.obj A)
+          (Ψ.functor.map (Φ.functor.map y) ≫
+            Ψ.functor.map ((D.transportIso Φ).inv.app A) ≫
+            (D.transportIso Ψ).inv.app (Φ.functor.obj A))
+      rw [Ψ.functor.map_comp, Category.assoc]
+
+
+end TransportFunctoriality
+
 end SerreFunctorData
 
 end CategoryTheory.SerreFunctor
