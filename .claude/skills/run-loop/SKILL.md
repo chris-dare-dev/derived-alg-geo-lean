@@ -1,6 +1,6 @@
 ---
 name: run-loop
-description: Work GitHub issues or a milestone to merged pull requests without stopping for the owner. Research each issue, build it, pass four independent reviewers, merge on green CI, and go straight on to the next.
+description: Work GitHub issues or a milestone to merged pull requests without stopping for the owner. Research each issue, build it, pass four independent reviewers, merge on green CI, and launch independent R&D after a terminal three-round attempt.
 ---
 
 # Run loop
@@ -53,7 +53,14 @@ no more than two issues in flight.
    hypothesis-elimination scouts from `.claude/agents/`. They advise and never
    block. Then write a short plan: what "done" means, what you will build and
    where it lives, what you considered and rejected, and what you will not do.
-   The plan opens the PR description.
+   The plan opens the PR description. Before implementation, post the plan
+   and frozen issue/acceptance scope as a marked objective comment on the
+   issue. Give it a stable objective ID and keep using that ID across
+   worktrees, branches, PRs, research and successor attempts. Check earlier
+   marked comments for overlapping scope; renaming a slice does not create
+   a new objective. Begin each record with
+   `<!-- run-loop-objective: <repo>#<issue>/<stable-id> -->`, where the
+   stable ID is fixed in the first comment, not regenerated from later edits.
 2. **Build.**
    - Branch `agent/<issue>-<slug>` from the latest `origin/main`, in its own
      worktree, and seed that worktree's cache with
@@ -66,7 +73,12 @@ no more than two issues in flight.
      environment.
    - If the issue has an entry under `.claude/roadmap/`, advance it in the same
      change. CI's `roadmap` job requires this.
-3. **Review.** Commit, then dispatch four reviewers in parallel on that commit.
+3. **Review.** Commit, then reserve a round in a marked issue comment under
+   the same objective ID, including attempt and round numbers, exact commit
+   and base, before dispatching four reviewers in parallel on that commit.
+   A partial or abandoned panel consumes its reserved slot. On a session
+   handoff, finish missing roles on that same commit and slot; never reuse
+   the reservation for a changed PR-content commit.
    Each is an independent agent following its file in `.claude/agents/`:
    `mathematics-adversary`, `repository-boundary-adversary`,
    `abstraction-adversary` and `mathlib-reviewer`.
@@ -74,11 +86,18 @@ no more than two issues in flight.
      `origin/main`. Never give one reviewer another's verdict.
    - Each review ends `Reviewed commit: <sha>` and
      `Close: PASS | PASS_WITH_LIFT | NEEDS_CHANGES | BLOCKED`.
+   - Append each complete verbatim review and outcome in marked issue
+     comments, linked from the PR description. A missing role stays visibly
+     missing; do not paraphrase it into a pass.
    - If all four pass on the same commit, publish. Put any lift under
      follow-ups in the PR description.
    - Otherwise fix what they found, commit, and put the new commit through all
      four again.
-   - A PR gets at most three rounds. After the third, park it.
+   - A frozen implementation attempt gets at most three rounds. After the
+     third unsuccessful round, freeze that attempt and start the research
+     handoff below. A deterministic required-check failure attributable to
+     reviewed PR content on the third reviewed commit is also terminal when
+     repair would change that content.
    - If a reviewer returns nothing, dispatch that role again on the same
      commit.
    - Never put your own reading of the diff in place of a reviewer's verdict.
@@ -93,31 +112,97 @@ no more than two issues in flight.
      done needs more than one PR.
 5. **Merge.**
    - Wait for the required checks.
-   - If a check fails, fix it and push. A fix that changes the PR's Lean source
-     goes back through the four reviewers, and counts as a round.
+   - If a check fails, classify it on the exact PR head. Any repair changing
+     PR content, including Lean, scripts, documentation or configuration,
+     goes through all four reviewers and reserves the next round of the same
+     attempt before a push. A deterministic required-check failure
+     attributable to reviewed PR content on the third reviewed commit freezes
+     that attempt when repair would change the content; do not make a fourth
+     PR-content revision. Rerunning a transient or unrelated check without
+     changing reviewed content consumes no review round.
    - When GitHub reports the branch out of date, merge `origin/main` into it and
-     push. Never rebase a pushed branch. That merge needs no new review, unless
-     you had to resolve a conflict inside the PR's own changes.
-   - Once every required check is green, run `gh pr merge <n> --squash`. Never
-     pass `--admin`.
+     push. Never rebase a pushed branch. A conflict-free base refresh needs no
+     new panel only after recording that the PR's contribution diff is
+     byte-identical and the base did not change relevant imports, pins or
+     reviewed behavior. A conflict in the PR's own changes, a changed
+     contribution diff or uncertain relevance requires another reserved
+     four-role round. This exception does not cover a source repair.
+   - Immediately before `gh pr merge <n> --squash`, verify the live PR head is
+     the exact reviewed commit or a recorded content-identical base refresh,
+     and every required check succeeded on that live head. Never pass
+     `--admin`.
    - Remove the worktree and take the next issue. For a progress PR, the next
      item is the next slice of the same issue, until its definition of done is
      met.
 
-## Park instead of stopping
+## Research after an exhausted attempt
 
-An issue cannot be finished when any of these happens:
-- three review rounds end without a pass;
-- a required check still fails after three honest attempts to fix it;
-- a research pass confirms the definition of done is false as written;
-- it needs an action the owner has withdrawn (see "What you may do").
+Start this handoff when three reserved implementation-review rounds end without
+a pass, or a deterministic required-check failure attributable to reviewed PR
+content on the third reviewed commit would require a content-changing repair.
 
-Then park it:
-- Mark its PR as a draft (`gh pr ready --undo`) with the open findings in the
-  description. If no code is worth keeping, comment on the issue with what you
-  found.
-- Add it to the final report.
-- Take the next issue.
+Freeze the failed attempt immediately:
+- If a PR exists, mark it as a draft (`gh pr ready --undo`) with the open
+  findings in its description. If no PR exists, preserve the local branch and
+  record its findings on the issue, whether or not the code is worth keeping.
+- Record the exact issue and frozen scope, base and final head SHAs, every
+  allocated round and verbatim review, required-check evidence, unresolved
+  findings, and tool, documentation, stale-state and reviewer friction. Post
+  the handoff under the stable objective ID in an issue comment and mirror it
+  in the draft PR description if one exists. Identify any unavailable
+  transcript explicitly; do not reconstruct it as a quotation. Preserve the
+  failed branch and the existing PR.
+- **Immediately dispatch a separate read-only R&D examination** with that
+  handoff. Give the researcher the original acceptance criteria, all available
+  failed evidence and the live base. Ask for the cause, at least two plausible
+  approaches (or a reason only one survives), a changed strategy, bounded
+  probes, inherited obligations and a way to falsify the proposal. Research
+  may use scratch probes but must not revise the frozen branch.
+- Have a reviewer distinct from both the researcher and the proposed
+  implementer independently assess the exact research report. The reviewer
+  checks that it explains the failure, preserves the entire known history,
+  changes the method materially, stays within the original issue/scope, and
+  gives a testable acceptance path. Post the report verbatim as a PR or issue
+  comment, calculate its SHA-256 from the exact UTF-8 text, and record that
+  digest, reviewer identity, verdict and reasons in the handoff. If the report
+  changes, obtain a review of the new digest. A rejected report is revised as
+  research, never as a fourth implementation-review round.
+- If the independent review accepts a changed strategy and the full failed
+  review inventory is available, inspect all marked issue comments and PRs
+  under the objective ID, account for every reserved and incomplete round,
+  and record a successor
+  **attempt under the same issue and frozen objective**, inheriting every
+  finding. Keep the failed attempt terminal. Each successor has at most three
+  implementation-review rounds; across the objective allow at most two recovery
+  episodes and nine allocated rounds total. A renamed branch, PR, worktree or
+  chunk is not a new objective. The accepted plan, complete history, recorded
+  admission and remaining allowance together permit successor implementation.
+  The research verdict alone does not authorize a push, PR readiness or merge:
+  the successor still needs its own four-role same-commit pass and required CI.
+  If the history is incomplete or
+  the strategy merely repairs the last finding, continue research or park;
+  do not claim a new attempt was admitted.
+- If research finds no viable changed strategy, records a false acceptance
+  criterion, or exhausts the bounded recovery allowance, record that terminal
+  decision and take the next independent issue. Keep dependent issues waiting.
+
+If research establishes that the issue's definition of done is false before
+any implementation round, record that finding with the available evidence;
+do not invent a failed source commit, PR or review allocation. If the owner
+has withdrawn an action needed to continue, preserve the available local
+handoff, respect the remaining mutation grants and take independent work.
+
+Marked issue comments are the shared issue-first recovery record; PR
+descriptions mirror their current status. This is an agent-enforced protocol,
+not a tamper-proof controller. If posting or reading that record fails, do not
+dispatch or admit a round. Check the live comment/PR mutation grants before
+posting or drafting; if the owner has withdrawn one, retain a local handoff
+and work only within the remaining grants. The legacy manifest controller has
+its own ledger and rules in
+`docs/architecture/loop-recovery.md`. Neither path may silently adopt the
+other's authority or reset its review count. On a session handoff, resume an
+unfinished research action from the recorded state before taking another
+dependent slice. Include the research outcome in the final report.
 
 Never re-chunk, rename or restart an issue to get a fresh review budget.
 
@@ -144,15 +229,17 @@ Never:
 
 ## Stay on the issues
 
-- Do not change the loop's own tooling and instructions during a run. That
+- Do not change the loop's own tooling and instructions during issue proof
+  work unless the owner explicitly asks for loop engineering. That
   means `.claude/` (except `.claude/roadmap/`), `.agents/`, `.codex/`,
   `.github/`, `openspec/`, `AGENTS.md`, `CLAUDE.md`, and `scripts/` (except the
   audit and census records). If the tooling gets in your way, work around it or
   park the issue, and describe the problem in the final report.
 - An issue about the loop itself (its controller, protocol or instructions) is
   not loop work unless the owner put it in the queue.
-- Do not create OpenSpec changes, loop manifests or review ledgers, and do not
-  run `scripts/loop_engine.py`. The PR description is the record.
+- Do not create controller manifests or controller review ledgers, and do not
+  run `scripts/loop_engine.py` for issue-first work. The marked issue comments
+  and PR description carry the issue-first record.
 
 ## When to stop
 
@@ -160,7 +247,8 @@ Stop only when:
 1. You need something only the owner has: a password, a token, `sudo`, 2FA.
 2. Every issue left in the queue needs an action the owner has withdrawn, or a
    bypassed check.
-3. The queue is empty.
+3. The queue is empty, including research handoffs still awaiting their
+   independent plan review or terminal disposition.
 
 Everything else is yours to decide. That includes ambiguity, a stale label or
 path, an unrelated failing check, `main` moving, reviewers who disagree, and a
