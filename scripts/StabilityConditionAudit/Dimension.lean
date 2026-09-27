@@ -60,3 +60,22 @@ Rouquier-dimension consequence. -/
 #print axioms CategoryTheory.ObjectProperty.isStrongTriangulatedGenerator_of_isClassical_of_singleton_strong
 #print axioms CategoryTheory.Triangulated.isStrongTriangulatedGenerator_of_classical_of_rouquierDim_ne_top
 #print axioms CategoryTheory.Triangulated.generationTime_ne_top_of_classical_of_rouquierDim_ne_top
+
+/-! ## Functor transport (#921)
+
+Finite triangulated-envelope stages, generation time, Rouquier dimension, and strong generators
+transport forward along exact functors. Target-wide dimension bounds use retract coverage, with
+essential surjectivity as a corollary; equivalences preserve the invariants. -/
+
+#print axioms CategoryTheory.ObjectProperty.triangEnvelopeIter_map_obj_of_le
+#print axioms CategoryTheory.ObjectProperty.triangEnvelopeIter_map_obj
+#print axioms CategoryTheory.ObjectProperty.triangEnvelopeIter_map_le
+#print axioms CategoryTheory.Triangulated.singleton_triangEnvelopeIter_map_obj
+#print axioms CategoryTheory.Triangulated.singleton_triangEnvelopeIter_top_of_retract_coverage
+#print axioms CategoryTheory.Triangulated.isStrongTriangulatedGenerator_map_of_retract_coverage
+#print axioms CategoryTheory.Triangulated.exists_isStrongTriangulatedGenerator_iff_of_equiv
+#print axioms CategoryTheory.ObjectProperty.generationTime_map_le
+#print axioms CategoryTheory.ObjectProperty.generationTime_map_eq_of_equiv
+#print axioms CategoryTheory.Triangulated.rouquierDim_le_of_retract_coverage
+#print axioms CategoryTheory.Triangulated.rouquierDim_le_of_essSurj
+#print axioms CategoryTheory.Triangulated.rouquierDim_eq_of_equiv
