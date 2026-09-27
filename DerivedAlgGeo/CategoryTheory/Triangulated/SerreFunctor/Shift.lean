@@ -82,7 +82,7 @@ private theorem transportIso_refl_inv_app (A : C) :
   rw [D.transportIso_refl]
   simp
 
-private theorem shift_zero_compat
+private theorem transportIso_shift_zero_inv_app
     [∀ n : ℤ, (shiftFunctor C n).Additive]
     [∀ n : ℤ, (shiftFunctor C n).Linear k]
     (A : C) :
@@ -120,7 +120,7 @@ private theorem shift_zero_compat
     _ = (shiftFunctorZero C ℤ).hom.app (D.S.obj A) ≫
       D.S.map ((shiftFunctorZero C ℤ).inv.app A) := by rw [← h]
 
-private theorem shift_add_compat
+private theorem transportIso_shift_add_inv_app
     [∀ n : ℤ, (shiftFunctor C n).Additive]
     [∀ n : ℤ, (shiftFunctor C n).Linear k]
     (n m : ℤ) (A : C) :
@@ -167,9 +167,10 @@ private theorem shift_add_compat
           simp only [Category.assoc]
           rfl
 
-/-- The conjugation transports for integer shifts form a coherent shift action
-on the Serre functor. The zero and addition equations follow from the
-functoriality of transport. -/
+/-- The conjugation transports give `D.S` a coherent commutation with integer
+shifts. Its component at `n` is `(D.commShiftIso n).symm`; the zero and addition
+laws follow from transport functoriality. Triangle preservation requires a
+separate signed comparison. -/
 @[implicit_reducible]
 noncomputable def commShift
     [∀ n : ℤ, (shiftFunctor C n).Additive]
@@ -180,7 +181,7 @@ noncomputable def commShift
         (Functor.CommShift.isoZero D.S ℤ).symm := by
       apply Iso.ext
       ext A
-      exact shift_zero_compat D A
+      exact transportIso_shift_zero_inv_app D A
     simpa using congrArg Iso.symm hs
   commShiftIso_add n m := by
     have hs : (D.transportIso (shiftEquiv C (n + m))).symm =
@@ -189,7 +190,7 @@ noncomputable def commShift
           (D.transportIso (shiftEquiv C m))).symm := by
       apply Iso.ext
       ext A
-      exact shift_add_compat D n m A
+      exact transportIso_shift_add_inv_app D n m A
     simpa using congrArg Iso.symm hs
 
 end CoherentShift
