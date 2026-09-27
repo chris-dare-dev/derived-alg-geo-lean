@@ -38,11 +38,14 @@ to sheaves are supplied; the resulting derived duality and its naturality are
 transported along the specified functor isomorphism. Hom-finiteness follows
 from sheaf Ext-finiteness, that transport, and the standard t-structure. No
 geometric inhabitant or derived tensor functor is constructed here.
+`CategoryTheory.SerreFunctor.SerreFunctorData` is the abstract API, and
+`AlgebraicGeometry.Duality.Serre.BilinearData` is the sheaf presentation.
 
 ## References
 
-* `CategoryTheory.SerreFunctor.SerreFunctorData` is the abstract duality root.
-* `AlgebraicGeometry.Duality.Serre.BilinearData` is the sheaf presentation.
+* A. I. Bondal and M. M. Kapranov, *Representable functors, Serre functors,
+  and mutations*, Math. USSR-Izv. 35:3 (1990), 519-541.
+  DOI: https://doi.org/10.1070/IM1990v035n03ABEH000716.
 
 ## Tags
 
