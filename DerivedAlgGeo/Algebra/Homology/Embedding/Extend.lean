@@ -44,8 +44,9 @@ variable {c : ComplexShape ι} {c' : ComplexShape ι'}
 
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
-/-- Naturality of `extendSingleIso` in the object placed at the supported degree.
-The equality identifies the chosen target degree with the embedding's image. -/
+/-- The components are Mathlib's `HomologicalComplex.extendSingleIso`.
+Naturality is determined at the supported degree because every other target
+component is a zero object. -/
 noncomputable def singleCompExtendIso (e : c.Embedding c') (i : ι) (i' : ι')
     (h : e.f i = i') :
     single C c i ⋙ e.extendFunctor C ≅ single C c' i' :=
@@ -62,8 +63,9 @@ noncomputable def singleCompExtendIso (e : c.Embedding c') (i : ι) (i' : ι')
       single_map_f_self]
     simp)
 
-/-- Choosing the image degree removes the equality argument from
-`singleCompExtendIso`. -/
+/-- For a nonzero source object, only the image degree can be nonzero after
+extension. This canonical form avoids transporting a separately chosen target
+index through later natural comparisons. -/
 noncomputable def singleCompExtendAtImageIso (e : c.Embedding c') (i : ι) :
     single C c i ⋙ e.extendFunctor C ≅ single C c' (e.f i) :=
   singleCompExtendIso e i (e.f i) rfl
