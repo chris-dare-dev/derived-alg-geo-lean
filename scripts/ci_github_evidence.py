@@ -18,6 +18,7 @@ import sys
 import urllib.error
 import urllib.request
 from collections.abc import Callable
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode, urlsplit
@@ -497,6 +498,19 @@ def _observations(
         for check in runs:
             if check.get("head_sha") != head:
                 raise EvidenceError("check run is not on the PR head")
+            if _positive(
+                _required_object(check.get("check_suite"), "check run suite").get("id"),
+                "check run suite ID",
+            ) != suite_id:
+                raise EvidenceError("check run is not in its requested check suite")
+            if _positive(
+                _required_object(check.get("app"), "check run app").get("id"),
+                "check run app ID",
+            ) != _positive(
+                _required_object(suite.get("app"), "check suite app").get("id"),
+                "check suite app ID",
+            ):
+                raise EvidenceError("check run and suite apps differ")
         check_runs.extend(runs)
         if suite_id == run["check_suite_id"]:
             primary_suite = suite
@@ -534,6 +548,167 @@ def _observations(
     }
 
 
+AI_SCAN_WORKFLOW_ID = 360047049
+AI_SCAN_BOT_ID = 62310815
+AI_SCAN_PATH = "dynamic/agents/github-advanced-security"
+
+
+def _observed_at() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="microseconds")
+
+
+def _ai_scan_setting(client: GitHubClient, head: str) -> dict[str, Any]:
+    """Record setting evidence; an inaccessible setting is not disabled."""
+    path = "/code-scanning/ai-scan"
+    result: dict[str, Any] = {
+        "head_sha": head, "api_path": path, "state": "unknown",
+        "requested_at_utc": _observed_at(),
+    }
+    try:
+        response = client.get_object(path)
+    except EvidenceError as exc:
+        result["completed_at_utc"] = _observed_at()
+        result["error"] = str(exc)
+        return result
+    result["completed_at_utc"] = _observed_at()
+    result["response"] = response
+    setting = response.get("pr_scan")
+    if isinstance(setting, str) and setting in {"enabled", "disabled"}:
+        result["state"] = setting
+    return result
+
+
+def _dynamic_security_gate(
+    client: GitHubClient,
+    pr_number: int,
+    head: str,
+    observed: dict[str, Any],
+    definition: dict[str, Any],
+    setting: dict[str, Any],
+) -> tuple[dict[str, Any] | None, dict[str, Any] | None, bytes | None, dict[str, Any]]:
+    """Bind the provider's dynamic workflow, job and check; never infer a scan from green."""
+    if (
+        definition.get("id") != "github-advanced-security"
+        or definition.get("name") != "github-advanced-security"
+        or definition.get("producer") != "github-actions/AI Scan"
+    ):
+        raise EvidenceError("unrecognized dynamic security gate definition")
+    checks = [
+        check for check in observed["check_runs"]
+        if check.get("name") == definition["name"]
+        and isinstance(check.get("app"), dict)
+        and check["app"].get("slug") == "github-actions"
+    ]
+    query = f"/actions/runs?head_sha={head}"
+    requested_at = _observed_at()
+    runs = client.get_all(query, key="workflow_runs")
+    completed_at = _observed_at()
+    observed["ai_scan_head_workflow_runs"] = runs
+    matches = [
+        run for run in runs
+        if run.get("workflow_id") == AI_SCAN_WORKFLOW_ID
+        and run.get("path") == AI_SCAN_PATH
+        and run.get("event") == "dynamic"
+        and run.get("head_sha") == head
+        and run.get("name") == f"Code scanning AI findings on PR #{pr_number}"
+        and isinstance(run.get("actor"), dict)
+        and run["actor"].get("id") == AI_SCAN_BOT_ID
+        and run["actor"].get("login") == "github-advanced-security[bot]"
+    ]
+    scan = {
+        "head_sha": head,
+        "setting": setting,
+        "matching_check_ids": [check.get("id") for check in checks],
+        "matching_run_ids": [run.get("id") for run in matches],
+        "run_query": {
+            "api_path": query, "requested_at_utc": requested_at,
+            "completed_at_utc": completed_at, "total_observed": len(runs),
+            "pagination": "all_link_pages_and_advertised_total_checked",
+        },
+    }
+    if not checks and not matches:
+        scan["state"] = {
+            "enabled": "missing", "disabled": "disabled_by_setting"
+        }.get(setting["state"], "provider_state_unknown")
+        return None, None, None, scan
+    if len(checks) != 1 or len(matches) != 1:
+        raise EvidenceError("dynamic security check/run is missing or ambiguous")
+    check, run = checks[0], matches[0]
+    check_id = _positive(check.get("id"), "security check ID")
+    run_id = _positive(run.get("id"), "security workflow run ID")
+    attempt = _positive(run.get("run_attempt"), "security workflow attempt")
+    suite = _required_object(check.get("check_suite"), "security check suite")
+    suite_id = _positive(suite.get("id"), "security check suite ID")
+    if suite_id != _positive(run.get("check_suite_id"), "security workflow suite ID"):
+        raise EvidenceError("security check and dynamic workflow suites differ")
+    app = _required_object(check.get("app"), "security check app")
+    if _positive(app.get("id"), "security app ID") != _positive(
+        _required_object(observed["primary_suite"].get("app"), "primary app").get("id"),
+        "primary app ID",
+    ):
+        raise EvidenceError("security check uses a different GitHub Actions app")
+    direct = client.get_object(f"/actions/runs/{run_id}")
+    for field in (
+        "id", "workflow_id", "name", "path", "event", "head_sha",
+        "check_suite_id", "run_attempt", "status", "conclusion", "actor",
+    ):
+        if direct.get(field) != run.get(field):
+            raise EvidenceError(f"security workflow changed during collection: {field}")
+    jobs = client.get_all(
+        f"/actions/runs/{run_id}/attempts/{attempt}/jobs", key="jobs"
+    )
+    matching_jobs = [job for job in jobs if job.get("id") == check_id]
+    if len(matching_jobs) != 1:
+        raise EvidenceError("dynamic security workflow has no unique matching job")
+    job = matching_jobs[0]
+    if (
+        job.get("name") != definition["name"]
+        or job.get("run_id") != run_id
+        or job.get("run_attempt") != attempt
+        or job.get("head_sha") != head
+        or job.get("check_run_url") != f"{client._prefix}check-runs/{check_id}"
+        or job.get("status") != check.get("status")
+        or job.get("conclusion") != check.get("conclusion")
+        or run.get("status") != check.get("status")
+        or run.get("conclusion") != check.get("conclusion")
+    ):
+        raise EvidenceError("dynamic security job, check and workflow disagree")
+    raw = str(check.get("conclusion") or "unknown")
+    if check.get("status") != "completed":
+        status, scan_state = "pending", "pending"
+    elif raw == "failure":
+        # A red check does not distinguish entitlement, a scanner crash, or a
+        # future result channel. The historical 403 diagnosis uses logs.
+        status, scan_state = "failed", "unclassified_failure"
+    else:
+        # No analysed-result or findings signal has been established for this
+        # provider. Even a successful workflow can exclude every changed file.
+        status, scan_state = "unknown", "execution_observed_result_unknown"
+    scan.update({"state": scan_state, "run_id": run_id, "run_attempt": attempt,
+                 "check_id": check_id, "raw_conclusion": raw})
+    payload = _canonical({"setting": setting, "head": head, "workflow_run": run,
+                          "job": job, "check_run": check, "scan_state": scan_state})
+    artifact_id = f"github-check-run-{check_id}"
+    artifact = {
+        "id": artifact_id, "path": f"results/check-run-{check_id}.json",
+        "sha256": hashlib.sha256(payload).hexdigest(),
+        "media_type": "application/json", "size_bytes": len(payload),
+        "producer": definition["producer"], "kind": definition["artifact"],
+        "subject": definition["id"], "commit": head,
+        "run_id": run_id, "run_attempt": attempt,
+    }
+    gate = {
+        "id": definition["id"], "name": definition["name"],
+        "producer": definition["producer"], "platform": "github-actions",
+        "provider_id": str(check_id), "commit": head,
+        "run_id": run_id, "run_attempt": attempt,
+        "status": status, "conclusion": raw, "applicable": True,
+        "prerequisites": definition["prerequisites"],
+        "artifact_refs": [artifact_id],
+    }
+    return gate, artifact, payload, scan
+
+
 def collect(client: GitHubClient, pr_number: int) -> dict[str, Any]:
     """Collect a candidate-bound bundle without mutating GitHub or Git state."""
     pr_number = _positive(pr_number, "pull request number")
@@ -548,6 +723,7 @@ def collect(client: GitHubClient, pr_number: int) -> dict[str, Any]:
     observed = _observations(client, head, run)
     observed["run_artifacts"] = run_artifacts
     observed["workflow_run"] = run
+    ai_setting = _ai_scan_setting(client, head)
     app = _required_object(observed["primary_suite"].get("app"), "primary suite app")
     app_id = _positive(app.get("id"), "primary suite app ID")
     if app.get("slug") != "github-actions":
@@ -586,6 +762,16 @@ def collect(client: GitHubClient, pr_number: int) -> dict[str, Any]:
                 "producer": "github-actions/CI",
             },
         ):
+            continue
+        if definition["run_binding"] == "dynamic":
+            gate, artifact, body, scan = _dynamic_security_gate(
+                client, pr_number, head, observed, definition, ai_setting
+            )
+            observed["security_scan"] = scan
+            if gate is not None and artifact is not None and body is not None:
+                gates.append(gate)
+                artifacts.append(artifact)
+                payloads[artifact["path"]] = body
             continue
         if definition["run_binding"] == "check":
             matches = [
@@ -771,6 +957,13 @@ def collect(client: GitHubClient, pr_number: int) -> dict[str, Any]:
         raise EvidenceError("protected base or PR head moved during collection")
     if _sha(final_pr.get("merge_commit_sha"), "final PR merge commit") != candidate:
         raise EvidenceError("PR merge candidate moved during collection")
+    final_ai_setting = _ai_scan_setting(client, head)
+    observed["security_setting_recheck"] = final_ai_setting
+    if (
+        final_ai_setting["state"] != ai_setting["state"]
+        or final_ai_setting.get("response") != ai_setting.get("response")
+    ):
+        raise EvidenceError("AI Scan setting changed during collection")
     final_protection = client.get_object(
         "/branches/main/protection/required_status_checks"
     )
@@ -779,6 +972,13 @@ def collect(client: GitHubClient, pr_number: int) -> dict[str, Any]:
     final_run = _select_run(client, pr_number, final_base, final_head)
     if _run_identity(final_run) != _run_identity(run):
         raise EvidenceError("CI run or attempt changed during collection")
+    if "security_scan" in observed:
+        final_scan = observed["security_scan"]
+        final_runs = client.get_all(
+            final_scan["run_query"]["api_path"], key="workflow_runs"
+        )
+        if final_runs != observed["ai_scan_head_workflow_runs"]:
+            raise EvidenceError("AI Scan head workflow runs changed during collection")
     validation = ci_contract.validate_evidence(
         inventory,
         evidence,
@@ -798,6 +998,10 @@ def collect(client: GitHubClient, pr_number: int) -> dict[str, Any]:
         validation["errors"].append("no provider-bound gate artifacts were collected")
         validation["claims"]["required_ci_verified"] = False
         validation["claims"]["all_pipelines_green"] = False
+    if "security_scan" in observed:
+        validation["warnings"].append(
+            "optional AI Scan observation: " + observed["security_scan"]["state"]
+        )
     # Unknown auxiliary observations remain visible, and cannot support an
     # all-pipelines-green statement from this collector.
     foreign = [

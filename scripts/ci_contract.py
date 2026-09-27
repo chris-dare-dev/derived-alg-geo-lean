@@ -20,8 +20,8 @@ from pathlib import Path
 from typing import Any
 
 
-SCHEMA_VERSION = 5
-SUPPORTED_SCHEMA_VERSIONS = {4, SCHEMA_VERSION}
+SCHEMA_VERSION = 6
+SUPPORTED_SCHEMA_VERSIONS = {4, 5, SCHEMA_VERSION}
 FULL_SHA = re.compile(r"^[0-9a-fA-F]{40}$")
 SHA256 = re.compile(r"^[0-9a-fA-F]{64}$")
 BRANCH_REF = re.compile(r"^refs/heads/[A-Za-z0-9._/-]+$")
@@ -269,8 +269,10 @@ def validate_inventory(inventory: Any) -> list[str]:
         if not isinstance(gate.get("required"), bool):
             errors.append(f"{prefix}.required must be boolean")
         bindings = {"primary", "independent", "status"}
-        if version == SCHEMA_VERSION:
+        if version in (5, 6):
             bindings.add("check")
+        if version == 6:
+            bindings.add("dynamic")
         if not _is_string(gate.get("run_binding")) or gate.get("run_binding") not in bindings:
             errors.append(f"{prefix}.run_binding must be one of {sorted(bindings)}")
         artifact_kind = gate.get("artifact")
@@ -278,10 +280,15 @@ def validate_inventory(inventory: Any) -> list[str]:
             _is_string(artifact_kind) and artifact_kind.startswith("commit-status:")
         ):
             errors.append(f"{prefix}.artifact must identify a commit status")
-        if gate.get("run_binding") == "check" and not (
+        if gate.get("run_binding") in {"check", "dynamic"} and not (
             _is_string(artifact_kind) and artifact_kind.startswith("check-run:")
         ):
             errors.append(f"{prefix}.artifact must identify a check run")
+        if gate.get("run_binding") == "dynamic" and (
+            gate.get("required") or gate.get("platforms") != ["github-actions"]
+            or gate.get("applies_to") != ["pull_request"]
+        ):
+            errors.append(f"{prefix}.dynamic binding must be an optional PR Actions gate")
         prerequisites = gate.get("prerequisites", [])
         if not isinstance(prerequisites, list) or any(
             not _is_string(item) for item in prerequisites
@@ -533,13 +540,13 @@ def validate_evidence(
         else:
             seen_provider_ids.add((str(gate.get("producer")), gate.get("provider_id")))
         expected_commit = (
-            evidence.get("head_commit") if definition.get("run_binding") == "check"
+            evidence.get("head_commit") if definition.get("run_binding") in {"check", "dynamic"}
             else evidence.get("candidate_commit")
         )
         if not _is_sha(gate.get("commit")):
             errors.append(f"{prefix}.commit must be a full SHA")
         elif gate.get("commit", "").lower() != str(expected_commit).lower():
-            subject_name = "head_commit" if definition.get("run_binding") == "check" else "candidate_commit"
+            subject_name = "head_commit" if definition.get("run_binding") in {"check", "dynamic"} else "candidate_commit"
             errors.append(f"{prefix}.commit is not bound to evidence.{subject_name}")
         if not _is_string(gate.get("status")) or gate.get("status") not in STATUSES:
             errors.append(f"{prefix}.status is not recognized")
@@ -597,6 +604,8 @@ def validate_evidence(
             or gate.get("conclusion") not in SUCCESS_CONCLUSIONS
         ):
             errors.append(f"{prefix}: passed status requires a successful conclusion")
+        if definition.get("run_binding") == "dynamic" and gate.get("status") == "passed":
+            errors.append(f"{prefix}: dynamic scan has no verified result signal; raw green is not a pass")
         if gate.get("applicable") and gate.get("status") != "passed" and definition.get("required"):
             errors.append(f"{prefix}: required gate is {gate.get('status')!r}, not passed")
         if gate.get("status") == "failed" and not definition.get("required"):

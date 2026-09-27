@@ -1,7 +1,7 @@
 # Decision record: CI gate and evidence contract (CI1.01)
 
-Status: proposed for workflow and controller review. Current schema version: 5;
-the validator also reads protected-base version 4 during migration.
+Status: proposed for workflow and controller review. Current schema version: 6;
+the validator also reads protected-base versions 4 and 5 during migration.
 
 ## Decision
 
@@ -19,11 +19,14 @@ Evidence uses the exact schema version of the protected-base inventory. Version
 4 remains readable while the current protected base still contains version 4; its
 `github-advanced-security` entry retains the legacy independent-workflow
 binding and may be reported missing, so it cannot make auxiliary health true.
-Version 5 adds `run_binding=check` for a runless check-app observation on the
-PR head. A version 4 inventory cannot use that binding, and evidence whose
-version differs from its trusted inventory is rejected. Once version 5 is on
-the protected base, the collector can report the security check with its
-actual provider identity.
+Version 5 added `run_binding=check` for a runless check-app observation on the
+PR head. That binding was incorrect for AI Scan: its check is a GitHub Actions
+job in a provider-generated `dynamic` workflow. Version 6 adds
+`run_binding=dynamic` for this optional PR gate, with its own run and attempt
+bound to the head, check suite, job and check run. Older protected inventories
+remain readable for historical evidence, but their runless mapping cannot
+prove this scanner. Evidence whose version differs from its trusted inventory
+is rejected.
 
 The record binds repository, base, PR head, tested commit and tree, event/ref,
 run and attempt, producer, toolchain and the SHA-256 of `lean-toolchain`,
@@ -42,10 +45,11 @@ The gate's platform is separate from the primary CI record's platform.
 gate to the record's CI run; `independent` allows an auxiliary workflow to
 have its own run and attempt. `status` represents a commit status, which has
 a provider status ID but no workflow run. `check` represents a check-app run
-on the PR head with no Actions workflow run; it records the head SHA rather
-than claiming the merge tree was tested. Workflow check-run artifacts must
-match their gate's run identity; runless status/check artifacts must not invent
-one. The adapter fetches every page of check runs and commit statuses on the
+on the PR head with no Actions workflow run. `dynamic` represents AI Scan's
+provider workflow on the PR head and requires a separate run and attempt.
+It does not claim the CI merge tree was scanned. Workflow check-run artifacts
+must match their gate's run identity; runless status/check artifacts must not
+invent one. The adapter fetches every page of check runs and commit statuses on the
 PR head and preserves their provider identities. The primary workflow's run
 artifact and Git parents separately prove the tested merge candidate. A
 name-only or latest-timestamp selection is not eligible evidence. A rerun
@@ -152,15 +156,18 @@ no proven gate mapping remain visible and prevent an all-pipelines-green
 claim. A missing or red required gate denies `required_ci_verified`; optional
 warnings remain separate.
 
-In version 5, the optional GitHub Advanced Security entry uses `run_binding=check` and
-`github-checks` platform. When the app reports a unique check run on the
-current PR head, the collector records its real app ID, provider ID, head
-subject and outcome without a workflow run. A green check can make auxiliary
-health true; a red check is a warning while required CI remains separately
-verified. If the app reports no check run, auxiliary health is false rather
-than assuming success. No independent Actions workflow in the current
-inventory applies to `pull_request`; Cache warm and Docs have separate event
-selectors and cannot borrow the primary run.
+In version 6, the optional AI Scan entry is bound to workflow ID `360047049`,
+`dynamic/agents/github-advanced-security`, the `dynamic` event, its bot actor,
+the current PR head SHA, and the exact job/check ID, suite, app and attempt.
+Its check app is `github-actions`, not a separate security app. A raw green
+workflow is **unknown** as a scan result: archived green runs excluded every
+changed file, and no provider-defined analysed-result signal is established.
+A raw failure is a visible optional failure; missing, disabled and unavailable
+settings are separate visible states. None can make auxiliary health true or
+turn into a required `ci` failure. The collector retains the setting request
+window and full paginated run observations, then rechecks the head, setting
+and runs before returning. Cache warm and Docs have separate event selectors
+and cannot borrow either the primary or dynamic run.
 
 Separate workflow runs on one head cannot silently supersede an older red
 required check: the collector denies a current claim if more than one CI run
@@ -183,9 +190,9 @@ them. `lean-toolchain`, `lake-manifest.json`, and `pins.json`
 digests come from the candidate Git tree. These hashes detect a changed
 local bundle; they do not authenticate GitHub beyond the authenticated API
 response. `ci_contract.validate_evidence` remains the canonical consistency
-validator. `scripts/loop_engine.py evidence --repo <owner/name> --pr <number>`
-is a read-only controller command for inspecting one open PR; `--output`
-optionally writes the local bundle. Its exit code reports whether required
+validator. The standalone read-only command above inspects one open PR;
+`--output` writes a local bundle. Its exit code reports whether required
 CI was verified. It makes no review, queue-admission, merge, or post-merge
 health decision. The CI workflow and durable controller admission path do
-not call this collector yet; #1434 owns that adoption.
+not call this collector yet; #1434 owns that adoption. The retired
+`scripts/loop_engine.py` is not a publication or admission route.

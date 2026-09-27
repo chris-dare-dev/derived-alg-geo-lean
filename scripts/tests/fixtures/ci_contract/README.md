@@ -1,6 +1,6 @@
 # CI contract fixtures
 
-`test_ci_contract.py` constructs schema-v4 fixture records from the checked-in
+`test_ci_contract.py` constructs schema-v6 fixture records from the checked-in
 gate inventory so every test continues to exercise the current mapping. The
 records bind the provider ref and revision tuple, require a hash-bound provider
 commit/tree proof with event-specific parent relationships, require typed
@@ -15,3 +15,6 @@ cancelled and timed-out work, missing pins, neutral required conclusions,
 independent auxiliary runs, missing optional checks, and scheduled Docs skips.
 The factory uses fixed SHAs and run
 identities, so a fixture failure is reproducible without a GitHub API call.
+Version 6 retains the v4 and v5 compatibility checks and adds a PR-only dynamic
+workflow binding for AI Scan. Its raw green outcome remains unverified until a
+provider-defined analysis/result signal can be bound to the run and head.

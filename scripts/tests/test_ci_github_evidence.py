@@ -76,10 +76,15 @@ class ProviderFixture:
         self.jobs = {1: [self._job(check, 1) for check in self.checks]}
         self.security_check: dict | None = None
         self.duplicate_security_check: dict | None = None
+        self.security_setting: dict | None = {"pr_scan": "disabled"}
+        self.dynamic_run: dict | None = None
+        self.extra_dynamic_runs: list[dict] = []
+        self.security_jobs: list[dict] = []
         self.statuses: list[dict] = []
         self.calls: list[str] = []
         self.move_head_on_recheck = False
         self.move_run_on_recheck = False
+        self.move_security_setting_on_recheck = False
         self.paginate_suites = False
         self.paginate_statuses = False
         self.paginate_checks = False
@@ -92,6 +97,7 @@ class ProviderFixture:
             "head_sha": SHA_HEAD,
             "status": "completed",
             "conclusion": conclusion,
+            "check_suite": {"id": 222},
             "app": {"id": 15368, "slug": "github-actions"},
         }
 
@@ -107,6 +113,32 @@ class ProviderFixture:
             "status": check["status"],
             "conclusion": check["conclusion"],
         }
+
+    def add_dynamic_scan(self, conclusion: str = "success") -> None:
+        self.security_check = {
+            **self._check("github-advanced-security", 900, conclusion),
+            "check_suite": {"id": 333},
+        }
+        self.dynamic_run = {
+            "id": 77777,
+            "workflow_id": 360047049,
+            "run_attempt": 1,
+            "check_suite_id": 333,
+            "name": "Code scanning AI findings on PR #7",
+            "event": "dynamic",
+            "path": "dynamic/agents/github-advanced-security",
+            "head_sha": SHA_HEAD,
+            "status": "completed",
+            "conclusion": conclusion,
+            "actor": {"id": 62310815, "login": "github-advanced-security[bot]"},
+            "pull_requests": [],
+        }
+        self.security_jobs = [
+            {
+                **self._job(self.security_check, 1),
+                "run_id": 77777,
+            }
+        ]
 
     @staticmethod
     def _content(data: bytes) -> dict:
@@ -144,6 +176,12 @@ class ProviderFixture:
             }, {}
         if path == "/branches/main/protection/required_status_checks":
             return self.protection, {}
+        if path == "/code-scanning/ai-scan":
+            if self.security_setting is None:
+                raise EvidenceError("AI Scan setting unavailable (403)")
+            if self.move_security_setting_on_recheck and self.calls.count(url) > 1:
+                return {"pr_scan": "enabled"}, {}
+            return self.security_setting, {}
         if path == "/git/commits/" + SHA_MERGE:
             return {
                 "sha": SHA_MERGE,
@@ -173,9 +211,17 @@ class ProviderFixture:
                 return self._content(f"{target} fixture\n".encode()), {}
             raise EvidenceError(f"missing fixture Git blob {ref}:{target}")
         if path == "/actions/runs":
-            return {"total_count": 1, "workflow_runs": [self.run]}, {}
+            runs = [self.run]
+            if self.dynamic_run is not None:
+                runs.append(self.dynamic_run)
+            runs.extend(self.extra_dynamic_runs)
+            return {"total_count": len(runs), "workflow_runs": runs}, {}
         if path == "/actions/runs/12345":
             return self.run, {}
+        if self.dynamic_run is not None and path == f"/actions/runs/{self.dynamic_run['id']}":
+            return self.dynamic_run, {}
+        if self.dynamic_run is not None and path == f"/actions/runs/{self.dynamic_run['id']}/attempts/{self.dynamic_run['run_attempt']}/jobs":
+            return {"total_count": len(self.security_jobs), "jobs": self.security_jobs}, {}
         if path == "/actions/runs/12345/artifacts":
             return {"total_count": len(self.artifacts), "artifacts": self.artifacts}, {}
         if path == "/actions/runs/12345/attempts/2":
@@ -201,11 +247,11 @@ class ProviderFixture:
             if self.security_check is not None:
                 suites.append(
                     {
-                        "id": 333,
+                        "id": self.security_check["check_suite"]["id"],
                         "head_sha": SHA_HEAD,
                         "latest_check_runs_count": 1
                         + (self.duplicate_security_check is not None),
-                        "app": {"id": 4444, "slug": "github-advanced-security"},
+                        "app": {"id": 15368, "slug": "github-actions"},
                     }
                 )
             if self.paginate_suites and "page=2" not in url:
@@ -221,7 +267,7 @@ class ProviderFixture:
                     "Link": f'<{next_url}>; rel="next"'
                 }
             return {"total_count": len(self.checks), "check_runs": self.checks}, {}
-        if path == "/check-suites/333/check-runs":
+        if self.security_check is not None and path == f"/check-suites/{self.security_check['check_suite']['id']}/check-runs":
             checks = [self.security_check]
             if self.duplicate_security_check is not None:
                 checks.append(self.duplicate_security_check)
@@ -314,7 +360,8 @@ class CollectorTests(unittest.TestCase):
             "head_sha": SHA_HEAD,
             "status": "completed",
             "conclusion": "success",
-            "app": {"id": 4444, "slug": "github-advanced-security"},
+            "check_suite": {"id": 333},
+            "app": {"id": 15368, "slug": "github-actions"},
         }
         result = collect(fixture.client(), 7)
         self.assertEqual(result["evidence"]["schema_version"], 4)
@@ -484,46 +531,112 @@ class CollectorTests(unittest.TestCase):
         self.assertFalse(result["validation"]["claims"]["all_pipelines_green"])
         self.assertEqual(result["observations"]["statuses"][0]["state"], "failure")
 
-    def test_security_check_green_and_red_without_workflow_run(self) -> None:
+    def test_dynamic_security_run_green_is_unknown_and_red_is_visible(self) -> None:
         fixture = ProviderFixture()
-        fixture.security_check = {
-            "id": 900,
-            "name": "github-advanced-security",
-            "head_sha": SHA_HEAD,
-            "status": "completed",
-            "conclusion": "success",
-            "app": {"id": 4444, "slug": "github-advanced-security"},
-        }
+        fixture.add_dynamic_scan()
         green = collect(fixture.client(), 7)
         self.assertTrue(green["validation"]["claims"]["required_ci_verified"])
-        self.assertTrue(green["validation"]["claims"]["auxiliary_checks_healthy"])
-        self.assertTrue(green["validation"]["claims"]["all_pipelines_green"])
+        self.assertFalse(green["validation"]["claims"]["auxiliary_checks_healthy"])
+        self.assertFalse(green["validation"]["claims"]["all_pipelines_green"])
         gate = next(
             g
             for g in green["evidence"]["gates"]
             if g["id"] == "github-advanced-security"
         )
         self.assertEqual(gate["commit"], SHA_HEAD)
-        self.assertNotIn("run_id", gate)
+        self.assertEqual(gate["run_id"], 77777)
+        self.assertEqual(gate["status"], "unknown")
+        self.assertEqual(green["observations"]["security_scan"]["state"], "execution_observed_result_unknown")
         fixture.security_check["conclusion"] = "failure"
+        fixture.dynamic_run["conclusion"] = "failure"
+        fixture.security_jobs[0]["conclusion"] = "failure"
         red = collect(fixture.client(), 7)
         self.assertTrue(red["validation"]["claims"]["required_ci_verified"])
         self.assertFalse(red["validation"]["claims"]["auxiliary_checks_healthy"])
         self.assertFalse(red["validation"]["claims"]["all_pipelines_green"])
+        self.assertEqual(red["observations"]["security_scan"]["state"], "unclassified_failure")
 
-    def test_duplicate_security_app_check_denies_claim(self) -> None:
+    def test_duplicate_dynamic_security_check_denies_claim(self) -> None:
         fixture = ProviderFixture()
-        fixture.security_check = {
-            "id": 900,
-            "name": "github-advanced-security",
-            "head_sha": SHA_HEAD,
-            "status": "completed",
-            "conclusion": "success",
-            "app": {"id": 4444, "slug": "github-advanced-security"},
-        }
+        fixture.add_dynamic_scan()
         fixture.duplicate_security_check = {**fixture.security_check, "id": 901}
-        with self.assertRaisesRegex(EvidenceError, "ambiguous check-app observations"):
+        with self.assertRaisesRegex(EvidenceError, "missing or ambiguous"):
             collect(fixture.client(), 7)
+
+    def test_dynamic_security_absence_preserves_setting_uncertainty(self) -> None:
+        fixture = ProviderFixture()
+        for setting, state in (({"pr_scan": "disabled"}, "disabled_by_setting"),
+                               ({"pr_scan": "enabled"}, "missing"),
+                               (None, "provider_state_unknown")):
+            with self.subTest(state=state):
+                fixture.security_setting = setting
+                result = collect(fixture.client(), 7)
+                self.assertEqual(result["observations"]["security_scan"]["state"], state)
+                self.assertFalse(result["validation"]["claims"]["auxiliary_checks_healthy"])
+                self.assertTrue(result["validation"]["claims"]["required_ci_verified"])
+
+    def test_wrong_dynamic_workflow_does_not_bind_same_named_check(self) -> None:
+        fixture = ProviderFixture()
+        fixture.add_dynamic_scan()
+        fixture.dynamic_run["workflow_id"] = 123
+        with self.assertRaisesRegex(EvidenceError, "missing or ambiguous"):
+            collect(fixture.client(), 7)
+
+    def test_ambiguous_dynamic_run_or_job_denies_claim(self) -> None:
+        fixture = ProviderFixture()
+        fixture.add_dynamic_scan()
+        fixture.extra_dynamic_runs.append({**fixture.dynamic_run, "id": 77778})
+        with self.assertRaisesRegex(EvidenceError, "missing or ambiguous"):
+            collect(fixture.client(), 7)
+        fixture.extra_dynamic_runs.clear()
+        fixture.security_jobs.append(dict(fixture.security_jobs[0]))
+        with self.assertRaisesRegex(EvidenceError, "no unique matching job"):
+            collect(fixture.client(), 7)
+
+    def test_dynamic_binding_rejects_wrong_protected_definition(self) -> None:
+        fixture = ProviderFixture()
+        fixture.add_dynamic_scan()
+        security = next(g for g in fixture.inventory["gates"] if g["id"] == "github-advanced-security")
+        security["producer"] = "github-actions/Unknown"
+        with self.assertRaisesRegex(EvidenceError, "unrecognized dynamic security gate"):
+            collect(fixture.client(), 7)
+
+    def test_security_setting_change_denies_stale_absence(self) -> None:
+        fixture = ProviderFixture()
+        fixture.move_security_setting_on_recheck = True
+        with self.assertRaisesRegex(EvidenceError, "AI Scan setting changed"):
+            collect(fixture.client(), 7)
+
+    def test_redacted_historical_dynamic_shapes_remain_unverified(self) -> None:
+        source = ROOT / "scripts/tests/fixtures/github-advanced-security/dynamic-runs.json"
+        records = json.loads(source.read_text())
+        self.assertEqual({item["pr"] for item in records["runs"]}, {1415, 1419, 1424, 1427, 1426})
+        for item in records["runs"]:
+            with self.subTest(pr=item["pr"]):
+                fixture = ProviderFixture()
+                fixture.add_dynamic_scan(item["conclusion"])
+                fixture.security_check["id"] = item["check_id"]
+                fixture.security_check["check_suite"]["id"] = item["suite_id"]
+                fixture.dynamic_run.update(
+                    id=item["run_id"], workflow_id=records["workflow_id"],
+                    check_suite_id=item["suite_id"], path=records["path"],
+                    event=records["event"], actor=records["actor"],
+                )
+                fixture.security_jobs[0].update(
+                    id=item["check_id"], run_id=item["run_id"],
+                    check_run_url=f"{BASE}/check-runs/{item['check_id']}",
+                )
+                result = collect(fixture.client(), 7)
+                gate = next(g for g in result["evidence"]["gates"] if g["id"] == "github-advanced-security")
+                self.assertEqual(gate["provider_id"], str(item["check_id"]))
+                self.assertEqual(gate["run_id"], item["run_id"])
+                self.assertEqual(gate["conclusion"], item["conclusion"])
+                self.assertEqual(gate["status"], "failed" if item["conclusion"] == "failure" else "unknown")
+                self.assertFalse(result["validation"]["claims"]["auxiliary_checks_healthy"])
+                if item["conclusion"] == "failure":
+                    self.assertIn("HTTP 403", item["diagnostic"])
+                else:
+                    self.assertIn("no prompt or model session", item["diagnostic"])
 
     def test_conflicting_job_or_workflow_outcome_denies_claim(self) -> None:
         fixture = ProviderFixture()
