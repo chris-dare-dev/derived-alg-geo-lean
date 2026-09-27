@@ -32,15 +32,21 @@ For both entry points, phase times are unions of intervals: concurrent phases
 can overlap, and they must not be summed as a partition of wall time. Workflow
 start delay, prerequisite wait, scheduler gap after a job is eligible, and
 runner queue are distinct. A negative timestamp interval is retained as an
-anomaly with unknown duration. A cancelled or timed-out run is not counted as
-a successful build. A run with no terminal job cannot form a completed profile.
+anomaly with unknown duration for its phase. Jobs carried forward from a prior
+run attempt remain in the raw capture and profile inventory, but contribute no
+time or failure outcome to the selected attempt. A cancelled or timed-out run
+is not counted as a successful build. A run with no terminal job cannot form a
+completed profile.
 
 `profile_actions.py replay <case.json>` is a conservative, offline decision
 harness. It compares explicit base and candidate toolchain, manifest, target,
 options, pins, emitter, instance and exported-axiom identities, and requires
-full revision SHAs, a complete change inventory and dependency graph, and explicit changed-file
-classification. Changed or absent identity, renames, deletions, unknown inputs,
+full revision SHAs, a complete change inventory and dependency graph, and
+explicit changed-file classification. Changed or absent identity, renames,
+deletions, unknown inputs,
 or incomplete classification force `full_rebuild`. `targeted_replay` is only an
 experiment candidate; it does not authorize skipping a required gate. A
 matched independent cold/full reference remains necessary before proposing
-production reuse. This tooling does not edit workflows, caches or checks.
+production reuse. The complete-graph and complete-change flags are caller
+assertions, not validated graph or diff provenance. This tooling does not edit
+workflows, caches or checks.

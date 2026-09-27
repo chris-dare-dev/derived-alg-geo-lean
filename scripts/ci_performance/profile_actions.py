@@ -85,6 +85,7 @@ def _phase(name: str) -> str:
         ("restore", "cache_restore"),
         ("cache", "cache_restore"),
         ("audit", "audit"),
+        ("single instantiation", "audit"),
         ("emit", "emitter"),
         ("contract", "contract"),
         ("upload", "upload"),
@@ -151,6 +152,10 @@ def profile_run(payload: Any) -> dict[str, Any]:
     if not isinstance(jobs, list) or not jobs:
         raise ValueError("jobs must be a non-empty array")
     anomalies: list[str] = []
+    attempt_created = (
+        _timestamp(payload["attempt_created_at"])
+        if payload.get("attempt_created_at") is not None else None
+    )
     run_start_delay = _observed_seconds(
         payload["created_at"], payload["run_started_at"], "workflow start", anomalies
     )
@@ -173,8 +178,11 @@ def profile_run(payload: Any) -> dict[str, Any]:
     phase_intervals: dict[str, list[tuple[datetime, datetime]]] = {
         name: [] for name in PHASES
     }
+    phase_unknown: set[str] = set()
     job_intervals: list[tuple[datetime, datetime]] = []
     terminal_jobs = 0
+    incomplete_job_interval = False
+    carried_forward_jobs: list[dict[str, Any]] = []
     for job_index, job in enumerate(jobs):
         if not isinstance(job, dict):
             raise ValueError(f"jobs[{job_index}] must be an object")
@@ -193,20 +201,37 @@ def profile_run(payload: Any) -> dict[str, Any]:
         if conclusion is not None and conclusion not in TERMINAL_CONCLUSIONS | {"queued", "in_progress"}:
             raise ValueError(f"{job_name}.conclusion is not recognized")
         is_terminal = conclusion in TERMINAL_CONCLUSIONS
-        if is_terminal:
+        start_time = _timestamp(job["started_at"]) if job.get("started_at") else None
+        end_time = _timestamp(job["completed_at"]) if job.get("completed_at") else None
+        carried_forward = attempt_created is not None and (
+            (start_time is not None and start_time < attempt_created)
+            or (start_time is None and end_time is not None and end_time < attempt_created)
+        )
+        if carried_forward:
+            carried_forward_jobs.append({
+                "id": job["id"], "name": job_name,
+                "started_at": job.get("started_at"),
+                "completed_at": job.get("completed_at"),
+                "conclusion": conclusion,
+            })
+            anomalies.append(f"{job_name}: job execution predates the selected attempt")
+        elif is_terminal:
             terminal_jobs += 1
-        if is_terminal and (not job.get("started_at") or not job.get("completed_at")):
+        if is_terminal and not carried_forward and (not job.get("started_at") or not job.get("completed_at")):
             anomalies.append(f"{job_name}: terminal job lacks complete timestamps")
         job_duration = None
-        if job.get("started_at") and job.get("completed_at"):
+        if not carried_forward and job.get("started_at") and job.get("completed_at"):
             job_duration = _observed_seconds(
                 job["started_at"], job["completed_at"], f"{job_name} job", anomalies
             )
             if job_duration is not None:
                 job_intervals.append((_timestamp(job["started_at"]), _timestamp(job["completed_at"])))
+        if is_terminal and not carried_forward and conclusion != "skipped" and job_duration is None:
+            incomplete_job_interval = True
         row = {
             "id": job["id"],
             "name": job_name,
+            "carried_forward": carried_forward,
             "runner_name": job.get("runner_name"),
             "labels": job.get("labels", []),
             "duration_seconds": job_duration,
@@ -220,6 +245,8 @@ def profile_run(payload: Any) -> dict[str, Any]:
             "scheduler_gap_seconds": None,
         }
         job_rows.append(row)
+        if carried_forward:
+            continue
         failure = _failure_class(job)
         if failure:
             failures.append({"job": job_name, "class": failure, "conclusion": job.get("conclusion")})
@@ -236,6 +263,7 @@ def profile_run(payload: Any) -> dict[str, Any]:
             if not step.get("started_at") or not step.get("completed_at"):
                 if is_terminal:
                     anomalies.append(f"{job_name}.steps[{step_index}] lacks complete timestamps")
+                    phase_unknown.add(_phase(str(step.get("name", ""))))
                 continue
             phase = _phase(str(step.get("name", "")))
             start = _timestamp(step["started_at"])
@@ -245,15 +273,21 @@ def profile_run(payload: Any) -> dict[str, Any]:
                 f"{job_name}.steps[{step_index}]", anomalies,
             ) is not None:
                 phase_intervals[phase].append((start, end))
+            else:
+                phase_unknown.add(phase)
     if terminal_jobs == 0:
         raise ValueError("run has no terminal job; pending data is not a completed profile")
     completion_by_name: dict[str, datetime] = {}
     for row in job_rows:
-        if row["completed_at"] and row["duration_seconds"] is not None:
+        if row["completed_at"] and (
+            row["duration_seconds"] is not None or row["carried_forward"]
+        ):
             completion_by_name[row["name"]] = _timestamp(row["completed_at"])
     workflow_created = _timestamp(payload["created_at"])
     queue_complete = True
     for row in job_rows:
+        if row["carried_forward"]:
+            continue
         created_at, started_at = row["created_at"], row["started_at"]
         if not created_at or not started_at:
             queue_complete = False
@@ -288,7 +322,8 @@ def profile_run(payload: Any) -> dict[str, Any]:
         if started > eligible:
             phase_intervals["queue"].append((eligible, started))
     phases: dict[str, float | None] = {
-        name: _union_seconds(intervals) for name, intervals in phase_intervals.items()
+        name: None if name in phase_unknown else _union_seconds(intervals)
+        for name, intervals in phase_intervals.items()
     }
     if not queue_complete:
         phases["queue"] = None
@@ -311,11 +346,15 @@ def profile_run(payload: Any) -> dict[str, Any]:
         "jobs": job_rows,
         "failures": failures,
         "pending_jobs": pending_jobs,
-        "wall_clock_seconds": _union_seconds(job_intervals) if job_intervals else None,
+        "wall_clock_seconds": (
+            _union_seconds(job_intervals) if job_intervals and not incomplete_job_interval
+            else None
+        ),
         "workflow_start_delay_seconds": run_start_delay,
         "terminal_job_count": terminal_jobs,
         "measurement_notes": payload.get("measurement_notes", []),
         "timestamp_anomalies": anomalies,
+        "carried_forward_jobs": carried_forward_jobs,
     }
 
 
@@ -357,6 +396,7 @@ def profile_bundle(bundle: Any, job_needs: dict[str, list[str]] | None = None) -
     }
     payload.update({
         "jobs": jobs,
+        "attempt_created_at": attempt.get("created_at"),
         "job_needs": job_needs,
         "platform": platform,
         "cache_state": "unknown",
@@ -441,6 +481,11 @@ def replay_decision(case: Any) -> dict[str, Any]:
         return {"decision": "full_rebuild", "reasons": ["changed_files contains an invalid path"]}
     if len(set(changed)) != len(changed):
         return {"decision": "full_rebuild", "reasons": ["changed_files contains duplicates"]}
+    if changed and case["base_commit"] == case["candidate_commit"]:
+        return {
+            "decision": "full_rebuild",
+            "reasons": ["identical revisions cannot have changed inputs"],
+        }
     if not changed:
         if case.get("direct_changes") != [] or case.get("transitive_changes") != []:
             return {
@@ -479,7 +524,7 @@ def replay_decision(case: Any) -> dict[str, Any]:
     if direct or transitive:
         return {
             "decision": "targeted_replay",
-            "reasons": ["complete dependency graph and explicit changed inputs"],
+            "reasons": ["caller-attested dependency graph and explicit changed inputs"],
             "changed_files": changed,
         }
     return {"decision": "full_rebuild", "reasons": ["changed inputs have no proven dependency classification"]}

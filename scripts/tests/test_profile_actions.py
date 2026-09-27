@@ -100,6 +100,9 @@ class ProfileActionTests(unittest.TestCase):
         self.assertEqual(profile_actions.replay_decision(empty_diff)["decision"], "full_rebuild")
         empty_diff["candidate_commit"] = empty_diff["base_commit"]
         self.assertEqual(profile_actions.replay_decision(empty_diff)["decision"], "cache_reuse")
+        contradictory = copy.deepcopy(REPLAY[0])
+        contradictory["candidate_commit"] = contradictory["base_commit"]
+        self.assertEqual(profile_actions.replay_decision(contradictory)["decision"], "full_rebuild")
 
     def test_profile_maps_lean_action_and_separates_dependency_wait(self) -> None:
         payload = copy.deepcopy(SAMPLE)
@@ -146,6 +149,51 @@ class ProfileActionTests(unittest.TestCase):
         self.assertIsNone(cancelled["duration_seconds"])
         self.assertEqual(cancelled["runner_queue_seconds"], 61.0)
         self.assertTrue(any("precedes start" in item for item in result["timestamp_anomalies"]))
+
+    def test_inverted_step_marks_affected_phase_unknown(self) -> None:
+        payload = copy.deepcopy(SAMPLE)
+        audit = payload["jobs"][0]["steps"][1]
+        audit["completed_at"] = "2026-09-20T18:09:47Z"
+        result = profile_actions.profile_run(payload)
+        self.assertIsNone(result["phase_durations_seconds"]["audit"])
+        self.assertEqual(result["phase_durations_seconds"]["reset"], 468.0)
+
+    def test_single_instantiation_is_audit_work(self) -> None:
+        self.assertEqual(profile_actions._phase("Single instantiation"), "audit")
+
+    def test_rerun_carries_forward_job_without_counting_its_work(self) -> None:
+        run = {
+            "id": 36334136413, "run_attempt": 2, "head_sha": SAMPLE["head_sha"],
+            "event": "pull_request", "status": "completed", "conclusion": "success",
+            "created_at": "2026-09-27T17:27:02Z", "run_started_at": "2026-09-27T17:27:02Z",
+        }
+        old = {
+            "id": 1, "name": "build", "run_id": run["id"], "run_attempt": 2,
+            "head_sha": run["head_sha"], "labels": ["ubuntu-latest"],
+            "created_at": "2026-09-27T16:49:15Z", "started_at": "2026-09-27T16:49:16Z",
+            "completed_at": "2026-09-27T17:08:55Z", "conclusion": "success",
+            "steps": [{"name": "Run leanprover/lean-action@v1",
+                       "started_at": "2026-09-27T16:50:00Z",
+                       "completed_at": "2026-09-27T16:55:05Z"}],
+        }
+        current = {
+            "id": 2, "name": "roadmap", "run_id": run["id"], "run_attempt": 2,
+            "head_sha": run["head_sha"], "labels": ["ubuntu-latest"],
+            "created_at": "2026-09-27T17:27:03Z", "started_at": "2026-09-27T17:27:06Z",
+            "completed_at": "2026-09-27T17:28:38Z", "conclusion": "success",
+            "steps": [{"name": "Roadmap", "started_at": "2026-09-27T17:27:06Z",
+                       "completed_at": "2026-09-27T17:28:38Z"}],
+        }
+        bundle = {
+            "schema_version": 1, "repository": "example/repo",
+            "captured_at_utc": "2026-09-27T18:00:00Z", "provider_paths": {},
+            "run": run, "attempt": run, "jobs": [old, current],
+        }
+        result = profile_actions.profile_bundle(bundle, {"build": [], "roadmap": []})
+        self.assertEqual(result["carried_forward_jobs"][0]["name"], "build")
+        self.assertIsNone(result["jobs"][0]["duration_seconds"])
+        self.assertEqual(result["phase_durations_seconds"]["lake_build"], 0.0)
+        self.assertEqual(result["wall_clock_seconds"], 92.0)
 
     def test_dependent_job_created_after_prerequisites_is_dependency_wait(self) -> None:
         payload = copy.deepcopy(SAMPLE)
