@@ -913,6 +913,12 @@ is not closed. -/
 #print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.toSerreFunctorData
 #print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.finrank_eq_from_abstract
 #print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.hom_finite_bounded
+#print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.serreIsoShift
+#print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.selfHomShiftTwoDual
+#print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.extTwoOfEndOne
+#print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.chiHom_symm_of_trivialTwist
+#print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.eulerComparison
+#print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.chiHom_self_eq_of_trivialCanonical
 
 /- The `BilinearData` and `TrivialCanonical` fields, and the `HasExt` instance the file needs.
 

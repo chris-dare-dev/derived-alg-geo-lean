@@ -8,6 +8,7 @@ import DerivedAlgGeo.Algebra.Homology.DerivedCategory.BoundedHeart
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomFinite
 import Mathlib.Algebra.Homology.DerivedCategory.Ext.Linear
 import DerivedAlgGeo.CategoryTheory.Linear.SerreFunctor.Basic
+import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor.Euler
 
 /-!
 # Geometric comparison for Serre duality
@@ -29,6 +30,13 @@ of a smooth proper scheme to the existing sheaf-level bilinear duality data.
   numerical duality in one direction.
 * `GeometricSerreData.hom_finite_bounded` derives finite-dimensional Hom spaces
   with bounded shift support for the bounded coherent derived category.
+* `GeometricSerreData.eulerComparison` identifies the Hom-built Euler form on
+  embedded sheaves with the sheaf-level Euler characteristic.
+* `GeometricSerreData.selfHomShiftTwoDual` and
+  `GeometricSerreData.chiHom_symm_of_trivialTwist` give conditional dimension-two
+  consequences of a functor-level trivialization of the derived twist.
+* `GeometricSerreData.chiHom_self_eq_of_trivialCanonical` transfers the
+  sheaf-level self-Euler calculation without that functor-level trivialization.
 
 ## Implementation notes
 
@@ -40,6 +48,10 @@ from sheaf Ext-finiteness, that transport, and the standard t-structure. No
 geometric inhabitant or derived tensor functor is constructed here.
 `CategoryTheory.SerreFunctor.SerreFunctorData` is the abstract API, and
 `AlgebraicGeometry.Duality.Serre.BilinearData` is the sheaf presentation.
+
+A sheaf-level `BilinearData.TrivialCanonical` does not identify the derived
+twist functor with identity; the dimension-two consequences below state that
+functor-level natural isomorphism explicitly.
 
 ## References
 
@@ -419,6 +431,7 @@ private theorem finrank_shifted_hom_eq_zero_of_dim_lt (G : GeometricSerreData K)
   simpa only [Subspace.dual_finrank_eq] using hDual
 
 end AlgebraicGeometry.Duality.Serre.GeometricSerreData
+
 namespace AlgebraicGeometry.Duality.Serre.GeometricSerreData
 open CategoryTheory AlgebraicGeometry AlgebraicGeometry.DerivedCategory
 open CategoryTheory.Triangulated
@@ -454,4 +467,166 @@ theorem hom_finite_bounded (G : GeometricSerreData K) :
         rw [Function.mem_support] at hj
         exact hj (by exact_mod_cast he.trans hzero))
   exact DerivedCategory.homFiniteBounded_boundedDerived (k := k) (A := Coh X)
+end AlgebraicGeometry.Duality.Serre.GeometricSerreData
+
+namespace AlgebraicGeometry.Duality.Serre.GeometricSerreData
+
+open CategoryTheory AlgebraicGeometry AlgebraicGeometry.DerivedCategory
+open CategoryTheory.Triangulated
+attribute [local instance] HasDerivedCategory.standard
+
+variable {k : Type u} [Field k] {X : Scheme.{u}}
+  [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X] {n : ℕ}
+  {K : SmoothProperVariety.CanonicalSheafData k X n}
+
+/-- A natural trivialization of the derived canonical twist identifies the
+supplied Serre functor with shift by the dimension. -/
+noncomputable def serreIsoShift (G : GeometricSerreData K)
+    (hT : G.canonicalTwistFunctor ≅ 𝟭 (SchemeBoundedCoherentDerivedCategory X)) :
+    G.toSerreFunctorData.S ≅ shiftFunctor (SchemeBoundedCoherentDerivedCategory X) (n : ℤ) :=
+  Functor.isoWhiskerRight hT
+    (shiftFunctor (SchemeBoundedCoherentDerivedCategory X) (n : ℤ)) ≪≫
+    Functor.leftUnitor (shiftFunctor (SchemeBoundedCoherentDerivedCategory X) (n : ℤ))
+
+/-- In dimension two, the top self-Hom is dual to the endomorphism space,
+provided the derived canonical twist is naturally trivial. -/
+noncomputable def selfHomShiftTwoDual (G : GeometricSerreData K)
+    (hn : n = 2) (hT : G.canonicalTwistFunctor ≅ 𝟭 (SchemeBoundedCoherentDerivedCategory X))
+    (E : SchemeBoundedCoherentDerivedCategory X) :
+    (E ⟶ E⟦(2 : ℤ)⟧) ≃ₗ[k] Module.Dual k (E ⟶ E) := by
+  let hS := G.serreIsoShift hT
+  subst hn
+  exact ((G.toSerreFunctorData.eta E E).trans
+    (Linear.homCongr k (Iso.refl E) (hS.app E))).symm
+
+/-- Under derived canonical-twist triviality in dimension two, the
+endomorphism-space condition supplies the top shifted self-Hom condition
+used by `SphericalExtProfile`. This does not change that profile's fields. -/
+theorem extTwoOfEndOne (G : GeometricSerreData K)
+    (hn : n = 2) (hT : G.canonicalTwistFunctor ≅ 𝟭 (SchemeBoundedCoherentDerivedCategory X))
+    (E : SchemeBoundedCoherentDerivedCategory X) (hEnd : Nonempty ((E ⟶ E) ≃ₗ[k] k)) :
+    Nonempty ((E ⟶ E⟦(2 : ℤ)⟧) ≃ₗ[k] k) := by
+  obtain ⟨e⟩ := hEnd
+  exact ⟨(G.selfHomShiftTwoDual hn hT E).trans
+    (e.dualMap.symm.trans (LinearMap.ringLmapEquivSelf k k k))⟩
+
+private local instance boundedShiftLinear (i : ℤ) :
+    (shiftFunctor (SchemeBoundedCoherentDerivedCategory X) i).Linear k := by
+  let J := DerivedCategory.Bounded.ι (C := Coh X)
+  have hcomp : ((shiftFunctor (SchemeBoundedCoherentDerivedCategory X) i) ⋙ J).Linear k :=
+    Functor.linear_of_iso k (J.commShiftIso i).symm
+  refine ⟨fun {A B} f r => ?_⟩
+  apply J.map_injective
+  exact hcomp.map_smul f r
+
+/-- In dimension two a naturally trivial derived canonical twist makes the
+Hom-built Euler form symmetric. Bounded Hom support comes from the supplied
+geometric data. -/
+theorem chiHom_symm_of_trivialTwist (G : GeometricSerreData K)
+    (hn : n = 2) (hT : G.canonicalTwistFunctor ≅ 𝟭 (SchemeBoundedCoherentDerivedCategory X))
+    (A B : SchemeBoundedCoherentDerivedCategory X) :
+    chiHom k (SchemeBoundedCoherentDerivedCategory X) A B =
+      chiHom k (SchemeBoundedCoherentDerivedCategory X) B A := by
+  letI := G.hom_finite_bounded
+  letI : ∀ j : ℤ, (shiftFunctor (SchemeBoundedCoherentDerivedCategory X) j).Linear k :=
+    fun j => boundedShiftLinear j
+  let hS : G.toSerreFunctorData.S ≅
+      (𝟭 (SchemeBoundedCoherentDerivedCategory X)) ⋙
+        shiftFunctor (SchemeBoundedCoherentDerivedCategory X) (n : ℤ) :=
+    Functor.isoWhiskerRight hT (shiftFunctor (SchemeBoundedCoherentDerivedCategory X) (n : ℤ))
+  have h := G.toSerreFunctorData.chiHom_eq_negOnePow_mul_chiHom_twist_of_natIso
+    k (SchemeBoundedCoherentDerivedCategory X)
+      (𝟭 (SchemeBoundedCoherentDerivedCategory X)) A B (n : ℤ) hS
+  subst hn
+  have hsign : (2 : ℤ).negOnePow = 1 := by
+    simpa using Int.negOnePow_two_mul (1 : ℤ)
+  simpa [hsign] using h
+
+end AlgebraicGeometry.Duality.Serre.GeometricSerreData
+
+namespace AlgebraicGeometry.Duality.Serre.GeometricSerreData
+
+open CategoryTheory AlgebraicGeometry AlgebraicGeometry.DerivedCategory
+open CategoryTheory.Triangulated
+open scoped BigOperators
+attribute [local instance] HasDerivedCategory.standard
+
+variable {k : Type u} [Field k] {X : Scheme.{u}}
+  [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X] {n : ℕ}
+  {K : SmoothProperVariety.CanonicalSheafData k X n}
+
+private theorem eulerCompareOfWindow
+    (G : GeometricSerreData K) (E F : Coh X)
+    (hwindow : ∀ j : ℤ, j < 0 ∨ (n : ℤ) < j →
+      Module.finrank k (((B (X := X)).obj E) ⟶ ((B (X := X)).obj F)⟦j⟧) = 0)
+    (hrank : ∀ i : ℕ,
+      Module.finrank k (G.bilinear.extSpace E F i) =
+        Module.finrank k (((B (X := X)).obj E) ⟶
+          ((B (X := X)).obj F)⟦(i : ℤ)⟧)) :
+    chiHom k (D (X := X)) ((B (X := X)).obj E) ((B (X := X)).obj F) =
+      G.bilinear.eulerChar E F := by
+  unfold chiHom BilinearData.eulerChar
+  let f : ℤ → ℤ := fun j => (j.negOnePow : ℤ) *
+    Module.finrank k (((B (X := X)).obj E) ⟶ ((B (X := X)).obj F)⟦j⟧)
+  have hsupport : Function.support f ⊆
+      (Finset.range (n + 1)).image (fun i : ℕ => (i : ℤ)) := by
+    intro j hj
+    by_contra hnot
+    have hlow : 0 ≤ j := by
+      by_contra hh
+      have hz := hwindow j (Or.inl (lt_of_not_ge hh))
+      exact hj (by simp [f, hz])
+    have hhigh : j ≤ (n : ℤ) := by
+      by_contra hh
+      have hz := hwindow j (Or.inr (lt_of_not_ge hh))
+      exact hj (by simp [f, hz])
+    obtain ⟨i, rfl⟩ := Int.eq_ofNat_of_zero_le hlow
+    simp at hnot
+    omega
+  rw [show (∑ᶠ j : ℤ, (j.negOnePow : ℤ) *
+      Module.finrank k (((B (X := X)).obj E) ⟶ ((B (X := X)).obj F)⟦j⟧)) =
+      ∑ᶠ j : ℤ, f j from rfl]
+  rw [finsum_eq_sum_of_support_subset f hsupport, Finset.sum_image]
+  · apply Finset.sum_congr rfl
+    intro i hi
+    simp only [f, Int.coe_negOnePow_natCast, hrank i]
+  · intro a ha b hb hab
+    exact Int.ofNat_injective hab
+
+private theorem degreeRank (G : GeometricSerreData K)
+    (E F : Coh X) (i : ℕ) :
+    Module.finrank k (G.bilinear.extSpace E F i) =
+      Module.finrank k (((B (X := X)).obj E) ⟶
+        ((B (X := X)).obj F)⟦(i : ℤ)⟧) := by
+  exact (extSpaceLinearEquivWithScalar G.bilinear E F i
+    (G.extComparison_scalar E F i)).finrank_eq
+
+/-- The Hom-built Euler form on embedded coherent sheaves equals the
+sheaf-level Euler characteristic supplied by the bilinear data. The derived
+Serre pairing and the sheaf restriction kill shifts above the dimension. -/
+theorem eulerComparison (G : GeometricSerreData K) (E F : Coh X) :
+    chiHom k (SchemeBoundedCoherentDerivedCategory X)
+        ((DerivedCategory.boundedSingleFunctor (Coh X)).obj E)
+        ((DerivedCategory.boundedSingleFunctor (Coh X)).obj F) =
+      G.bilinear.eulerChar E F := by
+  apply eulerCompareOfWindow G E F
+  · intro j hj
+    rcases hj with hneg | hhigh
+    · exact finrank_shifted_hom_eq_zero_of_neg (k := k) E F j hneg
+    · exact finrank_shifted_hom_eq_zero_of_dim_lt G E F j hhigh
+  · exact degreeRank G E F
+
+/-- Transfer the existing sheaf-level `surface_selfEuler_eq` calculation to
+the Hom-built Euler form on the bounded derived category. The sheaf-level
+trivial-canonical datum suffices for this numerical statement. -/
+theorem chiHom_self_eq_of_trivialCanonical (G : GeometricSerreData K)
+    (hn : n = 2) (T : G.bilinear.TrivialCanonical) (E : Coh X) :
+    chiHom k (SchemeBoundedCoherentDerivedCategory X)
+        ((DerivedCategory.boundedSingleFunctor (Coh X)).obj E)
+        ((DerivedCategory.boundedSingleFunctor (Coh X)).obj E) =
+      2 * (Module.finrank k (G.bilinear.extSpace E E 0) : ℤ) -
+        (Module.finrank k (G.bilinear.extSpace E E 1) : ℤ) := by
+  rw [G.eulerComparison]
+  exact G.bilinear.surface_selfEuler_eq hn T E
+
 end AlgebraicGeometry.Duality.Serre.GeometricSerreData
