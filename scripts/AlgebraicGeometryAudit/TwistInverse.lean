@@ -3,12 +3,12 @@ import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.TwistInverse
 /-!
 # The tensor inverse of `O(N)`, and Serre's surjection `⊕ O(-N) ↠ F` (#806, #586)
 
-## Tensoring by an invertible sheaf, two more consequences (Modules/Tensor/Invertible.lean)
+## Tensoring by an invertible sheaf, two consequences
 
 `tensorLeftFunctor L` preserves finite colimits, hence pushouts, hence epimorphisms
 (`epi_tensorHom_id_of_invertible`, the companion of `mono_tensorHom_id_of_invertible`); and it
-preserves finite coproducts, so `L ⊗ free I` is a finite direct sum of copies of `L`
-(`tensorLeftFreeIso`). Generic in the scheme and the invertible sheaf. -/
+preserves finite coproducts for any `L`, so `L ⊗ free I` is a finite direct sum of copies of `L`
+(`tensorLeftFreeIso`, in `Modules/Tensor/Colimits.lean`). -/
 
 #print axioms AlgebraicGeometry.Scheme.Modules.epi_tensorHom_id_of_invertible
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorLeftFreeIso

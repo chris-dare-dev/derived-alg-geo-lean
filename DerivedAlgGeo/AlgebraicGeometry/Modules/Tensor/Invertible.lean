@@ -16,9 +16,10 @@ This file is the neutral exact-functor owner for tensoring module sheaves by a l
 construction belongs under `Modules/Tensor`: divisor sequences, filtrations, and future moduli
 constructions are consumers of the same exact functor rather than separate owners of it.
 
-The generic `tensorLeftFunctor L` and its colimit preservation come from `Monoidal` and
-`Colimits`. For an invertible `L`, local rank-one trivializations show that it also preserves
-monomorphisms; hence it preserves homology and all finite limits.
+The generic `tensorLeftFunctor L`, its colimit preservation, additivity, and finite-free
+comparison come from `Monoidal` and `Colimits`. For an invertible `L`, local rank-one
+trivializations show that it also preserves monomorphisms; hence it preserves homology and all
+finite limits.
 -/
 
 open CategoryTheory CategoryTheory.Limits TopologicalSpace MonoidalCategory
@@ -35,15 +36,6 @@ private local instance tensorExact_category : Category X.Modules :=
 private noncomputable local instance tensorExact_monoidalCategory :
     MonoidalCategory X.PresheafOfModules :=
   PresheafOfModules.monoidalCategory (R := X.presheaf)
-
-/-- Tensoring by an invertible module sheaf is additive. -/
-noncomputable instance tensorLeftFunctor_additive (L : X.Modules)
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from L)] :
-    (tensorLeftFunctor L).Additive := by
-  letI := preservesBinaryBiproducts_of_preservesBinaryCoproducts
-    (tensorLeftFunctor L)
-  exact Functor.additive_of_preservesBinaryBiproducts (tensorLeftFunctor L)
 
 private noncomputable instance faithfulToSheaf : (toSheaf X).Faithful := by
   constructor
@@ -144,20 +136,6 @@ theorem epi_tensorHom_id_of_invertible (L : X.Modules)
     {M N : X.Modules} (f : M ⟶ N) [Epi f] :
     Epi (tensorHom (𝟙 L) f) :=
   (tensorLeftFunctor L).map_epi f
-
-/-- **Tensoring a finite free sheaf by an invertible sheaf is a finite direct sum of copies of
-it.** `free I` is the coproduct of copies of the unit, tensoring by an invertible sheaf preserves
-finite coproducts, and `L ⊗ unit ≅ L` by the right unitor. -/
-noncomputable def tensorLeftFreeIso (L : X.Modules)
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from L)]
-    (I : Type u) [Finite I] :
-    tensorObj L (show X.Modules from SheafOfModules.free.{u} I) ≅ ∐ (fun _ : I => L) := by
-  classical
-  haveI := Fintype.ofFinite I
-  exact PreservesCoproduct.iso (tensorLeftFunctor L)
-      (fun _ : I => (SheafOfModules.unit X.ringCatSheaf : X.Modules)) ≪≫
-    Sigma.mapIso (fun _ => tensorUnitRightIso L)
 
 /-- Tensoring a short exact sequence by an invertible module sheaf remains short exact. -/
 theorem shortExact_map_tensorLeft_of_invertible (L : X.Modules)

@@ -157,4 +157,21 @@ noncomputable instance tensorLeftFunctor_preservesFiniteColimits (L : X.Modules)
   change PreservesFiniteColimits (tensorLeft (C := X.Modules) L)
   infer_instance
 
+/-- Tensoring by any module sheaf is additive, since it preserves finite coproducts. -/
+noncomputable instance tensorLeftFunctor_additive (L : X.Modules) :
+    (tensorLeftFunctor L).Additive := by
+  letI := preservesBinaryBiproducts_of_preservesBinaryCoproducts
+    (tensorLeftFunctor L)
+  exact Functor.additive_of_preservesBinaryBiproducts (tensorLeftFunctor L)
+
+/-- The finite free sheaf is a coproduct of units. Tensoring with any module sheaf
+preserves that coproduct, and the right unitor identifies each summand. -/
+noncomputable def tensorLeftFreeIso (L : X.Modules) (I : Type u) [Finite I] :
+    tensorObj L (show X.Modules from SheafOfModules.free.{u} I) ≅ ∐ (fun _ : I => L) := by
+  classical
+  haveI := Fintype.ofFinite I
+  exact PreservesCoproduct.iso (tensorLeftFunctor L)
+      (fun _ : I => (SheafOfModules.unit X.ringCatSheaf : X.Modules)) ≪≫
+    Sigma.mapIso (fun _ => tensorUnitRightIso L)
+
 end AlgebraicGeometry.Scheme.Modules
