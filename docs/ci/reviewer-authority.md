@@ -64,6 +64,22 @@ receipt. A no-conflict base merge still changes the exact base/head binding and
 requires the controller to re-establish the receipt under its reviewed-change
 rule before admission.
 
+`scripts/review_authority_github.py` collects only the provider half of that
+snapshot. It uses the repository-scoped GET client, requires a page budget
+large enough to enumerate the PR file API's 3,000-file cap, checks the
+protected `main` SHA against the PR base, and compares PR identity before and
+after file collection. It fetches all review pages both before and after the
+file pages, rejecting a changed review set. It checks the reported changed-file
+count and retains rename sources and removals. A full final page without a
+provable continuation, an unavailable fork repository, or a 3,000-file result
+fails closed. Its output source is `github-read-only-metadata`, never the
+validator's `trusted-read-only-adapter` marker, and it contains neither policy
+nor technical-review records. It cannot produce a passing receipt on its own.
+CI1.05 must load the approved policy from the protected base, attach
+authenticated complete runtime records, re-read provider state at admission,
+and then call `validate_receipt`. Two matching reads narrow collection races;
+they are not an atomic GitHub snapshot or a lasting approval.
+
 The validator can observe a current GitHub `APPROVED` review by a distinct
 provider actor on the exact head when a future owner-approved policy requires
 one. It rejects an author or shared-credential actor, a dismissed/superseded
@@ -91,6 +107,9 @@ eligibility and post-merge health remain separate claims as in
 `python3 -m unittest scripts.tests.test_review_authority` exercises replay,
 stale head/base, trust-file changes, rename/removal, incomplete pages,
 revocation, shared credentials, label-only claims and merge-group denial.
+`python3 -m unittest scripts.tests.test_review_authority_github` exercises
+provider pagination, races, malformed and truncated file/review pages, fork
+identity and the explicit lack of a trusted source claim.
 These are local contract fixtures. The first safe PR demonstration is this
 contract's own PR: record its four independent technical reviewer outputs at
 the exact commit and current base, its published head, required CI result and
