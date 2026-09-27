@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.Algebra.Homology.HomologicalComplexLimits
 import Mathlib.Algebra.Homology.DerivedCategory.Basic
 import Mathlib.CategoryTheory.Localization.Bifunctor
 
@@ -66,6 +67,48 @@ lemma tensorLeft_inverts :
 lemma tensorRight_inverts :
     W.IsInvertedBy (tensor.flip.obj K ⋙ DerivedCategory.Q) :=
   hK.2
+
+end IsKFlat
+
+namespace IsKFlat
+
+universe w₁ w₂
+
+variable {J : Type w₁} [Category.{w₂} J]
+  {C : Type u} [Category.{v} C] [Abelian C]
+  [HasColimitsOfShape J C] [HasExactColimitsOfShape J C]
+  {tensor : CochainComplex C ℤ ⥤ CochainComplex C ℤ ⥤ CochainComplex C ℤ}
+  [∀ L, PreservesColimitsOfShape J (tensor.obj L)]
+  [∀ L, PreservesColimitsOfShape J (tensor.flip.obj L)]
+  (F : J ⥤ CochainComplex C ℤ)
+  (hF : ∀ j, CochainComplex.IsKFlat tensor (F.obj j))
+
+include hF in
+/-- Exact colimits of K-flat complexes remain K-flat when tensoring in either slot
+preserves the colimit shape. In an AB5 category this applies to filtered diagrams
+once the two tensor-preservation instances are supplied. -/
+theorem colimit : CochainComplex.IsKFlat tensor (Limits.colimit F) := by
+  constructor
+  · intro L M f hf
+    let α := tensor.flip.map f
+    have hα (j : J) : QuasiIso ((F.whiskerLeft α).app j) := by
+      rw [← DerivedCategory.isIso_Q_map_iff_quasiIso]
+      change IsIso (DerivedCategory.Q.map ((tensor.obj (F.obj j)).map f))
+      exact (hF j).1 f hf
+    have h : QuasiIso (α.app (Limits.colimit F)) :=
+      HomologicalComplex.quasiIso_app_colimit_of_preserves F α hα
+    change IsIso (DerivedCategory.Q.map (α.app (Limits.colimit F)))
+    rwa [DerivedCategory.isIso_Q_map_iff_quasiIso]
+  · intro L M f hf
+    let α := tensor.map f
+    have hα (j : J) : QuasiIso ((F.whiskerLeft α).app j) := by
+      rw [← DerivedCategory.isIso_Q_map_iff_quasiIso]
+      change IsIso (DerivedCategory.Q.map ((tensor.flip.obj (F.obj j)).map f))
+      exact (hF j).2 f hf
+    have h : QuasiIso (α.app (Limits.colimit F)) :=
+      HomologicalComplex.quasiIso_app_colimit_of_preserves F α hα
+    change IsIso (DerivedCategory.Q.map (α.app (Limits.colimit F)))
+    rwa [DerivedCategory.isIso_Q_map_iff_quasiIso]
 
 end IsKFlat
 
