@@ -233,3 +233,10 @@ natural in B by `naturality_right`, and `uniqueIso` is natural in A by `naturali
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.uniqueIso_trans
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.uniqueIso_symm
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.exists_uniqueIso
+
+-- Conjugation is linear Serre theory; shifts and the Euler identity consume it downstream.
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.conj
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.transportIso
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.commShiftIso
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.chiHom_eq_chiHom_swap_serre
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.chiHom_eq_chiHom_swap_serre_of_bounded
