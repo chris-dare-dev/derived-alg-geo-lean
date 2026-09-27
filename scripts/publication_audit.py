@@ -38,6 +38,10 @@ def _date(value: Any) -> datetime | None:
     return result if result.tzinfo is not None else None
 
 
+def _positive_id(value: Any) -> bool:
+    return isinstance(value, int) and not isinstance(value, bool) and value > 0
+
+
 def _digest(value: dict[str, Any]) -> str:
     payload = {key: item for key, item in value.items() if key != "receipt_sha256"}
     raw = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
@@ -62,6 +66,7 @@ def _check_summary(check: dict[str, Any]) -> dict[str, Any]:
         "app_slug": app.get("slug"),
         "status": check.get("status"),
         "conclusion": check.get("conclusion"),
+        "started_at": check.get("started_at"),
         "completed_at": check.get("completed_at"),
         "url": check.get("html_url"),
     }
@@ -73,7 +78,7 @@ def _checks(client: GitHubClient, commit: str) -> tuple[list[dict[str, Any]], li
     ids: set[int] = set()
     for check in checks:
         identifier = check.get("id")
-        if not isinstance(identifier, int) or isinstance(identifier, bool) or identifier <= 0:
+        if not _positive_id(identifier):
             raise EvidenceError("check run has invalid ID")
         if identifier in ids or check.get("head_sha") != commit:
             raise EvidenceError("duplicate or foreign check run")
@@ -86,12 +91,12 @@ def _checks(client: GitHubClient, commit: str) -> tuple[list[dict[str, Any]], li
 
 def _verify_run(client: GitHubClient, run: dict[str, Any]) -> None:
     run_id = run.get("id")
-    if not isinstance(run_id, int) or isinstance(run_id, bool) or run_id < 1:
+    if not _positive_id(run_id):
         raise EvidenceError("workflow run has invalid ID")
     direct = client.get_object(f"/actions/runs/{run_id}")
     for field in (
         "id", "name", "path", "event", "head_sha", "run_attempt",
-        "check_suite_id", "status", "conclusion", "updated_at", "pull_requests",
+        "check_suite_id", "status", "conclusion", "created_at", "updated_at", "pull_requests",
     ):
         if direct.get(field) != run.get(field):
             raise EvidenceError(f"workflow run changed during audit: {field}")
@@ -138,18 +143,23 @@ def _ci_observation(
     attempt = run.get("run_attempt")
     if (
         not isinstance(suite, dict)
-        or suite.get("id") != run.get("check_suite_id")
+        or not _positive_id(suite.get("id"))
+        or not _positive_id(run.get("check_suite_id"))
+        or suite["id"] != run["check_suite_id"]
         or not isinstance(attempt, int)
         or isinstance(attempt, bool)
         or attempt < 1
-        or not isinstance(run.get("id"), int)
+        or not _positive_id(run.get("id"))
     ):
         result["reason"] = "check-suite or attempt identity is ambiguous"
         return result
     completed = _date(check.get("completed_at"))
-    if completed is None or completed > merged_at:
+    if completed is None:
+        result["reason"] = "CI check completion time is unavailable"
+        return result
+    if completed > merged_at:
         result["state"] = "not_successful_before_merge"
-        result["reason"] = "CI check completed after merge or has no completion time"
+        result["reason"] = "CI check completed after merge"
         return result
     if attempt != 1 or _date(run.get("updated_at")) is None or _date(run["updated_at"]) > merged_at:
         result["reason"] = "workflow was rerun or updated after merge; merge-time attempt is ambiguous"
@@ -186,7 +196,8 @@ def _ci_observation(
 
 
 def _postmerge_observation(
-    client: GitHubClient, published: str, checks: list[dict[str, Any]]
+    client: GitHubClient, published: str, merged_at: datetime,
+    checks: list[dict[str, Any]]
 ) -> dict[str, Any]:
     """Bind a postmerge check to the exact push workflow and suite."""
     matches = [
@@ -207,7 +218,7 @@ def _postmerge_observation(
         "reason": "published-revision CI check or push workflow is missing or ambiguous",
         "checks": [_check_summary(check) for check in matches],
         "workflow_runs": [
-            {key: run.get(key) for key in ("id", "run_attempt", "check_suite_id", "status", "conclusion", "html_url")}
+            {key: run.get(key) for key in ("id", "run_attempt", "check_suite_id", "status", "conclusion", "created_at", "html_url")}
             for run in ci_runs
         ],
     }
@@ -218,13 +229,25 @@ def _postmerge_observation(
     suite = check.get("check_suite")
     if (
         not isinstance(suite, dict)
-        or suite.get("id") != run.get("check_suite_id")
+        or not _positive_id(suite.get("id"))
+        or not _positive_id(run.get("check_suite_id"))
+        or suite["id"] != run["check_suite_id"]
         or not isinstance(run.get("run_attempt"), int)
         or isinstance(run.get("run_attempt"), bool)
         or run["run_attempt"] != 1
     ):
         result["reason"] = "published check suite or run attempt is ambiguous"
         return result
+    created = _date(run.get("created_at"))
+    if created is None or created < merged_at:
+        result["reason"] = "push workflow is not proved to start after publication"
+        return result
+    if check.get("status") == "completed":
+        started = _date(check.get("started_at"))
+        completed = _date(check.get("completed_at"))
+        if started is None or completed is None or started < merged_at or completed < started:
+            result["reason"] = "published check timing is missing or predates publication"
+            return result
     if check.get("status") != run.get("status") or check.get("conclusion") != run.get("conclusion"):
         result["reason"] = "published check and push workflow outcomes conflict"
         return result
@@ -274,7 +297,7 @@ def collect(
         and _date(check.get("completed_at")) is not None
         and _date(check["completed_at"]) <= merged_at
     ]
-    post_ci = _postmerge_observation(client, published, published_checks)
+    post_ci = _postmerge_observation(client, published, merged_at, published_checks)
     receipt: dict[str, Any] = {
         "schema": SCHEMA,
         "repository": client.repository,

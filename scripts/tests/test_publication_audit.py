@@ -40,6 +40,7 @@ class Provider:
         self.ci = {
             "id": 11, "name": "ci", "head_sha": HEAD, "status": "completed",
             "conclusion": "success", "completed_at": "2026-09-27T09:59:00Z",
+            "started_at": "2026-09-27T09:58:00Z",
             "check_suite": {"id": 99}, "app": {"slug": "github-actions"},
             "html_url": f"https://github.com/{REPO}/runs/11",
         }
@@ -143,12 +144,12 @@ class PublicationAuditTest(unittest.TestCase):
 
     def test_postmerge_failure_is_separate(self):
         provider = Provider()
-        provider.checks[PUBLISHED] = [{**provider.ci, "id": 31, "head_sha": PUBLISHED, "conclusion": "failure", "check_suite": {"id": 199}}]
+        provider.checks[PUBLISHED] = [{**provider.ci, "id": 31, "head_sha": PUBLISHED, "conclusion": "failure", "check_suite": {"id": 199}, "started_at": "2026-09-27T10:01:00Z", "completed_at": "2026-09-27T10:02:00Z"}]
         provider.runs.append({
             "id": 41, "run_attempt": 1, "check_suite_id": 199,
             "name": "CI", "path": ".github/workflows/ci.yml",
             "event": "push", "head_sha": PUBLISHED,
-            "status": "completed", "conclusion": "failure",
+            "status": "completed", "conclusion": "failure", "created_at": "2026-09-27T10:00:30Z",
         })
         receipt = collect(provider, 7, REVIEWED)
         self.assertEqual(receipt["postmerge_ci"]["state"], "failed")
@@ -156,12 +157,12 @@ class PublicationAuditTest(unittest.TestCase):
 
     def test_postmerge_same_name_foreign_workflow_and_neutral(self):
         provider = Provider()
-        provider.checks[PUBLISHED] = [{**provider.ci, "id": 31, "head_sha": PUBLISHED, "check_suite": {"id": 199}}]
+        provider.checks[PUBLISHED] = [{**provider.ci, "id": 31, "head_sha": PUBLISHED, "check_suite": {"id": 199}, "started_at": "2026-09-27T10:01:00Z", "completed_at": "2026-09-27T10:02:00Z"}]
         provider.runs.append({
             "id": 41, "run_attempt": 1, "check_suite_id": 199,
             "name": "CI", "path": ".github/workflows/other.yml",
             "event": "push", "head_sha": PUBLISHED,
-            "status": "completed", "conclusion": "success",
+            "status": "completed", "conclusion": "success", "created_at": "2026-09-27T10:00:30Z",
         })
         self.assertEqual(collect(provider, 7)["postmerge_ci"]["state"], UNKNOWN)
         provider.runs[-1]["path"] = ".github/workflows/ci.yml"
@@ -171,6 +172,35 @@ class PublicationAuditTest(unittest.TestCase):
             receipt = collect(provider, 7)
             self.assertEqual(receipt["postmerge_ci"]["state"], "not_passed")
             self.assertEqual(receipt["postmerge_ci"]["checks"][0]["conclusion"], conclusion)
+
+    def test_missing_suite_ids_or_completion_time_cannot_pass(self):
+        provider = Provider()
+        provider.ci["check_suite"] = {}
+        provider.workflow["check_suite_id"] = None
+        self.assertEqual(collect(provider, 7)["premerge_ci"]["state"], UNKNOWN)
+        provider = Provider()
+        provider.ci["completed_at"] = None
+        self.assertEqual(collect(provider, 7)["premerge_ci"]["state"], UNKNOWN)
+        provider = Provider()
+        provider.checks[PUBLISHED] = [{**provider.ci, "id": 31, "head_sha": PUBLISHED, "check_suite": {}, "started_at": "2026-09-27T10:01:00Z", "completed_at": "2026-09-27T10:02:00Z"}]
+        provider.runs.append({
+            "id": 41, "run_attempt": 1, "check_suite_id": None,
+            "name": "CI", "path": ".github/workflows/ci.yml",
+            "event": "push", "head_sha": PUBLISHED,
+            "status": "completed", "conclusion": "success", "created_at": "2026-09-27T10:00:30Z",
+        })
+        self.assertEqual(collect(provider, 7)["postmerge_ci"]["state"], UNKNOWN)
+
+    def test_push_before_merge_cannot_be_postmerge_pass(self):
+        provider = Provider()
+        provider.checks[PUBLISHED] = [{**provider.ci, "id": 31, "head_sha": PUBLISHED, "check_suite": {"id": 199}, "started_at": "2026-09-27T09:58:00Z", "completed_at": "2026-09-27T09:59:00Z"}]
+        provider.runs.append({
+            "id": 41, "run_attempt": 1, "check_suite_id": 199,
+            "name": "CI", "path": ".github/workflows/ci.yml",
+            "event": "push", "head_sha": PUBLISHED,
+            "status": "completed", "conclusion": "success", "created_at": "2026-09-27T09:57:00Z",
+        })
+        self.assertEqual(collect(provider, 7)["postmerge_ci"]["state"], UNKNOWN)
 
     def test_forged_saved_claim_or_digest_cannot_verify_itself(self):
         provider = Provider()

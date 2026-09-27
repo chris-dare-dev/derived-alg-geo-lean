@@ -15,6 +15,7 @@
         "head_sha": "788f89a56793377a9d09b07a35799446f1e6a975",
         "id": 108563109711,
         "name": "ci",
+        "started_at": "2026-09-27T06:04:35Z",
         "status": "completed",
         "suite_id": 98290509776,
         "url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36298335259/job/108563109711"
@@ -26,6 +27,7 @@
       {
         "check_suite_id": 98290509776,
         "conclusion": "success",
+        "created_at": "2026-09-27T05:50:00Z",
         "html_url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36298335259",
         "id": 36298335259,
         "run_attempt": 1,
@@ -42,6 +44,7 @@
         "head_sha": "847c33d1d17e26c79c21b0c8bd23c7a5cf6d440d",
         "id": 108561061150,
         "name": "ci",
+        "started_at": "2026-09-27T05:48:45Z",
         "status": "completed",
         "suite_id": 98287148925,
         "url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36297017135/job/108561061150"
@@ -71,7 +74,7 @@
   "published_tree": "5227c25e9ace8d6f6fc6eee56ab7b5ef3ac5e80d",
   "pull_request": 1577,
   "pull_request_url": "https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1577",
-  "receipt_sha256": "edba0b0903752c99757fcbdb3fc1629c47b7ab4f8b3535aa78ea2e7f0aac9328",
+  "receipt_sha256": "54d43e8699a86f164d8e93c2cd31a0663dd795620b50855cc76fc01c77ff13cb",
   "recorded_base": "ceae23f170d837628f199ffdb902d405bc918077",
   "recorded_base_equals_published_parent": true,
   "repository": "chris-dare-dev/derived-alg-geo-lean",
