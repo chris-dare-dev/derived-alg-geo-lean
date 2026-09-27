@@ -32,6 +32,10 @@ whose path strings differ. Host admission stats every existing local POSIX
 root under the lease lock and rejects a supplied inode observation that no
 longer matches. An absent path has no inode yet; the bootstrap creates private
 roots after admission and must not install a hard link to another job.
+Path fields are literal absolute paths: the validator does not expand `~` or
+environment variables, and rejects leading or trailing whitespace. Spaces
+inside a path are preserved. This keeps report identity, local resolution and
+inode checks on the same spelling.
 
 `admit` takes a fresh physical-host capacity document and holds one exclusive
 lock in a host-owned lease directory while it reads **all** active leases,
@@ -147,9 +151,13 @@ It checks the archive digest and member types before issuing a token or lease,
 and repeats the check on the private copy inside the worker.
 It registers a uniquely named `--ephemeral --disableupdate` runner for one
 job. The runner's `_work` directory is a conservative reservation envelope;
-`logs/<namespace>/pickup.json` records the actual resolved checkout, Git
-index, Lake build/package, elan, temp, output and artifact locations after the
-job. Cleanup waits for the scope to empty and the GitHub registration to
+`logs/<namespace>/pickup.json` records planned checkout, Git index, Lake
+build/package, elan, temp, output and artifact locations, plus post-run
+existence and path resolution observations. `inventory_valid` means no existing
+listed path escaped the root; it does not mean every listed path existed or
+that the runner used those locations. A complete actual eight-root inventory
+remains part of the live acceptance demonstration. Cleanup waits for the scope
+to empty and the GitHub registration to
 disappear. Diagnostics are copied below host `logs/<namespace>/diag/` before the
 root is removed. An unresolved registration, missing checkout, path outside
 the root, or failed command retains root and lease for investigation. If startup

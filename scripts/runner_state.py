@@ -54,12 +54,18 @@ def _positive_int(value: Any) -> bool:
     return isinstance(value, int) and not isinstance(value, bool) and value > 0
 
 
+def _literal_path(value: Any) -> str:
+    """Keep a path's spelling intact across classification and host checks."""
+    if (not isinstance(value, str) or not value or value != value.strip() or
+            "\x00" in value):
+        raise ValueError("path must be a literal nonempty string without boundary whitespace")
+    return value
+
+
 def canonical_path(value: Any) -> str:
     """Resolve a local POSIX path or normalize a reported Windows path."""
 
-    if not isinstance(value, str) or not value.strip():
-        raise ValueError("path must be a non-empty string")
-    raw = os.path.expandvars(os.path.expanduser(value.strip()))
+    raw = _literal_path(value)
     # A double-leading-slash path is still a POSIX path on this Ubuntu host.
     # ntpath.splitdrive mistakes it for a UNC share, missing a real alias.
     if raw.startswith("/"):
@@ -86,28 +92,27 @@ def _overlap(left: str, right: str) -> bool:
 def _path_identity(value: Any) -> str:
     if not isinstance(value, dict):
         raise ValueError("path entry must be an object")
-    raw = value.get("path")
-    if not isinstance(raw, str) or not raw.strip():
-        raise ValueError("path must be a non-empty string")
-    if raw.strip().startswith("/"):
+    raw = _literal_path(value.get("path"))
+    if raw.startswith("/"):
         canonical_path(raw)
         observed = value.get("resolved_path")
         if observed is not None:
-            if not isinstance(observed, str) or not observed.startswith("/"):
+            observed = _literal_path(observed)
+            if not observed.startswith("/"):
                 raise ValueError("resolved_path must be an absolute POSIX path")
             # Detached reports must compare the collector's observed identity,
             # not re-resolve it on the machine reading the report.
             observed = posixpath.normpath("/" + observed.lstrip("/"))
             return ntpath.normpath(observed.replace("/", "\\").rstrip("\\") or "\\")
         return canonical_path(raw)
-    windows_style = bool(ntpath.splitdrive(raw.strip())[0]) or "\\" in raw
+    windows_style = bool(ntpath.splitdrive(raw)[0]) or "\\" in raw
     if windows_style:
         # Validate the observed path itself before trusting the collector's
         # OS-resolved identity. A drive-relative path must never be repaired by
         # a caller-supplied resolved_path.
         canonical_path(raw)
         resolved = value.get("resolved_path")
-        if not isinstance(resolved, str) or not resolved.strip():
+        if resolved is None:
             raise ValueError("resolved_path is required for Windows path identity")
         return canonical_path(resolved)
     return canonical_path(raw)
@@ -115,7 +120,7 @@ def _path_identity(value: Any) -> str:
 
 def _inode_identity(value: dict[str, Any], *, local: bool) -> tuple[int, int] | None:
     """Use observed identity, or stat an explicitly local POSIX path."""
-    raw = value["path"]
+    raw = _literal_path(value["path"])
     observed = None
     if "observed_device" in value or "observed_inode" in value:
         device = value.get("observed_device")
@@ -238,8 +243,8 @@ def _validate_local_path_identities(records: list[dict[str, Any]]) -> None:
         for name, value in record["paths"].items():
             if not isinstance(value, dict):
                 continue
-            raw = value.get("path")
-            if isinstance(raw, str) and raw.startswith("/"):
+            raw = _literal_path(value.get("path"))
+            if raw.startswith("/"):
                 observed = _path_identity(value)
                 current = canonical_path(raw)
                 if observed != current:
