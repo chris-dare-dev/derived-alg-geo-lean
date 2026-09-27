@@ -447,6 +447,7 @@ the `HomFiniteBounded` model built on it is audited with the Euler form. -/
 /-! ## K-flat resolutions and object-property lifting (#1060) -/
 
 #print axioms CategoryTheory.CochainComplex.IsKFlat
+#print axioms CategoryTheory.CochainComplex.IsKFlat.colimit_of_preservesHomology
 #print axioms CategoryTheory.CochainComplex.IsKFlat.colimit
 #print axioms CategoryTheory.CochainComplex.IsKFlat.tensorLeft_inverts
 #print axioms CategoryTheory.CochainComplex.IsKFlat.tensorRight_inverts

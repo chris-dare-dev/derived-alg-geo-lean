@@ -193,14 +193,15 @@ namespace HomologicalComplex
 universe w₁ w₂ v₁ u₁ v₂ u₂
 
 variable {J : Type w₁} [Category.{w₂} J]
-  {A : Type u₁} [Category.{v₁} A] [HasColimitsOfShape J A]
+  {A : Type u₁} [Category.{v₁} A]
   {C : Type u₂} [Category.{v₂} C] [HasZeroMorphisms C] [CategoryWithHomology C]
   [HasColimitsOfShape J C]
   {ι : Type*} {c : ComplexShape ι}
   [∀ i, PreservesColimitsOfShape J (homologyFunctor C c i)]
   {H H' : A ⥤ HomologicalComplex C c}
-  [PreservesColimitsOfShape J H] [PreservesColimitsOfShape J H']
   (F : J ⥤ A) (α : H ⟶ H')
+
+variable [HasColimit F] [PreservesColimit F H] [PreservesColimit F H']
 
 set_option backward.isDefEq.respectTransparency false in
 /-- A natural transformation between colimit-preserving functors to complexes is a

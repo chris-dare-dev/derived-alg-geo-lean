@@ -74,20 +74,26 @@ namespace IsKFlat
 
 universe w₁ w₂
 
+section HomologyPreservingColimits
+
 variable {J : Type w₁} [Category.{w₂} J]
   {C : Type u} [Category.{v} C] [Abelian C]
-  [HasColimitsOfShape J C] [HasExactColimitsOfShape J C]
+  [HasColimitsOfShape J C]
   {tensor : CochainComplex C ℤ ⥤ CochainComplex C ℤ ⥤ CochainComplex C ℤ}
-  [∀ L, PreservesColimitsOfShape J (tensor.obj L)]
-  [∀ L, PreservesColimitsOfShape J (tensor.flip.obj L)]
   (F : J ⥤ CochainComplex C ℤ)
+
+variable [∀ i, PreservesColimitsOfShape J
+    (HomologicalComplex.homologyFunctor C (ComplexShape.up ℤ) i)]
+  [∀ L, PreservesColimit F (tensor.obj L)]
+  [∀ L, PreservesColimit F (tensor.flip.obj L)]
   (hF : ∀ j, CochainComplex.IsKFlat tensor (F.obj j))
 
 include hF in
-/-- Exact colimits of K-flat complexes remain K-flat when tensoring in either slot
-preserves the colimit shape. In an AB5 category this applies to filtered diagrams
-once the two tensor-preservation instances are supplied. -/
-theorem colimit : CochainComplex.IsKFlat tensor (Limits.colimit F) := by
+/-- Homology-preserving colimits retain K-flatness when tensoring either slot
+preserves this diagram's colimit. The tensor maps of a quasi-isomorphism are
+pointwise quasi-isomorphisms, then remain so at the colimit. -/
+theorem colimit_of_preservesHomology :
+    CochainComplex.IsKFlat tensor (Limits.colimit F) := by
   constructor
   · intro L M f hf
     let α := tensor.flip.map f
@@ -109,6 +115,31 @@ theorem colimit : CochainComplex.IsKFlat tensor (Limits.colimit F) := by
       HomologicalComplex.quasiIso_app_colimit_of_preserves F α hα
     change IsIso (DerivedCategory.Q.map (α.app (Limits.colimit F)))
     rwa [DerivedCategory.isIso_Q_map_iff_quasiIso]
+
+end HomologyPreservingColimits
+
+section ExactColimits
+
+variable {J : Type w₁} [Category.{w₂} J]
+  {C : Type u} [Category.{v} C] [Abelian C]
+  [HasColimitsOfShape J C] [HasExactColimitsOfShape J C]
+  {tensor : CochainComplex C ℤ ⥤ CochainComplex C ℤ ⥤ CochainComplex C ℤ}
+  [∀ L, PreservesColimitsOfShape J (tensor.obj L)]
+  [∀ L, PreservesColimitsOfShape J (tensor.flip.obj L)]
+  (F : J ⥤ CochainComplex C ℤ)
+  (hF : ∀ j, CochainComplex.IsKFlat tensor (F.obj j))
+
+include hF in
+/-- Exact colimits commute with homology, so the homology-preserving K-flat
+closure applies. In an AB5 category this includes filtered diagrams once tensor
+preservation is supplied in both slots. -/
+theorem colimit : CochainComplex.IsKFlat tensor (Limits.colimit F) := by
+  letI : ∀ i, PreservesColimitsOfShape J
+      (HomologicalComplex.homologyFunctor C (ComplexShape.up ℤ) i) :=
+    fun _ => inferInstance
+  exact colimit_of_preservesHomology F hF
+
+end ExactColimits
 
 end IsKFlat
 

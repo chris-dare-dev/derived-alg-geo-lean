@@ -19,14 +19,16 @@ open Limits
 universe w w' v v' u u'
 
 variable {J : Type w} [Category.{w'} J]
-  {C : Type u} [Category.{v} C] [HasColimitsOfShape J C]
+  {C : Type u} [Category.{v} C]
   {D : Type u'} [Category.{v'} D] [HasColimitsOfShape J D]
-  {H H' : C ⥤ D} [PreservesColimitsOfShape J H] [PreservesColimitsOfShape J H']
+  {H H' : C ⥤ D}
   (α : H ⟶ H') (F : J ⥤ C)
 
+variable [HasColimit F] [PreservesColimit F H] [PreservesColimit F H']
+
 set_option backward.isDefEq.respectTransparency false in
-/-- The preserved-colimit comparisons commute with a natural transformation between
-colimit-preserving functors. -/
+/-- Naturality in the preserving functor complements Mathlib's diagram naturality
+for `preservesColimitIso`. Compare both sides on each colimit injection. -/
 @[reassoc]
 lemma preservesColimitIso_naturality :
     α.app (colimit F) ≫ (preservesColimitIso H' F).hom =
