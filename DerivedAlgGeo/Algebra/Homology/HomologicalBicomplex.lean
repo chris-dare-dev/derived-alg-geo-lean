@@ -4,31 +4,38 @@ Released under the MIT license.
 -/
 import Mathlib.Algebra.Homology.Additive
 import Mathlib.Algebra.Homology.HomologicalBicomplex
+import DerivedAlgGeo.Algebra.Homology.Embedding.Extend
 
 /-!
-# Single complexes and bicomplex symmetry
+# Single complexes, arbitrary embeddings, and bicomplex symmetry
 
-Applying the single-complex functor degreewise to a complex and then exchanging
-axes gives the same bicomplex naturally. The comparison is an isomorphism rather
-than a definitional equality, since the two constructions package the indices
-differently.
+For any source complex shape, supported source degree, and embedding with
+arbitrary integer image `j`, extending a single and mapping it degreewise gives
+a bicomplex naturally isomorphic to the flipped single at `j`. The comparison
+requires only zero morphisms and a zero object, and factors through the
+arbitrary-shape mapped-single/flip isomorphism rather than a definitional
+equality.
 
-## Main result
+## Main results
 
 * `HomologicalComplex₂.singleMapHomologicalComplexFlipIso` identifies the
   mapped-single and flipped-bicomplex functors for arbitrary complex shapes.
+* `HomologicalComplex₂.singleExtendMapFlipIso` identifies an extended single
+  at an arbitrary source degree with the flipped bicomplex at its image degree.
 
 ## Implementation notes
 
 At each outer degree, the component is the inverse of Mathlib's
 `HomologicalComplex.singleMapHomologicalComplex` for the evaluation functor.
 Differential compatibility splits the supported inner degree from the zero
-ones. Naturality follows from that existing comparison.
+ones. Naturality follows from that existing comparison. The arbitrary-image
+embedding theorem composes the natural single-extension and flip isomorphisms.
 
 ## References
 
 The proof uses Mathlib's `HomologicalComplex.singleMapHomologicalComplex`,
-`HomologicalComplex.Hom.isoOfComponents`, and `HomologicalComplex₂.flipFunctor`.
+`HomologicalComplex.Hom.isoOfComponents`, `HomologicalComplex₂.flipFunctor`,
+and the repository's `HomologicalComplex.singleCompExtendIso`.
 -/
 
 open CategoryTheory Category Limits
@@ -83,5 +90,22 @@ noncomputable def singleMapHomologicalComplexFlipIso :
     intro i
     exact (HomologicalComplex.singleMapHomologicalComplex
       (HomologicalComplex.eval C c₁ i) c₂ j₀).inv.naturality f)
+
+/-- Extending a single at any source index `i` along an embedding with
+`e.f i = j`, then mapping it degreewise, is the flipped single bicomplex at
+the arbitrary image `j`. This composes the existing single-extension and
+flip comparisons, without an additive or total-complex assumption. -/
+noncomputable def singleExtendMapFlipIso
+    {ι : Type*} [DecidableEq ι] {c : ComplexShape ι}
+    (e : c.Embedding (ComplexShape.up ℤ)) (i : ι) (j : ℤ) (h : e.f i = j) :
+    ((HomologicalComplex.single C c i ⋙ e.extendFunctor C).mapHomologicalComplex
+      (ComplexShape.up ℤ)) ≅
+    HomologicalComplex.single (CochainComplex C ℤ) (ComplexShape.up ℤ) j ⋙
+      flipFunctor C (ComplexShape.up ℤ) (ComplexShape.up ℤ) :=
+  (CategoryTheory.NatIso.mapHomologicalComplex
+    (HomologicalComplex.singleCompExtendIso (C := C) e i j h)
+    (ComplexShape.up ℤ)).trans
+  (singleMapHomologicalComplexFlipIso
+    (C := C) (ComplexShape.up ℤ) (ComplexShape.up ℤ) j)
 
 end HomologicalComplex₂

@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence.TotalFlipNaturality
 import Mathlib.Algebra.Homology.Single
+import Mathlib.Algebra.Homology.TotalComplex
 import Mathlib.Algebra.Homology.TotalComplexSymmetry
 
 /-!
@@ -12,6 +13,8 @@ import Mathlib.Algebra.Homology.TotalComplexSymmetry
 Placing an integer-indexed cochain complex in horizontal degree zero gives a
 bicomplex whose total is naturally isomorphic to the original complex.
 Exchanging axes gives the corresponding vertical-degree-zero comparison.
+Under an ambient total-existence assumption, the signed flipped comparison
+is natural in the input integer-indexed cochain complex.
 
 ## Main definitions and results
 
@@ -21,6 +24,8 @@ Exchanging axes gives the corresponding vertical-degree-zero comparison.
   naturally with the original complex.
 * `singleZeroFlipTotalIso` and `singleZeroFlipTotalIso_naturality` give the
   corresponding comparison after exchanging axes.
+* `HomologicalComplex₂.singleZeroFlipTotalNatIso` assembles the signed
+  flipped degree-zero comparisons into a natural isomorphism.
 
 ## Implementation notes
 
@@ -28,6 +33,8 @@ The total-degree `n` diagonal has one surviving summand, at `(0, n)`. Its
 cofan supplies the required total in any preadditive category with a zero
 object. The flipped comparison uses Mathlib's signed total symmetry, so its
 sign agrees with the existing totalization convention.
+The natural isomorphism uses these component isomorphisms and their proved
+naturality, rather than changing the sign convention.
 
 ## References
 
@@ -291,5 +298,21 @@ lemma singleZeroFlipTotalIso_naturality (f : A ⟶ B) :
   rw [← Category.assoc, totalFlipIso_naturality]
   rw [Category.assoc, singleZeroTotalIso_naturality]
   simp only [Category.assoc]
+
+/-- The signed total of a flipped bicomplex supported at outer degree zero is
+naturally the input cochain complex. Its components are
+`singleZeroFlipTotalIso`, and the naturality square is the theorem above. -/
+noncomputable def singleZeroFlipTotalNatIso
+    [∀ K : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ),
+      K.HasTotal (ComplexShape.up ℤ)] :
+    HomologicalComplex.single (CochainComplex C ℤ) (ComplexShape.up ℤ) 0 ⋙
+      flipFunctor C (ComplexShape.up ℤ) (ComplexShape.up ℤ) ⋙
+      totalFunctor C (ComplexShape.up ℤ) (ComplexShape.up ℤ) (ComplexShape.up ℤ) ≅
+    𝟭 (CochainComplex C ℤ) :=
+  NatIso.ofComponents
+    (fun K => singleZeroFlipTotalIso K)
+    (by
+      intro K L f
+      exact singleZeroFlipTotalIso_naturality f)
 
 end HomologicalComplex₂
