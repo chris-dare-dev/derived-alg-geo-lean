@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.Algebra.Homology.CochainComplexFiniteProjectiveResolution
 import DerivedAlgGeo.Algebra.Homology.DGCategory
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory
+import DerivedAlgGeo.Algebra.Homology.Embedding
 import DerivedAlgGeo.Algebra.Homology.HomologicalComplexLimits
 import DerivedAlgGeo.Algebra.Homology.HomologicalComplexFiniteDescent
 import DerivedAlgGeo.Algebra.Homology.Homotopy
