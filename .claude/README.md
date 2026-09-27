@@ -15,13 +15,17 @@ evidence behind one.
 | `open-questions.md` | The decisions blocking work, each with a GitHub issue. |
 | `references/mathlib-style.md` | The Mathlib conventions this repo holds itself to, and the deltas it keeps on purpose. The spec `agents/mathlib-reviewer.md` enforces. |
 | `agents/` | Repo-local agent specifications. One per file. |
-| `skills/` | Repo-local skills, one directory each. `run-loop` works issues or a milestone to merged PRs; `formalize-issue` and `land-pr` are single iterations. |
+| `skills/` | Repo-local skills, one directory each. `run-loop` works issues or a milestone to merged PRs; `formalize-issue` and `land-pr` are single iterations, not for loop runs. |
 | `loop-specs/` | Manifests of the retired loop controller. Runs no longer write them; they are kept for the ledgers they produced. |
 | `settings.json` | Hooks. Currently: the Mathlib-convention check on every Lean edit. |
 
-OpenSpec's generated Codex skills live in `.agents/skills/` and are refreshed by
-`openspec update`; do not hand-edit those generated files. Repository-specific
-reviewers and the loop protocol live in `.claude/agents/` and `.claude/skills/`.
+Repository-specific reviewers and the loop protocol live in `.claude/agents/`
+and `.claude/skills/`. Codex registers repository skills only from
+`.agents/skills/`, so
+`.agents/skills/run-loop` is a symlink to `skills/run-loop`: one file, visible
+to both runtimes. Codex lists a symlinked skill directory but ignores a
+symlinked `SKILL.md` (checked with `codex debug prompt-input`), so keep the link
+on the directory.
 
 ## Loop runs and OpenSpec
 
@@ -33,8 +37,20 @@ A loop run follows `skills/run-loop/SKILL.md`:
 - the PR description is its record. There is no manifest, ledger or controller
   on the run path.
 
-OpenSpec lives in `openspec/`, with its generated skills in `.agents/skills/`.
-It remains available for interactive design work; a run does not use it.
+OpenSpec lives in `openspec/`. It remains available for interactive design
+work; a run does not use it. Install its generated Codex skills per user, in
+`$CODEX_HOME/skills/` (default `~/.codex/skills/`, once per Codex home), not in
+`.agents/skills/`, so that the skill catalog every loop thread carries lists
+run-loop and not OpenSpec. To restore them from before their removal:
+
+```bash
+c=$(git log --diff-filter=D -1 --format=%H -- .agents/skills/openspec-propose/SKILL.md)
+tmp=$(mktemp -d) && git archive "$c^" .agents/skills | tar -x -C "$tmp"
+mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
+cp -r "$tmp"/.agents/skills/openspec-* "${CODEX_HOME:-$HOME/.codex}/skills/"
+```
+
+If `openspec update` writes them back into `.agents/skills/`, move them again.
 
 `scripts/loop_engine.py` and the manifests in `loop-specs/` are the retired
 manifest controller. It kept a digest-bound review ledger under the ignored
@@ -76,13 +92,13 @@ second agent instructed to default to REFUTED when it could not confirm.
 
 ### Reading order for an agent picking this up cold
 
-For public API ownership and structural moves, `CLAUDE.md` points to the
+For public API ownership and structural moves, `AGENTS.md` points to the
 versioned [mathematical ownership policy](../docs/architecture/mathematical-ownership.md)
 and [placement procedure](../docs/architecture/placement.md). Read those before
 using a dated note or issue path as a placement rule. The cutover ledger
 distinguishes existing source from proposed destinations.
 
-1. `CLAUDE.md` (the working rules — they are load-bearing and override defaults)
+1. `AGENTS.md` (the working rules, which `CLAUDE.md` imports — they are load-bearing and override defaults)
 2. `decisions/` in numeric order (~10 min, and it is the whole design)
 3. `notes/2026-08-04-contract-red-team.md` (what is wrong with the design)
 4. Only then the architecture and schema docs, which are long.
