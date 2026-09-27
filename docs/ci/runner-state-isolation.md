@@ -150,6 +150,10 @@ freed; a merely idle or temporarily stopped enabled service still counts.
 registration token, unpacking the pinned runner archive, or starting the runner.
 It checks the archive digest and member types before issuing a token or lease,
 and repeats the check on the private copy inside the worker.
+Relative symlinks are allowed only when they resolve to regular files inside
+the same archive. This admits the pinned GitHub release's Node npm/npx/corepack
+links while rejecting absolute or escaping links, hard links and special files.
+Extraction also uses Python's `data` filter.
 It registers a uniquely named `--ephemeral --disableupdate` runner for one
 job. The runner's `_work` directory is a conservative reservation envelope;
 `logs/<namespace>/pickup.json` records planned checkout, Git index, Lake

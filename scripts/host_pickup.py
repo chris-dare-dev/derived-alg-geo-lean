@@ -13,6 +13,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import posixpath
 import re
 import secrets
 import shutil
@@ -400,11 +401,32 @@ def _verify_runner_archive(archive: Path, digest: str) -> None:
     if measured != digest:
         raise ValueError("runner archive digest does not match")
     with tarfile.open(archive, mode="r:gz") as bundle:
+        members: dict[str, tarfile.TarInfo] = {}
         for member in bundle.getmembers():
             parts = Path(member.name).parts
             if (member.name.startswith("/") or ".." in parts or
-                    not (member.isfile() or member.isdir())):
+                    not (member.isfile() or member.isdir() or member.issym())):
                 raise ValueError("runner archive contains an unsafe member")
+            name = posixpath.normpath(member.name)
+            if (name in members or
+                    name == "." and not member.isdir()):
+                raise ValueError("runner archive contains an unsafe member")
+            members[name] = member
+        for name, member in members.items():
+            if not member.issym():
+                continue
+            link = member.linkname
+            target = posixpath.normpath(posixpath.join(posixpath.dirname(name), link))
+            if (not link or link.startswith("/") or
+                    target == ".." or target.startswith("../") or
+                    target not in members or not members[target].isfile()):
+                raise ValueError("runner archive contains an unsafe symlink")
+        for name in members:
+            parent = posixpath.dirname(name)
+            while parent not in ("", "."):
+                if parent in members and members[parent].issym():
+                    raise ValueError("runner archive contains a member below a symlink")
+                parent = posixpath.dirname(parent)
 
 
 def _runner_worker_started(archive: Path, digest: str, label: str, root: Path,
