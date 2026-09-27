@@ -46,6 +46,32 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
 
 ## Rows
 
+### 2026-09-27 — generic Fourier--Mukai `ShiftCompatibility` (issue #1369)
+- chunk:              1369-shiftcompat-unification
+- reviewing commit:   00196ff8
+- found by:           altitude-scout
+- proposed ancestor:  `CategoryTheory.Shift.NatTrans.CommShift`, with the
+  Fourier--Mukai record packaging a selected target `CommShift` structure and
+  compatibility evidence for the supplied comparison isomorphism
+- weaker hypotheses:  any natural transformation between functors carrying
+  selected shift structures for an additive monoid; no isomorphism, Fourier--Mukai
+  transform, triangulatedness, dg presentation, or cotwist shift is required
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Shift/CommShift.lean:360`
+- source note:        The pinned class asserts exactly the generic compatibility
+  between a natural transformation and the source and target shift structures.
+  It leaves those structures as inputs; the issue's record would package the
+  independently selected Fourier--Mukai target structure alongside this proof.
+  `Functor.CommShift.ofIso` can instead transport the source structure across
+  the comparison, but that produces the transported choice rather than proving
+  compatibility with an independently selected target structure. Mathlib's
+  `Functor.isTriangulated_of_iso` consumes the selected structures and this
+  compatibility evidence to transfer exactness. Stacks Project §13.3 (tag
+  05QK) describes the analogous compatibility for 2-morphisms between
+  triangulated functors, in the additional setting where the functors are
+  exact: [Stacks Project §13.3, tag 05QK](https://stacks.math.columbia.edu/tag/05QK).
+- state:              UNVERIFIED
+
 ### 2026-09-23 — K-flat resolutions and derived pullback for ringed topoi (planned)
 - chunk:              sf8-5-task12-kflat-pullback
 - reviewing commit:   e2332372922d884eea345f3ad79c536e66c22d84
@@ -1146,3 +1172,66 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   native specialization instead retains the generic helper's ambient
   decidability parameters and needs no explicit decisions from callers.
 - state:              FALSIFIED (attempted definitional identification fails)
+
+### 2026-09-27 — one-step compatibility suffices for triangulatedness transfer (planned)
+- chunk:              1369-shiftcompat-unification
+- reviewing commit:   00196ff8fa17f1904a68e0bdccd633ae2fe86d64
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `CategoryTheory.Functor.isTriangulated_of_iso` and
+  `Functor.mapTriangleIso`
+- weaker hypotheses:  keep the chosen `[F₁.CommShift ℤ]` and
+  `[F₂.CommShift ℤ]`, but require only
+  `NatTrans.CommShiftCore e.hom (1 : ℤ)` rather than the full
+  `[NatTrans.CommShift e.hom ℤ]`; retain `[F₁.IsTriangulated]` and the usual
+  pretriangulated-category context
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Shift/CommShift.lean:296-318`
+  and `.lake/packages/mathlib/Mathlib/CategoryTheory/Triangulated/Functor.lean:258`
+- source note:        `/tmp/issue1369_single_shift_probe.lean` copies the
+  triangle-isomorphism proof using only the core compatibility at `+1`, then
+  transfers distinguishedness by `isomorphic_distinguished`. The theorem
+  `isTriangulated_of_iso_of_core` compiled with exit code 0 under
+  `~/.elan/bin/lake env lean /tmp/issue1369_single_shift_probe.lean`. The
+  selected target `CommShift` remains an independent input; this does not
+  manufacture it via `Functor.CommShift.ofIso`.
+- state:              L (proof-witness verified)
+
+### 2026-09-27 — derive inverse shift compatibility for equivalence transfer (planned)
+- chunk:              1369-shiftcompat-unification
+- reviewing commit:   00196ff8fa17f1904a68e0bdccd633ae2fe86d64
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `CategoryTheory.Equivalence.IsTriangulated`, using
+  `Equivalence.commShiftInverse` and `Equivalence.commShift_of_functor`
+- weaker hypotheses:  an equivalence `E`, its selected forward
+  `[E.functor.CommShift ℤ]`, and `[E.functor.IsTriangulated]`; no independently
+  supplied `[E.inverse.CommShift ℤ]` or `E.CommShift ℤ` is needed. The inverse
+  shift and adjunction compatibility are derived from the chosen forward shift.
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Shift/Adjunction.lean:617-624`
+  and `.lake/packages/mathlib/Mathlib/CategoryTheory/Triangulated/Adjunction.lean:197-221`
+- source note:        `equivalenceIsTriangulated` in
+  `/tmp/issue1369_hypothesis_probe.lean` builds a selected forward shift from
+  the packaged comparison, derives the inverse and equivalence compatibility
+  with Mathlib, and applies `Equivalence.IsTriangulated.mk'`. The generic
+  wrapper compiled with exit code 0 under `~/.elan/bin/lake env lean
+  /tmp/issue1369_hypothesis_probe.lean`.
+- state:              L (proof-witness verified)
+
+### 2026-09-27 — drop all shift compatibility evidence for exactness transfer (attempted)
+- chunk:              1369-shiftcompat-unification
+- reviewing commit:   00196ff8fa17f1904a68e0bdccd633ae2fe86d64
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `CategoryTheory.Functor.isTriangulated_of_iso`
+- weaker hypotheses:  retain both selected functor `CommShift ℤ` structures
+  and source triangulatedness, but omit compatibility of `e.hom` with the
+  selected shifts
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Triangulated/Functor.lean:258`
+- source note:        `/tmp/issue1369_drop_comparison_compat.lean` attempts
+  `Functor.isTriangulated_of_iso α` after deleting only
+  `[NatTrans.CommShift α.hom ℤ]`. Lean reports `failed to synthesize instance
+  of type class NatTrans.CommShift α.hom ℤ`. The one-step witness above shows
+  that compatibility specifically at `+1` is sufficient for a weaker custom
+  wrapper, but some compatibility evidence cannot be dropped from the
+  transported-triangulation proof.
+- state:              FALSIFIED (literal compatibility-evidence deletion fails)
