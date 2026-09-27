@@ -1062,6 +1062,63 @@ class PublicationTests(unittest.TestCase):
         with self.assertRaisesRegex(EvidenceError, "contradicts its raw provider response"):
             verify_publication_provider_evidence(client, receipt)
 
+    def test_rehashed_dynamic_artifact_setting_must_equal_verified_scan(self) -> None:
+        client = PublicationClient()
+        receipt = self.collect(client)
+        artifact = next(
+            item for item in receipt["premerge"]["contract_evidence"]["artifacts"]
+            if item["subject"] == "github-advanced-security"
+        )
+        payloads = receipt["premerge"]["artifact_payloads"]
+        payload = json.loads(payloads[artifact["path"]])
+        payload["setting"]["state"] = "enabled"
+        payload["setting"]["response"] = {"pr_scan": "enabled"}
+        content = (
+            json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+            + "\n"
+        ).encode("utf-8")
+        payloads[artifact["path"]] = content.decode("utf-8")
+        artifact["sha256"] = hashlib.sha256(content).hexdigest()
+        artifact["size_bytes"] = len(content)
+        self.resign_receipt(receipt)
+        with self.assertRaisesRegex(EvidenceError, "artifact setting differs"):
+            verify_publication_provider_evidence(client, receipt)
+
+    def test_pending_scan_attempt_is_bound_to_retained_and_live_run(self) -> None:
+        client = PublicationClient()
+        client.pre_provider.add_dynamic_scan("failure")
+        client.pre_provider.security_check = None
+        client.pre_provider.security_jobs = []
+        client.pre_provider.dynamic_run["status"] = "queued"
+        client.pre_provider.dynamic_run["conclusion"] = None
+        receipt = self.collect(client)
+        scan = receipt["premerge"]["contract_evidence"]["security_scan"]
+        self.assertEqual(scan["state"], "pending")
+        verify_publication_provider_evidence(client, receipt)
+        scan["run_attempt"] = 999
+        self.resign_receipt(receipt)
+        with self.assertRaisesRegex(EvidenceError, "pending run differs"):
+            verify_publication_provider_evidence(client, receipt)
+
+    def test_postmerge_primary_association_loss_keeps_stable_scan_receipt(self) -> None:
+        client = PublicationClient()
+        receipt = self.collect(client)
+        client.pre_provider.run["pull_requests"] = []
+        verify_publication_provider_evidence(client, receipt)
+        client.pre_provider.run["run_attempt"] = 2
+        with self.assertRaises(EvidenceError):
+            verify_publication_provider_evidence(client, receipt)
+
+        client = PublicationClient()
+        receipt = self.collect(client)
+        retained_runs = receipt["premerge"]["contract_evidence"]["security_scan"]["head_workflow_runs"]
+        primary = next(run for run in retained_runs if run["id"] == client.pre_provider.run["id"])
+        primary["pull_requests"][0]["number"] = 8
+        client.pre_provider.run["pull_requests"] = []
+        self.resign_receipt(receipt)
+        with self.assertRaisesRegex(EvidenceError, "head-run query differs"):
+            verify_publication_provider_evidence(client, receipt)
+
     def test_absent_scan_state_survives_receipt_and_provider_reread(self) -> None:
         client = PublicationClient()
         client.pre_provider.security_check = None

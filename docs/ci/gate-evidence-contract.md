@@ -173,6 +173,15 @@ optional warning, and the publication verifier refetches the setting, complete
 head-run list and check list before accepting the retained classification. If
 provider state has changed since collection, historical absence is no longer
 independently verifiable from a current response; verification fails closed.
+The schema derives the **exact** matching dynamic-run IDs from the retained
+head-run query using the trusted workflow ID, path, event, bot and PR head;
+declared IDs must agree. A pending run records its actual attempt and status,
+even before it has a check. The contract requires `security_scan` for this
+dynamic gate whether or not a check exists. The publication receipt compares
+the dynamic artifact's setting bytes with that same verified scan setting.
+After a merge, GitHub may clear the primary CI run's `pull_requests` array;
+receipt revalidation permits only that already checked association change and
+still requires every run ID, attempt, head, outcome and AI Scan match to agree.
 Cache warm and Docs have separate event selectors
 and cannot borrow either the primary or dynamic run.
 

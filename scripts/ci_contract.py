@@ -19,6 +19,11 @@ import sys
 from pathlib import Path
 from typing import Any
 
+if __package__:
+    from . import ci_security_scan
+else:
+    import ci_security_scan
+
 
 SCHEMA_VERSION = 6
 SUPPORTED_SCHEMA_VERSIONS = {4, 5, SCHEMA_VERSION}
@@ -139,105 +144,10 @@ def _event_applies(definition: dict[str, Any], evidence: dict[str, Any]) -> bool
 
 
 def _security_scan_state(
-    scan: Any, head: Any, gate: dict[str, Any] | None
+    scan: Any, head: Any, pr_number: int | None, gate: dict[str, Any] | None
 ) -> tuple[str | None, list[str]]:
-    """Validate the recorded optional scan state independently of its gate."""
-    if scan is None:
-        return None, [] if gate is not None else ["evidence.security_scan is required when the dynamic gate is absent"]
-    if not isinstance(scan, dict):
-        return None, ["evidence.security_scan must be an object"]
-    errors: list[str] = []
-    if scan.get("head_sha") != head:
-        errors.append("evidence.security_scan.head_sha differs from the PR head")
-    setting = scan.get("setting")
-    setting_state: str | None = None
-    if not isinstance(setting, dict) or setting.get("head_sha") != head or setting.get("api_path") != "/code-scanning/ai-scan":
-        errors.append("evidence.security_scan.setting is not bound to the PR head and provider API")
-    else:
-        setting_state = setting.get("state")
-        response = setting.get("response")
-        if response is None:
-            if setting_state != "unknown" or not _is_string(setting.get("error")):
-                errors.append("evidence.security_scan.setting contradicts its API error")
-        elif not isinstance(response, dict) or "error" in setting:
-            errors.append("evidence.security_scan.setting response and error disagree")
-        else:
-            raw = response.get("pr_scan")
-            expected = raw if raw in {"enabled", "disabled"} else "unknown"
-            if setting_state != expected:
-                errors.append("evidence.security_scan.setting contradicts its raw response")
-        if not all(_is_string(setting.get(key)) for key in ("requested_at_utc", "completed_at_utc")):
-            errors.append("evidence.security_scan.setting lacks observation times")
-    query = scan.get("run_query")
-    runs = scan.get("head_workflow_runs")
-    if (
-        not isinstance(query, dict)
-        or query.get("api_path") != f"/actions/runs?head_sha={head}"
-        or query.get("pagination") != "all_link_pages_and_advertised_total_checked"
-        or not all(_is_string(query.get(key)) for key in ("requested_at_utc", "completed_at_utc"))
-        or not isinstance(runs, list)
-        or any(not isinstance(run, dict) or not _is_positive_int(run.get("id")) for run in runs)
-        or isinstance(query.get("total_observed"), bool)
-        or not isinstance(query.get("total_observed"), int)
-        or query["total_observed"] != len(runs)
-    ):
-        errors.append("evidence.security_scan.run_query does not retain a complete head-run observation")
-        runs = []
-    run_ids = scan.get("matching_run_ids")
-    check_ids = scan.get("matching_check_ids")
-    for label, ids in (("matching_run_ids", run_ids), ("matching_check_ids", check_ids)):
-        if not isinstance(ids, list) or any(not _is_positive_int(item) for item in ids) or len(ids) != len(set(ids)):
-            errors.append(f"evidence.security_scan.{label} must list unique positive IDs")
-    if errors:
-        return None, errors
-    assert isinstance(run_ids, list) and isinstance(check_ids, list)
-    assert isinstance(runs, list)
-    if not set(run_ids).issubset({run["id"] for run in runs}):
-        errors.append("evidence.security_scan matching runs are absent from the retained query")
-    state = scan.get("state")
-    if gate is None:
-        if check_ids:
-            errors.append("evidence.security_scan has a check but omits its gate")
-        if not run_ids:
-            expected = {
-                "enabled": "missing", "disabled": "disabled_by_setting",
-                "unknown": "provider_state_unknown",
-            }.get(setting_state)
-            if state != expected:
-                errors.append("evidence.security_scan absent-run state contradicts its setting")
-        elif len(run_ids) == 1:
-            matching = [run for run in runs if run.get("id") == run_ids[0]]
-            if (
-                state != "pending"
-                or len(matching) != 1
-                or matching[0].get("status") not in {"requested", "waiting", "pending", "queued", "in_progress"}
-                or matching[0].get("conclusion") is not None
-                or scan.get("run_id") != run_ids[0]
-                or not _is_positive_int(scan.get("run_attempt"))
-            ):
-                errors.append("evidence.security_scan pending run is not a queued unreported check")
-        else:
-            errors.append("evidence.security_scan has ambiguous runs without a gate")
-    else:
-        try:
-            provider_id = int(gate.get("provider_id"))
-        except (TypeError, ValueError):
-            provider_id = None
-        expected = {
-            "failed": "unclassified_failure",
-            "pending": "pending",
-            "unknown": "execution_observed_result_unknown",
-        }.get(gate.get("status"))
-        if (
-            expected is None or state != expected
-            or check_ids != [provider_id]
-            or run_ids != [gate.get("run_id")]
-            or scan.get("run_id") != gate.get("run_id")
-            or scan.get("run_attempt") != gate.get("run_attempt")
-            or scan.get("check_id") != provider_id
-        ):
-            errors.append("evidence.security_scan disagrees with its observed gate")
-    return state if not errors and isinstance(state, str) else None, errors
+    """Use the same pure dynamic-scan reconciliation as the GitHub adapter."""
+    return ci_security_scan.reconcile(scan, head, pr_number, gate)
 
 
 def _validate_provider_binding(evidence: dict[str, Any], errors: list[str]) -> None:
@@ -768,6 +678,9 @@ def validate_evidence(
         security_scan_state, scan_errors = _security_scan_state(
             evidence.get("security_scan"),
             evidence.get("head_commit"),
+            int(evidence["ref"].split("/")[2])
+            if isinstance(evidence.get("ref"), str) and PULL_REF.fullmatch(evidence["ref"])
+            else None,
             gate_by_id.get("github-advanced-security"),
         )
         errors.extend(scan_errors)
