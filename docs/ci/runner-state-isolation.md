@@ -158,13 +158,19 @@ It registers a uniquely named `--ephemeral --disableupdate` runner for one
 job. The runner's `_work` directory is a conservative reservation envelope;
 `logs/<namespace>/pickup.json` records planned checkout, Git index, Lake
 build/package, elan, temp, output and artifact locations, plus post-run
-existence and path resolution observations. `inventory_valid` means no existing
-listed path escaped the root; it does not mean every listed path existed or
+existence and path resolution observations. `inventory_valid` means no listed
+resolved path escaped the root, including an absent leaf below a symlink; it
+does not mean every listed path existed or
 that the runner used those locations. A complete actual eight-root inventory
 remains part of the live acceptance demonstration. Cleanup waits for the scope
 to empty and the GitHub registration to
-disappear. Diagnostics are copied below host `logs/<namespace>/diag/` before the
-root is removed. An unresolved registration, missing checkout, path outside
+disappear. Diagnostics must resolve inside the job root, including through
+their parent components. Diagnostics and metadata are staged in a private
+directory and then
+published together below host `logs/<namespace>/` before the root is removed.
+A failed diagnostic copy leaves no incomplete published archive, so explicit
+`recover` can retry while retaining the lease. An unresolved registration,
+missing checkout, path outside
 the root, or failed command retains root and lease for investigation. If startup
 fails before a checkout exists, `recover` can still archive the observed paths
 with `checkout_observed: false` after verifying the scope is stopped and the
@@ -177,8 +183,13 @@ all job roots; the worker verifies the pinned digest and rejects unsafe links
 or special files in the tarball. The host account running the controller needs
 repository administration permission for the registration-token and runner
 list APIs, and `gh` authentication outside the isolated job environment. No
-token is printed; it is passed into the configured runner and removed from the
-job root after configuration. Rotate/update the pinned archive deliberately
+token is printed or passed in process arguments; the pinned runner reads
+`ACTIONS_RUNNER_INPUT_TOKEN` from its configuration environment and removes it
+after registering it with its secret masker. The token is removed from the
+job root immediately after configuration and before `run.sh` starts. The host
+account must be trusted against same-UID inspection of the short-lived token
+file and process environment during configuration. Rotate/update
+the pinned archive deliberately
 because `--disableupdate` prevents an in-job self-update.
 
 ```bash
