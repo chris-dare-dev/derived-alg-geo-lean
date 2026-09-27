@@ -202,6 +202,9 @@ jobs:
           git clean -ffdx -e .lake
           echo "kept: $(du -sh .lake 2>/dev/null | cut -f1 || echo 'no .lake yet')"
 
+      - name: Codex loop entrypoint
+        run: python3 scripts/check_codex_entrypoint.py
+
       # Path scoping (2026-08-14). #362 removed the per-file sorry sweep, which
       # was 72.9% of a 54-minute run; what is left is dominated by three axiom
       # audits and four linter passes, each of which used to run whatever the
