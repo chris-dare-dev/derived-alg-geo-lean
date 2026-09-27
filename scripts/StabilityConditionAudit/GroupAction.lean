@@ -106,6 +106,7 @@ These extend the foundational library's own namespace, since they are API for it
 /-! ## QuotAutAction — Aut(D) as an honest group, by quotienting -/
 
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.TriEquiv
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.toTriEquiv
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.TriEquiv.id
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.TriEquiv.comp
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.TriEquiv.symm
@@ -355,4 +356,3 @@ this against the file by eye. -/
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.mk_smul_slicing
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.mk_smul_Z
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.toAutQuot
-
