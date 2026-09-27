@@ -1,5 +1,5 @@
 {
-  "schema_version": 5,
+  "schema_version": 6,
   "repository": "chris-dare-dev/derived-alg-geo-lean",
   "gates": [
     {
@@ -135,15 +135,15 @@
       "name": "github-advanced-security",
       "class": "auxiliary",
       "required": false,
-      "run_binding": "check",
+      "run_binding": "dynamic",
       "prerequisites": [],
       "applies_to": [
         "pull_request"
       ],
       "platforms": [
-        "github-checks"
+        "github-actions"
       ],
-      "producer": "github-advanced-security",
+      "producer": "github-actions/AI Scan",
       "artifact": "check-run:github-advanced-security"
     }
   ]
