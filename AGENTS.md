@@ -85,31 +85,30 @@ case applies. Two tiers.
 under `DerivedAlgGeo/`, in that API's namespace.** Nothing else decides it:
 not the abstraction level of the statement, not the weakest vocabulary in its
 signature, not its motivation, its first consumer, or its proof technique.
-
-| Concept | Mathlib defines it in | So it lives in |
-| --- | --- | --- |
-| `DerivedCategory C`, `Ext`, K-projectives, its t-structure, `Bounded` | `Algebra/Homology/DerivedCategory/` | `Algebra/Homology/DerivedCategory/` |
-| `HomotopyCategory`, `HomComplex`, bounded and plus variants | `Algebra/Homology/HomotopyCategory/` | `Algebra/Homology/HomotopyCategory/` |
-| `SheafOfModules`, `GeneratingSections`, `IsQuasicoherent`, presentations, invertibility | `Algebra/Category/ModuleCat/Sheaf/` | `Algebra/Category/ModuleCat/Sheaf/` |
-| `ObjectProperty`, `FullSubcategory`, `lift`, `inverseImage` | `CategoryTheory/ObjectProperty/` | `CategoryTheory/ObjectProperty/` |
-| Čech cohomology on a site | `CategoryTheory/Sites/SheafCohomology/` | `CategoryTheory/Sites/SheafCohomology/Cech/` |
-| Spectral sequences and total complexes | `Algebra/Homology/SpectralSequence/`, `SpectralObject/` | `Algebra/Homology/SpectralSequence/` |
-| `Pseudofunctor.ObjectProperty`, Cat-valued pseudofunctor transport | `CategoryTheory/Bicategory/Functor/Cat/` | `CategoryTheory/Bicategory/Functor/Cat/` |
-| `IsStack`, descent data | `CategoryTheory/Sites/Descent/` | `CategoryTheory/Sites/Descent/` |
-| `PrimeSpectrum.basicOpen` | `RingTheory/Spectrum/Prime/` | `RingTheory/Spectrum/Prime/` |
-| `Abelian (ModuleCat R)`, `Abelian X.Modules` | with `ModuleCat`, with `X.Modules` | with the object, never below the interface |
+The Tier 1 table in `docs/architecture/placement.md` lists each extended
+Mathlib API with its repository path; an ownership cutover updates it there. An
+instance of a Mathlib class for a Mathlib object lives with the object, never
+below the interface: `Abelian (ModuleCat R)` with `ModuleCat`, `Abelian
+X.Modules` with `X.Modules`.
 
 **Tier 2. A subject Mathlib lacks is placed by the nearest Mathlib
-precedent.**
-
-| Situation | Mathlib precedent | So it lives in |
-| --- | --- | --- |
-| A structure on an abstract triangulated category | `Triangulated/TStructure/`, `Subcategory`, `Orthogonal`, `Generators` | `CategoryTheory/Triangulated/<Name>/`: stability conditions, dg enhancements, K₀, Fourier--Mukai kernels, semiorthogonal decompositions, spherical twists, compact generation, families |
-| A weakened or strengthened variant of a named concept | `Topology/MetricSpace/Pseudo/`, `Monoidal/Braided/`, `Monoidal/Closed/` | a child directory named by the adjective: `Triangulated/StabilityCondition/Weak/` |
-| Compatibility between two independent structures | `Monoidal/Preadditive.lean`, `Monoidal/Linear.lean` | `CategoryTheory/Monoidal/Triangulated.lean` |
-| A geometric realization of a categorical interface | `Algebra/Category/ModuleCat/Abelian.lean`, `AlgebraicGeometry/Modules/Sheaf.lean` | with the geometric object under `AlgebraicGeometry/`; the declaration may keep the interface's namespace for dot notation |
-| A bespoke carrier built on a Mathlib API | definition site | beside that API: `DGCategory` on `HomComplex` is `Algebra/Homology/DGCategory/` |
-| A theorem whose signature mentions a scheme | `AlgebraicGeometry/` | `AlgebraicGeometry/`, even when the proof is entirely categorical |
+precedent**, listed in the Tier 2 table of `docs/architecture/placement.md`.
+For example:
+- a structure on an abstract triangulated category goes to
+  `CategoryTheory/Triangulated/<Name>/` (stability conditions, dg enhancements,
+  K₀, Fourier--Mukai kernels, semiorthogonal decompositions, spherical twists,
+  compact generation, families);
+- a weakened or strengthened variant of a named concept goes to a child
+  directory named by the adjective: `Triangulated/StabilityCondition/Weak/`;
+- compatibility between two independent structures gets its own file:
+  `CategoryTheory/Monoidal/Triangulated.lean`;
+- a geometric realization of a categorical interface lives with the geometric
+  object under `AlgebraicGeometry/`, and may keep the interface's namespace for
+  dot notation;
+- a bespoke carrier built on a Mathlib API lives beside that API: `DGCategory`
+  on `HomComplex` is `Algebra/Homology/DGCategory/`;
+- a theorem whose signature mentions a scheme lives under `AlgebraicGeometry/`,
+  even when the proof is entirely categorical.
 
 Three consequences follow, and each retires a former convention.
 

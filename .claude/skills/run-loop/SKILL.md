@@ -106,7 +106,8 @@ no more than two issues in flight.
       creates it. Every Mathlib path and declaration it says exists is at the
       pin. Every declaration it asks you to create does not exist yet.
    4. Placement. Its files and namespaces agree with the placement rules in
-      AGENTS.md and the owners in `docs/architecture/cutover-ledger.md`.
+      AGENTS.md, the owner tables in `docs/architecture/placement.md` and the
+      owners in `docs/architecture/cutover-ledger.md`.
    5. Kind of work. If the definition of done needs an owner-only decision, or
       targets tooling `main` has retired (OpenSpec changes, manifests, ledgers,
       `scripts/loop_engine.py`), it is false as written. Land any part that is
