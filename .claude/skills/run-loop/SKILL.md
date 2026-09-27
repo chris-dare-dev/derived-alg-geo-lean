@@ -78,7 +78,7 @@ no more than two issues in flight.
    and base, before dispatching four reviewers in parallel on that commit.
    A partial or abandoned panel consumes its reserved slot. On a session
    handoff, finish missing roles on that same commit and slot; never reuse
-   the reservation for a changed source commit.
+   the reservation for a changed PR-content commit.
    Each is an independent agent following its file in `.claude/agents/`:
    `mathematics-adversary`, `repository-boundary-adversary`,
    `abstraction-adversary` and `mathlib-reviewer`.
@@ -95,8 +95,9 @@ no more than two issues in flight.
      four again.
    - A frozen implementation attempt gets at most three rounds. After the
      third unsuccessful round, freeze that attempt and start the research
-     handoff below. A deterministic code failure in a required check on the
-     third reviewed source commit is also an unsuccessful terminal round.
+     handoff below. A deterministic required-check failure attributable to
+     reviewed PR content on the third reviewed commit is also terminal when
+     repair would change that content.
    - If a reviewer returns nothing, dispatch that role again on the same
      commit.
    - Never put your own reading of the diff in place of a reviewer's verdict.
@@ -114,10 +115,11 @@ no more than two issues in flight.
    - If a check fails, classify it on the exact PR head. Any repair changing
      PR content, including Lean, scripts, documentation or configuration,
      goes through all four reviewers and reserves the next round of the same
-     attempt before a push. A deterministic code
-     failure on the third reviewed source commit freezes that attempt
-     immediately; do not make a fourth source revision. Rerunning a transient
-     check without changing reviewed content consumes no review round.
+     attempt before a push. A deterministic required-check failure
+     attributable to reviewed PR content on the third reviewed commit freezes
+     that attempt when repair would change the content; do not make a fourth
+     PR-content revision. Rerunning a transient or unrelated check without
+     changing reviewed content consumes no review round.
    - When GitHub reports the branch out of date, merge `origin/main` into it and
      push. Never rebase a pushed branch. A conflict-free base refresh needs no
      new panel only after recording that the PR's contribution diff is
@@ -135,8 +137,9 @@ no more than two issues in flight.
 
 ## Research after an exhausted attempt
 
-Start this handoff when three reserved source-review rounds end without a pass,
-or a deterministic required check fails on the third reviewed source commit.
+Start this handoff when three reserved implementation-review rounds end without
+a pass, or a deterministic required-check failure attributable to reviewed PR
+content on the third reviewed commit would require a content-changing repair.
 
 Freeze the failed attempt immediately:
 - If a PR exists, mark it as a draft (`gh pr ready --undo`) with the open
@@ -163,18 +166,20 @@ Freeze the failed attempt immediately:
   comment, calculate its SHA-256 from the exact UTF-8 text, and record that
   digest, reviewer identity, verdict and reasons in the handoff. If the report
   changes, obtain a review of the new digest. A rejected report is revised as
-  research, never as a fourth source-review round.
+  research, never as a fourth implementation-review round.
 - If the independent review accepts a changed strategy and the full failed
   review inventory is available, inspect all marked issue comments and PRs
   under the objective ID, account for every reserved and incomplete round,
   and record a successor
   **attempt under the same issue and frozen objective**, inheriting every
   finding. Keep the failed attempt terminal. Each successor has at most three
-  source-review rounds; across the objective allow at most two recovery
+  implementation-review rounds; across the objective allow at most two recovery
   episodes and nine allocated rounds total. A renamed branch, PR, worktree or
-  chunk is not a new objective. No implementation, push, readiness or merge is
-  authorized by the research verdict alone: the successor still needs its own
-  four-role same-commit pass and required CI. If the history is incomplete or
+  chunk is not a new objective. The accepted plan, complete history, recorded
+  admission and remaining allowance together permit successor implementation.
+  The research verdict alone does not authorize a push, PR readiness or merge:
+  the successor still needs its own four-role same-commit pass and required CI.
+  If the history is incomplete or
   the strategy merely repairs the last finding, continue research or park;
   do not claim a new attempt was admitted.
 - If research finds no viable changed strategy, records a false acceptance

@@ -40,9 +40,10 @@ the unused premise to `tensorLeftFreeIso`; the proof of `singleLeftTensorIso`
 does not call that declaration directly. Compiler probes must settle the exact
 dependency before source revision.
 
-1. **Preferred rearchitecture:** keep the historical invertible-only
-   `tensorLeftFunctor`, its additive/finite-colimit instances and finite-free
-   comparison in `Tensor/Invertible.lean`, as they stood on the PR base. Prove
+1. **Preferred rearchitecture:** keep the historical `tensorLeftFunctor`,
+   defined for every `L : X.Modules`, along with its invertible-only
+   additive/finite-colimit instances and finite-free comparison in
+   `Tensor/Invertible.lean`, as they stood on the PR base. Prove
    generic colimit preservation only for the canonical monoidal
    `tensorLeft (C := X.Modules) L` in a new `Tensor/Colimits.lean`. Do not
    replace the historical functor with an abbreviation or register generic
