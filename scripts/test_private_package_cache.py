@@ -2,10 +2,13 @@
 """Focused contract tests for private run-loop package seeding."""
 
 import json
+import contextlib
+from concurrent.futures import ThreadPoolExecutor
 import os
 from pathlib import Path
 import subprocess
 import tempfile
+import threading
 import time
 import unittest
 from unittest.mock import patch
@@ -129,7 +132,7 @@ class PrivatePackageCacheTest(unittest.TestCase):
         first = self._target("initial")
         cache.seed(first, self.donor, False, False)
         key, _ = cache.pins(first)
-        archive = self.store / key / "packages.tar"
+        archive = self.store / key / "current/packages.tar"
         archive.chmod(0o644)
         with archive.open("ab") as stream:
             stream.write(b"corrupt")
@@ -209,6 +212,81 @@ class PrivatePackageCacheTest(unittest.TestCase):
         self.assertEqual(sentinel.read_text(), "unchanged")
         self.assertEqual(sorted(p.name for p in sibling.iterdir()), ["keep"])
         self.assertFalse((target / ".lake-moved" / cache.READY).exists())
+
+    def test_generation_publish_failure_recovers_without_partial_snapshot(self) -> None:
+        target = self._target("publish-fails")
+        original_replace = os.replace
+
+        def fail_generation(source: str, destination: str) -> None:
+            if Path(destination).name == "current":
+                raise OSError("injected generation publish failure")
+            original_replace(source, destination)
+
+        with patch.object(cache.os, "replace", side_effect=fail_generation):
+            with self.assertRaisesRegex(OSError, "generation publish failure"):
+                cache.seed(target, self.donor, False, False)
+        key, _ = cache.pins(target)
+        directory = self.store / key
+        self.assertFalse((directory / "current").exists())
+        self.assertFalse((target / ".lake" / cache.READY).exists())
+        orphan = directory / ".stage-abandoned"
+        orphan.mkdir()
+        (orphan / "partial").write_text("interrupted earlier generation")
+        cache.seed(target, self.donor, False, False)
+        self.assertFalse(orphan.exists())
+        self.assertTrue((directory / "current/snapshot.json").is_file())
+
+    def test_checked_snapshot_reuses_without_donor_package_checkout(self) -> None:
+        cache.seed(self._target("build-snapshot"), self.donor, False, False)
+        (self.donor / ".lake/packages").rename(self.donor / ".lake/packages-removed")
+        target = self._target("reuse-no-source")
+        cache.seed(target, self.donor, False, False)
+        self.assertTrue((target / ".lake" / cache.READY).is_file())
+
+    def test_concurrent_same_target_seeds_only_once(self) -> None:
+        target = self._target("two-callers")
+        barrier = threading.Barrier(2)
+        real_lock = cache.snapshot_lock
+
+        @contextlib.contextmanager
+        def coordinated_lock(directory: Path):
+            barrier.wait(timeout=5)
+            with real_lock(directory) as locked_directory:
+                yield locked_directory
+
+        with patch.object(cache, "snapshot_lock", coordinated_lock):
+            with ThreadPoolExecutor(max_workers=2) as workers:
+                futures = [workers.submit(cache.seed, target, self.donor, False, False)
+                           for _ in range(2)]
+                outcomes = [future.exception(timeout=10) for future in futures]
+        self.assertEqual(sum(error is None for error in outcomes), 1)
+        self.assertEqual(sum(isinstance(error, ValueError) and
+                             "target cache changed while waiting" in str(error)
+                             for error in outcomes), 1)
+        self.assertTrue((target / ".lake" / cache.READY).is_file())
+
+    def test_snapshot_directory_link_is_rejected(self) -> None:
+        target = self._target("linked-snapshot-store")
+        key, _ = cache.pins(target)
+        self.store.mkdir()
+        sibling = self.root / "sibling-store"
+        sibling.mkdir()
+        (self.store / key).symlink_to(sibling)
+        with self.assertRaisesRegex(ValueError, "snapshot directory is linked"):
+            cache.seed(target, self.donor, False, False)
+        self.assertEqual(list(sibling.iterdir()), [])
+
+    def test_snapshot_lock_link_is_not_followed(self) -> None:
+        target = self._target("linked-snapshot-lock")
+        key, _ = cache.pins(target)
+        directory = self.store / key
+        directory.mkdir(parents=True)
+        sentinel = self.root / "lock-sentinel"
+        sentinel.write_text("unchanged")
+        (directory / ".lock").symlink_to(sentinel)
+        with self.assertRaises(OSError):
+            cache.seed(target, self.donor, False, False)
+        self.assertEqual(sentinel.read_text(), "unchanged")
 
 
 if __name__ == "__main__":

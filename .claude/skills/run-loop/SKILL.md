@@ -134,10 +134,13 @@ no more than two issues in flight.
    The first private seed may create a checked, read-only package archive from a
    quiet pinned donor. It needs disk for that archive and two private copies;
    refusal is a stop before any Lean command. For an earlier worktree whose
-   `.lake/packages` is still a link, wait until it is idle and run
-   `bash scripts/seed_worktree_cache.sh --private-packages --force` there before
-   continuing. This replaces only that worktree's cache after validation; do
-   not migrate every old worktree or remove its shared donor.
+   `.lake/packages` is still a link, wait until it is idle and invoke the
+   current helper from the shared checkout, since the old branch may not have
+   `--private-packages`:
+   `python3 "$REPO/scripts/private_package_cache.py" --target "$WT" --donor "$REPO" --force`.
+   Use a different pinned donor when the old branch's manifest differs from
+   main. A refusal stops Lean. Migrate only the worktree being resumed; keep
+   the shared donor and other old worktrees intact.
    Agents you spawn start in the shared checkout, not in your worktree: give
    them the worktree path, and have them run every command and write every file
    there.

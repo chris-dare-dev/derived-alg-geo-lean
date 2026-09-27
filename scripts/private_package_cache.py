@@ -172,17 +172,34 @@ def snapshot_lock(directory: Path):
     if fcntl is None:
         fail("private package seeding requires Linux file locking")
     directory.mkdir(parents=True, exist_ok=True)
-    lock = directory / ".lock"
-    with lock.open("a+b") as stream:
-        fcntl.flock(stream, fcntl.LOCK_EX)
-        yield
+    if directory.is_symlink():
+        fail("package snapshot directory is linked")
+    root_fd = os.open(directory, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        lock_fd = os.open(".lock", os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW,
+                          0o600, dir_fd=root_fd)
+        with os.fdopen(lock_fd, "a+b") as stream:
+            if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
+                fail("package snapshot lock is not a regular file")
+            fcntl.flock(stream, fcntl.LOCK_EX)
+            actual = directory.lstat()
+            opened = os.fstat(root_fd)
+            if (directory.is_symlink() or
+                    (actual.st_dev, actual.st_ino) != (opened.st_dev, opened.st_ino)):
+                fail("package snapshot directory changed while waiting for its lock")
+            yield Path(f"/proc/self/fd/{root_fd}")
+    finally:
+        os.close(root_fd)
 
 
 def checked_snapshot(directory: Path, key: str, revisions: dict[str, str]) -> dict | None:
-    archive = directory / "packages.tar"
-    metadata = directory / "snapshot.json"
-    if not archive.exists() and not metadata.exists():
+    current = directory / "current"
+    if not current.exists() and not current.is_symlink():
         return None
+    if current.is_symlink() or not current.is_dir():
+        fail("package snapshot generation is linked or is not a directory")
+    archive = current / "packages.tar"
+    metadata = current / "snapshot.json"
     if not archive.is_file() or archive.is_symlink() or not metadata.is_file() or metadata.is_symlink():
         fail("incomplete or linked package snapshot; refusing to repair it implicitly")
     if archive.stat().st_mode & 0o222 or metadata.stat().st_mode & 0o222:
@@ -204,8 +221,8 @@ def create_snapshot(directory: Path, source: Path, key: str,
     disk_headroom(directory, 2 * source_bytes)
     token = uuid.uuid4().hex
     stage = directory / f".stage-{token}"
-    archive_stage = directory / f".packages-{token}.tar"
-    metadata_stage = directory / f".snapshot-{token}.json"
+    archive_stage = stage / "packages.tar"
+    metadata_stage = stage / "snapshot.json"
     try:
         shutil.copytree(source, stage / "packages", symlinks=True)
         after, _ = tree_digest(source)
@@ -223,13 +240,17 @@ def create_snapshot(directory: Path, source: Path, key: str,
         metadata_stage.write_text(json.dumps(record, sort_keys=True) + "\n")
         archive_stage.chmod(0o444)
         metadata_stage.chmod(0o444)
-        os.replace(archive_stage, directory / "packages.tar")
-        os.replace(metadata_stage, directory / "snapshot.json")
+        shutil.rmtree(stage / "packages")
+        os.replace(stage, directory / "current")
         return record
     finally:
         shutil.rmtree(stage, ignore_errors=True)
-        archive_stage.unlink(missing_ok=True)
-        metadata_stage.unlink(missing_ok=True)
+
+
+def remove_abandoned_snapshots(directory: Path) -> None:
+    """A killed creator leaves only a hidden staging generation under the lock."""
+    for path in directory.glob(".stage-*"):
+        remove_path(path)
 
 
 def safe_extract(archive: Path, destination: Path) -> None:
@@ -248,6 +269,16 @@ def remove_path(path: Path) -> None:
         path.unlink()
     elif path.exists():
         shutil.rmtree(path)
+
+
+def path_identity(path: Path) -> tuple | None:
+    """Capture the directory entry, including a link's target, without following it."""
+    try:
+        info = path.lstat()
+    except FileNotFoundError:
+        return None
+    link = os.readlink(path) if stat.S_ISLNK(info.st_mode) else None
+    return info.st_dev, info.st_ino, info.st_mode, link
 
 
 @contextlib.contextmanager
@@ -285,7 +316,7 @@ def seed(target: Path, donor: Path, force: bool, dry_run: bool) -> None:
     donor_key, _ = pins(donor)
     if key != donor_key:
         fail("donor and target have different lean-toolchain or lake-manifest.json")
-    source = (donor / ".lake/packages").resolve(strict=True)
+    source_hint = donor / ".lake/packages"
     build_source = donor / ".lake/build"
     if build_source.is_symlink() or not build_source.is_dir() or not next(build_source.rglob("*.olean"), None):
         fail("donor has no built project modules")
@@ -294,11 +325,11 @@ def seed(target: Path, donor: Path, force: bool, dry_run: bool) -> None:
         fail("target .lake is linked or is not a directory")
     lake_name.mkdir(exist_ok=True)
     with pinned_lake(lake_name) as (lake, verify_lake):
-        return _seed_at_lake(target, source, build_source, key, revisions,
+        return _seed_at_lake(target, source_hint, build_source, key, revisions,
                              force, dry_run, lake, verify_lake)
 
 
-def _seed_at_lake(target: Path, source: Path, build_source: Path, key: str,
+def _seed_at_lake(target: Path, source_hint: Path, build_source: Path, key: str,
                   revisions: dict[str, str], force: bool, dry_run: bool,
                   lake: Path, verify_lake) -> None:
     packages = lake / "packages"
@@ -309,12 +340,27 @@ def _seed_at_lake(target: Path, source: Path, build_source: Path, key: str,
         fail("donor or target build changed in the last 90 seconds")
     if force and (packages.exists() or packages.is_symlink()) and recently_written(packages):
         fail("target package tree changed in the last 90 seconds; migration is not quiescent")
+    initial_state = tuple(path_identity(path) for path in (packages, build, lake / READY))
     directory = snapshot_dir(key)
-    if directory.is_relative_to(source) or directory.is_relative_to(target):
+    if directory.is_relative_to(source_hint.resolve()) or directory.is_relative_to(target):
         fail("snapshot store must be outside the package source and target")
-    with snapshot_lock(directory):
+    snapshot_name = directory
+    with snapshot_lock(directory) as locked_directory:
+        directory = locked_directory
+        verify_lake()
+        if tuple(path_identity(path) for path in (packages, build, lake / READY)) != initial_state:
+            fail("target cache changed while waiting for the snapshot lock")
+        if not force and (packages.exists() or packages.is_symlink() or build.exists() or
+                          (lake / READY).exists()):
+            fail("target already has a cache after acquiring the snapshot lock")
+        if (build.exists() and recently_written(build)) or (force and
+                (packages.exists() or packages.is_symlink()) and recently_written(packages)):
+            fail("target cache changed during admission")
+        if not dry_run:
+            remove_abandoned_snapshots(directory)
         record = checked_snapshot(directory, key, revisions)
         if record is None:
+            source = source_hint.resolve(strict=True)
             validate_packages(source, revisions)
             if dry_run:
                 print(f"would create checked package snapshot from {source}")
@@ -324,11 +370,11 @@ def _seed_at_lake(target: Path, source: Path, build_source: Path, key: str,
                 print(f"creating checked package snapshot from {source}", flush=True)
                 record = create_snapshot(directory, source, key, revisions)
         else:
-            print(f"verified package snapshot {directory}", flush=True)
+            print(f"verified package snapshot {snapshot_name}", flush=True)
         build_before, build_bytes = tree_digest(build_source)
         disk_headroom(lake, record["source_bytes"] + build_bytes)
         if dry_run:
-            print(f"would privately seed {target} from snapshot {directory} and build {build_source}")
+            print(f"would privately seed {target} from snapshot {snapshot_name} and build {build_source}")
             return
         token = uuid.uuid4().hex
         pkg_stage = lake / f".packages-seeding-{token}"
@@ -341,7 +387,7 @@ def _seed_at_lake(target: Path, source: Path, build_source: Path, key: str,
         published_build = False
         marker.unlink(missing_ok=True)
         try:
-            safe_extract(directory / "packages.tar", pkg_stage)
+            safe_extract(directory / "current/packages.tar", pkg_stage)
             extracted = pkg_stage / "packages"
             got, _ = tree_digest(extracted)
             if got != record["tree_sha256"]:
