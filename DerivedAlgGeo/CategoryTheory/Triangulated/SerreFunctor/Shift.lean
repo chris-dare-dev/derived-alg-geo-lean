@@ -4,6 +4,8 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Linear.SerreFunctor.Conjugation
 import Mathlib.CategoryTheory.Shift.CommShift
+import Mathlib.CategoryTheory.Linear.FunctorCategory
+import Mathlib.Algebra.Ring.NegOnePow
 
 /-!
 # Serre functors and shifts
@@ -22,6 +24,9 @@ that separate exactness argument must use the signed rotation convention.
 `SerreFunctorData.commShiftIso n` specializes linear conjugation transport to
 the equivalence given by the single shift `n`. `SerreFunctorData.commShift`
 assembles these comparisons into a coherent `CommShift ℤ` structure.
+`SerreFunctorData.signedCommShift` adjusts each component by `(-1)^n` for
+the rotation convention; `signedCommShift_one_inv_app` and
+`trace_shift_one_signed` state its degree-one consequences.
 -/
 
 universe w v u
@@ -194,5 +199,101 @@ noncomputable def commShift
     simpa using congrArg Iso.symm hs
 
 end CoherentShift
+
+section SignedShift
+
+set_option backward.defeqAttrib.useBackward true
+set_option backward.isDefEq.respectTransparency false
+
+variable (D : SerreFunctorData k C)
+
+@[implicit_reducible]
+private noncomputable def signedCommShiftOfCommShift
+    {C : Type u} [Category.{v} C] [Preadditive C] [HasShift C ℤ]
+    [∀ n : ℤ, (shiftFunctor C n).Additive]
+    (F : C ⥤ C) [F.Additive] [F.CommShift ℤ] : F.CommShift ℤ where
+  commShiftIso a := a.negOnePow • F.commShiftIso a
+  commShiftIso_zero := by
+    ext X
+    dsimp
+    simpa only [Int.negOnePow_zero, one_smul] using
+      NatTrans.congr_app (congr_arg Iso.hom (F.commShiftIso_zero ℤ)) X
+  commShiftIso_add a b := by
+    ext X
+    dsimp
+    simp only [Functor.CommShift.isoAdd_hom_app]
+    change (a + b).negOnePow • (F.commShiftIso (a + b)).hom.app X =
+      F.map ((shiftFunctorAdd C a b).hom.app X) ≫
+        (b.negOnePow • (F.commShiftIso b).hom.app ((shiftFunctor C a).obj X)) ≫
+        (shiftFunctor C b).map (a.negOnePow • (F.commShiftIso a).hom.app X) ≫
+        (shiftFunctorAdd C a b).inv.app (F.obj X)
+    have h := NatTrans.congr_app
+      (congr_arg Iso.hom (F.commShiftIso_add a b)) X
+    rw [Int.negOnePow_add]
+    rw [h]
+    simp only [Functor.CommShift.isoAdd_hom_app]
+    rw [Functor.map_units_smul]
+    simp only [Linear.units_smul_comp, Linear.comp_units_smul,
+      smul_smul, mul_comm a.negOnePow b.negOnePow]
+
+/-- The sign-corrected shift commutation used by the triangulated rotation
+convention. It is derived from the coherent conjugation transport and is
+chosen explicitly by downstream exactness proofs. -/
+@[implicit_reducible]
+noncomputable def signedCommShift
+    [∀ n : ℤ, (shiftFunctor C n).Additive]
+    [∀ n : ℤ, (shiftFunctor C n).Linear k] : D.S.CommShift ℤ := by
+  letI : D.S.Additive := D.additive
+  letI : D.S.CommShift ℤ := D.commShift
+  exact signedCommShiftOfCommShift D.S
+
+/-- At degree one, the inverse signed component is the negative of the
+pointwise Serre/shift comparison. -/
+theorem signedCommShift_one_inv_app
+    [∀ n : ℤ, (shiftFunctor C n).Additive]
+    [∀ n : ℤ, (shiftFunctor C n).Linear k]
+    (X : C) :
+    (letI : D.S.CommShift ℤ := D.signedCommShift
+     (D.S.commShiftIso (1 : ℤ)).inv.app X) =
+       -(D.commShiftIso 1).hom.app X := by
+  dsimp only [Functor.commShiftIso, SerreFunctorData.signedCommShift,
+    signedCommShiftOfCommShift, SerreFunctorData.commShift]
+  simp only [Int.negOnePow_one, Preadditive.smul_iso_inv,
+    SerreFunctorData.commShiftIso, Iso.symm_hom]
+  norm_num
+
+/-- The signed degree-one transport reverses the Serre trace. -/
+theorem trace_shift_one_signed
+    [∀ n : ℤ, (shiftFunctor C n).Additive]
+    [∀ n : ℤ, (shiftFunctor C n).Linear k]
+    (X : C) (x : X ⟶ D.S.obj X) :
+    D.trace (X⟦(1 : ℤ)⟧)
+      ((shiftFunctor C (1 : ℤ)).map x ≫
+        (letI : D.S.CommShift ℤ := D.signedCommShift
+         (D.S.commShiftIso (1 : ℤ)).inv.app X)) = -D.trace X x := by
+  rw [signedCommShift_one_inv_app D X]
+  have hcomp :
+      (shiftFunctor C (1 : ℤ)).map x ≫ (-(D.commShiftIso (1 : ℤ)).hom.app X) =
+      -((shiftFunctor C (1 : ℤ)).map x ≫ (D.commShiftIso (1 : ℤ)).hom.app X) := by
+    exact Preadditive.comp_neg _ _
+  calc
+    D.trace (X⟦(1 : ℤ)⟧)
+        ((shiftFunctor C (1 : ℤ)).map x ≫ (-(D.commShiftIso (1 : ℤ)).hom.app X)) =
+        D.trace (X⟦(1 : ℤ)⟧)
+          (-((shiftFunctor C (1 : ℤ)).map x ≫ (D.commShiftIso (1 : ℤ)).hom.app X)) := by
+            exact congrArg (D.trace _) hcomp
+    _ = -D.trace (X⟦(1 : ℤ)⟧)
+          ((shiftFunctor C (1 : ℤ)).map x ≫ (D.commShiftIso (1 : ℤ)).hom.app X) := by
+            exact map_neg (D.trace _) _
+    _ = -D.trace X x := congrArg Neg.neg (by
+      letI : (shiftEquiv C (1 : ℤ)).functor.Additive := by
+        change (shiftFunctor C (1 : ℤ)).Additive
+        infer_instance
+      letI : (shiftEquiv C (1 : ℤ)).functor.Linear k := by
+        change (shiftFunctor C (1 : ℤ)).Linear k
+        infer_instance
+      exact D.trace_transport (shiftEquiv C (1 : ℤ)) X x)
+
+end SignedShift
 
 end CategoryTheory.SerreFunctor.SerreFunctorData
