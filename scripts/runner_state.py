@@ -10,11 +10,14 @@ jobs and the physical host capacity before admitting another writable job.
 from __future__ import annotations
 
 import argparse
+from contextlib import contextmanager
+import fcntl
 import hashlib
 import json
 import ntpath
 import os
 import re
+import stat
 import sys
 from pathlib import Path
 from typing import Any
@@ -162,6 +165,21 @@ def validate_record(record: Any) -> list[str]:
             errors.append(f"paths.{name}.path: {exc}")
         if not isinstance(value.get("writable"), bool):
             errors.append(f"paths.{name}.writable must be boolean")
+    # Lake may update packages even when a seed helper originally linked them
+    # as a cache. An agent/job therefore owns this tree, including its resolved
+    # symlink target, rather than marking a shared package tree read-only.
+    if isinstance(paths.get("lake_packages"), dict) and paths["lake_packages"].get("writable") is not True:
+        errors.append("paths.lake_packages must be job-owned writable state")
+    if isinstance(paths.get("checkout"), dict):
+        try:
+            checkout = _path_identity(paths["checkout"])
+            for name in ("lake_build", "lake_packages"):
+                if isinstance(paths.get(name), dict):
+                    resolved = _path_identity(paths[name])
+                    if not resolved.startswith(checkout.rstrip("\\") + "\\"):
+                        errors.append(f"paths.{name} resolves outside the job checkout")
+        except ValueError:
+            pass  # The invalid path was already reported above.
     return errors
 
 
@@ -259,26 +277,80 @@ def validate_snapshot(snapshot: Any) -> dict[str, Any]:
     }
 
 
-def acquire_lease(record: dict[str, Any], lease_dir: Path) -> dict[str, Any]:
+@contextmanager
+def _locked_lease_dir(lease_dir: Path):
+    """Serialize every admission and release through one host-owned directory."""
+    if not lease_dir.is_absolute() or lease_dir.is_symlink():
+        raise ValueError("lease directory must be an absolute, non-symlink host path")
+    lease_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
+    directory_stat = lease_dir.stat()
+    if directory_stat.st_uid != os.getuid() or stat.S_IMODE(directory_stat.st_mode) & 0o022:
+        raise ValueError("lease directory must be owned by this user and not group/world-writable")
+    lock_path = lease_dir / ".admission.lock"
+    descriptor = os.open(lock_path, os.O_CREAT | os.O_RDWR | getattr(os, "O_NOFOLLOW", 0), 0o600)
+    with os.fdopen(descriptor, "r+") as stream:
+        lock_stat = os.fstat(stream.fileno())
+        if (lock_stat.st_uid != os.getuid() or not stat.S_ISREG(lock_stat.st_mode)
+                or stat.S_IMODE(lock_stat.st_mode) & 0o022):
+            raise ValueError("admission lock must be an owned, non-writable-by-others regular file")
+        fcntl.flock(stream.fileno(), fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
+
+
+def _active_leases(lease_dir: Path) -> list[dict[str, Any]]:
+    jobs = []
+    for path in sorted(lease_dir.glob("*.json")):
+        if path.is_symlink() or not path.is_file():
+            raise ValueError(f"unsafe active lease: {path}")
+        payload = _load(path)
+        if not isinstance(payload, dict) or not isinstance(payload.get("record"), dict):
+            raise ValueError(f"invalid active lease: {path}")
+        current = payload["record"]
+        if current.get("namespace") != path.stem or payload.get("owner_digest") != _record_digest(current):
+            raise ValueError(f"active lease owner identity is invalid: {path}")
+        errors = validate_record(current)
+        if errors:
+            raise ValueError(f"invalid active lease {path}: {'; '.join(errors)}")
+        jobs.append(current)
+    return jobs
+
+
+def acquire_lease(
+    record: dict[str, Any], lease_dir: Path, host_capacity: dict[str, Any]
+) -> dict[str, Any]:
+    """Atomically admit a job after checking every live host lease."""
     errors = validate_record(record)
     if errors:
         raise ValueError("cannot acquire invalid record: " + "; ".join(errors))
-    lease_dir.mkdir(parents=True, exist_ok=True)
-    lease_path = _lease_path(record, lease_dir)
-    owner_digest = _record_digest(record)
-    payload = json.dumps(
-        {"owner_digest": owner_digest, "record": record}, sort_keys=True, indent=2
-    ) + "\n"
-    try:
-        descriptor = os.open(lease_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-    except FileExistsError as exc:
-        raise ValueError(f"lease already exists; recovery must inspect it: {lease_path}") from exc
-    try:
-        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
-            stream.write(payload)
-    except Exception:
-        lease_path.unlink(missing_ok=True)
-        raise
+    if not isinstance(host_capacity, dict) or record["host_id"] not in host_capacity:
+        raise ValueError("trusted physical host capacity is required")
+    if _overlap(canonical_path(str(lease_dir)), _path_identity(record["paths"]["checkout"])):
+        raise ValueError("host lease directory must be outside the job checkout")
+    with _locked_lease_dir(lease_dir):
+        jobs = _active_leases(lease_dir)
+        if any(job["host_id"] != record["host_id"] for job in jobs):
+            raise ValueError("one lease directory must describe one physical host")
+        admission = validate_snapshot({"host_capacity": host_capacity, "jobs": [*jobs, record]})
+        if not admission["valid"]:
+            raise ValueError("admission denied: " + "; ".join(admission["errors"]))
+        lease_path = _lease_path(record, lease_dir)
+        owner_digest = _record_digest(record)
+        payload = json.dumps(
+            {"owner_digest": owner_digest, "record": record}, sort_keys=True, indent=2
+        ) + "\n"
+        try:
+            descriptor = os.open(lease_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+        except FileExistsError as exc:
+            raise ValueError(f"lease already exists; recovery must inspect it: {lease_path}") from exc
+        try:
+            with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+                stream.write(payload)
+        except Exception:
+            lease_path.unlink(missing_ok=True)
+            raise
     return {
         "acquired": True,
         "lease": str(lease_path),
@@ -291,18 +363,19 @@ def release_lease(record: dict[str, Any], lease_dir: Path) -> dict[str, Any]:
     errors = validate_record(record)
     if errors:
         raise ValueError("cannot release invalid record: " + "; ".join(errors))
-    lease_path = _lease_path(record, lease_dir)
-    if not lease_path.is_file() or lease_path.is_symlink():
-        raise ValueError(f"lease is absent or unsafe: {lease_path}")
-    current = _load(lease_path)
-    owner_digest = _record_digest(record)
-    if (
-        not isinstance(current, dict)
-        or current.get("owner_digest") != owner_digest
-        or current.get("record") != record
-    ):
-        raise ValueError("lease owner identity does not match the requested record")
-    lease_path.unlink()
+    with _locked_lease_dir(lease_dir):
+        lease_path = _lease_path(record, lease_dir)
+        if not lease_path.is_file() or lease_path.is_symlink():
+            raise ValueError(f"lease is absent or unsafe: {lease_path}")
+        current = _load(lease_path)
+        owner_digest = _record_digest(record)
+        if (
+            not isinstance(current, dict)
+            or current.get("owner_digest") != owner_digest
+            or current.get("record") != record
+        ):
+            raise ValueError("lease owner identity does not match the requested record")
+        lease_path.unlink()
     return {
         "released": True,
         "lease": str(lease_path),
@@ -319,6 +392,7 @@ def _parser() -> argparse.ArgumentParser:
     admit = sub.add_parser("admit")
     admit.add_argument("record", type=Path)
     admit.add_argument("--lease-dir", type=Path, required=True)
+    admit.add_argument("--host-capacity", type=Path, required=True)
     release = sub.add_parser("release")
     release.add_argument("record", type=Path)
     release.add_argument("--lease-dir", type=Path, required=True)
@@ -331,10 +405,10 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "report":
             result = validate_snapshot(_load(args.snapshot))
         elif args.command == "admit":
-            result = acquire_lease(_load(args.record), args.lease_dir)
+            result = acquire_lease(_load(args.record), args.lease_dir, _load(args.host_capacity))
         else:
             result = release_lease(_load(args.record), args.lease_dir)
-    except ValueError as exc:
+    except (OSError, ValueError) as exc:
         print(json.dumps({"valid": False, "errors": [str(exc)]}, indent=2))
         return 1
     print(json.dumps(result, indent=2, sort_keys=True))
