@@ -474,3 +474,38 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   context, while the composition proof uses the triangulated stage-addition
   API.
 - state:              L (proof-witness verified)
+
+### 2026-09-26 — products of retract-closed object properties
+- chunk:              rou1-920-envelope-composition
+- reviewing commit:   12b1f252d33ca17406fc85197fa060c33794fc78
+- found by:           abstraction-adversary
+- proposed ancestor:  `Mathlib.CategoryTheory.ObjectProperty.Retract`
+- weaker hypotheses:  a category with binary products and an object property
+  `Q` closed under binary products; no additive, shift, or triangulated
+  structure
+- pin status:         UPSTREAM-ONLY (the pinned
+  `ObjectProperty/Retract.lean` and `ObjectProperty/FiniteProducts.lean`
+  provide no such closure instance)
+- source note:        The private `retractClosure_isClosedUnderBinaryProducts`
+  proof constructs products of two retracts componentwise and transfers the
+  product property across an isomorphism. Whether this belongs as a general
+  closure API in Mathlib's retract module remains to be confirmed.
+- state:              UNVERIFIED
+
+### 2026-09-26 — products of extension-closed object properties
+- chunk:              rou1-920-envelope-composition
+- reviewing commit:   12b1f252d33ca17406fc85197fa060c33794fc78
+- found by:           abstraction-adversary
+- proposed ancestor:  `Mathlib.CategoryTheory.Triangulated.Subcategory`
+- weaker hypotheses:  the existing pretriangulated context, binary products,
+  and binary-product closure of both input properties; no `IsTriangulated`
+  or nonemptiness assumption
+- pin status:         UPSTREAM-ONLY (the pinned `Subcategory.lean` has only
+  the more restrictive closure instance requiring a triangulated object
+  property)
+- source note:        The private `extensionProduct_prop_prod` and
+  `extensionProduct_isClosedUnderBinaryProducts` proofs form products of the
+  input distinguished triangles using Mathlib's
+  `productTriangle_distinguished`. Whether to expose this weaker closure
+  result as general Subcategory API remains to be confirmed.
+- state:              UNVERIFIED
