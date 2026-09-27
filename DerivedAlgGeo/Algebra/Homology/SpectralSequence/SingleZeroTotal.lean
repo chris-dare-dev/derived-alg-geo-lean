@@ -35,7 +35,7 @@ input integer-indexed cochain complex.
   comparison after exchanging axes.
 * `HomologicalComplex₂.singleZeroFlipTotalNatIso` assembles the signed
   flipped degree-zero comparisons into a natural isomorphism.
-* `HomologicalComplex₂.singleExtendMapFlipTotalIso` compares the total of an
+* `HomologicalComplex₂.singleExtendMapTotalIso` compares the total of an
   extended single with the original complex when the selected degree maps to zero.
 
 ## Implementation notes
@@ -313,7 +313,7 @@ lemma singleZeroFlipTotalIso_naturality (f : A ⟶ B) :
   simp only [Category.assoc]
 
 /-- Packages `HomologicalComplex₂.singleZeroFlipTotalIso` into a natural
-isomorphism. Mathlib's `totalFunctor` requires totals for every bicomplex;
+isomorphism. Mathlib's `HomologicalComplex₂.totalFunctor` requires totals for every bicomplex;
 the objectwise single-zero totals alone do not construct that functor.
 Flipping moves support from outer to inner degree zero. -/
 noncomputable def singleZeroFlipTotalNatIso
@@ -333,7 +333,7 @@ noncomputable def singleZeroFlipTotalNatIso
 maps to integer degree zero. The pre-total bicomplex isomorphism identifies
 its target with the flipped single-zero bicomplex; the signed total natural
 isomorphism then recovers the input cochain complex. -/
-noncomputable def singleExtendMapFlipTotalIso
+noncomputable def singleExtendMapTotalIso
     [∀ K : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ),
       K.HasTotal (ComplexShape.up ℤ)]
     {ι : Type*} [DecidableEq ι] {c : ComplexShape ι}

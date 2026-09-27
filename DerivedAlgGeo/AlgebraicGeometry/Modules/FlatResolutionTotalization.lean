@@ -34,7 +34,7 @@ quasi-isomorphism or K-flatness claim.
 
 * `AlgebraicGeometry.Scheme.Modules.normalizedBicomplexAugmentation_row_quasiIso`
   proves each resolution-direction row is a quasi-isomorphism.
-* `AlgebraicGeometry.Scheme.Modules.freeYonedaSheafCoproductTotalAugmentation_eq_toSingleZero`
+* `freeYonedaSheafCoproductTotalAugmentation_eq_toSingleZero_comp_targetIso`
   identifies the normalized total map with the earlier total-to-single-zero map
   followed by the target isomorphism.
 
@@ -174,7 +174,7 @@ noncomputable def freeYonedaSheafCoproductTotalTargetIso (X : Scheme.{u}) :
         HomologicalComplex₂.totalFunctor X.Modules (ComplexShape.up ℤ)
           (ComplexShape.up ℤ) (ComplexShape.up ℤ) ≅
     𝟭 (CochainComplex X.Modules ℤ) :=
-  HomologicalComplex₂.singleExtendMapFlipTotalIso
+  HomologicalComplex₂.singleExtendMapTotalIso
     (C := X.Modules) ComplexShape.embeddingDownNat 0 rfl
 
 /-- The natural augmentation of the total free-Yoneda resolution into the
@@ -189,11 +189,11 @@ noncomputable def freeYonedaSheafCoproductTotalAugmentation (X : Scheme.{u}) :
         (ComplexShape.up ℤ) (ComplexShape.up ℤ)) ≫
     (HomologicalComplex₂.singleZeroFlipTotalNatIso (C := X.Modules)).hom
 
-/-- The normalized total augmentation agrees with the earlier total map to
-the resolution-degree-zero bicomplex, followed by the generic target
-identification specialized to module sheaves. This connects both public
-presentations by an equality of natural transformations. -/
-theorem freeYonedaSheafCoproductTotalAugmentation_eq_toSingleZero (X : Scheme.{u}) :
+/-- The earlier and normalized augmentations identify the single-zero target
+at different stages. After unfolding the generic comparison and distributing
+right whiskering over composition, the two maps are definitionally equal;
+downstream proofs can switch presentations by rewriting. -/
+theorem freeYonedaSheafCoproductTotalAugmentation_eq_toSingleZero_comp_targetIso (X : Scheme.{u}) :
     freeYonedaSheafCoproductTotalAugmentation X =
       freeYonedaSheafCoproductTotalAugmentationToSingleZero X ≫
         (freeYonedaSheafCoproductTotalTargetIso X).hom := by
@@ -201,7 +201,7 @@ theorem freeYonedaSheafCoproductTotalAugmentation_eq_toSingleZero (X : Scheme.{u
     normalizedBicomplexAugmentation,
     freeYonedaSheafCoproductTotalAugmentationToSingleZero,
     freeYonedaSheafCoproductTotalTargetIso,
-    HomologicalComplex₂.singleExtendMapFlipTotalIso,
+    HomologicalComplex₂.singleExtendMapTotalIso,
     Functor.isoWhiskerRight_hom, Iso.trans_hom, Functor.whiskerRight_comp]
   rfl
 
