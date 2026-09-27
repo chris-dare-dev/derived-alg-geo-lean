@@ -28,7 +28,7 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
 
 | State | Meaning |
 |---|---|
-| `UNVERIFIED` | Proposed. The general statement has not been compiled. |
+| `UNVERIFIED` | The lift is not yet confirmed in merged canonical code. A proof may have been compiled in a scratch probe or an unmerged candidate; record that evidence in the source note. |
 | `CONFIRMED <PR>` | The lift was implemented and merged. |
 | `FALSIFIED <counterexample>` | The general statement is false. Leaves stay separate. |
 
@@ -573,7 +573,7 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   `LEAN_NUM_THREADS=2 ~/.elan/bin/lake env lean`; only unused-section-variable
   warnings in three scratch helper lemmas remain. No implementation module
   was changed by this scout.
-- state:              L (proof-witness verified)
+- state:              UNVERIFIED
 
 ### 2026-09-26 — equivalence transport can construct the inverse's exact data (planned)
 - chunk:              rou1-921-generation-functor-transport
@@ -596,7 +596,7 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   inverse shift is automatically compatible. The generation-time proof also
   compiled `P.isoClosure.triangEnvelopeIter n = P.triangEnvelopeIter n`,
   accounting for the isomorphism closure of `ObjectProperty.map`.
-- state:              L (proof-witness verified)
+- state:              UNVERIFIED
 
 ### 2026-09-26 — Rouquier dimension and strong generators under retract-dense functors (planned)
 - chunk:              rou1-921-generation-functor-transport
@@ -617,7 +617,7 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   compiled. This proposes an explicit hypothesis, not a new carrier or
   typeclass; whether to expose the stronger API in #921 remains an
   implementation scope decision.
-- state:              L (proof-witness verified)
+- state:              UNVERIFIED
 
 ### 2026-09-26 — replace exactness by additivity and shift compatibility (planned)
 - chunk:              rou1-921-generation-functor-transport
