@@ -1,18 +1,18 @@
 ---
 name: land-pr
-description: Not for loop runs (use run-loop). Run one landing iteration — select an eligible open PR, update it against main, pre-flight it with scripts/precheck.sh, review it, take the PR CI verdict, then stop. Never merges.
+description: Not for loop runs (use run-loop). Run one standalone landing iteration — select an eligible open PR, update it against main, pre-flight it with scripts/precheck.sh, review it, take the exact-head PR CI verdict, then stop before merging.
 ---
 
 # One landing iteration
 
 **Not for loop runs: use run-loop.** A run that works issues or a milestone to
-merged PRs follows `.claude/skills/run-loop/SKILL.md`, which merges its own PRs
-on green CI; this skill's "merging is a human action" applies only to this
-skill.
+merged PRs follows `.claude/skills/run-loop/SKILL.md`, which has its own
+reviewed-head, branch-update and merge procedure; do not pair this standalone
+rebase/force-push procedure with that loop.
 
-This is **one** iteration against an eligible open PR and it **halts** before
-the merge. Merging is a human action, always. Read the issue tracker and native
-blockers before selecting a PR; an open PR is not by itself admission-ready.
+This standalone skill performs **one** iteration against an eligible open PR
+and **halts** before the merge. Read the issue tracker and native blockers
+before selecting a PR; an open PR is not by itself admission-ready.
 
 The manifest controller (`scripts/loop_engine.py`), its OpenSpec changes and
 its review ledgers are retired from every run path; none of them scopes this
@@ -202,18 +202,33 @@ and over the 195 commits both lanes used to build, the faster of the two
 the push below still starts it.
 
 ```bash
+reviewed_sha=$(git rev-parse HEAD)
 git push --force-with-lease
-gh run list --branch "$(git branch --show-current)" --workflow ci.yml \
-  --limit 1 --json databaseId,url --jq '.[0]'
+gh pr view <N> --json headRefOid --jq '.headRefOid'
+gh run list --branch "$(git branch --show-current)" --commit "$reviewed_sha" \
+  --event pull_request --workflow ci.yml --limit 20 \
+  --json databaseId,event,headSha,url --jq '.[0] // empty'
 ```
 
-Then wait on it:
+The PR's `headRefOid` must equal `reviewed_sha`; if GitHub has not reflected the
+push yet, wait for it to do so. An empty run listing means the exact-head PR
+run has not appeared; wait for that run or halt at the bounded wait below.
+Never substitute an older-head run or a manual `workflow_dispatch` run.
+Then wait on the returned run ID:
 
 ```bash
 gh run watch <databaseId> -R chris-dare-dev/derived-alg-geo-lean --exit-status
 gh run view <databaseId> -R chris-dare-dev/derived-alg-geo-lean \
-  --json status,conclusion --jq '"\(.status)/\(.conclusion)"'
+  --json event,headSha,status,conclusion,url
+gh pr view <N> --json headRefOid,mergeStateStatus
+gh pr checks <N> --required --json name,state,bucket,link
 ```
+
+Require `event=pull_request`, `headSha=reviewed_sha`,
+`status=completed/conclusion=success`, the unchanged PR `headRefOid`, and a
+passing required `ci` check on that PR. A `BEHIND` or otherwise unmergeable PR
+must be refreshed and reviewed at its new head. A run listed for the right
+branch is insufficient on its own.
 
 **Read the conclusion, not the exit code.** `gh run watch --exit-status` exits
 **0 on a cancelled run**, and cancellation is the normal outcome here: `ci.yml`'s

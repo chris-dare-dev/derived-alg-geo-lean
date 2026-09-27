@@ -132,7 +132,8 @@ owner has been named, the weakest sufficient hypotheses of every central
 statement have been stated, and the Mathlib paths you searched have been
 recorded.
 
-Termination is the run's job, not yours: it parks a change after three review
-rounds. Never withhold a class of finding to help the loop converge. When the
-draft's "Responses to findings" shows an earlier round's finding still
-unresolved, say so rather than presenting it as new.
+Termination is the run's job, not yours: it freezes an implementation attempt
+after three review rounds and launches separate research. Never withhold a
+class of finding to help the loop converge. When the draft's "Responses to
+findings" shows an earlier round's finding still unresolved, say so rather than
+presenting it as new.

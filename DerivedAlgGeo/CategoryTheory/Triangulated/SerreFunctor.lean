@@ -1,8 +1,11 @@
 import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor.Objects
 import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor.Enriques
+import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor.Euler
+import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor.Exactness
 import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor.Classification
 import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor.Matching
 import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor.ProjectionObjects
+import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor.Shift
 import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor.Transport
 
 /-! # Serre functors on a triangulated category

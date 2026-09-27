@@ -263,16 +263,22 @@ Start a run with one line: "Run the run-loop skill from origin/main on
 <milestone URL, or issues #a #b>." The runtime re-sends the kickoff message
 after every compaction, so keep rules and state out of it.
 
-The run researches each issue and writes its plan into the PR description. Four
-independent reviewers must pass it on the same commit, with at most three
-rounds per PR. It merges once the required `ci` check passes, then takes the
-next issue. An issue it cannot finish is parked as a draft PR with its open
-findings, not waited on.
+The run researches each issue and writes its plan into the PR description.
+Four independent reviewers must pass it on the same commit, with at most three
+rounds per attempt. After an attempt exhausts them, the run freezes it as a
+draft PR, starts a separate read-only research examination and has the changed
+plan reviewed independently; an accepted plan gets a successor attempt on the
+same issue that inherits every finding, at most twice per issue. A renamed PR
+or branch cannot reset that history. The issue's loop-state comment carries it
+between contexts. The run merges once the required `ci` check passes on the
+PR's head, then takes the next issue; an issue it still cannot finish is
+parked as a draft PR with its open findings, and dependent issues wait.
 
 The request that starts a run authorizes its pushes, PRs and merges. The owner
 withdraws any of these with an explicit `false` in `.claude/loop-authority.yaml`
-on the default branch. A run never changes the loop's own tooling or
-instructions, and it uses no OpenSpec change, loop manifest or review ledger.
+on the default branch. A run changes the loop's own tooling or instructions
+only when the owner puts that work in its queue, and it uses no OpenSpec
+change, loop manifest or review ledger.
 The manifest controller (`scripts/loop_engine.py`, `.claude/loop-specs/`) is off
 the run path, and is kept only for the ledgers it already wrote. Issue closure
 for code work requires a merged PR.
