@@ -5,6 +5,10 @@ root rather than in divisor or stability-condition consumers.
 import DerivedAlgGeo.AlgebraicGeometry.Modules
 
 #print axioms AlgebraicGeometry.Scheme.Modules.reflectsEpimorphisms_toSheaf
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorLeft_preservesColimitsOfShape
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorRight_preservesColimitsOfShape
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorLeftFunctor_preservesFiniteColimits
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorLeftFunctor_additive
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorLeftFunctor_preservesFiniteLimits
 #print axioms AlgebraicGeometry.Scheme.Modules.isFinitePresentation_tensorObj_left_of_isInvertible
 #print axioms AlgebraicGeometry.Scheme.Modules.pushforward_faithful_of_isInducing
