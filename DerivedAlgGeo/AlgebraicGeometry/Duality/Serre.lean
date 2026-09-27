@@ -1,2 +1,3 @@
 import DerivedAlgGeo.AlgebraicGeometry.Duality.Serre.Cohomology
 import DerivedAlgGeo.AlgebraicGeometry.Duality.Serre.Bilinear
+import DerivedAlgGeo.AlgebraicGeometry.Duality.Serre.Categorical
