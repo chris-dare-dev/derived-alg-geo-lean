@@ -2,23 +2,24 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.Algebra.Homology.SpectralSequence.FilteredTotalComplexAdjacent
+import DerivedAlgGeo.Algebra.Homology.SpectralSequence.FilteredTotalComplexAdjacentCore
+import Mathlib.Algebra.Category.Grp.Abelian
 import Mathlib.Algebra.Homology.HomologySequenceLemmas
 import Mathlib.Algebra.Homology.DerivedCategory.HomologySequence
 import Mathlib.Algebra.Homology.QuasiIso
 
 /-!
-# Quasi-isomorphisms and filtered total complexes
+# Quasi-isomorphisms of first-quadrant total complexes
 
-This file supplies two naturality lemmas missing from the upstream homology-sequence and total-
-complex APIs.  They are the comparison-theorem plumbing needed for the Cech bicomplex:
+The main theorem `HomologicalComplex₂.totalMap_quasiIso` shows that a map of
+vertically and horizontally connective abelian-group bicomplexes is a
+quasi-isomorphism on totals when it is one on each nonnegative vertical column.
+The proof compares finite column cones, then uses vertical connectivity to
+make sufficiently distant tails vanish in each prescribed total degree.
 
-* in a morphism of short exact cochain-complex sequences, quasi-isomorphisms on the outer terms
-  imply a quasi-isomorphism on the middle term; and
-* a bicomplex morphism induces a morphism between its adjacent-column total short exact
-  sequences.
-
-Both statements are general and independent of sheaves.
+The generic adjacent-column maps and their cone quasi-isomorphism are in
+`FilteredTotalComplexAdjacentCore`. This file also proves the short-exact
+five lemma and mapping-cone composition comparison used by the finite argument.
 -/
 
 open CategoryTheory Category Limits
@@ -222,48 +223,6 @@ def IsHorizontallyConnective
     (K : HomologicalComplex₂ AddCommGrpCat.{w}
       (ComplexShape.up ℤ) (ComplexShape.up ℤ)) : Prop :=
   ∀ p q : ℤ, p < 0 → IsZero ((K.X p).X q)
-
-/-- A quasi-isomorphism on one vertical column induces a quasi-isomorphism on its single-column
-total complex. -/
-private lemma singleColumnTotalMap_quasiIso (f : K ⟶ L) (p : ℤ)
-    (h : QuasiIso (f.f p)) :
-    QuasiIso (total.map (singleColumnBicomplexMap f p) (ComplexShape.up ℤ)) := by
-  letI : QuasiIso (f.f p) := h
-  rw [← quasiIso_iff_comp_right _ (singleColumnTotalIso L p).hom]
-  rw [singleColumnTotalIso_naturality]
-  infer_instance
-
-/-- The morphism between the mapping cones of two adjacent-column inclusions induced by a
-bicomplex morphism. -/
-private noncomputable def adjacentColumnConeMap (f : K ⟶ L) (p : ℤ) :
-    CochainComplex.mappingCone (adjacentColumnTotalShortComplex K p).f ⟶
-      CochainComplex.mappingCone (adjacentColumnTotalShortComplex L p).f :=
-  CochainComplex.mappingCone.map _ _
-    (adjacentColumnTotalShortComplexMap f p).τ₁
-    (adjacentColumnTotalShortComplexMap f p).τ₂
-    (adjacentColumnTotalShortComplexMap f p).comm₁₂.symm
-
-/-- A quasi-isomorphism on one vertical column induces a quasi-isomorphism on the mapping cone
-of the corresponding adjacent-column inclusion. -/
-private lemma adjacentColumnConeMap_quasiIso (f : K ⟶ L) (p : ℤ)
-    (h : QuasiIso (f.f p)) : QuasiIso (adjacentColumnConeMap f p) := by
-  have h₃ : QuasiIso (adjacentColumnTotalShortComplexMap f p).τ₃ := by
-    exact singleColumnTotalMap_quasiIso f p h
-  letI : QuasiIso (adjacentColumnTotalShortComplexMap f p).τ₃ := h₃
-  letI : QuasiIso (CochainComplex.mappingCone.descShortComplex
-      (adjacentColumnTotalShortComplex L p)) :=
-    CochainComplex.mappingCone.quasiIso_descShortComplex
-      (adjacentColumnTotalShortExact L p)
-  letI : QuasiIso (CochainComplex.mappingCone.descShortComplex
-      (adjacentColumnTotalShortComplex K p)) :=
-    CochainComplex.mappingCone.quasiIso_descShortComplex
-      (adjacentColumnTotalShortExact K p)
-  rw [← quasiIso_iff_comp_right _
-    (CochainComplex.mappingCone.descShortComplex
-      (adjacentColumnTotalShortComplex L p))]
-  dsimp [adjacentColumnConeMap]
-  rw [CochainComplex.mappingCone.map_descShortComplex]
-  infer_instance
 
 /-- The inclusion of the tail beginning in column `n + 1` into the tail beginning in column
 zero.  Its cone is the finite quotient containing columns `0, …, n`. -/

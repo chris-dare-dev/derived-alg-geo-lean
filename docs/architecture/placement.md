@@ -19,6 +19,7 @@ and future upstream work; matching directories is not required to import Mathlib
 | `DerivedCategory C`, `Ext`, K-projectives, its t-structure, `Bounded` | `Algebra/Homology/DerivedCategory/` | `Algebra/Homology/DerivedCategory/` |
 | `HomotopyCategory`, `HomComplex`, bounded and plus variants | `Algebra/Homology/HomotopyCategory/` | `Algebra/Homology/HomotopyCategory/` |
 | Spectral sequences and total complexes | `Algebra/Homology/SpectralSequence/` | `Algebra/Homology/SpectralSequence/` |
+| Degree-at-least stupid truncations of cochain complexes | `Algebra/Homology/Embedding/` | `Algebra/Homology/Embedding/StupidTruncGE.lean` |
 | `SheafOfModules` and `PresheafOfModules` | `Algebra/Category/ModuleCat/{Sheaf,Presheaf}/` | `Algebra/Category/ModuleCat/{Sheaf,Presheaf}/` |
 | `ModuleCat`, `Grp` | `Algebra/Category/{ModuleCat,Grp}/` | `Algebra/Category/{ModuleCat,Grp}/` |
 | `ObjectProperty`, the full subcategory it cuts out, and functor lifts into it | `CategoryTheory/ObjectProperty/` | `CategoryTheory/ObjectProperty/` |

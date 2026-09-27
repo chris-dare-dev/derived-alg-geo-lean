@@ -132,6 +132,8 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex₂.columnFiltrationBicomplex
 #print axioms HomologicalComplex₂.columnFiltrationIndex
 #print axioms HomologicalComplex₂.adjacentColumnBicomplexShortComplex
+#print axioms HomologicalComplex₂.adjacentColumnConeMap
+#print axioms HomologicalComplex₂.adjacentColumnConeMap_quasiIso
 #print axioms HomologicalComplex₂.adjacentColumnConeToShift
 #print axioms HomologicalComplex₂.adjacentColumnConeToShift_quasiIso
 #print axioms HomologicalComplex₂.adjacentColumnInclusion
@@ -354,6 +356,7 @@ end CanonicalIntegerClassLocalizationClient
 -- Generic adjacent-column totalization and naturality.
 #print axioms HomologicalComplex₂.adjacentColumnTotalShortComplexMap
 #print axioms HomologicalComplex₂.singleColumnBicomplexMap
+#print axioms HomologicalComplex₂.singleColumnTotalMap_quasiIso
 #print axioms HomologicalComplex₂.singleColumnHasTotal
 #print axioms HomologicalComplex₂.singleColumnShiftIso_naturality
 #print axioms HomologicalComplex₂.singleColumnShiftIso_naturality_assoc
