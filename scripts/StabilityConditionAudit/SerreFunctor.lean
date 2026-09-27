@@ -51,6 +51,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.isEquivalence
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.toSerreCategoryData
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.pairing
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.additive
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.pairing_apply
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.pairing_separating_left
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.pairing_separating_right
@@ -233,3 +234,26 @@ natural in B by `naturality_right`, and `uniqueIso` is natural in A by `naturali
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.uniqueIso_trans
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.uniqueIso_symm
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.exists_uniqueIso
+
+-- Conjugation is linear Serre theory; shifts and the Euler identity consume it downstream.
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.conj
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.transportIso
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.conj_eta_trans
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.conj_trans_uniqueIso_hom_app_eq_id
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.transportIso_refl
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.trace_transport
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.transportIso_isoCompat
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.transportIso_trans
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.commShiftIso
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.commShift
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.signedCommShift
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.signedCommShift_one_inv_app
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.trace_shift_one_signed
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.isTriangulated
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.chiHom_eq_chiHom_swap_serre
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.chiHom_eq_chiHom_swap_serre_of_bounded
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.chiHom_eq_negOnePow_mul_chiHom_of_serre_shift
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.chiHom_eq_negOnePow_mul_chiHom_of_serre_shift_of_bounded
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.chiHom_eq_negOnePow_mul_chiHom_twist
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.chiHom_eq_negOnePow_mul_chiHom_twist_of_bounded
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.chiHom_eq_negOnePow_mul_chiHom_twist_of_natIso

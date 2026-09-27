@@ -15,20 +15,60 @@ canonical paths for checkout, Git index, `.lake/build`, `.lake/packages`,
 the observed path and an OS-resolved `resolved_path`; lexical normalization is
 not evidence that two junctions are distinct. The validator rejects writable
 path equality or ancestor overlap and compares resource reservations per
-physical host using `host_capacity`. Read-only dependency paths may be shared,
-but the snapshot must say so explicitly.
+physical host using `host_capacity`. A job's `.lake/packages` and `.lake/build`
+must be writable trees resolving within its own checkout; a symlink to another
+worktree is not an immutable dependency cache. All eight required roots are
+mutable; an input marking any of them read-only is rejected.
+Path collisions are scoped to jobs on the same physical host. POSIX path case
+is preserved; Windows records use Windows case normalization.
 
-`admit` creates an exact namespace lease with an atomic create; an existing
-lease is a fail-closed recovery condition. The lease stores a digest and full
-owner record, and `release` removes it only when the requested record matches
-that identity exactly. Namespace values are safe filenames and are contained
-under the configured lease directory. Neither command kills processes, deletes
-worktrees, repairs junctions, or changes runner services. A future bootstrap
-must inventory and reconcile stale holders under an operator-owned procedure
-before it is wired into required CI.
+`admit` takes a fresh physical-host capacity document and holds one exclusive
+lock in a host-owned lease directory while it reads **all** active leases,
+validates their digests and path identities, reserves the candidate's CPU/RAM/
+disk budget, and creates its exact namespace lease. A corrupt or stale lease
+fails closed for operator recovery. `release` uses the same lock and removes
+only an exact owner match. The lock directory must be an absolute host path
+outside every candidate and active job's writable roots, including temp,
+outputs, artifacts and elan; all runners on one host must use the **same**
+directory. Separate per-runner lease directories would defeat atomic admission.
+The candidate's paths are checked before opening the lock and again with all
+active leases under the lock. The trusted bootstrap must keep those resolved
+identities stable until job exit; this validator cannot prevent a job from
+retargeting a symlink after admission.
 
-The current CI workflow is intentionally unchanged by this issue. The next
-integration slice should collect these records before routing more work to the
-shared host and should use a host-level admission service when more
-than one runner process can be active. A recent-write heuristic or a runner
-label is not an admission lock.
+Example operator sequence, with a capacity file measured for the physical host
+immediately before admission:
+
+```bash
+python3 scripts/runner_state.py report snapshot.json
+python3 scripts/runner_state.py admit candidate.json \
+  --lease-dir "$HOME/.local/state/dag-runner-leases" \
+  --host-capacity host-capacity.json
+python3 scripts/runner_state.py release candidate.json \
+  --lease-dir "$HOME/.local/state/dag-runner-leases"
+```
+
+`host-capacity.json` maps one physical `host_id` to positive `cpu_threads`,
+`memory_bytes` and `disk_bytes` limits. It is a trusted operator input, not PR
+content. The reservation may be smaller than physical capacity to leave room
+for the desktop and other services. Refresh available disk and host load before
+every admission; this library validates the supplied numbers but does not yet
+measure them or wire itself into Actions job startup. A runner label is not a
+capacity record. Shared downloads need a separate immutable provenance
+demonstration; this contract currently requires a copied package tree. A
+per-job Git index, elan, temporary and output paths are checked for cross-job
+overlap.
+
+The commands do not kill processes, delete worktrees, repair junctions, or
+change runner services. After cancellation, an operator must establish that
+the prior job's processes have stopped before releasing its lease. A lease
+with an unknown owner is retained for investigation; do not remove it to make
+another job fit. Bootstrap, exact-target workspace cleanup, live Actions
+admission wiring and the two-build cancellation/cold-warm demonstration remain
+open in #1435.
+
+The current CI workflow is unchanged by this progress slice. The next slice
+must make the host capacity and active-job record collector trusted, bootstrap
+isolated workspaces, and call this admission path before a job can write.
+Until then, a passing fixture is code-complete evidence, not an applied runner
+control. A recent-write heuristic or a runner label is not an admission lock.

@@ -11,7 +11,8 @@ The placement rule has two tiers, stated in full in
 [placement.md](docs/architecture/placement.md). The subject/application
 boundaries and compact issue/PR decision record are maintained in
 [mathematical-ownership.md](docs/architecture/mathematical-ownership.md).
-`CLAUDE.md` and `AGENTS.md` summarize the same rules for coding agents.
+`AGENTS.md`, which `CLAUDE.md` imports, summarizes the same rules for coding
+agents.
 
 1. **An extension of a Mathlib API lives at that API's Mathlib path**, under
    `DerivedAlgGeo/`, in that API's namespace. Derived categories, `Ext`, and
@@ -134,9 +135,10 @@ the ratchet improves, lower its ceiling; never raise one to make a change pass.
 Every gate script under `scripts/` prints through `scripts/_output.py`: a new
 `scripts/check_*.py` must `from _output import force_utf8_output` and call
 `force_utf8_output()` as the first statement of its `if __name__ == "__main__":`
-block. The self-hosted Windows runner's console is cp1252, and a gate that
-prints a declaration name such as `chi₂_eq` without this dies with a `charmap`
-traceback instead of its finding (#868, #869). `python3 scripts/_output.py`
+block. While the self-hosted runners ran Windows (until 2026-09-21), their
+console was cp1252, and a gate that printed a declaration name such as
+`chi₂_eq` without this died with a `charmap` traceback instead of its finding
+(#868, #869); any non-UTF-8 console still does. `python3 scripts/_output.py`
 checks every script for the call and reproduces the crash to prove the helper
 prevents it; it runs near the front of `scripts/gates.sh`, of
 `scripts/precheck.sh`, and in CI.
@@ -171,16 +173,17 @@ python -m pip install -r scripts/requirements-loop.txt
 scripts/precheck.sh
 ```
 
-Keep this environment activated for local precheck and loop-controller
-commands: the scripts invoke `python3`, which will then resolve to the same
-environment that received the parser dependency.
+Keep this environment activated for local precheck: the scripts invoke
+`python3`, which will then resolve to the same environment that received the
+parser dependency.
 
 It runs every gate in `scripts/gates.sh` that needs no Lean build — workflows,
 `--diff-only` style on your own lines, source-independence, layering, the
 neutral derived-category Stability import closure, umbrella coverage, root
 reachability, coherent families, coverage map, pin, nolints,
 roadmap, and the two hook tests — then a targeted `lake build` of the modules
-you changed. Seconds, not minutes. It is a cheap green, not a green: the
+you changed. About a minute plus that build, against twenty minutes or more for
+CI. It is a cheap green, not a green: the
 library build, the audits, the ratchets, the linters and the emitter all need
 the library elaborated and run on the runners.
 
@@ -189,23 +192,93 @@ the library elaborated and run on the runners.
 An unattended run takes GitHub issues or a milestone and follows
 [the run-loop skill](.claude/skills/run-loop/SKILL.md) to merged PRs without
 owner input. The issue body is its specification, so write issues so that
-works:
-- state the goal;
-- give the definition of done as checkable statements;
-- list the deliverables: leaf paths, audits, umbrellas;
-- give dependencies as GitHub "blocked by" links;
-- say whether the issue closes in one PR (complete) or several (progress).
+works. Use the [formalization issue template](.github/ISSUE_TEMPLATE/formalization.md);
+an agent fills in a copy, deletes its front matter, and files it with
+`gh issue create --title <title> --body-file <file>`, because
+`gh issue create --body` ignores templates. Each field prevents a failure seen
+in loop runs:
 
-The run researches each issue and writes its plan into the PR description. Four
-independent reviewers must pass it on the same commit, with at most three
-rounds per PR. It merges once the required `ci` check passes, then takes the
-next issue. An issue it cannot finish is parked as a draft PR with its open
-findings, not waited on.
+| Field | What it prevents |
+| --- | --- |
+| Outcome, first consumer, complete or progress | losing the big picture across PRs |
+| Versioned source, theorem numbers, proof route, conventions | re-derived or invented routes, repeated unversioned fetches |
+| API verified at the pin (path:line), or "absent at the pin" | guessed names |
+| Each hypothesis load-bearing (with a witness) or weakenable | false "X fails" claims, over-hypothesis rounds |
+| Placement tier, files, namespaces, shared files | refactor rounds, cross-issue coupling |
+| Definition of done as named declarations, docstrings or gates | dropped acceptance items |
+| Non-goals and trust boundaries | conclusions smuggled in as fields or hypotheses |
+| Dependencies as issue numbers | misread blockers |
+| Known traps | repeating a failed route |
+| No process text | runs reverting to retired process |
+
+Before filing, check what the run's readiness step will check: dependencies
+resolve to issue numbers, every path and name the issue cites exists at the pin
+(or is marked absent), and the placement agrees with
+`docs/architecture/placement.md`. The filing agent does this, not the owner.
+
+On a roadmap-owned milestone, a new issue needs its `.claude/roadmap/*.yaml`
+entry, and a native blocked-by link must match its entry's `blocked_by`. CI's
+`roadmap` job reads the live tracker (RM-05, RM-06) and fails every open pull
+request until the two agree, so open the roadmap PR immediately after filing
+or linking, and merge it first.
+
+Labels never gate a loop run. `blocked` follows the blocked-by links;
+`research` means the first deliverable is a written verdict in the issue
+thread; `in-progress` expires when no PR is open.
+
+A milestone description carries the context its issues share. Paste this and
+fill it in:
+
+```markdown
+**Goal.** <What exists when this milestone closes, and its first consumer; or
+"foundational vocabulary: nothing is blocked on it".>
+
+**Source.** <Versioned reference(s), sections and theorem range, conventions
+every issue shares.> Pins: the Mathlib revision in `lake-manifest.json`.
+
+**Roadmap.** `.claude/roadmap/<file>.yaml`, entry `<id>` (or "none").
+
+**Issues.** GitHub blocked-by links decide the order; this list only
+summarises them.
+1. #A <title>
+2. #B <title>: needs #A
+3. #C <title>: independent of #B
+Shared files: `<umbrella>` and `<audit slice>` are created by #A; later issues
+append.
+
+**Out of scope.** <Each excluded result, and where it lives or why it cannot be
+done at the pin.>
+
+**Traps for every issue here.** <Shared conventions, false routes, hypotheses
+that look droppable but are not.>
+
+**Done when.** <All issues closed, plus any milestone-level statement.>
+
+**State.** Not kept here. Each issue's loop-state comment, and the latest run
+report on the tracking issue (#<n>, if any), hold it. Put no dated baselines,
+SHAs or "run X before Y" instructions in this description.
+```
+
+Start a run with one line: "Run the run-loop skill from origin/main on
+<milestone URL, or issues #a #b>." The runtime re-sends the kickoff message
+after every compaction, so keep rules and state out of it.
+
+The run researches each issue and writes its plan into the PR description.
+Four independent reviewers must pass it on the same commit, with at most three
+rounds per attempt. After an attempt exhausts them, the run freezes it as a
+draft PR, starts a separate read-only research examination and has the changed
+plan reviewed independently; an accepted plan gets a successor attempt on the
+same issue that inherits every finding, at most twice per issue. A renamed PR
+or branch cannot reset that history. The issue's loop-state comment carries it
+between contexts. The run merges once the required `ci` check passes on the
+PR's head, then takes the next issue; an issue it still cannot finish is
+parked as a draft PR with its open findings, and dependent issues wait.
 
 The request that starts a run authorizes its pushes, PRs and merges. The owner
 withdraws any of these with an explicit `false` in `.claude/loop-authority.yaml`
-on the default branch. A run never changes the loop's own tooling or
-instructions, and it uses no OpenSpec change, loop manifest or review ledger.
+on the default branch. A run changes the loop's own tooling or instructions
+only when the owner puts that work in its queue, and it uses no OpenSpec
+change, loop manifest or review ledger.
 The manifest controller (`scripts/loop_engine.py`, `.claude/loop-specs/`) is off
 the run path, and is kept only for the ledgers it already wrote. Issue closure
 for code work requires a merged PR.
@@ -214,8 +287,9 @@ This section previously read "Build the stable root while developing:
 `lake build`", and told you to run the fast gate before review and the full gate
 before merge. All three instructions are withdrawn. `CLAUDE.md` was corrected
 first, in `c91374a`, and this file was left behind — so for a while the two
-disagreed about the most basic question a contributor asks. `CLAUDE.md`
-§"Required verification" is the fuller statement; this is the short form.
+disagreed about the most basic question a contributor asks. AGENTS.md
+§"Required verification" (which `CLAUDE.md` imports) is the fuller statement;
+this is the short form.
 
 ## Local workflow
 

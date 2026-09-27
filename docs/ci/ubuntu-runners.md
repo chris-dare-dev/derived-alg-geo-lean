@@ -33,6 +33,36 @@ capacity limits, not benchmarked throughput guarantees. An oversized job may
 fail at its memory cap; use actual peak measurements before raising concurrency
 or limits. Four registrations are four processes on one physical machine.
 
+## Read-only inventory, 2026-09-27
+
+At 05:24 UTC, the GitHub runner API reported all four registrations online;
+the main runner was busy and the three general runners idle. `systemctl --user`
+reported four active services with separate main PIDs. Each runner's
+`_work/derived-alg-geo-lean/derived-alg-geo-lean`, `home/.elan`, `tmp`, and
+`cache` resolved under its own
+`/home/chris-dare/.local/share/github-runners/{main,general-1,general-2,general-3}/`
+root. The four resolved `.lake/packages` paths were distinct directories, not
+symlinks. This is a point-in-time inventory, not a proof about future jobs.
+
+The host measured 16 logical CPUs, 65,374,400,512 bytes of RAM and
+141,614,346,240 bytes of available filesystem space. The live service
+settings were three CPU seconds per second and 12 GiB maximum memory each;
+the shared runner slice was capped at 12 CPU seconds per second and 48 GiB.
+Those values bound the starting host-wide reservation policy, subject to
+fresh free-space/load readings and throughput measurements. Do not multiply
+capacity by the four runner labels.
+
+A separate read-only scan of this clone's 219 registered agent worktrees found
+three resolved `.lake/packages` targets shared by multiple worktrees (groups
+of 38, 22 and 19). These are not the runner package directories. They must
+not be treated as immutable merely because a worktree's `.lake/packages` is a
+symlink; the new admission preflight rejects such paths for a writable job.
+Migrate an idle agent non-destructively: create a new isolated worktree and
+job-owned package tree, copy from an idle verified donor if needed, compare
+the pin/toolchain inputs, run the focused build, then switch the pickup path.
+Keep the old checkout and cache until the new one is verified. No active
+service, checkout or cache was changed for this inventory.
+
 The user services invoke the runner's `runsvc.sh` entrypoint and restart after
 failures. User lingering makes them start at boot and survive logout. Inspect:
 
