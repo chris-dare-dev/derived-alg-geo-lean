@@ -10,13 +10,43 @@ import Mathlib.Algebra.Homology.DerivedCategory.Ext.Linear
 import DerivedAlgGeo.CategoryTheory.Linear.SerreFunctor.Basic
 
 /-!
-# Geometric Serre data on a smooth proper scheme
+# Geometric comparison for Serre duality
 
-`GeometricSerreData` packages an abstract right Serre functor, an explicit
-isomorphism to the derived canonical twist followed by shift, and the supplied
-sheaf comparison. The derived duality and its naturality are transported along
-the isomorphism; bounded Hom-finiteness follows from the scalar Ext comparison,
-sheaf Ext-finiteness, and derived duality. No geometric inhabitant is built here.
+This file relates abstract Serre duality on the bounded coherent derived category
+of a smooth proper scheme to the existing sheaf-level bilinear duality data.
+
+## Main definitions
+
+* `GeometricSerreData` holds the abstract Serre datum, a derived canonical
+  twist, their natural isomorphism after shifting, and sheaf-range comparison
+  data.
+* `GeometricSerreData.toSerreFunctorData` transports the abstract datum to the
+  specified twist-then-shift functor.
+
+## Main results
+
+* `GeometricSerreData.finrank_eq_from_abstract` recovers the sheaf-range
+  numerical duality in one direction.
+* `GeometricSerreData.hom_finite_bounded` derives finite-dimensional Hom spaces
+  with bounded shift support for the bounded coherent derived category.
+
+## Implementation notes
+
+`GeometricSerreData.serre` reuses the canonical abstract Serre root. The scalar
+compatibility of the additive Ext comparison and the derived twist's restriction
+to sheaves are supplied; the resulting derived duality and its naturality are
+transported along the specified functor isomorphism. Hom-finiteness follows
+from sheaf Ext-finiteness, that transport, and the standard t-structure. No
+geometric inhabitant or derived tensor functor is constructed here.
+
+## References
+
+* `CategoryTheory.SerreFunctor.SerreFunctorData` is the abstract duality root.
+* `AlgebraicGeometry.Duality.Serre.BilinearData` is the sheaf presentation.
+
+## Tags
+
+Serre duality, bounded derived category, coherent sheaves, Ext comparison.
 -/
 
 universe u
@@ -81,8 +111,9 @@ variable {k : Type u} [Field k] {X : Scheme.{u}}
   [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X] {n : ℕ}
 private local instance hasExtCohCategorical2 : HasExt.{u + 1} (Coh X) := HasExt.standard _
 
-/-- Forget the scalar action in `BilinearData.extComparison` to obtain the
-underlying additive Ext comparison. -/
+/-- Convert the supplied additive-group isomorphism to an additive equivalence.
+Its scalar compatibility is separately supplied by
+`GeometricSerreData.extComparison_scalar`. -/
 noncomputable def extSpaceAddEquiv
     {K : SmoothProperVariety.CanonicalSheafData k X n}
     (S : AlgebraicGeometry.Duality.Serre.BilinearData K)
@@ -183,9 +214,9 @@ variable {k : Type u} [Field k] {X : Scheme.{u}}
   [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X] {n : ℕ}
 private local instance hasExtCohCategorical5 : HasExt.{u + 1} (Coh X) := HasExt.standard _
 
-/-- Compare the supplied derived Serre pairing with the sheaf-level
-bilinear pairing on coherent sheaves in degrees `i ≤ n`, using explicit scalar
-compatibility and the restriction of the canonical twist to sheaves. -/
+/-- Transport a derived Serre pairing into the realized Ext coordinates.
+Agreement with the sheaf duality pairing is the separate
+`GeometricSerreData.compat` field. -/
 noncomputable def sheafComparison
     {K : SmoothProperVariety.CanonicalSheafData k X n}
     (S : AlgebraicGeometry.Duality.Serre.BilinearData K)
@@ -333,7 +364,7 @@ private noncomputable abbrev B : Coh X ⥤ D (X := X) :=
   DerivedCategory.boundedSingleFunctor (Coh X)
 private local instance hasExtCohRecovery : HasExt.{u + 1} (Coh X) := HasExt.standard _
 
-private theorem negativeHomZero (E F : Coh X) (j : ℤ) (hj : j < 0) :
+private theorem finrank_shifted_hom_eq_zero_of_neg (E F : Coh X) (j : ℤ) (hj : j < 0) :
     Module.finrank k (((B (X := X)).obj E) ⟶ ((B (X := X)).obj F)⟦j⟧) = 0 := by
   let J := DerivedCategory.Bounded.ι (C := Coh X)
   have hJ : J.FullyFaithful := Functor.FullyFaithful.ofFullyFaithful J
@@ -358,7 +389,7 @@ private theorem negativeHomZero (E F : Coh X) (j : ℤ) (hj : j < 0) :
     infer_instance
   exact e.finrank_eq.trans Module.finrank_zero_of_subsingleton
 
-private theorem highHomZeroNoBounded (G : GeometricSerreData K)
+private theorem finrank_shifted_hom_eq_zero_of_dim_lt (G : GeometricSerreData K)
     (E F : Coh X) (j : ℤ) (hj : (n : ℤ) < j) :
     Module.finrank k (((B (X := X)).obj E) ⟶ ((B (X := X)).obj F)⟦j⟧) = 0 := by
   let A := (B (X := X)).obj E
@@ -372,7 +403,8 @@ private theorem highHomZeroNoBounded (G : GeometricSerreData K)
       (G.twistOnSheaves E))
   let eShift := AlgebraicGeometry.Duality.Serre.shiftCancel (k := k) C W j (n : ℤ)
   have hneg : Module.finrank k (C ⟶ W⟦(n : ℤ) - j⟧) = 0 :=
-    negativeHomZero (k := k) F (G.bilinear.canonicalTwist E) ((n : ℤ) - j) (by omega)
+    finrank_shifted_hom_eq_zero_of_neg (k := k)
+      F (G.bilinear.canonicalTwist E) ((n : ℤ) - j) (by omega)
   have hDual : Module.finrank k
       (Module.Dual k (A ⟶ C⟦j⟧)) = 0 :=
     eDual.finrank_eq.trans (eTwist.finrank_eq.trans (eShift.finrank_eq.trans hneg))
@@ -396,7 +428,7 @@ private local instance hasExtCohFiniteness : HasExt.{u + 1} (Coh X) := HasExt.st
 /-- The sheaf Ext comparison and Serre duality bound the derived Hom support,
 so the bounded coherent derived category has finite-dimensional Hom spaces
 with finite shift support. -/
-theorem homFiniteBoundedFromRest (G : GeometricSerreData K) :
+theorem hom_finite_bounded (G : GeometricSerreData K) :
     CategoryTheory.Triangulated.HomFiniteBounded k
       (SchemeBoundedCoherentDerivedCategory X) := by
   letI : DerivedCategory.ExtFiniteBounded (k := k) (A := Coh X) :=
@@ -414,7 +446,7 @@ theorem homFiniteBoundedFromRest (G : GeometricSerreData K) :
         have hhigh : (n : ℤ) < (j : ℤ) := by
           simp only [Finset.mem_coe, Finset.mem_range] at hnot
           omega
-        have hzero := highHomZeroNoBounded G E F (j : ℤ) hhigh
+        have hzero := finrank_shifted_hom_eq_zero_of_dim_lt G E F (j : ℤ) hhigh
         have he := (extToBounded (k := k) E F j).finrank_eq
         rw [Function.mem_support] at hj
         exact hj (by exact_mod_cast he.trans hzero))

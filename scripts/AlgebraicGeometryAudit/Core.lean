@@ -912,7 +912,7 @@ is not closed. -/
 #print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.mk.sizeOf_spec
 #print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.toSerreFunctorData
 #print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.finrank_eq_from_abstract
-#print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.homFiniteBoundedFromRest
+#print axioms AlgebraicGeometry.Duality.Serre.GeometricSerreData.hom_finite_bounded
 
 /- The `BilinearData` and `TrivialCanonical` fields, and the `HasExt` instance the file needs.
 
