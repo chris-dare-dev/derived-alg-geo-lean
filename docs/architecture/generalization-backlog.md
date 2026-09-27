@@ -451,3 +451,61 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
 - weaker hypotheses:  an ambient bifunctor on three (possibly distinct) triangulated categories with a supplied `ExactBifunctor`, three object properties whose full subcategories inherit triangulated structures, and an explicit closure witness from the first two properties into the output property; no single-category or same-property identification among the three positions
 - source note:        This is a plausible API generalization inferred from the current restriction's use of one category and property for all three positions. The distinct-category coherence transport was not proved or compiled during this review.
 - state:              UNVERIFIED
+
+### 2026-09-26 — generation-time `+1` submultiplicativity without `P.Nonempty`
+- chunk:              rou1-920-envelope-composition
+- reviewing commit:   b674a436dd002da2487d744531f804ddbb795628
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `CategoryTheory.ObjectProperty.generationTime` and the
+  planned envelope-composition API
+- weaker hypotheses:  the scalar inequality
+  `P.generationTime R + 1 ≤ (P.generationTime Q + 1) *
+  (Q.generationTime R + 1)` needs no separate `[P.Nonempty]` binder. The
+  iterated-envelope composition law and zero-stage fixed-point statement also
+  hold without `[P.Nonempty]`; the fixed-point statement additionally needs no
+  `[IsTriangulated C]`.
+- pin status:         PIN-CONFIRMED for the corollary proof route
+- source note:        `CategoryTheory.ObjectProperty.generationTime_add_one_submultiplicative`
+  proves the scalar inequality by splitting the empty-generator case from
+  finite generation-time witnesses. `triangEnvelopeIter_compose` handles an
+  empty property by showing all its iterates are bottom; the nonempty branch
+  uses the fixed-point lemma. The fixed-point proof uses
+  `triangEnvelopeIter_succ`, which needs only the shared pretriangulated
+  context, while the composition proof uses the triangulated stage-addition
+  API.
+- state:              L (proof-witness verified)
+
+### 2026-09-26 — products of retract-closed object properties
+- chunk:              rou1-920-envelope-composition
+- reviewing commit:   12b1f252d33ca17406fc85197fa060c33794fc78
+- found by:           abstraction-adversary
+- proposed ancestor:  `Mathlib.CategoryTheory.ObjectProperty.Retract`
+- weaker hypotheses:  a category with binary products and an object property
+  `Q` closed under binary products; no additive, shift, or triangulated
+  structure
+- pin status:         UPSTREAM-ONLY (the pinned
+  `ObjectProperty/Retract.lean` and `ObjectProperty/FiniteProducts.lean`
+  provide no such closure instance)
+- source note:        The private `retractClosure_isClosedUnderBinaryProducts`
+  proof constructs products of two retracts componentwise and transfers the
+  product property across an isomorphism. Whether this belongs as a general
+  closure API in Mathlib's retract module remains to be confirmed.
+- state:              UNVERIFIED
+
+### 2026-09-26 — products of extension-closed object properties
+- chunk:              rou1-920-envelope-composition
+- reviewing commit:   12b1f252d33ca17406fc85197fa060c33794fc78
+- found by:           abstraction-adversary
+- proposed ancestor:  `Mathlib.CategoryTheory.Triangulated.Subcategory`
+- weaker hypotheses:  the existing pretriangulated context, binary products,
+  and binary-product closure of both input properties; no `IsTriangulated`
+  or nonemptiness assumption
+- pin status:         UPSTREAM-ONLY (the pinned `Subcategory.lean` has only
+  the more restrictive closure instance requiring a triangulated object
+  property)
+- source note:        The private `extensionProduct_prop_prod` and
+  `extensionProduct_isClosedUnderBinaryProducts` proofs form products of the
+  input distinguished triangles using Mathlib's
+  `productTriangle_distinguished`. Whether to expose this weaker closure
+  result as general Subcategory API remains to be confirmed.
+- state:              UNVERIFIED
