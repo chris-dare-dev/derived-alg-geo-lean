@@ -165,6 +165,9 @@ namespace ShiftCompatibility
 
 open CounitKernelConeData.PresentedCounitComparisonData.ShiftCompatibility
 
+noncomputable local instance : (K.transportedTwist eA).CommShift ℤ :=
+  K.twist.transportedH0CommShift
+
 /-- Supply the selected Fourier--Mukai dual-cotwist shift structure and
 compatibility of the dg comparison.  The result is the existing twist
 compatibility record viewed through the semantic facade. -/
@@ -175,9 +178,10 @@ def ofCommShift
         K.twist.transportedH0CommShift
       letI : T.dualCotwist.CommShift ℤ := dualCotwistCommShift
       NatTrans.CommShift N.transportedDualCotwistIso.hom ℤ) :
-    N.ShiftCompatibility where
-  twistCommShift := dualCotwistCommShift
-  transportedTwistIso_commShift := transportedDualCotwistIso_commShift
+    FunctorIsoShiftCompatibility
+      (K.transportedTwist eA) T.dualCotwist N.transportedDualCotwistIso where
+  targetCommShift := dualCotwistCommShift
+  hom_commShift := transportedDualCotwistIso_commShift
 
 variable (h : N.ShiftCompatibility)
 
