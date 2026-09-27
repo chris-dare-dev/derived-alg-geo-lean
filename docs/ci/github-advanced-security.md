@@ -34,23 +34,38 @@ scans.
 | [#1427](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1427) | 2026-09-21 23:12:52 | [run 35666505192](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35666505192) / [job 106553349308](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35666505192/job/106553349308) | [`deafef42b66b2f7ea9160247b13f62d2176a184f`](https://github.com/chris-dare-dev/derived-alg-geo-lean/commit/deafef42b66b2f7ea9160247b13f62d2176a184f) | Provider workflow succeeded, but no bound result artifact or executed negative-fixture proof was found; coverage remains unverified. |
 | [#1473](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1473) | 2026-09-23 02:57:40 | [run 35812428038](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35812428038) / [job 107026703282](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35812428038/job/107026703282) | [`edcf0b6213d9e5508ec85381f3d78e64c8d6feae`](https://github.com/chris-dare-dev/derived-alg-geo-lean/commit/edcf0b6213d9e5508ec85381f3d78e64c8d6feae) | Repeated Copilot SDK HTTP 403 authentication/licensing failure before scan; `provider_failure`. |
 
-## Current PR-head snapshot
+## Current open PR-head snapshot
 
-Captured at **2026-09-27 01:43:13 UTC** from PR metadata and the GitHub
-check-runs API. These observations are bound to the listed full head revisions.
+Captured at **2026-09-27 02:03:44 UTC** from PR metadata, check-runs API
+responses, and the live `main` required-status-check endpoint. These were all
+four PRs open in the repository at capture. Each check-runs request used
+`GET /repos/chris-dare-dev/derived-alg-geo-lean/commits/{head_sha}/check-runs?per_page=100&page=1`;
+the total counts were below 100, so each complete response fit on the first
+page. The snapshot artifact records the exact request URL, head SHA, `total_count`,
+returned names/statuses, and result links:
+[current-check-runs-2026-09-27T02-03-44Z.json](../../openspec/changes/ci1-1433-security-evidence-refresh/evidence/current-check-runs-2026-09-27T02-03-44Z.json)
+(SHA-256 `0c44956a03dfa12136b22f84333c59123072bf143c0060d082312418db9a76d1`).
 
-| PR head | Security check observation | Other check status at capture |
+| PR head | Check-runs response | Returned checks at capture |
 |---|---|---|
-| [#1566](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1566), [`06079755b65fb71c14d8f655832829e4b8bf65fd`](https://github.com/chris-dare-dev/derived-alg-geo-lean/commit/06079755b65fb71c14d8f655832829e4b8bf65fd) | No `github-advanced-security` check run appeared in the three returned check runs; classify this head as missing/unknown. | `build`, `roadmap`, and required `ci` succeeded in [run 36273289044](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36273289044). |
-| [#1568](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1568), [`5364d5bc2c7aaaf81953ef78583c7a7fd192489d`](https://github.com/chris-dare-dev/derived-alg-geo-lean/commit/5364d5bc2c7aaaf81953ef78583c7a7fd192489d) | No `github-advanced-security` check run appeared in the two returned check runs; classify this head as missing/unknown. | `roadmap` succeeded and `build` was in progress in [run 36286127013](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36286127013); required `ci` had not yet appeared. |
+| [#1566](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1566), [`06079755b65fb71c14d8f655832829e4b8bf65fd`](https://github.com/chris-dare-dev/derived-alg-geo-lean/commit/06079755b65fb71c14d8f655832829e4b8bf65fd) | [API response](https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/commits/06079755b65fb71c14d8f655832829e4b8bf65fd/check-runs?per_page=100&page=1), `total_count: 3` | `ci`, `build`, and `roadmap` all succeeded in [run 36273289044](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36273289044); no security check was returned. |
+| [#1568](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1568), [`5364d5bc2c7aaaf81953ef78583c7a7fd192489d`](https://github.com/chris-dare-dev/derived-alg-geo-lean/commit/5364d5bc2c7aaaf81953ef78583c7a7fd192489d) | [API response](https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/commits/5364d5bc2c7aaaf81953ef78583c7a7fd192489d/check-runs?per_page=100&page=1), `total_count: 2` | `roadmap` succeeded and `build` was in progress in [run 36286127013](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36286127013); no security check or required `ci` result had appeared. |
+| [#1570](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1570), [`b03e2a5b54b2af28a279049e5803e3ee79d76c8e`](https://github.com/chris-dare-dev/derived-alg-geo-lean/commit/b03e2a5b54b2af28a279049e5803e3ee79d76c8e) | [API response](https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/commits/b03e2a5b54b2af28a279049e5803e3ee79d76c8e/check-runs?per_page=100&page=1), `total_count: 6` | Two `ci`/`build`/`roadmap` runs succeeded, including [run 36284578168](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36284578168); no security check was returned. |
+| [#1571](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1571), [`54f7afb99d411fb51dafe2c50175b18a55a71911`](https://github.com/chris-dare-dev/derived-alg-geo-lean/commit/54f7afb99d411fb51dafe2c50175b18a55a71911) | [API response](https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/commits/54f7afb99d411fb51dafe2c50175b18a55a71911/check-runs?per_page=100&page=1), `total_count: 3` | `ci`, `build`, and `roadmap` succeeded in [run 36285293310](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36285293310); no security check was returned. |
 
-The missing observations do not show that the provider permanently retired the
-check, that a scan was clean, or that any failure should be suppressed. Recheck
-the exact current head before using these entries as operational evidence. The
-existing `scripts/ci_gate_inventory.json` classifies this check as auxiliary
-and `required: false`, applicable to PRs; the live `main` branch-protection API
-listed only `ci` as a required context at capture. Optional status does not
-mean invisible: provider failures remain reportable, and `ci` remains required.
+For each exact PR revision, the missing check is an API-level observation bound
+to the check-runs endpoint, query, capture time, total count, and complete
+returned first page in the saved artifact. No provider run/job ID exists for a
+missing check, so none is fabricated. These observations do not show that the
+provider permanently retired the check, that a scan was clean, or that any
+failure should be suppressed. Recheck the exact head before using this dated
+snapshot as operational evidence.
+
+The checked-in `scripts/ci_gate_inventory.json` classifies this check as
+auxiliary and `required: false`, applicable to PRs. At the same capture time,
+the live required-status-check endpoint reported `strict: true` and only `ci`
+as a required context. Optional status does not mean invisible: provider
+failures remain reportable, and `ci` remains required.
 
 ## Owner decision paths
 
@@ -66,12 +81,30 @@ Until an owner selects and completes one of these paths, keep the issue open and
 the provider's errors visible. Do not add `continue-on-error`, fabricate a
 success status, weaken required `ci`, or remove the check to make a PR green.
 
-## Evidence contract
+## Evidence contract and validator boundary
 
-The normalized `verified_scan` disposition is intentionally strict: successful
-PR and `main` executions must bind the workflow, run, job, candidate revision,
-scanner scope, and a hashed result artifact, and include an executed negative
-fixture whose expected finding was observed. An empty proof object, an
-unverified provider success, or an absent check is not coverage. Replacement or
-retirement decisions require an owner, reason, timestamp, exact reviewed
-revision, and follow-up; they remain distinct from scan outcomes.
+For issue-level closure, require separate successful execution records for the
+current PR revision and for `main` where configured. Each record must bind its
+own workflow, run, job, candidate SHA, scanner scope, hashed result artifact,
+and executed negative fixture with its expected finding observed. A single
+run's free-form scope list is not evidence of both environments.
+
+The existing `scripts/security_evidence.py` validator checks one JSON execution
+record at a time. For `verified_scan`, it checks the run/job and candidate-SHA
+bindings, artifact digest fields, negative-fixture fields, and zero findings;
+however, it only requires `scope` to be a non-empty string array. It does not
+aggregate a PR record with a separate `main` record or enforce which scopes are
+supported. Its current test accepts `pull_request` and `push:main` in the scope
+array of one run. Therefore a valid single-record result from
+`security_evidence.py` is not, by itself, proof of the issue's separate
+PR-and-`main` closure requirement.
+
+The labels `successful-but-unverified` and `missing/unknown` in this diagnosis
+are documentation classifications. The current JSON validator has no separate
+successful-but-unverified or missing-check disposition and requires workflow,
+run/job IDs, provider, phase, and conclusion. A missing-check observation is
+instead recorded from the check-runs API snapshot above; it is not a validator
+input and does not invent a run ID. An unverified success, an absent check, or
+an empty proof is not coverage. Replacement or retirement decisions require
+an owner, reason, timestamp, exact reviewed revision, and follow-up; they
+remain distinct from scan outcomes.
