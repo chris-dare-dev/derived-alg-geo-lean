@@ -130,6 +130,39 @@ def bind_provider_proof(candidate: dict) -> None:
     ).hexdigest()
 
 
+def absent_security_scan(setting_state: str = "disabled") -> dict:
+    return {
+        "head_sha": SHA_B,
+        "state": {
+            "disabled": "disabled_by_setting",
+            "enabled": "missing",
+            "unknown": "provider_state_unknown",
+        }[setting_state],
+        "setting": {
+            "head_sha": SHA_B,
+            "api_path": "/code-scanning/ai-scan",
+            "state": setting_state,
+            "requested_at_utc": "2026-09-27T17:00:00Z",
+            "completed_at_utc": "2026-09-27T17:00:01Z",
+            **(
+                {"error": "setting unavailable (403)"}
+                if setting_state == "unknown"
+                else {"response": {"pr_scan": setting_state}}
+            ),
+        },
+        "matching_check_ids": [],
+        "matching_run_ids": [],
+        "run_query": {
+            "api_path": f"/actions/runs?head_sha={SHA_B}",
+            "requested_at_utc": "2026-09-27T17:00:01Z",
+            "completed_at_utc": "2026-09-27T17:00:02Z",
+            "total_observed": 1,
+            "pagination": "all_link_pages_and_advertised_total_checked",
+        },
+        "head_workflow_runs": [{"id": 35532316123, "head_sha": SHA_B}],
+    }
+
+
 class ContractTests(unittest.TestCase):
     def evaluate(self, candidate: dict, inventory: dict = INVENTORY) -> dict:
         direct_ref_event = isinstance(candidate.get("event"), str) and candidate["event"] in {
@@ -494,11 +527,28 @@ class ContractTests(unittest.TestCase):
         candidate["gates"] = [
             gate for gate in candidate["gates"] if gate["id"] != "github-advanced-security"
         ]
+        candidate["artifacts"] = [
+            artifact for artifact in candidate["artifacts"]
+            if artifact["subject"] != "github-advanced-security"
+        ]
+        candidate["security_scan"] = absent_security_scan()
         result = self.evaluate(candidate)
         self.assertTrue(result["valid"], result)
         self.assertTrue(result["claims"]["required_ci_verified"])
         self.assertFalse(result["claims"]["all_pipelines_green"])
-        self.assertTrue(any("github-advanced-security is missing" in w for w in result["warnings"]))
+        self.assertTrue(any("github-advanced-security is disabled_by_setting" in w for w in result["warnings"]))
+
+        for setting, state in (("enabled", "missing"), ("unknown", "provider_state_unknown")):
+            with self.subTest(setting=setting):
+                candidate["security_scan"] = absent_security_scan(setting)
+                result = self.evaluate(candidate)
+                self.assertTrue(result["valid"], result)
+                self.assertTrue(any(f"github-advanced-security is {state}" in w for w in result["warnings"]))
+                self.assertTrue(result["claims"]["required_ci_verified"])
+
+        candidate["security_scan"] = absent_security_scan("disabled")
+        candidate["security_scan"]["setting"]["state"] = "enabled"
+        self.assert_invalid(candidate, "contradicts its raw response")
 
     def test_dynamic_security_check_binds_head_and_own_run(self) -> None:
         candidate = evidence()

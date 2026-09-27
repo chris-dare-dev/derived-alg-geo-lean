@@ -9,6 +9,7 @@ GitHub API returned HTTP 200.
 from __future__ import annotations
 
 import base64
+import copy
 import hashlib
 import json
 import os
@@ -555,6 +556,31 @@ AI_SCAN_BOT_ID = 62310815
 AI_SCAN_PATH = "dynamic/agents/github-advanced-security"
 
 
+def _matching_ai_scan_checks(checks: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        check for check in checks
+        if check.get("name") == "github-advanced-security"
+        and isinstance(check.get("app"), dict)
+        and check["app"].get("slug") == "github-actions"
+    ]
+
+
+def _matching_ai_scan_runs(
+    runs: list[dict[str, Any]], pr_number: int, head: str
+) -> list[dict[str, Any]]:
+    return [
+        run for run in runs
+        if run.get("workflow_id") == AI_SCAN_WORKFLOW_ID
+        and run.get("path") == AI_SCAN_PATH
+        and run.get("event") == "dynamic"
+        and run.get("head_sha") == head
+        and run.get("name") == f"Code scanning AI findings on PR #{pr_number}"
+        and isinstance(run.get("actor"), dict)
+        and run["actor"].get("id") == AI_SCAN_BOT_ID
+        and run["actor"].get("login") == "github-advanced-security[bot]"
+    ]
+
+
 def _observed_at() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="microseconds")
 
@@ -612,28 +638,13 @@ def _dynamic_security_gate(
         or definition.get("producer") != "github-actions/AI Scan"
     ):
         raise EvidenceError("unrecognized dynamic security gate definition")
-    checks = [
-        check for check in observed["check_runs"]
-        if check.get("name") == definition["name"]
-        and isinstance(check.get("app"), dict)
-        and check["app"].get("slug") == "github-actions"
-    ]
+    checks = _matching_ai_scan_checks(observed["check_runs"])
     query = f"/actions/runs?head_sha={head}"
     requested_at = _observed_at()
     runs = client.get_all(query, key="workflow_runs")
     completed_at = _observed_at()
     observed["ai_scan_head_workflow_runs"] = runs
-    matches = [
-        run for run in runs
-        if run.get("workflow_id") == AI_SCAN_WORKFLOW_ID
-        and run.get("path") == AI_SCAN_PATH
-        and run.get("event") == "dynamic"
-        and run.get("head_sha") == head
-        and run.get("name") == f"Code scanning AI findings on PR #{pr_number}"
-        and isinstance(run.get("actor"), dict)
-        and run["actor"].get("id") == AI_SCAN_BOT_ID
-        and run["actor"].get("login") == "github-advanced-security[bot]"
-    ]
+    matches = _matching_ai_scan_runs(runs, pr_number, head)
     scan = {
         "head_sha": head,
         "setting": setting,
@@ -753,12 +764,7 @@ def _verify_dynamic_security_publication(
     suites: dict[int, dict[str, Any]],
 ) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], str, str]:
     """Rebind a historical dynamic gate; current settings cannot certify old scans."""
-    candidates = [
-        check for check in checks.values()
-        if check.get("name") == "github-advanced-security"
-        and isinstance(check.get("app"), dict)
-        and check["app"].get("slug") == "github-actions"
-    ]
+    candidates = _matching_ai_scan_checks(list(checks.values()))
     if len(candidates) != 1 or candidates[0].get("id") != provider_id:
         raise EvidenceError("dynamic gate has no unique live check")
     check = candidates[0]
@@ -775,17 +781,7 @@ def _verify_dynamic_security_publication(
     ):
         raise EvidenceError("dynamic gate check, suite and app disagree")
     runs = client.get_all(f"/actions/runs?head_sha={head}", key="workflow_runs")
-    matching = [
-        run for run in runs
-        if run.get("workflow_id") == AI_SCAN_WORKFLOW_ID
-        and run.get("path") == AI_SCAN_PATH
-        and run.get("event") == "dynamic"
-        and run.get("head_sha") == head
-        and run.get("name") == f"Code scanning AI findings on PR #{pr_number}"
-        and isinstance(run.get("actor"), dict)
-        and run["actor"].get("id") == AI_SCAN_BOT_ID
-        and run["actor"].get("login") == "github-advanced-security[bot]"
-    ]
+    matching = _matching_ai_scan_runs(runs, pr_number, head)
     if len(matching) != 1:
         raise EvidenceError("dynamic gate has no unique live workflow")
     run = matching[0]
@@ -1069,6 +1065,11 @@ def collect(client: GitHubClient, pr_number: int) -> dict[str, Any]:
         "artifacts": artifacts,
         "gates": gates,
     }
+    if "security_scan" in observed:
+        evidence["security_scan"] = copy.deepcopy({
+            **observed["security_scan"],
+            "head_workflow_runs": observed["ai_scan_head_workflow_runs"],
+        })
 
     final_base, final_head, final_pr = _current_identity(client, pr_number)
     if final_base != base or final_head != head:
@@ -1116,10 +1117,6 @@ def collect(client: GitHubClient, pr_number: int) -> dict[str, Any]:
         validation["errors"].append("no provider-bound gate artifacts were collected")
         validation["claims"]["required_ci_verified"] = False
         validation["claims"]["all_pipelines_green"] = False
-    if "security_scan" in observed:
-        validation["warnings"].append(
-            "optional AI Scan observation: " + observed["security_scan"]["state"]
-        )
     # Unknown auxiliary observations remain visible, and cannot support an
     # all-pipelines-green statement from this collector.
     foreign = [
@@ -1604,6 +1601,37 @@ def verify_premerge_provider_evidence(
     }
     if len(recorded_check_map) != len(recorded_checks) or recorded_check_map != live_check_summaries:
         raise EvidenceError("receipt does not enumerate the complete live check-run set")
+
+    security_definition = definitions.get("github-advanced-security")
+    if (
+        isinstance(security_definition, dict)
+        and security_definition.get("run_binding") == "dynamic"
+        and ci_contract._event_applies(security_definition, contract_evidence)
+    ):
+        security_scan = _required_object(
+            contract_evidence.get("security_scan"), "receipt AI Scan observation"
+        )
+        retained_setting = _required_object(
+            security_scan.get("setting"), "receipt AI Scan setting"
+        )
+        _validate_ai_scan_setting(retained_setting)
+        current_setting = _ai_scan_setting(client, head)
+        if any(
+            current_setting.get(field) != retained_setting.get(field)
+            for field in ("head_sha", "api_path", "state", "response", "error")
+        ):
+            raise EvidenceError("receipt AI Scan setting differs from the current provider response")
+        retained_runs = security_scan.get("head_workflow_runs")
+        live_runs = client.get_all(f"/actions/runs?head_sha={head}", key="workflow_runs")
+        if retained_runs != live_runs:
+            raise EvidenceError("receipt AI Scan head-run query differs from GitHub")
+        matching_runs = _matching_ai_scan_runs(live_runs, pr_number, head)
+        matching_checks = _matching_ai_scan_checks(list(live_checks.values()))
+        if (
+            security_scan.get("matching_run_ids") != [item.get("id") for item in matching_runs]
+            or security_scan.get("matching_check_ids") != [item.get("id") for item in matching_checks]
+        ):
+            raise EvidenceError("receipt AI Scan check/run classification differs from GitHub")
 
     statuses = client.get_all(f"/commits/{head}/statuses")
     status_map: dict[int, dict[str, Any]] = {}

@@ -166,7 +166,14 @@ A raw failure is a visible optional failure; missing, disabled and unavailable
 settings are separate visible states. None can make auxiliary health true or
 turn into a required `ci` failure. The collector retains the setting request
 window and full paginated run observations, then rechecks the head, setting
-and runs before returning. Cache warm and Docs have separate event selectors
+and runs before returning. Version 6 puts that `security_scan` observation,
+including the raw setting response and head-run query, in the contract evidence
+even when no check or gate exists. The validator gives a state-specific
+optional warning, and the publication verifier refetches the setting, complete
+head-run list and check list before accepting the retained classification. If
+provider state has changed since collection, historical absence is no longer
+independently verifiable from a current response; verification fails closed.
+Cache warm and Docs have separate event selectors
 and cannot borrow either the primary or dynamic run.
 
 Separate workflow runs on one head cannot silently supersede an older red

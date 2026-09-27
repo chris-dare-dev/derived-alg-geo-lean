@@ -61,7 +61,11 @@ unavailable setting means `provider_state_unknown`. A failed dynamic run is
 `unclassified_failure` from check colour alone; the archived four 403
 diagnoses use redacted logs. It is not automatically a security finding. A
 raw green dynamic run does not prove analysis or zero findings. Keep the raw
-conclusion and evidence separately.
+conclusion and evidence separately. Schema-6 `security_scan` evidence retains
+the setting response and complete head-run query even when the optional gate
+has no check ID. Its warning names the observed state. A later publication
+verifier rereads the provider; if the setting or head runs changed, it cannot
+certify the earlier absence from current provider state.
 
 ## Decision record for the owner
 

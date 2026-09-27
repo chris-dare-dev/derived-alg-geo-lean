@@ -692,6 +692,11 @@ class CollectorTests(unittest.TestCase):
                 fixture.security_setting = setting
                 result = collect(fixture.client(), 7)
                 self.assertEqual(result["observations"]["security_scan"]["state"], state)
+                self.assertEqual(result["evidence"]["security_scan"]["state"], state)
+                self.assertTrue(any(
+                    f"github-advanced-security is {state}" in warning
+                    for warning in result["validation"]["warnings"]
+                ))
                 self.assertFalse(result["validation"]["claims"]["auxiliary_checks_healthy"])
                 self.assertTrue(result["validation"]["claims"]["required_ci_verified"])
 
@@ -708,8 +713,17 @@ class CollectorTests(unittest.TestCase):
         self.assertEqual(scan["state"], "pending")
         self.assertEqual(scan["run_id"], 77777)
         self.assertEqual(scan["matching_check_ids"], [])
+        self.assertEqual(result["evidence"]["security_scan"]["state"], "pending")
         self.assertTrue(result["validation"]["claims"]["required_ci_verified"])
         self.assertFalse(result["validation"]["claims"]["auxiliary_checks_healthy"])
+        self.assertTrue(any(
+            "github-advanced-security is pending" in warning
+            for warning in result["validation"]["warnings"]
+        ))
+        self.assertFalse(any(
+            "github-advanced-security is missing" in warning
+            for warning in result["validation"]["warnings"]
+        ))
         self.assertFalse(any(
             gate["id"] == "github-advanced-security" for gate in result["evidence"]["gates"]
         ))
@@ -1022,7 +1036,7 @@ class PublicationTests(unittest.TestCase):
         client = PublicationClient()
         receipt = self.collect(client)
         client.pre_provider.dynamic_run["actor"]["id"] = 1
-        with self.assertRaisesRegex(EvidenceError, "no unique live workflow"):
+        with self.assertRaisesRegex(EvidenceError, "head-run query differs from GitHub"):
             verify_publication_provider_evidence(client, receipt)
 
     def test_dynamic_publication_rejects_retained_setting_contradiction(self) -> None:
@@ -1046,6 +1060,22 @@ class PublicationTests(unittest.TestCase):
         self.resign_receipt(receipt)
 
         with self.assertRaisesRegex(EvidenceError, "contradicts its raw provider response"):
+            verify_publication_provider_evidence(client, receipt)
+
+    def test_absent_scan_state_survives_receipt_and_provider_reread(self) -> None:
+        client = PublicationClient()
+        client.pre_provider.security_check = None
+        client.pre_provider.dynamic_run = None
+        client.pre_provider.security_jobs = []
+        receipt = self.collect(client)
+        scan = receipt["premerge"]["contract_evidence"]["security_scan"]
+        self.assertEqual(scan["state"], "disabled_by_setting")
+        self.assertEqual(scan["matching_run_ids"], [])
+        self.assertEqual(scan["matching_check_ids"], [])
+        verify_publication_provider_evidence(client, receipt)
+
+        client.pre_provider.security_setting = {"pr_scan": "enabled"}
+        with self.assertRaisesRegex(EvidenceError, "setting differs from the current provider"):
             verify_publication_provider_evidence(client, receipt)
 
     def test_provider_verifier_rejects_forged_candidate_and_copied_pr_association(self) -> None:
