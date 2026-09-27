@@ -7,12 +7,32 @@ import Mathlib.Algebra.Homology.Single
 import Mathlib.Algebra.Homology.TotalComplexSymmetry
 
 /-!
-# Total complex of a bicomplex supported in one degree
+# Total complex of a bicomplex supported in degree zero
 
-A bicomplex with one nonzero horizontal degree has a total in any preadditive
-category with a zero object. Its total is naturally isomorphic to the supported
-complex. The flip gives the corresponding second-axis comparison. No ambient
-coproducts, abelian structure, or geometric data are required.
+Placing an integer-indexed cochain complex in horizontal degree zero gives a
+bicomplex whose total is naturally isomorphic to the original complex.
+Exchanging axes gives the corresponding vertical-degree-zero comparison.
+
+## Main definitions and results
+
+* `singleZeroBicomplex` places a complex in horizontal degree zero.
+* `singleZeroHasTotal` constructs its total without ambient coproducts.
+* `singleZeroTotalIso` and `singleZeroTotalIso_naturality` identify that total
+  naturally with the original complex.
+* `singleZeroFlipTotalIso` and `singleZeroFlipTotalIso_naturality` give the
+  corresponding comparison after exchanging axes.
+
+## Implementation notes
+
+The total-degree `n` diagonal has one surviving summand, at `(0, n)`. Its
+cofan supplies the required total in any preadditive category with a zero
+object. The flipped comparison uses Mathlib's signed total symmetry, so its
+sign agrees with the existing totalization convention.
+
+## References
+
+The construction uses Mathlib's `HomologicalComplex.single` and
+`HomologicalComplex₂.totalFlipIso`. It introduces no geometric assumptions.
 -/
 
 open CategoryTheory Category Limits
@@ -21,7 +41,11 @@ namespace HomologicalComplex₂
 
 universe v u
 
-variable {C : Type u} [Category.{v} C] [Preadditive C]
+variable {C : Type u} [Category.{v} C]
+
+section Zero
+
+variable [HasZeroMorphisms C]
 
 @[reassoc]
 private lemma singleZeroComponent_hom_inv {A B : CochainComplex C ℤ} (e : A ≅ B) (n : ℤ) :
@@ -46,11 +70,22 @@ noncomputable def singleZeroBicomplex :
       (ComplexShape.up ℤ) (ComplexShape.up ℤ) :=
   (HomologicalComplex.single (CochainComplex C ℤ) (ComplexShape.up ℤ) 0).obj A
 
-/-- The supported horizontal degree is the original complex. -/
+/-- Accepts an explicit equality identifying the horizontal index with zero, so callers can
+evaluate at their existing index without first rewriting the whole bicomplex. -/
 noncomputable def singleZeroXIso (i : ℤ) (hi : i = 0) :
     (singleZeroBicomplex A).X i ≅ A := by
   subst i
   exact HomologicalComplex.singleObjXSelf (ComplexShape.up ℤ) 0 A
+
+variable {A B : CochainComplex C ℤ}
+
+/-- Apply a cochain map to the supported horizontal degree. This uses no additive
+structure beyond the zero morphisms needed to form the single complex. -/
+noncomputable def singleZeroBicomplexMap (f : A ⟶ B) :
+    singleZeroBicomplex A ⟶ singleZeroBicomplex B :=
+  (HomologicalComplex.single (CochainComplex C ℤ) (ComplexShape.up ℤ) 0).map f
+
+variable (A : CochainComplex C ℤ)
 
 private noncomputable def singleZeroCofan (n : ℤ) :
     (singleZeroBicomplex A).toGradedObject.CofanMapObjFun
@@ -84,11 +119,21 @@ private noncomputable def singleZeroCofanIsColimit (n : ℤ) :
       have h' := congrArg (fun k => (singleZeroXIso A 0 rfl).inv.f n ≫ k) h
       simpa [singleZeroXIso, Category.assoc] using h')
 
-/-- A single supported horizontal degree has a total without ambient coproducts. -/
+end Zero
+
+attribute [local simp] singleZeroComponent_hom_inv singleZeroComponent_hom_inv_assoc
+  singleZeroComponent_inv_hom singleZeroComponent_inv_hom_assoc
+
+variable [Preadditive C] [HasZeroObject C]
+variable (A : CochainComplex C ℤ)
+
+/-- The unique supported summand gives the total cofan without a category-wide
+coproduct assumption. -/
 instance singleZeroHasTotal : (singleZeroBicomplex A).HasTotal (ComplexShape.up ℤ) :=
   GradedObject.CofanMapObjFun.hasMap _ _ (singleZeroCofan A) (singleZeroCofanIsColimit A)
 
-/-- Componentwise comparison from the total of a single-zero bicomplex. -/
+/-- Projects the total-degree diagonal onto its surviving `(0,n)` summand; the inverse is
+that summand's canonical inclusion. Every other summand is zero. -/
 noncomputable def singleZeroTotalXIso (n : ℤ) :
     ((singleZeroBicomplex A).total (ComplexShape.up ℤ)).X n ≅ A.X n where
   hom := HomologicalComplex₂.totalDesc _ (fun i j hij ↦
@@ -117,7 +162,8 @@ noncomputable def singleZeroTotalXIso (n : ℤ) :
     rw [Category.assoc, HomologicalComplex₂.ι_totalDesc]
     simp [singleZeroXIso]
 
-/-- The total complex of a horizontal degree-zero bicomplex is the original complex. -/
+/-- The horizontal differential vanishes and the totalization sign on the surviving
+column is positive, so the component projections commute with the original differential. -/
 noncomputable def singleZeroTotalIso :
     (singleZeroBicomplex A).total (ComplexShape.up ℤ) ≅ A :=
   HomologicalComplex.Hom.isoOfComponents (singleZeroTotalXIso A) (by
@@ -206,11 +252,6 @@ noncomputable def singleZeroTotalIso :
 
 variable {A B : CochainComplex C ℤ}
 
-/-- Naturality map for a bicomplex supported in horizontal degree zero. -/
-noncomputable def singleZeroBicomplexMap (f : A ⟶ B) :
-    singleZeroBicomplex A ⟶ singleZeroBicomplex B :=
-  (HomologicalComplex.single (CochainComplex C ℤ) (ComplexShape.up ℤ) 0).map f
-
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
 /-- The total-complex identification for a bicomplex supported in horizontal degree zero is
@@ -233,12 +274,14 @@ lemma singleZeroTotalIso_naturality (f : A ⟶ B) :
   rw [HomologicalComplex.single_map_f_self]
   simp
 
-/-- The same comparison when the supported degree is on the second axis. -/
+/-- Exchanges axes using Mathlib's signed total symmetry, then applies
+`HomologicalComplex₂.singleZeroTotalIso`, preserving the established totalization sign. -/
 noncomputable def singleZeroFlipTotalIso (A : CochainComplex C ℤ) :
     (singleZeroBicomplex A).flip.total (ComplexShape.up ℤ) ≅ A :=
   (singleZeroBicomplex A).totalFlipIso (ComplexShape.up ℤ) ≪≫ singleZeroTotalIso A
 
-/-- The second-axis comparison is natural in the supported complex. -/
+/-- Composes naturality of the signed total symmetry with naturality of the
+first-axis comparison. -/
 @[reassoc]
 lemma singleZeroFlipTotalIso_naturality (f : A ⟶ B) :
     total.map (flipMap (singleZeroBicomplexMap f)) (ComplexShape.up ℤ) ≫
