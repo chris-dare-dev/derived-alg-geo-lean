@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Collect an exact GitHub Actions run attempt without changing provider state.
 
-The JSON bundle keeps the provider's run, attempt, and every job object. Its
+The JSON bundle keeps the provider's run, attempt, and every jobs page. Its
 sidecar binds the bytes to a digest; neither file is a gate verdict.
 """
 
@@ -59,7 +59,8 @@ def collect_attempt(
     ):
         raise ValueError("attempt identity differs from the parent run")
     jobs_path = f"{attempt_path}/jobs"
-    jobs = client.get_all(jobs_path, key="jobs")
+    jobs_pages = client.get_pages(jobs_path, key="jobs")
+    jobs = [job for page in jobs_pages for job in page["response"]["jobs"]]
     seen: set[int] = set()
     for job in jobs:
         job_id = _positive(job.get("id"), "job ID")
@@ -76,7 +77,7 @@ def collect_attempt(
     if _snapshot_identity(after) != _snapshot_identity(before):
         raise ValueError("provider run changed during collection")
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "repository": client.repository,
         "captured_at_utc": datetime.now(timezone.utc).isoformat(timespec="microseconds"),
         "provider_paths": {
@@ -87,6 +88,7 @@ def collect_attempt(
         },
         "run": before,
         "attempt": attempt_run,
+        "jobs_pages": jobs_pages,
         "jobs": jobs,
     }
 
@@ -97,7 +99,7 @@ def write_snapshot(bundle: dict[str, Any], output: Path) -> dict[str, Any]:
         raise ValueError("snapshot output already exists; choose a new path")
     raw = (json.dumps(bundle, sort_keys=True, indent=2, ensure_ascii=False) + "\n").encode()
     manifest = {
-        "schema_version": 1,
+        "schema_version": bundle["schema_version"],
         "repository": bundle["repository"],
         "run_id": bundle["run"]["id"],
         "run_attempt": bundle["attempt"]["run_attempt"],

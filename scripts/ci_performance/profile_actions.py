@@ -13,7 +13,7 @@ import json
 import re
 import sys
 from datetime import datetime, timezone
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 
@@ -34,6 +34,22 @@ PHASES = (
     "upload",
     "other",
 )
+
+
+def _canonical_repo_path(value: Any) -> bool:
+    """Accept only normalized POSIX paths relative to the repository root."""
+    if not isinstance(value, str) or not value or value != value.strip():
+        return False
+    if "\\" in value or any(ord(char) < 32 or ord(char) == 127 for char in value):
+        return False
+    path = PurePosixPath(value)
+    parts = value.split("/")
+    return (
+        not path.is_absolute()
+        and not re.match(r"^[A-Za-z]:", value)
+        and all(part not in {"", ".", ".."} for part in parts)
+        and path.as_posix() == value
+    )
 
 
 def _load(path: Path) -> Any:
@@ -156,6 +172,7 @@ def profile_run(payload: Any) -> dict[str, Any]:
         _timestamp(payload["attempt_created_at"])
         if payload.get("attempt_created_at") is not None else None
     )
+    attempt_started = _timestamp(payload["run_started_at"])
     run_start_delay = _observed_seconds(
         payload["created_at"], payload["run_started_at"], "workflow start", anomalies
     )
@@ -183,6 +200,7 @@ def profile_run(payload: Any) -> dict[str, Any]:
     terminal_jobs = 0
     incomplete_job_interval = False
     carried_forward_jobs: list[dict[str, Any]] = []
+    uncertain_jobs: list[dict[str, Any]] = []
     for job_index, job in enumerate(jobs):
         if not isinstance(job, dict):
             raise ValueError(f"jobs[{job_index}] must be an object")
@@ -203,9 +221,17 @@ def profile_run(payload: Any) -> dict[str, Any]:
         is_terminal = conclusion in TERMINAL_CONCLUSIONS
         start_time = _timestamp(job["started_at"]) if job.get("started_at") else None
         end_time = _timestamp(job["completed_at"]) if job.get("completed_at") else None
-        carried_forward = attempt_created is not None and (
-            (start_time is not None and start_time < attempt_created)
-            or (start_time is None and end_time is not None and end_time < attempt_created)
+        carried_forward = (
+            attempt_created is not None
+            and end_time is not None
+            and end_time < attempt_created
+        )
+        attribution_uncertain = (
+            attempt_created is not None
+            and not carried_forward
+            and start_time is not None
+            and start_time < attempt_created
+            and (start_time < attempt_started or end_time is None)
         )
         if carried_forward:
             carried_forward_jobs.append({
@@ -215,23 +241,34 @@ def profile_run(payload: Any) -> dict[str, Any]:
                 "conclusion": conclusion,
             })
             anomalies.append(f"{job_name}: job execution predates the selected attempt")
+        elif attribution_uncertain:
+            uncertain_jobs.append({
+                "id": job["id"], "name": job_name,
+                "started_at": job.get("started_at"),
+                "completed_at": job.get("completed_at"),
+                "conclusion": conclusion,
+            })
+            anomalies.append(f"{job_name}: job overlaps the selected attempt boundary")
+            phase_unknown.update(PHASES[2:])
+            incomplete_job_interval = True
         elif is_terminal:
             terminal_jobs += 1
-        if is_terminal and not carried_forward and (not job.get("started_at") or not job.get("completed_at")):
+        if is_terminal and not carried_forward and not attribution_uncertain and (not job.get("started_at") or not job.get("completed_at")):
             anomalies.append(f"{job_name}: terminal job lacks complete timestamps")
         job_duration = None
-        if not carried_forward and job.get("started_at") and job.get("completed_at"):
+        if not carried_forward and not attribution_uncertain and job.get("started_at") and job.get("completed_at"):
             job_duration = _observed_seconds(
                 job["started_at"], job["completed_at"], f"{job_name} job", anomalies
             )
             if job_duration is not None:
                 job_intervals.append((_timestamp(job["started_at"]), _timestamp(job["completed_at"])))
-        if is_terminal and not carried_forward and conclusion != "skipped" and job_duration is None:
+        if is_terminal and not carried_forward and not attribution_uncertain and conclusion != "skipped" and job_duration is None:
             incomplete_job_interval = True
         row = {
             "id": job["id"],
             "name": job_name,
             "carried_forward": carried_forward,
+            "attribution_uncertain": attribution_uncertain,
             "runner_name": job.get("runner_name"),
             "labels": job.get("labels", []),
             "duration_seconds": job_duration,
@@ -245,7 +282,7 @@ def profile_run(payload: Any) -> dict[str, Any]:
             "scheduler_gap_seconds": None,
         }
         job_rows.append(row)
-        if carried_forward:
+        if carried_forward or attribution_uncertain:
             continue
         failure = _failure_class(job)
         if failure:
@@ -257,6 +294,8 @@ def profile_run(payload: Any) -> dict[str, Any]:
             raise ValueError(f"{job_name}.steps must be an array")
         if is_terminal and not steps:
             anomalies.append(f"{job_name}: terminal job has no step data")
+            if conclusion != "skipped" and (job_duration is None or job_duration > 0):
+                phase_unknown.update(PHASES[2:])
         for step_index, step in enumerate(steps):
             if not isinstance(step, dict):
                 raise ValueError(f"{job_name}.steps[{step_index}] must be an object")
@@ -286,7 +325,7 @@ def profile_run(payload: Any) -> dict[str, Any]:
     workflow_created = _timestamp(payload["created_at"])
     queue_complete = True
     for row in job_rows:
-        if row["carried_forward"]:
+        if row["carried_forward"] or row["attribution_uncertain"]:
             continue
         created_at, started_at = row["created_at"], row["started_at"]
         if not created_at or not started_at:
@@ -355,16 +394,53 @@ def profile_run(payload: Any) -> dict[str, Any]:
         "measurement_notes": payload.get("measurement_notes", []),
         "timestamp_anomalies": anomalies,
         "carried_forward_jobs": carried_forward_jobs,
+        "attribution_uncertain_jobs": uncertain_jobs,
     }
 
 
 def profile_bundle(bundle: Any, job_needs: dict[str, list[str]] | None = None) -> dict[str, Any]:
     """Normalize one captured provider attempt without inventing missing context."""
-    if not isinstance(bundle, dict) or bundle.get("schema_version") != 1:
+    if not isinstance(bundle, dict) or bundle.get("schema_version") not in {1, 2}:
         raise ValueError("provider bundle schema is not recognized")
     run, attempt, jobs = (bundle.get(key) for key in ("run", "attempt", "jobs"))
     if not isinstance(run, dict) or not isinstance(attempt, dict) or not isinstance(jobs, list):
         raise ValueError("provider bundle needs run, attempt, and jobs")
+    if bundle["schema_version"] == 2:
+        pages = bundle.get("jobs_pages")
+        if not isinstance(pages, list) or not pages:
+            raise ValueError("provider bundle has no retained jobs pages")
+        flattened: list[dict[str, Any]] = []
+        total: int | None = None
+        for index, page in enumerate(pages):
+            if not isinstance(page, dict):
+                raise ValueError("provider jobs page is malformed")
+            response = page.get("response")
+            links = page.get("pagination_links")
+            headers = page.get("response_headers")
+            if (
+                not isinstance(page.get("request_url"), str)
+                or not isinstance(response, dict)
+                or not isinstance(response.get("jobs"), list)
+                or not isinstance(links, dict)
+                or not isinstance(headers, dict)
+            ):
+                raise ValueError("provider jobs page envelope is malformed")
+            count = response.get("total_count")
+            if isinstance(count, bool) or not isinstance(count, int) or count < 0:
+                raise ValueError("provider jobs page lacks total_count")
+            if total is not None and count != total:
+                raise ValueError("provider jobs page totals differ")
+            total = count
+            flattened.extend(response["jobs"])
+            next_url = links.get("next")
+            if index + 1 < len(pages):
+                next_page = pages[index + 1]
+                if not isinstance(next_page, dict) or next_url != next_page.get("request_url"):
+                    raise ValueError("provider jobs page chain is inconsistent")
+            elif next_url is not None:
+                raise ValueError("provider jobs page chain is incomplete")
+        if flattened != jobs or total != len(jobs):
+            raise ValueError("retained jobs pages differ from flattened jobs")
     if (
         run.get("id") != attempt.get("id")
         or run.get("head_sha") != attempt.get("head_sha")
@@ -378,18 +454,10 @@ def profile_bundle(bundle: Any, job_needs: dict[str, list[str]] | None = None) -
         )
     ):
         raise ValueError("provider bundle identity is inconsistent")
-    platform_classes = set()
     for job in jobs:
         labels = job.get("labels") or []
         if not isinstance(labels, list):
             raise ValueError("provider job labels must be an array")
-        if "self-hosted" in labels:
-            platform_classes.add("self-hosted")
-        elif "ubuntu-latest" in labels:
-            platform_classes.add("github-hosted-ubuntu")
-        else:
-            platform_classes.add("unknown")
-    platform = next(iter(platform_classes)) if len(platform_classes) == 1 else "mixed"
     payload = {
         key: attempt.get(key)
         for key in ("id", "run_attempt", "head_sha", "event", "status", "conclusion", "created_at", "run_started_at")
@@ -398,7 +466,7 @@ def profile_bundle(bundle: Any, job_needs: dict[str, list[str]] | None = None) -
         "jobs": jobs,
         "attempt_created_at": attempt.get("created_at"),
         "job_needs": job_needs,
-        "platform": platform,
+        "platform": "unknown",
         "cache_state": "unknown",
         "host_pressure": None,
         "measurement_notes": [
@@ -408,12 +476,29 @@ def profile_bundle(bundle: Any, job_needs: dict[str, list[str]] | None = None) -
         ],
     })
     result = profile_run(payload)
+    platform_classes = set()
+    for row in result["jobs"]:
+        if row["carried_forward"] or row["attribution_uncertain"]:
+            continue
+        if "self-hosted" in row["labels"]:
+            platform_classes.add("self-hosted")
+        elif "ubuntu-latest" in row["labels"]:
+            platform_classes.add("github-hosted-ubuntu")
+        else:
+            platform_classes.add("unknown")
+    if result["attribution_uncertain_jobs"]:
+        result["run"]["platform"] = "unknown"
+    elif len(platform_classes) == 1:
+        result["run"]["platform"] = next(iter(platform_classes))
+    elif len(platform_classes) > 1:
+        result["run"]["platform"] = "mixed"
     result["provider_bundle"] = {
         "repository": bundle.get("repository"),
         "captured_at_utc": bundle.get("captured_at_utc"),
         "run_path": bundle.get("provider_paths", {}).get("run"),
         "attempt_path": bundle.get("provider_paths", {}).get("attempt"),
         "job_count": len(jobs),
+        "job_page_count": len(bundle["jobs_pages"]) if bundle["schema_version"] == 2 else None,
     }
     return result
 
@@ -477,7 +562,7 @@ def replay_decision(case: Any) -> dict[str, Any]:
     changed = case.get("changed_files")
     if not isinstance(changed, list):
         return {"decision": "full_rebuild", "reasons": ["changed_files is not an array"]}
-    if any(not isinstance(item, str) or not item.strip() for item in changed):
+    if any(not _canonical_repo_path(item) for item in changed):
         return {"decision": "full_rebuild", "reasons": ["changed_files contains an invalid path"]}
     if len(set(changed)) != len(changed):
         return {"decision": "full_rebuild", "reasons": ["changed_files contains duplicates"]}
@@ -506,7 +591,7 @@ def replay_decision(case: Any) -> dict[str, Any]:
             "reasons": ["changed inputs have no complete dependency classification"],
         }
     partitions = direct + transitive
-    if any(not isinstance(item, str) or not item.strip() for item in partitions):
+    if any(not _canonical_repo_path(item) for item in partitions):
         return {
             "decision": "full_rebuild",
             "reasons": ["dependency classification contains an invalid path"],

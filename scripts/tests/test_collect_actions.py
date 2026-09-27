@@ -32,16 +32,23 @@ class FakeClient:
             return self.attempt
         return self.before if self.calls.count(path) == 1 else self.after
 
-    def get_all(self, path, *, key):
+    def get_pages(self, path, *, key):
         self.calls.append((path, key))
-        return self.jobs
+        return [{
+            "request_url": f"https://api.github.com/repos/{self.repository}{path}?per_page=100",
+            "response_headers": {}, "pagination_links": {},
+            "response": {"total_count": len(self.jobs), key: self.jobs},
+        }]
 
 
 class CollectActionsTests(unittest.TestCase):
     def test_collects_exact_attempt_and_rechecks_run(self):
         client = FakeClient()
         bundle = collect_attempt(client, 17)
+        self.assertEqual(bundle["schema_version"], 2)
         self.assertEqual(bundle["jobs"], [JOB])
+        self.assertEqual(bundle["jobs_pages"][0]["response"]["total_count"], 1)
+        self.assertIn("request_url", bundle["jobs_pages"][0])
         self.assertEqual(bundle["attempt"]["run_attempt"], 2)
         self.assertIn(("/actions/runs/17/attempts/2/jobs", "jobs"), client.calls)
         self.assertEqual(client.calls.count("/actions/runs/17"), 2)

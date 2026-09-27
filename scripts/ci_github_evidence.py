@@ -140,9 +140,19 @@ class GitHubClient:
 
     def get_all(self, path: str, *, key: str | None = None) -> list[dict[str, Any]]:
         """Follow every Link page and check the advertised total when present."""
+        pages = self.get_pages(path, key=key)
+        return [
+            item
+            for page in pages
+            for item in (page["response"] if key is None else page["response"][key])
+        ]
+
+    def get_pages(self, path: str, *, key: str | None = None) -> list[dict[str, Any]]:
+        """Return validated page envelopes, including request and Link evidence."""
         url: str | None = self._url(path, per_page=100)
         seen_urls: set[str] = set()
         items: list[dict[str, Any]] = []
+        pages: list[dict[str, Any]] = []
         total: int | None = None
         while url is not None:
             if url in seen_urls or len(seen_urls) >= self.max_pages:
@@ -188,10 +198,16 @@ class GitHubClient:
                 raise EvidenceError(
                     f"GitHub API full page has no completeness proof: {path}"
                 )
+            pages.append({
+                "request_url": url,
+                "response_headers": headers,
+                "pagination_links": links,
+                "response": value,
+            })
             url = next_url
         if total is not None and len(items) != total:
             raise EvidenceError(f"GitHub API page count is inconsistent: {path}")
-        return items
+        return pages
 
 
 def _sha(value: Any, label: str) -> str:

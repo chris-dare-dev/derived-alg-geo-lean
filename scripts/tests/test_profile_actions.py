@@ -158,6 +158,27 @@ class ProfileActionTests(unittest.TestCase):
         self.assertIsNone(result["phase_durations_seconds"]["audit"])
         self.assertEqual(result["phase_durations_seconds"]["reset"], 468.0)
 
+    def test_executed_job_without_steps_does_not_claim_zero_phase_time(self) -> None:
+        payload = copy.deepcopy(SAMPLE)
+        payload["jobs"][0]["steps"] = []
+        result = profile_actions.profile_run(payload)
+        for phase in profile_actions.PHASES[2:]:
+            self.assertIsNone(result["phase_durations_seconds"][phase])
+        self.assertTrue(any("no step data" in note for note in result["timestamp_anomalies"]))
+
+    def test_replay_rejects_outside_and_noncanonical_paths(self) -> None:
+        for path in (
+            "../outside.lean", "/tmp/outside.lean",
+            "DerivedAlgGeo/../scripts/ci.yml", "DerivedAlgGeo//Foo.lean",
+            "DerivedAlgGeo/./Foo.lean", "C:/outside.lean",
+            "DerivedAlgGeo\\Foo.lean",
+        ):
+            with self.subTest(path=path):
+                case = copy.deepcopy(REPLAY[0])
+                case["changed_files"] = [path]
+                case["direct_changes"] = [path]
+                self.assertEqual(profile_actions.replay_decision(case)["decision"], "full_rebuild")
+
     def test_single_instantiation_is_audit_work(self) -> None:
         self.assertEqual(profile_actions._phase("Single instantiation"), "audit")
 
@@ -169,7 +190,7 @@ class ProfileActionTests(unittest.TestCase):
         }
         old = {
             "id": 1, "name": "build", "run_id": run["id"], "run_attempt": 2,
-            "head_sha": run["head_sha"], "labels": ["ubuntu-latest"],
+            "head_sha": run["head_sha"], "labels": ["self-hosted"],
             "created_at": "2026-09-27T16:49:15Z", "started_at": "2026-09-27T16:49:16Z",
             "completed_at": "2026-09-27T17:08:55Z", "conclusion": "success",
             "steps": [{"name": "Run leanprover/lean-action@v1",
@@ -194,6 +215,31 @@ class ProfileActionTests(unittest.TestCase):
         self.assertIsNone(result["jobs"][0]["duration_seconds"])
         self.assertEqual(result["phase_durations_seconds"]["lake_build"], 0.0)
         self.assertEqual(result["wall_clock_seconds"], 92.0)
+        self.assertEqual(result["run"]["platform"], "github-hosted-ubuntu")
+
+        # GitHub may report the attempt start one second before created_at.
+        run["run_started_at"] = "2026-09-27T17:27:01Z"
+        current["started_at"] = run["run_started_at"]
+        current["steps"][0]["started_at"] = run["run_started_at"]
+        result = profile_actions.profile_bundle(bundle, {"build": [], "roadmap": []})
+        self.assertFalse(result["jobs"][1]["carried_forward"])
+        self.assertFalse(result["jobs"][1]["attribution_uncertain"])
+        self.assertEqual(result["wall_clock_seconds"], 97.0)
+
+    def test_overlap_before_attempt_start_is_uncertain(self) -> None:
+        payload = copy.deepcopy(SAMPLE)
+        payload["attempt_created_at"] = "2026-09-20T18:00:00Z"
+        payload["run_started_at"] = "2026-09-20T17:59:59Z"
+        payload["jobs"].append({
+            "id": 2, "name": "overlap", "conclusion": "success",
+            "started_at": "2026-09-20T17:50:00Z",
+            "completed_at": "2026-09-20T18:01:00Z", "steps": [],
+        })
+        result = profile_actions.profile_run(payload)
+        self.assertTrue(result["jobs"][1]["attribution_uncertain"])
+        self.assertFalse(result["jobs"][1]["carried_forward"])
+        self.assertIsNone(result["wall_clock_seconds"])
+        self.assertIsNone(result["phase_durations_seconds"]["audit"])
 
     def test_dependent_job_created_after_prerequisites_is_dependency_wait(self) -> None:
         payload = copy.deepcopy(SAMPLE)
@@ -247,6 +293,35 @@ class ProfileActionTests(unittest.TestCase):
             path.write_text(path.read_text() + " ")
             with self.assertRaisesRegex(ValueError, "digest sidecar"):
                 profile_actions._load_verified_bundle(path)
+
+    def test_page_envelopes_must_agree_with_flattened_jobs(self) -> None:
+        run = {
+            "id": SAMPLE["id"], "run_attempt": 1,
+            "head_sha": SAMPLE["head_sha"], "event": SAMPLE["event"],
+            "status": "completed", "conclusion": "success",
+            "created_at": SAMPLE["created_at"],
+            "run_started_at": SAMPLE["run_started_at"],
+        }
+        job = copy.deepcopy(SAMPLE["jobs"][0])
+        job.update({"run_id": run["id"], "run_attempt": 1,
+                    "head_sha": run["head_sha"], "labels": ["ubuntu-latest"]})
+        page_url = "https://api.github.com/repos/example/repo/actions/runs/1/attempts/1/jobs?per_page=100"
+        bundle = {
+            "schema_version": 2, "repository": "example/repo",
+            "captured_at_utc": "2026-09-20T19:00:00Z", "provider_paths": {},
+            "run": run, "attempt": run, "jobs": [job],
+            "jobs_pages": [{
+                "request_url": page_url, "response_headers": {},
+                "pagination_links": {},
+                "response": {"total_count": 1, "jobs": [job]},
+            }],
+        }
+        profile = profile_actions.profile_bundle(bundle)
+        self.assertEqual(profile["provider_bundle"]["job_page_count"], 1)
+        altered = copy.deepcopy(bundle)
+        altered["jobs_pages"][0]["response"]["jobs"] = []
+        with self.assertRaisesRegex(ValueError, "differ from flattened"):
+            profile_actions.profile_bundle(altered)
 
 
 if __name__ == "__main__":
