@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import argparse
 import contextlib
-import fcntl
 import hashlib
 import json
 import os
@@ -25,6 +24,11 @@ import sys
 import tarfile
 import time
 import uuid
+
+try:
+    import fcntl
+except ImportError:  # The private mode deliberately fails closed off Ubuntu/Linux.
+    fcntl = None
 
 
 MIN_FREE_BYTES = 2 * 1024**3
@@ -69,16 +73,34 @@ def validate_packages(root: Path, revisions: dict[str, str]) -> None:
         fail(f"package directories differ from manifest: {actual ^ set(revisions)}")
     for name, revision in revisions.items():
         package = root / name
+        real_package = package.resolve()
         if package.is_symlink():
             fail(f"package is linked rather than privately owned: {package}")
+        git_dir = package / ".git"
+        if git_dir.is_symlink() or not git_dir.is_dir():
+            fail(f"{name} has external Git metadata (linked worktree or symlink)")
+        if (git_dir / "commondir").exists() or (git_dir / "objects/info/alternates").exists():
+            fail(f"{name} has external Git common data or object alternates")
+        actual_git_dir = subprocess.run(
+            ["git", "-C", str(real_package), "rev-parse", "--absolute-git-dir"],
+            capture_output=True, text=True, check=True,
+        ).stdout.strip()
+        if Path(actual_git_dir).resolve() != git_dir.resolve():
+            fail(f"{name} resolves its Git index outside the package")
+        toplevel = subprocess.run(
+            ["git", "-C", str(real_package), "rev-parse", "--show-toplevel"],
+            capture_output=True, text=True, check=True,
+        ).stdout.strip()
+        if Path(toplevel).resolve() != package.resolve():
+            fail(f"{name} resolves its worktree outside the package")
         head = subprocess.run(
-            ["git", "-C", str(package), "rev-parse", "HEAD"],
+            ["git", "-C", str(real_package), "rev-parse", "HEAD"],
             capture_output=True, text=True, check=True,
         ).stdout.strip()
         if head != revision:
             fail(f"{name} is at {head}, manifest pins {revision}")
         dirty = subprocess.run(
-            ["git", "--no-optional-locks", "-C", str(package),
+            ["git", "--no-optional-locks", "-C", str(real_package),
              "status", "--porcelain", "--untracked-files=all"],
             capture_output=True, text=True, check=True,
         ).stdout
@@ -147,6 +169,8 @@ def disk_headroom(path: Path, required: int) -> None:
 
 @contextlib.contextmanager
 def snapshot_lock(directory: Path):
+    if fcntl is None:
+        fail("private package seeding requires Linux file locking")
     directory.mkdir(parents=True, exist_ok=True)
     lock = directory / ".lock"
     with lock.open("a+b") as stream:
@@ -226,7 +250,33 @@ def remove_path(path: Path) -> None:
         shutil.rmtree(path)
 
 
+@contextlib.contextmanager
+def pinned_lake(path: Path):
+    """Keep every stage, rollback and cleanup below the opened target inode."""
+    if not Path("/proc/self/fd").is_dir():
+        fail("private package seeding requires Linux /proc/self/fd")
+    fd = os.open(path, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    info = os.fstat(fd)
+    pinned = Path(f"/proc/self/fd/{fd}")
+
+    def verify() -> None:
+        current = path.stat()
+        if (path.is_symlink() or path.resolve() != path or
+                (current.st_dev, current.st_ino) != (info.st_dev, info.st_ino)):
+            fail("target .lake changed identity or resolves outside the worktree")
+
+    try:
+        verify()
+        yield pinned, verify
+    finally:
+        os.close(fd)
+
+
 def seed(target: Path, donor: Path, force: bool, dry_run: bool) -> None:
+    for name in ("GIT_DIR", "GIT_COMMON_DIR", "GIT_INDEX_FILE", "GIT_OBJECT_DIRECTORY",
+                 "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_WORK_TREE"):
+        if name in os.environ:
+            fail(f"Git environment override {name} would hide package ownership")
     target = target.resolve()
     donor = donor.resolve()
     if target == donor:
@@ -239,14 +289,26 @@ def seed(target: Path, donor: Path, force: bool, dry_run: bool) -> None:
     build_source = donor / ".lake/build"
     if build_source.is_symlink() or not build_source.is_dir() or not next(build_source.rglob("*.olean"), None):
         fail("donor has no built project modules")
-    lake = target / ".lake"
-    lake.mkdir(exist_ok=True)
+    lake_name = target / ".lake"
+    if lake_name.is_symlink() or (lake_name.exists() and not lake_name.is_dir()):
+        fail("target .lake is linked or is not a directory")
+    lake_name.mkdir(exist_ok=True)
+    with pinned_lake(lake_name) as (lake, verify_lake):
+        return _seed_at_lake(target, source, build_source, key, revisions,
+                             force, dry_run, lake, verify_lake)
+
+
+def _seed_at_lake(target: Path, source: Path, build_source: Path, key: str,
+                  revisions: dict[str, str], force: bool, dry_run: bool,
+                  lake: Path, verify_lake) -> None:
     packages = lake / "packages"
     build = lake / "build"
     if not force and (packages.exists() or packages.is_symlink() or build.exists()):
         fail("target already has a cache; use --force for a quiescent migration")
     if recently_written(build_source) or (build.exists() and recently_written(build)):
         fail("donor or target build changed in the last 90 seconds")
+    if force and (packages.exists() or packages.is_symlink()) and recently_written(packages):
+        fail("target package tree changed in the last 90 seconds; migration is not quiescent")
     directory = snapshot_dir(key)
     if directory.is_relative_to(source) or directory.is_relative_to(target):
         fail("snapshot store must be outside the package source and target")
@@ -290,6 +352,11 @@ def seed(target: Path, donor: Path, force: bool, dry_run: bool) -> None:
             build_copied, _ = tree_digest(build_stage)
             if build_before != build_after or build_before != build_copied or recently_written(build_source):
                 fail("donor build changed during cache copy")
+            verify_lake()
+            if force and (packages.exists() or packages.is_symlink()) and recently_written(packages):
+                fail("target package tree changed during migration")
+            if build.exists() and recently_written(build):
+                fail("target build changed during migration")
             if packages.exists() or packages.is_symlink():
                 packages.rename(pkg_old)
             if build.exists() or build.is_symlink():
@@ -304,6 +371,7 @@ def seed(target: Path, donor: Path, force: bool, dry_run: bool) -> None:
                 "snapshot_sha256": record["archive_sha256"],
             }, sort_keys=True) + "\n")
             os.replace(marker_stage, marker)
+            verify_lake()
         except BaseException:
             marker.unlink(missing_ok=True)
             if pkg_old.exists() or pkg_old.is_symlink():

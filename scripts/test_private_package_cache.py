@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import subprocess
 import tempfile
+import time
 import unittest
 from unittest.mock import patch
 
@@ -138,6 +139,76 @@ class PrivatePackageCacheTest(unittest.TestCase):
             cache.seed(target, self.donor, False, False)
         self.assertFalse((target / ".lake/packages").exists())
         self.assertFalse((target / ".lake" / cache.READY).exists())
+
+    def test_linked_lake_root_cannot_write_into_sibling(self) -> None:
+        target = self._target("linked-lake")
+        sibling = self.root / "sibling-cache"
+        sibling.mkdir()
+        (target / ".lake").symlink_to(sibling)
+        with self.assertRaisesRegex(ValueError, "target .lake is linked"):
+            cache.seed(target, self.donor, False, False)
+        self.assertEqual(list(sibling.iterdir()), [])
+
+    def test_linked_git_worktree_cannot_share_index(self) -> None:
+        linked = self.root / "linked-donor"
+        self._project(linked)
+        (linked / ".lake/packages").mkdir(parents=True)
+        package = linked / ".lake/packages/mathlib"
+        git("-C", str(self.donor / ".lake/packages/mathlib"),
+            "worktree", "add", "--detach", str(package), "HEAD")
+        (package / ".lake/build/lib").mkdir(parents=True)
+        (package / ".lake/build/lib/Mathlib.olean").write_bytes(b"dependency cache")
+        (linked / ".lake/build/lib").mkdir(parents=True)
+        (linked / ".lake/build/lib/Project.olean").write_bytes(b"project cache")
+        target = self._target("linked-git-target")
+        with self.assertRaisesRegex(ValueError, "external Git metadata"):
+            cache.seed(target, linked, False, False)
+        self.assertFalse((target / ".lake/packages").exists())
+
+    def test_git_index_override_cannot_hide_shared_metadata(self) -> None:
+        target = self._target("git-env")
+        with patch.dict(os.environ, {"GIT_INDEX_FILE": str(self.root / "shared-index")}):
+            with self.assertRaisesRegex(ValueError, "GIT_INDEX_FILE"):
+                cache.seed(target, self.donor, False, False)
+        self.assertFalse((target / ".lake").exists())
+
+    def test_recent_target_package_write_blocks_forced_migration(self) -> None:
+        cache.seed(self._target("snapshot-first"), self.donor, False, False)
+        target = self._target("active-package")
+        (target / ".lake").mkdir()
+        (target / ".lake/packages").symlink_to(self.donor / ".lake/packages")
+        old = time.time() - 200
+        for parent, _, files in os.walk(self.donor / ".lake"):
+            for name in files:
+                os.utime(Path(parent) / name, (old, old))
+        dependency = self.donor / ".lake/packages/mathlib/.lake/build/lib/Mathlib.olean"
+        os.utime(dependency, None)
+        with patch.object(cache, "QUIET_SECONDS", 90):
+            with self.assertRaisesRegex(ValueError, "package tree changed"):
+                cache.seed(target, self.donor, True, False)
+        self.assertTrue((target / ".lake/packages").is_symlink())
+        self.assertFalse((target / ".lake" / cache.READY).exists())
+
+    def test_parent_retarget_does_not_write_or_clean_sibling(self) -> None:
+        cache.seed(self._target("snapshot-for-retarget"), self.donor, False, False)
+        target = self._target("retarget")
+        sibling = self.root / "unrelated"
+        sibling.mkdir()
+        sentinel = sibling / "keep"
+        sentinel.write_text("unchanged")
+        real_extract = cache.safe_extract
+
+        def retarget_during_extract(archive: Path, destination: Path) -> None:
+            (target / ".lake").rename(target / ".lake-moved")
+            (target / ".lake").symlink_to(sibling)
+            real_extract(archive, destination)
+
+        with patch.object(cache, "safe_extract", side_effect=retarget_during_extract):
+            with self.assertRaisesRegex(ValueError, "changed identity"):
+                cache.seed(target, self.donor, False, False)
+        self.assertEqual(sentinel.read_text(), "unchanged")
+        self.assertEqual(sorted(p.name for p in sibling.iterdir()), ["keep"])
+        self.assertFalse((target / ".lake-moved" / cache.READY).exists())
 
 
 if __name__ == "__main__":
