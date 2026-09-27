@@ -10,6 +10,13 @@ import Mathlib.CategoryTheory.Linear.LinearFunctor
 
 This module keeps equivalence transport in the linear Serre core. It does not
 require a shift or a triangulated structure.
+
+## Main definitions
+
+`SerreFunctorData.conj D Φ` is Serre duality on `Φ.inverse ⋙ D.S ⋙ Φ.functor`:
+the inverse moves both Hom arguments into the category where `D.eta` applies.
+`SerreFunctorData.transportIso D Φ` then uses uniqueness of Serre duality to
+identify `Φ.functor ⋙ D.S` with `D.S ⋙ Φ.functor`.
 -/
 
 universe w v u

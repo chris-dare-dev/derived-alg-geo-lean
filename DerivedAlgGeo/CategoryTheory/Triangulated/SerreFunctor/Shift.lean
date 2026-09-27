@@ -16,6 +16,11 @@ uniqueness of the Serre functor. Applying Serre uniqueness directly to
 The displayed comparison here is pointwise in the shift index. A coherent
 `CommShift ℤ` structure and preservation of distinguished triangles require
 additional proofs; the latter is the separate research seam #1576.
+
+## Main definition
+
+`SerreFunctorData.commShiftIso n` specializes linear conjugation transport to
+the equivalence given by the single shift `n`.
 -/
 
 universe w v u
@@ -26,13 +31,12 @@ open CategoryTheory
 
 variable {k : Type w} [Field k] {C : Type u} [Category.{v} C]
   [Preadditive C] [Linear k C] [HasShift C ℤ]
-  [∀ n : ℤ, (shiftFunctor C n).Additive]
-  [∀ n : ℤ, (shiftFunctor C n).Linear k]
 
 /-- The Serre functor commutes with each shift, by conjugation with the
 corresponding shift equivalence. This is the orientation used in #898;
 Mathlib's `CommShift` stores the inverse orientation. -/
-noncomputable def commShiftIso (D : SerreFunctorData k C) (n : ℤ) :
+noncomputable def commShiftIso (D : SerreFunctorData k C) (n : ℤ)
+    [(shiftFunctor C n).Additive] [(shiftFunctor C n).Linear k] :
     D.S ⋙ shiftFunctor C n ≅ shiftFunctor C n ⋙ D.S := by
   letI : (shiftEquiv C n).functor.Additive := by
     change (shiftFunctor C n).Additive
