@@ -1,0 +1,105 @@
+schema: derived-alg-geo-lean.loop-run/v1
+id: ci1-1433-security-evidence-refresh
+repository: chris-dare-dev/derived-alg-geo-lean
+actor: chris-dare-dev
+remote: origin
+base_branch: main
+base_ref: origin/main
+mode: independent
+enabled: true
+allow_force_push: false
+state_dir: .loop-runs
+roadmap_gate: required
+
+openspec:
+  change: ci1-1433-security-evidence-refresh
+  validation: cli-required
+  required_artifacts:
+    - .openspec.yaml
+    - proposal.md
+    - design.md
+    - tasks.md
+    - specs/security-integration-evidence/spec.md
+
+limits:
+  min_issues: 1
+  max_issues: 1
+  max_review_rounds_per_chunk: 3
+
+review:
+  independent: true
+  reviewers:
+    - mathematics-adversary
+    - repository-boundary-adversary
+    - abstraction-adversary
+    - mathlib-reviewer
+
+runner:
+  required_checks:
+    - ci
+
+merge:
+  method: squash
+  delete_branch: false
+  allow_method_override: false
+  allow_delete_branch_override: false
+  allow_auto: false
+  allow_admin: false
+
+closure:
+  code_issue: pr_merge_keyword
+  allow_non_pr: false
+  allow_progress_pr: true
+
+mutations:
+  comment_issue: true
+  close_issue: false
+  push_branch: true
+  create_pr: true
+  ready_pr: false
+  approve_pr: false
+  merge_pr: true
+  create_issue: false
+
+issues:
+  - number: 1433
+    slug: ci1-1433-security-evidence-refresh
+    depends_on: []
+    chunks:
+      - id: ci1-1433-security-evidence-refresh
+        scope: >-
+          Refresh the current security-integration evidence and present owner
+          disposition options in the existing diagnosis. Do not change the
+          provider, scanner, workflow, branch protection or required CI policy;
+          keep issue #1433 open pending owner selection and verified scan evidence.
+        requirements:
+          - Security integration reports SHALL bind observations and distinguish outcomes
+          - Verified scan reports SHALL require complete coverage evidence
+        files:
+          - docs/ci/github-advanced-security.md
+          - openspec/changes/ci1-1433-security-evidence-refresh
+        acceptance:
+          - >-
+            Each of the four original provider failures is tied to its exact
+            candidate SHA, UTC run time, run and job links, and is classified
+            as a provider authentication failure before scanner findings.
+          - >-
+            Later successful provider runs, the later provider failure, and
+            current PR heads without a security check are recorded with exact
+            revisions and observation dates; success without a hashed result
+            artifact and negative-fixture proof is not called verified_scan,
+            and an absent check is recorded as unknown.
+          - >-
+            The diagnosis states the minimum entitlement repair and owner
+            decisions for replacement or retirement, with coverage tradeoffs;
+            it records that current required ci remains required and the
+            security integration remains optional and visible.
+          - >-
+            The chunk changes only the existing diagnosis and this OpenSpec
+            change, leaves #1433 open, and claims no provider, scanner,
+            workflow, branch-protection, or coverage-policy change.
+          - >-
+            Strict OpenSpec validation, the focused evidence-classifier test,
+            scripts/precheck.sh, four independent same-commit reviews, and
+            hosted required ci pass before the non-closing progress PR is merged.
+        closure: progress

@@ -7,6 +7,7 @@ import base64
 import copy
 import hashlib
 import json
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -16,8 +17,12 @@ from scripts.ci_github_evidence import (
     EvidenceError,
     GitHubClient,
     collect,
+    collect_post_merge_health,
+    collect_publication,
+    verify_publication_provider_evidence,
     write_bundle,
 )
+from scripts import ci_contract, ci_publication
 
 REPO = "chris-dare-dev/derived-alg-geo-lean"
 BASE = f"https://api.github.com/repos/{REPO}"
@@ -281,6 +286,128 @@ class ProviderFixture:
 
     def client(self) -> GitHubClient:
         return GitHubClient(REPO, transport=self.transport)
+
+
+class PublicationClient:
+    def __init__(self, *, published_tree: str = SHA_TREE, conclusion: str = "success") -> None:
+        self.repository = REPO
+        self._prefix = BASE + "/"
+        self.base = SHA_BASE
+        self.head = SHA_HEAD
+        self.reviewed = SHA_HEAD
+        self.candidate = SHA_MERGE
+        self.published = "e" * 40
+        self.tree = published_tree
+        self.conclusion = conclusion
+        self.pull_reads = 0
+        self.race_on_final_read = False
+        self.pre_provider = ProviderFixture()
+        self.pre_provider.security_check = {
+            "id": 103,
+            "name": "github-advanced-security",
+            "head_sha": self.head,
+            "status": "completed",
+            "conclusion": "failure",
+            "app": {"id": 4444, "slug": "github-advanced-security"},
+        }
+        self.run = {
+            "id": 909,
+            "name": "CI",
+            "run_attempt": 1,
+            "check_suite_id": 910,
+            "head_sha": self.published,
+            "event": "push",
+            "path": ".github/workflows/ci.yml",
+            "status": "completed",
+            "conclusion": conclusion,
+            "html_url": f"https://github.com/{REPO}/actions/runs/909",
+        }
+
+    def get_object(self, path: str) -> dict:
+        if path == "/pulls/7":
+            self.pull_reads += 1
+            head = "f" * 40 if self.race_on_final_read and self.pull_reads > 1 else self.head
+            return {
+                "number": 7,
+                "state": "closed",
+                "merged": True,
+                "merge_commit_sha": self.published,
+                "html_url": f"https://github.com/{REPO}/pull/7",
+                "base": {"sha": self.base},
+                "head": {"sha": head},
+            }
+        if path.startswith("/git/commits/"):
+            sha = path.rsplit("/", 1)[-1]
+            records = {
+                self.reviewed: {
+                    "sha": self.reviewed, "tree": {"sha": SHA_TREE},
+                    "parents": [{"sha": self.base}],
+                },
+                self.head: {
+                    "sha": self.head, "tree": {"sha": SHA_TREE},
+                    "parents": [{"sha": self.base}],
+                },
+                self.candidate: {
+                    "sha": self.candidate, "tree": {"sha": SHA_TREE},
+                    "parents": [{"sha": self.base}, {"sha": self.head}],
+                },
+                self.published: {
+                    "sha": self.published, "tree": {"sha": self.tree},
+                    "parents": [{"sha": self.base}, {"sha": self.head}],
+                },
+            }
+            if sha in records:
+                return records[sha]
+        if path == "/actions/runs/909":
+            return self.run
+        return self.pre_provider.transport(BASE + path)[0]
+
+    def get_all(self, path: str, *, key: str | None = None) -> list[dict]:
+        if path == f"/actions/runs?head_sha={self.published}":
+            return [self.run]
+        response, _ = self.pre_provider.transport(BASE + path)
+        if isinstance(response, dict):
+            if key is None:
+                raise AssertionError(f"unexpected unkeyed list fixture response: {path}")
+            return response[key]
+        if isinstance(response, list):
+            return response
+        raise AssertionError(f"unexpected list response: {path}")
+
+    def _get(self, url: str):
+        raise AssertionError(f"unexpected comparison request: {url}")
+
+
+def publication_inputs(client: PublicationClient) -> tuple[dict, dict]:
+    collected = collect(client.pre_provider.client(), 7)
+    observations = {
+        "workflow_run": collected["observations"]["workflow_run"],
+        "suites": collected["observations"]["suites"],
+        "check_runs": collected["observations"]["check_runs"],
+        "statuses": collected["observations"]["statuses"],
+    }
+    readiness = ci_publication.evaluate_merge_readiness(
+        {
+            "state": "OPEN",
+            "isDraft": False,
+            "baseRefOid": client.base,
+            "headRefOid": client.head,
+            "mergeStateStatus": "CLEAN",
+            "reviewDecision": "APPROVED",
+        },
+        checked_base=client.base,
+        checked_head=client.head,
+        reviewed_tree=SHA_TREE,
+        head_tree=SHA_TREE,
+        required_ci_verified=True,
+    )
+    return {
+        "evidence": collected["evidence"],
+        "validation": collected["validation"],
+        "observations": observations,
+        "inventory": collected["inventory"],
+        "payloads": collected["payloads"],
+    }, readiness
 
 
 class ClientTests(unittest.TestCase):
@@ -714,6 +841,272 @@ class CollectorTests(unittest.TestCase):
         result = collect(fixture.client(), 7)
         self.assertTrue(result["validation"]["claims"]["required_ci_verified"])
         self.assertEqual(len(result["observations"]["run_artifacts"]), 2)
+
+
+class PublicationTests(unittest.TestCase):
+    def collect(self, client: PublicationClient) -> dict:
+        premerge, readiness = publication_inputs(client)
+        return collect_publication(
+            client, 7, reviewed_commit=client.reviewed, reviewed_tree=SHA_TREE,
+            premerge=premerge, merge_readiness=readiness,
+        )
+
+    def test_exact_publication_receipt_binds_tree_commit_parents_and_post_merge_health(self) -> None:
+        passed = self.collect(PublicationClient(conclusion="success"))
+        ci_publication.verify_receipt(passed)
+        self.assertEqual(passed["publication"]["commit"], "e" * 40)
+        self.assertEqual(passed["publication"]["tree"], SHA_TREE)
+        self.assertEqual(passed["publication"]["parents"], [SHA_BASE, SHA_HEAD])
+        self.assertTrue(passed["claims"]["operationally_verified"])
+        self.assertFalse(passed["claims"]["auxiliary_checks_healthy"])
+        self.assertFalse(passed["claims"]["all_pipelines_green"])
+
+        failed = self.collect(PublicationClient(conclusion="failure"))
+        ci_publication.verify_receipt(failed)
+        self.assertEqual(failed["claims"]["post_merge_health"], "failed")
+        self.assertFalse(failed["claims"]["operationally_verified"])
+
+    def test_publication_rejects_incomplete_tree_and_provider_identity_race(self) -> None:
+        with self.assertRaisesRegex(EvidenceError, "published tree differs"):
+            self.collect(PublicationClient(published_tree="9" * 40))
+
+        raced = PublicationClient()
+        raced.race_on_final_read = True
+        with self.assertRaisesRegex(EvidenceError, "identity changed"):
+            self.collect(raced)
+
+    def test_publication_rejects_same_blob_with_changed_mode_and_deleted_tree_entry(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            repository = Path(temporary)
+            subprocess.run(
+                ["git", "init", "--quiet", "--bare", str(repository)], check=True
+            )
+            blob = subprocess.run(
+                ["git", "-C", str(repository), "hash-object", "-w", "--stdin"],
+                input=b"same audit checker bytes\n",
+                check=True,
+                capture_output=True,
+            ).stdout.decode().strip()
+
+            def tree_with(entries: bytes) -> str:
+                return subprocess.run(
+                    ["git", "-C", str(repository), "mktree"],
+                    input=entries,
+                    check=True,
+                    capture_output=True,
+                ).stdout.decode().strip()
+
+            reviewed_tree = tree_with(
+                f"100755 blob {blob}\tcheck_audit_complete.py\n".encode()
+            )
+            mode_regressed_tree = tree_with(
+                f"100644 blob {blob}\tcheck_audit_complete.py\n".encode()
+            )
+            symlink_blob = subprocess.run(
+                ["git", "-C", str(repository), "hash-object", "-w", "--stdin"],
+                input=b"check_audit_complete.py",
+                check=True,
+                capture_output=True,
+            ).stdout.decode().strip()
+            symlink_tree = tree_with(
+                f"120000 blob {symlink_blob}\tlinked_checker\n".encode()
+            )
+            deleted_entry_tree = subprocess.run(
+                ["git", "-C", str(repository), "mktree"],
+                input=b"",
+                check=True,
+                capture_output=True,
+            ).stdout.decode().strip()
+            self.assertNotEqual(reviewed_tree, mode_regressed_tree)
+            self.assertNotEqual(reviewed_tree, symlink_tree)
+            self.assertNotEqual(reviewed_tree, deleted_entry_tree)
+
+        for published_tree in (mode_regressed_tree, symlink_tree, deleted_entry_tree):
+            client = PublicationClient(published_tree=published_tree)
+            with self.assertRaisesRegex(EvidenceError, "published tree differs"):
+                self.collect(client)
+
+    @staticmethod
+    def resign_receipt(receipt: dict) -> None:
+        receipt["receipt_sha256"] = ci_publication.receipt_digest(receipt)
+
+    @staticmethod
+    def flatten_contract_gates(receipt: dict) -> None:
+        premerge = receipt["premerge"]
+        evidence = premerge["contract_evidence"]
+        definitions = {gate["id"]: gate for gate in INVENTORY["gates"]}
+        premerge["gates"] = [
+            {
+                "id": gate["id"],
+                "name": gate["name"],
+                "provider_id": gate["provider_id"],
+                "commit": gate["commit"],
+                "status": gate["status"],
+                "conclusion": gate["conclusion"],
+                "class": definitions[gate["id"]]["class"],
+                "required": definitions[gate["id"]]["required"],
+            }
+            for gate in evidence["gates"]
+        ]
+
+    def test_provider_verifier_rejects_omitted_required_gate_even_after_rehash(self) -> None:
+        client = PublicationClient()
+        receipt = self.collect(client)
+        evidence = receipt["premerge"]["contract_evidence"]
+        evidence["gates"] = [gate for gate in evidence["gates"] if gate["id"] != "build"]
+        self.flatten_contract_gates(receipt)
+        receipt["premerge"]["required_gate_ids"] = []
+        self.resign_receipt(receipt)
+
+        with self.assertRaisesRegex(EvidenceError, "CI1.01 evidence is invalid"):
+            verify_publication_provider_evidence(client, receipt)
+
+    def test_provider_verifier_rejects_omitted_failed_auxiliary_gate_even_after_rehash(self) -> None:
+        client = PublicationClient()
+        receipt = self.collect(client)
+        premerge = receipt["premerge"]
+        evidence = premerge["contract_evidence"]
+        gate = next(item for item in evidence["gates"] if item["id"] == "github-advanced-security")
+        artifact_refs = set(gate["artifact_refs"])
+        evidence["gates"] = [item for item in evidence["gates"] if item is not gate]
+        evidence["artifacts"] = [
+            item for item in evidence["artifacts"] if item["id"] not in artifact_refs
+        ]
+        self.flatten_contract_gates(receipt)
+        premerge["applicable_auxiliary_gate_ids"] = []
+        for claims in (premerge["claims"], receipt["claims"]):
+            claims["auxiliary_checks_healthy"] = True
+            claims["all_pipelines_green"] = True
+        self.resign_receipt(receipt)
+
+        with self.assertRaises(EvidenceError):
+            verify_publication_provider_evidence(client, receipt)
+
+    def test_provider_verifier_rejects_forged_candidate_and_copied_pr_association(self) -> None:
+        client = PublicationClient()
+        receipt = self.collect(client)
+        premerge = receipt["premerge"]
+        evidence = premerge["contract_evidence"]
+        forged = "9" * 40
+        evidence["candidate_commit"] = forged
+        evidence["revision_binding"]["candidate_commit"] = forged
+        evidence["provider_binding"]["commit"] = forged
+        proof_body = {
+            key: value
+            for key, value in evidence["provider_binding"].items()
+            if key != "proof_sha256"
+        }
+        evidence["provider_binding"]["proof_sha256"] = ci_contract._canonical_sha256(
+            proof_body
+        )
+        for gate in evidence["gates"]:
+            if gate["id"] != "github-advanced-security":
+                gate["commit"] = forged
+        for artifact in evidence["artifacts"]:
+            if artifact["subject"] != "github-advanced-security":
+                artifact["commit"] = forged
+        premerge["candidate_commit"] = forged
+        premerge["provider_binding"] = evidence["provider_binding"]
+        premerge["provider_proof_sha256"] = evidence["provider_binding"]["proof_sha256"]
+        self.flatten_contract_gates(receipt)
+        self.resign_receipt(receipt)
+
+        with self.assertRaisesRegex(EvidenceError, "candidate differs"):
+            verify_publication_provider_evidence(client, receipt)
+
+        associated = PublicationClient()
+        associated_receipt = self.collect(associated)
+        associated.pre_provider.run["pull_requests"] = [
+            {"number": 8, "base": {"sha": "f" * 40}, "head": {"sha": "1" * 40}}
+        ]
+        self.resign_receipt(associated_receipt)
+        with self.assertRaisesRegex(EvidenceError, "associated with a different"):
+            verify_publication_provider_evidence(associated, associated_receipt)
+
+    def test_provider_verifier_rejects_forged_toolchain_pins_and_artifact_digests(self) -> None:
+        fields = ("toolchain", "pins", "artifact-sha256", "artifact-size", "artifact-payload")
+        for field in fields:
+            with self.subTest(field=field):
+                client = PublicationClient()
+                receipt = self.collect(client)
+                evidence = receipt["premerge"]["contract_evidence"]
+                if field == "toolchain":
+                    evidence["toolchain"] = "forged toolchain"
+                elif field == "pins":
+                    evidence["pins"] = {
+                        path: "0" * 64 for path in ci_contract.REQUIRED_PINS
+                    }
+                elif field == "artifact-sha256":
+                    for artifact in evidence["artifacts"]:
+                        artifact["sha256"] = "0" * 64
+                elif field == "artifact-size":
+                    for artifact in evidence["artifacts"]:
+                        artifact["size_bytes"] = 1
+                else:
+                    artifact = evidence["artifacts"][0]
+                    payloads = receipt["premerge"]["artifact_payloads"]
+                    payload = json.loads(payloads[artifact["path"]])
+                    payload["check_run"]["conclusion"] = "failure"
+                    content = (
+                        json.dumps(
+                            payload,
+                            sort_keys=True,
+                            separators=(",", ":"),
+                            ensure_ascii=False,
+                        )
+                        + "\n"
+                    ).encode("utf-8")
+                    payloads[artifact["path"]] = content.decode("utf-8")
+                    artifact["sha256"] = hashlib.sha256(content).hexdigest()
+                    artifact["size_bytes"] = len(content)
+                self.resign_receipt(receipt)
+
+                message = (
+                    "candidate Git blob|candidate Git blobs|CI1.01 artifact|"
+                    "retained CI1.01 artifact"
+                )
+                with self.assertRaisesRegex(EvidenceError, message):
+                    verify_publication_provider_evidence(client, receipt)
+
+    def test_provider_verifier_rejects_rehashed_contradictory_ready_claim(self) -> None:
+        client = PublicationClient()
+        receipt = self.collect(client)
+        receipt["merge_readiness"].update(
+            {
+                "checked_base": "9" * 40,
+                "checked_head": "8" * 40,
+                "head_tree": "7" * 40,
+                "merge_state": "BLOCKED",
+                "reasons": ["merge is blocked"],
+            }
+        )
+        self.resign_receipt(receipt)
+
+        with self.assertRaisesRegex(ci_publication.PublicationError, "ready merge readiness"):
+            verify_publication_provider_evidence(client, receipt)
+
+    def test_post_merge_health_is_not_inferred_from_a_pr_check_or_missing_run(self) -> None:
+        client = PublicationClient()
+        client.run["event"] = "pull_request"
+        self.assertEqual(
+            collect_post_merge_health(client, client.published)["status"], "pending"
+        )
+
+    def test_checked_in_pr1500_receipt_keeps_historical_unknowns_explicit(self) -> None:
+        path = ROOT / "scripts/tests/fixtures/ci_contract/publication-receipt-pr1500.json"
+        receipt = json.loads(path.read_text(encoding="utf-8"))
+        ci_publication.verify_receipt(receipt)
+        self.assertEqual(receipt["publication"]["commit"], "767a363943e83b933799b3a57c8e48cc62801284")
+        self.assertEqual(receipt["publication"]["tree"], "3f997549ff2c3ae629cd1136f9a0f218a9279225")
+        self.assertEqual(
+            receipt["publication"]["parents"],
+            ["8018746ca89a0816c01de80cf9387f9e12c8cb60", "cdde9046c0ae29a62f0ddc127ccc724f85aa34f5"],
+        )
+        self.assertTrue(receipt["claims"]["required_ci_verified"])
+        self.assertFalse(receipt["claims"]["auxiliary_checks_healthy"])
+        self.assertFalse(receipt["claims"]["all_pipelines_green"])
+        self.assertEqual(receipt["claims"]["merge_readiness"], "not_evaluated")
+        self.assertEqual(receipt["post_merge_health"]["run"]["id"], 35974476682)
 
 
 if __name__ == "__main__":

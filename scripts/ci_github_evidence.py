@@ -25,8 +25,10 @@ from urllib.parse import urlencode, urlsplit
 
 if __package__:
     from . import ci_contract
+    from . import ci_publication
 else:  # Imported by the standalone loop_engine.py entry point.
     import ci_contract
+    import ci_publication
 
 
 API_ROOT = "https://api.github.com"
@@ -1022,6 +1024,686 @@ def collect(client: GitHubClient, pr_number: int) -> dict[str, Any]:
         "payloads": payloads,
         "protection": protection["raw"],
     }
+
+
+def collect_post_merge_health(client: GitHubClient, commit: str) -> dict[str, Any]:
+    """Observe the protected CI workflow on the exact published commit.
+
+    This is deliberately a separate claim from premerge required CI. A merge
+    receipt made before the main-branch workflow finishes stays pending and
+    cannot claim operational verification.
+    """
+
+    commit = _sha(commit, "published commit")
+    runs = client.get_all(f"/actions/runs?head_sha={commit}", key="workflow_runs")
+    matches = [
+        run
+        for run in runs
+        if run.get("head_sha") == commit
+        and run.get("name") == "CI"
+        and run.get("path") == ".github/workflows/ci.yml"
+        and run.get("event") == "push"
+    ]
+    if not matches:
+        return {"status": "pending", "commit": commit, "run": None}
+    if len(matches) != 1:
+        return {
+            "status": "unknown",
+            "commit": commit,
+            "run": None,
+            "reason": "multiple post-merge CI runs are ambiguous",
+        }
+    listed = matches[0]
+    run_id = _positive(listed.get("id"), "post-merge CI run ID")
+    run = client.get_object(f"/actions/runs/{run_id}")
+    if _run_identity(run) != _run_identity(listed):
+        raise EvidenceError("post-merge CI run changed between listing and direct read")
+    if run.get("head_sha") != commit or run.get("event") != "push" or run.get(
+        "path"
+    ) != ".github/workflows/ci.yml":
+        raise EvidenceError("post-merge CI run is not bound to the published commit")
+    if run.get("status") != "completed":
+        status = "pending"
+    elif run.get("conclusion") == "success":
+        status = "passed"
+    elif run.get("conclusion") in {"failure", "cancelled", "timed_out", "action_required"}:
+        status = "failed"
+    else:
+        status = "unknown"
+    return {
+        "status": status,
+        "commit": commit,
+        "run": {
+            "id": run_id,
+            "attempt": _positive(run.get("run_attempt"), "post-merge CI run attempt"),
+            "url": run.get("html_url"),
+            "status": run.get("status"),
+            "conclusion": run.get("conclusion"),
+        },
+    }
+
+
+def collect_publication(
+    client: GitHubClient,
+    pr_number: int,
+    *,
+    reviewed_commit: str,
+    reviewed_tree: str,
+    premerge: dict[str, Any],
+    merge_readiness: dict[str, Any],
+) -> dict[str, Any]:
+    """Verify a merged PR's actual Git object and return an exact receipt."""
+
+    pr_number = _positive(pr_number, "pull request number")
+    evidence = premerge.get("evidence")
+    validation = premerge.get("validation")
+    observations = premerge.get("observations")
+    inventory = premerge.get("inventory")
+    if not all(isinstance(value, dict) for value in (evidence, validation, observations, inventory)):
+        raise EvidenceError("premerge evidence bundle is malformed")
+    base = _sha(evidence.get("base_commit"), "checked base")
+    head = _sha(evidence.get("head_commit"), "checked head")
+    candidate_tree = _sha(evidence.get("candidate_tree"), "CI candidate tree")
+    reviewed_commit = _sha(reviewed_commit, "reviewed commit")
+    reviewed_tree = _sha(reviewed_tree, "reviewed tree")
+
+    pr = client.get_object(f"/pulls/{pr_number}")
+    if pr.get("number") != pr_number or pr.get("state") != "closed" or pr.get("merged") is not True:
+        raise EvidenceError("pull request is not confirmed merged by GitHub")
+    pr_base = _sha(_required_object(pr.get("base"), "PR base").get("sha"), "PR base")
+    pr_head = _sha(_required_object(pr.get("head"), "PR head").get("sha"), "PR head")
+    published = _sha(pr.get("merge_commit_sha"), "published merge commit")
+    if pr_base != base or pr_head != head:
+        raise EvidenceError("merged PR base or head differs from the checked revisions")
+
+    reviewed_commit_tree, _ = _commit(client, reviewed_commit)
+    head_tree, _ = _commit(client, head)
+    published_tree, parents = _commit(client, published)
+    if reviewed_commit_tree != reviewed_tree or head_tree != reviewed_tree:
+        raise EvidenceError("PR head tree differs from the final reviewed tree; renew review")
+    if published_tree != reviewed_tree or published_tree != candidate_tree:
+        raise EvidenceError(
+            "published tree differs from the final reviewed tree; renew review"
+        )
+    if not parents:
+        raise EvidenceError("published commit has no parent")
+    if len(parents) == 2:
+        if parents != [base, head]:
+            raise EvidenceError(
+                "published merge commit parents differ from the checked base and head"
+            )
+        base_is_ancestor = True
+    elif len(parents) == 1 and parents[0] == base:
+        base_is_ancestor = True
+    elif len(parents) == 1:
+        # A rebase merge may publish a new final commit whose direct parent is
+        # another commit from the PR. The compare endpoint gives the provider's
+        # complete ancestry classification without treating a separate GET and
+        # ref update as an atomic CAS.
+        comparison_url = f"{client._prefix}compare/{base}...{published}"
+        comparison, _ = client._get(comparison_url)
+        if not isinstance(comparison, dict):
+            raise EvidenceError("provider ancestry comparison is malformed")
+        if (
+            _required_object(comparison.get("base_commit"), "comparison base").get("sha")
+            != base
+            or comparison.get("status") not in {"ahead", "identical"}
+        ):
+            raise EvidenceError("published commit is not based on the checked base")
+        base_is_ancestor = True
+    else:
+        raise EvidenceError("published commit has an unsupported parent set")
+
+    # Re-read immutable PR identity after collecting Git objects. The provider
+    # merge call uses --match-head-commit; this check records what actually
+    # landed and does not claim that separate reads are an atomic CAS.
+    final_pr = client.get_object(f"/pulls/{pr_number}")
+    if (
+        final_pr.get("state") != "closed"
+        or final_pr.get("merged") is not True
+        or _sha(final_pr.get("merge_commit_sha"), "final published commit") != published
+        or _sha(_required_object(final_pr.get("head"), "final PR head").get("sha"), "final PR head") != head
+    ):
+        raise EvidenceError("publication identity changed during receipt collection")
+
+    post_merge = collect_post_merge_health(client, published)
+    receipt = ci_publication.build_receipt(
+        repository=client.repository,
+        pr_number=pr_number,
+        pr_url=str(pr.get("html_url") or ""),
+        reviewed_commit=reviewed_commit,
+        reviewed_tree=reviewed_tree,
+        premerge_evidence=evidence,
+        premerge_validation=validation,
+        premerge_observations=observations,
+        premerge_inventory=inventory,
+        published_commit=published,
+        published_tree=published_tree,
+        published_parents=parents,
+        published_base_is_ancestor=base_is_ancestor,
+        merge_readiness=merge_readiness,
+        post_merge_health=post_merge,
+    )
+    payloads = premerge.get("payloads")
+    if not isinstance(payloads, dict):
+        raise EvidenceError("premerge evidence bundle does not retain provider artifact payloads")
+    artifact_payloads: dict[str, str] = {}
+    for artifact in evidence.get("artifacts", []):
+        path = artifact.get("path") if isinstance(artifact, dict) else None
+        content = payloads.get(path) if isinstance(path, str) else None
+        if not isinstance(content, bytes):
+            raise EvidenceError("premerge provider artifact payload is missing")
+        artifact_payloads[path] = content.decode("utf-8")
+    if set(artifact_payloads) != {artifact["path"] for artifact in evidence["artifacts"]}:
+        raise EvidenceError("premerge provider artifact payload set is incomplete")
+    receipt["premerge"]["artifact_payloads"] = artifact_payloads
+    receipt["receipt_sha256"] = ci_publication.receipt_digest(receipt)
+    verify_publication_provider_evidence(client, receipt)
+    return receipt
+
+
+def verify_publication_provider_evidence(
+    client: GitHubClient, receipt: dict[str, Any]
+) -> None:
+    """Independently re-read the published commit and both CI evidence phases."""
+
+    ci_publication.verify_receipt(receipt)
+    if receipt.get("repository") != client.repository:
+        raise EvidenceError("publication receipt names another repository")
+    pr_number = _positive(receipt.get("pull_request", {}).get("number"), "receipt PR number")
+    premerge = _required_object(receipt.get("premerge"), "receipt premerge")
+    base = _sha(premerge.get("base_commit"), "receipt checked base")
+    head = _sha(premerge.get("head_commit"), "receipt checked head")
+    review = _required_object(receipt.get("review"), "receipt review")
+    publication = _required_object(receipt.get("publication"), "receipt publication")
+    reviewed_commit = _sha(review.get("commit"), "receipt reviewed commit")
+    published_commit = _sha(publication.get("commit"), "receipt published commit")
+
+    pr = client.get_object(f"/pulls/{pr_number}")
+    if (
+        pr.get("state") != "closed"
+        or pr.get("merged") is not True
+        or _sha(pr.get("merge_commit_sha"), "provider merge commit") != published_commit
+        or _sha(_required_object(pr.get("base"), "provider PR base").get("sha"), "provider PR base") != base
+        or _sha(_required_object(pr.get("head"), "provider PR head").get("sha"), "provider PR head") != head
+    ):
+        raise EvidenceError("provider PR identity differs from the publication receipt")
+    reviewed_tree, _ = _commit(client, reviewed_commit)
+    head_tree, _ = _commit(client, head)
+    published_tree, parents = _commit(client, published_commit)
+    expected_parents = [_sha(parent, "receipt parent") for parent in publication["parents"]]
+    if (
+        reviewed_tree != review.get("tree")
+        or head_tree != review.get("tree")
+        or published_tree != publication.get("tree")
+        or parents != expected_parents
+    ):
+        raise EvidenceError("provider Git tree or parent list differs from the publication receipt")
+    if not parents or parents[0] != base:
+        compare_url = f"{client._prefix}compare/{base}...{published_commit}"
+        comparison, _ = client._get(compare_url)
+        if (
+            not isinstance(comparison, dict)
+            or _required_object(comparison.get("base_commit"), "comparison base").get("sha") != base
+            or comparison.get("status") not in {"ahead", "identical"}
+        ):
+            raise EvidenceError("provider no longer proves the checked base is an ancestor")
+
+    verify_premerge_provider_evidence(client, receipt)
+    observed_post = collect_post_merge_health(client, published_commit)
+    recorded_post = receipt.get("post_merge_health")
+    if not isinstance(recorded_post, dict) or recorded_post.get("commit") != published_commit:
+        raise EvidenceError("receipt post-merge observation is not bound to the published commit")
+    if recorded_post.get("status") == "pending" and recorded_post.get("run") is None:
+        # A run can start after the receipt was written; a pending snapshot is
+        # conservative and must never be promoted to operational verification.
+        return
+    if observed_post != recorded_post:
+        raise EvidenceError("provider post-merge CI differs from the publication receipt")
+
+
+def verify_premerge_provider_evidence(
+    client: GitHubClient, receipt: dict[str, Any]
+) -> None:
+    """Rebuild CI1.01 claims from protected policy and live provider facts."""
+
+    ci_publication.verify_receipt(receipt)
+    premerge = receipt["premerge"]
+    pr_number = receipt["pull_request"]["number"]
+    base = _sha(premerge.get("base_commit"), "receipt base")
+    head = _sha(premerge.get("head_commit"), "receipt head")
+    contract_evidence = _required_object(
+        premerge.get("contract_evidence"), "receipt CI1.01 evidence"
+    )
+    run_summary = _required_object(premerge.get("workflow_run"), "receipt workflow run")
+    run_id = _positive(premerge.get("run_id"), "receipt workflow run ID")
+    attempt = _positive(premerge.get("run_attempt"), "receipt workflow run attempt")
+    run = client.get_object(f"/actions/runs/{run_id}")
+    expected_run = (
+        run_id,
+        attempt,
+        _positive(run_summary.get("check_suite_id"), "receipt primary suite ID"),
+        head,
+        "pull_request",
+        "completed",
+        "success",
+    )
+    if _run_identity(run) != expected_run or run.get("path") != ".github/workflows/ci.yml" or any(
+        run.get(field) != run_summary.get(field)
+        for field in (
+            "id", "run_attempt", "check_suite_id", "head_sha", "event", "path",
+            "status", "conclusion", "html_url",
+        )
+    ):
+        raise EvidenceError("receipt premerge workflow run differs from GitHub")
+    live_associations = run.get("pull_requests")
+    matching_associations = [
+        {
+            "number": item.get("number"),
+            "base_sha": item["base"].get("sha"),
+            "head_sha": item["head"].get("sha"),
+        }
+        for item in live_associations or []
+        if isinstance(item, dict)
+        and item.get("number") == pr_number
+        and isinstance(item.get("base"), dict)
+        and item["base"].get("sha") == base
+        and isinstance(item.get("head"), dict)
+        and item["head"].get("sha") == head
+    ]
+    recorded_associations = run_summary.get("pull_requests")
+    if len(matching_associations) == 1:
+        if recorded_associations != matching_associations:
+            raise EvidenceError("receipt PR association differs from the live CI run")
+    elif not live_associations:
+        # GitHub currently clears Actions-run PR associations after merge. The
+        # receipt retains the premerge association, and the published-PR check
+        # plus the run-bound candidate's ordered base/head parents re-establish
+        # the same revisions below. A nonempty but conflicting association is
+        # never accepted as this fallback.
+        pr = client.get_object(f"/pulls/{pr_number}")
+        if (
+            pr.get("state") != "closed"
+            or pr.get("merged") is not True
+            or _sha(_required_object(pr.get("base"), "associated PR base").get("sha"), "associated PR base") != base
+            or _sha(_required_object(pr.get("head"), "associated PR head").get("sha"), "associated PR head") != head
+            or recorded_associations != [{"number": pr_number, "base_sha": base, "head_sha": head}]
+        ):
+            raise EvidenceError("live CI run no longer proves the receipt PR/base/head association")
+    else:
+        raise EvidenceError("live CI run is associated with a different PR/base/head")
+
+    candidate, candidate_tree, candidate_parents, _ = _candidate(
+        client, base, head, run
+    )
+    provider_binding = _required_object(
+        contract_evidence.get("provider_binding"), "receipt provider binding"
+    )
+    if (
+        candidate != premerge.get("candidate_commit")
+        or candidate_tree != premerge.get("candidate_tree")
+        or candidate_parents != provider_binding.get("parents")
+    ):
+        raise EvidenceError(
+            "receipt CI candidate differs from the current run artifact or Git object"
+        )
+
+    try:
+        inventory = json.loads(_blob(client, base, "scripts/ci_gate_inventory.json"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise EvidenceError("receipt base gate inventory is invalid JSON") from exc
+    if ci_contract.validate_inventory(inventory):
+        raise EvidenceError("receipt base gate inventory is invalid")
+    if inventory.get("repository") != client.repository:
+        raise EvidenceError("receipt base gate inventory names another repository")
+    validation = ci_contract.validate_evidence(
+        inventory,
+        contract_evidence,
+        trusted_base_commit=base,
+        trusted_head_commit=head,
+        trusted_inventory_sha256=ci_contract._canonical_sha256(inventory),
+    )
+    if not validation.get("valid"):
+        errors = validation.get("errors")
+        detail = "; ".join(errors) if isinstance(errors, list) else "unknown validation error"
+        raise EvidenceError("receipt CI1.01 evidence is invalid: " + detail)
+    try:
+        candidate_toolchain = _blob(client, candidate, "lean-toolchain").decode("utf-8").strip()
+    except UnicodeDecodeError as exc:
+        raise EvidenceError("candidate lean-toolchain is not UTF-8") from exc
+    if not candidate_toolchain or contract_evidence.get("toolchain") != candidate_toolchain:
+        raise EvidenceError("receipt toolchain differs from the candidate Git blob")
+    candidate_pins = {
+        path: hashlib.sha256(_blob(client, candidate, path)).hexdigest()
+        for path in sorted(ci_contract.REQUIRED_PINS)
+    }
+    if contract_evidence.get("pins") != candidate_pins:
+        raise EvidenceError("receipt pin digests differ from candidate Git blobs")
+    definitions = {gate["id"]: gate for gate in inventory["gates"]}
+    applicable_auxiliary_ids = sorted(
+        gate_id
+        for gate_id, definition in definitions.items()
+        if definition.get("class") == "auxiliary"
+        and ci_contract._event_applies(definition, contract_evidence)
+    )
+    required_ids = premerge.get("required_gate_ids")
+    if required_ids != validation.get("required_gates"):
+        raise EvidenceError("receipt required-gate set differs from the protected inventory")
+    if premerge.get("applicable_auxiliary_gate_ids") != applicable_auxiliary_ids:
+        raise EvidenceError("receipt auxiliary-gate set differs from the protected inventory")
+    validation_claims = validation.get("claims", {})
+    claims = premerge.get("claims")
+    if not isinstance(claims, dict) or claims.get("required_ci_verified") is not True:
+        raise EvidenceError("receipt does not establish required CI")
+
+    expected_contract_gate_records = []
+    expected_artifacts: dict[str, dict[str, Any]] = {}
+    provider_payload_facts: dict[str, dict[str, Any]] = {}
+    for gate in contract_evidence.get("gates", []):
+        definition = definitions.get(gate.get("id"))
+        if not isinstance(definition, dict):
+            raise EvidenceError("receipt contains a gate absent from protected inventory")
+        expected_contract_gate_records.append(
+            {
+                "id": gate.get("id"),
+                "name": gate.get("name"),
+                "provider_id": gate.get("provider_id"),
+                "commit": gate.get("commit"),
+                "status": gate.get("status"),
+                "conclusion": gate.get("conclusion"),
+                "class": definition.get("class"),
+                "required": definition.get("required"),
+            }
+        )
+    gate_records = premerge.get("gates")
+    if gate_records != expected_contract_gate_records:
+        raise EvidenceError("receipt flattened gates differ from CI1.01 contract evidence")
+
+    suites = client.get_all(f"/commits/{head}/check-suites", key="check_suites")
+    suite_map: dict[int, dict[str, Any]] = {}
+    suite_summaries: dict[int, dict[str, Any]] = {}
+    for suite in suites:
+        suite_id = _positive(suite.get("id"), "live check suite ID")
+        if suite_id in suite_map or suite.get("head_sha") != head:
+            raise EvidenceError("duplicate or foreign live check suite")
+        suite_map[suite_id] = suite
+        app = suite.get("app") if isinstance(suite.get("app"), dict) else {}
+        suite_summaries[suite_id] = {
+            "id": suite_id,
+            "head_sha": suite.get("head_sha"),
+            "app_id": app.get("id"),
+            "app_slug": app.get("slug"),
+        }
+    recorded_suites = premerge.get("check_suites")
+    if not isinstance(recorded_suites, list):
+        raise EvidenceError("receipt check-suite observations are malformed")
+    try:
+        recorded_suite_map = {
+            _positive(item.get("id"), "receipt check suite ID"): item
+            for item in recorded_suites
+            if isinstance(item, dict)
+        }
+    except EvidenceError:
+        raise
+    if len(recorded_suite_map) != len(recorded_suites) or recorded_suite_map != suite_summaries:
+        raise EvidenceError("receipt does not enumerate the complete live check-suite set")
+    primary_suite_id = expected_run[2]
+    primary_suite = suite_map.get(primary_suite_id)
+    if primary_suite is None or _required_object(
+        primary_suite.get("app"), "primary check-suite app"
+    ).get("slug") != "github-actions":
+        raise EvidenceError("live CI run is not bound to its GitHub Actions check suite")
+
+    live_checks: dict[int, dict[str, Any]] = {}
+    check_suite_by_id: dict[int, int] = {}
+    for suite_id, suite in suite_map.items():
+        checks = client.get_all(
+            f"/check-suites/{suite_id}/check-runs?filter=all", key="check_runs"
+        )
+        if (
+            suite.get("latest_check_runs_count") is not None
+            and len(checks) < suite["latest_check_runs_count"]
+        ):
+            raise EvidenceError("live check suite run count is truncated")
+        for check in checks:
+            check_id = _positive(check.get("id"), "live check run ID")
+            if check_id in live_checks or check.get("head_sha") != head:
+                raise EvidenceError("duplicate or foreign live check run")
+            live_checks[check_id] = check
+            check_suite_by_id[check_id] = suite_id
+    recorded_checks = premerge.get("check_runs")
+    if not isinstance(recorded_checks, list):
+        raise EvidenceError("receipt check-run observations are malformed")
+    try:
+        recorded_check_map = {
+            _positive(item.get("id"), "receipt check run ID"): item
+            for item in recorded_checks
+            if isinstance(item, dict)
+        }
+    except EvidenceError:
+        raise
+    live_check_summaries = {
+        check_id: ci_publication._provider_check_summary(check)
+        for check_id, check in live_checks.items()
+    }
+    if len(recorded_check_map) != len(recorded_checks) or recorded_check_map != live_check_summaries:
+        raise EvidenceError("receipt does not enumerate the complete live check-run set")
+
+    statuses = client.get_all(f"/commits/{head}/statuses")
+    status_map: dict[int, dict[str, Any]] = {}
+    for item in statuses:
+        status_id = _positive(item.get("id"), "live commit status ID")
+        if status_id in status_map or item.get("sha") != head:
+            raise EvidenceError("duplicate or foreign live commit status")
+        status_map[status_id] = item
+    recorded_statuses = premerge.get("statuses")
+    if not isinstance(recorded_statuses, list):
+        raise EvidenceError("receipt commit-status observations are malformed")
+    live_status_summaries = {
+        status_id: {
+            "id": item.get("id"),
+            "sha": item.get("sha"),
+            "context": item.get("context"),
+            "state": item.get("state"),
+            "updated_at": item.get("updated_at"),
+            "target_url": item.get("target_url"),
+        }
+        for status_id, item in status_map.items()
+    }
+    try:
+        recorded_status_map = {
+            _positive(item.get("id"), "receipt commit status ID"): item
+            for item in recorded_statuses
+            if isinstance(item, dict)
+        }
+    except EvidenceError:
+        raise
+    if len(recorded_status_map) != len(recorded_statuses) or recorded_status_map != live_status_summaries:
+        raise EvidenceError("receipt does not enumerate the complete live commit-status set")
+
+    observed_provider_ids = {
+        str(gate.get("provider_id"))
+        for gate in contract_evidence.get("gates", [])
+        if isinstance(gate, dict)
+    }
+    unclassified_check_ids = sorted(
+        str(check_id) for check_id in live_checks if str(check_id) not in observed_provider_ids
+    )
+    unclassified_status_ids = sorted(str(status_id) for status_id in status_map)
+    if premerge.get("unclassified_check_ids") != unclassified_check_ids or premerge.get(
+        "unclassified_status_ids"
+    ) != unclassified_status_ids:
+        raise EvidenceError("receipt unclassified-provider observations are incomplete")
+    expected_claims = {
+        "required_ci_verified": validation_claims.get("required_ci_verified") is True,
+        "auxiliary_checks_healthy": validation_claims.get("auxiliary_checks_healthy") is True,
+        "all_pipelines_green": (
+            validation_claims.get("all_pipelines_green") is True
+            and not unclassified_check_ids
+            and not unclassified_status_ids
+        ),
+    }
+    if claims != expected_claims:
+        raise EvidenceError("receipt CI claims differ from validated provider evidence")
+
+    primary_jobs = client.get_all(
+        f"/actions/runs/{run_id}/attempts/{attempt}/jobs", key="jobs"
+    )
+    jobs_by_name: dict[str, list[dict[str, Any]]] = {}
+    for job in primary_jobs:
+        if (
+            job.get("run_id") != run_id
+            or job.get("run_attempt") != attempt
+            or job.get("head_sha") != head
+        ):
+            raise EvidenceError("live workflow job is bound to another run, attempt, or head")
+        jobs_by_name.setdefault(str(job.get("name")), []).append(job)
+
+    for gate in contract_evidence.get("gates", []):
+        definition = definitions.get(gate.get("id"))
+        if not isinstance(definition, dict):
+            raise EvidenceError("receipt contains a gate absent from protected inventory")
+        try:
+            provider_id = int(gate.get("provider_id"))
+        except (TypeError, ValueError) as exc:
+            raise EvidenceError("receipt gate provider ID is malformed") from exc
+        if provider_id <= 0:
+            raise EvidenceError("receipt gate provider ID is not positive")
+        binding = definition.get("run_binding")
+        if binding == "primary":
+            matches = jobs_by_name.get(definition.get("name"), [])
+            if len(matches) != 1:
+                raise EvidenceError(f"primary gate {gate['id']!r} lacks one current workflow job")
+            job = matches[0]
+            check_url = job.get("check_run_url")
+            job_id = _positive(job.get("id"), "live workflow job ID")
+            if (
+                check_url != f"{client._prefix}check-runs/{job_id}"
+                or job_id != provider_id
+                or job.get("status") != live_checks.get(provider_id, {}).get("status")
+                or job.get("conclusion") != live_checks.get(provider_id, {}).get("conclusion")
+                or check_suite_by_id.get(provider_id) != primary_suite_id
+            ):
+                raise EvidenceError(f"primary gate {gate['id']!r} differs from its live workflow job")
+            actual = live_checks.get(provider_id)
+            app = actual.get("app") if isinstance(actual, dict) and isinstance(actual.get("app"), dict) else {}
+            primary_app = _required_object(primary_suite.get("app"), "primary suite app")
+            if app.get("id") != primary_app.get("id") or app.get("slug") != "github-actions":
+                raise EvidenceError(f"primary gate {gate['id']!r} has the wrong provider")
+            artifact_commit = candidate
+            artifact_run_fields = {"run_id": run_id, "run_attempt": attempt}
+        elif binding == "check":
+            matches = [
+                (check_id, check)
+                for check_id, check in live_checks.items()
+                if check.get("name") == definition.get("name")
+                and isinstance(check.get("app"), dict)
+                and check["app"].get("slug") == definition.get("producer")
+            ]
+            if len(matches) != 1 or matches[0][0] != provider_id:
+                raise EvidenceError(f"check gate {gate['id']!r} differs from its live provider run")
+            actual = matches[0][1]
+            artifact_commit = head
+            artifact_run_fields = {}
+        else:
+            raise EvidenceError(
+                f"receipt claims unsupported PR publication evidence for {binding!r} gate {gate['id']!r}"
+            )
+        status, conclusion = _conclusion(actual)
+        if gate.get("status") != status or gate.get("conclusion") != conclusion:
+            raise EvidenceError(f"receipt gate {gate['id']!r} differs from provider outcome")
+        artifact_id = f"github-check-run-{provider_id}"
+        artifact_path = f"results/check-run-{provider_id}.json"
+        if gate.get("artifact_refs") != [artifact_id]:
+            raise EvidenceError(f"receipt gate {gate['id']!r} does not reference its canonical provider artifact")
+        expected_artifacts[artifact_id] = {
+            "id": artifact_id,
+            "path": artifact_path,
+            "media_type": "application/json",
+            "producer": definition["producer"],
+            "kind": definition["artifact"],
+            "subject": gate["id"],
+            "commit": artifact_commit,
+            **artifact_run_fields,
+        }
+        provider_payload_facts[artifact_id] = {
+            "binding": binding,
+            "check_run": actual,
+            "job": job if binding == "primary" else None,
+            "candidate": candidate,
+            "head": head,
+            "run_id": run_id,
+            "run_attempt": attempt,
+        }
+
+    artifacts = contract_evidence.get("artifacts")
+    if not isinstance(artifacts, list):
+        raise EvidenceError("receipt CI1.01 artifacts are malformed")
+    payload_texts = premerge.get("artifact_payloads")
+    if not isinstance(payload_texts, dict):
+        raise EvidenceError("receipt does not retain CI1.01 provider artifact payloads")
+    if set(payload_texts) != {item["path"] for item in expected_artifacts.values()}:
+        raise EvidenceError("receipt provider artifact payload set is incomplete")
+    recorded_artifacts = {
+        artifact.get("id"): artifact
+        for artifact in artifacts
+        if isinstance(artifact, dict)
+    }
+    if len(recorded_artifacts) != len(artifacts) or set(recorded_artifacts) != set(expected_artifacts):
+        raise EvidenceError("receipt CI1.01 artifact records differ from live provider gates")
+    for artifact_id, expected in expected_artifacts.items():
+        artifact = recorded_artifacts[artifact_id]
+        facts = provider_payload_facts[artifact_id]
+        metadata = {key: value for key, value in artifact.items() if key not in {"sha256", "size_bytes"}}
+        if metadata != expected:
+            raise EvidenceError("receipt CI1.01 artifact metadata differs from live provider gates")
+        payload_text = payload_texts.get(expected["path"])
+        if not isinstance(payload_text, str):
+            raise EvidenceError("receipt CI1.01 artifact payload is not retained text")
+        payload_bytes = payload_text.encode("utf-8")
+        if (
+            hashlib.sha256(payload_bytes).hexdigest() != artifact.get("sha256")
+            or len(payload_bytes) != artifact.get("size_bytes")
+        ):
+            raise EvidenceError("receipt CI1.01 artifact digest or size differs from retained bytes")
+        try:
+            payload_value = json.loads(payload_text)
+        except json.JSONDecodeError as exc:
+            raise EvidenceError("receipt CI1.01 artifact payload is invalid JSON") from exc
+        if not isinstance(payload_value, dict) or _canonical(payload_value).decode("utf-8") != payload_text:
+            raise EvidenceError("receipt CI1.01 artifact payload is not canonical JSON")
+        if facts["binding"] == "primary":
+            expected_keys = {"check_run", "job", "candidate", "run_id", "run_attempt"}
+            snapshot_job = payload_value.get("job")
+            job_fields = (
+                "id", "name", "head_sha", "run_id", "run_attempt", "check_run_url",
+                "status", "conclusion",
+            )
+            if not isinstance(snapshot_job, dict) or any(
+                snapshot_job.get(field) != facts["job"].get(field) for field in job_fields
+            ):
+                raise EvidenceError("retained primary artifact job differs from its live workflow job")
+            if (
+                payload_value.get("candidate") != facts["candidate"]
+                or payload_value.get("run_id") != facts["run_id"]
+                or payload_value.get("run_attempt") != facts["run_attempt"]
+            ):
+                raise EvidenceError("retained primary artifact has a different candidate or workflow run")
+        else:
+            expected_keys = {"check_run", "head", "candidate"}
+            if (
+                payload_value.get("head") != facts["head"]
+                or payload_value.get("candidate") != facts["candidate"]
+            ):
+                raise EvidenceError("retained check artifact has a different head or candidate")
+        snapshot_check = payload_value.get("check_run")
+        if (
+            set(payload_value) != expected_keys
+            or not isinstance(snapshot_check, dict)
+            or ci_publication._provider_check_summary(snapshot_check)
+            != ci_publication._provider_check_summary(facts["check_run"])
+        ):
+            raise EvidenceError("retained CI1.01 artifact check differs from its live provider run")
 
 
 def write_bundle(result: dict[str, Any], directory: Path) -> None:

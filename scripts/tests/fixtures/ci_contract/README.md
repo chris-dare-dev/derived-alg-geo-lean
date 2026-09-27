@@ -18,3 +18,18 @@ identities, so a fixture failure is reproducible without a GitHub API call.
 Version 6 retains the v4 and v5 compatibility checks and adds a PR-only dynamic
 workflow binding for AI Scan. Its raw green outcome remains unverified until a
 provider-defined analysis/result signal can be bound to the run and head.
+
+`publication-receipt-pr1500.json` is a historical exact-revision example. It
+binds PR #1500's reviewed tree to GitHub's merge commit and parents, retains
+CI1.01 contract evidence, canonical artifact payloads and check-run IDs, and
+records a separate post-merge CI run. The historical PR predates the
+merge-readiness adapter, so that claim remains `not_evaluated`; required CI
+passed while auxiliary health and the all-pipelines claim remained false.
+`test_ci_github_evidence.py` checks its receipt digest and claim relationships
+without network access. The provider recheck reads the protected inventory,
+merge candidate artifact, commit, PR identity, workflow, check suites/runs,
+statuses and post-merge run. The snapshot retains its collected bytes while
+the verifier compares the fields that carry the CI claim. GitHub may clear a
+merged run's `pull_requests` field; a conflicting nonempty association is
+rejected. This fixture does not establish a provider-enforced publication
+guard for #1431.

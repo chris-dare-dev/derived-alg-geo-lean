@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import copy
+import os
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager, redirect_stdout
 import io
@@ -57,6 +58,46 @@ def snapshot(*jobs: dict, cpu_threads: int = 8) -> dict:
 
 
 class RunnerStateTests(unittest.TestCase):
+    def test_hardlinked_git_indexes_share_one_writable_inode(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            jobs = []
+            for name in ("job-a", "job-b"):
+                workspace = base / name / "workspace"
+                (workspace / ".git").mkdir(parents=True)
+                candidate = record(name)
+                candidate["host_id"] = "ubuntu-host"
+                candidate["paths"] = {
+                    "checkout": path_entry(str(workspace), True),
+                    "git_index": path_entry(str(workspace / ".git/index"), True),
+                    "lake_build": path_entry(str(workspace / ".lake/build"), True),
+                    "lake_packages": path_entry(str(workspace / ".lake/packages"), True),
+                    "elan": path_entry(str(base / name / "elan"), True),
+                    "temp": path_entry(str(base / name / "tmp"), True),
+                    "outputs": path_entry(str(base / name / "outputs"), True),
+                    "artifacts": path_entry(str(base / name / "artifacts"), True),
+                }
+                jobs.append(candidate)
+            first_index = Path(jobs[0]["paths"]["git_index"]["path"])
+            second_index = Path(jobs[1]["paths"]["git_index"]["path"])
+            first_index.write_text("index", encoding="utf-8")
+            os.link(first_index, second_index)
+            inode = first_index.stat()
+            for job in jobs:
+                job["paths"]["git_index"].update({
+                    "observed_device": inode.st_dev, "observed_inode": inode.st_ino,
+                })
+            report = runner_state.validate_snapshot(snapshot(*jobs))
+            self.assertFalse(report["valid"], report)
+            self.assertTrue(any("writable inode collision" in error for error in report["errors"]))
+            for job in jobs:
+                job["paths"]["git_index"].pop("observed_device")
+                job["paths"]["git_index"].pop("observed_inode")
+            lease_dir = base / "leases"
+            runner_state.acquire_lease(jobs[0], lease_dir, snapshot(*jobs)["host_capacity"])
+            with self.assertRaisesRegex(ValueError, "writable inode collision"):
+                runner_state.acquire_lease(jobs[1], lease_dir, snapshot(*jobs)["host_capacity"])
+
     def test_canonical_path_normalizes_case_and_separators(self) -> None:
         left = runner_state.canonical_path(r"C:\Actions\Runner\..\Runner\_work")
         right = runner_state.canonical_path(r"c:/actions/runner/_work")
@@ -73,6 +114,13 @@ class RunnerStateTests(unittest.TestCase):
         second = record("job-b", root=r"C:\actions\runner-b")
         second["host_id"] = "windows-host-2"
         result = runner_state.validate_snapshot(snapshot(first, second, cpu_threads=2))
+        self.assertTrue(result["valid"], result)
+
+    def test_namespace_is_scoped_per_physical_host(self) -> None:
+        first = record("same")
+        second = record("same")
+        second["host_id"] = "windows-host-2"
+        result = runner_state.validate_snapshot(snapshot(first, second))
         self.assertTrue(result["valid"], result)
 
     def test_same_paths_on_distinct_physical_hosts_do_not_collide(self) -> None:
@@ -96,6 +144,38 @@ class RunnerStateTests(unittest.TestCase):
             second["paths"]["temp"] = path_entry(str(lower), True)
             result = runner_state.validate_snapshot(snapshot(first, second))
             self.assertTrue(result["valid"], result)
+
+    def test_double_slash_posix_alias_collides(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            shared = Path(directory) / "shared"
+            shared.mkdir()
+            first = record("job-a")
+            second = record("job-b", root=r"C:\actions\runner-b")
+            first["paths"]["temp"] = path_entry(str(shared), True)
+            second["paths"]["temp"] = path_entry("/" + str(shared), True)
+            result = runner_state.validate_snapshot(snapshot(first, second))
+            self.assertFalse(result["valid"], result)
+            self.assertTrue(any("writable path collision" in error for error in result["errors"]))
+
+    def test_detached_posix_report_uses_observed_identity(self) -> None:
+        first = record("job-a")
+        second = record("job-b", root=r"C:\actions\runner-b")
+        first["paths"]["temp"] = path_entry("/remote/a", True)
+        second["paths"]["temp"] = path_entry("/remote/b", True)
+        first["paths"]["temp"]["resolved_path"] = "/remote/shared"
+        second["paths"]["temp"]["resolved_path"] = "/remote/shared"
+        result = runner_state.validate_snapshot(snapshot(first, second))
+        self.assertFalse(result["valid"], result)
+        self.assertTrue(any("writable path collision" in error for error in result["errors"]))
+
+    def test_windows_extended_drive_spelling_collides(self) -> None:
+        first = record("job-a")
+        second = record("job-b", root=r"C:\actions\runner-b")
+        first["paths"]["temp"] = path_entry(r"C:\shared\temp", True)
+        second["paths"]["temp"] = path_entry(r"\\?\C:\shared\temp", True)
+        result = runner_state.validate_snapshot(snapshot(first, second))
+        self.assertFalse(result["valid"], result)
+        self.assertTrue(any("writable path collision" in error for error in result["errors"]))
 
     def test_writable_build_collision_fails_closed(self) -> None:
         first = record("job-a")
@@ -246,6 +326,16 @@ class RunnerStateTests(unittest.TestCase):
             self.assertTrue((lease_dir / "job-a.json").is_file())
             self.assertFalse((lease_dir / "job-b.json").exists())
 
+    def test_admission_rejects_false_observed_posix_identity(self) -> None:
+        candidate = record("job-a")
+        candidate["paths"]["temp"] = path_entry("/tmp/actual", True)
+        candidate["paths"]["temp"]["resolved_path"] = "/tmp/claimed"
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(ValueError, "resolved_path differs from host identity"):
+                runner_state.acquire_lease(
+                    candidate, Path(directory), snapshot(candidate)["host_capacity"]
+                )
+
     def test_candidate_temp_root_cannot_contain_host_lease_directory(self) -> None:
         candidate = record("job-a")
         with tempfile.TemporaryDirectory() as directory:
@@ -267,6 +357,7 @@ class RunnerStateTests(unittest.TestCase):
             (lease_dir / "job-a.json").write_text(json.dumps({
                 "owner_digest": runner_state._record_digest(active), "record": active,
             }), encoding="utf-8")
+            (lease_dir / "job-a.json").chmod(0o600)
             with self.assertRaisesRegex(ValueError, "overlaps job-a:temp"):
                 runner_state.acquire_lease(candidate, lease_dir, snapshot(active, candidate)["host_capacity"])
             self.assertFalse((lease_dir / "job-b.json").exists())
@@ -282,15 +373,15 @@ class RunnerStateTests(unittest.TestCase):
             host_temp = root / "host-temp"
             host_temp.mkdir()
             lease_dir = host_temp / "leases"
-            candidate["paths"]["temp"] = path_entry(str(temp_link), True)
+            candidate["paths"]["temp"] = {"path": str(temp_link), "writable": True}
             original_lock = runner_state._locked_lease_dir
 
             @contextmanager
             def retarget_at_lock(path: Path):
                 temp_link.unlink()
                 temp_link.symlink_to(host_temp, target_is_directory=True)
-                with original_lock(path):
-                    yield
+                with original_lock(path) as directory_fd:
+                    yield directory_fd
 
             with patch.object(runner_state, "_locked_lease_dir", retarget_at_lock):
                 with self.assertRaisesRegex(ValueError, "overlaps job-a:temp"):
@@ -312,6 +403,7 @@ class RunnerStateTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             lease_dir = Path(directory)
             (lease_dir / "other.json").write_text("{}", encoding="utf-8")
+            (lease_dir / "other.json").chmod(0o600)
             with self.assertRaisesRegex(ValueError, "invalid active lease"):
                 runner_state.acquire_lease(candidate, lease_dir, snapshot(candidate)["host_capacity"])
 
@@ -323,6 +415,45 @@ class RunnerStateTests(unittest.TestCase):
             lease_dir.chmod(0o770)
             with self.assertRaisesRegex(ValueError, "not group/world-writable"):
                 runner_state.acquire_lease(candidate, lease_dir, snapshot(candidate)["host_capacity"])
+
+    def test_lease_directory_parent_symlink_is_rejected(self) -> None:
+        candidate = record("job-a")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            actual = root / "actual"
+            actual.mkdir()
+            alias = root / "alias"
+            alias.symlink_to(actual, target_is_directory=True)
+            with self.assertRaisesRegex(ValueError, "symlink or non-directory"):
+                runner_state.acquire_lease(
+                    candidate, alias / "leases", snapshot(candidate)["host_capacity"]
+                )
+            self.assertFalse((actual / "leases/job-a.json").exists())
+
+    def test_parent_rename_while_locked_denies_admission(self) -> None:
+        candidate = record("job-a")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            parent = root / "parent"
+            parent.mkdir()
+            lease_dir = parent / "leases"
+            original_lock = runner_state._locked_lease_dir
+
+            @contextmanager
+            def rename_after_lock(path: Path):
+                with original_lock(path) as directory_fd:
+                    parent.rename(root / "renamed")
+                    parent.mkdir()
+                    (parent / "leases").mkdir()
+                    yield directory_fd
+
+            with patch.object(runner_state, "_locked_lease_dir", rename_after_lock):
+                with self.assertRaisesRegex(ValueError, "moved while locked"):
+                    runner_state.acquire_lease(
+                        candidate, lease_dir, snapshot(candidate)["host_capacity"]
+                    )
+            self.assertFalse((root / "renamed/leases/job-a.json").exists())
+            self.assertFalse((parent / "leases/job-a.json").exists())
 
     def test_two_simultaneous_contenders_cannot_take_the_same_writable_path(self) -> None:
         first = record("job-a")
