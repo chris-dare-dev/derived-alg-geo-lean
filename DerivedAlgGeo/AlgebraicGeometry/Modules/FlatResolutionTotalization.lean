@@ -22,10 +22,17 @@ K-flatness remain separate obligations.
 
 ## Main definitions and results
 
-* `freeYonedaSheafCoproductTotalTargetIso` naturally identifies the
-  resolution-degree-zero augmentation target with the input complex.
-* `freeYonedaSheafCoproductTotalAugmentation` composes that isomorphism with
-  the totalized free-Yoneda augmentation.
+* `AlgebraicGeometry.Scheme.Modules.freeYonedaSheafCoproductTotalComplexFunctor`
+  totalizes the free-Yoneda bicomplex.
+* The rowwise augmentation theorem proves the resolution rows are
+  quasi-isomorphic to their targets.
+* `AlgebraicGeometry.Scheme.Modules.freeYonedaSheafCoproductTotalTargetIso`
+  naturally identifies the resolution-degree-zero augmentation target with
+  the input complex.
+* `AlgebraicGeometry.Scheme.Modules.freeYonedaSheafCoproductTotalAugmentation`
+  composes that isomorphism with the totalized free-Yoneda augmentation.
+* `AlgebraicGeometry.Scheme.Modules.freeYonedaSheafCoproductTotalComplexFunctor_obj_X_isFlatOverId`
+  proves that each total-complex term is flat over the identity.
 
 ## Implementation notes
 
@@ -33,6 +40,11 @@ The target comparison specializes `HomologicalComplex₂.singleCompExtendTotalIs
 That generic comparison combines the single/extension, mapped-single/flip,
 and signed single-zero total comparisons. The sign is inherited from Mathlib's
 total symmetry.
+
+## References
+
+`HomologicalComplex₂.singleCompExtendTotalIso` is the generic source of the
+geometric target comparison.
 -/
 
 universe u
