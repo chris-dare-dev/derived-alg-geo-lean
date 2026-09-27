@@ -1,23 +1,20 @@
 ---
 name: formalize-issue
-description: Run one unattended formalization iteration — claim a ready GitHub issue, formalize it on a branch, pre-flight it with scripts/precheck.sh, open a PR and take the gate verdict from CI, then stop. Use for hands-off sessions; pair with /loop for repeats.
+description: Not for loop runs (use run-loop). Run one formalization iteration — claim a ready GitHub issue, formalize it on a branch, pre-flight it with scripts/precheck.sh, open a PR and take the gate verdict from CI, then stop.
 ---
 
 # One formalization iteration
+
+**Not for loop runs: use run-loop.** A run that works issues or a milestone to
+merged PRs follows `.claude/skills/run-loop/SKILL.md`, not this skill.
 
 This is **one** iteration and it **halts** at the PR. It never merges, never
 pushes to `main`, and never leaves a `sorry` behind. Under `/loop` it will be
 re-entered from a clean state, so everything below must be safe to re-run.
 
-For a multi-issue run, `scripts/loop_engine.py` is the outer controller. It
-supplies the OpenSpec change, frozen chunk, branch, and ledger path; this skill
-must not widen that scope. The controller requires independent
-`mathematics-adversary`, `repository-boundary-adversary`,
-`abstraction-adversary`, and `mathlib-reviewer` verdicts on the same commit and
-stops a chunk after the manifest's `limits.max_review_rounds_per_chunk`
-review/improve rounds; the controller enforces that number, this skill does
-not restate it. A style review is not a
-mathematical verdict.
+The manifest controller (`scripts/loop_engine.py`) is retired from every run
+path; a manifest, OpenSpec change or ledger never scopes this skill. A style
+review is not a mathematical verdict.
 
 Issues live on `chris-dare-dev/derived-alg-geo-lean`.
 
@@ -120,7 +117,7 @@ python3 -m venv .loop-tools
 PATH="$PWD/.loop-tools/bin:$PATH" scripts/precheck.sh
 ```
 
-Seconds, not minutes. It runs every gate that needs no Lean build — workflows,
+About a minute, not the twenty of CI. It runs every gate that needs no Lean build — workflows,
 style on this branch's own lines, source-independence, layering, umbrella
 coverage, root reachability, coherent families, coverage map, pin, nolints,
 roadmap, and the two hook tests — then a **targeted** `lake build` of the
@@ -148,7 +145,7 @@ A failing check is the iteration's work, not a reason to weaken it.
 **The verdict comes from CI**, and since 2026-09-19 the push in step 6 does not
 start it: `ci.yml` triggers `push` on `main` alone, so the gate run is the
 `pull_request` one and you get it by opening the pull request. To dispatch the
-self-hosted Windows lane on the branch instead,
+self-hosted Ubuntu lane on the branch instead,
 `gh workflow run ci.yml --ref agent/<slug>`.
 
 ## 5. If it did not close
@@ -175,7 +172,8 @@ git push -u origin agent/<slug>
 gh pr create -R chris-dare-dev/derived-alg-geo-lean --fill
 ```
 
-The push started the gate run on the Windows runners. Find it and wait on it:
+Opening the pull request started the gate run (the `pull_request` lane). Find it
+and wait on it:
 
 ```bash
 gh run list --branch "agent/<slug>" --workflow ci.yml --limit 1 \

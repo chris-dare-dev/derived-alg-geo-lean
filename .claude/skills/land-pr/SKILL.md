@@ -1,15 +1,22 @@
 ---
 name: land-pr
-description: Run one standalone landing iteration — select an eligible open PR, update it against main, pre-flight it with scripts/precheck.sh, review it, take the exact-head PR CI verdict, then stop before merging.
+description: Not for loop runs (use run-loop). Run one standalone landing iteration — select an eligible open PR, update it against main, pre-flight it with scripts/precheck.sh, review it, take the exact-head PR CI verdict, then stop before merging.
 ---
 
 # One landing iteration
 
+**Not for loop runs: use run-loop.** A run that works issues or a milestone to
+merged PRs follows `.claude/skills/run-loop/SKILL.md`, which has its own
+reviewed-head, branch-update and merge procedure; do not pair this standalone
+rebase/force-push procedure with that loop.
+
 This standalone skill performs **one** iteration against an eligible open PR
 and **halts** before the merge. Read the issue tracker and native blockers
-before selecting a PR; an open PR is not by itself admission-ready. The
-`run-loop` skill has its own reviewed-head, branch-update and merge procedure;
-do not pair this standalone rebase/force-push procedure with that loop.
+before selecting a PR; an open PR is not by itself admission-ready.
+
+The manifest controller (`scripts/loop_engine.py`), its OpenSpec changes and
+its review ledgers are retired from every run path; none of them scopes this
+skill.
 
 ## What the queue actually is
 
@@ -145,7 +152,7 @@ python3 -m venv .loop-tools
 PATH="$PWD/.loop-tools/bin:$PATH" scripts/precheck.sh
 ```
 
-Seconds, not minutes. It runs every gate that needs no Lean build — workflows,
+About a minute, not the twenty of CI. It runs every gate that needs no Lean build — workflows,
 style on this branch's own lines, source-independence, layering, umbrella
 coverage, root reachability, coherent families, coverage map, pin, nolints,
 roadmap, and the two hook tests — then a **targeted** `lake build` of the
