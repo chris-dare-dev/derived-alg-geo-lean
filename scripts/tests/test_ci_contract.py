@@ -36,11 +36,11 @@ def evidence(*, event: str = "pull_request", workflow: str | None = None) -> dic
         applicable = ci_contract._event_applies(
             definition, {"event": event, "ref": ref, "producer": producer}
         )
-        status = "passed" if applicable else "skipped"
+        status = ("unknown" if definition["run_binding"] == "dynamic" else "passed") if applicable else "skipped"
         conclusion = "success" if applicable else "skipped"
         artifact_id = f"artifact-{index}"
         runless = definition["run_binding"] in {"status", "check"}
-        subject_commit = SHA_B if definition["run_binding"] == "check" else candidate_commit
+        subject_commit = SHA_B if definition["run_binding"] in {"check", "dynamic"} else candidate_commit
         if applicable:
             artifacts.append(
                 {
@@ -130,6 +130,39 @@ def bind_provider_proof(candidate: dict) -> None:
     ).hexdigest()
 
 
+def absent_security_scan(setting_state: str = "disabled") -> dict:
+    return {
+        "head_sha": SHA_B,
+        "state": {
+            "disabled": "disabled_by_setting",
+            "enabled": "missing",
+            "unknown": "provider_state_unknown",
+        }[setting_state],
+        "setting": {
+            "head_sha": SHA_B,
+            "api_path": "/code-scanning/ai-scan",
+            "state": setting_state,
+            "requested_at_utc": "2026-09-27T17:00:00Z",
+            "completed_at_utc": "2026-09-27T17:00:01Z",
+            **(
+                {"error": "setting unavailable (403)"}
+                if setting_state == "unknown"
+                else {"response": {"pr_scan": setting_state}}
+            ),
+        },
+        "matching_check_ids": [],
+        "matching_run_ids": [],
+        "run_query": {
+            "api_path": f"/actions/runs?head_sha={SHA_B}",
+            "requested_at_utc": "2026-09-27T17:00:01Z",
+            "completed_at_utc": "2026-09-27T17:00:02Z",
+            "total_observed": 1,
+            "pagination": "all_link_pages_and_advertised_total_checked",
+        },
+        "head_workflow_runs": [{"id": 35532316123, "head_sha": SHA_B}],
+    }
+
+
 class ContractTests(unittest.TestCase):
     def evaluate(self, candidate: dict, inventory: dict = INVENTORY) -> dict:
         direct_ref_event = isinstance(candidate.get("event"), str) and candidate["event"] in {
@@ -211,6 +244,48 @@ class ContractTests(unittest.TestCase):
             any("run_binding" in error for error in ci_contract.validate_inventory(legacy))
         )
 
+    def test_v5_head_bound_check_artifact_remains_valid(self) -> None:
+        legacy = copy.deepcopy(INVENTORY)
+        legacy["schema_version"] = 5
+        security = next(
+            gate for gate in legacy["gates"] if gate["id"] == "github-advanced-security"
+        )
+        security.update(
+            run_binding="check",
+            platforms=["github-checks"],
+            producer="github-advanced-security",
+        )
+        self.assertEqual(ci_contract.validate_inventory(legacy), [])
+
+        candidate = evidence()
+        candidate["schema_version"] = 5
+        candidate["policy_binding"]["inventory_sha256"] = ci_contract._canonical_sha256(legacy)
+        check_gate = next(
+            gate for gate in candidate["gates"] if gate["id"] == "github-advanced-security"
+        )
+        check_gate.update(
+            platform="github-checks",
+            producer="github-advanced-security",
+            status="passed",
+        )
+        check_gate.pop("run_id")
+        check_gate.pop("run_attempt")
+        check_artifact = next(
+            artifact for artifact in candidate["artifacts"]
+            if artifact["subject"] == "github-advanced-security"
+        )
+        check_artifact.update(
+            producer="github-advanced-security",
+            kind=security["artifact"],
+        )
+        check_artifact.pop("run_id")
+        check_artifact.pop("run_attempt")
+        bind_provider_proof(candidate)
+
+        result = self.evaluate(candidate, legacy)
+        self.assertTrue(result["valid"], result)
+        self.assertEqual(check_artifact["commit"], SHA_B)
+
     def test_inventory_rejects_unknown_scope_and_platform(self) -> None:
         inventory = copy.deepcopy(INVENTORY)
         inventory["gates"][0]["applies_to"].append("workflow_dispatch:Unknown")
@@ -242,7 +317,7 @@ class ContractTests(unittest.TestCase):
         bind_provider_proof(candidate)
         result = self.evaluate(candidate)
         self.assertTrue(result["valid"], result)
-        self.assertEqual(result["warnings"], [])
+        self.assertTrue(any("optional gate github-advanced-security is unknown" in warning for warning in result["warnings"]))
 
     def test_missing_candidate_identity_is_rejected(self) -> None:
         candidate = evidence()
@@ -452,26 +527,64 @@ class ContractTests(unittest.TestCase):
         candidate["gates"] = [
             gate for gate in candidate["gates"] if gate["id"] != "github-advanced-security"
         ]
+        candidate["artifacts"] = [
+            artifact for artifact in candidate["artifacts"]
+            if artifact["subject"] != "github-advanced-security"
+        ]
+        candidate["security_scan"] = absent_security_scan()
         result = self.evaluate(candidate)
         self.assertTrue(result["valid"], result)
         self.assertTrue(result["claims"]["required_ci_verified"])
         self.assertFalse(result["claims"]["all_pipelines_green"])
-        self.assertTrue(any("github-advanced-security is missing" in w for w in result["warnings"]))
+        self.assertTrue(any("github-advanced-security is disabled_by_setting" in w for w in result["warnings"]))
 
-    def test_runless_security_check_uses_head_without_invented_run(self) -> None:
+        for setting, state in (("enabled", "missing"), ("unknown", "provider_state_unknown")):
+            with self.subTest(setting=setting):
+                candidate["security_scan"] = absent_security_scan(setting)
+                result = self.evaluate(candidate)
+                self.assertTrue(result["valid"], result)
+                self.assertTrue(any(f"github-advanced-security is {state}" in w for w in result["warnings"]))
+                self.assertTrue(result["claims"]["required_ci_verified"])
+
+        candidate["security_scan"] = absent_security_scan("disabled")
+        candidate["security_scan"]["setting"]["state"] = "enabled"
+        self.assert_invalid(candidate, "contradicts its raw response")
+
+    def test_dynamic_security_check_binds_head_and_own_run(self) -> None:
         candidate = evidence()
         bind_provider_proof(candidate)
         security = next(gate for gate in candidate["gates"] if gate["id"] == "github-advanced-security")
         artifact = next(item for item in candidate["artifacts"] if item["subject"] == "github-advanced-security")
         self.assertEqual(security["commit"], candidate["head_commit"])
-        self.assertNotIn("run_id", security)
-        self.assertNotIn("run_attempt", artifact)
-        self.assertTrue(self.evaluate(candidate)["claims"]["auxiliary_checks_healthy"])
+        self.assertEqual(security["run_id"], artifact["run_id"])
+        self.assertEqual(security["run_attempt"], artifact["run_attempt"])
+        self.assertFalse(self.evaluate(candidate)["claims"]["auxiliary_checks_healthy"])
         security["run_id"] = 123
-        self.assert_invalid(candidate, "runless observation must not claim a workflow run")
-        del security["run_id"]
+        self.assert_invalid(candidate, "artifact run_id must equal gate.run_id")
+        security["run_id"] = artifact["run_id"]
         artifact["commit"] = candidate["candidate_commit"]
         self.assert_invalid(candidate, "artifact commit does not match gate revision")
+
+    def test_dynamic_green_cannot_be_forged_into_verified_scan(self) -> None:
+        candidate = evidence()
+        bind_provider_proof(candidate)
+        security = next(gate for gate in candidate["gates"] if gate["id"] == "github-advanced-security")
+        security["status"] = "passed"
+        security["conclusion"] = "success"
+        self.assert_invalid(candidate, "no verified result signal")
+
+    def test_dynamic_binding_requires_v6_and_optional_pr_scope(self) -> None:
+        legacy = copy.deepcopy(INVENTORY)
+        legacy["schema_version"] = 5
+        self.assertTrue(any("run_binding" in error for error in ci_contract.validate_inventory(legacy)))
+        malformed = copy.deepcopy(INVENTORY)
+        malformed["schema_version"] = []
+        self.assertTrue(any("schema_version" in error for error in ci_contract.validate_inventory(malformed)))
+        changed = copy.deepcopy(INVENTORY)
+        security = next(gate for gate in changed["gates"] if gate["id"] == "github-advanced-security")
+        security["required"] = True
+        security["applies_to"] = ["push:main"]
+        self.assertTrue(any("optional PR Actions gate" in error for error in ci_contract.validate_inventory(changed)))
 
     def test_missing_required_gate_still_denies_ci_claim(self) -> None:
         candidate = evidence()
@@ -542,7 +655,7 @@ class ContractTests(unittest.TestCase):
         }
         for gate in INVENTORY["gates"]:
             producer = gate["producer"]
-            if not producer.startswith("github-actions/"):
+            if not producer.startswith("github-actions/") or gate["run_binding"] == "dynamic":
                 continue
             workflow = producer.removeprefix("github-actions/")
             self.assertIn(gate["name"], jobs[workflow], gate)

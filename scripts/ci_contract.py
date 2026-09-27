@@ -20,8 +20,8 @@ from pathlib import Path
 from typing import Any
 
 
-SCHEMA_VERSION = 5
-SUPPORTED_SCHEMA_VERSIONS = {4, SCHEMA_VERSION}
+SCHEMA_VERSION = 6
+SUPPORTED_SCHEMA_VERSIONS = {4, 5, SCHEMA_VERSION}
 FULL_SHA = re.compile(r"^[0-9a-fA-F]{40}$")
 SHA256 = re.compile(r"^[0-9a-fA-F]{64}$")
 BRANCH_REF = re.compile(r"^refs/heads/[A-Za-z0-9._/-]+$")
@@ -136,6 +136,108 @@ def _event_applies(definition: dict[str, Any], evidence: dict[str, Any]) -> bool
         ):
             return True
     return False
+
+
+def _security_scan_state(
+    scan: Any, head: Any, gate: dict[str, Any] | None
+) -> tuple[str | None, list[str]]:
+    """Validate the recorded optional scan state independently of its gate."""
+    if scan is None:
+        return None, [] if gate is not None else ["evidence.security_scan is required when the dynamic gate is absent"]
+    if not isinstance(scan, dict):
+        return None, ["evidence.security_scan must be an object"]
+    errors: list[str] = []
+    if scan.get("head_sha") != head:
+        errors.append("evidence.security_scan.head_sha differs from the PR head")
+    setting = scan.get("setting")
+    setting_state: str | None = None
+    if not isinstance(setting, dict) or setting.get("head_sha") != head or setting.get("api_path") != "/code-scanning/ai-scan":
+        errors.append("evidence.security_scan.setting is not bound to the PR head and provider API")
+    else:
+        setting_state = setting.get("state")
+        response = setting.get("response")
+        if response is None:
+            if setting_state != "unknown" or not _is_string(setting.get("error")):
+                errors.append("evidence.security_scan.setting contradicts its API error")
+        elif not isinstance(response, dict) or "error" in setting:
+            errors.append("evidence.security_scan.setting response and error disagree")
+        else:
+            raw = response.get("pr_scan")
+            expected = raw if raw in {"enabled", "disabled"} else "unknown"
+            if setting_state != expected:
+                errors.append("evidence.security_scan.setting contradicts its raw response")
+        if not all(_is_string(setting.get(key)) for key in ("requested_at_utc", "completed_at_utc")):
+            errors.append("evidence.security_scan.setting lacks observation times")
+    query = scan.get("run_query")
+    runs = scan.get("head_workflow_runs")
+    if (
+        not isinstance(query, dict)
+        or query.get("api_path") != f"/actions/runs?head_sha={head}"
+        or query.get("pagination") != "all_link_pages_and_advertised_total_checked"
+        or not all(_is_string(query.get(key)) for key in ("requested_at_utc", "completed_at_utc"))
+        or not isinstance(runs, list)
+        or any(not isinstance(run, dict) or not _is_positive_int(run.get("id")) for run in runs)
+        or isinstance(query.get("total_observed"), bool)
+        or not isinstance(query.get("total_observed"), int)
+        or query["total_observed"] != len(runs)
+    ):
+        errors.append("evidence.security_scan.run_query does not retain a complete head-run observation")
+        runs = []
+    run_ids = scan.get("matching_run_ids")
+    check_ids = scan.get("matching_check_ids")
+    for label, ids in (("matching_run_ids", run_ids), ("matching_check_ids", check_ids)):
+        if not isinstance(ids, list) or any(not _is_positive_int(item) for item in ids) or len(ids) != len(set(ids)):
+            errors.append(f"evidence.security_scan.{label} must list unique positive IDs")
+    if errors:
+        return None, errors
+    assert isinstance(run_ids, list) and isinstance(check_ids, list)
+    assert isinstance(runs, list)
+    if not set(run_ids).issubset({run["id"] for run in runs}):
+        errors.append("evidence.security_scan matching runs are absent from the retained query")
+    state = scan.get("state")
+    if gate is None:
+        if check_ids:
+            errors.append("evidence.security_scan has a check but omits its gate")
+        if not run_ids:
+            expected = {
+                "enabled": "missing", "disabled": "disabled_by_setting",
+                "unknown": "provider_state_unknown",
+            }.get(setting_state)
+            if state != expected:
+                errors.append("evidence.security_scan absent-run state contradicts its setting")
+        elif len(run_ids) == 1:
+            matching = [run for run in runs if run.get("id") == run_ids[0]]
+            if (
+                state != "pending"
+                or len(matching) != 1
+                or matching[0].get("status") not in {"requested", "waiting", "pending", "queued", "in_progress"}
+                or matching[0].get("conclusion") is not None
+                or scan.get("run_id") != run_ids[0]
+                or not _is_positive_int(scan.get("run_attempt"))
+            ):
+                errors.append("evidence.security_scan pending run is not a queued unreported check")
+        else:
+            errors.append("evidence.security_scan has ambiguous runs without a gate")
+    else:
+        try:
+            provider_id = int(gate.get("provider_id"))
+        except (TypeError, ValueError):
+            provider_id = None
+        expected = {
+            "failed": "unclassified_failure",
+            "pending": "pending",
+            "unknown": "execution_observed_result_unknown",
+        }.get(gate.get("status"))
+        if (
+            expected is None or state != expected
+            or check_ids != [provider_id]
+            or run_ids != [gate.get("run_id")]
+            or scan.get("run_id") != gate.get("run_id")
+            or scan.get("run_attempt") != gate.get("run_attempt")
+            or scan.get("check_id") != provider_id
+        ):
+            errors.append("evidence.security_scan disagrees with its observed gate")
+    return state if not errors and isinstance(state, str) else None, errors
 
 
 def _validate_provider_binding(evidence: dict[str, Any], errors: list[str]) -> None:
@@ -269,8 +371,10 @@ def validate_inventory(inventory: Any) -> list[str]:
         if not isinstance(gate.get("required"), bool):
             errors.append(f"{prefix}.required must be boolean")
         bindings = {"primary", "independent", "status"}
-        if version == SCHEMA_VERSION:
+        if version in (5, 6):
             bindings.add("check")
+        if version == 6:
+            bindings.add("dynamic")
         if not _is_string(gate.get("run_binding")) or gate.get("run_binding") not in bindings:
             errors.append(f"{prefix}.run_binding must be one of {sorted(bindings)}")
         artifact_kind = gate.get("artifact")
@@ -278,10 +382,15 @@ def validate_inventory(inventory: Any) -> list[str]:
             _is_string(artifact_kind) and artifact_kind.startswith("commit-status:")
         ):
             errors.append(f"{prefix}.artifact must identify a commit status")
-        if gate.get("run_binding") == "check" and not (
+        if gate.get("run_binding") in {"check", "dynamic"} and not (
             _is_string(artifact_kind) and artifact_kind.startswith("check-run:")
         ):
             errors.append(f"{prefix}.artifact must identify a check run")
+        if gate.get("run_binding") == "dynamic" and (
+            gate.get("required") or gate.get("platforms") != ["github-actions"]
+            or gate.get("applies_to") != ["pull_request"]
+        ):
+            errors.append(f"{prefix}.dynamic binding must be an optional PR Actions gate")
         prerequisites = gate.get("prerequisites", [])
         if not isinstance(prerequisites, list) or any(
             not _is_string(item) for item in prerequisites
@@ -478,7 +587,7 @@ def validate_evidence(
             errors.append(f"{prefix}.commit must be a full SHA")
         else:
             allowed_commits = {str(evidence.get("candidate_commit", "")).lower()}
-            if version == SCHEMA_VERSION:
+            if version in (5, SCHEMA_VERSION):
                 allowed_commits.add(str(evidence.get("head_commit", "")).lower())
             if _is_sha(artifact.get("commit")) and artifact["commit"].lower() not in allowed_commits:
                 errors.append(
@@ -533,13 +642,13 @@ def validate_evidence(
         else:
             seen_provider_ids.add((str(gate.get("producer")), gate.get("provider_id")))
         expected_commit = (
-            evidence.get("head_commit") if definition.get("run_binding") == "check"
+            evidence.get("head_commit") if definition.get("run_binding") in {"check", "dynamic"}
             else evidence.get("candidate_commit")
         )
         if not _is_sha(gate.get("commit")):
             errors.append(f"{prefix}.commit must be a full SHA")
         elif gate.get("commit", "").lower() != str(expected_commit).lower():
-            subject_name = "head_commit" if definition.get("run_binding") == "check" else "candidate_commit"
+            subject_name = "head_commit" if definition.get("run_binding") in {"check", "dynamic"} else "candidate_commit"
             errors.append(f"{prefix}.commit is not bound to evidence.{subject_name}")
         if not _is_string(gate.get("status")) or gate.get("status") not in STATUSES:
             errors.append(f"{prefix}.status is not recognized")
@@ -597,6 +706,8 @@ def validate_evidence(
             or gate.get("conclusion") not in SUCCESS_CONCLUSIONS
         ):
             errors.append(f"{prefix}: passed status requires a successful conclusion")
+        if definition.get("run_binding") == "dynamic" and gate.get("status") == "passed":
+            errors.append(f"{prefix}: dynamic scan has no verified result signal; raw green is not a pass")
         if gate.get("applicable") and gate.get("status") != "passed" and definition.get("required"):
             errors.append(f"{prefix}: required gate is {gate.get('status')!r}, not passed")
         if gate.get("status") == "failed" and not definition.get("required"):
@@ -646,10 +757,27 @@ def validate_evidence(
                 if artifact.get("run_attempt") != gate.get("run_attempt"):
                     errors.append(f"{prefix}: artifact run_attempt must equal gate.run_attempt")
 
+    security_scan_state: str | None = None
+    security_definition = definitions.get("github-advanced-security")
+    if (
+        version == SCHEMA_VERSION
+        and isinstance(security_definition, dict)
+        and security_definition.get("run_binding") == "dynamic"
+        and _event_applies(security_definition, evidence)
+    ):
+        security_scan_state, scan_errors = _security_scan_state(
+            evidence.get("security_scan"),
+            evidence.get("head_commit"),
+            gate_by_id.get("github-advanced-security"),
+        )
+        errors.extend(scan_errors)
+
     for gate_id, definition in definitions.items():
         if gate_id not in seen_ids and _event_applies(definition, evidence):
             if definition.get("required"):
                 errors.append(f"evidence is missing required inventory gate {gate_id!r}")
+            elif gate_id == "github-advanced-security" and security_scan_state is not None:
+                warnings.append(f"optional gate {gate_id} is {security_scan_state}")
             else:
                 warnings.append(f"optional gate {gate_id} is missing")
         if _event_applies(definition, evidence) and gate_id in gate_by_id:
