@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionTwistComparison
+import DerivedAlgGeo.CategoryTheory.Triangulated.FunctorIsoShiftCompatibility
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DualCotwistKernel
 
 /-!
@@ -178,7 +179,7 @@ def ofCommShift
         K.twist.transportedH0CommShift
       letI : T.dualCotwist.CommShift ℤ := dualCotwistCommShift
       NatTrans.CommShift N.transportedDualCotwistIso.hom ℤ) :
-    FunctorIsoShiftCompatibility
+    CategoryTheory.Triangulated.FunctorIsoShiftCompatibility
       (K.transportedTwist eA) T.dualCotwist N.transportedDualCotwistIso where
   targetCommShift := dualCotwistCommShift
   hom_commShift := transportedDualCotwistIso_commShift

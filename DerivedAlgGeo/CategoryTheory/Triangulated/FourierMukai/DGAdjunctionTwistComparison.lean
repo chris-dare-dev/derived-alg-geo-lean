@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.AdjunctionConePresentation
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.FunctorTransport
+import DerivedAlgGeo.CategoryTheory.Triangulated.FunctorIsoShiftCompatibility
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.CounitKernel
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionPresentation
 
@@ -234,7 +235,7 @@ realization. -/
 abbrev ShiftCompatibility :=
   letI : (K.transportedTwist eB).CommShift ℤ :=
     K.twist.transportedH0CommShift
-  FunctorIsoShiftCompatibility
+  CategoryTheory.Triangulated.FunctorIsoShiftCompatibility
     (K.transportedTwist eB) S.twist N.transportedTwistIso
 
 namespace ShiftCompatibility
@@ -283,7 +284,7 @@ theorem twistKernelAutoequivalenceIsTriangulated
     K.twist.transportedH0CommShift
   letI : (K.transportedTwist eB).IsTriangulated :=
     K.twist.transportedH0IsTriangulated
-  exact FunctorIsoShiftCompatibility.equivalenceIsTriangulatedOfEq h rfl
+  exact CategoryTheory.Triangulated.FunctorIsoShiftCompatibility.equivalenceIsTriangulatedOfEq h rfl
 
 end ShiftCompatibility
 

@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.AdjunctionCotwistPresentation
+import DerivedAlgGeo.CategoryTheory.Triangulated.FunctorIsoShiftCompatibility
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernel
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionPresentation
 
@@ -308,7 +309,7 @@ stored here. -/
 abbrev ShiftCompatibility :=
   letI : (K.transportedCotwist eA).CommShift ℤ :=
     K.transportedCotwistCommShift (eC := eA)
-  FunctorIsoShiftCompatibility
+  CategoryTheory.Triangulated.FunctorIsoShiftCompatibility
     (K.transportedCotwist eA) S.cotwist N.transportedCotwistIso
 
 namespace ShiftCompatibility
@@ -380,7 +381,7 @@ theorem cotwistKernelAutoequivalenceIsTriangulated
     K.transportedCotwistCommShift (eC := eA)
   letI : (K.transportedCotwist eA).IsTriangulated :=
     K.transportedCotwistIsTriangulated (eC := eA)
-  exact FunctorIsoShiftCompatibility.equivalenceIsTriangulatedOfEq h rfl
+  exact CategoryTheory.Triangulated.FunctorIsoShiftCompatibility.equivalenceIsTriangulatedOfEq h rfl
 
 end ShiftCompatibility
 
