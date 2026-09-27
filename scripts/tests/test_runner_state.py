@@ -336,6 +336,65 @@ class RunnerStateTests(unittest.TestCase):
                     candidate, Path(directory), snapshot(candidate)["host_capacity"]
                 )
 
+    def test_nonliteral_spelling_cannot_admit_duplicate_temp_root(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            shared = base / "shared temp"
+            shared.mkdir()
+            first = record("job-a")
+            second = record("job-b", root=r"C:\actions\runner-b")
+            first["paths"]["temp"] = path_entry(str(shared), True)
+            capacity = snapshot(first, second)["host_capacity"]
+            leases = base / "leases"
+            runner_state.acquire_lease(first, leases, capacity)
+            for prefix in (" ", "\t", "\u00a0", "\u2003"):
+                with self.subTest(prefix=repr(prefix)):
+                    second["paths"]["temp"] = {
+                        "path": prefix + str(shared),
+                        "resolved_path": str(base / "fictional"),
+                        "writable": True,
+                    }
+                    with self.assertRaisesRegex(ValueError, "literal nonempty"):
+                        runner_state.acquire_lease(second, leases, capacity)
+                    self.assertFalse((leases / "job-b.json").exists())
+            self.assertTrue((leases / "job-a.json").is_file())
+
+    def test_path_identity_uses_literal_absolute_paths(self) -> None:
+        with patch.dict(os.environ, {"DAG_SHARED_TEMP": "/tmp/shared"}):
+            for spelling in ("$DAG_SHARED_TEMP", "~/shared", "/tmp/shared "):
+                with self.subTest(spelling=spelling), self.assertRaises(ValueError):
+                    runner_state.canonical_path(spelling)
+        self.assertIsInstance(runner_state.canonical_path("/tmp/inner space/file"), str)
+        candidate = record("job-a")
+        candidate["paths"]["temp"] = path_entry("/tmp/actual", True)
+        candidate["paths"]["temp"]["resolved_path"] = " /tmp/actual"
+        self.assertTrue(any("literal nonempty" in error
+                            for error in runner_state.validate_record(candidate)))
+
+    def test_extra_writable_root_is_validated_and_compared(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            shared = Path(directory) / "controller-temp"
+            shared.mkdir()
+            first = record("job-a")
+            second = record("job-b", root=r"C:\actions\runner-b")
+            first["paths"]["controller_temp"] = path_entry(str(shared), True)
+            second["paths"]["controller_temp"] = path_entry(str(shared), True)
+            collision = runner_state.validate_snapshot(snapshot(first, second))
+            self.assertFalse(collision["valid"])
+            self.assertTrue(any("writable path collision" in error
+                                for error in collision["errors"]))
+            second["paths"]["controller_temp"] = {
+                "path": " " + str(shared), "resolved_path": str(shared / "fictional"),
+                "writable": True,
+            }
+            malformed = runner_state.validate_snapshot(snapshot(first, second))
+            self.assertFalse(malformed["valid"])
+            self.assertTrue(any("controller_temp.path" in error and "literal nonempty" in error
+                                for error in malformed["errors"]))
+            second["paths"]["controller_temp"] = path_entry(str(shared), False)
+            self.assertTrue(any("controller_temp must be job-owned writable state" in error
+                                for error in runner_state.validate_record(second)))
+
     def test_candidate_temp_root_cannot_contain_host_lease_directory(self) -> None:
         candidate = record("job-a")
         with tempfile.TemporaryDirectory() as directory:
