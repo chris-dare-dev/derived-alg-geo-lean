@@ -378,16 +378,20 @@ A run stops only when:
 - every remaining issue needs an action the owner has withdrawn;
 - its queue is empty.
 
-Everything else it decides, records in the PR, and continues past. An issue it
-cannot finish is parked, not waited on.
+Everything else it decides, records in the PR and marked issue comments, and
+continues past. After a terminal three-round implementation attempt it starts
+separate read-only R&D and independent plan review, preserving the failed
+history. A successor attempt needs a materially changed plan and inherits the
+same issue/objective and bounded review allowance; dependent issues still wait.
 
 The request that starts a run authorizes pushing `agent/*` branches, opening PRs
 and merging them once required checks pass. The owner withdraws an action by
 setting it to `false` in `.claude/loop-authority.yaml` on `main`.
 
-A run never changes the loop's own tooling or instructions. It uses no OpenSpec
-change, loop manifest, review ledger or `scripts/loop_engine.py`: those are
-retired from the run path. `.claude/loop-specs/README.md` and
+A run changes the loop's own tooling or instructions only when the owner
+explicitly asks for loop engineering. It uses no controller OpenSpec change,
+loop manifest, controller review ledger or `scripts/loop_engine.py`: those are
+retired from the issue-first run path. `.claude/loop-specs/README.md` and
 `docs/architecture/loop-recovery.md` describe them for their existing ledgers.
 
 `scripts/loop_tokens.py` reports what a run cost, for either runtime. It reads
