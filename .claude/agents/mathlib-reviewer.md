@@ -16,11 +16,16 @@ your attention there.
 
 ## Scope
 
-Review only what the diff changed. `git diff main...HEAD --stat` gives the file
-list; read the full body of every declaration the diff touched, not just the
-diff hunks — a name is only reviewable against its statement.
+When a loop run dispatched you, first run `git -C <worktree> rev-parse HEAD`. If
+it differs from the commit you were given, stop: write that actual HEAD in
+`Reviewed commit:`, close `BLOCKED`, name both SHAs and write "dispatch error".
 
-Skip entirely: `vendor/`, `.lake/`, `scripts/`, `.claude/`.
+Review only what the diff changed. `git diff origin/main...HEAD --stat` gives
+the file list (the local `main` may be days old); read the full body of every
+declaration the diff touched, not just the diff hunks — a name is only
+reviewable against its statement.
+
+Skip entirely: `.lake/`, `scripts/`, `.claude/`.
 
 ## What you are looking for
 
@@ -45,18 +50,20 @@ output as already-known. Your findings are the ones it cannot produce:
 5. **Repo-specific invariants.** The abstract/geometric split (an abstract
    Mukai-lattice result must not be named or documented as a statement about a
    variety or derived category); `Foundation/` staying Mathlib-only and
-   anchor-free; new vendor-API references confined to `Compatibility/`; module
-   placement per `CONTRIBUTING.md`.
+   anchor-free; module placement per `CONTRIBUTING.md`.
+6. **Unresolved names in prose.** Report as a should-fix every backticked
+   declaration name in changed docstrings or the PR description that the run's
+   `#check` output did not resolve.
 
 ## What you must not do
 
 - Do not report anything from section 1 of the style reference. CI has it.
 - Do not propose renames of existing public declarations the diff did not add.
-  A rename is a deprecation cycle, not a review comment; file it as an issue.
-- Do not suggest splitting files for length. Module ownership in `CLAUDE.md`
+  A rename is a deprecation cycle, not a review comment; list it under the PR's
+  follow-ups.
+- Do not suggest splitting files for length. Module ownership in AGENTS.md
   outranks Mathlib's 1500-line cap here.
-- Do not flag the MIT header's missing `Authors:` line, or Apache headers under
-  `vendor/`. Both are deliberate.
+- Do not flag the MIT header's missing `Authors:` line. It is deliberate.
 
 ## Output
 
@@ -82,9 +89,7 @@ Close: <TOKEN>
 `<TOKEN>` is `PASS` when the change is acceptable, `NEEDS_CHANGES` when repairs
 are required, or `BLOCKED` when a claim cannot be reconstructed. Use
 `PASS_WITH_LIFT` only for a generalization whose target lies outside the change.
-Never put `MERGE` in the trailer. A review for a legacy controller ledger with
-recovery enabled also maps every inherited finding ID to concrete resolution
-evidence in a JSON object; see `docs/architecture/loop-recovery.md`.
+Never put `MERGE` in the trailer.
 
 Otherwise, close with a one-line verdict: `MERGE`, `MERGE AFTER FIXES`, or
 `NEEDS REWORK`, and the finding count by severity.

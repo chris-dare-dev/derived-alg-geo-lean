@@ -2,8 +2,11 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.Algebra.Homology.ShortComplex.Limits
+import DerivedAlgGeo.CategoryTheory.Limits.Preserves.Naturality
 import Mathlib.Algebra.Homology.HomologicalComplexLimits
 import Mathlib.Algebra.Homology.ShortComplex.HomologicalComplex
+import Mathlib.Algebra.Homology.QuasiIso
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Products
 
 /-!
@@ -35,6 +38,11 @@ of short complexes does (which is the case when colimits of shape `J` are exact)
   restrictions to the summands.
 * `HomologicalComplex.homologyFunctor_preservesColimitsOfShape`: homology in degree `i`
   preserves colimits of shape `J` when homology of short complexes does.
+* `HomologicalComplex.quasiIso_colimMap_of_preservesHomology`: homology-preserving
+  colimits preserve componentwise quasi-isomorphisms.
+* `HomologicalComplex.quasiIso_colimMap`: the exact-colimit specialization.
+* `HomologicalComplex.quasiIso_app_colimit_of_preserves`: a pointwise quasi-isomorphism
+  between colimit-preserving functors is a quasi-isomorphism at a colimit.
 
 ## Implementation notes
 
@@ -114,5 +122,104 @@ instance homologyFunctor_preservesColimitsOfShape [CategoryWithHomology C] (i : 
   preservesColimitsOfShape_of_natIso (homologyFunctorIso C c i).symm
 
 end Colimits
+
+end HomologicalComplex
+
+namespace HomologicalComplex
+
+section HomologyPreservingColimits
+
+variable {C : Type u} [Category.{v} C] [HasZeroMorphisms C] [CategoryWithHomology C]
+  {J : Type w'} [Category.{w''} J]
+  [HasColimitsOfShape J C]
+  {ι : Type*} {c : ComplexShape ι}
+
+/-- Commuting degreewise homology with this colimit identifies the homology map
+of `colim.map α` with the colimit of the pointwise homology maps, which are
+isomorphisms. -/
+theorem quasiIso_colimMap_of_preservesHomology
+    [∀ i, PreservesColimitsOfShape J (homologyFunctor C c i)]
+    {F G : J ⥤ HomologicalComplex C c} (α : F ⟶ G)
+    (hα : ∀ j, QuasiIso (α.app j)) : QuasiIso (colim.map α) := by
+  rw [quasiIso_iff]
+  intro i
+  rw [quasiIsoAt_iff_isIso_homologyMap]
+  let H := homologyFunctor C c i
+  haveI hαH (j : J) : IsIso ((Functor.whiskerRight α H).app j) := by
+    change IsIso (homologyMap (α.app j) i)
+    letI : QuasiIso (α.app j) := hα j
+    rw [← quasiIsoAt_iff_isIso_homologyMap]
+    infer_instance
+  haveI : IsIso (Functor.whiskerRight α H) :=
+    NatIso.isIso_of_isIso_app _
+  haveI : IsIso (colim.map (Functor.whiskerRight α H)) := inferInstance
+  let β := preservesColimitNatIso (J := J) H
+  have h := β.hom.naturality α
+  haveI : IsIso (β.hom.app F) := inferInstance
+  haveI : IsIso (β.hom.app G) := inferInstance
+  have hH : IsIso ((colim ⋙ H).map α ≫ β.hom.app G) := by
+    rw [h]
+    change IsIso (β.hom.app F ≫ colim.map (Functor.whiskerRight α H))
+    exact IsIso.comp_isIso' (inferInstance : IsIso (β.hom.app F))
+      (inferInstance : IsIso (colim.map (Functor.whiskerRight α H)))
+  have hmap : IsIso ((colim ⋙ H).map α) :=
+    IsIso.of_isIso_comp_right _ (β.hom.app G)
+  exact hmap
+
+end HomologyPreservingColimits
+
+end HomologicalComplex
+
+namespace HomologicalComplex
+
+variable {C : Type u} [Category.{v} C] [Abelian C]
+  {J : Type w'} [Category.{w''} J]
+  [HasColimitsOfShape J C] [HasExactColimitsOfShape J C]
+  {ι : Type*} {c : ComplexShape ι}
+
+/-- Exact colimits commute with homology through the short-complex comparison, so the
+homology-preserving criterion above applies. This includes filtered colimits in an
+AB5 category. -/
+theorem quasiIso_colimMap {F G : J ⥤ HomologicalComplex C c} (α : F ⟶ G)
+    (hα : ∀ j, QuasiIso (α.app j)) : QuasiIso (colim.map α) := by
+  letI : ∀ i, PreservesColimitsOfShape J (homologyFunctor C c i) :=
+    fun _ => inferInstance
+  exact quasiIso_colimMap_of_preservesHomology α hα
+
+end HomologicalComplex
+
+namespace HomologicalComplex
+
+universe w₁ w₂ v₁ u₁ v₂ u₂
+
+variable {J : Type w₁} [Category.{w₂} J]
+  {A : Type u₁} [Category.{v₁} A]
+  {C : Type u₂} [Category.{v₂} C] [HasZeroMorphisms C] [CategoryWithHomology C]
+  [HasColimitsOfShape J C]
+  {ι : Type*} {c : ComplexShape ι}
+  [∀ i, PreservesColimitsOfShape J (homologyFunctor C c i)]
+  {H H' : A ⥤ HomologicalComplex C c}
+  (F : J ⥤ A) (α : H ⟶ H')
+
+variable [HasColimit F] [PreservesColimit F H] [PreservesColimit F H']
+
+set_option backward.isDefEq.respectTransparency false in
+/-- A natural transformation between colimit-preserving functors to complexes is a
+quasi-isomorphism at a colimit when it is one on every object of the diagram.
+Preservation of the colimit by degreewise homology transfers the pointwise
+quasi-isomorphisms through `colim.map`; naturality of the preserved-colimit
+comparisons transfers the result back to the original transformation. -/
+theorem quasiIso_app_colimit_of_preserves
+    (hα : ∀ j, QuasiIso ((F.whiskerLeft α).app j)) :
+    QuasiIso (α.app (colimit F)) := by
+  have hcolim := quasiIso_colimMap_of_preservesHomology (F.whiskerLeft α) hα
+  haveI : QuasiIso (colim.map (F.whiskerLeft α)) := hcolim
+  have hnat := CategoryTheory.preservesColimitIso_naturality α F
+  haveI : QuasiIso (α.app (colimit F) ≫
+      (CategoryTheory.preservesColimitIso H' F).hom) := by
+    rw [hnat]
+    infer_instance
+  exact quasiIso_of_comp_right (α.app (colimit F))
+    (CategoryTheory.preservesColimitIso H' F).hom
 
 end HomologicalComplex

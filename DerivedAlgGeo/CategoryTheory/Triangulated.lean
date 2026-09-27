@@ -12,6 +12,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Polishchuk
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Thick
 import DerivedAlgGeo.CategoryTheory.Triangulated.PostnikovTower
 import DerivedAlgGeo.CategoryTheory.Triangulated.ExtensionClosure
+import DerivedAlgGeo.CategoryTheory.Triangulated.Generators
 import DerivedAlgGeo.CategoryTheory.Triangulated.Dimension
 import DerivedAlgGeo.CategoryTheory.Triangulated.ExactFunctorFamily
 import DerivedAlgGeo.CategoryTheory.Triangulated.FullSubcategory
@@ -41,8 +42,8 @@ integral shift functors, t-structures, objectwise
 triangle lifts to full triangulated subcategories, first-map normalization of
 triangle-valued functors, compact generation,
 Postnikov towers, strict morphisms, semiorthogonal sequences,
-extension closures, generation time, the Grothendieck group, the spherical twist on `K₀`,
-Fourier--Mukai kernel functors, dg enhancements, and stability conditions on
+extension closures, envelope composition, generation time, the Grothendieck group, the spherical
+twist on `K₀`, Fourier--Mukai kernel functors, dg enhancements, and stability conditions on
 triangulated categories.
 
 Everything above `StabilityCondition` in this list is generic: it mentions no

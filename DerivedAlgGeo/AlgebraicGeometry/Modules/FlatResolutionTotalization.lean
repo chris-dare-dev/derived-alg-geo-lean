@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Modules.FlatGenerators
 import Mathlib.Algebra.Homology.Embedding.Extend
+import Mathlib.Algebra.Homology.Embedding.ExtendHomology
 import Mathlib.Algebra.Homology.TotalComplex
 
 /-!
@@ -11,8 +12,10 @@ import Mathlib.Algebra.Homology.TotalComplex
 
 The objectwise left resolution gives a bicomplex of flat module sheaves. We include its
 resolution direction into the integers and form Mathlib's direct-sum total complex in
-`X.Modules`. Every term of this total complex is flat over the identity. Its comparison
-with the input and K-flatness remain separate obligations.
+`X.Modules`. Every term of this total complex is flat over the identity. The natural
+augmentation is a quasi-isomorphism in each resolution-direction row, and it totalizes
+to a map into a resolution-degree-zero bicomplex. A quasi-isomorphism of total complexes,
+comparison with the input, and K-flatness remain separate obligations.
 -/
 
 universe u
@@ -42,6 +45,63 @@ noncomputable def freeYonedaSheafCoproductTotalComplexFunctor (X : Scheme.{u}) :
   freeYonedaSheafCoproductResolutionBicomplexUpInt X ⋙
     HomologicalComplex₂.totalFunctor X.Modules (ComplexShape.up ℤ)
       (ComplexShape.up ℤ) (ComplexShape.up ℤ)
+
+/-- Apply the natural augmentation of each free-Yoneda left resolution in the
+resolution direction. The target retains the input complex in resolution degree
+zero after extending that direction to integer degrees. This is a bicomplex
+map; its totalization is treated below, without a quasi-isomorphism claim. -/
+noncomputable def freeYonedaSheafCoproductResolutionBicomplexAugmentation
+    (X : Scheme.{u}) :
+    freeYonedaSheafCoproductResolutionBicomplexUpInt X ⟶
+      ((ChainComplex.single₀ X.Modules) ⋙
+        ComplexShape.embeddingDownNat.extendFunctor X.Modules).mapHomologicalComplex
+          (ComplexShape.up ℤ) := by
+  let Λ := freeYonedaSheafCoproductReducedLeftResolution X
+  let ι := ObjectProperty.ι (fun M : X.Modules => IsFlatOver (𝟙 X) M)
+  let E := ComplexShape.embeddingDownNat.extendFunctor X.Modules
+  letI : Λ.chainComplexFunctor.PreservesZeroMorphisms :=
+    ⟨fun M N => freeYonedaSheafCoproductReducedLeftResolution_chainComplexMap_zero X⟩
+  letI : (ι.mapHomologicalComplex (ComplexShape.down ℕ)).PreservesZeroMorphisms :=
+    by infer_instance
+  letI : E.PreservesZeroMorphisms := by infer_instance
+  letI : ((Λ.chainComplexFunctor ⋙
+      ι.mapHomologicalComplex (ComplexShape.down ℕ)) ⋙ E).PreservesZeroMorphisms :=
+    by infer_instance
+  letI : ((ChainComplex.single₀ X.Modules) ⋙ E).PreservesZeroMorphisms :=
+    by infer_instance
+  exact NatTrans.mapHomologicalComplex
+    (Functor.whiskerRight (Λ.chainComplexAugmentationNatTrans ι) E)
+      (ComplexShape.up ℤ)
+
+/-- In each input degree, the bicomplex augmentation is a quasi-isomorphism in
+the resolution direction. Mathlib's embedding extension preserves the generic
+left-resolution quasi-isomorphism; this does not imply that its unbounded
+direct-sum totalization is a quasi-isomorphism. -/
+theorem freeYonedaSheafCoproductResolutionBicomplexAugmentation_row_quasiIso
+    (X : Scheme.{u}) (K : CochainComplex X.Modules ℤ) (p : ℤ) :
+    QuasiIso (((freeYonedaSheafCoproductResolutionBicomplexAugmentation X).app K).f p) := by
+  let Λ := freeYonedaSheafCoproductReducedLeftResolution X
+  let ι := ObjectProperty.ι (fun M : X.Modules => IsFlatOver (𝟙 X) M)
+  haveI : QuasiIso (Λ.chainComplexAugmentation ι (K.X p)) :=
+    Λ.chainComplexAugmentation_quasiIso ι (K.X p)
+  change QuasiIso (HomologicalComplex.extendMap
+    (Λ.chainComplexAugmentation ι (K.X p)) ComplexShape.embeddingDownNat)
+  infer_instance
+
+/-- Totalize the natural bicomplex augmentation. The target is the total
+complex of a bicomplex concentrated in resolution degree zero; identifying it
+with the input complex and proving this map a quasi-isomorphism remain open. -/
+noncomputable def freeYonedaSheafCoproductTotalAugmentationToSingleZero
+    (X : Scheme.{u}) :
+    freeYonedaSheafCoproductTotalComplexFunctor X ⟶
+      (((ChainComplex.single₀ X.Modules) ⋙
+        ComplexShape.embeddingDownNat.extendFunctor X.Modules).mapHomologicalComplex
+          (ComplexShape.up ℤ) ⋙
+        HomologicalComplex₂.totalFunctor X.Modules (ComplexShape.up ℤ)
+          (ComplexShape.up ℤ) (ComplexShape.up ℤ)) :=
+  Functor.whiskerRight (freeYonedaSheafCoproductResolutionBicomplexAugmentation X)
+    (HomologicalComplex₂.totalFunctor X.Modules (ComplexShape.up ℤ)
+      (ComplexShape.up ℤ) (ComplexShape.up ℤ))
 
 private theorem isFlatOverId_of_iso (X : Scheme.{u}) {M N : X.Modules}
     (e : M ≅ N) (hM : IsFlatOver (𝟙 X) M) : IsFlatOver (𝟙 X) N := by
