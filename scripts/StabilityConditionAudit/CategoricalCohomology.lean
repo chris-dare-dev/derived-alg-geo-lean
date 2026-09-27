@@ -345,3 +345,13 @@ end CanonicalIntegerClassLocalizationClient
 #print axioms HomologicalComplex.SubcomplexData.top_d
 #print axioms HomologicalComplex.SubcomplexData.top_X
 #print axioms HomologicalComplex.SubcomplexData.X
+
+-- Generic adjacent-column totalization and naturality.
+#print axioms HomologicalComplex₂.adjacentColumnTotalShortComplexMap
+#print axioms HomologicalComplex₂.singleColumnBicomplexMap
+#print axioms HomologicalComplex₂.singleColumnHasTotal
+#print axioms HomologicalComplex₂.singleColumnShiftIso_naturality
+#print axioms HomologicalComplex₂.singleColumnShiftIso_naturality_assoc
+#print axioms HomologicalComplex₂.singleColumnTotalIso_naturality
+#print axioms HomologicalComplex₂.singleColumnTotalIso_naturality_assoc
+#print axioms HomologicalComplex₂.truncatedBicomplexMap

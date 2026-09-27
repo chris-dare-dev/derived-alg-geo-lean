@@ -11,31 +11,37 @@ import Mathlib.Algebra.Homology.TotalComplexShift
 /-!
 # Adjacent layers of a column-filtered total complex
 
-For a cohomological bicomplex of abelian groups, two consecutive stupid column truncations form a
-degreewise split short exact sequence. Their quotient is the newly added column. After totalizing,
-the mapping cone of the inclusion is quasi-isomorphic to that column shifted by its horizontal
-degree. This identifies the initial page of the column-filtration spectral sequence with vertical
-column homology.
+For a cohomological bicomplex in a preadditive category with a zero object, the totals of two
+consecutive stupid column truncations form a degreewise split short complex, provided the two
+diagonal coproducts exist. Its quotient is the newly added column, whose total is canonically
+that column shifted by its horizontal degree. These constructions are natural in the bicomplex.
+In an abelian category the short complex is short exact, and the mapping cone of the inclusion
+is quasi-isomorphic to the shifted column.
+
+The subsequent spectral-page identifications specialize these constructions to abelian groups.
+No boundedness or total-complex comparison theorem is asserted here.
 -/
 
 namespace HomologicalComplex₂
 
 open CategoryTheory Category Limits
 
-universe w
+universe u v w
 
-variable (K : HomologicalComplex₂ AddCommGrpCat.{w}
-  (ComplexShape.up ℤ) (ComplexShape.up ℤ))
+section Preadditive
+
+variable {C : Type u} [Category.{v} C] [Preadditive C] [HasZeroObject C]
+  (K : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ))
 
 noncomputable def truncatedBicomplex (p : ℤ) :
-    HomologicalComplex₂ AddCommGrpCat.{w}
+    HomologicalComplex₂ C
       (ComplexShape.up ℤ) (ComplexShape.up ℤ) :=
   K.stupidTrunc (ComplexShape.embeddingUpIntGE p)
 
 noncomputable def singleColumnBicomplex (p : ℤ) :
-    HomologicalComplex₂ AddCommGrpCat.{w}
+    HomologicalComplex₂ C
       (ComplexShape.up ℤ) (ComplexShape.up ℤ) :=
-  (CochainComplex.singleFunctor (CochainComplex AddCommGrpCat.{w} ℤ) p).obj (K.X p)
+  (CochainComplex.singleFunctor (CochainComplex C ℤ) p).obj (K.X p)
 
 noncomputable def singleColumnXIso (p i : ℤ) (hi : i = p) :
     (singleColumnBicomplex K p).X i ≅ K.X p := by
@@ -85,7 +91,7 @@ noncomputable def adjacentColumnProjection (p : ℤ) :
       apply comp_zero
 
 noncomputable def adjacentColumnBicomplexShortComplex (p : ℤ) :
-    ShortComplex (HomologicalComplex₂ AddCommGrpCat.{w}
+    ShortComplex (HomologicalComplex₂ C
       (ComplexShape.up ℤ) (ComplexShape.up ℤ)) :=
   ShortComplex.mk
     (adjacentColumnInclusion K p)
@@ -103,32 +109,41 @@ noncomputable def adjacentColumnBicomplexShortComplex (p : ℤ) :
         rw [ComplexShape.notMem_range_embeddingUpIntGE_iff]
         omega)
 
-noncomputable instance totalFunctor_additive :
-    (totalFunctor AddCommGrpCat.{w} (ComplexShape.up ℤ)
-      (ComplexShape.up ℤ) (ComplexShape.up ℤ)).Additive where
-  map_add := by
-    intro X Y f g
-    apply HomologicalComplex.Hom.ext
-    funext n
-    apply total.hom_ext
-    intro i j h
-    dsimp [totalFunctor]
-    rw [ιTotal_map, HomologicalComplex.add_f_apply,
-      HomologicalComplex.add_f_apply, Preadditive.add_comp,
-      ← ιTotal_map X Y f, ← ιTotal_map X Y g]
-    exact (Preadditive.comp_add _ _ _ _ _ _).symm
+/-- A column in horizontal degree `p` is a degree-zero column shifted by `-p`. -/
+noncomputable def singleColumnShiftIso (p : ℤ) :
+    singleColumnBicomplex K p ≅
+      (shiftFunctor₁ C (-p)).obj
+        (singleZeroBicomplex (K.X p)) :=
+  (((CochainComplex.singleFunctors
+    (CochainComplex C ℤ)).shiftIso
+      (-p) p 0 (by omega)).app (K.X p)).symm
 
-noncomputable def adjacentColumnTotalShortComplex (p : ℤ) :
-    ShortComplex (CochainComplex AddCommGrpCat.{w} ℤ) :=
+/-- A single column has a total using only the zero object, via its shifted degree-zero model. -/
+noncomputable instance singleColumnHasTotal (p : ℤ) :
+    (singleColumnBicomplex K p).HasTotal (ComplexShape.up ℤ) :=
+  hasTotal_of_iso (singleColumnShiftIso K p).symm (ComplexShape.up ℤ)
+
+/-- The total of a single column is that column shifted by its horizontal degree. -/
+noncomputable def singleColumnTotalIso (p : ℤ) :
+    (singleColumnBicomplex K p).total (ComplexShape.up ℤ) ≅
+      (K.X p)⟦-p⟧ :=
+  HomologicalComplex₂.total.mapIso (singleColumnShiftIso K p)
+      (ComplexShape.up ℤ) ≪≫
+    (singleZeroBicomplex (K.X p)).totalShift₁Iso (-p) ≪≫
+    (shiftFunctor (CochainComplex C ℤ) (-p)).mapIso
+      (singleZeroTotalIso (K.X p))
+
+/-- Totals of adjacent column tails and their single-column quotient. -/
+noncomputable def adjacentColumnTotalShortComplex (p : ℤ)
+    [(truncatedBicomplex K p).HasTotal (ComplexShape.up ℤ)]
+    [(truncatedBicomplex K (p + 1)).HasTotal (ComplexShape.up ℤ)] :
+    ShortComplex (CochainComplex C ℤ) :=
   ShortComplex.mk
     (total.map (adjacentColumnInclusion K p) (ComplexShape.up ℤ))
     (total.map (adjacentColumnProjection K p) (ComplexShape.up ℤ)) (by
       rw [← total.map_comp]
-      change total.map
-        ((adjacentColumnBicomplexShortComplex K p).f ≫
-          (adjacentColumnBicomplexShortComplex K p).g)
-        (ComplexShape.up ℤ) = 0
-      rw [(adjacentColumnBicomplexShortComplex K p).zero]
+      rw [show adjacentColumnInclusion K p ≫ adjacentColumnProjection K p = 0 from
+        (adjacentColumnBicomplexShortComplex K p).zero]
       apply HomologicalComplex.Hom.ext
       funext n
       apply total.hom_ext
@@ -178,17 +193,21 @@ lemma stupidTruncGEXIso_hom_inv_f (p i j : ℤ) (hi hi' : p ≤ i) :
     (stupidTruncGEXIso K p i hi).hom_inv_id,
     HomologicalComplex.id_f]
 
+omit [HasZeroObject C] in
 @[reassoc (attr := simp)]
-lemma complexIso_inv_hom_f {A B : CochainComplex AddCommGrpCat.{w} ℤ}
+lemma complexIso_inv_hom_f {A B : CochainComplex C ℤ}
     (e : A ≅ B) (j : ℤ) : e.inv.f j ≫ e.hom.f j = 𝟙 _ := by
   rw [← HomologicalComplex.comp_f, e.inv_hom_id, HomologicalComplex.id_f]
 
+omit [HasZeroObject C] in
 @[reassoc (attr := simp)]
-lemma complexIso_hom_inv_f {A B : CochainComplex AddCommGrpCat.{w} ℤ}
+lemma complexIso_hom_inv_f {A B : CochainComplex C ℤ}
     (e : A ≅ B) (j : ℤ) : e.hom.f j ≫ e.inv.f j = 𝟙 _ := by
   rw [← HomologicalComplex.comp_f, e.hom_inv_id, HomologicalComplex.id_f]
 
-noncomputable def adjacentColumnTotalRetraction (p n : ℤ) :
+noncomputable def adjacentColumnTotalRetraction (p n : ℤ)
+    [(truncatedBicomplex K p).HasTotal (ComplexShape.up ℤ)]
+    [(truncatedBicomplex K (p + 1)).HasTotal (ComplexShape.up ℤ)] :
     ((truncatedBicomplex K p).total
       (ComplexShape.up ℤ)).X n ⟶
     ((truncatedBicomplex K (p + 1)).total
@@ -201,7 +220,8 @@ noncomputable def adjacentColumnTotalRetraction (p n : ℤ) :
           (ComplexShape.up ℤ) i j n hij
     else 0)
 
-noncomputable def adjacentColumnTotalSection (p n : ℤ) :
+noncomputable def adjacentColumnTotalSection (p n : ℤ)
+    [(truncatedBicomplex K p).HasTotal (ComplexShape.up ℤ)] :
     ((singleColumnBicomplex K p).total (ComplexShape.up ℤ)).X n ⟶
     ((truncatedBicomplex K p).total
       (ComplexShape.up ℤ)).X n :=
@@ -215,9 +235,12 @@ noncomputable def adjacentColumnTotalSection (p n : ℤ) :
           (ComplexShape.up ℤ) i j n hij
     else 0)
 
-noncomputable def adjacentColumnTotalDegreewiseSplitting (p n : ℤ) :
+/-- Split the adjacent-column total short complex in each total degree. -/
+noncomputable def adjacentColumnTotalDegreewiseSplitting (p n : ℤ)
+    [(truncatedBicomplex K p).HasTotal (ComplexShape.up ℤ)]
+    [(truncatedBicomplex K (p + 1)).HasTotal (ComplexShape.up ℤ)] :
     (((adjacentColumnTotalShortComplex K p).map
-      (HomologicalComplex.eval AddCommGrpCat.{w} (ComplexShape.up ℤ) n)).Splitting) where
+      (HomologicalComplex.eval C (ComplexShape.up ℤ) n)).Splitting) where
   r := adjacentColumnTotalRetraction K p n
   s := adjacentColumnTotalSection K p n
   f_r := by
@@ -241,7 +264,7 @@ noncomputable def adjacentColumnTotalDegreewiseSplitting (p n : ℤ) :
       rw [dif_pos hi]
       simp [HomologicalComplex.comp_f, Category.assoc]
     · apply IsZero.eq_of_src
-      apply (HomologicalComplex.eval AddCommGrpCat.{w} (ComplexShape.up ℤ) j).map_isZero
+      apply (HomologicalComplex.eval C (ComplexShape.up ℤ) j).map_isZero
       apply HomologicalComplex.isZero_stupidTrunc_X
       rw [ComplexShape.notMem_range_embeddingUpIntGE_iff]
       omega
@@ -263,9 +286,7 @@ noncomputable def adjacentColumnTotalDegreewiseSplitting (p n : ℤ) :
       rw [Category.assoc, Category.assoc, Category.assoc,
         HomologicalComplex₂.ιTotal_map]
       subst i
-      simp [adjacentColumnProjection,
-        singleColumnBicomplex,
-        Category.assoc]
+      simp [adjacentColumnProjection, singleColumnBicomplex]
       let e₀ := stupidTruncGEXIso K p p le_rfl
       let e₁ := singleColumnXIso K p p rfl
       change e₁.hom.f j ≫ e₀.inv.f j ≫
@@ -282,7 +303,7 @@ noncomputable def adjacentColumnTotalDegreewiseSplitting (p n : ℤ) :
         singleColumnXIso_hom_inv_f_assoc]
       rfl
     · apply IsZero.eq_of_src
-      apply (HomologicalComplex.eval AddCommGrpCat.{w} (ComplexShape.up ℤ) j).map_isZero
+      apply (HomologicalComplex.eval C (ComplexShape.up ℤ) j).map_isZero
       apply HomologicalComplex.isZero_single_obj_X
       exact hi
   id := by
@@ -355,43 +376,149 @@ noncomputable def adjacentColumnTotalDegreewiseSplitting (p n : ℤ) :
               (ComplexShape.up ℤ) p j n hij = _
         rw [stupidTruncGEXIso_hom_inv_f_assoc]
       · apply IsZero.eq_of_src
-        apply (HomologicalComplex.eval AddCommGrpCat.{w} (ComplexShape.up ℤ) j).map_isZero
+        apply (HomologicalComplex.eval C (ComplexShape.up ℤ) j).map_isZero
         apply HomologicalComplex.isZero_stupidTrunc_X
         rw [ComplexShape.notMem_range_embeddingUpIntGE_iff]
         omega
 
-end HomologicalComplex₂
 
-namespace HomologicalComplex₂
+variable {K} {L : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ)}
 
-open CategoryTheory Category Limits
+/-- Stupid column truncation is natural in the bicomplex. -/
+noncomputable def truncatedBicomplexMap (f : K ⟶ L) (p : ℤ) :
+    truncatedBicomplex K p ⟶ truncatedBicomplex L p :=
+  HomologicalComplex.stupidTruncMap f (ComplexShape.embeddingUpIntGE p)
 
-universe w
+/-- The single-column construction is natural in the bicomplex. -/
+noncomputable def singleColumnBicomplexMap (f : K ⟶ L) (p : ℤ) :
+    singleColumnBicomplex K p ⟶ singleColumnBicomplex L p :=
+  (CochainComplex.singleFunctor (CochainComplex C ℤ) p).map (f.f p)
 
-noncomputable def singleColumnShiftIso
-    (K : HomologicalComplex₂ AddCommGrpCat.{w}
-      (ComplexShape.up ℤ) (ComplexShape.up ℤ)) (p : ℤ) :
-    singleColumnBicomplex K p ≅
-      (shiftFunctor₁ AddCommGrpCat.{w} (-p)).obj
-        (singleZeroBicomplex (K.X p)) :=
-  (((CochainComplex.singleFunctors
-    (CochainComplex AddCommGrpCat.{w} ℤ)).shiftIso
-      (-p) p 0 (by omega)).app (K.X p)).symm
+/-- The identification of a single column with a shifted degree-zero column is natural. -/
+@[reassoc]
+lemma singleColumnShiftIso_naturality (f : K ⟶ L) (p : ℤ) :
+    singleColumnBicomplexMap f p ≫ (singleColumnShiftIso L p).hom =
+      (singleColumnShiftIso K p).hom ≫
+        (shiftFunctor₁ C (-p)).map
+          (singleZeroBicomplexMap (f.f p)) := by
+  exact ((CochainComplex.singleFunctors
+    (CochainComplex C ℤ)).shiftIso
+      (-p) p 0 (by omega)).inv.naturality (f.f p)
 
-noncomputable def singleColumnTotalIso
-    (K : HomologicalComplex₂ AddCommGrpCat.{w}
-      (ComplexShape.up ℤ) (ComplexShape.up ℤ)) (p : ℤ) :
-    (singleColumnBicomplex K p).total (ComplexShape.up ℤ) ≅
-      (K.X p)⟦-p⟧ :=
-  HomologicalComplex₂.total.mapIso (singleColumnShiftIso K p)
-      (ComplexShape.up ℤ) ≪≫
-    (singleZeroBicomplex (K.X p)).totalShift₁Iso (-p) ≪≫
-    (shiftFunctor (CochainComplex AddCommGrpCat.{w} ℤ) (-p)).mapIso
-      (singleZeroTotalIso (K.X p))
+set_option backward.defeqAttrib.useBackward true in
+set_option backward.isDefEq.respectTransparency false in
+/-- The standard identification of a single-column total complex with the shifted column is
+natural. -/
+@[reassoc]
+lemma singleColumnTotalIso_naturality (f : K ⟶ L) (p : ℤ) :
+    total.map (singleColumnBicomplexMap f p) (ComplexShape.up ℤ) ≫
+        (singleColumnTotalIso L p).hom =
+      (singleColumnTotalIso K p).hom ≫ (f.f p)⟦-p⟧' := by
+  dsimp only [singleColumnTotalIso, Iso.trans_hom]
+  simp only [HomologicalComplex₂.total.mapIso_hom, Functor.mapIso_hom,
+    Category.assoc]
+  rw [← Category.assoc, ← total.map_comp]
+  rw [singleColumnShiftIso_naturality]
+  rw [total.map_comp]
+  rw [Category.assoc]
+  rw [HomologicalComplex₂.totalShift₁Iso_hom_naturality_assoc]
+  rw [← Functor.map_comp]
+  rw [singleZeroTotalIso_naturality]
+  rw [Functor.map_comp]
 
-noncomputable def adjacentColumnTotalShortExact
-    (K : HomologicalComplex₂ AddCommGrpCat.{w}
-      (ComplexShape.up ℤ) (ComplexShape.up ℤ)) (p : ℤ) :
+set_option backward.defeqAttrib.useBackward true in
+set_option backward.isDefEq.respectTransparency false in
+/-- A bicomplex morphism maps the adjacent-column short exact sequence of its source to that of
+its target. -/
+noncomputable def adjacentColumnTotalShortComplexMap (f : K ⟶ L) (p : ℤ)
+    [(truncatedBicomplex K p).HasTotal (ComplexShape.up ℤ)]
+    [(truncatedBicomplex K (p + 1)).HasTotal (ComplexShape.up ℤ)]
+    [(truncatedBicomplex L p).HasTotal (ComplexShape.up ℤ)]
+    [(truncatedBicomplex L (p + 1)).HasTotal (ComplexShape.up ℤ)] :
+    adjacentColumnTotalShortComplex K p ⟶ adjacentColumnTotalShortComplex L p where
+  τ₁ := total.map (truncatedBicomplexMap f (p + 1)) (ComplexShape.up ℤ)
+  τ₂ := total.map (truncatedBicomplexMap f p) (ComplexShape.up ℤ)
+  τ₃ := total.map (singleColumnBicomplexMap f p) (ComplexShape.up ℤ)
+  comm₁₂ := by
+    dsimp [adjacentColumnTotalShortComplex, adjacentColumnBicomplexShortComplex]
+    rw [← total.map_comp, ← total.map_comp]
+    congr 1
+    apply HomologicalComplex.Hom.ext
+    funext i
+    by_cases hi : p + 1 ≤ i
+    · dsimp [adjacentColumnInclusion, HomologicalComplex.stupidTruncGEMap]
+      rw [dif_pos hi, dif_pos hi]
+      let eK₀ := stupidTruncGEXIso K (p + 1) i hi
+      let eK₁ := stupidTruncGEXIso K p i (by omega)
+      let eL₀ := stupidTruncGEXIso L (p + 1) i hi
+      let eL₁ := stupidTruncGEXIso L p i (by omega)
+      simp only [Category.assoc]
+      change (truncatedBicomplexMap f (p + 1)).f i ≫ eL₀.hom ≫ eL₁.inv =
+        eK₀.hom ≫ eK₁.inv ≫ (truncatedBicomplexMap f p).f i
+      dsimp [truncatedBicomplexMap, truncatedBicomplex]
+      rw [← cancel_mono eL₁.hom]
+      simp only [Category.assoc, eL₁.inv_hom_id, Category.comp_id]
+      rw [← Category.assoc, ← Category.assoc]
+      dsimp [eK₀, eK₁, eL₀, eL₁, stupidTruncGEXIso]
+      rw [HomologicalComplex.stupidTruncMap_stupidTruncXIso_hom]
+      simp only [Category.assoc]
+      rw [HomologicalComplex.stupidTruncMap_stupidTruncXIso_hom]
+      simp
+    · apply IsZero.eq_of_src
+      apply HomologicalComplex.isZero_stupidTrunc_X
+      rw [ComplexShape.notMem_range_embeddingUpIntGE_iff]
+      omega
+  comm₂₃ := by
+    dsimp [adjacentColumnTotalShortComplex, adjacentColumnBicomplexShortComplex]
+    rw [← total.map_comp, ← total.map_comp]
+    congr 1
+    apply HomologicalComplex.Hom.ext
+    funext i
+    by_cases hi : i = p
+    · subst i
+      let eK := K.stupidTruncXIso (ComplexShape.embeddingUpIntGE p)
+        (i := 0) (i' := p) (by simp [ComplexShape.embeddingUpIntGE])
+      let eL := L.stupidTruncXIso (ComplexShape.embeddingUpIntGE p)
+        (i := 0) (i' := p) (by simp [ComplexShape.embeddingUpIntGE])
+      let sK := singleColumnXIso K p p rfl
+      let sL := singleColumnXIso L p p rfl
+      rw [HomologicalComplex.comp_f, HomologicalComplex.comp_f]
+      dsimp [adjacentColumnProjection]
+      rw [dif_pos rfl, dif_pos rfl]
+      simp only [Category.id_comp]
+      simp only [Category.assoc]
+      change (truncatedBicomplexMap f p).f p ≫ eL.hom ≫ sL.inv =
+        eK.hom ≫ sK.inv ≫ (singleColumnBicomplexMap f p).f p
+      rw [← cancel_mono sL.hom]
+      simp only [Category.assoc, sL.inv_hom_id, Category.comp_id]
+      dsimp [truncatedBicomplexMap, truncatedBicomplex, singleColumnBicomplexMap, eK, eL]
+      rw [HomologicalComplex.stupidTruncMap_stupidTruncXIso_hom]
+      rw [cancel_epi (K.stupidTruncXIso
+        (ComplexShape.embeddingUpIntGE p) (i := 0) (i' := p)
+          (by simp [ComplexShape.embeddingUpIntGE])).hom]
+      dsimp [sK, sL, singleColumnXIso, singleColumnBicomplex]
+      change f.f p =
+        (HomologicalComplex.singleObjXSelf (ComplexShape.up ℤ) p (K.X p)).inv ≫
+          ((HomologicalComplex.single (CochainComplex C ℤ)
+            (ComplexShape.up ℤ) p).map (f.f p)).f p ≫
+          (HomologicalComplex.singleObjXSelf (ComplexShape.up ℤ) p (L.X p)).hom
+      rw [HomologicalComplex.single_map_f_self]
+      simp
+    · apply IsZero.eq_of_tgt
+      apply HomologicalComplex.isZero_single_obj_X
+      exact hi
+
+end Preadditive
+
+section Abelian
+
+variable {C : Type u} [Category.{v} C] [Abelian C]
+  (K : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ))
+
+/-- Adjacent column tails form a short exact sequence after totalization. -/
+theorem adjacentColumnTotalShortExact (p : ℤ)
+    [(truncatedBicomplex K p).HasTotal (ComplexShape.up ℤ)]
+    [(truncatedBicomplex K (p + 1)).HasTotal (ComplexShape.up ℤ)] :
     (adjacentColumnTotalShortComplex K p).ShortExact :=
   HomologicalComplex.shortExact_of_degreewise_shortExact
     (adjacentColumnTotalShortComplex K p) (fun n ↦
@@ -400,18 +527,19 @@ noncomputable def adjacentColumnTotalShortExact
         epi_g := s.epi_g
         exact := s.exact })
 
-noncomputable def adjacentColumnConeToShift
-    (K : HomologicalComplex₂ AddCommGrpCat.{w}
-      (ComplexShape.up ℤ) (ComplexShape.up ℤ)) (p : ℤ) :
+/-- The cone of an adjacent-tail inclusion maps to the shifted quotient column. -/
+noncomputable def adjacentColumnConeToShift (p : ℤ)
+    [(truncatedBicomplex K p).HasTotal (ComplexShape.up ℤ)]
+    [(truncatedBicomplex K (p + 1)).HasTotal (ComplexShape.up ℤ)] :
     CochainComplex.mappingCone (adjacentColumnTotalShortComplex K p).f ⟶
       (K.X p)⟦-p⟧ :=
   CochainComplex.mappingCone.descShortComplex
       (adjacentColumnTotalShortComplex K p) ≫
     (singleColumnTotalIso K p).hom
 
-noncomputable instance adjacentColumnConeToShift_quasiIso
-    (K : HomologicalComplex₂ AddCommGrpCat.{w}
-      (ComplexShape.up ℤ) (ComplexShape.up ℤ)) (p : ℤ) :
+noncomputable instance adjacentColumnConeToShift_quasiIso (p : ℤ)
+    [(truncatedBicomplex K p).HasTotal (ComplexShape.up ℤ)]
+    [(truncatedBicomplex K (p + 1)).HasTotal (ComplexShape.up ℤ)] :
     QuasiIso (adjacentColumnConeToShift K p) := by
   letI : QuasiIso
       (CochainComplex.mappingCone.descShortComplex
@@ -420,6 +548,23 @@ noncomputable instance adjacentColumnConeToShift_quasiIso
       (adjacentColumnTotalShortExact K p)
   dsimp [adjacentColumnConeToShift]
   infer_instance
+
+end Abelian
+
+noncomputable instance totalFunctor_additive :
+    (totalFunctor AddCommGrpCat.{w} (ComplexShape.up ℤ)
+      (ComplexShape.up ℤ) (ComplexShape.up ℤ)).Additive where
+  map_add := by
+    intro X Y f g
+    apply HomologicalComplex.Hom.ext
+    funext n
+    apply total.hom_ext
+    intro i j h
+    dsimp [totalFunctor]
+    rw [ιTotal_map, HomologicalComplex.add_f_apply,
+      HomologicalComplex.add_f_apply, Preadditive.add_comp,
+      ← ιTotal_map X Y f, ← ιTotal_map X Y g]
+    exact (Preadditive.comp_add _ _ _ _ _ _).symm
 
 /-- The adjacent filtration layer that contributes column `p`: the mapping cone of the map from
 filtration stage `-p - 1` to stage `-p`. -/
@@ -601,8 +746,7 @@ lemma columnFilteredAdjacentLayerComplex_eq
       CochainComplex.mappingCone (adjacentColumnTotalShortComplex K p).f := by
   simp [columnFilteredAdjacentLayerComplex,
     columnFilteredTotalComplex, columnFiltrationBicomplex,
-    adjacentColumnTotalShortComplex, adjacentColumnBicomplexShortComplex,
-    adjacentColumnInclusion, truncatedBicomplex]
+    adjacentColumnTotalShortComplex, adjacentColumnInclusion, truncatedBicomplex]
   exact mappingConeTotalStupidTruncGEMap_eq_of_eq K
     (-columnFiltrationIndex p) (-columnFiltrationIndex (p + 1)) p
       (by simp [columnFiltrationIndex])
@@ -855,8 +999,7 @@ lemma columnFilteredConnecting_comp_homologyFactor
       (CochainComplex.mappingConeCompTriangle (F.map f) (F.map g))
       (p + q) (p + 1 + q) (by omega)]
     simp only [CochainComplex.mappingConeCompTriangle_obj₁,
-      CochainComplex.mappingConeCompTriangle_obj₃,
-      Category.assoc, Iso.inv_hom_id_app, Category.comp_id]
+      CochainComplex.mappingConeCompTriangle_obj₃, Iso.inv_hom_id_app]
     congr 1
   have hδ : H.homologySequenceδ ((X.precomp F).triangle f g)
         (p + q) (p + 1 + q) (by omega) ≫
