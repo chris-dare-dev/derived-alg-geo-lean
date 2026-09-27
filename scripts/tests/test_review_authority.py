@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import unittest
 
 from scripts import review_authority
@@ -11,7 +12,6 @@ from scripts import review_authority
 HEAD = "a" * 40
 BASE = "b" * 40
 NEXT = "c" * 40
-ARTIFACT = "d" * 64
 
 
 def fixture() -> tuple[dict, dict, dict]:
@@ -38,10 +38,14 @@ def fixture() -> tuple[dict, dict, dict]:
             "base_commit": BASE,
             "policy_sha256": review_authority.digest(policy),
             "files_sha256": files_sha256,
-            "artifact_sha256": ARTIFACT,
+            "artifact_text": f"Reviewed by agent-{index}.\nReviewed commit: {HEAD}\nClose: PASS\n",
         }
         for index, role in enumerate(review_authority.REQUIRED_ROLES, start=1)
     ]
+    for record in records:
+        record["artifact_sha256"] = hashlib.sha256(
+            record["artifact_text"].encode("utf-8")
+        ).hexdigest()
     receipt = {
         "schema_version": 1,
         "repository": "chris-dare-dev/derived-alg-geo-lean",
@@ -144,6 +148,16 @@ class ReviewAuthorityTests(unittest.TestCase):
         snapshot["technical_reviews"]["fetched_count"] = 5
         self.assert_rejected(policy, receipt, snapshot, "superseded by a later technical review")
 
+    def test_review_artifact_bytes_and_trailer_are_verified(self) -> None:
+        policy, receipt, snapshot = fixture()
+        snapshot["technical_reviews"]["items"][0]["artifact_sha256"] = "d" * 64
+        self.assert_rejected(policy, receipt, snapshot, "digest does not match")
+        policy, receipt, snapshot = fixture()
+        record = snapshot["technical_reviews"]["items"][0]
+        record["artifact_text"] = record["artifact_text"].replace(f"Reviewed commit: {HEAD}", f"Reviewed commit: {BASE}")
+        record["artifact_sha256"] = hashlib.sha256(record["artifact_text"].encode()).hexdigest()
+        self.assert_rejected(policy, receipt, snapshot, "trailer does not bind")
+
     def test_duplicate_or_missing_technical_sequence_fails(self) -> None:
         for bad in (None, 2):
             with self.subTest(sequence=bad):
@@ -196,6 +210,18 @@ class ReviewAuthorityTests(unittest.TestCase):
         )
         snapshot["provider_reviews"]["fetched_count"] = 2
         self.assert_rejected(policy, receipt, snapshot, "revoked, superseded or stale")
+
+    def test_pending_provider_review_without_submission_time_does_not_veto_technical_receipt(self) -> None:
+        policy, receipt, snapshot = fixture()
+        snapshot["provider_reviews"] = {
+            "items": [{"id": 22, "actor_id": 900, "state": "PENDING", "commit_id": HEAD,
+                       "submitted_at": None}],
+            "fetched_count": 1, "complete": True, "truncated": False, "next_page": False,
+        }
+        result = review_authority.validate_receipt(policy, receipt, snapshot)
+        self.assertTrue(result["valid"], result)
+        self.assertTrue(result["claims"]["technical_reviews_recorded"])
+        self.assertFalse(result["claims"]["github_approval_observed"])
 
     def test_shared_credential_cannot_satisfy_provider_requirement(self) -> None:
         policy, receipt, snapshot = fixture()

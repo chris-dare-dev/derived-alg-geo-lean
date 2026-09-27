@@ -35,9 +35,10 @@ review in the trusted live snapshot has a distinct role and runtime identity,
 passing verdict, active status, exact head/base/policy/file digests and an
 artifact SHA-256. A trusted runtime supplies a unique positive review sequence;
 the validator selects the greatest sequence for each role and identity, so
-reordering a fetched array cannot revive an earlier pass. The artifact digest binds the recorded review text; it does
-not authenticate who wrote it. The runtime that creates these records must
-retain the full reviewer output and authenticate its own agent/session identity
+reordering a fetched array cannot revive an earlier pass. The trusted runtime
+supplies the retained full reviewer text. The validator checks its SHA-256 and
+the exact head/verdict trailer against the record. This does not authenticate
+who wrote the text. The runtime must authenticate its own agent/session identity
 independently of PR-controlled text. `technical_reviews_recorded` means these
 records are current and complete; it never means a human approved.
 
@@ -68,8 +69,9 @@ provider actor on the exact head when a future owner-approved policy requires
 one. It rejects an author or shared-credential actor, a dismissed/superseded
 approval, and incomplete provider results. The adapter supplies the
 provider-observed author actor ID and each review's `submitted_at`; the
-validator selects the latest review per actor by submission time and review
-ID, regardless of array order. Even this observation is labeled
+validator selects the latest submitted review per actor by submission time and
+review ID, regardless of array order. An unsubmitted `PENDING` review has no
+`submitted_at` and is excluded from that ordering. Even this observation is labeled
 `github_approval_observed`, not `independent_human_approval`. The current
 policy requires zero such reviews. A new required GitHub review setting,
 independent account, or trust-surface check is an owner decision, not an

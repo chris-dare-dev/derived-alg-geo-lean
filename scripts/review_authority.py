@@ -222,8 +222,18 @@ def validate_receipt(policy: Any, receipt: Any, snapshot: Any) -> dict[str, Any]
                                 ("files_sha256", files_sha256)):
             if record.get(field) != expected:
                 errors.append(f"review {review_id} has stale {field}")
-        if not _digest(record.get("artifact_sha256")):
-            errors.append(f"review {review_id} has no verified artifact digest")
+        artifact_text = record.get("artifact_text")
+        artifact_sha256 = record.get("artifact_sha256")
+        if not _nonempty(artifact_text) or not _digest(artifact_sha256):
+            errors.append(f"review {review_id} has no verifiable artifact text and digest")
+        else:
+            actual_digest = hashlib.sha256(artifact_text.encode("utf-8")).hexdigest()
+            if artifact_sha256 != actual_digest:
+                errors.append(f"review {review_id} artifact digest does not match retained text")
+            trailer = artifact_text.splitlines()[-2:]
+            if trailer != [f"Reviewed commit: {snapshot.get('head_commit')}",
+                           f"Close: {verdict}"]:
+                errors.append(f"review {review_id} artifact trailer does not bind head and verdict")
     missing = set(REQUIRED_ROLES) - set(roles)
     if missing:
         errors.append("missing technical review roles: " + ", ".join(sorted(missing)))
@@ -238,13 +248,15 @@ def validate_receipt(policy: Any, receipt: Any, snapshot: Any) -> dict[str, Any]
         if not isinstance(review, dict) or not _positive_int(review.get("id")) or not _positive_int(review.get("actor_id")):
             errors.append(f"snapshot.provider_reviews[{index}] has invalid identity")
             continue
+        if review["id"] in seen_ids:
+            errors.append(f"snapshot.provider_reviews[{index}] duplicates an ID")
+        seen_ids.add(review["id"])
+        if review.get("state") == "PENDING" and review.get("submitted_at") is None:
+            continue
         submitted = _submitted_at(review.get("submitted_at"))
         if submitted is None:
             errors.append(f"snapshot.provider_reviews[{index}] has no trusted submitted_at")
             continue
-        if review["id"] in seen_ids:
-            errors.append(f"snapshot.provider_reviews[{index}] duplicates an ID")
-        seen_ids.add(review["id"])
         previous = latest.get(review["actor_id"])
         if previous is None or (submitted, review["id"]) > (
             _submitted_at(previous["submitted_at"]), previous["id"]
