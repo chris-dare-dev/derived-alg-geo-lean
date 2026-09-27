@@ -17,10 +17,13 @@ require a shift or a triangulated structure.
 the inverse moves both Hom arguments into the category where `D.eta` applies.
 `SerreFunctorData.transportIso D Φ` then uses uniqueness of Serre duality to
 identify `Φ.functor ⋙ D.S` with `D.S ⋙ Φ.functor`.
+
+## Main results
+
 `SerreFunctorData.transportIso_refl` identifies its specialization to the
 identity equivalence with the canonical functor unitors.
 `SerreFunctorData.conj_eta_trans` and
-`SerreFunctorData.conj_trans_uniqueIso_hom_app` give the duality and canonical
+`SerreFunctorData.conj_trans_uniqueIso_hom_app_eq_id` give the duality and canonical
 comparison laws for a composite linear equivalence.
 -/
 
@@ -161,6 +164,18 @@ noncomputable def transportIso (D : SerreFunctorData k C) (Φ : C ≌ C)
     (Functor.associator Φ.functor Φ.inverse (D.S ⋙ Φ.functor)).symm ≪≫
     Φ.funInvIdAssoc (D.S ⋙ Φ.functor)
 
+local instance transFunctorAdditive (Φ Ψ : C ≌ C)
+    [Φ.functor.Additive] [Ψ.functor.Additive] :
+    (Φ.trans Ψ).functor.Additive := by
+  change (Φ.functor ⋙ Ψ.functor).Additive
+  infer_instance
+
+local instance transFunctorLinear (Φ Ψ : C ≌ C)
+    [Φ.functor.Linear k] [Ψ.functor.Linear k] :
+    (Φ.trans Ψ).functor.Linear k := by
+  change (Φ.functor ⋙ Ψ.functor).Linear k
+  infer_instance
+
 omit [Preadditive C] in
 private theorem preimage_inverse_trans (Φ Ψ : C ≌ C)
     (A B : C) (h : (Φ.trans Ψ).inverse.obj A ⟶ (Φ.trans Ψ).inverse.obj B) :
@@ -187,7 +202,6 @@ private theorem counit_inv_trans (Φ Ψ : C ≌ C) (B : C) :
 private theorem homEquivCounit_trans (Φ Ψ : C ≌ C)
     [Φ.functor.Additive] [Φ.functor.Linear k]
     [Ψ.functor.Additive] [Ψ.functor.Linear k]
-    [(Φ.trans Ψ).functor.Additive] [(Φ.trans Ψ).functor.Linear k]
     (B X : C) (h : (Φ.trans Ψ).inverse.obj B ⟶ X) :
     homEquivCounit (k := k) (Φ.trans Ψ) B X h =
       homEquivCounit (k := k) Ψ B (Φ.functor.obj X)
@@ -202,12 +216,11 @@ private theorem homEquivCounit_trans (Φ Ψ : C ≌ C)
   erw [Category.assoc]
   rfl
 
-/-- Conjugation by a composite linear equivalence agrees with successive
-conjugation on the Serre duality equivalences. -/
+/-- Inverse Hom preimages for a composite equivalence run in reverse order;
+its composite counit then identifies the two transported Serre duality maps. -/
 theorem conj_eta_trans (D : SerreFunctorData k C) (Φ Ψ : C ≌ C)
     [Φ.functor.Additive] [Φ.functor.Linear k]
     [Ψ.functor.Additive] [Ψ.functor.Linear k]
-    [(Φ.trans Ψ).functor.Additive] [(Φ.trans Ψ).functor.Linear k]
     (A B : C) (φ : Module.Dual k (A ⟶ B)) :
     (D.conj (Φ.trans Ψ)).eta A B φ = ((D.conj Φ).conj Ψ).eta A B φ := by
   letI : Φ.inverse.Additive := inferInstance
@@ -243,12 +256,12 @@ theorem conj_eta_trans (D : SerreFunctorData k C) (Φ Ψ : C ≌ C)
   rw [homEquivCounit_trans]
   rfl
 
-/-- The canonical Serre comparison between composite and successive
-conjugation has identity components. -/
-theorem conj_trans_uniqueIso_hom_app (D : SerreFunctorData k C) (Φ Ψ : C ≌ C)
+/-- Equality of the transported duality maps forces the canonical comparison
+between composite and successive conjugation to be the identity on each object. -/
+theorem conj_trans_uniqueIso_hom_app_eq_id
+    (D : SerreFunctorData k C) (Φ Ψ : C ≌ C)
     [Φ.functor.Additive] [Φ.functor.Linear k]
     [Ψ.functor.Additive] [Ψ.functor.Linear k]
-    [(Φ.trans Ψ).functor.Additive] [(Φ.trans Ψ).functor.Linear k]
     (A : C) :
     ((D.conj (Φ.trans Ψ)).uniqueIso ((D.conj Φ).conj Ψ)).hom.app A = 𝟙 _ := by
   rw [uniqueIso_hom_app, uniqueIsoApp_hom_eq]
@@ -294,8 +307,8 @@ private theorem uniqueIso_conj_refl_hom_app (D : SerreFunctorData k C) (A : C) :
   rw [eta_conj_refl D A (D.S.obj A)]
   exact LinearEquiv.apply_symm_apply _ _
 
-/-- Transport of Serre duality by the identity equivalence is the canonical
-identification of the two composites with the identity functor. -/
+/-- Reflexive η compatibility and Serre uniqueness normalize transport by
+the identity equivalence to the functor unitors. This states no shift coherence. -/
 theorem transportIso_refl (D : SerreFunctorData k C) :
     D.transportIso (Equivalence.refl : C ≌ C) =
       Functor.leftUnitor D.S ≪≫ (Functor.rightUnitor D.S).symm := by

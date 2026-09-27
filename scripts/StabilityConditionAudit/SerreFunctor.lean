@@ -238,7 +238,7 @@ natural in B by `naturality_right`, and `uniqueIso` is natural in A by `naturali
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.conj
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.transportIso
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.conj_eta_trans
-#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.conj_trans_uniqueIso_hom_app
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.conj_trans_uniqueIso_hom_app_eq_id
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.transportIso_refl
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.commShiftIso
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.chiHom_eq_chiHom_swap_serre
