@@ -3,10 +3,9 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Equivalence
-import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Monoidal
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Colimits
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Presentation.Isomorphism
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Presentation.Locality
-import DerivedAlgGeo.CategoryTheory.Limits.Preserves.Reflective
 import Mathlib.Algebra.Homology.ShortComplex.ExactFunctor
 import Mathlib.CategoryTheory.Abelian.ShortExact
 
@@ -17,10 +16,9 @@ This file is the neutral exact-functor owner for tensoring module sheaves by a l
 construction belongs under `Modules/Tensor`: divisor sequences, filtrations, and future moduli
 constructions are consumers of the same exact functor rather than separate owners of it.
 
-For an invertible `L`, `tensorLeftFunctor L` is the sheafified tensor product `L ⊗ -`.  It
-preserves finite colimits by comparison with objectwise presheaf tensor and sheafification.  Local
-rank-one trivializations show that it preserves monomorphisms; hence it preserves homology and all
-finite limits as well.
+The generic `tensorLeftFunctor L` and its colimit preservation come from `Monoidal` and
+`Colimits`. For an invertible `L`, local rank-one trivializations show that it also preserves
+monomorphisms; hence it preserves homology and all finite limits.
 -/
 
 open CategoryTheory CategoryTheory.Limits TopologicalSpace MonoidalCategory
@@ -37,78 +35,6 @@ private local instance tensorExact_category : Category X.Modules :=
 private noncomputable local instance tensorExact_monoidalCategory :
     MonoidalCategory X.PresheafOfModules :=
   PresheafOfModules.monoidalCategory (R := X.presheaf)
-
-/-- Tensoring on the left by a module sheaf, using the sheafified tensor product. -/
-noncomputable def tensorLeftFunctor (L : X.Modules) : X.Modules ⥤ X.Modules where
-  obj M := tensorObj L M
-  map f := tensorHom (𝟙 L) f
-  map_id M := tensorHom_id_id L M
-  map_comp f g := by
-    symm
-    simpa using tensorHom_comp_tensorHom (𝟙 L) f (𝟙 L) g
-
-private noncomputable def tensorLeftComparisonIso (L : X.Modules)
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from L)] :
-    ((MonoidalCategory.tensoringLeft X.PresheafOfModules).obj
-        ((toPresheafOfModules X).obj L) ⋙
-      PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)) ≅
-      (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj) ⋙
-        tensorLeftFunctor L) :=
-  NatIso.ofComponents
-    (fun P ↦ @asIso _ _ _ _ (tensorSheafificationComparisonLeft L P)
-      (isIso_tensorSheafificationComparisonLeft L P))
-    (fun {P Q} g ↦ by
-      change (PresheafOfModules.sheafification
-          (𝟙 X.ringCatSheaf.obj)).map
-            (((toPresheafOfModules X).obj L) ◁ g) ≫
-          tensorSheafificationComparisonLeft L Q =
-        tensorSheafificationComparisonLeft L P ≫
-          tensorHom (𝟙 L)
-            ((PresheafOfModules.sheafification
-              (𝟙 X.ringCatSheaf.obj)).map g)
-      have h := tensorSheafificationComparisonLeft_naturality (𝟙 L) g
-      have hid : (toPresheafOfModules X).map (𝟙 L) =
-          𝟙 ((toPresheafOfModules X).obj L) :=
-        (toPresheafOfModules X).map_id L
-      rw [hid, MonoidalCategory.id_tensorHom] at h
-      exact h)
-
-/-- Tensoring by an invertible module sheaf preserves finite colimits. -/
-noncomputable instance tensorLeftFunctor_preservesFiniteColimits (L : X.Modules)
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from L)] :
-    PreservesFiniteColimits (tensorLeftFunctor L) where
-  preservesFiniteColimits K _ _ := by
-    let a := PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)
-    let T := (MonoidalCategory.tensoringLeft X.PresheafOfModules).obj
-      ((toPresheafOfModules X).obj L)
-    have hT : PreservesFiniteColimits T := by
-      change PreservesFiniteColimits
-        ((MonoidalCategory.tensoringLeft
-          (_root_.PresheafOfModules.{u}
-            (X.presheaf ⋙ forget₂ CommRingCat RingCat))).obj
-          (show _root_.PresheafOfModules.{u}
-            (X.presheaf ⋙ forget₂ CommRingCat RingCat) from
-              (toPresheafOfModules X).obj L))
-      infer_instance
-    letI : PreservesFiniteColimits T := hT
-    haveI : PreservesFiniteColimits a := inferInstance
-    have hsource : PreservesColimitsOfShape K
-        (((MonoidalCategory.tensoringLeft X.PresheafOfModules).obj
-            ((toPresheafOfModules X).obj L)) ⋙
-          PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)) := by
-      change PreservesColimitsOfShape K (T ⋙ a)
-      infer_instance
-    have htarget : PreservesColimitsOfShape K
-        (PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj) ⋙
-          tensorLeftFunctor L) :=
-      (preservesColimitsOfShape_iff_of_natIso
-        (J := K) (tensorLeftComparisonIso L)).mp hsource
-    letI : PreservesColimitsOfShape K (a ⋙ tensorLeftFunctor L) := htarget
-    exact (PresheafOfModules.sheafificationAdjunction
-      (𝟙 X.ringCatSheaf.obj)).preservesColimitsOfShape_of_comp_left
-        (tensorLeftFunctor L)
 
 /-- Tensoring by an invertible module sheaf is additive. -/
 noncomputable instance tensorLeftFunctor_additive (L : X.Modules)
