@@ -17,6 +17,11 @@ require a shift or a triangulated structure.
 the inverse moves both Hom arguments into the category where `D.eta` applies.
 `SerreFunctorData.transportIso D Φ` then uses uniqueness of Serre duality to
 identify `Φ.functor ⋙ D.S` with `D.S ⋙ Φ.functor`.
+`SerreFunctorData.transportIso_refl` identifies its specialization to the
+identity equivalence with the canonical functor unitors.
+`SerreFunctorData.conj_eta_trans` and
+`SerreFunctorData.conj_trans_uniqueIso_hom_app` give the duality and canonical
+comparison laws for a composite linear equivalence.
 -/
 
 universe w v u
@@ -155,6 +160,155 @@ noncomputable def transportIso (D : SerreFunctorData k C) (Φ : C ≌ C)
     Functor.isoWhiskerLeft Φ.functor (Functor.associator Φ.inverse D.S Φ.functor) ≪≫
     (Functor.associator Φ.functor Φ.inverse (D.S ⋙ Φ.functor)).symm ≪≫
     Φ.funInvIdAssoc (D.S ⋙ Φ.functor)
+
+omit [Preadditive C] in
+private theorem preimage_inverse_trans (Φ Ψ : C ≌ C)
+    (A B : C) (h : (Φ.trans Ψ).inverse.obj A ⟶ (Φ.trans Ψ).inverse.obj B) :
+    (Φ.trans Ψ).fullyFaithfulInverse.preimage h =
+      Ψ.fullyFaithfulInverse.preimage (Φ.fullyFaithfulInverse.preimage h) := by
+  apply (Φ.trans Ψ).fullyFaithfulInverse.map_injective
+  rw [(Φ.trans Ψ).fullyFaithfulInverse.map_preimage]
+  change h = Φ.inverse.map (Ψ.inverse.map
+    (Ψ.fullyFaithfulInverse.preimage (Φ.fullyFaithfulInverse.preimage h)))
+  rw [Ψ.fullyFaithfulInverse.map_preimage, Φ.fullyFaithfulInverse.map_preimage]
+
+omit [Preadditive C] in
+private theorem counit_inv_trans (Φ Ψ : C ≌ C) (B : C) :
+    (Φ.trans Ψ).counitIso.inv.app B =
+      Ψ.counitIso.inv.app B ≫ Ψ.functor.map (Φ.counitIso.inv.app (Ψ.inverse.obj B)) := by
+  simp [Equivalence.trans, Functor.associator_inv_app, Functor.associator_hom_app,
+    Functor.isoWhiskerLeft_inv, Functor.isoWhiskerRight_inv,
+    Functor.rightUnitor_inv_app, Category.assoc]
+  erw [Ψ.functor.map_id, Category.id_comp]
+  erw [Ψ.functor.map_id, Category.comp_id]
+  erw [Category.comp_id]
+  rfl
+
+private theorem homEquivCounit_trans (Φ Ψ : C ≌ C)
+    [Φ.functor.Additive] [Φ.functor.Linear k]
+    [Ψ.functor.Additive] [Ψ.functor.Linear k]
+    [(Φ.trans Ψ).functor.Additive] [(Φ.trans Ψ).functor.Linear k]
+    (B X : C) (h : (Φ.trans Ψ).inverse.obj B ⟶ X) :
+    homEquivCounit (k := k) (Φ.trans Ψ) B X h =
+      homEquivCounit (k := k) Ψ B (Φ.functor.obj X)
+        (homEquivCounit (k := k) Φ (Ψ.inverse.obj B) X h) := by
+  simp only [homEquivCounit, LinearEquiv.trans_apply, Linear.homCongr_apply,
+    homEquivOfFullyFaithful, Iso.refl_hom, Category.comp_id]
+  change (Φ.trans Ψ).counitIso.inv.app B ≫ Ψ.functor.map (Φ.functor.map h) =
+    Ψ.counitIso.inv.app B ≫ Ψ.functor.map
+      (Φ.counitIso.inv.app (Ψ.inverse.obj B) ≫ Φ.functor.map h)
+  rw [counit_inv_trans Φ Ψ B]
+  simp only [Functor.map_comp]
+  erw [Category.assoc]
+  rfl
+
+/-- Conjugation by a composite linear equivalence agrees with successive
+conjugation on the Serre duality equivalences. -/
+theorem conj_eta_trans (D : SerreFunctorData k C) (Φ Ψ : C ≌ C)
+    [Φ.functor.Additive] [Φ.functor.Linear k]
+    [Ψ.functor.Additive] [Ψ.functor.Linear k]
+    [(Φ.trans Ψ).functor.Additive] [(Φ.trans Ψ).functor.Linear k]
+    (A B : C) (φ : Module.Dual k (A ⟶ B)) :
+    (D.conj (Φ.trans Ψ)).eta A B φ = ((D.conj Φ).conj Ψ).eta A B φ := by
+  letI : Φ.inverse.Additive := inferInstance
+  letI : Φ.inverse.Linear k := CategoryTheory.Equivalence.inverseLinear k Φ
+  letI : Ψ.inverse.Additive := inferInstance
+  letI : Ψ.inverse.Linear k := CategoryTheory.Equivalence.inverseLinear k Ψ
+  letI : (Φ.trans Ψ).inverse.Additive := inferInstance
+  letI : (Φ.trans Ψ).inverse.Linear k := CategoryTheory.Equivalence.inverseLinear k (Φ.trans Ψ)
+  have hdual :
+      (homEquivOfFullyFaithful (k := k) (Φ.trans Ψ).inverse
+        (Φ.trans Ψ).fullyFaithfulInverse A B).symm.dualMap φ =
+      (homEquivOfFullyFaithful (k := k) Φ.inverse Φ.fullyFaithfulInverse
+        (Ψ.inverse.obj A) (Ψ.inverse.obj B)).symm.dualMap
+        ((homEquivOfFullyFaithful (k := k) Ψ.inverse Ψ.fullyFaithfulInverse
+          A B).symm.dualMap φ) := by
+    ext h
+    simp [LinearEquiv.dualMap_apply, homEquivOfFullyFaithful, preimage_inverse_trans]
+    rfl
+  dsimp [conj, etaConj]
+  change homEquivCounit (k := k) (Φ.trans Ψ) B (D.S.obj ((Φ.trans Ψ).inverse.obj A))
+      (D.eta ((Φ.trans Ψ).inverse.obj A) ((Φ.trans Ψ).inverse.obj B)
+        ((homEquivOfFullyFaithful (k := k) (Φ.trans Ψ).inverse
+          (Φ.trans Ψ).fullyFaithfulInverse A B).symm.dualMap φ)) =
+    homEquivCounit (k := k) Ψ B ((Φ.inverse ⋙ D.S ⋙ Φ.functor).obj (Ψ.inverse.obj A))
+      (homEquivCounit (k := k) Φ (Ψ.inverse.obj B)
+        (D.S.obj (Φ.inverse.obj (Ψ.inverse.obj A)))
+        (D.eta (Φ.inverse.obj (Ψ.inverse.obj A)) (Φ.inverse.obj (Ψ.inverse.obj B))
+          ((homEquivOfFullyFaithful (k := k) Φ.inverse Φ.fullyFaithfulInverse
+            (Ψ.inverse.obj A) (Ψ.inverse.obj B)).symm.dualMap
+              ((homEquivOfFullyFaithful (k := k) Ψ.inverse Ψ.fullyFaithfulInverse
+                A B).symm.dualMap φ))))
+  rw [hdual]
+  rw [homEquivCounit_trans]
+  rfl
+
+/-- The canonical Serre comparison between composite and successive
+conjugation has identity components. -/
+theorem conj_trans_uniqueIso_hom_app (D : SerreFunctorData k C) (Φ Ψ : C ≌ C)
+    [Φ.functor.Additive] [Φ.functor.Linear k]
+    [Ψ.functor.Additive] [Ψ.functor.Linear k]
+    [(Φ.trans Ψ).functor.Additive] [(Φ.trans Ψ).functor.Linear k]
+    (A : C) :
+    ((D.conj (Φ.trans Ψ)).uniqueIso ((D.conj Φ).conj Ψ)).hom.app A = 𝟙 _ := by
+  rw [uniqueIso_hom_app, uniqueIsoApp_hom_eq]
+  rw [compareEquiv_apply]
+  rw [← conj_eta_trans D Φ Ψ A ((D.conj (Φ.trans Ψ)).S.obj A)]
+  exact LinearEquiv.apply_symm_apply _ _
+
+local instance : (Equivalence.refl : C ≌ C).functor.Additive := by
+  change (𝟭 C).Additive
+  infer_instance
+
+local instance : (Equivalence.refl : C ≌ C).functor.Linear k := by
+  change (𝟭 C).Linear k
+  infer_instance
+
+private theorem eta_conj_refl (D : SerreFunctorData k C) (A B : C)
+    (φ : Module.Dual k (A ⟶ B)) :
+    (D.conj (Equivalence.refl : C ≌ C)).eta A B φ = D.eta A B φ := by
+  let Φ : C ≌ C := Equivalence.refl
+  letI : Φ.inverse.Additive := inferInstance
+  letI : Φ.inverse.Linear k := CategoryTheory.Equivalence.inverseLinear k Φ
+  have hpre (f : A ⟶ B) : Φ.fullyFaithfulInverse.preimage f = f := by
+    have h := Φ.fullyFaithfulInverse.map_preimage f
+    change (𝟭 C).map (Φ.fullyFaithfulInverse.preimage f) = f at h
+    simpa only [Functor.id_map, Functor.id_obj] using h
+  have hdual :
+      (homEquivOfFullyFaithful Φ.inverse Φ.fullyFaithfulInverse A B).symm.dualMap φ = φ := by
+    ext f
+    simp [LinearEquiv.dualMap_apply, homEquivOfFullyFaithful, hpre]
+    rfl
+  change homEquivCounit Φ B (D.S.obj A)
+      (D.eta A B
+        ((homEquivOfFullyFaithful Φ.inverse Φ.fullyFaithfulInverse A B).symm.dualMap φ)) =
+        D.eta A B φ
+  rw [hdual]
+  dsimp [homEquivCounit, homEquivOfFullyFaithful, Φ]
+  change (𝟙 B ≫ (D.eta A B) φ) ≫ 𝟙 (D.S.obj A) = (D.eta A B) φ
+  simp
+
+private theorem uniqueIso_conj_refl_hom_app (D : SerreFunctorData k C) (A : C) :
+    (D.uniqueIso (D.conj (Equivalence.refl : C ≌ C))).hom.app A = 𝟙 _ := by
+  rw [uniqueIso_hom_app, uniqueIsoApp_hom_eq, compareEquiv_apply]
+  rw [eta_conj_refl D A (D.S.obj A)]
+  exact LinearEquiv.apply_symm_apply _ _
+
+/-- Transport of Serre duality by the identity equivalence is the canonical
+identification of the two composites with the identity functor. -/
+theorem transportIso_refl (D : SerreFunctorData k C) :
+    D.transportIso (Equivalence.refl : C ≌ C) =
+      Functor.leftUnitor D.S ≪≫ (Functor.rightUnitor D.S).symm := by
+  ext A
+  have h := uniqueIso_conj_refl_hom_app D A
+  change (D.uniqueIsoApp (D.conj (Equivalence.refl : C ≌ C)) A).hom = 𝟙 _ at h
+  simp only [transportIso, Iso.trans_hom, NatTrans.comp_app, Functor.isoWhiskerLeft_hom,
+    Functor.whiskerLeft_app, Functor.associator_hom_app, Functor.leftUnitor_hom_app]
+  erw [uniqueIso_hom_app]
+  erw [h]
+  simp [Equivalence.refl, Functor.associator_inv_app]
+  erw [D.S.map_id]
+  erw [Category.id_comp, Category.id_comp, Category.id_comp]
 
 end SerreFunctorData
 
