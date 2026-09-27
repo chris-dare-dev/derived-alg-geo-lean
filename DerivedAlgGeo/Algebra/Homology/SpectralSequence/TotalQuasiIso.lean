@@ -9,13 +9,17 @@ import Mathlib.Algebra.Homology.QuasiIso
 /-!
 # Quasi-isomorphisms for mapping cones and first-quadrant totals
 
+This file proves quasi-isomorphism criteria for mapping-cone maps and
+first-quadrant total complexes of abelian groups.
+
 ## Main results
 
-* `CochainComplex.mappingCone.quasiIso_compMap` composes quasi-isomorphisms
-  between mapping cones of composable arrows.
+* `CochainComplex.mappingCone.quasiIso_compMap` deduces a quasi-isomorphism
+  for the cone map of a composite from quasi-isomorphisms for the two
+  constituent cone maps.
 * `CochainComplex.mappingCone.quasiIsoAt_inr_of_isZero_X` gives a
-  quasi-isomorphism at the cone inclusion in degree `n` when its source
-  vanishes in degrees `n` and `n + 1`.
+  quasi-isomorphism at the cone inclusion in degree `n` when the source `A`
+  of the arrow `f : A ⟶ B` vanishes in degrees `n` and `n + 1`.
 * `HomologicalComplex₂.totalMap_quasiIso` turns a columnwise
   quasi-isomorphism of first-quadrant bicomplexes of abelian groups into a
   quasi-isomorphism of their totals.
