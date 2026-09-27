@@ -1,10 +1,11 @@
 # Bounded automatic recovery
 
-> **Retired from the run path.** Loop runs follow
-> `.claude/skills/run-loop/SKILL.md`, which parks an issue after three review
-> rounds instead of recovering it. This document describes recovery for the
-> objectives the manifest controller (`scripts/loop_engine.py`) already
-> recorded.
+> **Separate controller protocol.** Issue-first loop runs follow
+> `.claude/skills/run-loop/SKILL.md`: after a terminal three-round attempt they
+> launch a read-only R&D handoff and independent plan review, recorded on the
+> issue. This document describes ledger-backed recovery only for objectives
+> the manifest controller (`scripts/loop_engine.py`) already recorded. The two
+> authorities do not silently adopt each other's history or budgets.
 
 An exhausted three-round attempt is preserved as failed. For an explicitly
 opted-in objective, the supervising agent next investigates the obstacle and

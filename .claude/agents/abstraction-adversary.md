@@ -126,8 +126,9 @@ owner has been named, the weakest sufficient hypotheses of every central
 statement have been stated, and the Mathlib paths you searched have been
 recorded.
 
-Termination is the run's job, not yours: it parks a change after three review
-rounds. Never withhold a class of finding to help the loop converge. When a
+Termination is the run's job, not yours: it freezes a failed implementation
+attempt after three review rounds and launches a separate R&D handoff. Never
+withhold a class of finding to help the loop converge. When a
 finding from an earlier round is still unresolved, say so rather than presenting
 it as new.
 
