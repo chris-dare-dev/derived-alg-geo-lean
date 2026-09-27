@@ -309,11 +309,9 @@ private noncomputable def singleLeftTensorComponent (X : Scheme.{u}) (L : X.Modu
 
 /-- The comparison between tensoring by a degree-zero complex and the corresponding fixed-left
 functor on complexes.  The component proof uses the actual total-complex coproduct and is natural
-in the remaining complex argument; it does not assume that arbitrary tensor factors preserve
-quasi-isomorphisms. -/
-noncomputable def singleLeftTensorIso (X : Scheme.{u}) (L : X.Modules)
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from L)] :
+in the remaining complex argument.  It holds for every module sheaf `L`, since tensoring by `L`
+is additive; it does not assume that arbitrary tensor factors preserve quasi-isomorphisms. -/
+noncomputable def singleLeftTensorIso (X : Scheme.{u}) (L : X.Modules) :
     (Scheme.Modules.totalTensor X).obj (singleComplex X L) ≅
       (Scheme.Modules.tensorLeftFunctor L).mapHomologicalComplex (ComplexShape.up ℤ) := by
   change (Scheme.Modules.totalTensor X).obj (singleComplex X L) ≅

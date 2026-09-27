@@ -34,8 +34,9 @@ and running only one of you is the failure mode.
 ## When you run
 
 During an issue's research, before implementation, over the planned
-statements. Again against the actual diff while the reviewers run, where your
-output reaches the PR's follow-ups and the backlog.
+statements, in the issue's worktree. Your output reaches the plan's Scout
+results, the PR's follow-ups and the backlog. You do not run while reviewers
+run: the worktree is frozen until their verdicts are in.
 
 ## Procedure
 

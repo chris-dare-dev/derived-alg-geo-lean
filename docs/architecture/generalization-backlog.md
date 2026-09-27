@@ -28,7 +28,7 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
 
 | State | Meaning |
 |---|---|
-| `UNVERIFIED` | Proposed. The general statement has not been compiled. |
+| `UNVERIFIED` | The lift is not yet confirmed in merged canonical code. A proof may have been compiled in a scratch probe or an unmerged candidate; record that evidence in the source note. |
 | `CONFIRMED <PR>` | The lift was implemented and merged. |
 | `FALSIFIED <counterexample>` | The general statement is false. Leaves stay separate. |
 
@@ -451,3 +451,439 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
 - weaker hypotheses:  an ambient bifunctor on three (possibly distinct) triangulated categories with a supplied `ExactBifunctor`, three object properties whose full subcategories inherit triangulated structures, and an explicit closure witness from the first two properties into the output property; no single-category or same-property identification among the three positions
 - source note:        This is a plausible API generalization inferred from the current restriction's use of one category and property for all three positions. The distinct-category coherence transport was not proved or compiled during this review.
 - state:              UNVERIFIED
+
+### 2026-09-26 — generation-time `+1` submultiplicativity without `P.Nonempty`
+- chunk:              rou1-920-envelope-composition
+- reviewing commit:   b674a436dd002da2487d744531f804ddbb795628
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `CategoryTheory.ObjectProperty.generationTime` and the
+  planned envelope-composition API
+- weaker hypotheses:  the scalar inequality
+  `P.generationTime R + 1 ≤ (P.generationTime Q + 1) *
+  (Q.generationTime R + 1)` needs no separate `[P.Nonempty]` binder. The
+  iterated-envelope composition law and zero-stage fixed-point statement also
+  hold without `[P.Nonempty]`; the fixed-point statement additionally needs no
+  `[IsTriangulated C]`.
+- pin status:         PIN-CONFIRMED for the corollary proof route
+- source note:        `CategoryTheory.ObjectProperty.generationTime_add_one_submultiplicative`
+  proves the scalar inequality by splitting the empty-generator case from
+  finite generation-time witnesses. `triangEnvelopeIter_compose` handles an
+  empty property by showing all its iterates are bottom; the nonempty branch
+  uses the fixed-point lemma. The fixed-point proof uses
+  `triangEnvelopeIter_succ`, which needs only the shared pretriangulated
+  context, while the composition proof uses the triangulated stage-addition
+  API.
+- state:              L (proof-witness verified)
+
+### 2026-09-26 — products of retract-closed object properties
+- chunk:              rou1-920-envelope-composition
+- reviewing commit:   12b1f252d33ca17406fc85197fa060c33794fc78
+- found by:           abstraction-adversary
+- proposed ancestor:  `Mathlib.CategoryTheory.ObjectProperty.Retract`
+- weaker hypotheses:  a category with binary products and an object property
+  `Q` closed under binary products; no additive, shift, or triangulated
+  structure
+- pin status:         UPSTREAM-ONLY (the pinned
+  `ObjectProperty/Retract.lean` and `ObjectProperty/FiniteProducts.lean`
+  provide no such closure instance)
+- source note:        The private `retractClosure_isClosedUnderBinaryProducts`
+  proof constructs products of two retracts componentwise and transfers the
+  product property across an isomorphism. Whether this belongs as a general
+  closure API in Mathlib's retract module remains to be confirmed.
+- state:              UNVERIFIED
+
+### 2026-09-26 — products of extension-closed object properties
+- chunk:              rou1-920-envelope-composition
+- reviewing commit:   12b1f252d33ca17406fc85197fa060c33794fc78
+- found by:           abstraction-adversary
+- proposed ancestor:  `Mathlib.CategoryTheory.Triangulated.Subcategory`
+- weaker hypotheses:  the existing pretriangulated context, binary products,
+  and binary-product closure of both input properties; no `IsTriangulated`
+  or nonemptiness assumption
+- pin status:         UPSTREAM-ONLY (the pinned `Subcategory.lean` has only
+  the more restrictive closure instance requiring a triangulated object
+  property)
+- source note:        The private `extensionProduct_prop_prod` and
+  `extensionProduct_isClosedUnderBinaryProducts` proofs form products of the
+  input distinguished triangles using Mathlib's
+  `productTriangle_distinguished`. Whether to expose this weaker closure
+  result as general Subcategory API remains to be confirmed.
+- state:              UNVERIFIED
+
+### 2026-09-26 — exact-functor transport of finite triangulated-generation stages
+- chunk:              rou1-921-generation-functor-transport
+- reviewing commit:   e83b614078d491b7f1d8dab085bf494fddb32ebc
+- found by:           altitude-scout
+- proposed ancestor:  `CategoryTheory.Triangulated.Generators`, for pointwise
+  transport of `ObjectProperty.triangEnvelopeIter`; the generation-time and
+  Rouquier-dimension consequences remain downstream
+- weaker hypotheses:  an exact functor between triangulated categories and an
+  object property with a finite generation-stage bound; essential
+  surjectivity is needed only for the category-level Rouquier-dimension
+  inequality, and full faithfulness is not needed
+- pin status:         UPSTREAM-ONLY (the transport and dimension statements
+  are absent at the pinned revision)
+- source note:        Olander, *Ample line bundles and generation time*, §4,
+  uses that finite-stage generated subcategories are preserved by exact
+  functors (published PDF p. 304, lines 324-328). Its Lemma 7 proves that an
+  essentially-surjective exact functor does not increase countable Rouquier
+  dimension (PDF p. 303, lines 224-230); specializing its stage argument to a
+  singleton gives the planned ordinary Rouquier-dimension inequality. This
+  is a literature precedent, not a pinned Lean API. At the pin,
+  `triangEnvelopeIter` and its stage recurrence are defined at
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Triangulated/Generators.lean:62-80`,
+  while `Functor.IsTriangulated` and its additive/product-preservation
+  instances are at
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Triangulated/Functor.lean:181-235`;
+  the searched Mathlib tree has no functor transport of these stages or
+  Rouquier-dimension API. The quasi-inverse triangulated structure is already
+  supplied for `Equivalence.IsTriangulated` at
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Triangulated/Adjunction.lean:186-198`.
+  Source: [Olander, published PDF](https://pure.uva.nl/ws/files/174469947/Ample_line_bundles_and_generation_time.pdf).
+  Merged implementation in PR #1590: `triangEnvelopeIter_map_obj` and
+  `triangEnvelopeIter_map_le` are in
+  `DerivedAlgGeo/CategoryTheory/Triangulated/Generators/Functor.lean`;
+  generation-time and Rouquier-dimension consequences are in
+  `DerivedAlgGeo/CategoryTheory/Triangulated/Dimension/Functor.lean`.
+- state:              CONFIRMED #1590
+
+### 2026-09-26 — generation transport needs only pretriangulated categories (planned)
+- chunk:              rou1-921-generation-functor-transport
+- reviewing commit:   e83b614078d491b7f1d8dab085bf494fddb32ebc
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `CategoryTheory.ObjectProperty` envelope transport and
+  `CategoryTheory.Triangulated.Dimension.Functor` numerical consequences
+- weaker hypotheses:  independently universe-polymorphic `C` and `D`, each
+  with `Category`, `HasZeroObject`, `HasShift _ ℤ`, `Preadditive`, additive
+  shifts, and `Pretriangulated`; `F : C ⥤ D` with `F.CommShift ℤ` and
+  `F.IsTriangulated`. Neither category needs `IsTriangulated` (octahedral).
+  Pointwise transport additionally binds `P : ObjectProperty C`, `n : ℕ`,
+  `X : C`, and the source stage-membership proof; the `map` inequality binds
+  only `P,n`; generation-time monotonicity binds arbitrary `P,Q`. None needs
+  property nonemptiness, `ContainsZero`, closure under isomorphisms,
+  `F.Full`, `F.Faithful`, or `F.EssSurj`. Additivity and binary-product
+  preservation of `F` are inferred, not additional assumptions. Dimension
+  monotonicity adds `F.EssSurj`; strong-generator transport adds `G : C`
+  and `(singleton G).IsStrongTriangulatedGenerator`.
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Triangulated/Functor.lean:181-235`
+  and `Triangulated/Generators.lean:62-74`
+- source note:        `/tmp/rou1-921-hypothesis-probes.lean` compiled complete
+  proofs of pointwise tower transport, the `ObjectProperty.map` inequality,
+  generation-time monotonicity, Rouquier-dimension monotonicity and equivalence
+  invariance, generation-time equivalence invariance, and strong-generator
+  transport with the above category hypotheses. The tower proof follows the
+  left-associated `triangEnvelopeIter_succ`, so never uses the octahedral
+  recurrence or the composition law. Verified using
+  `LEAN_NUM_THREADS=2 ~/.elan/bin/lake env lean`; only unused-section-variable
+  warnings in three scratch helper lemmas remain. No implementation module
+  was changed by this scout.
+  Merged implementation in PR #1590 uses the recorded `Pretriangulated C`
+  and `Pretriangulated D` context, without an `IsTriangulated` (octahedral)
+  assumption; see the stage and generation-time results in
+  `DerivedAlgGeo/CategoryTheory/Triangulated/Generators/Functor.lean` and
+  `DerivedAlgGeo/CategoryTheory/Triangulated/Dimension/Functor.lean`.
+- state:              CONFIRMED #1590
+
+### 2026-09-26 — equivalence transport can construct the inverse's exact data (planned)
+- chunk:              rou1-921-generation-functor-transport
+- reviewing commit:   e83b614078d491b7f1d8dab085bf494fddb32ebc
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `CategoryTheory.Triangulated.Dimension.Functor`
+- weaker hypotheses:  the pretriangulated category context recorded above,
+  `E : C ≌ D`, `[E.functor.CommShift ℤ]`, and
+  `[E.functor.IsTriangulated]`; omit separate inverse-shift, inverse-exactness,
+  and `E.CommShift` assumptions. Generation-time invariance additionally binds
+  arbitrary `P,Q : ObjectProperty C`, without either being replete.
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Shift/Adjunction.lean:617-624`
+  and `Triangulated/Adjunction.lean:61`
+- source note:        `/tmp/rou1-921-hypothesis-probes.lean` compiled
+  `dim_equivalence` and `time_equivalence` using
+  `letI := E.commShiftInverse ℤ`, `letI := E.commShift_of_functor ℤ`, and
+  `letI := E.toAdjunction.isTriangulated_rightAdjoint`. The proof constructs
+  the compatible inverse shift, rather than claiming an independently chosen
+  inverse shift is automatically compatible. The generation-time proof also
+  compiled `P.isoClosure.triangEnvelopeIter n = P.triangEnvelopeIter n`,
+  accounting for the isomorphism closure of `ObjectProperty.map`.
+  Merged implementation in PR #1590 constructs the inverse compatibility
+  locally in `generationTime_map_eq_of_equiv` and
+  `rouquierDim_eq_of_equiv`; the strong-generator equivalence result is
+  `exists_isStrongTriangulatedGenerator_iff_of_equiv`.
+- state:              CONFIRMED #1590
+
+### 2026-09-26 — Rouquier dimension and strong generators under retract-dense functors (planned)
+- chunk:              rou1-921-generation-functor-transport
+- reviewing commit:   e83b614078d491b7f1d8dab085bf494fddb32ebc
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `CategoryTheory.Triangulated.Dimension.Functor`
+- weaker hypotheses:  the pretriangulated category and exact-functor context
+  recorded above, replacing `[F.EssSurj]` by
+  `∀ Y : D, ∃ X : C, Nonempty (Retract Y (F.obj X))`; strong-generator
+  transport also binds `G : C` and its singleton strong-generation proof.
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/ObjectProperty/Retract.lean:34`
+- source note:        `/tmp/rou1-921-hypothesis-probes.lean` compiled
+  `dim_retract_dense` and `strong_retract_dense` with complete proofs.
+  Apply pointwise singleton-stage transport and then `prop_of_retract` to
+  the target envelope stage. Essential surjectivity supplies this premise
+  using `(F.objObjPreimageIso Y).symm.retract`; that specialization also
+  compiled. This proposes an explicit hypothesis, not a new carrier or
+  typeclass; whether to expose the stronger API in #921 remains an
+  implementation scope decision.
+  Merged implementation in PR #1590 proves
+  `rouquierDim_le_of_retract_coverage` in
+  `DerivedAlgGeo/CategoryTheory/Triangulated/Dimension/Functor.lean` and
+  `isStrongTriangulatedGenerator_map_of_retract_coverage` in
+  `DerivedAlgGeo/CategoryTheory/Triangulated/Generators/Functor.lean`.
+- state:              CONFIRMED #1590
+
+### 2026-09-26 — replace exactness by additivity and shift compatibility (planned)
+- chunk:              rou1-921-generation-functor-transport
+- reviewing commit:   e83b614078d491b7f1d8dab085bf494fddb32ebc
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  distinguished-triangle step of finite-stage transport
+- weaker hypotheses:  retain the pretriangulated category context,
+  `[F.CommShift ℤ]`, and `[F.Additive]`; omit `[F.IsTriangulated]`.
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Triangulated/Functor.lean:185`
+- source note:        `/tmp/rou1-921-failed-hypothesis-probes.lean` attempted
+  `F.map_distinguished T hT` with exactly these assumptions. The compiler
+  reports `failed to synthesize instance of type class F.IsTriangulated`.
+  This falsifies deleting exactness from this proof route; it is not a
+  compiler-produced mathematical counterexample to every alternate statement.
+- state:              UNVERIFIED
+
+### 2026-09-26 — omit compatibility for a separately chosen inverse shift (planned)
+- chunk:              rou1-921-generation-functor-transport
+- reviewing commit:   e83b614078d491b7f1d8dab085bf494fddb32ebc
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `Equivalence` inverse triangulated-functor derivation
+- weaker hypotheses:  retain `[E.functor.CommShift ℤ]`,
+  `[E.functor.IsTriangulated]`, and an independently supplied
+  `[E.inverse.CommShift ℤ]`; omit `[E.CommShift ℤ]`.
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Triangulated/Adjunction.lean:53-61`
+- source note:        `/tmp/rou1-921-failed-hypothesis-probes.lean` attempted
+  `E.toAdjunction.isTriangulated_rightAdjoint` for that inverse shift. The
+  compiler reports `failed to synthesize instance of type class
+  E.toAdjunction.CommShift ℤ`. The verified construction above avoids this
+  failure by choosing the compatible inverse shift locally; it does not
+  erase compatibility from the adjunction theorem.
+- state:              UNVERIFIED
+
+### 2026-09-26 — transport of shift-closed properties for arbitrary additive shifts (planned)
+- chunk:              rou1-921-triangulated-functor-transport
+- reviewing commit:   65b2dff1ef8aaa5a986c8695f9e59dcc3b236c56
+- found by:           abstraction-adversary (review round 1)
+- proposed ancestor:  `DerivedAlgGeo/CategoryTheory/ObjectProperty/Shift.lean`
+- weaker hypotheses:  categories with shifts by an additive monoid `A`,
+  `[F.CommShift A]`, and pointwise transport of the generating property; no
+  preadditivity, zero object, or triangulated structure
+- pin status:         PIN-CONFIRMED
+- source note:        Replacing `ℤ` by `A` in the complete shift-closure
+  transport proof compiles unchanged; only `F.mapIso` and
+  `F.commShiftIso` are used. The proposed owner is outside the frozen #921
+  file list, so this lift is deferred.
+- state:              UNVERIFIED
+
+### 2026-09-26 — transport of arbitrary-shape limit closures (planned)
+- chunk:              rou1-921-triangulated-functor-transport
+- reviewing commit:   65b2dff1ef8aaa5a986c8695f9e59dcc3b236c56
+- found by:           abstraction-adversary (review round 1)
+- proposed ancestor:  `DerivedAlgGeo/CategoryTheory/ObjectProperty/LimitsClosure.lean`
+- weaker hypotheses:  an arbitrary family `J : α → Type`, categories on each
+  `J a`, preservation of each `J a`-shaped limit by `F`, and pointwise
+  transport of the generating property; no `WalkingPair` specialization
+- pin status:         PIN-CONFIRMED
+- source note:        The complete `limitsClosure_le` proof compiles for
+  `P.limitsClosure J`; no proof step uses the binary-product shape. The
+  proposed owner is outside the frozen #921 file list, so this lift is
+  deferred.
+- state:              UNVERIFIED
+
+### 2026-09-26 — shift closure commutes with isomorphism closure for arbitrary additive shifts (planned)
+- chunk:              rou1-921-triangulated-functor-transport
+- reviewing commit:   65b2dff1ef8aaa5a986c8695f9e59dcc3b236c56
+- found by:           abstraction-adversary (review round 1)
+- proposed ancestor:  `DerivedAlgGeo/CategoryTheory/ObjectProperty/Shift.lean`
+- weaker hypotheses:  one category with shifts by any additive monoid `A` and
+  an arbitrary object property `P`; no preadditivity, zero object, or
+  triangulation
+- pin status:         PIN-CONFIRMED
+- source note:        The existing three-line argument for
+  `P.isoClosure.shiftClosure A = P.shiftClosure A` compiles with only the
+  additive-shift assumptions. The proposed owner is outside the frozen #921
+  file list, so this lift is deferred.
+- state:              UNVERIFIED
+
+
+### 2026-09-27 — extension of the resolution-degree-zero augmentation target (planned)
+- chunk:              sf8-554-total-zero-comparison
+- reviewing commit:   1d29d6696bb048fc2a3e648fab4b39931d836488
+- found by:           altitude-scout
+- proposed ancestor:  `HomologicalComplex.extendSingleIso` in
+  `Mathlib.Algebra.Homology.Embedding.Extend`
+- weaker hypotheses:  an arbitrary category with zero morphisms and a zero
+  object, decidable equality on both complex index types, an embedding of
+  arbitrary complex shapes, and an equality identifying the image of the
+  single supported degree; no schemes, abelianness, or flatness
+- pin status:         PIN-CONFIRMED .lake/packages/mathlib/Mathlib/Algebra/Homology/Embedding/Extend.lean:293
+- source note:        At Mathlib pin `520045ab14e26149ee970e2e617ca04b09bde5d6`,
+  `extendSingleIso e X i i' h` identifies the extension of the single complex
+  at `i` with the single complex at `i'`. Specializing to
+  `embeddingDownNat`, `i = 0`, and `i' = 0` supplies the objectwise
+  identification of the inner complexes in the target of
+  `freeYonedaSheafCoproductTotalAugmentationToSingleZero`. It does not
+  identify a total complex with the input, and its declaration is an
+  objectwise isomorphism rather than the required natural isomorphism of
+  totalization functors. The functorial assembly and total comparison are
+  still obligations; no proof was compiled by this research scout.
+- state:              UNVERIFIED
+
+### 2026-09-27 — exchanging the supported axis before a single-zero total comparison (planned)
+- chunk:              sf8-554-total-zero-comparison
+- reviewing commit:   1d29d6696bb048fc2a3e648fab4b39931d836488
+- found by:           altitude-scout
+- proposed ancestor:  `HomologicalComplex₂.totalFlipIso` in
+  `Mathlib.Algebra.Homology.TotalComplexSymmetry`
+- weaker hypotheses:  a preadditive category, arbitrary input and output
+  complex shapes with total-shape structures in both orders and compatible
+  symmetry signs, existence of the chosen bicomplex total, and decidable
+  equality on the output indices; no schemes, flatness, or abelianness
+- pin status:         PIN-CONFIRMED .lake/packages/mathlib/Mathlib/Algebra/Homology/TotalComplexSymmetry.lean:114
+- source note:        This is the canonical isomorphism
+  `K.flip.total c ≅ K.total c`. The repository already proves its generic
+  naturality in `Algebra/Homology/SpectralSequence/TotalFlipNaturality.lean:47`.
+  It permits a second-axis support comparison to reuse a first-axis
+  comparison, but does not itself collapse a single supported axis.
+  The existing `singleZeroTotalIso` in
+  `Algebra/Homology/SpectralSequence/FilteredTotalComplexAdjacent.lean:410`
+  and its naturality in `TotalQuasiIso.lean:248` are explicitly restricted
+  to `AddCommGrpCat`, so they do not instantiate directly for `X.Modules`.
+  `CategoryTheory/Sites/SheafCohomology/Cech/TotalComparison.lean:154`
+  demonstrates composition through this flip and the existing single-zero
+  comparison for abelian groups. A generic extraction and the required
+  bicomplex adapter remain to be checked; none was compiled by this scout.
+- state:              UNVERIFIED
+
+### 2026-09-27 — natural recovery of the supported term of a single complex (planned)
+- chunk:              sf8-554-total-zero-comparison
+- reviewing commit:   1d29d6696bb048fc2a3e648fab4b39931d836488
+- found by:           altitude-scout
+- proposed ancestor:  `HomologicalComplex.singleCompEvalIsoSelf` in
+  `Mathlib.Algebra.Homology.Single`
+- weaker hypotheses:  an arbitrary category with zero morphisms and a zero
+  object, an arbitrary complex shape, decidable equality on its indices,
+  and a chosen supported degree; no preadditivity or geometric assumptions
+- pin status:         PIN-CONFIRMED .lake/packages/mathlib/Mathlib/Algebra/Homology/Single.lean:103
+- source note:        The natural isomorphism
+  `single V c j ⋙ eval V c j ≅ 𝟭 V` recovers the surviving degree,
+  while the adjacent `isZero_single_comp_eval` treats all other degrees.
+  This supplies canonical component data for the single-axis comparison;
+  it is an evaluation theorem and does not subsume the direct-sum total
+  comparison or its differential compatibility. The related pinned
+  `singleMapHomologicalComplex` in `Algebra/Homology/Additive.lean:266`
+  already makes single-complex formation commute with any functor
+  preserving zero morphisms, but likewise contains no totalization result.
+  Source inspection did not find a general single-complex total theorem
+  at the pin. The three-candidate cap was reached on disk, so no external
+  sources were fetched. No proof was compiled by this scout.
+- state:              UNVERIFIED
+
+
+### 2026-09-27 — single-zero total comparison outside abelian groups (planned)
+- chunk:              sf8-554-total-zero-comparison
+- reviewing commit:   1d29d6696bb048fc2a3e648fab4b39931d836488
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  the canonical `HomologicalComplex₂.singleZeroTotalIso`
+  and `singleZeroTotalIso_naturality` beside Mathlib's total-complex API,
+  extracted from the current spectral-sequence consumers
+- weaker hypotheses:  `{C : Type u} [Category.{v} C] [Preadditive C]
+  [HasZeroObject C]`, an arbitrary `A : CochainComplex C ℤ`, and only
+  `[(singleZeroBicomplex A).HasTotal (ComplexShape.up ℤ)]`; naturality also
+  takes an arbitrary `B`, its selected-total instance, and `f : A ⟶ B`.
+  No `Abelian C`, all-coproducts, boundedness, flatness, or scheme assumption.
+- pin status:         PIN-CONFIRMED Mathlib
+  `520045ab14e26149ee970e2e617ca04b09bde5d6`
+- source note:        `.lake/sf8_hypothesis_minimal.lean` copied the existing
+  comparison and naturality proof into a scratch namespace, replacing
+  `AddCommGrpCat` with `C`. The only proof adjustment was to expose generic
+  componentwise cancellation for an isomorphism of complexes, proved by
+  `HomologicalComplex.comp_f` and the iso identities. The complete proof,
+  naturality, and the composite `totalFlipIso ≪≫ singleZeroTotalIso` compiled
+  with `LEAN_NUM_THREADS=2 /home/chris-dare/.elan/bin/lake env lean
+  .lake/sf8_hypothesis_minimal.lean`. The printed axiom sets for the comparison
+  and naturality contain only `propext`, `Classical.choice`, and `Quot.sound`.
+  The subsequent support witness below removes even the selected-total
+  assumptions. These are scratch witnesses, not merged public declarations.
+- state:              L (proof-witness verified)
+
+### 2026-09-27 — single support supplies the required total coproducts (planned)
+- chunk:              sf8-554-total-zero-comparison
+- reviewing commit:   1d29d6696bb048fc2a3e648fab4b39931d836488
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  the same canonical single-zero bicomplex comparison
+  beside Mathlib's total-complex API
+- weaker hypotheses:  `{C : Type u} [Category.{v} C] [Preadditive C]
+  [HasZeroObject C]` and an arbitrary `A : CochainComplex C ℤ`; no supplied
+  `HasTotal`, countable coproducts, finite biproducts, or arbitrary coproducts.
+  Naturality adds only `B : CochainComplex C ℤ` and `f : A ⟶ B`.
+- pin status:         PIN-CONFIRMED Mathlib
+  `520045ab14e26149ee970e2e617ca04b09bde5d6`
+- source note:        `.lake/sf8_hypothesis_support.lean` reorganizes the
+  existing surviving-summand/inverse calculation into a cofan with point
+  `A.X n`. Its universal property selects the `(0,n)` summand; every other
+  summand is zero. `GradedObject.CofanMapObjFun.hasMap` then supplies
+  `singleZeroHasTotal`. The comparison, its naturality, and the second-axis
+  comparison through `totalFlipIso` compile without any colimit assumption.
+  `.lake/sf8_hypothesis_narrow.lean` additionally compiles the same witness
+  with only `Mathlib.Algebra.Homology.Single` and
+  `Mathlib.Algebra.Homology.TotalComplexSymmetry` imports, using the underlying
+  `HomologicalComplex.single` instead of the definitionally equal
+  `CochainComplex.singleFunctor` spelling. Command:
+  `LEAN_NUM_THREADS=2 /home/chris-dare/.elan/bin/lake env lean
+  .lake/sf8_hypothesis_narrow.lean`. Exit code 0; comparison and naturality
+  depend only on `propext`, `Classical.choice`, and `Quot.sound`. No stable
+  Lean source was edited. This records the support argument for the planned
+  extraction, not a general coproduct-existence theorem for arbitrary totals.
+- state:              L (proof-witness verified)
+
+### 2026-09-27 — drop the zero object from the single-zero comparison (attempted)
+- chunk:              sf8-554-total-zero-comparison
+- reviewing commit:   1d29d6696bb048fc2a3e648fab4b39931d836488
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  the canonical single-zero bicomplex constructor
+- weaker hypotheses:  `{C : Type u} [Category.{v} C] [Preadditive C]` and
+  `A : CochainComplex C ℤ`, deliberately omitting `HasZeroObject C`
+- pin status:         PIN-CONFIRMED Mathlib
+  `520045ab14e26149ee970e2e617ca04b09bde5d6`
+- source note:        `.lake/sf8_hypothesis_nozero.lean`, compiled with
+  `LEAN_NUM_THREADS=1 /home/chris-dare/.elan/bin/lake env lean`, fails at
+  `(CochainComplex.singleFunctor (CochainComplex C ℤ) 0).obj A` with the exact
+  diagnostic `failed to synthesize instance of type class
+  HasZeroObject (CochainComplex C ℤ)`. The canonical single complex needs an
+  actual zero object to populate every unsupported degree. This is a boundary
+  of the current construction, not a claim about all possible alternate APIs.
+- state:              FALSIFIED compiler witness: the current single-complex
+  constructor does not accept this hypothesis deletion.
+
+### 2026-09-27 — replace preadditivity by zero morphisms for totalization (attempted)
+- chunk:              sf8-554-total-zero-comparison
+- reviewing commit:   1d29d6696bb048fc2a3e648fab4b39931d836488
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `HomologicalComplex₂.total`
+- weaker hypotheses:  `{C : Type u} [Category.{v} C] [HasZeroMorphisms C]
+  [HasZeroObject C]`, deliberately omitting `Preadditive C`
+- pin status:         PIN-CONFIRMED Mathlib
+  `520045ab14e26149ee970e2e617ca04b09bde5d6`
+- source note:        `.lake/sf8_hypothesis_nopreadditive.lean`, compiled with
+  `LEAN_NUM_THREADS=1 /home/chris-dare/.elan/bin/lake env lean`, fails at
+  `HomologicalComplex₂.total (C := C)` with the exact diagnostic
+  `failed to synthesize instance of type class Preadditive C`. The existing
+  proof also explicitly uses `Preadditive.comp_add`, `Preadditive.add_comp`,
+  and the integer-unit signs in the total differential. Single support does
+  not remove the preadditive parameter from this canonical total API. A
+  different construction would be outside this proof-based scout's scope.
+- state:              FALSIFIED compiler witness: zero morphisms alone do not
+  support Mathlib's existing total-complex construction.
