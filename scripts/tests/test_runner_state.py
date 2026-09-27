@@ -93,6 +93,15 @@ class RunnerStateTests(unittest.TestCase):
         self.assertFalse(result["valid"])
         self.assertTrue(any("job-owned writable" in item for item in result["errors"]))
 
+    def test_every_mandatory_mutable_root_rejects_false_writability(self) -> None:
+        for name in runner_state.WRITABLE_PATHS:
+            with self.subTest(path=name):
+                candidate = record("job-a")
+                candidate["paths"][name]["writable"] = False
+                errors = runner_state.validate_record(candidate)
+                self.assertTrue(any(f"paths.{name} must be job-owned writable state" in error
+                                    for error in errors), errors)
+
     def test_resource_overcommit_fails(self) -> None:
         first = record("job-a")
         second = record("job-b", root=r"C:\actions\runner-b")
@@ -199,6 +208,45 @@ class RunnerStateTests(unittest.TestCase):
             runner_state.acquire_lease(first, lease_dir, capacity)
             with self.assertRaisesRegex(ValueError, "writable path collision"):
                 runner_state.acquire_lease(second, lease_dir, capacity)
+
+    def test_false_writability_cannot_hide_shared_index_from_admission(self) -> None:
+        first = record("job-a")
+        second = record("job-b", root=r"C:\actions\runner-b")
+        second["paths"]["git_index"] = copy.deepcopy(first["paths"]["git_index"])
+        second["paths"]["git_index"]["writable"] = False
+        capacity = snapshot(first, second)["host_capacity"]
+        with tempfile.TemporaryDirectory() as directory:
+            lease_dir = Path(directory)
+            runner_state.acquire_lease(first, lease_dir, capacity)
+            with self.assertRaisesRegex(ValueError, "paths.git_index must be job-owned writable state"):
+                runner_state.acquire_lease(second, lease_dir, capacity)
+            self.assertTrue((lease_dir / "job-a.json").is_file())
+            self.assertFalse((lease_dir / "job-b.json").exists())
+
+    def test_candidate_temp_root_cannot_contain_host_lease_directory(self) -> None:
+        candidate = record("job-a")
+        with tempfile.TemporaryDirectory() as directory:
+            temp_root = Path(directory) / "job-temp"
+            lease_dir = temp_root / "leases"
+            candidate["paths"]["temp"] = path_entry(str(temp_root), True)
+            with self.assertRaisesRegex(ValueError, "overlaps job-a:temp"):
+                runner_state.acquire_lease(candidate, lease_dir, snapshot(candidate)["host_capacity"])
+            self.assertFalse(lease_dir.exists())
+
+    def test_existing_temp_root_cannot_contain_host_lease_directory(self) -> None:
+        active = record("job-a")
+        candidate = record("job-b", root=r"C:\actions\runner-b")
+        with tempfile.TemporaryDirectory() as directory:
+            lease_dir = Path(directory) / "job-temp" / "leases"
+            lease_dir.mkdir(parents=True)
+            lease_dir.chmod(0o700)
+            active["paths"]["temp"] = path_entry(str(lease_dir.parent), True)
+            (lease_dir / "job-a.json").write_text(json.dumps({
+                "owner_digest": runner_state._record_digest(active), "record": active,
+            }), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "overlaps job-a:temp"):
+                runner_state.acquire_lease(candidate, lease_dir, snapshot(active, candidate)["host_capacity"])
+            self.assertFalse((lease_dir / "job-b.json").exists())
 
     def test_atomic_admission_reserves_capacity_for_one_physical_host(self) -> None:
         first = record("job-a")

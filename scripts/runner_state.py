@@ -163,13 +163,11 @@ def validate_record(record: Any) -> list[str]:
             _path_identity(value)
         except ValueError as exc:
             errors.append(f"paths.{name}.path: {exc}")
-        if not isinstance(value.get("writable"), bool):
-            errors.append(f"paths.{name}.writable must be boolean")
-    # Lake may update packages even when a seed helper originally linked them
-    # as a cache. An agent/job therefore owns this tree, including its resolved
-    # symlink target, rather than marking a shared package tree read-only.
-    if isinstance(paths.get("lake_packages"), dict) and paths["lake_packages"].get("writable") is not True:
-        errors.append("paths.lake_packages must be job-owned writable state")
+        # These are mandatory mutable roots. In particular, Lake may update a
+        # package tree originally linked by the seed helper. Letting a caller
+        # mark any one of these read-only would skip collision detection.
+        if value.get("writable") is not True:
+            errors.append(f"paths.{name} must be job-owned writable state")
     if isinstance(paths.get("checkout"), dict):
         try:
             checkout = _path_identity(paths["checkout"])
@@ -318,6 +316,17 @@ def _active_leases(lease_dir: Path) -> list[dict[str, Any]]:
     return jobs
 
 
+def _check_lease_dir_isolated(lease_dir: Path, records: list[dict[str, Any]]) -> None:
+    """Keep the host lock outside every job-owned mutable root."""
+    lease_path = canonical_path(str(lease_dir))
+    for record in records:
+        for name, path, writable in _path_rows(record):
+            if writable and _overlap(lease_path, path):
+                raise ValueError(
+                    f"host lease directory overlaps {record['namespace']}:{name} writable state"
+                )
+
+
 def acquire_lease(
     record: dict[str, Any], lease_dir: Path, host_capacity: dict[str, Any]
 ) -> dict[str, Any]:
@@ -327,10 +336,13 @@ def acquire_lease(
         raise ValueError("cannot acquire invalid record: " + "; ".join(errors))
     if not isinstance(host_capacity, dict) or record["host_id"] not in host_capacity:
         raise ValueError("trusted physical host capacity is required")
-    if _overlap(canonical_path(str(lease_dir)), _path_identity(record["paths"]["checkout"])):
-        raise ValueError("host lease directory must be outside the job checkout")
+    # Check the candidate before opening the lock: a job may place temp or
+    # output roots outside its checkout, and cleanup of one must not unlink
+    # the host-wide admission lock.
+    _check_lease_dir_isolated(lease_dir, [record])
     with _locked_lease_dir(lease_dir):
         jobs = _active_leases(lease_dir)
+        _check_lease_dir_isolated(lease_dir, jobs)
         if any(job["host_id"] != record["host_id"] for job in jobs):
             raise ValueError("one lease directory must describe one physical host")
         admission = validate_snapshot({"host_capacity": host_capacity, "jobs": [*jobs, record]})

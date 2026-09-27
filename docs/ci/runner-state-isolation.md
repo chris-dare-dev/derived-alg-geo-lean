@@ -17,7 +17,8 @@ not evidence that two junctions are distinct. The validator rejects writable
 path equality or ancestor overlap and compares resource reservations per
 physical host using `host_capacity`. A job's `.lake/packages` and `.lake/build`
 must be writable trees resolving within its own checkout; a symlink to another
-worktree is not an immutable dependency cache.
+worktree is not an immutable dependency cache. All eight required roots are
+mutable; an input marking any of them read-only is rejected.
 
 `admit` takes a fresh physical-host capacity document and holds one exclusive
 lock in a host-owned lease directory while it reads **all** active leases,
@@ -25,7 +26,8 @@ validates their digests and path identities, reserves the candidate's CPU/RAM/
 disk budget, and creates its exact namespace lease. A corrupt or stale lease
 fails closed for operator recovery. `release` uses the same lock and removes
 only an exact owner match. The lock directory must be an absolute host path
-outside every job checkout; all runners on one host must use the **same**
+outside every candidate and active job's writable roots, including temp,
+outputs, artifacts and elan; all runners on one host must use the **same**
 directory. Separate per-runner lease directories would defeat atomic admission.
 
 Example operator sequence, with a capacity file measured for the physical host
