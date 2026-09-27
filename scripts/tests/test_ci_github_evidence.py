@@ -1100,6 +1100,25 @@ class PublicationTests(unittest.TestCase):
         with self.assertRaisesRegex(EvidenceError, "pending run differs"):
             verify_publication_provider_evidence(client, receipt)
 
+    def test_gate_present_scan_cannot_invent_run_status(self) -> None:
+        for status in ("queued", "completed"):
+            with self.subTest(status=status):
+                client = PublicationClient()
+                receipt = self.collect(client)
+                receipt["premerge"]["contract_evidence"]["security_scan"]["run_status"] = status
+                self.resign_receipt(receipt)
+                with self.assertRaisesRegex(EvidenceError, "CI1.01 evidence is invalid"):
+                    verify_publication_provider_evidence(client, receipt)
+
+    def test_dynamic_run_projection_ignores_unrelated_provider_field(self) -> None:
+        client = PublicationClient()
+        receipt = self.collect(client)
+        client.pre_provider.dynamic_run["new_api_field"] = {"provider_added": True}
+        verify_publication_provider_evidence(client, receipt)
+        client.pre_provider.dynamic_run["run_attempt"] = 2
+        with self.assertRaisesRegex(EvidenceError, "head-run query differs"):
+            verify_publication_provider_evidence(client, receipt)
+
     def test_postmerge_primary_association_loss_keeps_stable_scan_receipt(self) -> None:
         client = PublicationClient()
         receipt = self.collect(client)

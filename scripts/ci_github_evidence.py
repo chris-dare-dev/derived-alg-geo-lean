@@ -568,12 +568,26 @@ def _matching_ai_scan_runs(
     return ci_security_scan.matching_runs(runs, pr_number, head)
 
 
+def _head_run_projection(run: dict[str, Any]) -> tuple[Any, ...]:
+    """Provider fields that bind a workflow run's identity and outcome."""
+    actor = run.get("actor")
+    actor_identity = (
+        (actor.get("id"), actor.get("login")) if isinstance(actor, dict) else None
+    )
+    return (
+        run.get("id"), run.get("workflow_id"), run.get("path"),
+        run.get("event"), run.get("head_sha"), run.get("name"),
+        actor_identity, run.get("run_attempt"), run.get("status"),
+        run.get("conclusion"), run.get("check_suite_id"),
+    )
+
+
 def _same_head_run_snapshot(
     retained: Any, live: list[dict[str, Any]], primary_run_id: int,
     pr_number: int, base: str, head: str,
     *, allow_cleared_primary_association: bool,
 ) -> bool:
-    """Compare all run facts, except one verified post-merge association loss."""
+    """Compare stable run facts and one checked post-merge association loss."""
     if not isinstance(retained, list) or len(retained) != len(live):
         return False
     if any(
@@ -596,7 +610,9 @@ def _same_head_run_snapshot(
         return False
     for identity, old in retained_by_id.items():
         current = live_by_id[identity]
-        if old == current:
+        if _head_run_projection(old) != _head_run_projection(current):
+            return False
+        if old.get("pull_requests") == current.get("pull_requests"):
             continue
         if not (
             allow_cleared_primary_association
@@ -615,11 +631,6 @@ def _same_head_run_snapshot(
             or association["base"].get("sha") != base
             or not isinstance(association.get("head"), dict)
             or association["head"].get("sha") != head
-        ):
-            return False
-        if (
-            {key: value for key, value in old.items() if key != "pull_requests"}
-            != {key: value for key, value in current.items() if key != "pull_requests"}
         ):
             return False
     return True

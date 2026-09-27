@@ -175,6 +175,7 @@ def reconcile(
             or scan.get("run_id") != gate.get("run_id")
             or scan.get("run_attempt") != gate.get("run_attempt")
             or scan.get("run_attempt") != run.get("run_attempt")
+            or "run_status" in scan
             or scan.get("check_id") != provider_id
             or scan.get("raw_conclusion") != gate.get("conclusion")
             or scan.get("raw_conclusion") != str(run.get("conclusion") or "unknown")
