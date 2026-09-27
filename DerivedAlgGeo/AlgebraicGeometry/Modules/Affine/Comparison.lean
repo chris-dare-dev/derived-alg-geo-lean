@@ -158,9 +158,10 @@ theorem isIso_fromTildeΓ_app_basicOpen (M : (Spec R).Modules) (f : R)
 /-- **The counit is an isomorphism as soon as restriction to every basic open is a
 localisation.**
 
-This is the whole geometric content of the affine comparison theorem; what remains is to
-discharge the hypothesis for quasi-coherent `M`, which is not done here — see the module
-docstring. -/
+This is a basiswise reduction of the affine comparison. Mathlib's pinned quasi-coherent instance
+proves the comparison for quasi-coherent modules by a finite basic-open-cover argument; this
+criterion also applies to an arbitrary module sheaf when its localization hypotheses are supplied
+directly. -/
 theorem isIso_fromTildeΓ_of_isLocalizedModule (M : (Spec R).Modules)
     (h : ∀ f : R, IsLocalizedModule (Submonoid.powers f) (M.basicOpenRestriction f).hom) :
     IsIso M.fromTildeΓ := by
@@ -215,9 +216,9 @@ theorem Scheme.Modules.isLocalizedModule_basicOpenRestriction_of_isIso (M : (Spe
   have hy := congrArg (fun g => ModuleCat.Hom.hom g y) key
   simpa [eTop, eBas] using hy.symm
 
-/-- A presented sheaf of modules on an affine scheme restricts to a localisation on every
-basic open. This is the per-member input for gluing the affine comparison from a basic-open
-cover carrying presentations. -/
+/-- A presentation on `Spec R` makes the counit an isomorphism by Mathlib's
+`AlgebraicGeometry.isIso_fromTildeΓ_of_presentation`; the localization criterion
+then shows that each basic-open restriction is a localization. -/
 theorem Scheme.Modules.isLocalizedModule_basicOpenRestriction_of_presentation
     (M : (Spec R).Modules) (P : M.Presentation) (f : R) :
     IsLocalizedModule (Submonoid.powers f) (M.basicOpenRestriction f).hom := by
