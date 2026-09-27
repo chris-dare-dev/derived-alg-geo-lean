@@ -540,7 +540,12 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   supplied for `Equivalence.IsTriangulated` at
   `.lake/packages/mathlib/Mathlib/CategoryTheory/Triangulated/Adjunction.lean:186-198`.
   Source: [Olander, published PDF](https://pure.uva.nl/ws/files/174469947/Ample_line_bundles_and_generation_time.pdf).
-- state:              UNVERIFIED
+  Merged implementation in PR #1590: `triangEnvelopeIter_map_obj` and
+  `triangEnvelopeIter_map_le` are in
+  `DerivedAlgGeo/CategoryTheory/Triangulated/Generators/Functor.lean`;
+  generation-time and Rouquier-dimension consequences are in
+  `DerivedAlgGeo/CategoryTheory/Triangulated/Dimension/Functor.lean`.
+- state:              CONFIRMED #1590
 
 ### 2026-09-26 — generation transport needs only pretriangulated categories (planned)
 - chunk:              rou1-921-generation-functor-transport
@@ -573,7 +578,12 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   `LEAN_NUM_THREADS=2 ~/.elan/bin/lake env lean`; only unused-section-variable
   warnings in three scratch helper lemmas remain. No implementation module
   was changed by this scout.
-- state:              UNVERIFIED
+  Merged implementation in PR #1590 uses the recorded `Pretriangulated C`
+  and `Pretriangulated D` context, without an `IsTriangulated` (octahedral)
+  assumption; see the stage and generation-time results in
+  `DerivedAlgGeo/CategoryTheory/Triangulated/Generators/Functor.lean` and
+  `DerivedAlgGeo/CategoryTheory/Triangulated/Dimension/Functor.lean`.
+- state:              CONFIRMED #1590
 
 ### 2026-09-26 — equivalence transport can construct the inverse's exact data (planned)
 - chunk:              rou1-921-generation-functor-transport
@@ -596,7 +606,11 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   inverse shift is automatically compatible. The generation-time proof also
   compiled `P.isoClosure.triangEnvelopeIter n = P.triangEnvelopeIter n`,
   accounting for the isomorphism closure of `ObjectProperty.map`.
-- state:              UNVERIFIED
+  Merged implementation in PR #1590 constructs the inverse compatibility
+  locally in `generationTime_map_eq_of_equiv` and
+  `rouquierDim_eq_of_equiv`; the strong-generator equivalence result is
+  `exists_isStrongTriangulatedGenerator_iff_of_equiv`.
+- state:              CONFIRMED #1590
 
 ### 2026-09-26 — Rouquier dimension and strong generators under retract-dense functors (planned)
 - chunk:              rou1-921-generation-functor-transport
@@ -617,7 +631,12 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   compiled. This proposes an explicit hypothesis, not a new carrier or
   typeclass; whether to expose the stronger API in #921 remains an
   implementation scope decision.
-- state:              UNVERIFIED
+  Merged implementation in PR #1590 proves
+  `rouquierDim_le_of_retract_coverage` in
+  `DerivedAlgGeo/CategoryTheory/Triangulated/Dimension/Functor.lean` and
+  `isStrongTriangulatedGenerator_map_of_retract_coverage` in
+  `DerivedAlgGeo/CategoryTheory/Triangulated/Generators/Functor.lean`.
+- state:              CONFIRMED #1590
 
 ### 2026-09-26 — replace exactness by additivity and shift compatibility (planned)
 - chunk:              rou1-921-generation-functor-transport
