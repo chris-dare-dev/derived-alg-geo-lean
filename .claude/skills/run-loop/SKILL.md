@@ -124,10 +124,20 @@ no more than two issues in flight.
    REPO=$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)")
    N=<issue>; SLUG=<short-slug>; WT=<new worktree directory>
    git -C "$REPO" worktree add -b "agent/$N-$SLUG" "$WT" origin/main
-   (cd "$WT" && bash scripts/seed_worktree_cache.sh)
+   (cd "$WT" && bash scripts/seed_worktree_cache.sh --private-packages) || {
+     echo "Private cache seed failed; do not run Lean in this worktree." >&2
+     exit 1
+   }
    V="$REPO/.loop-tools"
    [ -x "$V/bin/python" ] || { python3 -m venv "$V" && "$V/bin/pip" install -q -r "$WT/scripts/requirements-loop.txt"; }
    ```
+   The first private seed may create a checked, read-only package archive from a
+   quiet pinned donor. It needs disk for that archive and two private copies;
+   refusal is a stop before any Lean command. For an earlier worktree whose
+   `.lake/packages` is still a link, wait until it is idle and run
+   `bash scripts/seed_worktree_cache.sh --private-packages --force` there before
+   continuing. This replaces only that worktree's cache after validation; do
+   not migrate every old worktree or remove its shared donor.
    Agents you spawn start in the shared checkout, not in your worktree: give
    them the worktree path, and have them run every command and write every file
    there.
