@@ -3679,75 +3679,48 @@ def protected_check_names(root: Path, spec: dict[str, Any]) -> set[str]:
     return names
 
 
-def check_required_checks(root: Path, spec: dict[str, Any], pr_number: int) -> str:
-    """Require green checks and return the PR head they were read for."""
+def _ci_evidence_modules() -> tuple[Any, Any]:
+    if __package__:
+        from . import ci_github_evidence, ci_publication
+    else:  # Standalone scripts/loop_engine.py invocation.
+        import ci_github_evidence
+        import ci_publication
+    return ci_github_evidence, ci_publication
 
-    data = gh_json(
-        root,
-        ["pr", "view", str(pr_number), "--repo", spec["repository"], "--json", "headRefOid,statusCheckRollup"],
-    )
-    if not isinstance(data, dict) or not isinstance(data.get("headRefOid"), str) or not FULL_GIT_SHA_RE.fullmatch(
-        data["headRefOid"]
+
+def collect_required_check_evidence(
+    root: Path, spec: dict[str, Any], pr_number: int
+) -> dict[str, Any]:
+    """Collect complete provider evidence and require its CI1.01 claim."""
+
+    ci_github_evidence, _ = _ci_evidence_modules()
+    try:
+        result = ci_github_evidence.collect(
+            ci_github_evidence.GitHubClient(spec["repository"]), pr_number
+        )
+    except ci_github_evidence.EvidenceError as exc:
+        raise LoopError(f"cannot verify required CI evidence: {exc}") from exc
+    validation = result.get("validation")
+    if not isinstance(validation, dict) or validation.get("valid") is not True:
+        errors = validation.get("errors", []) if isinstance(validation, dict) else []
+        detail = "; ".join(str(error) for error in errors) or "validator returned no valid claim"
+        raise LoopError(f"required CI evidence is not valid: {detail}")
+    claims = validation.get("claims")
+    if not isinstance(claims, dict) or claims.get("required_ci_verified") is not True:
+        raise LoopError("required CI evidence is not verified")
+    evidence = result.get("evidence")
+    if not isinstance(evidence, dict) or not FULL_GIT_SHA_RE.fullmatch(
+        str(evidence.get("head_commit", ""))
     ):
-        raise LoopError("PR check rollup is missing a valid head commit")
+        raise LoopError("CI evidence is not bound to a valid PR head")
+    return result
 
-    def start_time(item: dict[str, Any]) -> datetime | None:
-        value = item.get("startedAt") or item.get("createdAt")
-        if not isinstance(value, str):
-            return None
-        try:
-            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
-        except ValueError:
-            return None
-        return parsed if parsed.tzinfo is not None else None
 
-    latest: dict[str, dict[str, Any]] = {}
-    for check in data.get("statusCheckRollup") or []:
-        if not isinstance(check, dict):
-            continue
-        name = check.get("name") or check.get("context")
-        if not isinstance(name, str):
-            continue
-        previous = latest.get(name)
-        if previous is None:
-            latest[name] = check
-            continue
-        # A completion time can be later than the start of a newer pending
-        # attempt. Compare starts only; an unorderable duplicate is not green.
-        current_start = start_time(check)
-        previous_start = start_time(previous)
-        if current_start is None or previous_start is None or current_start == previous_start:
-            raise LoopError(f"cannot order duplicate check runs for {name}")
-        if current_start > previous_start:
-            latest[name] = check
-    missing: list[str] = []
-    failed: list[str] = []
-    # Branch protection is the live list of required checks. A manifest check
-    # still counts when the PR actually runs it; a name that neither the
-    # protection nor the PR knows was retired after the manifest was written.
-    live = protected_check_names(root, spec)
-    # With no live list, a manifest check that has not started must not drop out.
-    required_names = (
-        live | {name for name in spec["runner"]["required_checks"] if name in latest}
-        if live
-        else set(spec["runner"]["required_checks"])
-    )
-    for required in sorted(required_names):
-        check = latest.get(required)
-        if check is None:
-            missing.append(required)
-            continue
-        conclusion = check.get("conclusion") or check.get("state") or check.get("status")
-        if conclusion not in SUCCESS_CONCLUSIONS:
-            failed.append(f"{required}={conclusion}")
-    if missing or failed:
-        detail = []
-        if missing:
-            detail.append("missing " + ", ".join(missing))
-        if failed:
-            detail.append("not successful " + ", ".join(failed))
-        raise LoopError("required checks are not green: " + "; ".join(detail))
-    return data["headRefOid"]
+def check_required_checks(root: Path, spec: dict[str, Any], pr_number: int) -> str:
+    """Require complete CI1.01 evidence and return its checked PR head."""
+
+    result = collect_required_check_evidence(root, spec, pr_number)
+    return str(result["evidence"]["head_commit"])
 
 
 def strict_protected_check_map(root: Path, spec: dict[str, Any]) -> dict[str, int | None]:
@@ -4548,11 +4521,8 @@ def action_merge(
         raise LoopError("merge requires a passing adjudicated review round")
     # Refuse a disallowed method, auto or admin request before any provider call.
     build_merge_command(spec, pr_number, str(current["commit"]), method, auto, admin, delete_branch)
-    checked_head = (
-        None
-        if admin and not state.get("ci_failure_repairs")
-        else check_required_checks(root, spec, pr_number)
-    )
+    premerge_evidence = collect_required_check_evidence(root, spec, pr_number)
+    checked_head = str(premerge_evidence["evidence"]["head_commit"])
     pr = gh_json(
         root,
         [
@@ -4562,23 +4532,44 @@ def action_merge(
             "--repo",
             spec["repository"],
             "--json",
-            "state,isDraft,headRefName,headRefOid,baseRefName,body,files,comments",
+            "state,isDraft,headRefName,headRefOid,baseRefName,baseRefOid,mergeStateStatus,reviewDecision,body,files,comments",
         ],
     )
     if pr.get("state") != "OPEN" or pr.get("isDraft"):
         raise LoopError("merge requires an open, non-draft PR")
     require_pr_targets_base(pr, spec)
+    if checked_head.lower() != str(pr.get("headRefOid", "")).lower():
+        raise LoopError("PR head moved between the check read and verification; rerun the merge")
     require_pr_matches_frozen_issue(pr, state)
     require_repair_pr_binding(state, pr_number, str(pr.get("headRefOid") or ""))
     require_predecessor_merges_ancestor(root, predecessor_proofs, pr.get("headRefOid", ""), "PR head")
     if not reviewed_content_matches(root, spec, state, str(current.get("commit", "")), str(pr.get("headRefOid", ""))):
         raise LoopError("PR head does not carry the change reviewed by the passing ledger")
+    ci_github_evidence, ci_publication = _ci_evidence_modules()
+    reviewed_commit = str(current.get("commit", ""))
+    reviewed_tree = git(root, "rev-parse", f"{reviewed_commit}^{{tree}}").lower()
+    head_tree = git(root, "rev-parse", f"{pr['headRefOid']}^{{tree}}").lower()
+    candidate_tree = str(premerge_evidence["evidence"].get("candidate_tree", "")).lower()
+    if candidate_tree != reviewed_tree or head_tree != reviewed_tree:
+        raise LoopError("CI candidate or PR head tree differs from the final reviewed tree; renew review")
+    readiness = ci_publication.evaluate_merge_readiness(
+        pr,
+        checked_base=str(premerge_evidence["evidence"]["base_commit"]),
+        checked_head=checked_head,
+        reviewed_tree=reviewed_tree,
+        head_tree=head_tree,
+        required_ci_verified=premerge_evidence["validation"]["claims"]["required_ci_verified"],
+    )
+    if readiness["status"] != "ready":
+        raise LoopError(
+            "PR is not merge-ready: " + "; ".join(readiness["reasons"])
+        )
     verify_remote_chunk_files(root, spec, pr, state)
     require_published_head_has_no_links(root, spec, state, str(pr.get("headRefOid", "")))
     if predecessor_attestation_policy(spec)["emit"]:
         payload = predecessor_attestation_from_state(state, pr["headRefOid"])
         require_exact_predecessor_attestation(pr, payload, spec["actor"], pr_number)
-    if isinstance(checked_head, str) and checked_head and checked_head.lower() != str(pr.get("headRefOid", "")).lower():
+    if checked_head.lower() != str(pr.get("headRefOid", "")).lower():
         raise LoopError("PR head moved between the check read and verification; rerun the merge")
     # Pin the head just verified to carry the reviewed change: a push after
     # this point makes the provider refuse the merge instead of landing it.
@@ -4589,10 +4580,31 @@ def action_merge(
     run_command(root, args, check=True)
     if auto:
         print(f"PASS PR queued for auto-merge: #{pr_number}")
-    elif admin:
-        print(f"PASS PR admin-merged: #{pr_number}")
-    else:
-        print(f"PASS PR merged: #{pr_number}")
+        return 0
+    try:
+        receipt = ci_github_evidence.collect_publication(
+            ci_github_evidence.GitHubClient(spec["repository"]),
+            pr_number,
+            reviewed_commit=reviewed_commit,
+            reviewed_tree=reviewed_tree,
+            premerge=premerge_evidence,
+            merge_readiness=readiness,
+        )
+        ci_publication.verify_receipt(receipt)
+    except (ci_github_evidence.EvidenceError, ci_publication.PublicationError) as exc:
+        raise LoopError(
+            f"PR #{pr_number} merged, but its exact publication receipt could not be verified: {exc}"
+        ) from exc
+    receipt_path = ledger_file.parent / f"publication-receipt-pr{pr_number}.json"
+    receipt_path.parent.mkdir(parents=True, exist_ok=True)
+    receipt_path.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    print(
+        f"PASS PR merged: #{pr_number}; receipt={receipt_path}; "
+        f"required_ci_verified=true; auxiliary_checks_healthy={receipt['claims']['auxiliary_checks_healthy']}; "
+        f"merge_readiness={receipt['claims']['merge_readiness']}; "
+        f"post_merge_health={receipt['claims']['post_merge_health']}; "
+        f"operationally_verified={receipt['claims']['operationally_verified']}"
+    )
     return 0
 
 

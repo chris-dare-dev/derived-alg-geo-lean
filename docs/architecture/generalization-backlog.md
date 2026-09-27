@@ -887,3 +887,262 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   different construction would be outside this proof-based scout's scope.
 - state:              FALSIFIED compiler witness: zero morphisms alone do not
   support Mathlib's existing total-complex construction.
+
+### 2026-09-27 — natural extension of a single complex for the free-Yoneda augmentation target (planned)
+- chunk:              sf8-554-target-comparison
+- reviewing commit:   f18bf326077601e1502702b6e6dc154a0a34f057
+- found by:           altitude-scout
+- proposed ancestor:  `HomologicalComplex.singleCompExtendIso`, as a direct
+  extension of Mathlib's `Algebra/Homology/Embedding/Extend.lean` API
+- weaker hypotheses:  any category with zero morphisms and a zero object,
+  arbitrary complex shapes with decidable index equality, an embedding `e`,
+  degrees `i` and `i'`, and `e.f i = i'`; no schemes, sheaves, abelian structure,
+  coproducts, preadditivity, or fixed natural/integer grading are needed for
+  the natural isomorphism before totalization
+- pin status:         PIN-CONFIRMED `.lake/packages/mathlib/Mathlib/Algebra/Homology/Embedding/Extend.lean:293`
+- source note:        At Mathlib revision
+  `520045ab14e26149ee970e2e617ca04b09bde5d6`, the cited
+  `HomologicalComplex.extendSingleIso` supplies the objectwise canonical
+  comparison. The proposed lift packages those same components as
+  `single C c i ⋙ e.extendFunctor C ≅ single C c' i'`; it is not a claim that
+  this natural wrapper is already declared in the pin. A unique scratch
+  probe, `.lake/sf8_554_target_altitude_single_extend_20260927.lean`, compiled
+  this naturalization, its `ChainComplex.single₀` / `embeddingDownNat`
+  specialization, and its cochain lift using pinned
+  `CategoryTheory.NatIso.mapHomologicalComplex`
+  (`Mathlib/Algebra/Homology/Additive.lean:196`). The only printed axioms were
+  `propext`, `Classical.choice`, and `Quot.sound`. This finding is distinct from
+  the objectwise ancestor noted in pending PR #1600: it checks arbitrary-shape
+  naturality and the reusable outer-complex transport. The mapped single
+  presentation still needs an explicit comparison with the flipped
+  `singleZeroBicomplex` presentation before composing with that PR's
+  `singleZeroFlipTotalIso`; an `Iso.refl` probe did not elaborate, which is
+  evidence only against that attempted definitional identification. Whiskering
+  with pinned `HomologicalComplex₂.totalFunctor`
+  (`Mathlib/Algebra/Homology/TotalComplex.lean:467`) requires that functor's
+  ambient total-existence assumptions. No total augmentation quasi-isomorphism
+  or K-flatness claim follows from these comparisons.
+- state:              UNVERIFIED
+
+### 2026-09-27 — omit explicit decidable index equality from natural single extension (planned)
+- chunk:              sf8-554-target-comparison
+- reviewing commit:   f18bf326077601e1502702b6e6dc154a0a34f057
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `HomologicalComplex.singleCompExtendIso`, extending
+  `Algebra/Homology/Embedding/Extend.lean`
+- weaker hypotheses:  `[Category C] [HasZeroObject C] [HasZeroMorphisms C]`,
+  arbitrary index types and shapes, `e : c.Embedding c'`, `i`, `i'`, and
+  `h : e.f i = i'`; neither `[DecidableEq ι]` nor `[DecidableEq ι']`
+  is an explicit parameter
+- level:              L (proof-witness verified)
+- pin status:         PIN-CONFIRMED Mathlib `520045ab14e26149ee970e2e617ca04b09bde5d6`
+- source note:        `.lake/sf8_554_target_hypothesis_verified_20260927.lean`
+  compiled with Lean v4.32.1, exit 0. Its
+  `SF8554TargetHypothesisScout20260927.singleCompExtendIso` uses the altitude
+  scout's complete naturality proof unchanged under `open scoped Classical`.
+  `#print` confirms both decidability parameters are absent; `#print axioms`
+  reports only `propext`, `Classical.choice`, and `Quot.sound`. This supplies
+  classical decisions inside the signature; it does not make `single`
+  independent of its chosen decisions. Preserving ambient instances in the
+  generic public wrapper remains useful for definitional interoperability.
+- state:              UNVERIFIED
+
+### 2026-09-27 — construct the zero morphisms needed by natural single extension (planned)
+- chunk:              sf8-554-target-comparison
+- reviewing commit:   f18bf326077601e1502702b6e6dc154a0a34f057
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `HomologicalComplex.singleCompExtendIso`, with the
+  existing `CategoryTheory.Limits.HasZeroObject.zeroMorphismsOfZeroObject`
+- weaker hypotheses:  `[Category C] [HasZeroObject C]`, arbitrary index types
+  and shapes, embedding, degrees and `e.f i = i'`; zero morphisms are chosen
+  locally and index equality is supplied classically
+- level:              L (proof-witness verified)
+- pin status:         PIN-CONFIRMED
+  `Mathlib/CategoryTheory/Limits/Shapes/ZeroMorphisms.lean:258`
+- source note:        In
+  `.lake/sf8_554_target_hypothesis_verified_20260927.lean`,
+  `SF8554TargetHypothesisDerivedZeros20260927.singleCompExtendIso` compiles
+  using `letI : HasZeroMorphisms C :=
+  HasZeroObject.zeroMorphismsOfZeroObject (C := C)` in both its result type and
+  proof. `SF8554TargetHypothesisNativeDerivedZeros20260927.mappedSingleZeroExtendDownNatIso`
+  separately verifies the same deletion for the native `ChainComplex.single₀`
+  / `embeddingDownNat` specialization and its outer cochain lift. Both print
+  only the standard three axioms. A further compiled example proves agreement
+  with any ambient `HasZeroMorphisms C` by `Subsingleton.elim`. This agreement
+  is propositional: Mathlib's comment immediately preceding the constructor
+  explicitly warns that the constructed instance need not be definitionally
+  equal to an additive category's existing instance. This is a verified logical
+  redundancy, not a recommendation to replace the ambient-instance API.
+- state:              UNVERIFIED
+
+### 2026-09-27 — eliminate the output-degree equality by fixing its value (planned)
+- chunk:              sf8-554-target-comparison
+- reviewing commit:   f18bf326077601e1502702b6e6dc154a0a34f057
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `HomologicalComplex.singleCompExtendIso`
+- weaker hypotheses:  category, zero object, zero morphisms, arbitrary shapes,
+  embedding `e` and source degree `i`; the target is `single C c' (e.f i)`
+- level:              L (proof-witness verified)
+- pin status:         PIN-CONFIRMED
+- source note:        `singleCompExtendAtImageIso` in
+  `.lake/sf8_554_target_hypothesis_verified_20260927.lean` compiles by applying
+  the generic comparison with `i' := e.f i` and `rfl`. This removes a redundant
+  parameter and its equality proof together; it does not justify deleting
+  the equality while keeping an independently selected `i'`.
+- state:              UNVERIFIED
+
+### 2026-09-27 — natural single extension lifts along any outer complex shape (planned)
+- chunk:              sf8-554-target-comparison
+- reviewing commit:   f18bf326077601e1502702b6e6dc154a0a34f057
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `HomologicalComplex.singleCompExtendIso`, consumed by
+  pinned `CategoryTheory.NatIso.mapHomologicalComplex`
+- weaker hypotheses:  the category, zero object, zero morphisms and embedding
+  comparison above, plus an arbitrary `κ : Type*` and `d : ComplexShape κ`;
+  no outer `[DecidableEq κ]`, fixed `ℤ`, preadditivity, abelian structure,
+  boundedness, or total-existence assumption
+- level:              L (proof-witness verified)
+- pin status:         PIN-CONFIRMED `Mathlib/Algebra/Homology/Additive.lean:196`
+- source note:        `SF8554TargetHypothesisScout20260927.mappedSingleCompExtendIso`
+  in `.lake/sf8_554_target_hypothesis_verified_20260927.lean` compiles directly
+  as `NatIso.mapHomologicalComplex (singleCompExtendIso e i i' h) d`. The two
+  required zero-preservation instances are inferred from the single and
+  extension functors. Its printed signature contains none of the omitted
+  assumptions and its axioms are the standard three. The scratch file imports
+  only `Mathlib.Algebra.Homology.Embedding.Extend`; the altitude witness's
+  `TotalComplex` import is unnecessary for these comparisons. This is an outer
+  complex comparison and asserts no totalization quasi-isomorphism.
+- state:              UNVERIFIED
+
+### 2026-09-27 — native zero-degree extension needs no caller index data (planned)
+- chunk:              sf8-554-target-comparison
+- reviewing commit:   f18bf326077601e1502702b6e6dc154a0a34f057
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  natural single extension specialized to
+  `ChainComplex.single₀` and `ComplexShape.embeddingDownNat`
+- weaker hypotheses:  only `{C : Type u} [Category.{v} C] [HasZeroObject C]
+  [HasZeroMorphisms C]`; no index types, decidability instances, embedding,
+  degrees, or equality supplied by the caller
+- level:              L (proof-witness verified)
+- pin status:         PIN-CONFIRMED
+- source note:        In
+  `.lake/sf8_554_target_hypothesis_verified_20260927.lean`, the namespace
+  `SF8554TargetHypothesisNative20260927` rechecks the altitude witness with
+  the ambient decidability parameters preserved in its generic helper.
+  `#print singleZeroExtendDownNatIso` and
+  `#print mappedSingleZeroExtendDownNatIso` show exactly the four parameters
+  above. The equality is discharged by `simp`, the two concrete index
+  instances are synthesized, and the lift uses `NatIso.mapHomologicalComplex`.
+  Both the specialization and its lift compile with no additional assumptions.
+- state:              UNVERIFIED
+
+### 2026-09-27 — weaken the category of natural single extension to CategoryStruct (failed)
+- chunk:              sf8-554-target-comparison
+- reviewing commit:   f18bf326077601e1502702b6e6dc154a0a34f057
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  the same pinned single/extension API with only
+  `[CategoryStruct C]`
+- weaker hypotheses:  remove category laws while retaining objects, morphisms,
+  identities and composition
+- source note:        `.lake/sf8_554_target_hypothesis_failures_20260927.lean`
+  attempts both `HasZeroObject C` and
+  `HomologicalComplex C (ComplexShape.up ℤ)` under `[CategoryStruct C]`.
+  Lean reports `failed to synthesize instance of type class Category ... C`
+  at lines 10 and 11. This falsifies literal deletion in the existing API;
+  it is not a counterexample about a different encoding. Functors, complex
+  categories, and the naturality proof all use the category structure.
+- state:              FALSIFIED (the proposed signature does not elaborate)
+
+### 2026-09-27 — omit zero morphisms without installing their construction (failed)
+- chunk:              sf8-554-target-comparison
+- reviewing commit:   f18bf326077601e1502702b6e6dc154a0a34f057
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  native single/extension API with automatic zero-morphism
+  synthesis from a zero object
+- weaker hypotheses:  `[Category C] [HasZeroObject C]`, with no local choice
+  of `HasZeroMorphisms C`
+- source note:        `.lake/sf8_554_target_hypothesis_failures_20260927.lean:17`
+  and line 18 check `ChainComplex.single₀ C` and
+  `ComplexShape.embeddingDownNat.extendFunctor C`. Both report
+  `failed to synthesize instance of type class HasZeroMorphisms C`.
+  The successful explicit local construction is recorded above; the failure
+  is about automatic instance search, not mathematical existence.
+- state:              FALSIFIED (the unmodified signature does not elaborate)
+
+### 2026-09-27 — omit the zero object or replace it by a distinguished object (failed)
+- chunk:              sf8-554-target-comparison
+- reviewing commit:   f18bf326077601e1502702b6e6dc154a0a34f057
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  the same pinned single/extension API without
+  `[HasZeroObject C]`
+- weaker hypotheses:  `[Category C] [HasZeroMorphisms C]`, first alone and
+  then additionally `[Zero C]`
+- source note:        `.lake/sf8_554_target_hypothesis_failures_20260927.lean`
+  checks generic `single` and `extendFunctor`, the native `single₀` and
+  `embeddingDownNat.extendFunctor`, and `single`/`single₀` again with `[Zero C]`.
+  All report `failed to synthesize instance of type class HasZeroObject C`.
+  The proof uses zero-object uniqueness off the support, and extension uses
+  the zero object outside the embedding's image. A chosen object with a
+  supplied `IsZero` proof would reintroduce equivalent evidence; a bare
+  distinguished object does not. This records the existing API's requirement,
+  not an impossibility result for every special shape or alternative proof.
+- state:              FALSIFIED (the proposed signatures do not elaborate)
+
+### 2026-09-27 — omit decidable indices without supplying classical decisions (failed)
+- chunk:              sf8-554-target-comparison
+- reviewing commit:   f18bf326077601e1502702b6e6dc154a0a34f057
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  the same pinned `HomologicalComplex.single` API
+- weaker hypotheses:  remove `[DecidableEq ι]` and `[DecidableEq ι']`
+  independently, without enabling a classical instance
+- source note:        The `NoSourceDecidableEq` and `NoTargetDecidableEq`
+  sections of `.lake/sf8_554_target_hypothesis_failures_20260927.lean` each
+  check the corresponding `single`. Lean reports respectively
+  `failed to synthesize instance of type class DecidableEq ι` and
+  `failed to synthesize instance of type class DecidableEq ι'`.
+  The successful classical wrapper above resolves exactly these failures;
+  this row does not claim that decidability is an essential mathematical
+  hypothesis of a noncomputable comparison.
+- state:              FALSIFIED (literal binder deletion without replacement)
+
+### 2026-09-27 — independently choose a different degree for extended single complexes (failed)
+- chunk:              sf8-554-target-comparison
+- reviewing commit:   f18bf326077601e1502702b6e6dc154a0a34f057
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  `HomologicalComplex.extendSingleIso` or its natural
+  wrapper without `e.f i = i'`
+- weaker hypotheses:  retain independent `i : ι` and `i' : ι'`, removing
+  their equality constraint
+- source note:        The direct reuse attempt in
+  `.lake/sf8_554_target_hypothesis_failures_20260927.lean` fails with the
+  remaining goal `⊢ e.f i = i'`. More decisively,
+  `SF8554TargetHypothesisScout20260927.noExtendSingleIsoOffImage` in the
+  verified probe proves that `e.f i ≠ i'` and `¬ IsZero X` imply
+  `¬ Nonempty ((((single C c i).obj X).extend e) ≅ (single C c' i').obj X)`.
+  Evaluation at `e.f i` would identify `X` with the target's zero object.
+  The compiler accepts that obstruction with only the standard three axioms.
+  No different proof can supply the unconstrained comparison in this case;
+  fixing `i' := e.f i`, or imposing a zero-object degeneracy, changes the claim.
+- state:              FALSIFIED (proved obstruction for unequal degrees and nonzero input)
+
+### 2026-09-27 — treat a classical single wrapper as definitionally the native single₀ (failed)
+- chunk:              sf8-554-target-comparison
+- reviewing commit:   f18bf326077601e1502702b6e6dc154a0a34f057
+- found by:           hypothesis-elimination-scout
+- proposed ancestor:  direct native specialization of a generic wrapper
+  whose signature fixes classical decidability
+- weaker hypotheses:  omit the generic decidability parameters and expect
+  the resulting concrete specialization to identify definitionally with
+  `ChainComplex.single₀`
+- source note:        The retained
+  `.lake/sf8_554_target_hypothesis_classical_native_attempt_20260927.lean`
+  and its log show the attempted direct specialization failing at line 40:
+  the source uses `@HomologicalComplex.single ... ℕ
+  (fun a b => Classical.propDecidable (a = b)) ...`, whereas the expected
+  `single₀` uses `instDecidableEqNat`. The attempted `simpa only` transport
+  did not close this mismatch. This falsifies that attempted definitional
+  reuse, not the existence of a comparison; a different proof could transport
+  between the decisions using their propositional equality. The verified
+  native specialization instead retains the generic helper's ambient
+  decidability parameters and needs no explicit decisions from callers.
+- state:              FALSIFIED (attempted definitional identification fails)
