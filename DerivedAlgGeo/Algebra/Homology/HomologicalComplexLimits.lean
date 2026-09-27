@@ -37,8 +37,9 @@ of short complexes does (which is the case when colimits of shape `J` are exact)
   restrictions to the summands.
 * `HomologicalComplex.homologyFunctor_preservesColimitsOfShape`: homology in degree `i`
   preserves colimits of shape `J` when homology of short complexes does.
-* `HomologicalComplex.quasiIso_colimMap`: an exact colimit of componentwise
-  quasi-isomorphisms is a quasi-isomorphism.
+* `HomologicalComplex.quasiIso_colimMap_of_preservesHomology`: homology-preserving
+  colimits preserve componentwise quasi-isomorphisms.
+* `HomologicalComplex.quasiIso_colimMap`: the exact-colimit specialization.
 
 ## Implementation notes
 
@@ -123,16 +124,18 @@ end HomologicalComplex
 
 namespace HomologicalComplex
 
-section ExactColimits
+section HomologyPreservingColimits
 
-variable {C : Type u} [Category.{v} C] [Abelian C]
+variable {C : Type u} [Category.{v} C] [HasZeroMorphisms C] [CategoryWithHomology C]
   {J : Type w'} [Category.{w''} J]
-  [HasColimitsOfShape J C] [HasExactColimitsOfShape J C]
+  [HasColimitsOfShape J C]
   {ι : Type*} {c : ComplexShape ι}
 
-/-- Exact colimits preserve quasi-isomorphisms of diagrams of complexes. In particular,
-this applies to filtered colimits in an AB5 category. -/
-theorem quasiIso_colimMap {F G : J ⥤ HomologicalComplex C c} (α : F ⟶ G)
+/-- A colimit of pointwise quasi-isomorphisms is a quasi-isomorphism when homology
+in every degree preserves colimits of that shape. -/
+theorem quasiIso_colimMap_of_preservesHomology
+    [∀ i, PreservesColimitsOfShape J (homologyFunctor C c i)]
+    {F G : J ⥤ HomologicalComplex C c} (α : F ⟶ G)
     (hα : ∀ j, QuasiIso (α.app j)) : QuasiIso (colim.map α) := by
   rw [quasiIso_iff]
   intro i
@@ -159,6 +162,23 @@ theorem quasiIso_colimMap {F G : J ⥤ HomologicalComplex C c} (α : F ⟶ G)
     IsIso.of_isIso_comp_right _ (β.hom.app G)
   exact hmap
 
-end ExactColimits
+end HomologyPreservingColimits
+
+end HomologicalComplex
+
+namespace HomologicalComplex
+
+variable {C : Type u} [Category.{v} C] [Abelian C]
+  {J : Type w'} [Category.{w''} J]
+  [HasColimitsOfShape J C] [HasExactColimitsOfShape J C]
+  {ι : Type*} {c : ComplexShape ι}
+
+/-- Exact colimits preserve quasi-isomorphisms of diagrams of complexes. In particular,
+this applies to filtered colimits in an AB5 category. -/
+theorem quasiIso_colimMap {F G : J ⥤ HomologicalComplex C c} (α : F ⟶ G)
+    (hα : ∀ j, QuasiIso (α.app j)) : QuasiIso (colim.map α) := by
+  letI : ∀ i, PreservesColimitsOfShape J (homologyFunctor C c i) :=
+    fun _ => inferInstance
+  exact quasiIso_colimMap_of_preservesHomology α hα
 
 end HomologicalComplex
