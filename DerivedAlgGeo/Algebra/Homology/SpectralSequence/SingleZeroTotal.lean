@@ -16,14 +16,19 @@ Exchanging axes gives the corresponding vertical-degree-zero comparison.
 Under an ambient total-existence assumption, the signed flipped comparison
 is natural in the input integer-indexed cochain complex.
 
-## Main definitions and results
+## Main definitions
 
-* `singleZeroBicomplex` places a complex in horizontal degree zero.
-* `singleZeroHasTotal` constructs its total without ambient coproducts.
-* `singleZeroTotalIso` and `singleZeroTotalIso_naturality` identify that total
+* `HomologicalComplex₂.singleZeroBicomplex` places a complex in horizontal degree zero.
+
+## Main results
+
+* `HomologicalComplex₂.singleZeroHasTotal` constructs its total without ambient coproducts.
+* `HomologicalComplex₂.singleZeroTotalIso` and
+  `HomologicalComplex₂.singleZeroTotalIso_naturality` identify that total
   naturally with the original complex.
-* `singleZeroFlipTotalIso` and `singleZeroFlipTotalIso_naturality` give the
-  corresponding comparison after exchanging axes.
+* `HomologicalComplex₂.singleZeroFlipTotalIso` and
+  `HomologicalComplex₂.singleZeroFlipTotalIso_naturality` give the corresponding
+  comparison after exchanging axes.
 * `HomologicalComplex₂.singleZeroFlipTotalNatIso` assembles the signed
   flipped degree-zero comparisons into a natural isomorphism.
 
@@ -299,9 +304,10 @@ lemma singleZeroFlipTotalIso_naturality (f : A ⟶ B) :
   rw [Category.assoc, singleZeroTotalIso_naturality]
   simp only [Category.assoc]
 
-/-- The signed total of a flipped bicomplex supported at outer degree zero is
-naturally the input cochain complex. Its components are
-`singleZeroFlipTotalIso`, and the naturality square is the theorem above. -/
+/-- The signed total of the flip of a bicomplex originally supported at outer
+degree zero is naturally the input cochain complex. After flipping, the
+support lies at inner degree zero. Its components are
+`HomologicalComplex₂.singleZeroFlipTotalIso`, with naturality proved above. -/
 noncomputable def singleZeroFlipTotalNatIso
     [∀ K : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ),
       K.HasTotal (ComplexShape.up ℤ)] :

@@ -9,19 +9,20 @@ import DerivedAlgGeo.Algebra.Homology.Embedding.Extend
 /-!
 # Single complexes, arbitrary embeddings, and bicomplex symmetry
 
-For any source complex shape, supported source degree, and embedding with
-arbitrary integer image `j`, extending a single and mapping it degreewise gives
-a bicomplex naturally isomorphic to the flipped single at `j`. The comparison
-requires only zero morphisms and a zero object, and factors through the
-arbitrary-shape mapped-single/flip isomorphism rather than a definitional
-equality.
+For any source and target complex shapes, source degree, embedding, and image
+degree `j`, extending a single and mapping it degreewise along an independent
+complex shape gives a bicomplex naturally isomorphic to the flipped single at
+`j`. The comparison requires only zero morphisms and a zero object, and factors
+through the arbitrary-shape mapped-single/flip isomorphism rather than a
+definitional equality.
 
 ## Main results
 
 * `HomologicalComplex₂.singleMapHomologicalComplexFlipIso` identifies the
   mapped-single and flipped-bicomplex functors for arbitrary complex shapes.
 * `HomologicalComplex₂.singleExtendMapFlipIso` identifies an extended single
-  at an arbitrary source degree with the flipped bicomplex at its image degree.
+  at an arbitrary source degree with the flipped bicomplex at its image degree,
+  for arbitrary source, target, and mapped complex shapes.
 
 ## Implementation notes
 
@@ -91,21 +92,19 @@ noncomputable def singleMapHomologicalComplexFlipIso :
     exact (HomologicalComplex.singleMapHomologicalComplex
       (HomologicalComplex.eval C c₁ i) c₂ j₀).inv.naturality f)
 
-/-- Extending a single at any source index `i` along an embedding with
-`e.f i = j`, then mapping it degreewise, is the flipped single bicomplex at
-the arbitrary image `j`. This composes the existing single-extension and
-flip comparisons, without an additive or total-complex assumption. -/
+/-- Extending a single at source index `i` along `e` with `e.f i = j`, then
+mapping along any independent complex shape `d`, is the flipped single at the
+image index `j`. This composes the existing single-extension and flip
+comparisons, without an additive or total-complex assumption. -/
 noncomputable def singleExtendMapFlipIso
-    {ι : Type*} [DecidableEq ι] {c : ComplexShape ι}
-    (e : c.Embedding (ComplexShape.up ℤ)) (i : ι) (j : ℤ) (h : e.f i = j) :
-    ((HomologicalComplex.single C c i ⋙ e.extendFunctor C).mapHomologicalComplex
-      (ComplexShape.up ℤ)) ≅
-    HomologicalComplex.single (CochainComplex C ℤ) (ComplexShape.up ℤ) j ⋙
-      flipFunctor C (ComplexShape.up ℤ) (ComplexShape.up ℤ) :=
+    {ι ι' κ : Type*} [DecidableEq ι] [DecidableEq ι']
+    {c : ComplexShape ι} {c' : ComplexShape ι'} (d : ComplexShape κ)
+    (e : c.Embedding c') (i : ι) (j : ι') (h : e.f i = j) :
+    ((HomologicalComplex.single C c i ⋙ e.extendFunctor C).mapHomologicalComplex d) ≅
+      HomologicalComplex.single (HomologicalComplex C d) c' j ⋙
+        flipFunctor C c' d :=
   (CategoryTheory.NatIso.mapHomologicalComplex
-    (HomologicalComplex.singleCompExtendIso (C := C) e i j h)
-    (ComplexShape.up ℤ)).trans
-  (singleMapHomologicalComplexFlipIso
-    (C := C) (ComplexShape.up ℤ) (ComplexShape.up ℤ) j)
+    (HomologicalComplex.singleCompExtendIso (C := C) e i j h) d).trans
+  (singleMapHomologicalComplexFlipIso (C := C) d c' j)
 
 end HomologicalComplex₂

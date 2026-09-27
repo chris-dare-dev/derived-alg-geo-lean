@@ -21,25 +21,33 @@ target is naturally the input complex.
 The final augmentation is a constructed map, without an unbounded total
 quasi-isomorphism or K-flatness claim.
 
-## Main declarations
+## Main definitions
 
 * `AlgebraicGeometry.Scheme.Modules.normalizedBicomplexAugmentation` is the
   natural map to the flipped single-zero bicomplex.
-* `AlgebraicGeometry.Scheme.Modules.normalizedBicomplexAugmentation_row_quasiIso`
-  proves each resolution-direction row is a quasi-isomorphism.
 * `AlgebraicGeometry.Scheme.Modules.freeYonedaSheafCoproductTotalTargetIso`
   identifies the total of the original target with the input.
 * `AlgebraicGeometry.Scheme.Modules.freeYonedaSheafCoproductTotalAugmentation`
   composes the normalized total map with the signed target comparison.
 
-## Proof idea and references
+## Main results
+
+* `AlgebraicGeometry.Scheme.Modules.normalizedBicomplexAugmentation_row_quasiIso`
+  proves each resolution-direction row is a quasi-isomorphism.
+
+## Implementation notes
 
 The normalized map composes the existing row augmentation with
 `HomologicalComplex₂.singleExtendMapFlipIso` at the image degree zero.
 Its row maps stay quasi-isomorphisms because the second map is an isomorphism.
 `HomologicalComplex₂.singleZeroFlipTotalNatIso` supplies the signed total
-comparison. The construction uses Mathlib's embedding extension and total
-functor; the original target type is retained for downstream consumers.
+comparison. The original target type is retained for downstream consumers.
+
+## References
+
+The construction uses Mathlib's `ComplexShape.Embedding.extendFunctor`,
+`HomologicalComplex₂.totalFunctor`, and the repository's natural
+single-extension, mapped-single/flip, and signed single-zero comparisons.
 -/
 
 universe u
@@ -115,8 +123,8 @@ theorem freeYonedaSheafCoproductResolutionBicomplexAugmentation_row_quasiIso
 
 /-- Normalize the free-Yoneda augmentation before totalization: the embedding
 of the resolution degree sends source degree zero to integer degree zero, and
-`singleExtendMapFlipIso` identifies its target with the flipped single-zero
-bicomplex. -/
+`HomologicalComplex₂.singleExtendMapFlipIso` identifies its target with the
+flipped single-zero bicomplex. -/
 noncomputable def normalizedBicomplexAugmentation (X : Scheme.{u}) :
     freeYonedaSheafCoproductResolutionBicomplexUpInt X ⟶
       HomologicalComplex.single (CochainComplex X.Modules ℤ) (ComplexShape.up ℤ) 0 ⋙
@@ -124,7 +132,7 @@ noncomputable def normalizedBicomplexAugmentation (X : Scheme.{u}) :
           (ComplexShape.up ℤ) :=
   freeYonedaSheafCoproductResolutionBicomplexAugmentation X ≫
     (HomologicalComplex₂.singleExtendMapFlipIso
-      (C := X.Modules) ComplexShape.embeddingDownNat 0 0 rfl).hom
+      (C := X.Modules) (ComplexShape.up ℤ) ComplexShape.embeddingDownNat 0 0 rfl).hom
 
 /-- Each row of the normalized augmentation remains a quasi-isomorphism:
 the original row theorem is followed by a component of a bicomplex
@@ -165,7 +173,7 @@ noncomputable def freeYonedaSheafCoproductTotalTargetIso (X : Scheme.{u}) :
     𝟭 (CochainComplex X.Modules ℤ) :=
   (CategoryTheory.Functor.isoWhiskerRight
     (HomologicalComplex₂.singleExtendMapFlipIso
-      (C := X.Modules) ComplexShape.embeddingDownNat 0 0 rfl) _).trans
+      (C := X.Modules) (ComplexShape.up ℤ) ComplexShape.embeddingDownNat 0 0 rfl) _).trans
     (HomologicalComplex₂.singleZeroFlipTotalNatIso (C := X.Modules))
 
 /-- The natural augmentation of the total free-Yoneda resolution into the
