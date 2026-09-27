@@ -38,6 +38,7 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex.extendHomologyIso_naturality
 #print axioms HomologicalComplex.extendHomologyIso_naturality_assoc
 #print axioms HomologicalComplex₂.singleMapHomologicalComplexFlipIso
+#print axioms HomologicalComplex₂.singleExtendMapFlipIso
 #print axioms HomologicalComplex.singleCompExtendIso
 #print axioms HomologicalComplex.singleCompExtendAtImageIso
 #print axioms CategoryTheory.Triangulated.SpectralObject.mapHomologicalFunctor
@@ -187,6 +188,8 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex₂.singleZeroTotalXIso
 #print axioms HomologicalComplex₂.singleZeroXIso
 #print axioms HomologicalComplex₂.singleZeroFlipTotalIso
+#print axioms HomologicalComplex₂.singleZeroFlipTotalNatIso
+#print axioms HomologicalComplex₂.singleExtendMapTotalIso
 #print axioms HomologicalComplex₂.singleZeroFlipTotalIso_naturality
 #print axioms HomologicalComplex₂.singleZeroFlipTotalIso_naturality_assoc
 #print axioms HomologicalComplex₂.stupidTruncGEXIso
