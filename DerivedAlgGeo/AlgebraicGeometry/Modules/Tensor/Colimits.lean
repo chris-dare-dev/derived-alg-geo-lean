@@ -11,8 +11,9 @@ import DerivedAlgGeo.CategoryTheory.Limits.Preserves.Reflective
 Presheaf tensor preserves colimits objectwise. The arbitrary-sheaf tensor/sheafification
 comparisons transfer that property to the sheafified tensor in both slots.
 
-The main results are `tensorLeft_preservesColimitsOfShape` and
-`tensorRight_preservesColimitsOfShape`. Their index categories have the same universe as
+The main results are `AlgebraicGeometry.Scheme.Modules.tensorLeft_preservesColimitsOfShape` and
+`AlgebraicGeometry.Scheme.Modules.tensorRight_preservesColimitsOfShape`.
+Their index categories have the same universe as
 the underlying scheme site, matching the available presheaf tensor instance.
 The historical functor and its invertible instances remain in `Tensor/Invertible.lean`.
 -/
