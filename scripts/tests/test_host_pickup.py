@@ -140,6 +140,57 @@ class HostPickupTests(unittest.TestCase):
             self.assertEqual(list((base / "jobs").iterdir()), [])
             self.assertEqual(list((base / "leases").glob("*.json")), [])
 
+    def test_runner_archive_accepts_in_tree_file_symlink(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            archive = Path(directory) / "runner.tar.gz"
+            target = "./externals/node24/lib/node_modules/npm/bin/npm-cli.js"
+            link = "./externals/node24/bin/npm"
+            with tarfile.open(archive, "w:gz") as bundle:
+                member = tarfile.TarInfo(link)
+                member.type = tarfile.SYMTYPE
+                member.linkname = "../lib/node_modules/npm/bin/npm-cli.js"
+                bundle.addfile(member)
+                body = b"safe npm target\n"
+                member = tarfile.TarInfo(target)
+                member.size = len(body)
+                bundle.addfile(member, io.BytesIO(body))
+            digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+            host_pickup._verify_runner_archive(archive, digest)
+            destination = Path(directory) / "unpacked"
+            destination.mkdir()
+            with tarfile.open(archive, "r:gz") as bundle:
+                bundle.extractall(destination, filter="data")
+            self.assertEqual((destination / link).read_bytes(), body)
+
+    def test_runner_archive_rejects_symlink_escape_and_missing_target(self) -> None:
+        for linkname in ("/outside", "../../../../outside", "../missing"):
+            with self.subTest(linkname=linkname), tempfile.TemporaryDirectory() as directory:
+                archive = Path(directory) / "unsafe.tar.gz"
+                with tarfile.open(archive, "w:gz") as bundle:
+                    member = tarfile.TarInfo("./externals/node24/bin/npm")
+                    member.type = tarfile.SYMTYPE
+                    member.linkname = linkname
+                    bundle.addfile(member)
+                digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+                with self.assertRaisesRegex(ValueError, "unsafe symlink"):
+                    host_pickup._verify_runner_archive(archive, digest)
+
+    def test_runner_archive_rejects_member_below_symlink(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            archive = Path(directory) / "unsafe.tar.gz"
+            with tarfile.open(archive, "w:gz") as bundle:
+                link = tarfile.TarInfo("alias")
+                link.type = tarfile.SYMTYPE
+                link.linkname = "target"
+                bundle.addfile(link)
+                for name in ("target", "alias/child"):
+                    member = tarfile.TarInfo(name)
+                    member.size = 1
+                    bundle.addfile(member, io.BytesIO(b"x"))
+            digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+            with self.assertRaisesRegex(ValueError, "below a symlink"):
+                host_pickup._verify_runner_archive(archive, digest)
+
     def test_runner_failure_before_checkout_can_recover_without_token(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             base, _, _ = fixture(Path(directory))
