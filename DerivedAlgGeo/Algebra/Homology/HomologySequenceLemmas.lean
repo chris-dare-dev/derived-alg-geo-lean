@@ -3,8 +3,6 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.Algebra.Homology.HomologySequenceLemmas
-import Mathlib.Algebra.Homology.DerivedCategory.HomologySequence
-import Mathlib.Algebra.Homology.QuasiIso
 
 /-!
 # Quasi-isomorphisms in short exact sequences of complexes
@@ -45,8 +43,10 @@ include hS₁ hS₂
 
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
-/-- If the outer maps in a morphism of short exact sequences of cochain
-complexes are quasi-isomorphisms, then so is the middle map. -/
+/-- The `τ₂` companion to Mathlib's `HomologicalComplex.HomologySequence.quasiIso_τ₃`:
+if the outer maps in a morphism of short exact cochain-complex sequences are
+quasi-isomorphisms, so is the middle map. The neighboring five-object homology
+windows and abelian four lemmas make each middle homology map both mono and epi. -/
 lemma HomologySequence.quasiIso_τ₂
     (h₁ : QuasiIso φ.τ₁) (h₃ : QuasiIso φ.τ₃) : QuasiIso φ.τ₂ := by
   rw [quasiIso_iff]

@@ -7,17 +7,31 @@ import Mathlib.Algebra.Homology.DerivedCategory.HomologySequence
 import Mathlib.Algebra.Homology.QuasiIso
 
 /-!
-# Quasi-isomorphisms and filtered total complexes
+# Quasi-isomorphisms for mapping cones and first-quadrant totals
 
-This file supplies comparison lemmas for filtered total complexes. They are
-the comparison-theorem plumbing needed for the Cech bicomplex:
+## Main results
 
-* mapping-cone quasi-isomorphisms compose via the octahedral triangle; and
-* a bicomplex morphism induces a morphism between its adjacent-column total
-  short exact sequences.
+* `CochainComplex.mappingCone.quasiIso_compMap` composes quasi-isomorphisms
+  between mapping cones of composable arrows.
+* `CochainComplex.mappingCone.quasiIsoAt_inr_of_isZero_X` gives a
+  quasi-isomorphism at the cone inclusion in degree `n` when its source
+  vanishes in degrees `n` and `n + 1`.
+* `HomologicalComplex₂.totalMap_quasiIso` turns a columnwise
+  quasi-isomorphism of first-quadrant bicomplexes of abelian groups into a
+  quasi-isomorphism of their totals.
 
-The middle-term quasi-isomorphism for a morphism of short exact complex
-sequences lives at the separate generic homology-sequence owner.
+## Implementation notes
+
+The composition result uses the octahedral mapping-cone triangle in the
+derived category. The total result compares finite-column cones through
+adjacent-column maps, then identifies the connective tail with the full
+total. The middle-term short-exact comparison lives at the separate generic
+homology-sequence owner.
+
+## References
+
+These proofs use Mathlib's mapping-cone composition triangle, derived-category
+localization, and homological-complex totalization.
 -/
 
 open CategoryTheory Category Limits
