@@ -460,14 +460,17 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   planned envelope-composition API
 - weaker hypotheses:  the scalar inequality
   `P.generationTime R + 1 ≤ (P.generationTime Q + 1) *
-  (Q.generationTime R + 1)` needs no separate `[P.Nonempty]` binder, provided
-  the iterated-envelope composition lemma is available for nonempty `P`.
+  (Q.generationTime R + 1)` needs no separate `[P.Nonempty]` binder. The
+  iterated-envelope composition law and zero-stage fixed-point statement also
+  hold without `[P.Nonempty]`; the fixed-point statement additionally needs no
+  `[IsTriangulated C]`.
 - pin status:         PIN-CONFIRMED for the corollary proof route
-- source note:        `/tmp/rou1-920-plusone.lean` compiled the scalar
-  inequality from a parameterized composition lemma under `[P.Nonempty]`.
-  When `P` is empty, all its envelope stages are bottom; finite generation
-  time then forces the intermediate and target properties to be bottom, and
-  the `+1` inequality closes. Otherwise the proof obtains finite natural
-  witnesses and applies composition. This probe did not prove the separate
-  iterated-envelope composition lemma.
+- source note:        `CategoryTheory.ObjectProperty.generationTime_add_one_submultiplicative`
+  proves the scalar inequality by splitting the empty-generator case from
+  finite generation-time witnesses. `triangEnvelopeIter_compose` handles an
+  empty property by showing all its iterates are bottom; the nonempty branch
+  uses the fixed-point lemma. The fixed-point proof uses
+  `triangEnvelopeIter_succ`, which needs only the shared pretriangulated
+  context, while the composition proof uses the triangulated stage-addition
+  API.
 - state:              L (proof-witness verified)

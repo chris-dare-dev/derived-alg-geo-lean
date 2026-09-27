@@ -23,9 +23,10 @@ finite binary products, and retracts of `G`, which is `⟨G⟩₁`;
 adds one extension at the next stage. The equation
 `CategoryTheory.ObjectProperty.triangEnvelopeIter_add` is a conditional decomposition of
 envelope stages under `[IsTriangulated C]`. It is not a generation-time composition or
-subadditivity law. The multiplicative composition theorem and the resulting
-`+1` submultiplicativity inequality are proved in `Dimension/Composition.lean`; the unshifted
-generation-time additive inequality is false.
+subadditivity law. The generic multiplicative composition theorem is proved beside Mathlib's
+generator API in `CategoryTheory/Triangulated/Generators/Composition.lean`; its `+1`
+generation-time consequence is in `Dimension/Composition.lean`. The additive generation-time
+inequality is false.
 
 ## Main definitions
 
