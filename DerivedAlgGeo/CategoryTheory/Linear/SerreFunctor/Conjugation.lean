@@ -164,13 +164,13 @@ noncomputable def transportIso (D : SerreFunctorData k C) (Φ : C ≌ C)
     (Functor.associator Φ.functor Φ.inverse (D.S ⋙ Φ.functor)).symm ≪≫
     Φ.funInvIdAssoc (D.S ⋙ Φ.functor)
 
-local instance transFunctorAdditive (Φ Ψ : C ≌ C)
+private local instance transFunctorAdditive (Φ Ψ : C ≌ C)
     [Φ.functor.Additive] [Ψ.functor.Additive] :
     (Φ.trans Ψ).functor.Additive := by
   change (Φ.functor ⋙ Ψ.functor).Additive
   infer_instance
 
-local instance transFunctorLinear (Φ Ψ : C ≌ C)
+private local instance transFunctorLinear (Φ Ψ : C ≌ C)
     [Φ.functor.Linear k] [Ψ.functor.Linear k] :
     (Φ.trans Ψ).functor.Linear k := by
   change (Φ.functor ⋙ Ψ.functor).Linear k
