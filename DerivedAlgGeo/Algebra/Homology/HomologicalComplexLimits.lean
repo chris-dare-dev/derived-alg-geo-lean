@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.ShortComplex.Limits
+import DerivedAlgGeo.CategoryTheory.Limits.Preserves.Naturality
 import Mathlib.Algebra.Homology.HomologicalComplexLimits
 import Mathlib.Algebra.Homology.ShortComplex.HomologicalComplex
 import Mathlib.Algebra.Homology.QuasiIso
@@ -40,6 +41,8 @@ of short complexes does (which is the case when colimits of shape `J` are exact)
 * `HomologicalComplex.quasiIso_colimMap_of_preservesHomology`: homology-preserving
   colimits preserve componentwise quasi-isomorphisms.
 * `HomologicalComplex.quasiIso_colimMap`: the exact-colimit specialization.
+* `HomologicalComplex.quasiIso_app_colimit_of_preserves`: a pointwise quasi-isomorphism
+  between colimit-preserving functors is a quasi-isomorphism at a colimit.
 
 ## Implementation notes
 
@@ -182,5 +185,41 @@ theorem quasiIso_colimMap {F G : J ⥤ HomologicalComplex C c} (α : F ⟶ G)
   letI : ∀ i, PreservesColimitsOfShape J (homologyFunctor C c i) :=
     fun _ => inferInstance
   exact quasiIso_colimMap_of_preservesHomology α hα
+
+end HomologicalComplex
+
+namespace HomologicalComplex
+
+universe w₁ w₂ v₁ u₁ v₂ u₂
+
+variable {J : Type w₁} [Category.{w₂} J]
+  {A : Type u₁} [Category.{v₁} A]
+  {C : Type u₂} [Category.{v₂} C] [HasZeroMorphisms C] [CategoryWithHomology C]
+  [HasColimitsOfShape J C]
+  {ι : Type*} {c : ComplexShape ι}
+  [∀ i, PreservesColimitsOfShape J (homologyFunctor C c i)]
+  {H H' : A ⥤ HomologicalComplex C c}
+  (F : J ⥤ A) (α : H ⟶ H')
+
+variable [HasColimit F] [PreservesColimit F H] [PreservesColimit F H']
+
+set_option backward.isDefEq.respectTransparency false in
+/-- A natural transformation between colimit-preserving functors to complexes is a
+quasi-isomorphism at a colimit when it is one on every object of the diagram.
+Preservation of the colimit by degreewise homology transfers the pointwise
+quasi-isomorphisms through `colim.map`; naturality of the preserved-colimit
+comparisons transfers the result back to the original transformation. -/
+theorem quasiIso_app_colimit_of_preserves
+    (hα : ∀ j, QuasiIso ((F.whiskerLeft α).app j)) :
+    QuasiIso (α.app (colimit F)) := by
+  have hcolim := quasiIso_colimMap_of_preservesHomology (F.whiskerLeft α) hα
+  haveI : QuasiIso (colim.map (F.whiskerLeft α)) := hcolim
+  have hnat := CategoryTheory.preservesColimitIso_naturality α F
+  haveI : QuasiIso (α.app (colimit F) ≫
+      (CategoryTheory.preservesColimitIso H' F).hom) := by
+    rw [hnat]
+    infer_instance
+  exact quasiIso_of_comp_right (α.app (colimit F))
+    (CategoryTheory.preservesColimitIso H' F).hom
 
 end HomologicalComplex
