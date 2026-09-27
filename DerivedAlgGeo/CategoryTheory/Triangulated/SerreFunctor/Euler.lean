@@ -21,13 +21,19 @@ or to commute with shifts.
 `HomFinite`. `SerreFunctorData.chiHom_eq_chiHom_swap_serre_of_bounded` supplies
 the version with `HomFiniteBounded`, ensuring the Euler sums have finite support.
 Shifting the second argument by `n` multiplies the Euler sum by `(-1)^n`.
-`chiHom_eq_negOnePow_mul_chiHom_of_serre_shift` gives the pointwise signed
-identity for an arbitrary object identified with the shifted Serre image.
-`chiHom_eq_negOnePow_mul_chiHom_of_serre_shift_of_bounded` gives its finite
-Euler form. The `_twist` and `_twist_of_bounded` corollaries specialize that
-object to the image of a fixed functor; `_twist_of_natIso` uses a natural
-comparison of functors. Without `HomFiniteBounded`, the sums may still be
-junk-total.
+
+* `SerreFunctorData.chiHom_eq_negOnePow_mul_chiHom_of_serre_shift` gives the
+  pointwise formula for an arbitrary comparison object.
+* `SerreFunctorData.chiHom_eq_negOnePow_mul_chiHom_of_serre_shift_of_bounded`
+  makes it an equality of finite Euler sums.
+* `SerreFunctorData.chiHom_eq_negOnePow_mul_chiHom_twist` specializes the
+  comparison object to a functor's image of `A`.
+* `SerreFunctorData.chiHom_eq_negOnePow_mul_chiHom_twist_of_bounded` gives
+  that specialization with finite Hom support.
+* `SerreFunctorData.chiHom_eq_negOnePow_mul_chiHom_twist_of_natIso` takes
+  its pointwise comparison from a natural isomorphism.
+
+Without `HomFiniteBounded`, the sums may still be junk-total.
 -/
 
 universe w v u
