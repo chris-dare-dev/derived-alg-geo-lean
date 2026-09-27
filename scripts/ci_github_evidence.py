@@ -711,6 +711,90 @@ def _dynamic_security_gate(
     return gate, artifact, payload, scan
 
 
+def _verify_dynamic_security_publication(
+    client: GitHubClient,
+    pr_number: int,
+    head: str,
+    provider_id: int,
+    checks: dict[int, dict[str, Any]],
+    suite_by_check: dict[int, int],
+    suites: dict[int, dict[str, Any]],
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], str, str]:
+    """Rebind a historical dynamic gate; current settings cannot certify old scans."""
+    candidates = [
+        check for check in checks.values()
+        if check.get("name") == "github-advanced-security"
+        and isinstance(check.get("app"), dict)
+        and check["app"].get("slug") == "github-actions"
+    ]
+    if len(candidates) != 1 or candidates[0].get("id") != provider_id:
+        raise EvidenceError("dynamic gate has no unique live check")
+    check = candidates[0]
+    suite_id = suite_by_check.get(provider_id)
+    suite = suites.get(suite_id)
+    app = check.get("app")
+    if (
+        suite is None
+        or _positive(
+            _required_object(check.get("check_suite"), "dynamic check suite").get("id"),
+            "dynamic check suite ID",
+        ) != suite_id
+        or app.get("id") != _required_object(suite.get("app"), "dynamic suite app").get("id")
+    ):
+        raise EvidenceError("dynamic gate check, suite and app disagree")
+    runs = client.get_all(f"/actions/runs?head_sha={head}", key="workflow_runs")
+    matching = [
+        run for run in runs
+        if run.get("workflow_id") == AI_SCAN_WORKFLOW_ID
+        and run.get("path") == AI_SCAN_PATH
+        and run.get("event") == "dynamic"
+        and run.get("head_sha") == head
+        and run.get("name") == f"Code scanning AI findings on PR #{pr_number}"
+        and isinstance(run.get("actor"), dict)
+        and run["actor"].get("id") == AI_SCAN_BOT_ID
+        and run["actor"].get("login") == "github-advanced-security[bot]"
+    ]
+    if len(matching) != 1:
+        raise EvidenceError("dynamic gate has no unique live workflow")
+    run = matching[0]
+    run_id = _positive(run.get("id"), "dynamic run ID")
+    attempt = _positive(run.get("run_attempt"), "dynamic run attempt")
+    if run.get("check_suite_id") != suite_id:
+        raise EvidenceError("dynamic run and check suites differ")
+    direct = client.get_object(f"/actions/runs/{run_id}")
+    for field in (
+        "id", "workflow_id", "name", "path", "event", "head_sha",
+        "check_suite_id", "run_attempt", "status", "conclusion", "actor",
+    ):
+        if direct.get(field) != run.get(field):
+            raise EvidenceError(f"dynamic workflow changed on reread: {field}")
+    jobs = client.get_all(f"/actions/runs/{run_id}/attempts/{attempt}/jobs", key="jobs")
+    matches = [job for job in jobs if job.get("id") == provider_id]
+    if len(matches) != 1:
+        raise EvidenceError("dynamic gate has no unique live job")
+    job = matches[0]
+    if (
+        job.get("name") != "github-advanced-security"
+        or job.get("run_id") != run_id
+        or job.get("run_attempt") != attempt
+        or job.get("head_sha") != head
+        or job.get("check_run_url") != f"{client._prefix}check-runs/{provider_id}"
+        or job.get("status") != check.get("status")
+        or job.get("conclusion") != check.get("conclusion")
+        or run.get("status") != check.get("status")
+        or run.get("conclusion") != check.get("conclusion")
+    ):
+        raise EvidenceError("dynamic workflow, job and check outcomes disagree")
+    raw = str(check.get("conclusion") or "unknown")
+    if check.get("status") != "completed":
+        status, scan_state = "pending", "pending"
+    elif raw == "failure":
+        status, scan_state = "failed", "unclassified_failure"
+    else:
+        status, scan_state = "unknown", "execution_observed_result_unknown"
+    return check, job, run, status, scan_state
+
+
 def collect(client: GitHubClient, pr_number: int) -> dict[str, Any]:
     """Collect a candidate-bound bundle without mutating GitHub or Git state."""
     pr_number = _positive(pr_number, "pull request number")
@@ -1592,6 +1676,7 @@ def verify_premerge_provider_evidence(
                 raise EvidenceError(f"primary gate {gate['id']!r} has the wrong provider")
             artifact_commit = candidate
             artifact_run_fields = {"run_id": run_id, "run_attempt": attempt}
+            status, conclusion = _conclusion(actual)
         elif binding == "check":
             matches = [
                 (check_id, check)
@@ -1605,11 +1690,31 @@ def verify_premerge_provider_evidence(
             actual = matches[0][1]
             artifact_commit = head
             artifact_run_fields = {}
+            status, conclusion = _conclusion(actual)
+        elif binding == "dynamic":
+            if (
+                definition.get("id") != "github-advanced-security"
+                or definition.get("producer") != "github-actions/AI Scan"
+            ):
+                raise EvidenceError("receipt has an unknown dynamic gate definition")
+            actual, job, dynamic_run, status, scan_state = _verify_dynamic_security_publication(
+                client, pr_number, head, provider_id,
+                live_checks, check_suite_by_id, suite_map,
+            )
+            dynamic_id = _positive(dynamic_run.get("id"), "dynamic run ID")
+            dynamic_attempt = _positive(dynamic_run.get("run_attempt"), "dynamic attempt")
+            if gate.get("run_id") != dynamic_id or gate.get("run_attempt") != dynamic_attempt:
+                raise EvidenceError("receipt dynamic gate run and attempt differ from provider")
+            artifact_commit = head
+            artifact_run_fields = {
+                "run_id": dynamic_id, "run_attempt": dynamic_attempt,
+            }
         else:
             raise EvidenceError(
                 f"receipt claims unsupported PR publication evidence for {binding!r} gate {gate['id']!r}"
             )
-        status, conclusion = _conclusion(actual)
+        if binding == "dynamic":
+            conclusion = str(actual.get("conclusion") or "unknown")
         if gate.get("status") != status or gate.get("conclusion") != conclusion:
             raise EvidenceError(f"receipt gate {gate['id']!r} differs from provider outcome")
         artifact_id = f"github-check-run-{provider_id}"
@@ -1629,11 +1734,13 @@ def verify_premerge_provider_evidence(
         provider_payload_facts[artifact_id] = {
             "binding": binding,
             "check_run": actual,
-            "job": job if binding == "primary" else None,
+            "job": job if binding in {"primary", "dynamic"} else None,
+            "workflow_run": dynamic_run if binding == "dynamic" else None,
+            "scan_state": scan_state if binding == "dynamic" else None,
             "candidate": candidate,
             "head": head,
-            "run_id": run_id,
-            "run_attempt": attempt,
+            "run_id": artifact_run_fields.get("run_id"),
+            "run_attempt": artifact_run_fields.get("run_attempt"),
         }
 
     artifacts = contract_evidence.get("artifacts")
@@ -1689,6 +1796,43 @@ def verify_premerge_provider_evidence(
                 or payload_value.get("run_attempt") != facts["run_attempt"]
             ):
                 raise EvidenceError("retained primary artifact has a different candidate or workflow run")
+        elif facts["binding"] == "dynamic":
+            expected_keys = {
+                "setting", "head", "workflow_run", "job", "check_run", "scan_state",
+            }
+            setting = payload_value.get("setting")
+            if (
+                not isinstance(setting, dict)
+                or setting.get("head_sha") != facts["head"]
+                or setting.get("api_path") != "/code-scanning/ai-scan"
+                or not isinstance(setting.get("state"), str)
+                or setting.get("state") not in {"enabled", "disabled", "unknown"}
+                or not isinstance(setting.get("requested_at_utc"), str)
+                or not isinstance(setting.get("completed_at_utc"), str)
+                or payload_value.get("head") != facts["head"]
+                or payload_value.get("scan_state") != facts["scan_state"]
+            ):
+                raise EvidenceError("retained dynamic artifact setting or scan state is inconsistent")
+            snapshot_run = payload_value.get("workflow_run")
+            run_fields = (
+                "id", "workflow_id", "name", "path", "event", "head_sha",
+                "check_suite_id", "run_attempt", "status", "conclusion", "actor",
+            )
+            if not isinstance(snapshot_run, dict) or any(
+                snapshot_run.get(field) != facts["workflow_run"].get(field)
+                for field in run_fields
+            ):
+                raise EvidenceError("retained dynamic workflow differs from provider")
+            snapshot_job = payload_value.get("job")
+            job_fields = (
+                "id", "name", "head_sha", "run_id", "run_attempt",
+                "check_run_url", "status", "conclusion",
+            )
+            if not isinstance(snapshot_job, dict) or any(
+                snapshot_job.get(field) != facts["job"].get(field)
+                for field in job_fields
+            ):
+                raise EvidenceError("retained dynamic job differs from provider")
         else:
             expected_keys = {"check_run", "head", "candidate"}
             if (

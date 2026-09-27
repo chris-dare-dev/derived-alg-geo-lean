@@ -194,5 +194,6 @@ validator. The standalone read-only command above inspects one open PR;
 `--output` writes a local bundle. Its exit code reports whether required
 CI was verified. It makes no review, queue-admission, merge, or post-merge
 health decision. The CI workflow and durable controller admission path do
-not call this collector yet; #1434 owns that adoption. The retired
-`scripts/loop_engine.py` is not a publication or admission route.
+not call this collector yet; #1434 owns that adoption. The current run-loop
+skill does not use `scripts/loop_engine.py` for publication or admission;
+#1431 tracks review of the client publication code recently merged there.

@@ -302,14 +302,7 @@ class PublicationClient:
         self.pull_reads = 0
         self.race_on_final_read = False
         self.pre_provider = ProviderFixture()
-        self.pre_provider.security_check = {
-            "id": 103,
-            "name": "github-advanced-security",
-            "head_sha": self.head,
-            "status": "completed",
-            "conclusion": "failure",
-            "app": {"id": 4444, "slug": "github-advanced-security"},
-        }
+        self.pre_provider.add_dynamic_scan("failure")
         self.run = {
             "id": 909,
             "name": "CI",
@@ -980,6 +973,33 @@ class PublicationTests(unittest.TestCase):
         self.resign_receipt(receipt)
 
         with self.assertRaises(EvidenceError):
+            verify_publication_provider_evidence(client, receipt)
+
+    def test_dynamic_publication_verifier_rechecks_run_job_and_payload(self) -> None:
+        client = PublicationClient()
+        receipt = self.collect(client)
+        artifact = next(
+            item for item in receipt["premerge"]["contract_evidence"]["artifacts"]
+            if item["subject"] == "github-advanced-security"
+        )
+        payloads = receipt["premerge"]["artifact_payloads"]
+        payload = json.loads(payloads[artifact["path"]])
+        payload["job"]["run_id"] = 987654
+        content = (
+            json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+            + "\n"
+        ).encode("utf-8")
+        payloads[artifact["path"]] = content.decode("utf-8")
+        artifact["sha256"] = hashlib.sha256(content).hexdigest()
+        artifact["size_bytes"] = len(content)
+        self.resign_receipt(receipt)
+        with self.assertRaisesRegex(EvidenceError, "retained dynamic job differs"):
+            verify_publication_provider_evidence(client, receipt)
+
+        client = PublicationClient()
+        receipt = self.collect(client)
+        client.pre_provider.dynamic_run["actor"]["id"] = 1
+        with self.assertRaisesRegex(EvidenceError, "no unique live workflow"):
             verify_publication_provider_evidence(client, receipt)
 
     def test_provider_verifier_rejects_forged_candidate_and_copied_pr_association(self) -> None:
