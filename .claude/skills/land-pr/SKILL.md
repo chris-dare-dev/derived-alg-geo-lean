@@ -1,21 +1,22 @@
 ---
 name: land-pr
-description: Run one unattended landing iteration — select an eligible open PR, update it against main, pre-flight it with scripts/precheck.sh, review it, take the PR CI verdict, then stop. Never merges. Pair with /loop.
+description: Not for loop runs (use run-loop). Run one landing iteration — select an eligible open PR, update it against main, pre-flight it with scripts/precheck.sh, review it, take the PR CI verdict, then stop. Never merges.
 ---
 
 # One landing iteration
+
+**Not for loop runs: use run-loop.** A run that works issues or a milestone to
+merged PRs follows `.claude/skills/run-loop/SKILL.md`, which merges its own PRs
+on green CI; this skill's "merging is a human action" applies only to this
+skill.
 
 This is **one** iteration against an eligible open PR and it **halts** before
 the merge. Merging is a human action, always. Read the issue tracker and native
 blockers before selecting a PR; an open PR is not by itself admission-ready.
 
-When called by a bounded loop manifest, the controller's OpenSpec change and
-review ledger remain authoritative. Landing may act only on the reviewed head;
-the three adversarial lenses plus `mathlib-reviewer` must already have been
-recorded for the frozen chunk, and the controller's maximum of three
-review/improve rounds still applies, at whatever number the manifest's
-`limits.max_review_rounds_per_chunk` sets. This skill's normal one-PR stop behavior
-is unchanged.
+The manifest controller (`scripts/loop_engine.py`), its OpenSpec changes and
+its review ledgers are retired from every run path; none of them scopes this
+skill.
 
 ## What the queue actually is
 
@@ -151,7 +152,7 @@ python3 -m venv .loop-tools
 PATH="$PWD/.loop-tools/bin:$PATH" scripts/precheck.sh
 ```
 
-Seconds, not minutes. It runs every gate that needs no Lean build — workflows,
+About a minute, not the twenty of CI. It runs every gate that needs no Lean build — workflows,
 style on this branch's own lines, source-independence, layering, umbrella
 coverage, root reachability, coherent families, coverage map, pin, nolints,
 roadmap, and the two hook tests — then a **targeted** `lake build` of the

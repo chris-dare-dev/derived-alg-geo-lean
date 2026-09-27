@@ -15,13 +15,18 @@ evidence behind one.
 | `open-questions.md` | The decisions blocking work, each with a GitHub issue. |
 | `references/mathlib-style.md` | The Mathlib conventions this repo holds itself to, and the deltas it keeps on purpose. The spec `agents/mathlib-reviewer.md` enforces. |
 | `agents/` | Repo-local agent specifications. One per file. |
-| `skills/` | Repo-local skills, one directory each. `run-loop` works issues or a milestone to merged PRs; `formalize-issue` and `land-pr` are single iterations. |
+| `skills/` | Repo-local skills, one directory each. `run-loop` works issues or a milestone to merged PRs; `formalize-issue` and `land-pr` are single iterations, not for loop runs. |
 | `loop-specs/` | Manifests of the retired loop controller. Runs no longer write them; they are kept for the ledgers they produced. |
 | `settings.json` | Hooks. Currently: the Mathlib-convention check on every Lean edit. |
 
 OpenSpec's generated Codex skills live in `.agents/skills/` and are refreshed by
 `openspec update`; do not hand-edit those generated files. Repository-specific
 reviewers and the loop protocol live in `.claude/agents/` and `.claude/skills/`.
+Codex registers skills only from `.agents/skills/`, so
+`.agents/skills/run-loop` is a symlink to `skills/run-loop`: one file, visible
+to both runtimes. Codex lists a symlinked skill directory but ignores a
+symlinked `SKILL.md` (checked with `codex debug prompt-input`), so keep the link
+on the directory.
 
 ## Loop runs and OpenSpec
 
