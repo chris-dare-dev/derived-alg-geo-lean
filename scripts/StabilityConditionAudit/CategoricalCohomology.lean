@@ -37,6 +37,7 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex.extendHomologyIso_naturality
 #print axioms HomologicalComplex.extendHomologyIso_naturality_assoc
 #print axioms HomologicalComplex₂.singleMapHomologicalComplexFlipIso
+#print axioms HomologicalComplex₂.singleCompExtendTotalIso
 #print axioms HomologicalComplex.singleCompExtendIso
 #print axioms HomologicalComplex.singleCompExtendAtImageIso
 #print axioms CategoryTheory.Triangulated.SpectralObject.mapHomologicalFunctor

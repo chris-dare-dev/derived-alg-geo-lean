@@ -5,10 +5,9 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.Modules.FlatGenerators
 import DerivedAlgGeo.Algebra.Homology.Embedding.Extend
 import DerivedAlgGeo.Algebra.Homology.HomologicalBicomplex
-import DerivedAlgGeo.Algebra.Homology.SpectralSequence.SingleZeroTotal
+import DerivedAlgGeo.Algebra.Homology.SpectralSequence.SingleExtensionTotal
 import Mathlib.Algebra.Homology.Embedding.Extend
 import Mathlib.Algebra.Homology.Embedding.ExtendHomology
-import Mathlib.Algebra.Homology.HomotopyCategory.SingleFunctors
 import Mathlib.Algebra.Homology.TotalComplex
 
 /-!
@@ -20,6 +19,20 @@ resolution direction into the integers and form Mathlib's direct-sum total compl
 augmentation is a quasi-isomorphism in each resolution-direction row, and it totalizes
 to a natural map into the input complex. A quasi-isomorphism of total complexes and
 K-flatness remain separate obligations.
+
+## Main definitions and results
+
+* `freeYonedaSheafCoproductTotalTargetIso` naturally identifies the
+  resolution-degree-zero augmentation target with the input complex.
+* `freeYonedaSheafCoproductTotalAugmentation` composes that isomorphism with
+  the totalized free-Yoneda augmentation.
+
+## Implementation notes
+
+The target comparison specializes `HomologicalComplex₂.singleCompExtendTotalIso`.
+That generic comparison combines the single/extension, mapped-single/flip,
+and signed single-zero total comparisons. The sign is inherited from Mathlib's
+total symmetry.
 -/
 
 universe u
@@ -107,65 +120,6 @@ noncomputable def freeYonedaSheafCoproductTotalAugmentationToSingleZero
     (HomologicalComplex₂.totalFunctor X.Modules (ComplexShape.up ℤ)
       (ComplexShape.up ℤ) (ComplexShape.up ℤ))
 
-private noncomputable def freeYonedaTargetSingleIso (X : Scheme.{u}) :
-    ChainComplex.single₀ X.Modules ⋙
-        ComplexShape.embeddingDownNat.extendFunctor X.Modules ≅
-      CochainComplex.singleFunctor X.Modules 0 :=
-  HomologicalComplex.singleCompExtendIso
-    (C := X.Modules) ComplexShape.embeddingDownNat 0 0 rfl
-
-private noncomputable def freeYonedaTargetBicomplexIso (X : Scheme.{u}) :
-    ((ChainComplex.single₀ X.Modules) ⋙
-      ComplexShape.embeddingDownNat.extendFunctor X.Modules).mapHomologicalComplex
-        (ComplexShape.up ℤ) ≅
-      (CochainComplex.singleFunctor X.Modules 0).mapHomologicalComplex
-        (ComplexShape.up ℤ) :=
-  CategoryTheory.NatIso.mapHomologicalComplex
-    (freeYonedaTargetSingleIso X) (ComplexShape.up ℤ)
-
-private noncomputable def freeYonedaTargetTotalIso (X : Scheme.{u}) :
-    (((ChainComplex.single₀ X.Modules) ⋙
-        ComplexShape.embeddingDownNat.extendFunctor X.Modules).mapHomologicalComplex
-      (ComplexShape.up ℤ)) ⋙
-        HomologicalComplex₂.totalFunctor X.Modules (ComplexShape.up ℤ)
-          (ComplexShape.up ℤ) (ComplexShape.up ℤ) ≅
-      ((CochainComplex.singleFunctor X.Modules 0).mapHomologicalComplex
-        (ComplexShape.up ℤ)) ⋙
-        HomologicalComplex₂.totalFunctor X.Modules (ComplexShape.up ℤ)
-          (ComplexShape.up ℤ) (ComplexShape.up ℤ) :=
-  CategoryTheory.Functor.isoWhiskerRight (freeYonedaTargetBicomplexIso X) _
-
-private noncomputable def freeYonedaMappedSingleFlipIso (X : Scheme.{u}) :
-    (CochainComplex.singleFunctor X.Modules 0).mapHomologicalComplex
-      (ComplexShape.up ℤ) ≅
-    CochainComplex.singleFunctor (CochainComplex X.Modules ℤ) 0 ⋙
-      HomologicalComplex₂.flipFunctor X.Modules (ComplexShape.up ℤ) (ComplexShape.up ℤ) :=
-  HomologicalComplex₂.singleMapHomologicalComplexFlipIso
-    (C := X.Modules) (ComplexShape.up ℤ) (ComplexShape.up ℤ) 0
-
-private noncomputable def freeYonedaMappedSingleTotalFlipIso (X : Scheme.{u}) :
-    ((CochainComplex.singleFunctor X.Modules 0).mapHomologicalComplex
-      (ComplexShape.up ℤ)) ⋙
-      HomologicalComplex₂.totalFunctor X.Modules (ComplexShape.up ℤ)
-        (ComplexShape.up ℤ) (ComplexShape.up ℤ) ≅
-    (CochainComplex.singleFunctor (CochainComplex X.Modules ℤ) 0 ⋙
-      HomologicalComplex₂.flipFunctor X.Modules (ComplexShape.up ℤ) (ComplexShape.up ℤ)) ⋙
-      HomologicalComplex₂.totalFunctor X.Modules (ComplexShape.up ℤ)
-        (ComplexShape.up ℤ) (ComplexShape.up ℤ) :=
-  CategoryTheory.Functor.isoWhiskerRight (freeYonedaMappedSingleFlipIso X) _
-
-private noncomputable def freeYonedaFlippedSingleTotalToId (X : Scheme.{u}) :
-    (CochainComplex.singleFunctor (CochainComplex X.Modules ℤ) 0 ⋙
-      HomologicalComplex₂.flipFunctor X.Modules (ComplexShape.up ℤ) (ComplexShape.up ℤ)) ⋙
-      HomologicalComplex₂.totalFunctor X.Modules (ComplexShape.up ℤ)
-        (ComplexShape.up ℤ) (ComplexShape.up ℤ) ≅
-    𝟭 (CochainComplex X.Modules ℤ) :=
-  CategoryTheory.NatIso.ofComponents
-    (fun K => HomologicalComplex₂.singleZeroFlipTotalIso K)
-    (by
-      intro K L f
-      exact HomologicalComplex₂.singleZeroFlipTotalIso_naturality f)
-
 /-- The total complex of the resolution-degree-zero target of the free-Yoneda
 augmentation is naturally isomorphic to the input cochain complex. The comparison
 uses the signed totalization of a single-zero bicomplex. -/
@@ -176,8 +130,7 @@ noncomputable def freeYonedaSheafCoproductTotalTargetIso (X : Scheme.{u}) :
         HomologicalComplex₂.totalFunctor X.Modules (ComplexShape.up ℤ)
           (ComplexShape.up ℤ) (ComplexShape.up ℤ) ≅
     𝟭 (CochainComplex X.Modules ℤ) :=
-  (freeYonedaTargetTotalIso X).trans
-    ((freeYonedaMappedSingleTotalFlipIso X).trans (freeYonedaFlippedSingleTotalToId X))
+  HomologicalComplex₂.singleCompExtendTotalIso (C := X.Modules)
 
 /-- The natural augmentation from the direct-sum total complex of the free-Yoneda
 resolution to the input complex. Its source is termwise flat; the augmentation is
