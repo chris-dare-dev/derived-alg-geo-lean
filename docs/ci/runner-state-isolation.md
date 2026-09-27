@@ -173,8 +173,8 @@ the recorded root before log archival or cleanup.
 
 Use a reviewed, pristine GitHub runner Linux x64 release archive and record
 its SHA-256 independently of the downloaded bytes. Keep the archive outside
-all job roots; the worker verifies the pinned digest and rejects links or
-special files in the tarball. The host account running the controller needs
+all job roots; the worker verifies the pinned digest and rejects unsafe links
+or special files in the tarball. The host account running the controller needs
 repository administration permission for the registration-token and runner
 list APIs, and `gh` authentication outside the isolated job environment. No
 token is printed; it is passed into the configured runner and removed from the
