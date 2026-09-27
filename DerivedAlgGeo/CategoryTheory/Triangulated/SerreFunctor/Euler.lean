@@ -21,9 +21,13 @@ or to commute with shifts.
 `HomFinite`. `SerreFunctorData.chiHom_eq_chiHom_swap_serre_of_bounded` supplies
 the version with `HomFiniteBounded`, ensuring the Euler sums have finite support.
 Shifting the second argument by `n` multiplies the Euler sum by `(-1)^n`.
-When the Serre functor is a shifted fixed twist, these two identities give the
-corresponding signed Euler identity. Without `HomFiniteBounded`, the sums may
-still be junk-total.
+`chiHom_eq_negOnePow_mul_chiHom_of_serre_shift` gives the pointwise signed
+identity for an arbitrary object identified with the shifted Serre image.
+`chiHom_eq_negOnePow_mul_chiHom_of_serre_shift_of_bounded` gives its finite
+Euler form. The `_twist` and `_twist_of_bounded` corollaries specialize that
+object to the image of a fixed functor; `_twist_of_natIso` uses a natural
+comparison of functors. Without `HomFiniteBounded`, the sums may still be
+junk-total.
 -/
 
 universe w v u
@@ -137,29 +141,51 @@ theorem SerreFunctorData.chiHom_eq_chiHom_swap_serre_of_bounded
   letI : HomFinite k C := homFinite_of_bounded k C
   exact D.chiHom_eq_chiHom_swap_serre k C A B
 
+section ShiftedSerreImage
+
+variable (D : SerreFunctorData k C) (A B X : C) (n : ℤ)
+
+omit [HasZeroObject C] [Pretriangulated C] in
+/-- A pointwise identification of the Serre image of `A` with `X⟦n⟧`
+gives the signed Euler identity. Without bounded Hom support, the Euler
+sums may be junk-total. -/
+theorem SerreFunctorData.chiHom_eq_negOnePow_mul_chiHom_of_serre_shift
+    [HomFinite k C] (e : D.S.obj A ≅ X⟦n⟧) :
+    chiHom k C A B = (n.negOnePow : ℤ) * chiHom k C B X := by
+  rw [D.chiHom_eq_chiHom_swap_serre k C A B,
+    chiHom_congr_right k C B e,
+    chiHom_shift_right k C B X n]
+
+omit [HasZeroObject C] [Pretriangulated C] in
+/-- Bounded Hom support makes the signed pointwise identity an equality of
+actual finite Euler sums. -/
+theorem SerreFunctorData.chiHom_eq_negOnePow_mul_chiHom_of_serre_shift_of_bounded
+    [HomFiniteBounded k C] (e : D.S.obj A ≅ X⟦n⟧) :
+    chiHom k C A B = (n.negOnePow : ℤ) * chiHom k C B X := by
+  letI : HomFinite k C := homFinite_of_bounded k C
+  exact D.chiHom_eq_negOnePow_mul_chiHom_of_serre_shift k C A B X n e
+
+end ShiftedSerreImage
+
 section ShiftedTwist
 
 variable (D : SerreFunctorData k C) (T : C ⥤ C) (A B : C) (n : ℤ)
 
 omit [HasZeroObject C] [Pretriangulated C] in
-/-- If the Serre image of `A` is the `n`-shift of a fixed twist of `A`,
-Serre duality gives the signed Euler identity. The Euler sums can remain
-junk-total without bounded Hom support. -/
+/-- The pointwise signed Euler identity when the comparison object is the
+image of `A` under a fixed twist functor. -/
 theorem SerreFunctorData.chiHom_eq_negOnePow_mul_chiHom_twist [HomFinite k C]
     (e : D.S.obj A ≅ (T.obj A)⟦n⟧) :
-    chiHom k C A B = (n.negOnePow : ℤ) * chiHom k C B (T.obj A) := by
-  rw [D.chiHom_eq_chiHom_swap_serre k C A B,
-    chiHom_congr_right k C B e,
-    chiHom_shift_right k C B (T.obj A) n]
+    chiHom k C A B = (n.negOnePow : ℤ) * chiHom k C B (T.obj A) :=
+  D.chiHom_eq_negOnePow_mul_chiHom_of_serre_shift k C A B (T.obj A) n e
 
 omit [HasZeroObject C] [Pretriangulated C] in
-/-- The signed Euler identity with finite Hom support. -/
+/-- Bounded Hom support makes the twist formula an equality of finite
+Euler sums, instead of potentially junk-total sums. -/
 theorem SerreFunctorData.chiHom_eq_negOnePow_mul_chiHom_twist_of_bounded
     [HomFiniteBounded k C] (e : D.S.obj A ≅ (T.obj A)⟦n⟧) :
-    chiHom k C A B = (n.negOnePow : ℤ) * chiHom k C B (T.obj A) := by
-  rw [D.chiHom_eq_chiHom_swap_serre_of_bounded k C A B,
-    chiHom_congr_right k C B e,
-    chiHom_shift_right k C B (T.obj A) n]
+    chiHom k C A B = (n.negOnePow : ℤ) * chiHom k C B (T.obj A) :=
+  D.chiHom_eq_negOnePow_mul_chiHom_of_serre_shift_of_bounded k C A B (T.obj A) n e
 
 omit [HasZeroObject C] [Pretriangulated C] in
 /-- A natural identification `S ≅ T ⋙ [n]` supplies the objectwise comparison
