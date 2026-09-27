@@ -47,9 +47,13 @@ and future upstream work; matching directories is not required to import Mathlib
 If two rows seem to apply, identify the API actually being extended, rather
 than choosing the weakest type appearing in the statement.
 `PrimeSpectrum.basicOpen_prod_eq_pi` is stated
-in the lattice of opens of a prime spectrum, but `basicOpen` is defined in
+in the lattice of opens of a prime spectrum, but `PrimeSpectrum.basicOpen` is defined in
 `RingTheory/Spectrum/Prime/Topology.lean`, so it lives there and not in
-`Topology/` or `Algebra/`. Stalks of module presheaves are stated with
+`Topology/` or `Algebra/`. The basic-open cover bridge
+`PrimeSpectrum.coversTop_basicOpen_of_span_eq_top` also lives under
+`RingTheory/Spectrum/Prime/`: it uses only a commutative semiring and
+`PrimeSpectrum.basicOpen`, then composes the prime-spectrum supremum criterion with the
+topological open-site cover theorem. Stalks of module presheaves are stated with
 `TopCat`, germs, and stalk functors, which Mathlib defines in
 `Topology/Sheaves/`, so they live there.
 
