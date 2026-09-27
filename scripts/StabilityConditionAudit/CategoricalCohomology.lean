@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence
+import DerivedAlgGeo.Algebra.Homology.HomologySequenceLemmas
 import DerivedAlgGeo.Algebra.Homology.HomologicalBicomplex
 import DerivedAlgGeo.Algebra.Homology.Embedding
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Coproducts
