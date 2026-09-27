@@ -8,10 +8,40 @@ import Mathlib.CategoryTheory.Triangulated.Functor
 /-!
 # Shift-compatible isomorphisms of triangulated functors
 
-This file packages the selected source and target `CommShift` structures for
-an isomorphism of functors and transfers triangulatedness across that
-isomorphism. The package is generic in the functors and is consumed by
-Fourier--Mukai comparisons and other presentations.
+This file packages the selected source and target shift structures for an
+isomorphism of functors and transfers triangulatedness across that isomorphism.
+It is generic in the functors and is consumed by Fourier--Mukai comparisons
+and other presentations.
+
+## Main definitions
+
+`CategoryTheory.Triangulated.FunctorIsoShiftCompatibility` stores a selected
+target shift structure and the compatibility of a supplied comparison with
+the caller-selected source structure.
+
+## Main results
+
+`CategoryTheory.Triangulated.FunctorIsoShiftCompatibility.targetIsTriangulated`
+transfers triangulatedness across the comparison.
+`CategoryTheory.Triangulated.FunctorIsoShiftCompatibility.equivalenceIsTriangulatedOfEq`
+applies this transfer to an equivalence whose forward functor is the target.
+
+## Implementation notes
+
+The source `CategoryTheory.Functor.CommShift` remains an input, so a
+specialization can preserve a shift structure already chosen by its
+presentation instead of replacing it with one transported across the
+isomorphism.
+
+## References
+
+The transfer uses Mathlib's
+`CategoryTheory.Functor.isTriangulated_of_iso` and
+`CategoryTheory.Equivalence.IsTriangulated.mk'`.
+
+## Tags
+
+triangulated functor, shift compatibility, natural isomorphism, equivalence
 -/
 
 set_option autoImplicit false
@@ -23,16 +53,16 @@ namespace CategoryTheory.Triangulated
 source functor's selected shift structure and an independently selected shift
 structure on the target functor.
 
-The source `CommShift` instance is an input to this record. Specializations
-must preserve the shift structure already chosen by their presentation rather
-than replacing it with one transported from the target. -/
+The source `CategoryTheory.Functor.CommShift` is an input to this record.
+Specializations must preserve the shift structure already chosen by their
+presentation rather than replacing it with one transported from the target. -/
 structure FunctorIsoShiftCompatibility
     {C D : Type*} [Category* C] [Category* D]
     [HasShift C ℤ] [HasShift D ℤ]
     (G F : C ⥤ D) [G.CommShift ℤ] (α : G ≅ F) where
-  /-- The independently selected shift structure on the target functor. -/
+  /-- The target's chosen presentation is kept independent of transport from the source. -/
   targetCommShift : F.CommShift ℤ
-  /-- The supplied isomorphism respects the selected source and target shifts. -/
+  /-- This compatibility lets Mathlib transport distinguished triangles across the isomorphism. -/
   hom_commShift :
     letI : F.CommShift ℤ := targetCommShift
     NatTrans.CommShift α.hom ℤ
@@ -49,8 +79,9 @@ variable {C D : Type*} [Category* C] [Category* D]
   {G F : C ⥤ D} [G.CommShift ℤ] {α : G ≅ F}
   (h : FunctorIsoShiftCompatibility G F α)
 
-/-- Transfer triangulatedness across the supplied isomorphism using the
-selected source and target shift structures. -/
+/-- Use the supplied shift compatibility to transport distinguished triangles
+across the isomorphism, as required by
+`CategoryTheory.Functor.isTriangulated_of_iso`. -/
 theorem targetIsTriangulated [G.IsTriangulated] :
     letI : F.CommShift ℤ := h.targetCommShift
     F.IsTriangulated := by
@@ -58,9 +89,10 @@ theorem targetIsTriangulated [G.IsTriangulated] :
   letI : NatTrans.CommShift α.hom ℤ := h.hom_commShift
   exact Functor.isTriangulated_of_iso α
 
-/-- Transfer triangulatedness to an equivalence whose functor is the target
-of the supplied comparison, deriving the inverse and equivalence shift
-structures from the selected forward structure. -/
+/-- Transfer triangulatedness to an equivalence whose forward functor is the
+comparison target. Mathlib derives the inverse and equivalence shift structures
+from the selected forward structure before constructing the triangulated
+equivalence. -/
 theorem equivalenceIsTriangulatedOfEq {E : C ≌ D}
     (hEF : E.functor = F) [G.IsTriangulated] :
     letI : E.functor.CommShift ℤ := hEF ▸ h.targetCommShift
