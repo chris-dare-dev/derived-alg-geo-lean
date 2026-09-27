@@ -117,6 +117,7 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex.stupidTruncGEMap_comp_assoc
 #print axioms HomologicalComplex.stupidTruncGEMap_comp_ι
 #print axioms HomologicalComplex.stupidTruncGEMap_comp_ι_assoc
+#print axioms HomologicalComplex.stupidTruncGEMap_naturality
 #print axioms HomologicalComplex.stupidTruncGEMap_self
 #print axioms HomologicalComplex.stupidTruncGEι
 #print axioms HomologicalComplex.stupidTruncGEι_f_mono
@@ -190,12 +191,12 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex₂.singleZeroFlipTotalIso
 #print axioms HomologicalComplex₂.singleZeroFlipTotalIso_naturality
 #print axioms HomologicalComplex₂.singleZeroFlipTotalIso_naturality_assoc
-#print axioms HomologicalComplex₂.stupidTruncGEXIso
+#print axioms HomologicalComplex.stupidTruncGEXIso
 #print axioms HomologicalComplex₂.stupidTruncGEXIso_hom_inv_f
 #print axioms HomologicalComplex₂.stupidTruncGEXIso_hom_inv_f_assoc
 #print axioms HomologicalComplex₂.stupidTruncGEXIso_inv_hom_f
 #print axioms HomologicalComplex₂.stupidTruncGEXIso_inv_hom_f_assoc
-#print axioms HomologicalComplex₂.stupidTruncXIso_eq_stupidTruncGEXIso
+#print axioms HomologicalComplex.stupidTruncXIso_eq_stupidTruncGEXIso
 #print axioms HomologicalComplex₂.totalFunctor_additive
 #print axioms HomologicalComplex₂.truncatedBicomplex
 #print axioms HomologicalComplex₂.adjacentColumnConnecting_representative

@@ -10,8 +10,26 @@ import Mathlib.Algebra.Category.Grp.Abelian
 # Spectral pages of a column-filtered total complex
 
 The generic adjacent-column construction is in `FilteredTotalComplexAdjacentCore`.
-Here it is specialized to abelian groups and compared with the filtered
-spectral object's adjacent layers, connecting maps, and initial-page differential.
+Here it is specialized to `AddCommGrpCat` and compared with the filtered
+spectral object's adjacent layers and connecting maps.
+
+## Main definitions and results
+
+* `HomologicalComplex₂.columnFilteredInitialPageColumnHomologyIso` identifies
+  the initial-page object with vertical column homology.
+* `HomologicalComplex₂.columnFilteredFirstPage_d_eq` computes the initial
+  differential from the horizontal bicomplex differential.
+
+## Implementation notes
+
+The comparison transports the generic adjacent cone through filtration-stage
+isos, then tracks the signed total convention through connecting morphisms.
+The spectral-page statements here specialize to abelian groups.
+
+## References
+
+The proof uses Mathlib's filtered `SpectralObject`, mapping-cone triangles,
+and homology connecting maps, together with the generic adjacent-column core.
 -/
 
 namespace HomologicalComplex₂
@@ -80,6 +98,9 @@ private lemma totalStupidTruncGEMap_eqToHom
   subst b₁
   rfl
 
+/-- Reindexing filtration stage `-p` gives precisely the tail beginning at
+`p`; the comparison commutes with the adjacent-stage inclusion by the
+naturality of nested stupid-truncation maps. -/
 @[reassoc]
 lemma columnFilteredStageIso_comm
     (K : HomologicalComplex₂ AddCommGrpCat.{w}
@@ -105,6 +126,8 @@ lemma columnFilteredStageIso_comm
         (by simp [columnFiltrationIndex])
         (by simp [columnFiltrationIndex]) (by simp [columnFiltrationIndex])
 
+/-- Invert the preceding adjacent-stage square. Cancellation by the stage
+isomorphism turns its commutative square into this inverse orientation. -/
 @[reassoc]
 lemma columnFilteredStageIso_inv_comm
     (K : HomologicalComplex₂ AddCommGrpCat.{w}
@@ -583,8 +606,9 @@ lemma homologyMap_descShortComplex_comp_delta
   have h₁'' := h₁'.trans (Category.assoc _ _ w).symm
   exact ((cancel_mono w).mp h₁'').symm
 
-/-- Naturality of the raw mapping-cone connecting map under the canonical filtration-stage
-comparison. -/
+/-- Apply the homology functor to the cone-triangle isomorphism induced by
+the filtration-stage square. Its third morphism gives the connecting-map
+square after the shift-map comparison. -/
 @[reassoc]
 lemma columnFilteredRawConnecting_comp_stageIso
     (K : HomologicalComplex₂ AddCommGrpCat.{w}
@@ -680,8 +704,9 @@ lemma columnFilteredHomologyMap_inr_comp_coneToShift
       simp only [HomologicalComplex.homologyMap_comp]
       rfl
 
-/-- Cancelling the final single-column isomorphism leaves the short-complex mapping-cone
-comparison. -/
+/-- The adjacent-layer cone comparison factors through the short-complex
+cone projection and the single-column total isomorphism. Cancel that final
+isomorphism after applying homology to expose the short-complex map. -/
 @[reassoc]
 lemma columnFilteredHomologyMap_coneToShift_comp_singleColumnTotalIso_inv
     (K : HomologicalComplex₂ AddCommGrpCat.{w}

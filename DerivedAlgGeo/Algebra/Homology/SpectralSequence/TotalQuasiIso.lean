@@ -23,6 +23,7 @@ five lemma and mapping-cone composition comparison used by the finite argument.
 -/
 
 open CategoryTheory Category Limits
+open HomologicalComplex (stupidTruncGEXIso stupidTruncXIso_eq_stupidTruncGEXIso)
 open CategoryTheory.Pretriangulated
 
 universe w
@@ -268,30 +269,8 @@ private lemma truncatedBicomplexMap_naturality_inclusion (f : K ⟶ L)
   dsimp [truncatedTotalMap]
   rw [← total.map_comp, ← total.map_comp]
   congr 1
-  apply HomologicalComplex.Hom.ext
-  funext i
-  by_cases hi : q ≤ i
-  · dsimp [HomologicalComplex.stupidTruncGEMap]
-    rw [dif_pos hi, dif_pos hi]
-    let eK₀ := stupidTruncGEXIso K q i hi
-    let eK₁ := stupidTruncGEXIso K p i (hpq.trans hi)
-    let eL₀ := stupidTruncGEXIso L q i hi
-    let eL₁ := stupidTruncGEXIso L p i (hpq.trans hi)
-    change (truncatedBicomplexMap f q).f i ≫ eL₀.hom ≫ eL₁.inv =
-      eK₀.hom ≫ eK₁.inv ≫ (truncatedBicomplexMap f p).f i
-    dsimp [truncatedBicomplexMap, truncatedBicomplex]
-    rw [← cancel_mono eL₁.hom]
-    simp only [Category.assoc, eL₁.inv_hom_id, Category.comp_id]
-    rw [← Category.assoc, ← Category.assoc]
-    dsimp [eK₀, eK₁, eL₀, eL₁, stupidTruncGEXIso]
-    rw [HomologicalComplex.stupidTruncMap_stupidTruncXIso_hom]
-    simp only [Category.assoc]
-    rw [HomologicalComplex.stupidTruncMap_stupidTruncXIso_hom]
-    simp
-  · apply IsZero.eq_of_src
-    apply HomologicalComplex.isZero_stupidTrunc_X
-    rw [ComplexShape.notMem_range_embeddingUpIntGE_iff]
-    omega
+  simpa only [truncatedBicomplexMap] using
+    (HomologicalComplex.stupidTruncGEMap_naturality f p q hpq)
 
 /-- The direct inclusion of a column tail is natural in the bicomplex. -/
 private lemma tailToZero_naturality (f : K ⟶ L) (n : ℕ) :

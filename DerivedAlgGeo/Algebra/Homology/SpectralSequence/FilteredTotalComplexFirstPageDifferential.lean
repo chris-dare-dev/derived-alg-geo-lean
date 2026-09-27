@@ -16,6 +16,7 @@ that this connecting morphism is induced by the horizontal differential of the b
 universe w
 
 open CategoryTheory Category Limits
+open HomologicalComplex (stupidTruncGEXIso stupidTruncXIso_eq_stupidTruncGEXIso)
 
 namespace HomologicalComplex₂
 
