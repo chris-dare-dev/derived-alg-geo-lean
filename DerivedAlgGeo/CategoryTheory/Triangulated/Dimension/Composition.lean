@@ -13,8 +13,9 @@ generation time and Rouquier dimension.
 
 ## Main definitions
 
-This file introduces no definitions; it reuses `generationTime`, `rouquierDim`, and Mathlib's
-envelope tower.
+This file introduces no definitions; it reuses `CategoryTheory.ObjectProperty.generationTime`,
+`CategoryTheory.Triangulated.rouquierDim`, and Mathlib's
+`CategoryTheory.ObjectProperty.triangEnvelopeIter` tower.
 
 ## Main results
 
@@ -28,8 +29,9 @@ envelope tower.
 ## Implementation notes
 
 The `+1` records the shift between iterated-envelope indices and Rouquier's stage indices:
-`triangEnvelopeIter n` is stage `n + 1`. This form handles infinite values without subtracting
-one from an `ℕ∞` bound. The expanded expression `a * b + a + b` is `⊤` if either input is `⊤`;
+`CategoryTheory.ObjectProperty.triangEnvelopeIter P n` is stage `n + 1`. This form handles
+infinite values without subtracting one from an `ℕ∞` bound. The expanded expression
+`a * b + a + b` is `⊤` if either input is `⊤`;
 `0 * ⊤ = 0` is relevant only to a bare product.
 
 ## References
@@ -75,19 +77,25 @@ variable [IsTriangulated C]
 
 /-- Generation time plus one is submultiplicative.
 
-The additive law `generationTime P R ≤ generationTime P Q + generationTime Q R` is false.
+The additive law `CategoryTheory.ObjectProperty.generationTime P R ≤
+CategoryTheory.ObjectProperty.generationTime P Q +
+CategoryTheory.ObjectProperty.generationTime Q R` is false.
 For a counterexample, take the bounded derived category of finite-length modules over
 `A = k[t]/(t^6)`, let `S = A/(t)`, `T = A/(t^3)`, `P = singleton S`,
-`Q = singleton T`, and `R = singleton A`. Then `P.generationTime Q = 2` by the
-length-three composition series, and `Q.generationTime R = 1` by the exact sequence
+`Q = singleton T`, and `R = singleton A`. Then
+`CategoryTheory.ObjectProperty.generationTime P Q = 2` by the length-three composition
+series, and `CategoryTheory.ObjectProperty.generationTime Q R = 1` by the exact sequence
 `0 → t^3 A → A → T → 0`, since `t^3 A ≃ T`. Objects in
-`P.triangEnvelopeIter n` have cohomology modules of Loewy length at most `n + 1`: this holds
+`CategoryTheory.ObjectProperty.triangEnvelopeIter P n` have cohomology modules of Loewy length
+at most `n + 1`: this holds
 for shifts, finite sums, and retracts at stage zero, and each extension by a semisimple module
 adds at most one Loewy layer. This bound makes the generation times exact: `T` has Loewy
 length three, while `A` has Loewy length six, a length-six composition series, and a filtration
-by two copies of `T`. Also, `A` is not in `Q.triangEnvelopeIter 0`, whose cohomology modules
-have Loewy length at most three, so `Q.generationTime R = 1`. Thus
-`P.generationTime R = 5`, while additivity would give `5 ≤ 2 + 1`, which is false. In tower indices,
+by two copies of `T`. Also, `A` is not in `CategoryTheory.ObjectProperty.triangEnvelopeIter Q 0`,
+whose cohomology modules have Loewy length at most three, so
+`CategoryTheory.ObjectProperty.generationTime Q R = 1`. Thus
+`CategoryTheory.ObjectProperty.generationTime P R = 5`, while additivity would give
+`5 ≤ 2 + 1`, which is false. In tower indices,
 the `iter 2` then `iter 1` composition lands in `iter 5`; additivity predicts `iter 3`,
 which is Rouquier's `⟨P⟩₄`. The composition law gives the upper bound
 `⟨P⟩₃ ⋆ ⟨P⟩₃ ⊆ ⟨P⟩₆`. -/

@@ -6,14 +6,17 @@ import Mathlib.CategoryTheory.Triangulated.Generators
 
 /-! # Composition of triangulated envelope stages
 
-This file extends Mathlib's existing `ObjectProperty.triangEnvelopeIter` tower. It proves a
-fixed-point property for its iterates, a composition law, transfer through an intermediate
-property, and the bounded object-property form of Stacks 0FXA.
+This file extends Mathlib's existing `CategoryTheory.ObjectProperty.triangEnvelopeIter` tower.
+It proves a fixed-point property for its iterates, a composition law, transfer through an
+intermediate property, and the bounded object-property form of Stacks 0FXA.
 
 ## Main definitions
 
-This file introduces no definitions. It reuses Mathlib's `triangEnvelopeIter`,
-`extensionProduct`, and strong and classical generator predicates.
+This file introduces no definitions. It reuses Mathlib's
+`CategoryTheory.ObjectProperty.triangEnvelopeIter`,
+`CategoryTheory.ObjectProperty.extensionProduct`,
+`CategoryTheory.ObjectProperty.IsStrongTriangulatedGenerator`, and
+`CategoryTheory.ObjectProperty.IsClassicalTriangulatedGenerator`.
 
 ## Main results
 
@@ -29,8 +32,9 @@ This file introduces no definitions. It reuses Mathlib's `triangEnvelopeIter`,
 ## Implementation notes
 
 The product-closure proof uses products of retracts and the product of two distinguished triangles.
-It keeps the existing closure operations and uses `triangEnvelopeIter_succ`, so the fixed-point
-lemma needs no triangulated-category hypothesis. The empty property has empty iterates; the
+It keeps the existing closure operations and uses
+`CategoryTheory.ObjectProperty.triangEnvelopeIter_succ`, so the fixed-point lemma needs no
+triangulated-category hypothesis. The empty property has empty iterates; the
 nonempty branch supplies the zero object required by the finite-product closure argument.
 
 ## References
@@ -256,7 +260,10 @@ private lemma nonempty_of_isStrongTriangulatedGenerator (Q : ObjectProperty C)
   rw [hn]
   infer_instance
 
-/-- A uniformly bounded stage reduces strong generation to the composition lemma. -/
+/-- A uniformly bounded stage reduces strong generation to the composition lemma. The pointwise
+condition `Q ≤ CategoryTheory.ObjectProperty.triangEnvelope P` does not provide such a `k`: the
+stage may vary with the object of `Q`, so this argument does not establish the unrestricted
+object-property analogue. -/
 theorem isStrongTriangulatedGenerator_of_strong_le_iter
     (P Q : ObjectProperty C) (k : ℕ)
     (hQ : Q.IsStrongTriangulatedGenerator) (hQP : Q ≤ P.triangEnvelopeIter k) :
