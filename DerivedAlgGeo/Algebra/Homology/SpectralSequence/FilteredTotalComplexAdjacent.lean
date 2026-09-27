@@ -28,7 +28,8 @@ The spectral-page statements here specialize to abelian groups.
 
 ## References
 
-The proof uses Mathlib's filtered `SpectralObject`, mapping-cone triangles,
+The proof uses Mathlib's filtered
+`CategoryTheory.Triangulated.SpectralObject`, mapping-cone triangles,
 and homology connecting maps, together with the generic adjacent-column core.
 -/
 
