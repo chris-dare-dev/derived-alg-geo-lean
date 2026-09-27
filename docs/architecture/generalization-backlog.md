@@ -633,8 +633,7 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   reports `failed to synthesize instance of type class F.IsTriangulated`.
   This falsifies deleting exactness from this proof route; it is not a
   compiler-produced mathematical counterexample to every alternate statement.
-- state:              FALSIFIED compiler witness: the distinguished-triangle
-  step still consumes functor exactness.
+- state:              UNVERIFIED
 
 ### 2026-09-26 — omit compatibility for a separately chosen inverse shift (planned)
 - chunk:              rou1-921-generation-functor-transport
@@ -652,8 +651,7 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   E.toAdjunction.CommShift ℤ`. The verified construction above avoids this
   failure by choosing the compatible inverse shift locally; it does not
   erase compatibility from the adjunction theorem.
-- state:              FALSIFIED compiler witness: arbitrary inverse shift
-  data do not provide the adjunction's required compatibility instance.
+- state:              UNVERIFIED
 
 ### 2026-09-26 — transport of shift-closed properties for arbitrary additive shifts (planned)
 - chunk:              rou1-921-triangulated-functor-transport
@@ -668,7 +666,7 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   transport proof compiles unchanged; only `F.mapIso` and
   `F.commShiftIso` are used. The proposed owner is outside the frozen #921
   file list, so this lift is deferred.
-- state:              UNVERIFIED (review proof compiled; lift not implemented)
+- state:              UNVERIFIED
 
 ### 2026-09-26 — transport of arbitrary-shape limit closures (planned)
 - chunk:              rou1-921-triangulated-functor-transport
@@ -683,7 +681,7 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   `P.limitsClosure J`; no proof step uses the binary-product shape. The
   proposed owner is outside the frozen #921 file list, so this lift is
   deferred.
-- state:              UNVERIFIED (review proof compiled; lift not implemented)
+- state:              UNVERIFIED
 
 ### 2026-09-26 — shift closure commutes with isomorphism closure for arbitrary additive shifts (planned)
 - chunk:              rou1-921-triangulated-functor-transport
@@ -698,4 +696,4 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   `P.isoClosure.shiftClosure A = P.shiftClosure A` compiles with only the
   additive-shift assumptions. The proposed owner is outside the frozen #921
   file list, so this lift is deferred.
-- state:              UNVERIFIED (review proof compiled; lift not implemented)
+- state:              UNVERIFIED
