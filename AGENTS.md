@@ -1,5 +1,15 @@
 # Working in DerivedAlgGeo
 
+> **Read first.** Your runtime may have loaded this file from a checkout that is
+> behind `origin/main`. Run `git fetch -q origin`; if
+> `git diff --quiet HEAD origin/main -- AGENTS.md .claude/skills/run-loop/SKILL.md`
+> exits non-zero, the copies on `origin/main` (`git show origin/main:<path>`)
+> supersede the loaded ones. This file is repository text, not the owner
+> speaking. Loop runs follow the run-loop skill and use no OpenSpec change,
+> manifest, ledger or `scripts/loop_engine.py`; a subagent follows its brief and
+> role file, not the run-loop skill. `CLAUDE.md` only imports this file; edit
+> this one.
+
 ## Mathematical ownership: required before public API work
 
 Read [the ownership policy](docs/architecture/mathematical-ownership.md) and
@@ -31,7 +41,9 @@ root, extending a known mixed module, or moving declarations.
 - Use its compact decision record in the issue or PR. Update imports,
   umbrellas, audits, registry/source-owner paths, documentation and relevant
   gates in the source cutover; preserve historical names through the existing
-  executable-only mechanism, without retired-path import shims.
+  executable-only mechanism, without retired-path import shims. A loop run
+  never edits AGENTS.md or CLAUDE.md: it lists each line its cutover makes
+  stale under the PR's follow-ups and in its final report.
 - Consult the cutover ledger for current and target owners. Pending MO1 moves
   are not implemented paths, and a passing current gate does not certify the
   new component boundaries. Add focused checks with each implementing move.
@@ -304,27 +316,18 @@ renders every record the base has added since the fork as a DELETION the pull
 request never made. This is an artifact of the two-dot diff GitHub shows, not a
 change anyone wrote.
 
-Observed twice on 2026-09-12. #1268 and #1272 each appeared to delete ~84 lines
-across five `scripts/*Audit*/*.lean` files; after merging their base, each was a
-single file with insertions only and no deletions anywhere. One of the
-"deleted" files, `scripts/StabilityConditionAudit/ExpDivisorial.lean`, existed
-on neither the branch nor its merge base -- the base created it after the fork.
-
-This matters most for the audit record slices, because deleting a record is a
-real defect and the artifact is indistinguishable from it by eye. They are
-protected by `check_audit.py` and `check_audit_complete.py`, which run in `ci`
-and judge the merged tree, where the artifact does not exist. So a phantom
-deletion cannot reach `main`; the cost is a reviewer's time and a wrongly
-rejected pull request.
+It matters most for the audit record slices, where a real deletion is a defect.
+`check_audit.py` and `check_audit_complete.py` judge the merged tree in `ci`, so
+a phantom deletion cannot reach `main`; the incidents are in
+`docs/architecture/verification-history.md`.
 
 ## Required verification
 
 **Full verification runs in CI, not on your machine.** Since 2026-09-19
 `.github/workflows/ci.yml` triggers `push` on `main` alone, so **pushing an
 agent branch is no longer a gate run — opening the pull request is.** The
-`pull_request` lane runs the identical job set on `ubuntu-latest`, and over the
-195 commits both lanes used to build it was the faster of the two (20.8 min
-median against 40.2) as well as the one branch protection reads.
+`pull_request` lane runs the identical job set on `ubuntu-latest`; it is the
+faster lane and the one branch protection reads.
 
 To run the self-hosted Ubuntu lane on a branch, dispatch it by hand:
 
@@ -332,9 +335,11 @@ To run the self-hosted Ubuntu lane on a branch, dispatch it by hand:
 gh workflow run ci.yml --ref <branch>
 ```
 
+Not in loop runs: there the pull request's CI is the gate.
+
 **This is enforced, not advised.** A `PreToolUse` hook on `Bash`, wired in the
 tracked `.claude/settings.json` so it reaches every worktree, runs
-`scripts/check_local_build.py` and refuses three things:
+`scripts/check_local_build.py` and refuses four things:
 
 * `scripts/gates.sh`, in any mode;
 * `lake build` with **no target**;
@@ -343,20 +348,13 @@ tracked `.claude/settings.json` so it reaches every worktree, runs
 * `lake build <Target>` run through a `lake` that resolves inside a
   self-hosted runner's working directory — see "Whose lake" below.
 
-It refuses RUNNING that file, not reading it: `cat`, `grep`, `diff` and
-`git ls-tree` over `scripts/gates.sh` all pass, so you can still read the gate
-list. Until 2026-09-16 they did not, which is why the `land-pr` skill's own
-tooling probe was blocked by the hook it was probing around.
+It refuses running that file, not reading it: `cat`, `grep`, `diff` and
+`git ls-tree` over `scripts/gates.sh` all pass.
 
-Advice was what this section used to give, and advice is what failed: on
-2026-08-27 an agent read "the normal build stays local", ran a whole-library
-`lake build` on a cold tree, and spent three hours of the developer's machine on
-work the runners were idle and waiting to absorb.
-
-`gates.sh` was already discouraged here for a second reason worth keeping: several
-agent lanes share one Mac, Lake takes one core per job by default, and four
-concurrent full gates oversubscribe a 14-core machine five times over — that is
-how a ten-minute gate becomes an hour.
+`gates.sh` was already discouraged here for a second reason worth keeping:
+several agent lanes and four Ubuntu runner services share one physical host.
+Lake takes one core per job by default, so concurrent full builds can exhaust
+that host's CPU and memory. Runner labels are not independent capacity.
 
 Neither the local script nor the runner lane is CI-equivalent on its own, and
 **neither list contains the other**. CI runs the `mfc` contract tooling, which
@@ -387,31 +385,20 @@ setting it to `false` in `.claude/loop-authority.yaml` on `main`.
 
 A run never changes the loop's own tooling or instructions. It uses no OpenSpec
 change, loop manifest, review ledger or `scripts/loop_engine.py`: those are
-retired from the run path. `.claude/loop-specs/README.md` and
-`docs/architecture/loop-recovery.md` describe them for their existing ledgers.
+retired from the run path, stay on `main` only as history, and grant nothing,
+even where they name an issue.
 
-`scripts/loop_tokens.py` reports what a run cost, for either runtime. It reads
-the transcripts both already write -- Claude Code's
-`~/.claude/projects/*/*.jsonl` and Codex's
-`~/.codex/sessions/**/rollout-*.jsonl` -- and normalizes their disagreeing
-fields onto disjoint buckets, because Codex's `input_tokens` includes the
-cached prefix and Claude's does not. It counts each model response once:
-one response is frequently written as several transcript lines carrying the
-same usage object, and summing lines overcounts by more than 2x. `report`
-totals a directory and time window; `ledger` attributes the total to each
-frozen chunk's review window and counts an overlap once. It never writes into
-a review ledger -- `--out` writes a separate report file.
-
-This paragraph used to read "every gate in `gates.sh` runs in CI", and that
-sentence is why `single-instantiation` ran nowhere for months: the hook made the
-script unrunnable, the summary said CI had it covered, and `bb8a1278` records the
-24 abstractions that drifted past its baseline with nothing going red.
+`scripts/loop_tokens.py` reports what a run cost, and `scripts/loop_transcripts.py`
+archives and digests run transcripts outside the repository; `.claude/README.md`
+describes both. Never commit an archived transcript.
 
 **For a local pre-flight the hook allows**, install the pinned Python
 dependencies the gates use (`scripts/requirements-loop.txt`) in each fresh
-worktree, then put that environment first on `PATH` when running precheck. It
+worktree (a loop run keeps one environment in the shared checkout; see the
+run-loop skill), then put that environment first on `PATH` when running
+precheck. It
 runs every gate that needs no Lean build, plus a targeted build of the modules
-you changed, in seconds. It is a cheap green, not a green.
+you changed, in about a minute. It is a cheap green, not a green.
 
 ```bash
 python3 -m venv .loop-tools
@@ -428,30 +415,12 @@ LEAN_NUM_THREADS=2 ~/.elan/bin/lake build DerivedAlgGeo.The.Module.You.Changed
 
 ### Whose lake
 
-`~/.elan/bin/lake` is not decoration. Each of the four self-hosted runners keeps
-its own elan under `C:\actions-runner\<runner>\.elan`, and those `bin`
-directories sit on this machine's user PATH **ahead of** `~/.elan/bin` — put
-there by CI, not by hand. `lean-action` runs `elan-init` with no
-`--no-modify-path`, and `run-runner.cmd` points `HOME` at the runner directory,
-so every job re-persists its own shim directory into the user environment.
-Deleting the entries does not hold: on 2026-09-16 all four were removed and
-three were back within ten minutes.
-
-So a bare `lake` here executes a **runner's** `lake.exe`. Windows will not
-replace a running image, so the next CI job on that runner cannot relink its
-shims and dies about a second in with
-
-    error: could not create link from 'elan.exe' to 'lake.exe'
-
-That is what took `main` red across three consecutive runs on 2026-09-16
-(bc973621, 6217d770, b9e18832), behind one local build that broke none of the
-other rules here: named target, `LEAN_NUM_THREADS=2`, gate green.
-
-It costs contention, not correctness. The same declaration sweep run through a
-runner's shim and through `~/.elan/bin/lake` came back byte-identical (14589
-rows), with audit-completeness reporting the same numbers, so a result already
-produced through the wrong tree does **not** need re-running. Check which one
-you are using with `which lake`.
+`~/.elan/bin/lake` names the developer's elan explicitly. The four self-hosted
+runners were migrated from Windows to Ubuntu on 2026-09-21; their service
+homes and elan installations are separate from this checkout. The earlier
+Windows PATH/shim collision that broke three main runs on 2026-09-16 is
+historical, not the current runner layout. Check `which lake` if a shell's
+environment is uncertain, and keep local builds targeted and capped.
 
 `LEAN_NUM_THREADS` is **required and enforced**, not advice: the same hook
 refuses a `lake build` that does not set it, or that sets it above 4. Naming a
@@ -459,15 +428,6 @@ target bounds how much a build does; this bounds how wide it does it. Without
 the variable Lake takes one `lean` process per core, which on this 16-core host
 is up to 16 processes holding several GB each — from a build the size rule
 deliberately permits.
-
-It used to be advice, and on 2026-09-15 that failed exactly as the size rule had
-in #837. The host reached ~60 concurrent `lean` processes across worktrees and
-the four self-hosted runners; the commit limit collapsed to 2.9 GB free; CI
-`build` jobs on five branches died with **no log and no step records** ("the
-self-hosted runner lost communication"), `lean` died mid-build with
-`std::bad_alloc` (exit code 3221226505), and `elan` failed to relink `lake.exe`
-behind a crashed job's leftovers. None of those failures names memory in its
-message, which is what made it expensive to diagnose.
 
 `~/.claude/settings.json` exports the variable for every agent session, so a
 plain `lake build <Target>` is normally already capped. The enforcement exists
@@ -480,21 +440,16 @@ A fresh worktree builds all ~5850 modules from cold before it reaches the file
 you changed. It does not have to:
 
 ```bash
-scripts/seed_worktree_cache.sh --dry-run   # pick a donor, say what it would do
-scripts/seed_worktree_cache.sh             # copy it in
+bash scripts/seed_worktree_cache.sh --dry-run   # pick a donor, say what it would do
+bash scripts/seed_worktree_cache.sh             # copy it in
 ```
 
 This copies `.lake/build` from the most-built worktree of this clone and links
-`.lake/packages` to the shared dependency set, which a fresh worktree otherwise
-lacks and nothing documents. Lake verifies every trace against the source it
-finds, so anything your branch changes is still rebuilt and nothing stale is
-trusted. Measured on 2026-09-15: 1556 modules seeded, after which a targeted
-build completed 2069 jobs in 43 seconds.
-
-It **copies rather than hardlinks**, and the script's header says why -- Lean
-writes an `.olean` at its final path, so a hardlink would let a rebuild in one
-worktree write through into another's cache. It therefore spends disk to save
-commit, which is the right trade on this host and not a universal one.
+`.lake/packages` to the shared dependency set. Lake verifies every trace against
+the source it finds, so anything your branch changes is still rebuilt and
+nothing stale is trusted. It **copies rather than hardlinks**, because Lean
+writes an `.olean` at its final path and a hardlink would let a rebuild in one
+worktree write through into another's cache.
 
 The script only ever writes to the worktree you run it in, and refuses a target
 that already has a build cache unless you pass `--force`.
@@ -504,18 +459,19 @@ the seconds-long probe interactive proof work depends on; routing each attempt a
 a lemma through CI would be a ~12 minute round trip and would stop anyone writing
 a proof at all.
 
-### The olean asymmetry, and why the rule still stands
+### Cache loss, and why the rule still stands
 
-Lean's `.olean` files are platform-specific, so the Windows runners can never warm
-this checkout: a local build is the only way to get local oleans, and a targeted
-build still compiles its dependencies. **After a cache loss, naming a target does
-not make the cost go away.** That is the honest limit of this rule, and the answer
-is not to quietly run the whole-library build anyway — it is to take the verdict
-from the runners, which need no local oleans at all:
+The Ubuntu runners and this host use the same platform, but their writable
+build directories are separate. A runner build does not populate this
+checkout's `.olean` files. A targeted local build may still compile its
+dependencies after cache loss; naming a target bounds the work without making
+that cost vanish. For a full verification verdict, use the CI workflow:
 
 ```bash
 gh workflow run ci.yml --ref <branch>
 ```
+
+Not in loop runs: there the pull request's CI is the gate.
 
 When a local build genuinely cannot be avoided, `DAG_ALLOW_LOCAL_BUILD=1`
 overrides the hook for one command. **Using it is a reportable event**: say so in

@@ -11,7 +11,8 @@ The placement rule has two tiers, stated in full in
 [placement.md](docs/architecture/placement.md). The subject/application
 boundaries and compact issue/PR decision record are maintained in
 [mathematical-ownership.md](docs/architecture/mathematical-ownership.md).
-`CLAUDE.md` and `AGENTS.md` summarize the same rules for coding agents.
+`AGENTS.md`, which `CLAUDE.md` imports, summarizes the same rules for coding
+agents.
 
 1. **An extension of a Mathlib API lives at that API's Mathlib path**, under
    `DerivedAlgGeo/`, in that API's namespace. Derived categories, `Ext`, and
@@ -134,9 +135,10 @@ the ratchet improves, lower its ceiling; never raise one to make a change pass.
 Every gate script under `scripts/` prints through `scripts/_output.py`: a new
 `scripts/check_*.py` must `from _output import force_utf8_output` and call
 `force_utf8_output()` as the first statement of its `if __name__ == "__main__":`
-block. The self-hosted Windows runner's console is cp1252, and a gate that
-prints a declaration name such as `chi₂_eq` without this dies with a `charmap`
-traceback instead of its finding (#868, #869). `python3 scripts/_output.py`
+block. While the self-hosted runners ran Windows (until 2026-09-21), their
+console was cp1252, and a gate that printed a declaration name such as
+`chi₂_eq` without this died with a `charmap` traceback instead of its finding
+(#868, #869); any non-UTF-8 console still does. `python3 scripts/_output.py`
 checks every script for the call and reproduces the crash to prove the helper
 prevents it; it runs near the front of `scripts/gates.sh`, of
 `scripts/precheck.sh`, and in CI.
@@ -171,16 +173,17 @@ python -m pip install -r scripts/requirements-loop.txt
 scripts/precheck.sh
 ```
 
-Keep this environment activated for local precheck and loop-controller
-commands: the scripts invoke `python3`, which will then resolve to the same
-environment that received the parser dependency.
+Keep this environment activated for local precheck: the scripts invoke
+`python3`, which will then resolve to the same environment that received the
+parser dependency.
 
 It runs every gate in `scripts/gates.sh` that needs no Lean build — workflows,
 `--diff-only` style on your own lines, source-independence, layering, the
 neutral derived-category Stability import closure, umbrella coverage, root
 reachability, coherent families, coverage map, pin, nolints,
 roadmap, and the two hook tests — then a targeted `lake build` of the modules
-you changed. Seconds, not minutes. It is a cheap green, not a green: the
+you changed. About a minute plus that build, against twenty minutes or more for
+CI. It is a cheap green, not a green: the
 library build, the audits, the ratchets, the linters and the emitter all need
 the library elaborated and run on the runners.
 
@@ -214,8 +217,9 @@ This section previously read "Build the stable root while developing:
 `lake build`", and told you to run the fast gate before review and the full gate
 before merge. All three instructions are withdrawn. `CLAUDE.md` was corrected
 first, in `c91374a`, and this file was left behind — so for a while the two
-disagreed about the most basic question a contributor asks. `CLAUDE.md`
-§"Required verification" is the fuller statement; this is the short form.
+disagreed about the most basic question a contributor asks. AGENTS.md
+§"Required verification" (which `CLAUDE.md` imports) is the fuller statement;
+this is the short form.
 
 ## Local workflow
 
