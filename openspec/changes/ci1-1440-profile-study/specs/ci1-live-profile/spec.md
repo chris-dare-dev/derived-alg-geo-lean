@@ -49,3 +49,11 @@ The report SHALL state raw run identities, sample size, platform, cache and host
 #### Scenario: Post-rollout dependencies are still open
 - **WHEN** #1436 or #1438 has not completed
 - **THEN** the report marks the rollout refresh pending and does not close #1440 or certify one-week targets
+
+### Requirement: Producer-capacity implications SHALL be evidence-bounded
+
+The report SHALL quantify observed producer concurrency, queue delay, service intervals, throughput, and service-rate implications relevant to four-to-six concurrent producers. It SHALL identify the physical host and runner services represented by the sample, SHALL NOT infer capacity from the number of configured services, and SHALL NOT extrapolate beyond observed load without labeling the result as an estimate. If the evidence does not cover four-to-six concurrent producers, the report SHALL say that capacity is not yet measured, identify the missing observation, record no-go for a capacity claim, and keep #1440 open.
+
+#### Scenario: Current sample does not reach four producers
+- **WHEN** collected runs do not provide a representative window with four-to-six concurrent producers and corresponding host-pressure samples
+- **THEN** the report discloses the highest observed concurrency, leaves four-to-six producer capacity unmeasured, makes no service-rate claim, and keeps #1440 open

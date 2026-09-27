@@ -10,7 +10,7 @@ CI1.11 (#1440) has an offline Actions profiler and a conservative replay harness
 - Add a read-only host sampler for one named self-hosted runner service and run identity; do not alter the service, workflow, cache, or runner configuration.
 - Publish a reproducible, bounded warm-cache versus cold-target-build experiment on one exact commit and compare the target artifact hashes.
 - Extend the offline replay matrix for direct/transitive dependencies and trust-boundary changes; keep replay opt-in and outside required CI.
-- Publish a current evidence report with sample size, platform, cache, and measurement limitations; leave rollout claims pending until #1436/#1438 are available.
+- Publish ranked current bottlenecks and evidence-bounded concurrency/service-rate implications for four-to-six producers, with sample size, platform, cache, and measurement limits; if observations do not cover that load, record the gap and make no capacity claim. Leave rollout claims pending until #1436/#1438 are available.
 - Add this manifest's exact digest to the owner-reviewed manifest list in a protected-path planning PR; run preflight only after that PR merges.
 
 ## Capabilities

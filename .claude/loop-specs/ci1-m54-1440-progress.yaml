@@ -89,5 +89,6 @@ issues:
           - The collector and tests preserve run/attempt/commit/event/runner identity, distinguish explicit cache markers from unknown state, and classify provider failures separately from verification failures.
           - A bounded cold/warm target experiment on one exact source/pin/toolchain set records elapsed times and compares the same target artifact digest.
           - The report names source run links, sample size, queue/phase timings, cache/host evidence and gaps, and a go/no-go; it does not claim one-week or post-rollout verification.
+          - The report quantifies observed producer concurrency, queue delay, service intervals, throughput, and service-rate implications relevant to four-to-six concurrent producers; if the sample does not cover that load, it names the maximum observed concurrency and missing evidence without claiming capacity and keeps #1440 open.
           - The progress PR changes no workflow, cache policy, runner service, production audit entrypoint, or Lean source and does not close #1440.
         closure: progress

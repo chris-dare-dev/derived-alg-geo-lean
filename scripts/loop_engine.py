@@ -133,7 +133,7 @@ LEGACY_REVIEWED_MANIFESTS = frozenset(
         "38d0d07e7f4e237af5e13c96149caa7e0b6926ddf6a051270a9c0fc8ae10e5fa",  # sf8-5-task12-kflat-pullback (#554)
         "315637cf2347791dce3abb9fdd1b57a6fcf83f63f5c0cb5ffab986ef9cb57419",  # rou1-919-rouquier-dimension (#1478)
         "b9c85b5909a68b5fc120d8be3073e5f391288b08beb4ef2319cd9ed3cfb6ff37",  # controller-publication-integrity-repair (#1482; zero provider grants)
-        "3aee524b2d4cc50c7b7a95e0b258e48a47a9e5439d54a3e7b0f79e8e3b943a77",  # ci1-m54-1440-progress (#1440; profiling progress only)
+        "74a621914565081b77dbf2d36e134fe6c4d687a9cf66468db570c7beb7c156b4",  # ci1-m54-1440-progress (#1440; profiling progress only)
     }
 )
 # A branch-authored run's frozen chunk may never touch its own authority, the
