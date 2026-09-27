@@ -99,6 +99,7 @@ class HostPickupTests(unittest.TestCase):
             archive = Path(directory) / "unused.tar.gz"
             archive.write_bytes(b"fixture")
             with patch.object(host_pickup, "_capacity", side_effect=capacity), \
+                 patch.object(host_pickup, "_verify_runner_archive"), \
                  patch.object(host_pickup, "_registration_token", return_value="test-token"), \
                  patch.object(host_pickup, "_run_scope", return_value=0), \
                  patch.object(host_pickup, "_scope_cleared", return_value=True), \
@@ -110,6 +111,56 @@ class HostPickupTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "still registered"):
                     host_pickup.recover(base, leases[0].stem)
             self.assertEqual(len(list((base / "jobs").iterdir())), 1)
+
+    def test_bad_archive_denies_before_token_or_lease(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            base, _, _ = fixture(Path(directory))
+            archive = Path(directory) / "bad.tar.gz"
+            archive.write_bytes(b"bad archive")
+            with patch.object(host_pickup, "_registration_token") as token:
+                with self.assertRaisesRegex(ValueError, "digest does not match"):
+                    host_pickup.runner_once(base, archive, "0" * 64, "owner-linux")
+            token.assert_not_called()
+            self.assertEqual(list((base / "jobs").iterdir()), [])
+            self.assertEqual(list((base / "leases").glob("*.json")), [])
+
+    def test_unsafe_archive_member_denies_before_token_or_lease(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            base, _, _ = fixture(Path(directory))
+            archive = Path(directory) / "unsafe.tar.gz"
+            with tarfile.open(archive, "w:gz") as bundle:
+                member = tarfile.TarInfo("../outside")
+                member.size = 0
+                bundle.addfile(member)
+            digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+            with patch.object(host_pickup, "_registration_token") as token:
+                with self.assertRaisesRegex(ValueError, "unsafe member"):
+                    host_pickup.runner_once(base, archive, digest, "owner-linux")
+            token.assert_not_called()
+            self.assertEqual(list((base / "jobs").iterdir()), [])
+            self.assertEqual(list((base / "leases").glob("*.json")), [])
+
+    def test_runner_failure_before_checkout_can_recover_without_token(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            base, _, _ = fixture(Path(directory))
+            archive = Path(directory) / "fixture.tar.gz"
+            archive.write_bytes(b"fixture")
+            with patch.object(host_pickup, "_verify_runner_archive"), \
+                 patch.object(host_pickup, "_capacity", side_effect=capacity), \
+                 patch.object(host_pickup, "_registration_token", return_value="test-token"), \
+                 patch.object(host_pickup, "_run_scope", return_value=1), \
+                 patch.object(host_pickup, "_scope_cleared", return_value=True), \
+                 patch.object(host_pickup, "_runner_registered", return_value=False):
+                with self.assertRaisesRegex(ValueError, "exited unsuccessfully"):
+                    host_pickup.runner_once(base, archive, "0" * 64, "owner-linux")
+                lease = next((base / "leases").glob("*.json"))
+                root = base / "jobs" / lease.stem
+                self.assertFalse((root / "registration-token").exists())
+                host_pickup.recover(base, lease.stem)
+            self.assertEqual(list((base / "jobs").iterdir()), [])
+            self.assertFalse(lease.exists())
+            metadata = json.loads((base / "logs" / lease.stem / "pickup.json").read_text())
+            self.assertFalse(metadata["checkout_observed"])
 
     def test_recovery_rejects_replacement_root_with_forged_local_marker(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

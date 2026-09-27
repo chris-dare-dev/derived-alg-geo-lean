@@ -390,25 +390,32 @@ def _runner_registered(name: str) -> bool:
     return any(runner.get("name") == name for runner in payload["runners"])
 
 
-def _runner_worker(archive: Path, digest: str, label: str, root: Path,
-                   expected: tuple[int, int]) -> int:
-    _verify_worker_root(root, expected)
+def _verify_runner_archive(archive: Path, digest: str) -> None:
     if not re.fullmatch(r"[0-9a-f]{64}", digest):
         raise ValueError("runner archive requires a SHA-256 digest")
-    local_archive = root / "runner-archive.tar.gz"
-    shutil.copyfile(archive, local_archive)
-    with local_archive.open("rb") as stream:
+    if archive.is_symlink() or not archive.is_file():
+        raise ValueError("runner archive must be a regular file")
+    with archive.open("rb") as stream:
         measured = hashlib.file_digest(stream, "sha256").hexdigest()
     if measured != digest:
         raise ValueError("runner archive digest does not match")
-    runner_dir = root / "runner"
-    runner_dir.mkdir(mode=0o700)
-    with tarfile.open(local_archive, mode="r:gz") as bundle:
+    with tarfile.open(archive, mode="r:gz") as bundle:
         for member in bundle.getmembers():
             parts = Path(member.name).parts
             if (member.name.startswith("/") or ".." in parts or
                     not (member.isfile() or member.isdir())):
                 raise ValueError("runner archive contains an unsafe member")
+
+
+def _runner_worker_started(archive: Path, digest: str, label: str, root: Path,
+                           expected: tuple[int, int]) -> int:
+    _verify_worker_root(root, expected)
+    local_archive = root / "runner-archive.tar.gz"
+    shutil.copyfile(archive, local_archive)
+    _verify_runner_archive(local_archive, digest)
+    runner_dir = root / "runner"
+    runner_dir.mkdir(mode=0o700)
+    with tarfile.open(local_archive, mode="r:gz") as bundle:
         bundle.extractall(runner_dir, filter="data")
     (runner_dir / "_work/_temp").mkdir(parents=True, mode=0o700, exist_ok=False)
     token_path = root / "registration-token"
@@ -416,19 +423,49 @@ def _runner_worker(archive: Path, digest: str, label: str, root: Path,
     if not token:
         raise ValueError("registration token is missing")
     name = f"dag-{root.name}"
-    try:
-        subprocess.run([
-            "./config.sh", "--unattended", "--ephemeral", "--disableupdate",
-            "--url", f"https://github.com/{REPOSITORY}", "--token", token,
-            "--name", name, "--labels", label, "--work", "_work",
-        ], cwd=runner_dir, check=True)
-    finally:
-        token_path.unlink(missing_ok=True)
+    subprocess.run([
+        "./config.sh", "--unattended", "--ephemeral", "--disableupdate",
+        "--url", f"https://github.com/{REPOSITORY}", "--token", token,
+        "--name", name, "--labels", label, "--work", "_work",
+    ], cwd=runner_dir, check=True)
     return subprocess.run(["./run.sh"], cwd=runner_dir, check=False).returncode
 
 
+def _runner_worker(archive: Path, digest: str, label: str, root: Path,
+                   expected: tuple[int, int]) -> int:
+    _verify_worker_root(root, expected)
+    root_fd = os.open(root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    if (os.fstat(root_fd).st_dev, os.fstat(root_fd).st_ino) != expected:
+        os.close(root_fd)
+        raise ValueError("worker root changed before token cleanup")
+    try:
+        return _runner_worker_started(archive, digest, label, root, expected)
+    finally:
+        try:
+            try:
+                os.unlink("registration-token", dir_fd=root_fd)
+            except FileNotFoundError:
+                pass
+        finally:
+            os.close(root_fd)
+
+
+def _unlink_registration_token(root: Path, expected: tuple[int, int]) -> None:
+    root_fd = os.open(root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        info = os.fstat(root_fd)
+        if (info.st_dev, info.st_ino) != expected:
+            raise ValueError("token cleanup root changed identity")
+        try:
+            os.unlink("registration-token", dir_fd=root_fd)
+        except FileNotFoundError:
+            pass
+    finally:
+        os.close(root_fd)
+
+
 def _archive_runner_logs(base: Path, root: Path, namespace: str,
-                         record: dict[str, Any]) -> None:
+                         record: dict[str, Any], *, require_checkout: bool = True) -> None:
     logs = base / "logs"
     if (not logs.is_dir() or logs.is_symlink() or
             logs.stat().st_uid != os.getuid() or stat.S_IMODE(logs.stat().st_mode) != 0o700):
@@ -449,7 +486,8 @@ def _archive_runner_logs(base: Path, root: Path, namespace: str,
             raise ValueError("incomplete runner log archive; lease retained") from exc
         finally:
             os.close(descriptor)
-        if archived.get("namespace") != namespace or archived.get("inventory_valid") is not True:
+        if (archived.get("namespace") != namespace or archived.get("inventory_valid") is not True or
+                require_checkout and archived.get("checkout_observed") is not True):
             raise ValueError("runner log archive identity or inventory is invalid")
         return
     source = root / "runner/_diag"
@@ -484,11 +522,13 @@ def _archive_runner_logs(base: Path, root: Path, namespace: str,
             if observed != root and root not in observed.parents:
                 escaped.append(key)
         inventory[key] = entry
-    inventory_valid = not escaped and bool(inventory["checkout"]["exists"])
+    checkout_observed = bool(inventory["checkout"]["exists"])
+    inventory_valid = not escaped
     metadata = json.dumps({
         "namespace": namespace, "runner_name": f"dag-{namespace}",
         "repository": REPOSITORY, "writable_path_inventory": inventory,
         "inventory_valid": inventory_valid,
+        "checkout_observed": checkout_observed,
         "reservation": record["resources"],
         "host_capacity_at_admission": record.get("host_capacity_at_admission"),
     }, sort_keys=True, indent=2) + "\n"
@@ -504,7 +544,7 @@ def _archive_runner_logs(base: Path, root: Path, namespace: str,
         os.close(descriptor)
     if escaped:
         raise ValueError(f"runner writable paths escaped job root: {', '.join(escaped)}")
-    if not inventory["checkout"]["exists"]:
+    if require_checkout and not checkout_observed:
         raise ValueError("runner checkout was not observed; lease retained")
 
 
@@ -513,6 +553,7 @@ def runner_once(base: Path, archive: Path, digest: str, label: str) -> None:
         raise ValueError("absolute host base and runner archive paths are required")
     if label not in ("owner-linux", "owner-linux-main"):
         raise ValueError("unrecognized runner scheduling label")
+    _verify_runner_archive(archive, digest)
     if not all((base / name).is_dir() for name in ("jobs", "leases", "logs")):
         raise ValueError("host base requires jobs/, leases/ and logs/")
     namespace = secrets.token_hex(12)
@@ -531,10 +572,14 @@ def runner_once(base: Path, archive: Path, digest: str, label: str) -> None:
         stream.flush()
         os.fsync(stream.fileno())
     unit = f"dag-pickup-{namespace}.scope"
-    result = _run_scope(unit, root, "build", [
-        sys.executable, str(Path(__file__).resolve()), "_runner_worker", str(archive), digest,
-        label, str(root), str(identity[0]), str(identity[1]),
-    ])
+    try:
+        result = _run_scope(unit, root, "build", [
+            sys.executable, str(Path(__file__).resolve()), "_runner_worker", str(archive), digest,
+            label, str(root), str(identity[0]), str(identity[1]),
+        ])
+    finally:
+        if _scope_cleared(unit):
+            _unlink_registration_token(root, identity)
     if not _scope_cleared(unit) or result != 0:
         raise ValueError("runner exited unsuccessfully or scope is active; lease and root retained")
     if _runner_registered(f"dag-{namespace}"):
@@ -621,7 +666,7 @@ def recover(base: Path, namespace: str) -> None:
         if (info.st_dev, info.st_ino) != identity:
             raise ValueError("recovery root differs from recorded inode; lease retained")
         if record["kind"] == "runner":
-            _archive_runner_logs(base, root, namespace, record)
+            _archive_runner_logs(base, root, namespace, record, require_checkout=False)
         _cleanup(base, namespace, identity)
         _remove_root_identity(base, record)
     runner_state.release_lease(record, base / "leases")

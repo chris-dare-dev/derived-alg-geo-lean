@@ -25,7 +25,13 @@ is preserved; Windows records use Windows case normalization.
 The report API accepts detached observations. On Ubuntu, admission re-resolves
 POSIX entries on the admitting host and rejects a claimed `resolved_path` that
 differs from that observation. A double-leading-slash POSIX path is handled as
-POSIX, and report namespaces are unique per physical host.
+POSIX, and report namespaces are unique per physical host. A collector may
+include `observed_device` and `observed_inode` for each writable root. Reports
+compare those values across jobs on the same host, detecting hard-linked files
+whose path strings differ. Host admission stats every existing local POSIX
+root under the lease lock and rejects a supplied inode observation that no
+longer matches. An absent path has no inode yet; the bootstrap creates private
+roots after admission and must not install a hard link to another job.
 
 `admit` takes a fresh physical-host capacity document and holds one exclusive
 lock in a host-owned lease directory while it reads **all** active leases,
@@ -137,6 +143,8 @@ freed; a merely idle or temporarily stopped enabled service still counts.
 
 `runner-once` uses the same host lease and root before requesting a GitHub
 registration token, unpacking the pinned runner archive, or starting the runner.
+It checks the archive digest and member types before issuing a token or lease,
+and repeats the check on the private copy inside the worker.
 It registers a uniquely named `--ephemeral --disableupdate` runner for one
 job. The runner's `_work` directory is a conservative reservation envelope;
 `logs/<namespace>/pickup.json` records the actual resolved checkout, Git
@@ -144,7 +152,11 @@ index, Lake build/package, elan, temp, output and artifact locations after the
 job. Cleanup waits for the scope to empty and the GitHub registration to
 disappear. Diagnostics are copied below host `logs/<namespace>/diag/` before the
 root is removed. An unresolved registration, missing checkout, path outside
-the root, or failed command retains root and lease for investigation.
+the root, or failed command retains root and lease for investigation. If startup
+fails before a checkout exists, `recover` can still archive the observed paths
+with `checkout_observed: false` after verifying the scope is stopped and the
+ephemeral registration has disappeared. The registration token is removed from
+the recorded root before log archival or cleanup.
 
 Use a reviewed, pristine GitHub runner Linux x64 release archive and record
 its SHA-256 independently of the downloaded bytes. Keep the archive outside

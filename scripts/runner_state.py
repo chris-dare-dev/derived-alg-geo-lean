@@ -113,6 +113,31 @@ def _path_identity(value: Any) -> str:
     return canonical_path(raw)
 
 
+def _inode_identity(value: dict[str, Any], *, local: bool) -> tuple[int, int] | None:
+    """Use observed identity, or stat an explicitly local POSIX path."""
+    raw = value["path"]
+    observed = None
+    if "observed_device" in value or "observed_inode" in value:
+        device = value.get("observed_device")
+        inode = value.get("observed_inode")
+        if (not isinstance(device, int) or isinstance(device, bool) or device < 0 or
+                not _positive_int(inode)):
+            raise ValueError("observed device/inode must be valid integers")
+        observed = device, inode
+    if raw.startswith("/") and (local or "resolved_path" not in value):
+        try:
+            info = os.stat(raw)
+        except FileNotFoundError:
+            if local and observed is not None:
+                raise ValueError("observed inode no longer exists on admitting host")
+        else:
+            actual = (info.st_dev, info.st_ino)
+            if local and observed is not None and actual != observed:
+                raise ValueError("observed inode differs from admitting host")
+            return actual
+    return observed
+
+
 def _record_digest(record: dict[str, Any]) -> str:
     encoded = json.dumps(record, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
@@ -171,6 +196,17 @@ def validate_record(record: Any) -> list[str]:
         # mark any one of these read-only would skip collision detection.
         if value.get("writable") is not True:
             errors.append(f"paths.{name} must be job-owned writable state")
+        has_device = "observed_device" in value
+        has_inode = "observed_inode" in value
+        if has_device != has_inode:
+            errors.append(f"paths.{name} observed device/inode must appear together")
+        elif has_device and (
+            not isinstance(value["observed_device"], int)
+            or isinstance(value["observed_device"], bool)
+            or value["observed_device"] < 0
+            or not _positive_int(value["observed_inode"])
+        ):
+            errors.append(f"paths.{name} observed device/inode must be nonnegative integers")
     if isinstance(paths.get("checkout"), dict):
         try:
             checkout = _path_identity(paths["checkout"])
@@ -212,7 +248,7 @@ def _validate_local_path_identities(records: list[dict[str, Any]]) -> None:
                     )
 
 
-def validate_snapshot(snapshot: Any) -> dict[str, Any]:
+def validate_snapshot(snapshot: Any, *, verify_local_inodes: bool = False) -> dict[str, Any]:
     errors: list[str] = []
     warnings: list[str] = []
     if not isinstance(snapshot, dict):
@@ -269,6 +305,7 @@ def validate_snapshot(snapshot: Any) -> dict[str, Any]:
                 )
 
     path_owners: list[tuple[str, str, str, str, bool]] = []
+    inode_owners: dict[tuple[str, int, int], tuple[str, str]] = {}
     for job in valid_jobs:
         for path_name, path, writable in _path_rows(job):
             if not writable:
@@ -288,6 +325,22 @@ def validate_snapshot(snapshot: Any) -> dict[str, Any]:
                         f"{other_job}:{other_name}={other_path}"
                     )
             path_owners.append((job["host_id"], job["namespace"], path_name, path, writable))
+            try:
+                inode = _inode_identity(job["paths"][path_name], local=verify_local_inodes)
+            except (OSError, ValueError) as exc:
+                errors.append(f"{job['namespace']}:{path_name}: {exc}")
+                continue
+            if inode is None:
+                continue
+            key = job["host_id"], *inode
+            earlier = inode_owners.get(key)
+            if earlier is not None and earlier[0] != job["namespace"]:
+                errors.append(
+                    f"writable inode collision: {job['namespace']}:{path_name} "
+                    f"shares device/inode with {earlier[0]}:{earlier[1]}"
+                )
+            else:
+                inode_owners[key] = job["namespace"], path_name
     return {
         "valid": not errors,
         "errors": errors,
@@ -438,7 +491,10 @@ def acquire_lease(
         _check_lease_dir_isolated(stable_dir, [record, *jobs])
         if any(job["host_id"] != record["host_id"] for job in jobs):
             raise ValueError("one lease directory must describe one physical host")
-        admission = validate_snapshot({"host_capacity": host_capacity, "jobs": [*jobs, record]})
+        admission = validate_snapshot(
+            {"host_capacity": host_capacity, "jobs": [*jobs, record]},
+            verify_local_inodes=True,
+        )
         if not admission["valid"]:
             raise ValueError("admission denied: " + "; ".join(admission["errors"]))
         lease_name = _lease_name(record)

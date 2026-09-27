@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import copy
+import os
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager, redirect_stdout
 import io
@@ -57,6 +58,46 @@ def snapshot(*jobs: dict, cpu_threads: int = 8) -> dict:
 
 
 class RunnerStateTests(unittest.TestCase):
+    def test_hardlinked_git_indexes_share_one_writable_inode(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            jobs = []
+            for name in ("job-a", "job-b"):
+                workspace = base / name / "workspace"
+                (workspace / ".git").mkdir(parents=True)
+                candidate = record(name)
+                candidate["host_id"] = "ubuntu-host"
+                candidate["paths"] = {
+                    "checkout": path_entry(str(workspace), True),
+                    "git_index": path_entry(str(workspace / ".git/index"), True),
+                    "lake_build": path_entry(str(workspace / ".lake/build"), True),
+                    "lake_packages": path_entry(str(workspace / ".lake/packages"), True),
+                    "elan": path_entry(str(base / name / "elan"), True),
+                    "temp": path_entry(str(base / name / "tmp"), True),
+                    "outputs": path_entry(str(base / name / "outputs"), True),
+                    "artifacts": path_entry(str(base / name / "artifacts"), True),
+                }
+                jobs.append(candidate)
+            first_index = Path(jobs[0]["paths"]["git_index"]["path"])
+            second_index = Path(jobs[1]["paths"]["git_index"]["path"])
+            first_index.write_text("index", encoding="utf-8")
+            os.link(first_index, second_index)
+            inode = first_index.stat()
+            for job in jobs:
+                job["paths"]["git_index"].update({
+                    "observed_device": inode.st_dev, "observed_inode": inode.st_ino,
+                })
+            report = runner_state.validate_snapshot(snapshot(*jobs))
+            self.assertFalse(report["valid"], report)
+            self.assertTrue(any("writable inode collision" in error for error in report["errors"]))
+            for job in jobs:
+                job["paths"]["git_index"].pop("observed_device")
+                job["paths"]["git_index"].pop("observed_inode")
+            lease_dir = base / "leases"
+            runner_state.acquire_lease(jobs[0], lease_dir, snapshot(*jobs)["host_capacity"])
+            with self.assertRaisesRegex(ValueError, "writable inode collision"):
+                runner_state.acquire_lease(jobs[1], lease_dir, snapshot(*jobs)["host_capacity"])
+
     def test_canonical_path_normalizes_case_and_separators(self) -> None:
         left = runner_state.canonical_path(r"C:\Actions\Runner\..\Runner\_work")
         right = runner_state.canonical_path(r"c:/actions/runner/_work")
