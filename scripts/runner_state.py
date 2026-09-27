@@ -73,7 +73,9 @@ def canonical_path(value: Any) -> str:
     except OSError:
         resolved = raw
     normalized = resolved.replace("/", "\\").rstrip("\\") or "\\"
-    return ntpath.normcase(ntpath.normpath(normalized))
+    # POSIX filesystems can distinguish Cache from cache. Keep their case
+    # while using one separator for the overlap check below.
+    return ntpath.normpath(normalized)
 
 
 def _overlap(left: str, right: str) -> bool:
@@ -248,12 +250,14 @@ def validate_snapshot(snapshot: Any) -> dict[str, Any]:
                     f"{total} > {capacity[field]}"
                 )
 
-    path_owners: list[tuple[str, str, str, bool]] = []
+    path_owners: list[tuple[str, str, str, str, bool]] = []
     for job in valid_jobs:
         for path_name, path, writable in _path_rows(job):
             if not writable:
                 continue
-            for other_job, other_name, other_path, other_writable in path_owners:
+            for other_host, other_job, other_name, other_path, other_writable in path_owners:
+                if other_host != job["host_id"]:
+                    continue
                 if other_job == job["namespace"]:
                     # A checkout necessarily contains its own index, build,
                     # output, and artifact children. Isolation is a cross-job
@@ -265,7 +269,7 @@ def validate_snapshot(snapshot: Any) -> dict[str, Any]:
                         f"{job['namespace']}:{path_name}={path} overlaps "
                         f"{other_job}:{other_name}={other_path}"
                     )
-            path_owners.append((job["namespace"], path_name, path, writable))
+            path_owners.append((job["host_id"], job["namespace"], path_name, path, writable))
     return {
         "valid": not errors,
         "errors": errors,
@@ -342,7 +346,10 @@ def acquire_lease(
     _check_lease_dir_isolated(lease_dir, [record])
     with _locked_lease_dir(lease_dir):
         jobs = _active_leases(lease_dir)
-        _check_lease_dir_isolated(lease_dir, jobs)
+        # The pre-lock check prevents creating a lock inside the candidate's
+        # own writable root. Repeat it under the lock so a path retargeted
+        # while waiting cannot be admitted.
+        _check_lease_dir_isolated(lease_dir, [record, *jobs])
         if any(job["host_id"] != record["host_id"] for job in jobs):
             raise ValueError("one lease directory must describe one physical host")
         admission = validate_snapshot({"host_capacity": host_capacity, "jobs": [*jobs, record]})

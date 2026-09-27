@@ -5,11 +5,12 @@ from __future__ import annotations
 
 import copy
 from concurrent.futures import ThreadPoolExecutor
-from contextlib import redirect_stdout
+from contextlib import contextmanager, redirect_stdout
 import io
 import json
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 from scripts import runner_state
@@ -73,6 +74,28 @@ class RunnerStateTests(unittest.TestCase):
         second["host_id"] = "windows-host-2"
         result = runner_state.validate_snapshot(snapshot(first, second, cpu_threads=2))
         self.assertTrue(result["valid"], result)
+
+    def test_same_paths_on_distinct_physical_hosts_do_not_collide(self) -> None:
+        first = record("job-a")
+        second = record("job-b")
+        second["host_id"] = "windows-host-2"
+        result = runner_state.validate_snapshot(snapshot(first, second))
+        self.assertTrue(result["valid"], result)
+
+    def test_posix_path_identity_preserves_case(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            upper = Path(directory) / "Cache"
+            lower = Path(directory) / "cache"
+            upper.mkdir()
+            lower.mkdir()
+            self.assertNotEqual(runner_state.canonical_path(str(upper)),
+                                runner_state.canonical_path(str(lower)))
+            first = record("job-a")
+            second = record("job-b", root=r"C:\actions\runner-b")
+            first["paths"]["temp"] = path_entry(str(upper), True)
+            second["paths"]["temp"] = path_entry(str(lower), True)
+            result = runner_state.validate_snapshot(snapshot(first, second))
+            self.assertTrue(result["valid"], result)
 
     def test_writable_build_collision_fails_closed(self) -> None:
         first = record("job-a")
@@ -247,6 +270,32 @@ class RunnerStateTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "overlaps job-a:temp"):
                 runner_state.acquire_lease(candidate, lease_dir, snapshot(active, candidate)["host_capacity"])
             self.assertFalse((lease_dir / "job-b.json").exists())
+
+    def test_candidate_retargets_temp_symlink_before_lock(self) -> None:
+        candidate = record("job-a")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            safe = root / "safe"
+            safe.mkdir()
+            temp_link = root / "job-temp"
+            temp_link.symlink_to(safe, target_is_directory=True)
+            host_temp = root / "host-temp"
+            host_temp.mkdir()
+            lease_dir = host_temp / "leases"
+            candidate["paths"]["temp"] = path_entry(str(temp_link), True)
+            original_lock = runner_state._locked_lease_dir
+
+            @contextmanager
+            def retarget_at_lock(path: Path):
+                temp_link.unlink()
+                temp_link.symlink_to(host_temp, target_is_directory=True)
+                with original_lock(path):
+                    yield
+
+            with patch.object(runner_state, "_locked_lease_dir", retarget_at_lock):
+                with self.assertRaisesRegex(ValueError, "overlaps job-a:temp"):
+                    runner_state.acquire_lease(candidate, lease_dir, snapshot(candidate)["host_capacity"])
+            self.assertFalse((lease_dir / "job-a.json").exists())
 
     def test_atomic_admission_reserves_capacity_for_one_physical_host(self) -> None:
         first = record("job-a")

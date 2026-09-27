@@ -19,6 +19,8 @@ physical host using `host_capacity`. A job's `.lake/packages` and `.lake/build`
 must be writable trees resolving within its own checkout; a symlink to another
 worktree is not an immutable dependency cache. All eight required roots are
 mutable; an input marking any of them read-only is rejected.
+Path collisions are scoped to jobs on the same physical host. POSIX path case
+is preserved; Windows records use Windows case normalization.
 
 `admit` takes a fresh physical-host capacity document and holds one exclusive
 lock in a host-owned lease directory while it reads **all** active leases,
@@ -29,6 +31,10 @@ only an exact owner match. The lock directory must be an absolute host path
 outside every candidate and active job's writable roots, including temp,
 outputs, artifacts and elan; all runners on one host must use the **same**
 directory. Separate per-runner lease directories would defeat atomic admission.
+The candidate's paths are checked before opening the lock and again with all
+active leases under the lock. The trusted bootstrap must keep those resolved
+identities stable until job exit; this validator cannot prevent a job from
+retargeting a symlink after admission.
 
 Example operator sequence, with a capacity file measured for the physical host
 immediately before admission:
