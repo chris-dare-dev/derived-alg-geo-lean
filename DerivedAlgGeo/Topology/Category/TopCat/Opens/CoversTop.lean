@@ -9,19 +9,18 @@ import Mathlib.CategoryTheory.Sites.Spaces
 /-!
 # Covering the terminal object of an open-set site
 
-`GrothendieckTopology.CoversTop` is the hypothesis every local-to-global statement on a site
-takes. On the open-set site of a topological space it is implied by the far more familiar
-condition that the family's supremum is `⊤`, and on `Spec R` that condition is in turn implied
-by the purely algebraic one that the defining elements generate the unit ideal. This file
-supplies both bridges.
+`GrothendieckTopology.CoversTop` is the site-theoretic form of a covering family. For the open-set
+site of a topological space, an open family with supremum `⊤` covers the terminal object. On a
+prime spectrum, the separate lemma `PrimeSpectrum.basicOpen_coversTop_of_span_eq_top` translates
+the algebraic criterion that a family generates the unit ideal.
 
 ## Main results
 
 * `TopCat.Opens.grothendieckTopology_coversTop` — a family of opens with `⨆ i, U i = ⊤` covers
   the terminal object.
-The `Spec R` companion, `AlgebraicGeometry.basicOpen_coversTop_of_span_eq_top`, lives in
-`AlgebraicGeometry/Spec/CoversTop.lean`. It used to live here, which made a `Topology` module
-import `Mathlib.AlgebraicGeometry.Scheme` — a layer-0 subject reaching into geometry.
+* `PrimeSpectrum.basicOpen_coversTop_of_span_eq_top` — in
+  `RingTheory/Spectrum/Prime/CoversTop.lean`, a unit-ideal generating family gives a cover of the
+  prime spectrum by basic opens.
 
 ## Why this is its own file
 
@@ -31,23 +30,9 @@ topological spaces with no reference to coherence, sheaves of modules, or scheme
 there made it unreachable from the lower-level topology and algebraic-geometry infrastructure
 without creating an import cycle.
 
-That was a live constraint rather than an aesthetic one — the remaining half of the affine
-comparison theorem (issue #46) needs `basicOpen_coversTop_of_span_eq_top` in
-`AlgebraicGeometry/Modules/Coherent/Affine/Comparison.lean`, which is exactly where the old
-placement blocked it. Moving the lemma into the topology domain keeps the dependency direction
-explicit.
-
-## Where the second one is used
-
-Quasi-compactness of `Spec R` produces a *finite* subfamily of basic opens covering it, and
-`PrimeSpectrum.iSup_basicOpen_eq_top_iff` turns that into `Ideal.span (Set.range g) = ⊤`. So the
-shape a local-to-global argument actually has in hand is the algebraic condition, and
-`basicOpen_coversTop_of_span_eq_top` is what converts it back into something the site machinery
-(`SheafOfModules.IsFinitePresentation.of_coversTop`, `QuasicoherentData.coversTop`) accepts.
-
-These declarations are maintained by DerivedAlgGeo. Their Mathlib-style namespaces express the
-mathematical owner of the API and ease replacement by equivalent upstream declarations; they
-do not imply any commitment to submit or merge them into Mathlib.
+The general topological bridge stays independent of schemes. Its prime-spectrum specialization
+lives with `PrimeSpectrum.basicOpen`, under `RingTheory/Spectrum/Prime/`, and assumes only a
+commutative semiring; it is not part of the affine module comparison.
 -/
 
 universe u v

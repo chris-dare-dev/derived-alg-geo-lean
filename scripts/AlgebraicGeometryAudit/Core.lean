@@ -4,6 +4,7 @@ branches append to different files (#480). See the umbrella file for the contrac
 -/
 import DerivedAlgGeo.Algebra
 import DerivedAlgGeo.AlgebraicGeometry
+import DerivedAlgGeo.RingTheory.Spectrum.Prime.CoversTop
 import DerivedAlgGeo.AlgebraicGeometry.IntersectionTheory.ChernCharacter.Basic
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Surface
 import DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Threefold
@@ -1251,7 +1252,7 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms Coh.faithful_ι
 #print axioms Scheme.coherent_isClosedUnderIsomorphisms
 #print axioms TopCat.Opens.grothendieckTopology_coversTop
-#print axioms basicOpen_coversTop_of_span_eq_top
+#print axioms PrimeSpectrum.basicOpen_coversTop_of_span_eq_top
 #print axioms Scheme.Hom.opensRangeEquivalence
 #print axioms Scheme.Hom.opensRangeModulesEquivalence
 #print axioms Scheme.Hom.restrictFunctorIsoOver

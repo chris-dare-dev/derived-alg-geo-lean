@@ -310,6 +310,11 @@ RETIRED_BY_CUTOVER: dict[str, tuple[str, ...]] = {
         # The generic open-square comparison moved to Modules/Pushforward/BaseChange.lean.
         "AlgebraicGeometry/Modules/Coherent/Pushforward/BaseChange.lean",
     ),
+    "2026-09-27 prime-spectrum-covers-top": (
+        # The basic-open covering bridge follows PrimeSpectrum's Mathlib owner.
+        # Its former geometry-owned leaf held no scheme-level construction.
+        "AlgebraicGeometry/Spec",
+    ),
     "MO1.02": (
         # 2026-09-13 MO1.02: charge construction moved upstream of wall loci.
         "LinearAlgebra/QuadraticForm/CentralCharge.lean",
@@ -1777,6 +1782,64 @@ def _rule_mo1_13(
     )
 
 
+def _rule_prime_spectrum_covers_top(
+    modules: Modules, closure: Closure
+) -> tuple[list[str], str]:
+    """The basic-open cover bridge extends PrimeSpectrum and has no scheme dependency."""
+    failures: list[str] = []
+    owner = f"{LIBRARY}.RingTheory.Spectrum.Prime.CoversTop"
+    entry = modules.get(owner)
+    if entry is None:
+        failures.append(f"missing {owner}: it owns the prime-spectrum cover bridge")
+    else:
+        path, imports, namespaces = entry
+        text = path.read_text(encoding="utf-8")
+        if "PrimeSpectrum" not in namespaces:
+            failures.append(f"{owner}: the extension must use PrimeSpectrum's namespace")
+        if "[CommSemiring R]" not in text:
+            failures.append(
+                f"{owner}: the covering bridge is expected to use the "
+                "weakest supported algebraic hypothesis, [CommSemiring R]"
+            )
+        if any(
+            in_tree(dep, GEOMETRY) or in_tree(dep, MATHLIB_GEOMETRY)
+            for dep in imports
+        ):
+            failures.append(f"{owner}: directly imports scheme geometry")
+        reached_geometry = sorted(
+            dep for dep in closure.of(owner) if in_tree(dep, GEOMETRY)
+        )
+        if reached_geometry:
+            failures.append(
+                f"{owner}: reaches {reached_geometry[0]} through a local import; "
+                "prime-spectrum topology must remain scheme-free"
+            )
+        if not re.search(
+            r"(?m)^lemma basicOpen_coversTop_of_span_eq_top\b", text
+        ):
+            failures.append(
+                f"{owner}: must declare basicOpen_coversTop_of_span_eq_top at the canonical owner"
+            )
+
+    declaration_sites = [
+        module
+        for module, (path, _imports, _namespaces) in modules.items()
+        if re.search(
+            r"(?m)^lemma basicOpen_coversTop_of_span_eq_top\b",
+            path.read_text(encoding="utf-8"),
+        )
+    ]
+    if declaration_sites != [owner]:
+        failures.append(
+            "basicOpen_coversTop_of_span_eq_top must be declared exactly once at "
+            f"{owner}; found {declaration_sites}"
+        )
+    return failures, (
+        "the basic-open cover bridge is declared once at PrimeSpectrum's "
+        "scheme-free owner with commutative-semiring hypotheses"
+    )
+
+
 # Every milestone that pins a claim used to append TWICE: a block at the end
 # of main() and a clause at the end of the `ok:` string. Both are the same
 # shape of edit -- insert before a fixed closing line -- so two milestones in
@@ -1805,6 +1868,7 @@ MILESTONE_RULES: dict[str, MilestoneRule] = {
     "MO1.11": _rule_mo1_11,
     "MO1.12": _rule_mo1_12,
     "MO1.13": _rule_mo1_13,
+    "PRIME-SPECTRUM-COVERS-TOP": _rule_prime_spectrum_covers_top,
 }
 
 
