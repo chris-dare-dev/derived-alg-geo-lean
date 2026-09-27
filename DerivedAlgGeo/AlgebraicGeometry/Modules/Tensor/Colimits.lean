@@ -164,12 +164,13 @@ noncomputable instance tensorLeftFunctor_additive (L : X.Modules) :
     (tensorLeftFunctor L)
   exact Functor.additive_of_preservesBinaryBiproducts (tensorLeftFunctor L)
 
-/-- The finite free sheaf is a coproduct of units. Tensoring with any module sheaf
-preserves that coproduct, and the right unitor identifies each summand. -/
-noncomputable def tensorLeftFreeIso (L : X.Modules) (I : Type u) [Finite I] :
+/-- The free sheaf on any index type is a coproduct of units. Tensoring with a module sheaf
+preserves this coproduct, and the right unitor identifies each summand. -/
+noncomputable def tensorLeftFreeIso (L : X.Modules) (I : Type u) :
     tensorObj L (show X.Modules from SheafOfModules.free.{u} I) ≅ ∐ (fun _ : I => L) := by
   classical
-  haveI := Fintype.ofFinite I
+  letI : PreservesColimitsOfShape (Discrete I) (tensorLeftFunctor L) :=
+    tensorLeft_preservesColimitsOfShape L (Discrete I)
   exact PreservesCoproduct.iso (tensorLeftFunctor L)
       (fun _ : I => (SheafOfModules.unit X.ringCatSheaf : X.Modules)) ≪≫
     Sigma.mapIso (fun _ => tensorUnitRightIso L)

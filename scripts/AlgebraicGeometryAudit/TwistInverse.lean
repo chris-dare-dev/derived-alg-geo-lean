@@ -7,7 +7,7 @@ import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.TwistInverse
 
 `tensorLeftFunctor L` preserves finite colimits, hence pushouts, hence epimorphisms
 (`epi_tensorHom_id_of_invertible`, the companion of `mono_tensorHom_id_of_invertible`); and it
-preserves finite coproducts for any `L`, so `L ⊗ free I` is a finite direct sum of copies of `L`
+preserves coproducts for any `L`, so `L ⊗ free I` is a direct sum of copies of `L`
 (`tensorLeftFreeIso`, in `Modules/Tensor/Colimits.lean`). -/
 
 #print axioms AlgebraicGeometry.Scheme.Modules.epi_tensorHom_id_of_invertible
