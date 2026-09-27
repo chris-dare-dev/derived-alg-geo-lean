@@ -51,6 +51,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.isEquivalence
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.toSerreCategoryData
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.pairing
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.additive
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.pairing_apply
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.pairing_separating_left
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.pairing_separating_right
@@ -245,6 +246,9 @@ natural in B by `naturality_right`, and `uniqueIso` is natural in A by `naturali
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.transportIso_trans
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.commShiftIso
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.commShift
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.signedCommShift
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.signedCommShift_one_inv_app
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.trace_shift_one_signed
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.chiHom_eq_chiHom_swap_serre
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.chiHom_eq_chiHom_swap_serre_of_bounded
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.chiHom_eq_negOnePow_mul_chiHom_of_serre_shift
