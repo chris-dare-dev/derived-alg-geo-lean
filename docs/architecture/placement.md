@@ -57,6 +57,66 @@ topological open-site cover theorem. Stalks of module presheaves are stated with
 `TopCat`, germs, and stalk functors, which Mathlib defines in
 `Topology/Sheaves/`, so they live there.
 
+## Affine and projective spectrum foundations
+
+The removed local `AlgebraicGeometry/Spec/` folder was not Mathlib's scheme spectrum API: it held
+only a scheme-namespaced convenience theorem about basic opens. The canonical scheme `Spec` remains
+upstream in Mathlib's `AlgebraicGeometry/Spec.lean`. At the repository's Mathlib v4.32.1 pin
+([commit `520045ab14e26149ee970e2e617ca04b09bde5d6`](https://github.com/leanprover-community/mathlib4/tree/520045ab14e26149ee970e2e617ca04b09bde5d6)),
+the underlying topological space of scheme `Spec R` is Mathlib's `PrimeSpectrum R`, and the
+scheme API adds its structure sheaf and locally ringed-space structure. The ownership map is:
+
+| Foundation | Pinned Mathlib owner and APIs | DerivedAlgGeo extensions |
+| --- | --- | --- |
+| Prime spectrum as a topological space; basic opens | [`RingTheory/Spectrum/Prime/Topology.lean`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/RingTheory/Spectrum/Prime/Topology.lean#L628): `PrimeSpectrum`, `basicOpen`, `iSup_basicOpen_eq_top_iff` | `RingTheory/Spectrum/Prime/`, including `PrimeSpectrum.coversTop_basicOpen_of_span_eq_top` as the scheme-free basic-open covering bridge |
+| The scheme `Spec`, the global-sections/Spec adjunction, and affine schemes | [`AlgebraicGeometry/Spec.lean`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/AlgebraicGeometry/Spec.lean), [`GammaSpecAdjunction.lean`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/AlgebraicGeometry/GammaSpecAdjunction.lean#L390), [`AffineScheme.lean`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/AlgebraicGeometry/AffineScheme.lean#L217): `Scheme.Spec`, `ΓSpec.adjunction`, `AffineScheme.equivCommRingCat` | Scheme-specific results stay in `AlgebraicGeometry/`; affine module-sheaf results stay in `AlgebraicGeometry/Modules/Affine/` |
+| Associated modules and the affine quasi-coherent equivalence | [`AlgebraicGeometry/Modules/Tilde.lean`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/AlgebraicGeometry/Modules/Tilde.lean#L833): `Scheme.Modules.isIso_fromTildeΓ_of_isQuasicoherent` and [`AlgebraicGeometry.tildeEquiv`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/AlgebraicGeometry/Modules/Tilde.lean#L881) | `Modules/Affine/` adds localization criteria and bridges that consume the upstream comparison |
+| Proj's standard affine charts, cover, and structure map | [`ProjectiveSpectrum/Basic.lean`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/AlgebraicGeometry/ProjectiveSpectrum/Basic.lean#L161): `Proj.basicOpenIsoSpec`, `Proj.awayι`, `Proj.affineOpenCover`, `Proj.toSpecZero` | `AlgebraicGeometry/ProjectiveSpectrum/` develops further scheme and module-sheaf results on these existing charts |
+| The chart ring used by Proj | [`RingTheory/GradedAlgebra/HomogeneousLocalization.lean`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/RingTheory/GradedAlgebra/HomogeneousLocalization.lean#L601): `HomogeneousLocalization.Away` | `Proj.chartRing` is only an `abbrev` bundling this ring as `CommRingCat` |
+
+These are the implemented owners and paths after the #1607 cutover; the map records no proposed
+directory move or unimplemented target.
+
+The dependency is concrete and one-way: `ProjectiveSpectrum/Modules/ChartExtension.lean` imports
+`Modules/Affine/Extension.lean`, which imports Mathlib's
+`AlgebraicGeometry/Modules/Tilde.lean`. `ChartExtension.lean` defines `chartRing` as an
+`abbrev` for `HomogeneousLocalization.Away` and defines `awayRestrict` by restricting
+along Mathlib's existing open immersion `Proj.awayι`. It does not define another affine chart or
+spectrum.
+
+For a graded ring `A` and homogeneous `f` of positive degree, Mathlib's
+`Proj.basicOpenIsoSpec` identifies the scheme on `D₊(f)` with
+`Spec (HomogeneousLocalization.Away 𝒜 f)`, the degree-zero localization usually written
+`(A[f⁻¹])₀` or `A_{(f)}`. This is the degree-zero homogeneous localization, not the full ordinary
+localization `Localization.Away f`. `Proj.affineOpenCover` packages these charts into an affine
+open cover, and `Proj.toSpecZero` is the structure map `Proj A ⟶ Spec A₀`. The lemma
+`Proj.awayι_toSpecZero` verifies that each chart immersion followed by this structure map is the
+map induced from `A₀` to the chart ring.
+
+Keep the relationships distinct:
+
+- **Ownership:** ring-theoretic `PrimeSpectrum` extensions follow `RingTheory/Spectrum/Prime/`;
+  genuine scheme results follow Mathlib's `AlgebraicGeometry/` owner; affine module-sheaf
+  extensions stay under `Modules/Affine/`; Proj chart consumers stay under
+  `ProjectiveSpectrum/`.
+- **Dependency:** the local Proj module-chart extension imports the affine module extension, which
+  uses Mathlib's module-sheaf API.
+- **Comparison maps:** `ΓSpec.adjunction` relates global sections and `Spec`;
+  `AffineScheme.equivCommRingCat` identifies affine schemes with opposite commutative rings;
+  `AlgebraicGeometry.tildeEquiv` and
+  `Scheme.Modules.isIso_fromTildeΓ_of_isQuasicoherent` give the affine module comparison;
+  `Proj.awayι_toSpecZero` relates each standard chart to the structure map.
+
+The size of a local directory measures the additional DerivedAlgGeo extensions and proofs it
+contains, not how much affine or projective spectrum theory is available to consumers: the core
+scheme, module-sheaf, and Proj chart APIs listed above are already in Mathlib.
+
+For the mathematical picture, see [nLab on affine schemes](https://ncatlab.org/nlab/show/affine+scheme),
+[nLab on projective schemes](https://ncatlab.org/nlab/show/projective+scheme), and the [Stacks
+Project discussion of Proj, its affine charts, and the map to `Spec A₀` (Tag
+01M3)](https://stacks.math.columbia.edu/tag/01M3).
+
+
 ## Tier 1 is about extension, not use
 
 Tier 1 decides where an *extension of an existing Mathlib API* lives. It does

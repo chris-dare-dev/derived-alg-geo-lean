@@ -5,4 +5,12 @@ import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.ProjectiveSpacePropert
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.ProjectiveSpaceVariety
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.StructureSections
 
-/-! # Graded modules and associated sheaves on projective spectra -/
+/-!
+# Graded modules and associated sheaves on projective spectra
+
+Mathlib supplies the scheme, standard affine charts, and structure map of Proj;
+this library develops further geometric and module-sheaf results on those
+charts. See the
+[affine and projective spectrum placement map](../../docs/architecture/placement.md)
+for the upstream owners and the concrete connection to the affine module API.
+-/

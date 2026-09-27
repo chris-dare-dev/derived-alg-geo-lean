@@ -12,8 +12,9 @@ import Mathlib.CategoryTheory.Limits.Constructions.Over.Products
 # Presentations on a basic-open cover
 
 A quasi-coherent sheaf on an affine scheme has presentations on the members of some cover of the
-open-set site. This file refines that cover to basic opens. The result is the geometric input to
-the remaining gluing argument in the affine comparison theorem.
+open-set site. This file refines that cover to basic opens. Mathlib v4.32 supplies the global
+quasi-coherent affine comparison; this local refinement remains a separate presentation-cover
+result.
 
 ## Main result
 

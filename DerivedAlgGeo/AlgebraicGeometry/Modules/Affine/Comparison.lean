@@ -9,15 +9,16 @@ import DerivedAlgGeo.Topology.Sheaves.Basis
 /-!
 # The localisation criterion for the affine comparison theorem
 
-On `Spec R`, a quasi-coherent sheaf of modules should be recovered from its global sections
-by `~`: the counit `Scheme.Modules.fromTildeΓ` should be an isomorphism. This is Stacks
-[01IA](https://stacks.math.columbia.edu/tag/01IA) / Hartshorne II.5.1, and it is missing from
-Mathlib at `v4.29.0`.
+For a commutative ring `R`, the affine comparison identifies a quasi-coherent sheaf on `Spec R`
+with the sheaf associated to its global sections. This is Stacks
+[01IA](https://stacks.math.columbia.edu/tag/01IA) and Hartshorne II.5.1. The pinned Mathlib
+v4.32.1 supplies the quasi-coherent case as
+`Scheme.Modules.isIso_fromTildeΓ_of_isQuasicoherent` in
+`Mathlib/AlgebraicGeometry/Modules/Tilde.lean`.
 
-This file reduces that theorem to a statement about localisation of modules, and proves the
-reduction is *exact*: the counit is an isomorphism **if and only if** restriction to every
-basic open is a localisation. `AlgebraicGeometry.Modules.Affine.Gluing` proves that
-quasi-coherence supplies this condition and completes the comparison theorem.
+This file develops a more general localization criterion for the counit
+`Scheme.Modules.fromTildeΓ`: it is an isomorphism **if and only if** restriction to every basic
+open is a localization. It does not reprove the upstream quasi-coherent comparison.
 
 ## Main results
 
@@ -32,8 +33,7 @@ quasi-coherence supplies this condition and completes the comparison theorem.
 * `AlgebraicGeometry.Scheme.Modules.isLocalizedModule_basicOpenRestriction_of_isIso` — the
   converse of the reduction, obtained by transporting the base case along the counit.
 * `AlgebraicGeometry.Scheme.Modules.isLocalizedModule_basicOpenRestriction_of_presentation` —
-  the local input for the gluing argument: a global presentation makes every basic-open
-  restriction a localisation.
+  a presentation on `Spec R` makes restriction to each basic open a localization.
 * `AlgebraicGeometry.Scheme.Modules.isIso_fromTildeΓ_iff_isLocalizedModule` — the two put
   together: **`IsIso M.fromTildeΓ ↔ ∀ f, IsLocalizedModule (powers f) (restriction to D(f))`.**
   This is the statement to quote.
@@ -48,28 +48,20 @@ resulting triangle: the component composed with `tilde.toOpen` is the restrictio
 instance — the component is the comparison map between two candidate localisations, and is an
 isomorphism precisely when the second one is a localisation too.
 
-Nothing in that argument needs quasi-coherence, and `tilde.isUnit_algebraMap_end_basicOpen` is
-already stated in Mathlib for an *arbitrary* `M : (Spec R).Modules`, not only for tildes. So
-the whole content of the comparison theorem is concentrated in the single hypothesis of
-`isIso_fromTildeΓ_of_isLocalizedModule`.
+Nothing in this local criterion needs quasi-coherence. Mathlib states
+`Scheme.Modules.isUnit_algebraMap_end_of_le_basicOpen` for an *arbitrary* `M : (Spec R).Modules`,
+not only for tildes. The quasi-coherent application is provided by Mathlib's pinned instance; the
+local criterion remains available when a caller supplies the localization hypotheses directly.
 
-## Completion
+## Relation to the local bridges
 
-The mathematical implication deliberately left out of this reduction is:
-
-> for `M` **quasi-coherent** on `Spec R` and `f : R`, the restriction `Γ(M, ⊤) → Γ(M, D(f))`
-> exhibits its target as the localisation at `Submonoid.powers f`
-
-equivalently, by `isIso_fromTildeΓ_iff_isLocalizedModule`, that a quasi-coherent sheaf on an
-affine scheme lies in the essential image of `~`. It is proved in
-`AlgebraicGeometry.Modules.Affine.Gluing` as
-`Scheme.Modules.isLocalizedModule_basicOpenRestriction_of_isQuasicoherent`; the resulting
-counit theorem is `Scheme.Modules.isIso_fromTildeΓ_of_isQuasicoherent`.
-
-The completion is the classical covering argument: choose a finite basic-open subcover carrying
-presentations, choose uniform powers of `f` for equality and extension, and glue the normalized
-local lifts with the sheaf axiom. The scheme/slice transport used by its local input is in
-`AlgebraicGeometry.Modules.Restriction.OpenImmersion`.
+`AlgebraicGeometry.Modules.Affine.Gluing` documents the current division of work: Mathlib owns the
+finite-cover proof of the quasi-coherent comparison, while the local file retains the
+restriction-to-chart linear equivalence and wrappers for DerivedAlgGeo's explicit
+quasi-coherent-data and localization APIs. In particular,
+`Scheme.Modules.isLocalizedModule_basicOpenRestriction_of_isQuasicoherent` is a bridge to the
+upstream result, not a second proof of it. The scheme/slice transport used by these local bridges
+is in `AlgebraicGeometry.Modules.Restriction.OpenImmersion`.
 
 ## References
 
