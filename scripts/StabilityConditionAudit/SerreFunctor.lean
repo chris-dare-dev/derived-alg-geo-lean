@@ -249,6 +249,7 @@ natural in B by `naturality_right`, and `uniqueIso` is natural in A by `naturali
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.signedCommShift
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.signedCommShift_one_inv_app
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.trace_shift_one_signed
+#print axioms CategoryTheory.SerreFunctor.SerreFunctorData.isTriangulated
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.chiHom_eq_chiHom_swap_serre
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.chiHom_eq_chiHom_swap_serre_of_bounded
 #print axioms CategoryTheory.SerreFunctor.SerreFunctorData.chiHom_eq_negOnePow_mul_chiHom_of_serre_shift
