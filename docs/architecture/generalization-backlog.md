@@ -50,26 +50,30 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
 - chunk:              1369-shiftcompat-unification
 - reviewing commit:   00196ff8
 - found by:           altitude-scout
-- proposed ancestor:  `CategoryTheory.Shift.NatTrans.CommShift`, with the
-  Fourier--Mukai record packaging a selected target `CommShift` structure and
-  compatibility evidence for the supplied comparison isomorphism
+- proposed ancestor:  `CategoryTheory.NatTrans.CommShift`, defined in module
+  `Mathlib.CategoryTheory.Shift.CommShift`; the Fourier--Mukai record packages
+  a selected `CategoryTheory.Functor.CommShift` structure and compatibility
+  evidence for the supplied comparison isomorphism
 - weaker hypotheses:  any natural transformation between functors carrying
   selected shift structures for an additive monoid; no isomorphism, Fourier--Mukai
   transform, triangulatedness, dg presentation, or cotwist shift is required
 - pin status:         PIN-CONFIRMED
   `.lake/packages/mathlib/Mathlib/CategoryTheory/Shift/CommShift.lean:360`
-- source note:        The pinned class asserts exactly the generic compatibility
-  between a natural transformation and the source and target shift structures.
-  It leaves those structures as inputs; the issue's record would package the
-  independently selected Fourier--Mukai target structure alongside this proof.
-  `Functor.CommShift.ofIso` can instead transport the source structure across
-  the comparison, but that produces the transported choice rather than proving
-  compatibility with an independently selected target structure. Mathlib's
-  `Functor.isTriangulated_of_iso` consumes the selected structures and this
-  compatibility evidence to transfer exactness. Stacks Project §13.3 (tag
-  05QK) describes the analogous compatibility for 2-morphisms between
-  triangulated functors, in the additional setting where the functors are
-  exact: [Stacks Project §13.3, tag 05QK](https://stacks.math.columbia.edu/tag/05QK).
+  [pinned Mathlib source](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/CategoryTheory/Shift/CommShift.lean#L35-L362)
+- source note:        The pinned `CategoryTheory.NatTrans.CommShift` class asserts
+  generic compatibility of a natural transformation with its source and target
+  shift structures, leaving both structures as inputs. The `CategoryTheory.NatTrans`
+  namespace is nested directly under `CategoryTheory`; `Shift` belongs to the
+  defining module path, not the declaration namespace. The issue's record packages
+  the independently selected Fourier--Mukai target structure alongside this proof.
+  `CategoryTheory.Functor.CommShift.ofIso` can instead transport the source
+  structure across the comparison, but that produces the transported choice
+  rather than proving compatibility with an independently selected target.
+  `CategoryTheory.Functor.isTriangulated_of_iso` consumes the selected structures
+  and this compatibility evidence to transfer exactness. Stacks Project §13.3
+  (tag 05QK) describes the analogous compatibility for 2-morphisms between
+  triangulated functors, in the additional setting where the functors are exact:
+  [Stacks Project §13.3, tag 05QK](https://stacks.math.columbia.edu/tag/05QK).
 - state:              UNVERIFIED
 
 ### 2026-09-23 — K-flat resolutions and derived pullback for ringed topoi (planned)
