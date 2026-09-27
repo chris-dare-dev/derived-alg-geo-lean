@@ -95,8 +95,8 @@ no more than two issues in flight.
      four again.
    - A frozen implementation attempt gets at most three rounds. After the
      third unsuccessful round, freeze that attempt and start the research
-     handoff below. A failing required check on the third reviewed source
-     commit is also an unsuccessful terminal round.
+     handoff below. A deterministic code failure in a required check on the
+     third reviewed source commit is also an unsuccessful terminal round.
    - If a reviewer returns nothing, dispatch that role again on the same
      commit.
    - Never put your own reading of the diff in place of a reviewer's verdict.
@@ -111,28 +111,32 @@ no more than two issues in flight.
      done needs more than one PR.
 5. **Merge.**
    - Wait for the required checks.
-   - If a check fails, classify it on the exact PR head. Any repair to
-     review-relevant source goes through all four reviewers and reserves the
-     next round of the same attempt before a push. A deterministic code
+   - If a check fails, classify it on the exact PR head. Any repair changing
+     PR content, including Lean, scripts, documentation or configuration,
+     goes through all four reviewers and reserves the next round of the same
+     attempt before a push. A deterministic code
      failure on the third reviewed source commit freezes that attempt
      immediately; do not make a fourth source revision. Rerunning a transient
-     check without changing reviewed source consumes no source-review round.
+     check without changing reviewed content consumes no review round.
    - When GitHub reports the branch out of date, merge `origin/main` into it and
-     push. Never rebase a pushed branch. That merge needs no new review, unless
-     you had to resolve a conflict inside the PR's own changes.
-   - Once every required check is green, run `gh pr merge <n> --squash`. Never
-     pass `--admin`.
+     push. Never rebase a pushed branch. A conflict-free base refresh needs no
+     new panel only after recording that the PR's contribution diff is
+     byte-identical and the base did not change relevant imports, pins or
+     reviewed behavior. A conflict in the PR's own changes, a changed
+     contribution diff or uncertain relevance requires another reserved
+     four-role round. This exception does not cover a source repair.
+   - Immediately before `gh pr merge <n> --squash`, verify the live PR head is
+     the exact reviewed commit or a recorded content-identical base refresh,
+     and every required check succeeded on that live head. Never pass
+     `--admin`.
    - Remove the worktree and take the next issue. For a progress PR, the next
      item is the next slice of the same issue, until its definition of done is
      met.
 
 ## Research after an exhausted attempt
 
-An issue cannot be finished when any of these happens:
-- three review rounds end without a pass;
-- a deterministic required check fails on the third reviewed source commit;
-- a research pass confirms the definition of done is false as written;
-- it needs an action the owner has withdrawn (see "What you may do").
+Start this handoff when three reserved source-review rounds end without a pass,
+or a deterministic required check fails on the third reviewed source commit.
 
 Freeze the failed attempt immediately:
 - If a PR exists, mark it as a draft (`gh pr ready --undo`) with the open
@@ -176,6 +180,12 @@ Freeze the failed attempt immediately:
 - If research finds no viable changed strategy, records a false acceptance
   criterion, or exhausts the bounded recovery allowance, record that terminal
   decision and take the next independent issue. Keep dependent issues waiting.
+
+If research establishes that the issue's definition of done is false before
+any implementation round, record that finding with the available evidence;
+do not invent a failed source commit, PR or review allocation. If the owner
+has withdrawn an action needed to continue, preserve the available local
+handoff, respect the remaining mutation grants and take independent work.
 
 Marked issue comments are the shared issue-first recovery record; PR
 descriptions mirror their current status. This is an agent-enforced protocol,

@@ -21,3 +21,8 @@ the live #554 response as an open issue with `blockedBy` connection
 a read-only scratch Lean probe in the cold report worktree; it failed on a
 missing DerivedAlgGeo olean after ignored dependency downloads. That result
 is neither positive nor negative proof evidence, and no tracked file changed.
+On the exact #1574 PR base, the abstraction reviewer subsequently compiled
+`rfl` for equality between the historical `tensorLeftFunctor L` and the
+canonical `tensorLeft (C := X.Modules) L`. This is concrete root-agreement
+evidence for the research design, not a compile of its restored-colimit
+successor or a review of new source.
