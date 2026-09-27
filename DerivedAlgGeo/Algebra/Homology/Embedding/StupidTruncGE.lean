@@ -16,7 +16,8 @@ in any category with zero morphisms and a zero object.
 
 * `HomologicalComplex.stupidTruncGEι` includes a tail in its source complex.
 * `HomologicalComplex.stupidTruncGEMap` includes a deeper tail in a shallower
-  one; `stupidTruncGEMap_self` and `stupidTruncGEMap_comp` give its laws.
+  one; `HomologicalComplex.stupidTruncGEMap_self` and
+  `HomologicalComplex.stupidTruncGEMap_comp` give its laws.
 * `HomologicalComplex.stupidTrunc_d_eq` describes the retained differential.
 
 ## Implementation notes
@@ -62,7 +63,9 @@ lemma stupidTrunc_d_eq (K : HomologicalComplex C (ComplexShape.up ℤ)) (p : ℤ
   simp [stupidTruncXIso, restrictionXIso, Category.assoc]
   all_goals aesop
 
-/-- The inclusion of the stupid truncation in degrees at least `p` into the original complex. -/
+/-- On retained degrees this uses `HomologicalComplex.stupidTruncXIso`; below
+`p` its source component is zero. The resulting map is monic without an
+abelian-category assumption. -/
 noncomputable def stupidTruncGEι (K : HomologicalComplex C (ComplexShape.up ℤ)) (p : ℤ) :
     K.stupidTrunc (ComplexShape.embeddingUpIntGE p) ⟶ K where
   f i := if hi : p ≤ i then
@@ -97,8 +100,9 @@ noncomputable instance stupidTruncGEι_mono
     Mono (stupidTruncGEι K p) :=
   mono_of_mono_f _ (fun _ ↦ inferInstance)
 
-/-- Inclusion between nested stupid truncations.  If `p ≤ q`, the terms in degrees at
-least `q` form a subcomplex of the terms in degrees at least `p`. -/
+/-- Compatibility with the monic `HomologicalComplex.stupidTruncGEι` maps
+characterizes this nested-tail inclusion; cancellation gives its identity and
+composition laws. -/
 noncomputable def stupidTruncGEMap (K : HomologicalComplex C (ComplexShape.up ℤ))
     (p q : ℤ) (hpq : p ≤ q) :
     K.stupidTrunc (ComplexShape.embeddingUpIntGE q) ⟶

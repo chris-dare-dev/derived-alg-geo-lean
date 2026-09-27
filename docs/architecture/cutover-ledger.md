@@ -2543,7 +2543,8 @@ or exactness was strengthened by relocation.
 ## Confirmed next lanes
 
 The SF8 #554 integer-tail cutover moves the existing
-`HomologicalComplex.stupidTruncGEι` and `stupidTruncGEMap` API, including its
+`HomologicalComplex.stupidTruncGEι` and
+`HomologicalComplex.stupidTruncGEMap` API, including its
 mono instances and map laws, from the filtered-total consumer to
 `Algebra/Homology/Embedding/StupidTruncGE.lean`. The names and hypotheses are
 unchanged; `FilteredTotalComplex.lean` imports that owner. This source move
