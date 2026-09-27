@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-import re
+import json
 from pathlib import Path
 
 from _output import force_utf8_output
@@ -14,7 +14,7 @@ MAX_PROJECT_DOC_BYTES = 32_768
 
 
 def valid_frontmatter(contents: str) -> bool:
-    """Require a complete named and described Codex skill header."""
+    """Require a complete skill header in the supported YAML/JSON scalar subset."""
     lines = contents.splitlines()
     if not lines or lines[0] != "---":
         return False
@@ -23,16 +23,19 @@ def valid_frontmatter(contents: str) -> bool:
     except ValueError:
         return False
     header = lines[1:end]
-    names = [line for line in header if re.match(r"name\s*:", line)]
-    descriptions = [line for line in header if re.match(r"description\s*:", line)]
-    if len(names) != 1 or len(descriptions) != 1:
+    prefix = "description: "
+    if (
+        len(header) != 2
+        or header[0] != "name: run-loop"
+        or not header[1].startswith(prefix)
+        or not any(line.strip() for line in lines[end + 1 :])
+    ):
         return False
-    match = re.fullmatch(r"description:\s*(\S.*?)\s*", descriptions[0])
-    return (
-        bool(re.fullmatch(r"name:\s*run-loop\s*", names[0]))
-        and match is not None
-        and match[1] not in {"''", '""'}
-    )
+    try:
+        description = json.loads(header[1][len(prefix) :])
+    except json.JSONDecodeError:
+        return False
+    return isinstance(description, str) and bool(description.strip())
 
 
 def main() -> int:

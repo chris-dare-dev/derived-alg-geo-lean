@@ -1,6 +1,6 @@
 ---
 name: run-loop
-description: Work GitHub issues or a milestone to merged pull requests without stopping for the owner. Research each issue, build it, pass four independent reviewers, merge on green CI, and launch independent R&D after a terminal three-round attempt.
+description: "Work GitHub issues or a milestone to merged pull requests without stopping for the owner. Research each issue, build it, pass four independent reviewers, merge on green CI, and launch independent R&D after a terminal three-round attempt."
 ---
 
 # Run loop
