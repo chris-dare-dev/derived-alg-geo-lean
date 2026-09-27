@@ -290,7 +290,7 @@ CategoryTheory/Monoidal
   └─→ Triangulated                            compatibility class; instances come from geometry
 
 RingTheory/Spectrum/Prime
-  └─→ BasicOpen                               finite products of basic opens
+  └─→ BasicOpen, CoversTop                    products and covers by basic opens
 
 Topology
   ├─→ Covering                                product of a covering map with an identity
@@ -371,7 +371,7 @@ AlgebraicGeometry
 | Stability functions and HN theory on an abelian category | `DerivedAlgGeo.CategoryTheory.Abelian.Stability` |
 | Slope and Gieseker stability of coherent sheaves | `DerivedAlgGeo.AlgebraicGeometry.Stability` |
 | Basiswise isomorphism detection for topological sheaves | `DerivedAlgGeo.Topology.Sheaves.Basis` |
-| Finite products of prime-spectrum basic opens | `DerivedAlgGeo.RingTheory.Spectrum.Prime.BasicOpen` |
+| Products and covers by basic opens on prime spectra | `DerivedAlgGeo.RingTheory.Spectrum.Prime` |
 | Coherent sheaves | `DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent` |
 | Cartier divisors as line bundles | `DerivedAlgGeo.AlgebraicGeometry.Divisors.CartierLineBundle` |
 | Effective-divisor sequences twisted by line bundles | `DerivedAlgGeo.AlgebraicGeometry.Divisors.EffectiveLineBundle` |
