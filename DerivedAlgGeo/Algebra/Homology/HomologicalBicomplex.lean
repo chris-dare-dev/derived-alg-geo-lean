@@ -69,8 +69,10 @@ private noncomputable def singleMapHomologicalComplexFlipObjIso
 
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
-/-- The mapped-single presentation is naturally isomorphic to placing the outer
-complex in one inner degree and flipping the resulting bicomplex. -/
+/-- The two functors package the complex indices differently, so this comparison
+is not definitional. Its components use the inverse of
+`HomologicalComplex.singleMapHomologicalComplex`; differential compatibility
+reduces to the supported inner degree and its zero complement. -/
 noncomputable def singleMapHomologicalComplexFlipIso :
     (HomologicalComplex.single C c₂ j₀).mapHomologicalComplex c₁ ≅
       HomologicalComplex.single (HomologicalComplex C c₁) c₂ j₀ ⋙
