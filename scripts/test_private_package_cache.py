@@ -228,6 +228,29 @@ class PrivatePackageCacheTest(unittest.TestCase):
         finally:
             project_build.chmod(0o755)
 
+    def test_legacy_receipt_is_read_only_and_rejects_duplicate_keys(self) -> None:
+        target = self._target("legacy-receipt")
+        self._seed(target)
+        receipt = target / ".lake/private-cache-ready.json"
+        original = receipt.read_bytes()
+        (target / ".lake/build/lib/Project.olean").write_bytes(b"normal Lake update")
+        cache.verify_ready(target)
+        self.assertEqual(receipt.read_bytes(), original)
+        receipt.write_bytes(original[:-2] + b',"format":4}\n')
+        with self.assertRaisesRegex(ValueError, "duplicate private-cache record key"):
+            cache.verify_ready(target)
+        self.assertEqual((target / ".lake/build/lib/Project.olean").read_bytes(),
+                         b"normal Lake update")
+
+    def test_oversized_receipt_refuses_without_repair(self) -> None:
+        target = self._target("oversized-receipt")
+        self._seed(target)
+        receipt = target / ".lake/private-cache-ready.json"
+        receipt.write_bytes(b" " * (cache.MAX_RECORD_BYTES + 1))
+        with self.assertRaisesRegex(ValueError, "bounded private file"):
+            cache.verify_ready(target)
+        self.assertEqual(receipt.stat().st_size, cache.MAX_RECORD_BYTES + 1)
+
     def test_preplaced_target_stage_link_refuses_without_sibling_write(self) -> None:
         self._seed(self._target("snapshot-first"))
         target = self._target("stage-link")
