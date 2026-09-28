@@ -19,7 +19,7 @@ ambient finite-coproduct assumption or replacement coproduct is introduced.
 
 * `CategoryTheory.Limits.Sigma.sum_π_ι_eq_id_of_isZero` gives the finite
   projection-inclusion identity, and
-  `CategoryTheory.Limits.Sigma.isZero_of_sum_π_ι_eq_id` gives its converse.
+  `CategoryTheory.Limits.Sigma.isZero_of_sum_π_ι_eq_id_of_not_mem` gives its converse.
 * `CategoryTheory.Limits.Sigma.hom_ext_of_finite_support` compares incoming maps
   on the finite nonzero support.
 * `CategoryTheory.Limits.Sigma.hom_eq_zero_of_finite_support` detects a zero
@@ -70,7 +70,7 @@ private lemma sum_π_ι_eq_id_of_isZero_chosen (s : Finset I)
   · have hjzero := (hz j hj).eq_zero_of_src (Sigma.ι f j)
     simp [hjzero]
 
-private lemma isZero_of_sum_π_ι_eq_id_chosen (s : Finset I)
+private lemma isZero_of_sum_π_ι_eq_id_of_not_mem_chosen (s : Finset I)
     (hid : ∑ i ∈ s, Sigma.π f i ≫ Sigma.ι f i = 𝟙 (∐ f))
     (j : I) (hj : j ∉ s) : IsZero (f j) := by
   have hι : Sigma.ι f j = 0 := by
@@ -124,17 +124,17 @@ lemma sum_π_ι_eq_id_of_isZero (s : Finset I)
 
 /-- Conversely, the finite identity forces an omitted summand to be zero:
 its inclusion is zero and its projection is a left inverse. -/
-lemma isZero_of_sum_π_ι_eq_id (s : Finset I)
+lemma isZero_of_sum_π_ι_eq_id_of_not_mem (s : Finset I)
     (hid : ∑ i ∈ s, Sigma.π f i ≫ Sigma.ι f i = 𝟙 (∐ f))
     (j : I) (hj : j ∉ s) : IsZero (f j) :=
-  isZero_of_sum_π_ι_eq_id_chosen f s hid j hj
+  isZero_of_sum_π_ι_eq_id_of_not_mem_chosen f s hid j hj
 
 /-- An omitted nonzero summand obstructs the identity: composing with its
 inclusion and projection would force its identity morphism to vanish. -/
 lemma sum_π_ι_eq_id_iff_isZero (s : Finset I) :
     (∑ i ∈ s, Sigma.π f i ≫ Sigma.ι f i = 𝟙 (∐ f)) ↔
       ∀ i, i ∉ s → IsZero (f i) :=
-  ⟨fun hid i hi => isZero_of_sum_π_ι_eq_id f s hid i hi,
+  ⟨fun hid i hi => isZero_of_sum_π_ι_eq_id_of_not_mem f s hid i hi,
     sum_π_ι_eq_id_of_isZero f s⟩
 
 end ClassicalProjection
