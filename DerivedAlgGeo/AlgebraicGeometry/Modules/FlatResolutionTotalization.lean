@@ -2,8 +2,10 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.AlgebraicGeometry.Modules.AB
 import DerivedAlgGeo.AlgebraicGeometry.Modules.FlatGenerators
 import DerivedAlgGeo.Algebra.Homology.Embedding.CochainComplex
+import DerivedAlgGeo.Algebra.Homology.HomologicalComplexLimits
 import DerivedAlgGeo.Algebra.Homology.TotalComplex
 import DerivedAlgGeo.Algebra.Homology.HomologicalBicomplex
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence.SingleZeroTotal
@@ -20,8 +22,8 @@ normalizes to a flipped single-zero bicomplex and is a quasi-isomorphism in
 each resolution-direction row. Its integer-extended direct-sum total complex
 has terms flat over the identity, and the signed total of the normalized
 target is naturally the input complex.
-The final augmentation is a constructed map, without an unbounded total
-quasi-isomorphism or K-flatness claim.
+The final augmentation is a quasi-isomorphism for arbitrary inputs. K-flatness
+remains a separate obligation.
 For every strictly bounded-above input, termwise support and the nonpositive
 resolution degree make its total augmentation a quasi-isomorphism. This
 includes every canonical good truncation.
@@ -46,6 +48,8 @@ includes every canonical good truncation.
   augmentation is a quasi-isomorphism for strictly bounded-above inputs.
 * `quasiIso_freeYonedaSheafCoproductTotalAugmentation_truncLE` specializes
   this result to each canonical good truncation.
+* `quasiIso_freeYonedaSheafCoproductTotalAugmentation` passes the stagewise
+  quasi-isomorphisms through the good-truncation colimit for arbitrary inputs.
 
 ## Implementation notes
 
@@ -58,6 +62,9 @@ For an input strictly supported at `c`, both bicomplexes vanish in outer
 degrees above `c` and inner degrees above zero. Reduced left resolution
 preserves zero terms, so the four-bound total-map criterion applies on each
 diagonal.
+The source and target good-truncation cocones are colimiting. Exact filtered
+colimits preserve stagewise quasi-isomorphisms, and naturality transports the
+result from the chosen colimit to the original input.
 
 ## References
 
@@ -87,8 +94,8 @@ noncomputable def freeYonedaSheafCoproductResolutionBicomplexUpInt
     E.mapHomologicalComplex (ComplexShape.up ℤ)
 
 /-- The direct-sum total complex of the functorial free-Yoneda flat-resolution bicomplex.
-The augmentation to the input is constructed below; its quasi-isomorphism
-and K-flatness remain separate obligations. -/
+The augmentation to the input and its quasi-isomorphism are proved below;
+K-flatness remains a separate obligation. -/
 noncomputable def freeYonedaSheafCoproductTotalComplexFunctor (X : Scheme.{u}) :
     CochainComplex X.Modules ℤ ⥤ CochainComplex X.Modules ℤ :=
   freeYonedaSheafCoproductResolutionBicomplexUpInt X ⋙
@@ -129,8 +136,8 @@ noncomputable def isColimitFreeYonedaSheafCoproductTotalTruncLETowerCocone
 
 /-- Apply the natural augmentation of each free-Yoneda left resolution in the
 resolution direction. The target retains the input complex in resolution degree
-zero after extending that direction to integer degrees. This is a bicomplex
-map; its totalization is treated below, without a quasi-isomorphism claim. -/
+zero after extending that direction to integer degrees. Its totalization and
+comparison with the input are constructed below. -/
 noncomputable def freeYonedaSheafCoproductResolutionBicomplexAugmentation
     (X : Scheme.{u}) :
     freeYonedaSheafCoproductResolutionBicomplexUpInt X ⟶
@@ -194,9 +201,8 @@ theorem normalizedBicomplexAugmentation_row_quasiIso (X : Scheme.{u})
   infer_instance
 
 /-- Totalize the natural bicomplex augmentation. The target is the total
-complex of a bicomplex concentrated in resolution degree zero; a natural
-identification with the input is constructed below, while quasi-isomorphism
-of this unbounded total map remains open. -/
+complex of a bicomplex concentrated in resolution degree zero. A natural
+identification with the input is constructed below and compared with this map. -/
 noncomputable def freeYonedaSheafCoproductTotalAugmentationToSingleZero
     (X : Scheme.{u}) :
     freeYonedaSheafCoproductTotalComplexFunctor X ⟶
@@ -439,13 +445,42 @@ theorem quasiIso_freeYonedaSheafCoproductTotalAugmentation_of_isStrictlyLE
     (hφ := quasiIso_normalizedBicomplexAugmentation_totalMap_of_isStrictlyLE X M c)
     (hφ' := hQI) f g
 
-/-- The free-Yoneda total augmentation is a quasi-isomorphism on every
-canonical good truncation. The unbounded augmentation needs a separate
-colimit argument. -/
+/-- Good truncations are strictly bounded above, so the bounded augmentation
+theorem applies at each stage of the tower used for the unbounded result below. -/
 theorem quasiIso_freeYonedaSheafCoproductTotalAugmentation_truncLE :
     QuasiIso ((freeYonedaSheafCoproductTotalAugmentation X).app (M.truncLE c)) :=
   quasiIso_freeYonedaSheafCoproductTotalAugmentation_of_isStrictlyLE X (M.truncLE c) c
 
 end BoundedAugmentation
+
+/-- The free-Yoneda total augmentation is a quasi-isomorphism for every input
+complex. Both good-truncation cocones are colimiting, so exact filtered colimits
+preserve the stagewise quasi-isomorphisms and naturality identifies the
+resulting map with the original augmentation. -/
+theorem quasiIso_freeYonedaSheafCoproductTotalAugmentation
+    (X : Scheme.{u}) (M : CochainComplex X.Modules ℤ) :
+    QuasiIso ((freeYonedaSheafCoproductTotalAugmentation X).app M) := by
+  letI : AB5OfSize.{0,0} X.Modules := AB5OfSize_of_univLE X.Modules
+  let H := freeYonedaSheafCoproductTotalComplexFunctor X
+  let α := freeYonedaSheafCoproductTotalAugmentation X
+  let T := CochainComplex.truncLETower M
+  let hT := CochainComplex.isColimitTruncLETowerCocone M
+  letI : PreservesColimit T H := preservesColimit_of_preserves_colimit_cocone hT
+    (isColimitFreeYonedaSheafCoproductTotalTruncLETowerCocone X M)
+  have hcolim : QuasiIso (α.app (colimit T)) :=
+    HomologicalComplex.quasiIso_app_colimit_of_preserves T α
+      (fun n => quasiIso_freeYonedaSheafCoproductTotalAugmentation_truncLE X M (n : ℤ))
+  let e : M ≅ colimit T := IsColimit.coconePointUniqueUpToIso hT (colimit.isColimit T)
+  have hn := α.naturality e.hom
+  haveI : QuasiIso (α.app (colimit T)) := hcolim
+  haveI : QuasiIso (H.map e.hom) := inferInstance
+  haveI : QuasiIso (H.map e.hom ≫ α.app (colimit T)) :=
+    quasiIso_comp (H.map e.hom) (α.app (colimit T))
+  have hcomp : α.app M ≫ e.hom = H.map e.hom ≫ α.app (colimit T) := by
+    simpa using hn.symm
+  haveI : QuasiIso (α.app M ≫ e.hom) := by
+    rw [hcomp]
+    exact ‹QuasiIso (H.map e.hom ≫ α.app (colimit T))›
+  exact quasiIso_of_comp_right (α.app M) e.hom
 
 end AlgebraicGeometry.Scheme.Modules
