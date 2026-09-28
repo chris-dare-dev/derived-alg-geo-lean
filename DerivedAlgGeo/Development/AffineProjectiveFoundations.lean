@@ -21,12 +21,34 @@ The general localization criterion for the affine counit is Mathlib's
 using `basicOpenRestriction` is definitionally the same, checked below by
 `Iff.rfl`.
 
+## Main definitions
+
+This verification module introduces no public definitions.
+
+## Main results
+
+The anonymous example checks that Mathlib's `AlgebraicGeometry.IsLocalizing`
+condition is definitionally equal to the condition expressed using
+`AlgebraicGeometry.Scheme.Modules.basicOpenRestriction`.
+
+## Implementation notes
+
+The declaration checks verify the names and types cited by the affine and
+projective spectrum placement map. The anonymous example uses `Iff.rfl` so a
+change that breaks the definitional agreement fails compilation.
+`DerivedAlgGeo.Development` imports this module so the verification sweep and
+emitter cover it; the stable `DerivedAlgGeo` root does not import it.
+
 ## References
 
 - Mathlib v4.32.1, pinned at commit
   `520045ab14e26149ee970e2e617ca04b09bde5d6`:
   `Mathlib/AlgebraicGeometry/Modules/Tilde.lean`.
 - Issue #1608.
+
+## Tags
+
+affine schemes, projective spectra, localization, API verification
 -/
 
 #check @PrimeSpectrum
