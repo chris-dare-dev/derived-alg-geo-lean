@@ -42,7 +42,7 @@ includes every canonical good truncation.
 * `freeYonedaSheafCoproductTotalAugmentation_eq_toSingleZero_comp_targetIso`
   identifies the normalized total map with the earlier total-to-single-zero map
   followed by the target isomorphism.
-* `quasiIso_freeYonedaSheafCoproductTotalAugmentation_strictLE` proves the
+* `quasiIso_freeYonedaSheafCoproductTotalAugmentation_of_isStrictlyLE` proves the
   augmentation is a quasi-isomorphism for strictly bounded-above inputs.
 * `quasiIso_freeYonedaSheafCoproductTotalAugmentation_truncLE` specializes
   this result to each canonical good truncation.
@@ -318,7 +318,7 @@ section BoundedAugmentation
 
 variable (X : Scheme.{u}) (M : CochainComplex X.Modules ℤ) (c : ℤ)
 
-private theorem isZero_resolutionBicomplexUpInt_strictLE_X_of_gt [M.IsStrictlyLE c]
+private theorem isZero_resolutionBicomplexUpInt_X_of_isStrictlyLE_of_lt [M.IsStrictlyLE c]
     (p : ℤ) (hp : c < p) :
     IsZero (((freeYonedaSheafCoproductResolutionBicomplexUpInt X).obj M).X p) := by
   let Λ := freeYonedaSheafCoproductReducedLeftResolution X
@@ -358,7 +358,7 @@ private theorem isZero_singleZeroFlip_inner_of_ne (p q : ℤ) (hq : q ≠ 0) :
   exact (HomologicalComplex.eval X.Modules (ComplexShape.up ℤ) p).map_isZero
     (HomologicalComplex.isZero_single_obj_X (ComplexShape.up ℤ) 0 M q hq)
 
-private theorem isZero_singleZeroFlip_strictLE_X_of_gt [M.IsStrictlyLE c]
+private theorem isZero_singleZeroFlip_X_of_isStrictlyLE_of_lt [M.IsStrictlyLE c]
     (p q : ℤ) (hp : c < p) :
     IsZero ((((((HomologicalComplex.single
       (CochainComplex X.Modules ℤ) (ComplexShape.up ℤ) 0) ⋙
@@ -375,13 +375,13 @@ private theorem isZero_singleZeroFlip_strictLE_X_of_gt [M.IsStrictlyLE c]
       (HomologicalComplex.isZero_single_obj_X (ComplexShape.up ℤ) 0 M q hq)
 
 
-private theorem isZero_resolutionBicomplexUpInt_strictLE_diagonal_of_lt
+private theorem isZero_resolutionBicomplexUpInt_diagonal_of_add_eq_of_lt
     (n p q : ℤ) (hn : p + q = n) (hp : p < n) :
     IsZero (((((freeYonedaSheafCoproductResolutionBicomplexUpInt X).obj
       M).X p).X q)) := by
   exact isZero_resolutionBicomplexUpInt_inner_of_pos X M p q (by omega)
 
-private theorem isZero_singleZeroFlip_strictLE_diagonal_of_lt
+private theorem isZero_singleZeroFlip_diagonal_of_add_eq_of_lt
     (n p q : ℤ) (hn : p + q = n) (hp : p < n) :
     IsZero ((((((HomologicalComplex.single
       (CochainComplex X.Modules ℤ) (ComplexShape.up ℤ) 0) ⋙
@@ -389,7 +389,7 @@ private theorem isZero_singleZeroFlip_strictLE_diagonal_of_lt
         (ComplexShape.up ℤ)).obj M).X p).X q)) := by
   exact isZero_singleZeroFlip_inner_of_ne X M p q (by omega)
 
-private theorem quasiIso_normalizedBicomplexAugmentation_totalMap_strictLE
+private theorem quasiIso_normalizedBicomplexAugmentation_totalMap_of_isStrictlyLE
     [M.IsStrictlyLE c] :
     QuasiIso (HomologicalComplex₂.total.map
       ((normalizedBicomplexAugmentation X).app M)
@@ -402,17 +402,17 @@ private theorem quasiIso_normalizedBicomplexAugmentation_totalMap_strictLE
   let f : K ⟶ L := (normalizedBicomplexAugmentation X).app M
   have hKLower : ∀ n p q : ℤ, p + q = n → p < n → IsZero ((K.X p).X q) := by
     intro n p q hpq hp
-    exact isZero_resolutionBicomplexUpInt_strictLE_diagonal_of_lt X M n p q hpq hp
+    exact isZero_resolutionBicomplexUpInt_diagonal_of_add_eq_of_lt X M n p q hpq hp
   have hKUpper : ∀ n p q : ℤ, p + q = n → c < p → IsZero ((K.X p).X q) := by
     intro n p q _ hp
     exact (HomologicalComplex.eval X.Modules (ComplexShape.up ℤ) q).map_isZero
-      (isZero_resolutionBicomplexUpInt_strictLE_X_of_gt X M c p hp)
+      (isZero_resolutionBicomplexUpInt_X_of_isStrictlyLE_of_lt X M c p hp)
   have hLLower : ∀ n p q : ℤ, p + q = n → p < n → IsZero ((L.X p).X q) := by
     intro n p q hpq hp
-    exact isZero_singleZeroFlip_strictLE_diagonal_of_lt X M n p q hpq hp
+    exact isZero_singleZeroFlip_diagonal_of_add_eq_of_lt X M n p q hpq hp
   have hLUpper : ∀ n p q : ℤ, p + q = n → c < p → IsZero ((L.X p).X q) := by
     intro n p q _ hp
-    exact isZero_singleZeroFlip_strictLE_X_of_gt X M c p q hp
+    exact isZero_singleZeroFlip_X_of_isStrictlyLE_of_lt X M c p q hp
   exact HomologicalComplex₂.quasiIso_totalMap_of_four_diagonal_bounds_of_column_quasiIso
     f (fun n => n) (fun _ => c) (fun n => n) (fun _ => c)
     hKLower hKUpper hLLower hLUpper
@@ -421,12 +421,13 @@ private theorem quasiIso_normalizedBicomplexAugmentation_totalMap_strictLE
 /-- The free-Yoneda total augmentation is a quasi-isomorphism for inputs
 whose terms vanish strictly above `c`. The cutoff and nonpositive resolution
 degree give finite support on each total diagonal. -/
-theorem quasiIso_freeYonedaSheafCoproductTotalAugmentation_strictLE
+theorem quasiIso_freeYonedaSheafCoproductTotalAugmentation_of_isStrictlyLE
     [M.IsStrictlyLE c] :
     QuasiIso ((freeYonedaSheafCoproductTotalAugmentation X).app M) := by
   haveI : QuasiIso (HomologicalComplex₂.total.map
       ((normalizedBicomplexAugmentation X).app M)
-      (ComplexShape.up ℤ)) := quasiIso_normalizedBicomplexAugmentation_totalMap_strictLE X M c
+      (ComplexShape.up ℤ)) :=
+    quasiIso_normalizedBicomplexAugmentation_totalMap_of_isStrictlyLE X M c
   let f := HomologicalComplex₂.total.map
       ((normalizedBicomplexAugmentation X).app M) (ComplexShape.up ℤ)
   let g := (HomologicalComplex₂.singleZeroFlipTotalNatIso
@@ -435,7 +436,7 @@ theorem quasiIso_freeYonedaSheafCoproductTotalAugmentation_strictLE
   haveI hIso : IsIso g := by infer_instance
   haveI hQI : QuasiIso g := by exact quasiIso_of_isIso g
   exact quasiIso_comp
-    (hφ := quasiIso_normalizedBicomplexAugmentation_totalMap_strictLE X M c)
+    (hφ := quasiIso_normalizedBicomplexAugmentation_totalMap_of_isStrictlyLE X M c)
     (hφ' := hQI) f g
 
 /-- The free-Yoneda total augmentation is a quasi-isomorphism on every
@@ -443,7 +444,7 @@ canonical good truncation. The unbounded augmentation needs a separate
 colimit argument. -/
 theorem quasiIso_freeYonedaSheafCoproductTotalAugmentation_truncLE :
     QuasiIso ((freeYonedaSheafCoproductTotalAugmentation X).app (M.truncLE c)) :=
-  quasiIso_freeYonedaSheafCoproductTotalAugmentation_strictLE X (M.truncLE c) c
+  quasiIso_freeYonedaSheafCoproductTotalAugmentation_of_isStrictlyLE X (M.truncLE c) c
 
 end BoundedAugmentation
 
