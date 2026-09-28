@@ -97,6 +97,28 @@ there is no filesystem quota on this host, so an individual job can still
 exceed its disk reservation. The legacy services' 16 GiB disk reservations are
 an initial measured upper bound and must be raised if their roots grow.
 
+Before a pickup, an operator can inspect the same physical-host measurements
+without creating a lease, root, registration token or scope:
+
+```bash
+python3 /home/chris-dare/.local/lib/dag-pickup/scripts/host_pickup.py capacity-report \
+  --base /home/chris-dare/.local/state/dag-pickup --profile build
+```
+
+The JSON reports CPU affinity, MemAvailable, filesystem free bytes, each old
+service's state and reservation, headroom, remaining capacity and a separate
+deficit for each resource. `profile_fits_snapshot` describes only this
+point-in-time measurement. The command does not inspect or reserve live leases;
+it is not an admission result. A pickup measures again before acquiring the
+lease; the lease lock validates that supplied capacity against existing leases,
+and the pickup may still refuse. Unknown service state or incomplete
+measurements fail the report. With only the main old service reserved,
+28 GiB MemAvailable and
+20 GiB free disk yield build deficits of 4 GiB memory and 28 GiB disk under
+the current profile. A `probe` still has a 6 GiB disk deficit. Install the
+reviewed script revision before relying on this report; an older host copy may
+not have the command.
+
 After the reviewed revision is merged, install both scripts together outside
 any job checkout. Create one host-absolute base on the workstation, outside
 runner and agent roots, with owner-only permissions:
