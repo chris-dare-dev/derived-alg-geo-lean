@@ -9,6 +9,7 @@ is explicit; a fresh pickup never guesses that a stale lease is disposable.
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 import hashlib
 import json
 import os
@@ -57,39 +58,76 @@ def _systemctl_show(unit: str, *properties: str) -> dict[str, str]:
     return dict(line.split("=", 1) for line in result.stdout.splitlines() if "=" in line)
 
 
-def _legacy_reservations() -> dict[str, int]:
+def _legacy_observation() -> tuple[dict[str, int], list[dict[str, Any]]]:
     total = {name: 0 for name in runner_state.RESOURCE_FIELDS}
+    units: list[dict[str, Any]] = []
     for name in LEGACY_UNITS:
         data = _systemctl_show(
             f"dag-runner@{name}.service", "ActiveState", "UnitFileState",
             "CPUQuotaPerSecUSec", "MemoryMax"
         )
-        if data.get("ActiveState") == "inactive" and data.get("UnitFileState") == "disabled":
-            continue
-        if data.get("ActiveState") not in ("active", "inactive"):
+        if (data.get("ActiveState") not in ("active", "inactive") or
+                data.get("UnitFileState") not in ("enabled", "disabled")):
             raise ValueError(f"legacy runner {name} has unknown state; capacity denied")
+        inactive = data["ActiveState"] == "inactive" and data["UnitFileState"] == "disabled"
+        if inactive:
+            units.append({"unit": name, "active_state": "inactive", "unit_file_state": "disabled",
+                          "reserved": False, "resources": {key: 0 for key in total}})
+            continue
         quota = data.get("CPUQuotaPerSecUSec", "")
         memory = data.get("MemoryMax", "")
         if not quota.endswith("s") or not quota[:-1].isdigit() or not memory.isdigit():
             raise ValueError(f"unmeasured active legacy runner: {name}")
         # systemd reports CPUQuotaPerSecUSec in seconds per second.
-        total["cpu_threads"] += int(quota[:-1])
-        total["memory_bytes"] += int(memory)
-        total["disk_bytes"] += LEGACY_DISK_RESERVATION
+        resources = {"cpu_threads": int(quota[:-1]), "memory_bytes": int(memory),
+                     "disk_bytes": LEGACY_DISK_RESERVATION}
+        for key, value in resources.items():
+            total[key] += value
+        units.append({"unit": name, "active_state": data["ActiveState"],
+                      "unit_file_state": data["UnitFileState"],
+                      "reserved": True, "resources": resources})
+    return total, units
+
+
+def _legacy_reservations() -> dict[str, int]:
+    total, _ = _legacy_observation()
     return total
+
+
+def _capacity_observation(base: Path) -> dict[str, Any]:
+    """Read the same physical-host inputs used for admission, without a lease."""
+    legacy, units = _legacy_observation()
+    measured = {"cpu_threads": len(os.sched_getaffinity(0)),
+                "memory_bytes": _mem_available(), "disk_bytes": shutil.disk_usage(base).free}
+    headroom = {"cpu_threads": HOST_CPU_HEADROOM,
+                "memory_bytes": HOST_MEMORY_HEADROOM, "disk_bytes": HOST_DISK_HEADROOM}
+    available = {key: measured[key] - headroom[key] - legacy[key] for key in measured}
+    return {"measured": measured, "headroom": headroom, "legacy_reservations": legacy,
+            "legacy_units": units, "capacity_after_legacy": available}
 
 
 def _capacity(base: Path) -> dict[str, dict[str, int]]:
     """Measure one physical host, reserving active old services first."""
-    legacy = _legacy_reservations()
-    cpu = len(os.sched_getaffinity(0)) - HOST_CPU_HEADROOM - legacy["cpu_threads"]
-    available_memory = _mem_available() - HOST_MEMORY_HEADROOM - legacy["memory_bytes"]
-    available_disk = shutil.disk_usage(base).free - HOST_DISK_HEADROOM - legacy["disk_bytes"]
-    if min(cpu, available_memory, available_disk) <= 0:
+    available = _capacity_observation(base)["capacity_after_legacy"]
+    if min(available.values()) <= 0:
         raise ValueError("host has no measured capacity after legacy reservations and headroom")
-    return {_host_id(): {
-        "cpu_threads": cpu, "memory_bytes": available_memory, "disk_bytes": available_disk,
-    }}
+    return {_host_id(): available}
+
+
+def capacity_report(base: Path, profile: str) -> dict[str, Any]:
+    """Report a measurement, never an admission decision or reservation."""
+    if not base.is_absolute() or profile not in PROFILES:
+        raise ValueError("absolute host base and known profile are required")
+    observed = _capacity_observation(base)
+    available = observed["capacity_after_legacy"]
+    requested = PROFILES[profile]
+    deficit = {key: max(0, requested[key] - available[key]) for key in requested}
+    return {"schema": "derived-alg-geo-lean.host-capacity-report/v1",
+            "observed_at_utc": datetime.now(timezone.utc).isoformat(),
+            "host_id": _host_id(), "profile": profile, "requested": requested,
+            **observed, "deficit": deficit,
+            "profile_fits_snapshot": all(value == 0 for value in deficit.values()),
+            "admission": "not attempted; live leases and subsequent measurements may deny pickup"}
 
 
 def _mem_available() -> int:
@@ -713,6 +751,9 @@ def recover(base: Path, namespace: str) -> None:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="action", required=True)
+    report = sub.add_parser("capacity-report")
+    report.add_argument("--base", required=True, type=Path)
+    report.add_argument("--profile", choices=PROFILES, required=True)
     run = sub.add_parser("agent")
     run.add_argument("--base", required=True, type=Path)
     run.add_argument("--repo", required=True, type=Path)
@@ -743,6 +784,9 @@ def main(argv: list[str] | None = None) -> int:
     runner_worker.add_argument("inode", type=int)
     args = parser.parse_args(argv)
     try:
+        if args.action == "capacity-report":
+            print(json.dumps(capacity_report(args.base, args.profile), sort_keys=True))
+            return 0
         if args.action == "_worker":
             return _worker(args.repo, args.revision, args.root,
                            (args.device, args.inode), args.command)
