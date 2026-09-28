@@ -265,8 +265,9 @@ variable [Preadditive C]
 variable (K : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ))
     [K.HasTotal (ComplexShape.up ℤ)]
 set_option backward.isDefEq.respectTransparency false in
-/-- The incoming differential at `(p,q+1)` is the horizontal contribution
-from `(p-1,q+1)` plus the signed vertical contribution from `(p,q)`. -/
+/-- Compute an incoming coordinate by checking each coproduct inclusion against
+Mathlib's outgoing differential formulas. This uses the coproduct universal
+property and requires no finite diagonal support. -/
 lemma total_d_comp_totalProjection (p q n : ℤ) (h : p + q = n) :
     (K.total (ComplexShape.up ℤ)).d n (n+1) ≫
       totalProjection K p (q+1) (n+1) (by omega) =
@@ -329,10 +330,12 @@ variable (K : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ
     [K.HasTotal (ComplexShape.up ℤ)]
 
 set_option backward.isDefEq.respectTransparency false in
-/-- A selected total coordinate is vertically closed when the selected
-projection of the total differential and the preceding horizontal
-contribution vanish. -/
-lemma totalProjection_isCycle_of_horizontal_zero (p q n : ℤ) (h : p+q=n)
+/-- The incoming-coordinate formula isolates the vertical differential after
+the horizontal contribution vanishes; applying its sign again removes the
+sign. Only the selected total-differential coordinate must vanish, so callers
+need not supply a full total cycle. -/
+lemma comp_totalProjection_comp_d_eq_zero_of_total_component_eq_zero_of_horizontal_eq_zero
+    (p q n : ℤ) (h : p+q=n)
     {A : C} (x : A ⟶ (K.total (ComplexShape.up ℤ)).X n)
     (hx : (x ≫ (K.total (ComplexShape.up ℤ)).d n (n+1)) ≫
       totalProjection K p (q+1) (n+1) (by omega) = 0)
@@ -351,7 +354,8 @@ private lemma totalProjection_isCycle_of_cycle_and_previous_zero (p q n : ℤ) (
     (hx : x ≫ (K.total (ComplexShape.up ℤ)).d n (n+1) = 0)
     (hl : x ≫ totalProjection K (p-1) (q+1) n (by omega) = 0) :
     (x ≫ totalProjection K p q n h) ≫ (K.X p).d q (q+1) = 0 := by
-  apply totalProjection_isCycle_of_horizontal_zero K p q n h x
+  apply comp_totalProjection_comp_d_eq_zero_of_total_component_eq_zero_of_horizontal_eq_zero
+    K p q n h x
   · rw [hx, zero_comp]
   · rw [hl, zero_comp]
 
@@ -362,9 +366,10 @@ variable [Abelian C]
 variable (K : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ))
     [K.HasTotal (ComplexShape.up ℤ)]
 set_option backward.isDefEq.respectTransparency false in
-/-- If all columns below `p` already vanish and column `p` is exact at `q`,
-an epi refinement and one signed boundary correction clear every column at
-most `p`, while preserving the total-cycle equation. -/
+/-- Apply exactness up to epi refinement to the selected vertical cycle, then
+subtract the boundary of its signed preimage. That boundary reaches only
+columns `p` and `p + 1`, preserving the cleared lower coordinates. Refinement
+avoids assuming that the generalized cycle lifts on its original source. -/
 theorem exists_totalCycleRefinement_zero_le
     (p q n : ℤ) (h : p + q = n)
     (hE : (ShortComplex.mk ((K.X p).d (q-1) q) ((K.X p).d q (q+1))

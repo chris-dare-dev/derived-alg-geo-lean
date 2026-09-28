@@ -56,7 +56,7 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex₂.totalFunctor_preservesColimitsOfShape
 #print axioms HomologicalComplex₂.totalProjection
 #print axioms HomologicalComplex₂.total_d_comp_totalProjection
-#print axioms HomologicalComplex₂.totalProjection_isCycle_of_horizontal_zero
+#print axioms HomologicalComplex₂.comp_totalProjection_comp_d_eq_zero_of_total_component_eq_zero_of_horizontal_eq_zero
 #print axioms HomologicalComplex₂.exists_totalCycleRefinement_zero_le
 #print axioms HomologicalComplex.singleCompExtendIso
 #print axioms HomologicalComplex.singleCompExtendAtImageIso
