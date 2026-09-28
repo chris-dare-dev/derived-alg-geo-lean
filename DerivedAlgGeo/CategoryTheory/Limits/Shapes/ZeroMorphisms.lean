@@ -122,8 +122,9 @@ lemma hom_ext_of_finite_support (s : Finset I)
       rw [← assoc, h i hi, assoc]
     _ = y := by rw [sum_π_ι_eq_id_of_isZero_all f s hz, comp_id]
 
-/-- An incoming map is zero once its projections to the finite nonzero
-support vanish. The projection convention remains the caller's. -/
+/-- Specialize `CategoryTheory.Limits.Sigma.hom_ext_of_finite_support` to
+comparison with the zero map.
+The projection convention remains the caller's. -/
 lemma hom_eq_zero_of_finite_support (s : Finset I)
     (hz : ∀ i, i ∉ s → IsZero (f i)) {A : C} (x : A ⟶ ∐ f)
     (h : ∀ i ∈ s, x ≫ Sigma.π f i = 0) : x = 0 := by
@@ -136,23 +137,26 @@ end ChosenDecidableEq
 section ClassicalProjection
 open scoped Classical
 
-/-- Check the finite projection-inclusion sum after every coproduct inclusion.
-An omitted summand has zero inclusion; orthogonality leaves only the matching
-projection on the finite support. No caller decidability instance is needed. -/
+/-- Specialize `CategoryTheory.Limits.Sigma.sum_π_ι_eq_id_of_isZero_all` using
+classical equality so callers need not supply a decidability instance; the
+universal theorem supplies the coproduct-inclusion argument. -/
 lemma sum_π_ι_eq_id_of_isZero (s : Finset I)
     (hz : ∀ i, i ∉ s → IsZero (f i)) :
     ∑ i ∈ s, Sigma.π f i ≫ Sigma.ι f i = 𝟙 (∐ f) :=
   sum_π_ι_eq_id_of_isZero_all f s hz
 
-/-- Conversely, the finite identity forces an omitted summand to be zero:
-its inclusion is zero and its projection is a left inverse. -/
+/-- Specialize
+`CategoryTheory.Limits.Sigma.isZero_of_sum_π_ι_eq_id_of_not_mem_all` using
+classical equality. The universal converse supplies the omitted-summand
+argument. -/
 lemma isZero_of_sum_π_ι_eq_id_of_not_mem (s : Finset I)
     (hid : ∑ i ∈ s, Sigma.π f i ≫ Sigma.ι f i = 𝟙 (∐ f))
     (j : I) (hj : j ∉ s) : IsZero (f j) :=
   isZero_of_sum_π_ι_eq_id_of_not_mem_all f s hid j hj
 
-/-- An omitted nonzero summand obstructs the identity: composing with its
-inclusion and projection would force its identity morphism to vanish. -/
+/-- Specialize `CategoryTheory.Limits.Sigma.sum_π_ι_eq_id_iff_isZero_all` using
+classical equality; the universal characterization contains the
+omitted-summand obstruction. -/
 lemma sum_π_ι_eq_id_iff_isZero (s : Finset I) :
     (∑ i ∈ s, Sigma.π f i ≫ Sigma.ι f i = 𝟙 (∐ f)) ↔
       ∀ i, i ∉ s → IsZero (f i) :=

@@ -434,7 +434,7 @@ private def diagonalEmbedding (n : ℤ) :
 
 /-- The finite-support coproduct identity detects a zero incoming map on a
 literal total-degree diagonal. This helper is confined to the exactness proof. -/
-private lemma total_eq_zero_of_finite_support (n : ℤ) (s : Finset ℤ)
+private lemma total_hom_eq_zero_of_finite_support (n : ℤ) (s : Finset ℤ)
     (hz : ∀ p q, p+q=n → p ∉ s → IsZero ((K.X p).X q))
     {A : C} (x : A ⟶ (K.total (ComplexShape.up ℤ)).X n)
     (h : ∀ p ∈ s, x ≫ K.totalProjection p (n-p) n (by omega) = 0) : x = 0 := by
@@ -549,7 +549,7 @@ theorem total_exactAt_of_diagonal_bounds_of_column_exactAt (n a b : ℤ)
         (fun p q hpq hp => (hLower p q hpq hp).eq_of_tgt _ _)
     refine ⟨B, π, hπ, t, ?_⟩
     apply sub_eq_zero.mp
-    apply total_eq_zero_of_finite_support K n (Finset.Icc a b)
+    apply total_hom_eq_zero_of_finite_support K n (Finset.Icc a b)
     · intro p q hpq hp
       rw [Finset.mem_Icc] at hp
       by_cases hpa : p < a
@@ -561,7 +561,7 @@ theorem total_exactAt_of_diagonal_bounds_of_column_exactAt (n a b : ℤ)
         omega)
   · refine ⟨A, 𝟙 A, inferInstance, 0, ?_⟩
     simp only [Category.id_comp, zero_comp]
-    apply total_eq_zero_of_finite_support K n ∅
+    apply total_hom_eq_zero_of_finite_support K n ∅
     · intro p q hpq _
       by_cases hpa : p < a
       · exact hLower p q hpq hpa
