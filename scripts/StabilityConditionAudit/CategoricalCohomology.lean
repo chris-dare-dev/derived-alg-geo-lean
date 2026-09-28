@@ -192,6 +192,8 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex₂.singleExtendMapTotalIso
 #print axioms HomologicalComplex₂.singleZeroFlipTotalIso_naturality
 #print axioms HomologicalComplex₂.singleZeroFlipTotalIso_naturality_assoc
+#print axioms HomologicalComplex.stupidTruncGEXIso
+#print axioms HomologicalComplex.stupidTruncXIso_eq_stupidTruncGEXIso
 #print axioms HomologicalComplex₂.stupidTruncGEXIso
 #print axioms HomologicalComplex₂.stupidTruncGEXIso_hom_inv_f
 #print axioms HomologicalComplex₂.stupidTruncGEXIso_hom_inv_f_assoc
