@@ -3,6 +3,9 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.Algebra.Homology.TotalComplex
+import Mathlib.Algebra.Homology.Refinements
+import Mathlib.Data.Int.Interval
+import DerivedAlgGeo.CategoryTheory.Limits.Shapes.ZeroMorphisms
 import Mathlib.CategoryTheory.Abelian.Refinements
 import Mathlib.Algebra.Homology.HomologicalComplexLimits
 import Mathlib.CategoryTheory.Adjunction.Limits
@@ -19,6 +22,9 @@ No exactness or homology argument is involved.
 For integer-indexed totals, a projection to one summand exposes the horizontal
 and signed vertical parts of the incoming differential. Exactness in one column
 then clears one coordinate of a generalized cycle after an epi refinement.
+Finite iteration and a finite-support coproduct identity turn this into
+degree-local exactness and acyclicity when each total diagonal has finite
+nonzero support. The results assume the literal total already exists.
 
 ## Main definitions
 
@@ -35,6 +41,11 @@ then clears one coordinate of a generalized cycle after an epi refinement.
   differential at one direct-sum coordinate.
 * `HomologicalComplex₂.exists_totalCycleRefinement_zero_le` clears one
   coordinate of a generalized total cycle by an epi refinement.
+* `HomologicalComplex₂.total_exactAt_of_diagonal_bounds` proves exactness
+  from finite support and exactness on one total-degree diagonal.
+* `HomologicalComplex₂.total_acyclic_of_diagonal_bounds` allows a separate
+  finite support interval in every degree; `total_acyclic_of_upper_bounds`
+  derives the uniform-rectangle case.
 
 ## Implementation notes
 
@@ -46,7 +57,9 @@ For the integer-indexed coordinate result, compose each summand inclusion
 with the total differential and the canonical coproduct projection. The
 horizontal term reaches the next column, while the signed vertical term stays
 in the current column. Epi refinement supplies a preimage of the vertical
-cycle, and its boundary leaves all earlier columns zero.
+cycle, and its boundary leaves all earlier columns zero. Finite iteration
+composes the epi refinements; the generic finite-support identity from
+`CategoryTheory.Limits.Sigma` makes the zero-coordinate residual a zero map.
 
 ## References
 
@@ -400,4 +413,186 @@ theorem exists_totalCycleRefinement_zero_le
       (hlow r s hr (by omega))
 end Elimination
 
+end HomologicalComplex₂
+
+namespace HomologicalComplex₂
+
+universe u' v'
+
+section FiniteSupport
+variable {C : Type u'} [Category.{v'} C] [Preadditive C]
+variable (K : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ))
+    [K.HasTotal (ComplexShape.up ℤ)]
+
+private def diagonalEmbedding (n : ℤ) :
+    ℤ ↪ ((ComplexShape.π (ComplexShape.up ℤ) (ComplexShape.up ℤ)
+      (ComplexShape.up ℤ)) ⁻¹' {n}) where
+  toFun p := ⟨(p, n-p), by change p + (n-p) = n; omega⟩
+  inj' _ _ h := congrArg (fun i => i.1.1) h
+
+/-- The finite-support coproduct identity detects a zero incoming map on a
+literal total-degree diagonal. This helper is confined to the exactness proof. -/
+private lemma total_eq_zero_of_finiteSupport (n : ℤ) (s : Finset ℤ)
+    (hz : ∀ p q, p+q=n → p ∉ s → IsZero ((K.X p).X q))
+    {A : C} (x : A ⟶ (K.total (ComplexShape.up ℤ)).X n)
+    (h : ∀ p ∈ s, x ≫ K.totalProjection p (n-p) n (by omega) = 0) : x = 0 := by
+  classical
+  let f := K.toGradedObject.mapObjFun
+    (ComplexShape.π (ComplexShape.up ℤ) (ComplexShape.up ℤ)
+      (ComplexShape.up ℤ)) n
+  apply Sigma.hom_eq_zero_of_finiteSupport f (s.map (diagonalEmbedding n)) ?_ x ?_
+  · intro i hi
+    apply hz i.1.1 i.1.2 i.2
+    intro hp
+    apply hi
+    apply Finset.mem_map.mpr
+    refine ⟨i.1.1, hp, ?_⟩
+    apply Subtype.ext
+    change (i.1.1, n-i.1.1) = (i.1.1, i.1.2)
+    congr 1
+    have hsum := i.2
+    change i.1.1 + i.1.2 = n at hsum
+    omega
+  · intro i hi
+    obtain ⟨p, hp, rfl⟩ := Finset.mem_map.mp hi
+    convert h p hp using 1 <;> rfl
+
+end FiniteSupport
+
+section FiniteRefinement
+open CategoryTheory.Preadditive
+variable {C : Type u'} [Category.{v'} C] [Abelian C]
+variable (K : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ))
+    [K.HasTotal (ComplexShape.up ℤ)]
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Iterate the one-coordinate correction through a finite interval. The
+composite epi changes the source, while the accumulated boundary and residual
+keep the cycle equation and cleared lower coordinates. -/
+private theorem exists_finite_totalCycleRefinement (n a : ℤ) (m : ℕ)
+    (hE : ∀ p : ℤ, a ≤ p → p < a + m →
+      (ShortComplex.mk ((K.X p).d (n-p-1) (n-p))
+        ((K.X p).d (n-p) (n-p+1)) ((K.X p).d_comp_d _ _ _)).Exact)
+    {A : C} (x : A ⟶ (K.total (ComplexShape.up ℤ)).X n)
+    (hx : x ≫ (K.total (ComplexShape.up ℤ)).d n (n+1) = 0)
+    (hlow : ∀ r s : ℤ, ∀ (hr : r+s=n), r < a →
+      x ≫ K.totalProjection r s n hr = 0) :
+    ∃ (A' : C) (π : A' ⟶ A) (_ : Epi π)
+        (t : A' ⟶ (K.total (ComplexShape.up ℤ)).X (n-1)),
+      ((π ≫ x - t ≫ (K.total (ComplexShape.up ℤ)).d (n-1) n) ≫
+        (K.total (ComplexShape.up ℤ)).d n (n+1) = 0) ∧
+      (∀ r s : ℤ, ∀ (hr : r+s=n), r < a + m →
+        (π ≫ x - t ≫ (K.total (ComplexShape.up ℤ)).d (n-1) n) ≫
+          K.totalProjection r s n hr = 0) := by
+  induction m with
+  | zero =>
+      refine ⟨A, 𝟙 A, inferInstance, 0, ?_, ?_⟩
+      · simpa using hx
+      · simpa using hlow
+  | succ m ih =>
+      obtain ⟨B, π, hπ, t, htcycle, htlow⟩ :=
+        ih (fun p hp hpm => hE p hp (by omega))
+      letI : Epi π := hπ
+      obtain ⟨D, ρ, hρ, y, hcycle, hzero⟩ :=
+        K.exists_totalCycleRefinement_zero_le (a+m) (n-(a+m)) n (by omega)
+          (hE (a+m) (by omega) (by omega))
+          (π ≫ x - t ≫ (K.total (ComplexShape.up ℤ)).d (n-1) n)
+          htcycle htlow
+      letI : Epi ρ := hρ
+      let z := ((ComplexShape.up ℤ).ε (a+m) • y) ≫
+        K.ιTotal (ComplexShape.up ℤ) (a+m) (n-(a+m)-1) (n-1) (by
+          change a+(m:ℤ)+(n-(a+m)-1)=n-1
+          omega)
+      have hres : (ρ ≫ π) ≫ x - (ρ ≫ t + z) ≫
+          (K.total (ComplexShape.up ℤ)).d (n-1) n =
+          ρ ≫ (π ≫ x - t ≫ (K.total (ComplexShape.up ℤ)).d (n-1) n) -
+            z ≫ (K.total (ComplexShape.up ℤ)).d (n-1) n := by
+        simp only [Category.assoc, comp_sub, add_comp]
+        abel
+      refine ⟨D, ρ ≫ π, inferInstance, ρ ≫ t + z, ?_, ?_⟩
+      · rw [hres]
+        exact hcycle
+      · intro r s hr hrs
+        rw [hres]
+        exact hzero r s hr (by omega)
+
+set_option backward.isDefEq.respectTransparency false in
+omit [K.HasTotal (ComplexShape.up ℤ)] in
+private theorem diagonal_exactAt_to_short (n p : ℤ)
+    (hE : (K.X p).ExactAt (n-p)) :
+    (ShortComplex.mk ((K.X p).d (n-p-1) (n-p))
+      ((K.X p).d (n-p) (n-p+1)) ((K.X p).d_comp_d _ _ _)).Exact := by
+  exact ((K.X p).exactAt_iff' (n-p-1) (n-p) (n-p+1)
+    (by simp) (by simp)).1 hE
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Refine a total cycle through the finitely supported diagonal, then use
+the finite projection identity to make its residual zero. The abelian
+exactness criterion turns that epi-refined boundary into `ExactAt`. -/
+theorem total_exactAt_of_diagonal_bounds (n a b : ℤ)
+    (hLower : ∀ p q : ℤ, p + q = n → p < a → IsZero ((K.X p).X q))
+    (hUpper : ∀ p q : ℤ, p + q = n → b < p → IsZero ((K.X p).X q))
+    (hExact : ∀ p : ℤ, a ≤ p → p ≤ b → (K.X p).ExactAt (n-p)) :
+    (K.total (ComplexShape.up ℤ)).ExactAt n := by
+  apply ((K.total (ComplexShape.up ℤ)).exactAt_iff_exact_up_to_refinements
+    (n-1) n (n+1) (by simp) (by simp)).2
+  intro A x hx
+  by_cases hab : a ≤ b
+  · have hcount : ((b+1-a).toNat : ℤ) = b+1-a :=
+      Int.toNat_of_nonneg (by omega)
+    obtain ⟨B, π, hπ, t, hcycle, hzero⟩ :=
+      exists_finite_totalCycleRefinement K n a (b+1-a).toNat
+        (fun p hp hpb => diagonal_exactAt_to_short K n p
+          (hExact p hp (by omega))) x hx
+        (fun p q hpq hp => (hLower p q hpq hp).eq_of_tgt _ _)
+    refine ⟨B, π, hπ, t, ?_⟩
+    apply sub_eq_zero.mp
+    apply total_eq_zero_of_finiteSupport K n (Finset.Icc a b)
+    · intro p q hpq hp
+      rw [Finset.mem_Icc] at hp
+      by_cases hpa : p < a
+      · exact hLower p q hpq hpa
+      · exact hUpper p q hpq (by omega)
+    · intro p hp
+      exact hzero p (n-p) (by omega) (by
+        have := (Finset.mem_Icc.mp hp).2
+        omega)
+  · refine ⟨A, 𝟙 A, inferInstance, 0, ?_⟩
+    simp only [Category.id_comp, zero_comp]
+    apply total_eq_zero_of_finiteSupport K n ∅
+    · intro p q hpq _
+      by_cases hpa : p < a
+      · exact hLower p q hpq hpa
+      · exact hUpper p q hpq (by omega)
+    · simp
+
+/-- Apply degree-local exactness to each diagonal, allowing the support
+interval and required column exactness to vary with total degree. -/
+theorem total_acyclic_of_diagonal_bounds
+    (hData : ∀ n : ℤ, ∃ a b : ℤ,
+      (∀ p q : ℤ, p + q = n → p < a → IsZero ((K.X p).X q)) ∧
+      (∀ p q : ℤ, p + q = n → b < p → IsZero ((K.X p).X q)) ∧
+      (∀ p : ℤ, a ≤ p → p ≤ b → (K.X p).ExactAt (n-p))) :
+    (K.total (ComplexShape.up ℤ)).Acyclic := by
+  intro n
+  obtain ⟨a, b, hLower, hUpper, hExact⟩ := hData n
+  exact total_exactAt_of_diagonal_bounds K n a b hLower hUpper hExact
+
+/-- A uniform upper rectangle gives finite support on every diagonal. Only
+columns and degrees inside that rectangle need the exactness premise. -/
+theorem total_acyclic_of_upper_bounds (b c : ℤ)
+    (hp : ∀ p q : ℤ, b < p → IsZero ((K.X p).X q))
+    (hq : ∀ p q : ℤ, c < q → IsZero ((K.X p).X q))
+    (hExact : ∀ p q : ℤ, p ≤ b → q ≤ c → (K.X p).ExactAt q) :
+    (K.total (ComplexShape.up ℤ)).Acyclic := by
+  intro n
+  apply total_exactAt_of_diagonal_bounds K n (n-c) b
+  · intro p q hpq hpl
+    exact hq p q (by omega)
+  · intro p q hpq hpu
+    exact hp p q hpu
+  · intro p hpl hpu
+    exact hExact p (n-p) hpu (by omega)
+
+end FiniteRefinement
 end HomologicalComplex₂

@@ -58,6 +58,9 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex₂.total_d_comp_totalProjection
 #print axioms HomologicalComplex₂.comp_totalProjection_comp_d_eq_zero_of_total_component_eq_zero_of_horizontal_eq_zero
 #print axioms HomologicalComplex₂.exists_totalCycleRefinement_zero_le
+#print axioms HomologicalComplex₂.total_exactAt_of_diagonal_bounds
+#print axioms HomologicalComplex₂.total_acyclic_of_diagonal_bounds
+#print axioms HomologicalComplex₂.total_acyclic_of_upper_bounds
 #print axioms HomologicalComplex.singleCompExtendIso
 #print axioms HomologicalComplex.singleCompExtendAtImageIso
 #print axioms CategoryTheory.Triangulated.SpectralObject.mapHomologicalFunctor
