@@ -29,6 +29,7 @@ import DerivedAlgGeo.RingTheory.Spectrum.Prime.CoversTop
 #check @AlgebraicGeometry.Proj.awayι_toSpecZero
 #check @HomogeneousLocalization.Away
 #check @Localization.Away
+#check @CommRingCat
 #check @CommRingCat.of
 #check @AlgebraicGeometry.Proj.chartRing
 #check @AlgebraicGeometry.Proj.awayRestrict
@@ -55,3 +56,4 @@ import DerivedAlgGeo.RingTheory.Spectrum.Prime.CoversTop
 #check @TopCat.Sheaf.restrictHomEquivHom
 #check @IsLocalizedModule.lift
 #check @Submonoid.powers
+#check @IsLocalizedModule
