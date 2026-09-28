@@ -55,7 +55,11 @@ variable {C : Type u} [Category.{v} C] [Preadditive C]
   [TotalComplexShape c₁ c₂ c₁₂] [DecidableEq I₁₂]
   [∀ n : I₁₂, HasCoproductsOfShape ((ComplexShape.π c₁ c₂ c₁₂) ⁻¹' {n}) C]
 
-private def totalDegreeFiberFunctor (n : I₁₂) :
+private def totalDegreeFiberFunctor
+    {C : Type u} [Category.{v} C] [HasZeroMorphisms C]
+    {I₁ I₂ I₁₂ : Type*}
+    (c₁ : ComplexShape I₁) (c₂ : ComplexShape I₂) (c₁₂ : ComplexShape I₁₂)
+    [TotalComplexShape c₁ c₂ c₁₂] (n : I₁₂) :
     HomologicalComplex₂ C c₁ c₂ ⥤
       GradedObject ((ComplexShape.π c₁ c₂ c₁₂) ⁻¹' {n}) C where
   obj K i := (K.X i.1.1).X i.1.2
@@ -83,8 +87,10 @@ private noncomputable def totalIsColimit
   HomologicalComplex.isColimitOfEval _ _
     (fun n => totalDegreeIsColimit c₁ c₂ c₁₂ F s n (hs n))
 
-/-- Direct-sum totalization preserves this cocone when every bidegree diagram
-has a colimit. The total shape and its degree fibers may be arbitrary. -/
+/-- Evaluate the cocone in each bidegree, commute its diagram colimit with
+the coproduct over each total-degree fiber, and reflect colimits through
+degreewise evaluation. Only the bidegree diagrams occurring in `F` need
+colimits; ambient colimits of shape `J` are unnecessary. -/
 noncomputable def isColimitTotalFunctorMapCocone
     (F : J ⥤ HomologicalComplex₂ C c₁ c₂)
     [∀ (p : I₁) (q : I₂), HasColimit
