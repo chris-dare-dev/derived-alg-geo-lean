@@ -61,6 +61,11 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex₂.total_exactAt_of_diagonal_bounds_of_column_exactAt
 #print axioms HomologicalComplex₂.total_acyclic_of_diagonal_bounds_of_column_exactAt
 #print axioms HomologicalComplex₂.total_acyclic_of_upper_bounds_of_column_exactAt
+#print axioms HomologicalComplex₂.columnCone
+#print axioms HomologicalComplex₂.columnCone_hasTotal
+#print axioms HomologicalComplex₂.totalColumnConeIso
+#print axioms HomologicalComplex₂.ι_totalColumnConeIso_hom_source
+#print axioms HomologicalComplex₂.ι_totalColumnConeIso_hom_target
 #print axioms HomologicalComplex.singleCompExtendIso
 #print axioms HomologicalComplex.singleCompExtendAtImageIso
 #print axioms CategoryTheory.Triangulated.SpectralObject.mapHomologicalFunctor
