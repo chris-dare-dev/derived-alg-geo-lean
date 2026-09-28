@@ -1253,9 +1253,8 @@ jobs:
   # ---------------------------------------------------------------------------
   # The roadmap-vs-tracker gate (#620), in its own job since #1392.
   #
-  # ubuntu-latest UNCONDITIONALLY, unlike `build`. That job's routing invariant
-  # permits self-hosted only on `push`/`workflow_dispatch`; this one has no
-  # reason to want a warm `.lake`, so it never goes near the question.
+  # ubuntu-latest UNCONDITIONALLY, like `build` after the hosted cutover. This
+  # job has no reason to want a warm `.lake` or a persistent runner.
   roadmap:
     runs-on: ubuntu-latest
     # Seconds of work. The cap is here so a hung `gh` call cannot hold the
