@@ -45,7 +45,6 @@
  ["docBlame", "HomologicalComplex₂.singleZeroTotalIso"],
  ["docBlame", "HomologicalComplex₂.singleZeroTotalXIso"],
  ["docBlame", "HomologicalComplex₂.singleZeroXIso"],
- ["docBlame", "HomologicalComplex₂.stupidTruncGEXIso"],
  ["docBlame", "HomologicalComplex₂.truncatedBicomplex"],
  ["docBlame", "SheafOfModules.instAbelianSheafAddCommGrpCat_derivedAlgGeo"],
  ["docBlame",
