@@ -33,7 +33,8 @@
 # `.lake/packages` is a different story and is already shared: it is a symlink
 # to a single resolved dependency set. This script creates that symlink when a
 # fresh worktree is missing it, which is otherwise a manual step nothing
-# documents.
+# documents. The `--private-packages` mode used by unattended loop worktrees
+# instead copies a checked snapshot into a private writable package tree.
 #
 # It creates it as a JUNCTION on Windows, and asserts afterwards that what it
 # made is a link. `ln -s` to a directory there silently deep-copies instead,
@@ -45,6 +46,7 @@
 #
 # Usage:
 #   scripts/seed_worktree_cache.sh                 # seed here from the best donor
+#   scripts/seed_worktree_cache.sh --private-packages # private checked packages and build
 #   scripts/seed_worktree_cache.sh --dry-run       # say what it would do
 #   scripts/seed_worktree_cache.sh --from <path>   # choose the donor yourself
 #   scripts/seed_worktree_cache.sh --force         # overwrite a populated target
@@ -61,16 +63,34 @@ TARGET="$(git rev-parse --show-toplevel 2>/dev/null)" || {
 DONOR=""
 DRY_RUN=0
 FORCE=0
+PRIVATE_PACKAGES=0
 
 while [ $# -gt 0 ]; do
   case "$1" in
     --from)    DONOR="${2:-}"; shift 2 || { echo "--from needs a path" >&2; exit 2; } ;;
     --dry-run) DRY_RUN=1; shift ;;
     --force)   FORCE=1; shift ;;
-    -h|--help) sed -n '1,48p' "$0"; exit 0 ;;
+    --private-packages) PRIVATE_PACKAGES=1; shift ;;
+    -h|--help) sed -n '1,53p' "$0"; exit 0 ;;
     *)         echo "unknown argument: $1" >&2; exit 2 ;;
   esac
 done
+
+# The private route runs before donor discovery.  A checked snapshot remains
+# usable after the checkout that produced it has disappeared.  The helper
+# accepts only a fresh target and verifies its receipt before returning.
+if [ "$PRIVATE_PACKAGES" -eq 1 ]; then
+  private_args=(--target "$TARGET")
+  [ -z "$DONOR" ] || private_args+=(--donor "$DONOR")
+  [ "$FORCE" -eq 0 ] || private_args+=(--force)
+  [ "$DRY_RUN" -eq 0 ] || private_args+=(--dry-run)
+  # A crash after the atomic rename leaves a complete generation.  A retry
+  # verifies that receipt instead of trying to seed over an existing `.lake`.
+  if [ -e "$TARGET/.lake" ] || [ -L "$TARGET/.lake" ]; then
+    private_args+=(--verify)
+  fi
+  exec python3 "$TARGET/scripts/private_package_cache.py" "${private_args[@]}"
+fi
 
 olean_count () {
   local dir="$1/.lake/build"
