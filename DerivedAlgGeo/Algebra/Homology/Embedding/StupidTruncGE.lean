@@ -58,11 +58,7 @@ retained-index presentation with this one. -/
 noncomputable def stupidTruncGEXIso
     (K : HomologicalComplex C (ComplexShape.up ℤ)) (p i : ℤ) (hi : p ≤ i) :
     (K.stupidTrunc (ComplexShape.embeddingUpIntGE p)).X i ≅ K.X i :=
-  K.stupidTruncXIso (ComplexShape.embeddingUpIntGE p)
-    (i := (i - p).toNat) (by
-      change p + ((i - p).toNat : ℤ) = i
-      rw [Int.toNat_of_nonneg (by omega)]
-      omega)
+  K.stupidTruncXIso (ComplexShape.embeddingUpIntGE p) (geIndex_spec p i hi)
 
 lemma stupidTruncXIso_eq_stupidTruncGEXIso
     (K : HomologicalComplex C (ComplexShape.up ℤ)) (p i : ℤ) (k : ℕ)
