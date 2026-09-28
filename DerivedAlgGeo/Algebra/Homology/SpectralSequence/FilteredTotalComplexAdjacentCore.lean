@@ -9,7 +9,7 @@ import Mathlib.Algebra.Homology.HomotopyCategory.SingleFunctors
 import Mathlib.Algebra.Homology.TotalComplexShift
 
 /-!
-# Adjacent layers of a column-filtered total complex
+# Adjacent-column short complexes of total complexes
 
 For a cohomological bicomplex in a preadditive category with a zero object, the totals of two
 consecutive stupid column truncations form a degreewise split short complex, provided the two
@@ -17,6 +17,29 @@ diagonal coproducts exist. Its quotient is the newly added column, whose total i
 that column shifted by its horizontal degree. These constructions are natural in the bicomplex.
 In an abelian category the short complex is short exact. `FiniteStripTotal` consumes its
 natural map downstream, using the derived-category triangle of a short exact sequence.
+
+## Main definitions and results
+
+* `truncatedBicomplex` and `singleColumnBicomplex` use Mathlib's stupid truncation and
+  single-object functor to select a tail and one column.
+* `singleColumnTotalIso` identifies the signed total of one column with its shifted
+  vertical complex.
+* `adjacentColumnTotalShortComplex` and `adjacentColumnTotalDegreewiseSplitting`
+  exhibit consecutive tail totals and their one-column quotient as degreewise split.
+* `adjacentColumnTotalShortComplexMap` is the natural map of these short complexes;
+  `adjacentColumnTotalShortExact` proves exactness when the target category is abelian.
+
+## Implementation notes
+
+The maps in the adjacent short complex are the literal maps induced by Mathlib's
+`HomologicalComplex₂.total.map`. The splitting is constructed separately in each total
+degree; no chain-level splitting is asserted. Existence of adjacent total objects is an
+explicit premise until a downstream theorem supplies it.
+
+## References
+
+This extends Mathlib's `HomologicalComplex.stupidTrunc`,
+`HomologicalComplex.single`, and `HomologicalComplex₂.total` APIs.
 -/
 
 namespace HomologicalComplex₂
@@ -47,11 +70,15 @@ section Zero
 variable {C : Type u} [Category.{v} C] [HasZeroMorphisms C] [HasZeroObject C]
   (K : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ))
 
+/-- The column tail beginning at `p`, definitionally Mathlib's stupid truncation along
+`ComplexShape.embeddingUpIntGE p`. -/
 noncomputable def truncatedBicomplex (p : ℤ) :
     HomologicalComplex₂ C
       (ComplexShape.up ℤ) (ComplexShape.up ℤ) :=
   K.stupidTrunc (ComplexShape.embeddingUpIntGE p)
 
+/-- The column at `p`, obtained from Mathlib's canonical `HomologicalComplex.single`
+functor; no second bicomplex carrier is introduced. -/
 noncomputable def singleColumnBicomplex (p : ℤ) :
     HomologicalComplex₂ C
       (ComplexShape.up ℤ) (ComplexShape.up ℤ) :=
@@ -125,12 +152,14 @@ noncomputable def adjacentColumnBicomplexShortComplex (p : ℤ) :
 
 variable {K} {L : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ)}
 
-/-- Stupid column truncation is natural in the bicomplex. -/
+/-- Stupid column truncation is natural in the bicomplex. This is Mathlib's
+`HomologicalComplex.stupidTruncMap` at the standard degree-at-least embedding. -/
 noncomputable def truncatedBicomplexMap (f : K ⟶ L) (p : ℤ) :
     truncatedBicomplex K p ⟶ truncatedBicomplex L p :=
   HomologicalComplex.stupidTruncMap f (ComplexShape.embeddingUpIntGE p)
 
-/-- The single-column construction is natural in the bicomplex. -/
+/-- The single-column construction is natural in the bicomplex. It is Mathlib's
+`HomologicalComplex.single` functor applied to the actual column map `f.f p`. -/
 noncomputable def singleColumnBicomplexMap (f : K ⟶ L) (p : ℤ) :
     singleColumnBicomplex K p ⟶ singleColumnBicomplex L p :=
   (HomologicalComplex.single (CochainComplex C ℤ) (ComplexShape.up ℤ) p).map (f.f p)
@@ -142,7 +171,9 @@ section Preadditive
 variable {C : Type u} [Category.{v} C] [Preadditive C] [HasZeroObject C]
   (K : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ))
 
-/-- A column in horizontal degree `p` is a degree-zero column shifted by `-p`. -/
+/-- A column in horizontal degree `p` is its degree-zero model shifted by `-p`.
+The negative sign matches the cohomological shift convention: horizontal degree `p`
+contributes in total degree `p + q`. -/
 noncomputable def singleColumnShiftIso (p : ℤ) :
     singleColumnBicomplex K p ≅
       (shiftFunctor₁ C (-p)).obj
@@ -156,7 +187,9 @@ noncomputable instance singleColumnHasTotal (p : ℤ) :
     (singleColumnBicomplex K p).HasTotal (ComplexShape.up ℤ) :=
   hasTotal_of_iso (singleColumnShiftIso K p).symm (ComplexShape.up ℤ)
 
-/-- The total of a single column is that column shifted by its horizontal degree. -/
+/-- The signed total of one column is the vertical complex shifted by `-p`.
+This factors through `singleColumnShiftIso`, Mathlib's total/shift comparison, and
+the degree-zero-column total iso; the factorization retains the signed total map. -/
 noncomputable def singleColumnTotalIso (p : ℤ) :
     (singleColumnBicomplex K p).total (ComplexShape.up ℤ) ≅
       (K.X p)⟦-p⟧ :=
@@ -166,7 +199,9 @@ noncomputable def singleColumnTotalIso (p : ℤ) :
     (shiftFunctor (CochainComplex C ℤ) (-p)).mapIso
       (singleZeroTotalIso (K.X p))
 
-/-- Totals of adjacent column tails and their single-column quotient. -/
+/-- The short complex of the `p + 1` tail total, `p` tail total, and column-`p`
+total. Both arrows are the literal maps induced by Mathlib's `total.map`; its
+zero-composite property is proved before any exactness assumption. -/
 noncomputable def adjacentColumnTotalShortComplex (p : ℤ)
     [(truncatedBicomplex K p).HasTotal (ComplexShape.up ℤ)]
     [(truncatedBicomplex K (p + 1)).HasTotal (ComplexShape.up ℤ)] :
@@ -216,7 +251,9 @@ noncomputable def adjacentColumnTotalSection (p n : ℤ)
 
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
-/-- Split the adjacent-column total short complex in each total degree. -/
+/-- Split the adjacent-column total short complex in each total degree using an
+explicit retraction and section of the diagonal coproduct maps. The degreewise
+splitting does not assert a splitting by chain maps. -/
 noncomputable def adjacentColumnTotalDegreewiseSplitting (p n : ℤ)
     [(truncatedBicomplex K p).HasTotal (ComplexShape.up ℤ)]
     [(truncatedBicomplex K (p + 1)).HasTotal (ComplexShape.up ℤ)] :
@@ -368,8 +405,9 @@ lemma singleColumnTotalIso_naturality (f : K ⟶ L) (p : ℤ) :
 
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
-/-- A bicomplex morphism maps the adjacent-column short exact sequence of its source to that of
-its target. -/
+/-- A bicomplex morphism gives a map between adjacent-column total short complexes.
+Its three components are the literal `total.map` maps on the deeper tail, shallower
+tail, and single column; the commutative squares prove their naturality. -/
 noncomputable def adjacentColumnTotalShortComplexMap (f : K ⟶ L) (p : ℤ)
     [(truncatedBicomplex K p).HasTotal (ComplexShape.up ℤ)]
     [(truncatedBicomplex K (p + 1)).HasTotal (ComplexShape.up ℤ)]
@@ -455,7 +493,9 @@ section Abelian
 variable {C : Type u} [Category.{v} C] [Abelian C]
   (K : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ))
 
-/-- Adjacent column tails form a short exact sequence after totalization. -/
+/-- Adjacent column tails form a short exact sequence after totalization in an
+abelian category. Exactness follows from the separately constructed degreewise
+splitting; no chain-level retraction or section is used. -/
 theorem adjacentColumnTotalShortExact (p : ℤ)
     [(truncatedBicomplex K p).HasTotal (ComplexShape.up ℤ)]
     [(truncatedBicomplex K (p + 1)).HasTotal (ComplexShape.up ℤ)] :

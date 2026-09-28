@@ -1911,6 +1911,7 @@ SF8_ADJACENT_PAGE = (
 )
 SF8_FINITE_STRIP = f"{LIBRARY}.Algebra.Homology.SpectralSequence.FiniteStripTotal"
 SF8_SPECIALIZED_TOTAL = f"{LIBRARY}.Algebra.Homology.SpectralSequence.TotalQuasiIso"
+SF8_FINITE_COPRODUCT = f"{LIBRARY}.CategoryTheory.Limits.Shapes.FiniteProducts"
 SF8_ADJACENT_DECLARATIONS = {
     "truncatedBicomplex",
     "singleColumnBicomplex",
@@ -1940,7 +1941,7 @@ def _rule_sf8_finite_strip(modules: Modules, closure: Closure) -> tuple[list[str
     """Keep the generic adjacent core upstream of page and finite-strip consumers."""
     failures: list[str] = []
     for name in (SF8_ADJACENT_CORE, SF8_ADJACENT_PAGE, SF8_FINITE_STRIP,
-                 SF8_SPECIALIZED_TOTAL):
+                 SF8_SPECIALIZED_TOTAL, SF8_FINITE_COPRODUCT):
         if name not in modules:
             failures.append(f"missing SF8 finite-strip module {name}")
     if SF8_ADJACENT_CORE in modules:
@@ -1979,14 +1980,25 @@ def _rule_sf8_finite_strip(modules: Modules, closure: Closure) -> tuple[list[str
                 failures.append(f"{consumer}: duplicates adjacent API {sorted(duplicated)}")
     if SF8_FINITE_STRIP in modules:
         strip_path, strip_imports, _ = modules[SF8_FINITE_STRIP]
-        if "finiteStrip_totalMap_quasiIso" not in declared_names(
+        if "totalMap_quasiIso_of_finiteStrip" not in declared_names(
             strip_path.read_text(encoding="utf-8")
         ):
             failures.append(f"{SF8_FINITE_STRIP}: missing finite-strip theorem")
+        if SF8_FINITE_COPRODUCT not in strip_imports:
+            failures.append(f"{SF8_FINITE_STRIP}: must import finite-support coproduct owner")
         if SF8_SPECIALIZED_TOTAL in closure.of(SF8_FINITE_STRIP):
             failures.append(f"{SF8_FINITE_STRIP}: reaches specialized total comparison")
         if "Mathlib.Algebra.Homology.HomologySequenceLemmas" in strip_imports:
             failures.append(f"{SF8_FINITE_STRIP}: imports generic homology-sequence lemmas")
+    if SF8_FINITE_COPRODUCT in modules:
+        coproduct_path, _, _ = modules[SF8_FINITE_COPRODUCT]
+        if "hasCoproduct_of_finite_support" not in declared_names(
+            coproduct_path.read_text(encoding="utf-8")
+        ):
+            failures.append(f"{SF8_FINITE_COPRODUCT}: missing finite-support coproduct API")
+        if SF8_ADJACENT_CORE in closure.of(SF8_FINITE_COPRODUCT) or \
+                SF8_FINITE_STRIP in closure.of(SF8_FINITE_COPRODUCT):
+            failures.append(f"{SF8_FINITE_COPRODUCT}: reaches spectral consumer")
     return failures, "the generic adjacent core and triangle proof feed finite strips without spectral-page or specialized-total dependencies"
 
 

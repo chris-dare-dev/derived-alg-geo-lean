@@ -23,6 +23,7 @@ import DerivedAlgGeo.Algebra.Homology.Localization
 import DerivedAlgGeo.Algebra.Homology.ShortComplex.Limits
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.InjectiveResolutionNaturality
 import DerivedAlgGeo.CategoryTheory.Limits.Preserves.Shapes.Products
+import DerivedAlgGeo.CategoryTheory.Limits.Shapes.FiniteProducts
 import DerivedAlgGeo.CategoryTheory.Localization.Coproducts
 import DerivedAlgGeo.CategoryTheory.MorphismProperty.Limits
 import DerivedAlgGeo.Algebra.Homology.Subcomplex
@@ -97,6 +98,7 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms CategoryTheory.ShortComplex.homologyFunctor_preservesColimitsOfShape
 #print axioms CategoryTheory.Limits.preservesCoproductsOfShape_of_essSurj
 #print axioms CategoryTheory.Limits.isIso_map_sigma_map
+#print axioms CategoryTheory.Limits.hasCoproduct_of_finite_support
 #print axioms HomotopyCategory.filteredComplexSpectralObject
 #print axioms CategoryTheory.Abelian.SpectralObject.coreE₂CohomologicalInt
 #print axioms CategoryTheory.Abelian.SpectralObject.coreE₂CohomologicalInt_deg
@@ -121,6 +123,9 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex.stupidTruncGEMap_comp_ι_assoc
 #print axioms HomologicalComplex.stupidTruncGEMap_self
 #print axioms HomologicalComplex.stupidTruncGEι
+#print axioms HomologicalComplex.stupidTruncMap_comp_stupidTruncGEι
+#print axioms HomologicalComplex.stupidTruncMap_comp_stupidTruncGEι_assoc
+#print axioms HomologicalComplex.stupidTruncGEι_isIso_of_isZero
 #print axioms HomologicalComplex.stupidTruncGEι_f_mono
 #print axioms HomologicalComplex.stupidTruncGEι_mono
 #print axioms HomologicalComplex.stupidTrunc_d_eq
@@ -173,7 +178,7 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex₂.complexIso_inv_hom_f
 #print axioms HomologicalComplex₂.complexIso_inv_hom_f_assoc
 #print axioms HomologicalComplex₂.filteredComplexPrecompTriangleIso
-#print axioms HomologicalComplex₂.finiteStrip_totalMap_quasiIso
+#print axioms HomologicalComplex₂.totalMap_quasiIso_of_finiteStrip
 #print axioms HomologicalComplex₂.homologyMap_descShortComplex_comp_delta
 #print axioms HomologicalComplex₂.homologyMap_descShortComplex_comp_delta_assoc
 #print axioms HomologicalComplex₂.singleColumnBicomplex

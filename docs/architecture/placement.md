@@ -20,6 +20,7 @@ and future upstream work; matching directories is not required to import Mathlib
 | `HomotopyCategory`, `HomComplex`, bounded and plus variants | `Algebra/Homology/HomotopyCategory/` | `Algebra/Homology/HomotopyCategory/` |
 | `HomologicalComplex.stupidTrunc` inclusions between integer degree-at-least truncations | `Algebra/Homology/Embedding/StupidTrunc.lean` | `Algebra/Homology/Embedding/StupidTruncGE.lean` |
 | `HomologicalComplex.stupidTruncXIso` normalized retained-component comparison and its bicomplex specialization | `Algebra/Homology/Embedding/StupidTrunc.lean` | `Algebra/Homology/Embedding/StupidTruncGE.lean` |
+| Coproducts indexed by a family with finite nonzero support | `CategoryTheory/Limits/Shapes/FiniteProducts.lean` | `CategoryTheory/Limits/Shapes/FiniteProducts.lean` |
 | Spectral sequences and total complexes | `Algebra/Homology/SpectralSequence/` | `Algebra/Homology/SpectralSequence/` |
 | `SheafOfModules` and `PresheafOfModules` | `Algebra/Category/ModuleCat/{Sheaf,Presheaf}/` | `Algebra/Category/ModuleCat/{Sheaf,Presheaf}/` |
 | `ModuleCat`, `Grp` | `Algebra/Category/{ModuleCat,Grp}/` | `Algebra/Category/{ModuleCat,Grp}/` |
@@ -53,8 +54,11 @@ generic adjacent-column short exact sequence and its natural map.
 `FiniteStripTotal.lean` consumes that core to prove the finite horizontal-strip
 comparison for the actual `HomologicalComplex₂.total.map`. The spectral-page
 and first-page files consume the core downstream; they do not define a second
-adjacent sequence. The retained truncation-component iso used by the core is
-owned separately by `Embedding/StupidTruncGE.lean`.
+adjacent sequence. The retained truncation-component iso, inclusion naturality,
+and criterion that the inclusion is an isomorphism when discarded components
+vanish are owned separately by `Embedding/StupidTruncGE.lean`. The
+finite-support coproduct lemma used to construct total objects is owned by
+`CategoryTheory/Limits/Shapes/FiniteProducts.lean`; it has no bicomplex premise.
 `PrimeSpectrum.basicOpen_prod_eq_pi` is stated
 in the lattice of opens of a prime spectrum, but `PrimeSpectrum.basicOpen` is defined in
 `RingTheory/Spectrum/Prime/Topology.lean`, so it lives there and not in

@@ -9,12 +9,34 @@ import Mathlib.Algebra.Homology.HomotopyCategory.ShortExact
 import Mathlib.Algebra.Homology.TotalComplexShift
 
 /-!
-# Adjacent layers of a column-filtered total complex
+# Mapping cones and the first page of the column filtration
 
 The generic adjacent-column short exact sequence lives in
 `FilteredTotalComplexAdjacentCore`. This file compares its mapping cone with the newly added
 column for bicomplexes of abelian groups, then identifies the initial page of the column-filtration
 spectral sequence with vertical column homology.
+
+## Main definitions and results
+
+* `adjacentColumnConeToShift` compares the adjacent-tail mapping cone with the
+  shifted vertical column.
+* `columnFilteredAdjacentLayerConeToShift` makes that comparison for the
+  filtration's actual adjacent layer.
+* `columnFilteredInitialPageColumnHomologyIso` identifies the initial page
+  with vertical column homology.
+* `columnFilteredFirstPage_d_eq` identifies the first-page differential under
+  those isomorphisms.
+
+## Implementation notes
+
+The adjacent short complex, its degreewise splitting, exactness, and natural map
+are defined in `FilteredTotalComplexAdjacentCore`. This file uses those maps
+to compare the mapping-cone and spectral-page presentations in abelian groups.
+
+## References
+
+This comparison uses Mathlib's mapping-cone and spectral-object APIs for
+homological complexes.
 -/
 
 namespace HomologicalComplex₂

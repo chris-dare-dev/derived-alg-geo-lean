@@ -12,13 +12,28 @@ import Mathlib.Algebra.Homology.QuasiIso
 /-!
 # Quasi-isomorphisms and filtered total complexes
 
-This file proves the first-quadrant total quasi-isomorphism comparison for bicomplexes of abelian
-groups. It uses the canonical adjacent-column maps from `FilteredTotalComplexAdjacentCore` and
-cone comparisons. It also supplies a specialized middle-term lemma: for a morphism of short exact
-cochain-complex sequences, quasi-isomorphisms on the outer terms imply a quasi-isomorphism on the
-middle term.
-The finite-strip comparison in `FiniteStripTotal` uses derived short-exact triangles directly and
-does not depend on that specialized middle-term lemma.
+## Main definitions
+
+* `HomologicalComplex₂.IsVerticallyConnective` records vanishing in negative
+  vertical degrees.
+* `HomologicalComplex₂.IsHorizontallyConnective` records vanishing in negative
+  horizontal degrees.
+
+## Main results
+
+* `HomologySequence.quasiIso_τ₂` compares the middle terms of short exact
+  cochain-complex sequences when the outer maps are quasi-isomorphisms.
+* `HomologicalComplex₂.totalMap_quasiIso` compares total complexes of
+  first-quadrant bicomplexes of abelian groups under columnwise
+  quasi-isomorphisms.
+
+## Implementation notes
+
+The first-quadrant comparison uses the canonical adjacent-column maps from
+`FilteredTotalComplexAdjacentCore` and mapping-cone comparisons. The
+downstream finite-strip comparison in `FiniteStripTotal` uses derived
+short-exact triangles directly; it does not depend on the specialized
+middle-term lemma here.
 -/
 
 open CategoryTheory Category Limits
@@ -500,21 +515,12 @@ the original bicomplex. -/
 private lemma stupidTruncGEι_zero_isIso (K : HomologicalComplex₂ AddCommGrpCat.{w}
     (ComplexShape.up ℤ) (ComplexShape.up ℤ)) (hK : IsHorizontallyConnective K) :
     IsIso (HomologicalComplex.stupidTruncGEι K 0) := by
-  letI componentIso (p q : ℤ) :
-      IsIso (((HomologicalComplex.stupidTruncGEι K 0).f p).f q) := by
-    dsimp [HomologicalComplex.stupidTruncGEι]
-    split_ifs with hp
-    · infer_instance
-    · apply IsZero.isIso
-      · apply (HomologicalComplex.eval AddCommGrpCat.{w}
-          (ComplexShape.up ℤ) q).map_isZero
-        apply HomologicalComplex.isZero_stupidTrunc_X
-        rw [ComplexShape.notMem_range_embeddingUpIntGE_iff]
-        omega
-      · exact hK p q (by omega)
-  letI rowIso (p : ℤ) : IsIso ((HomologicalComplex.stupidTruncGEι K 0).f p) :=
-    HomologicalComplex.Hom.isIso_of_components _
-  exact HomologicalComplex.Hom.isIso_of_components _
+  apply HomologicalComplex.stupidTruncGEι_isIso_of_isZero
+  intro p hp
+  rw [IsZero.iff_id_eq_zero]
+  apply HomologicalComplex.Hom.ext
+  funext q
+  exact (hK p q hp).eq_of_src _ _
 
 /-- The inclusion of the nonnegative column tail induces an isomorphism on total complexes for
 a horizontally connective bicomplex. -/
@@ -536,18 +542,7 @@ bicomplex map followed by the source inclusion. -/
 private lemma truncatedBicomplexMap_comp_stupidTruncGEι (f : K ⟶ L) :
     truncatedBicomplexMap f 0 ≫ HomologicalComplex.stupidTruncGEι L 0 =
       HomologicalComplex.stupidTruncGEι K 0 ≫ f := by
-  apply HomologicalComplex.Hom.ext
-  funext p
-  by_cases hp : 0 ≤ p
-  · dsimp [truncatedBicomplexMap, truncatedBicomplex,
-      HomologicalComplex.stupidTruncGEι]
-    rw [dif_pos hp, dif_pos hp]
-    exact HomologicalComplex.stupidTruncMap_stupidTruncXIso_hom f _ _
-  · apply IsZero.eq_of_src
-    dsimp [truncatedBicomplex]
-    apply HomologicalComplex.isZero_stupidTrunc_X
-    rw [ComplexShape.notMem_range_embeddingUpIntGE_iff]
-    omega
+  exact HomologicalComplex.stupidTruncMap_comp_stupidTruncGEι f 0
 
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in

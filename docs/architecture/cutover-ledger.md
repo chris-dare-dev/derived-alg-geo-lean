@@ -2555,6 +2555,10 @@ or exactness was strengthened by relocation.
   The owner imports no spectral or geometric consumer, and the adjacent core
   imports the owner directly. This is a direct Mathlib API extension (Tier 1);
   the import graph and the specialization map are separate facts.
+  The finite-strip review also moved the generic naturality of
+  `stupidTruncGEι` and its isomorphism criterion for vanishing discarded
+  components to this owner; the finite-strip and first-quadrant total
+  consumers now use those results instead of private specialized proofs.
 - The SF8 #554 adjacent-core cutover puts the truncation, single-column and
   adjacent-short-complex declarations at
   `SpectralSequence/FilteredTotalComplexAdjacentCore.lean`, retaining their
@@ -2570,7 +2574,9 @@ or exactness was strengthened by relocation.
   `FiniteStripTotal.lean` uses derived short-exact triangles to prove an actual
   total-map quasi-isomorphism for columnwise quasi-isomorphisms supported on a
   finite horizontal interval in any abelian category. Finite diagonal support
-  constructs its total objects. The original free-Yoneda bicomplex is
+  constructs its total objects using the independent finite-support coproduct
+  result in `CategoryTheory/Limits/Shapes/FiniteProducts.lean`. The original
+  free-Yoneda bicomplex is
   horizontally unbounded: its total comparison, K-flatness and arbitrary
   derived pullback remain SF8 obligations.
 
