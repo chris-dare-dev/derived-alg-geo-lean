@@ -303,7 +303,8 @@ private noncomputable def adjacentColumnTotalShortComplexMap (f : K ⟶ L) (p : 
       rw [← cancel_mono eL₁.hom]
       simp only [Category.assoc, eL₁.inv_hom_id, Category.comp_id]
       rw [← Category.assoc, ← Category.assoc]
-      dsimp [eK₀, eK₁, eL₀, eL₁, stupidTruncGEXIso]
+      dsimp [eK₀, eK₁, eL₀, eL₁, stupidTruncGEXIso,
+        HomologicalComplex.stupidTruncGEXIso]
       rw [HomologicalComplex.stupidTruncMap_stupidTruncXIso_hom]
       simp only [Category.assoc]
       rw [HomologicalComplex.stupidTruncMap_stupidTruncXIso_hom]
@@ -442,7 +443,8 @@ private lemma truncatedBicomplexMap_naturality_inclusion (f : K ⟶ L)
     rw [← cancel_mono eL₁.hom]
     simp only [Category.assoc, eL₁.inv_hom_id, Category.comp_id]
     rw [← Category.assoc, ← Category.assoc]
-    dsimp [eK₀, eK₁, eL₀, eL₁, stupidTruncGEXIso]
+    dsimp [eK₀, eK₁, eL₀, eL₁, stupidTruncGEXIso,
+      HomologicalComplex.stupidTruncGEXIso]
     rw [HomologicalComplex.stupidTruncMap_stupidTruncXIso_hom]
     simp only [Category.assoc]
     rw [HomologicalComplex.stupidTruncMap_stupidTruncXIso_hom]
