@@ -1,5 +1,6 @@
 # Build artifacts.
 /.lake/
+/.private-cache-seed.lock
 *.olean
 *.ilean
 *.trace

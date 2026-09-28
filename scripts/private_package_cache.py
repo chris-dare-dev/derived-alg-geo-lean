@@ -31,6 +31,8 @@ except ImportError:
     fcntl = None
 
 from private_archive_io import DIR_FLAGS, extract_checked_archive, remove_owned_tree
+from private_alias_scan import scan_owned_child, scan_private_lake
+from private_source_contract import verify_source_packages
 
 MIN_FREE_BYTES = 2 * 1024**3
 QUIET_SECONDS = 90
@@ -38,10 +40,57 @@ READY = "private-cache-ready.json"
 STAGE_OWNER = ".private-stage-owner.json"
 FORMAT = 4
 RENAME_NOREPLACE = 1
+MAX_RECORD_BYTES = 256 * 1024
+SOURCE_READER = Path(__file__).resolve().parent / "private-reader.git"
 
 
 def fail(message: str) -> None:
     raise ValueError(message)
+
+
+def _unique_pairs(pairs: list[tuple[str, object]]) -> dict:
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            fail(f"duplicate private-cache record key: {key}")
+        result[key] = value
+    return result
+
+
+def _read_record(path: Path) -> dict:
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+    try:
+        info = os.fstat(fd)
+        if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1 or info.st_size > MAX_RECORD_BYTES:
+            fail("private-cache record is not one bounded private file")
+        raw = os.read(fd, MAX_RECORD_BYTES + 1)
+        if len(raw) > MAX_RECORD_BYTES:
+            fail("private-cache record is too large")
+        record = json.loads(raw, object_pairs_hook=_unique_pairs)
+        if not isinstance(record, dict):
+            fail("private-cache record must be an object")
+        return record
+    finally:
+        os.close(fd)
+
+
+def _validate_record(record: dict, key: str, revisions: dict[str, str],
+                     urls: dict[str, str], label: str) -> None:
+    expected = {"format", "key", "revisions", "urls", "cache_digests",
+                "packages_sha256", "build_sha256", "source_bytes", "archive_sha256"}
+    if (set(record) != expected or type(record.get("format")) is not int or
+            record["format"] != FORMAT or record.get("key") != key or
+            record.get("revisions") != revisions or record.get("urls") != urls):
+        fail(f"private-cache {label} pins or schema differ from target")
+    digests = record.get("cache_digests")
+    if (not isinstance(digests, dict) or set(digests) != set(revisions) | {"project"} or
+            type(record.get("source_bytes")) is not int or record["source_bytes"] <= 0):
+        fail("private-cache record inventory is incomplete")
+    for value in (record["archive_sha256"], record["packages_sha256"],
+                  record["build_sha256"], *digests.values()):
+        if (not isinstance(value, str) or len(value) != 64 or
+                any(ch not in "0123456789abcdef" for ch in value)):
+            fail("private-cache record has an invalid content digest")
 
 
 def digest_file(path: Path) -> str:
@@ -165,6 +214,27 @@ def disk_headroom(path: Path, required: int) -> None:
         fail(f"insufficient disk at {path}: need {required + MIN_FREE_BYTES} bytes, have {free}")
 
 
+def dry_run_headroom(path: Path, required: int) -> None:
+    """Check the target filesystem through existing no-follow ancestors only."""
+    if not path.is_absolute() or ".." in path.parts:
+        fail("snapshot store path must be absolute and normalized")
+    fd = os.open("/", DIR_FLAGS)
+    try:
+        for part in path.parts[1:]:
+            try:
+                child = os.open(part, DIR_FLAGS, dir_fd=fd)
+            except FileNotFoundError:
+                break
+            os.close(fd)
+            fd = child
+        capacity = os.fstatvfs(fd)
+        free = capacity.f_bavail * capacity.f_frsize
+        if free < required + MIN_FREE_BYTES:
+            fail(f"insufficient disk at {path}: need {required + MIN_FREE_BYTES} bytes, have {free}")
+    finally:
+        os.close(fd)
+
+
 def snapshot_dir(key: str) -> Path:
     base = os.environ.get("DAG_PRIVATE_PACKAGE_SNAPSHOT_DIR")
     if not base:
@@ -260,21 +330,8 @@ def checked_snapshot(directory: Path, key: str, revisions: dict[str, str],
         fail("snapshot files are linked or incomplete")
     if archive.stat().st_mode & 0o222 or metadata.stat().st_mode & 0o222:
         fail("snapshot files are writable")
-    record = json.loads(metadata.read_text())
-    if (record.get("format") != FORMAT or record.get("key") != key or
-            record.get("revisions") != revisions or record.get("urls") != urls):
-        fail("snapshot pins differ from target")
-    expected_caches = set(revisions) | {"project"}
-    digests = record.get("cache_digests")
-    if (not isinstance(digests, dict) or set(digests) != expected_caches or
-            not isinstance(record.get("source_bytes"), int) or
-            record["source_bytes"] <= 0):
-        fail("snapshot cache inventory is incomplete")
-    for value in (record.get("archive_sha256"), record.get("packages_sha256"),
-                  record.get("build_sha256"), *digests.values()):
-        if (not isinstance(value, str) or len(value) != 64 or
-                any(ch not in "0123456789abcdef" for ch in value)):
-            fail("snapshot has an invalid content digest")
+    record = _read_record(metadata)
+    _validate_record(record, key, revisions, urls, "snapshot")
     if record.get("archive_sha256") != digest_file(archive):
         fail("snapshot archive checksum failed")
     return record
@@ -436,35 +493,37 @@ def _read_receipt(lake: Path) -> dict:
     receipt = lake / READY
     if receipt.is_symlink() or not receipt.is_file():
         fail("target has no private-cache receipt")
-    return json.loads(receipt.read_text())
+    return _read_record(receipt)
 
 
 def verify_ready(target: Path) -> None:
+    """Check private ownership and pins; build caches may change after Lake runs."""
     key, revisions = pins(target)
     urls = package_urls(target, revisions)
     lake = target / ".lake"
     record = _read_receipt(lake)
-    if (record.get("format") != FORMAT or record.get("key") != key or
-            record.get("revisions") != revisions or record.get("urls") != urls):
-        fail("private-cache receipt pins differ from target")
+    _validate_record(record, key, revisions, urls, "receipt")
     validate_packages(lake / "packages", revisions)
+    verified_links = verify_source_packages(lake / "packages", revisions,
+                                            reader_git_dir=SOURCE_READER)
+    scan_private_lake(target, verified_links)
     for name, url in urls.items():
         if git("-C", str(lake / "packages" / name), "remote", "get-url", "origin") != url:
             fail(f"private package remote differs from manifest: {name}")
     caches = {name: lake / "packages" / name / ".lake/build" for name in revisions}
     caches["project"] = lake / "build"
+    if set(record["cache_digests"]) != set(caches):
+        fail("private-cache receipt inventory is incomplete")
     for name, path in caches.items():
         if not path.is_dir() or path.is_symlink():
             fail(f"private build cache missing or linked: {name}")
         require_owner_writable(path)
-    packages_digest, _ = tree_digest(lake / "packages")
-    project_digest, _ = tree_digest(lake / "build")
-    if (packages_digest != record.get("packages_sha256") or
-            project_digest != record.get("build_sha256")):
-        fail("private-cache receipt content differs from target")
-    for name, path in caches.items():
-        if tree_digest(path)[0] != record.get("cache_digests", {}).get(name):
-            fail(f"private build cache differs from receipt: {name}")
+    # The snapshot and extracted candidate were byte-checked before the atomic
+    # publish. Afterwards Lake owns these writable trees: even a no-op build
+    # can update package Git indexes. Rechecks enforce private roots and safe
+    # links, not equality to their pre-build bytes.
+    tree_digest(lake / "packages")
+    tree_digest(lake / "build")
 
 
 def default_donor(target: Path) -> Path:
@@ -504,6 +563,26 @@ def seed(target: Path, donor: Path | None, *, verify: bool, dry_run: bool,
     directory = snapshot_dir(key)
     if directory.is_relative_to(target):
         fail("snapshot store must be outside the target")
+    if dry_run:
+        dry_run_headroom(directory, 0)
+        record = checked_snapshot(directory, key, revisions, urls)
+        if record is None:
+            donor = default_donor(target) if donor is None else donor.resolve(strict=True)
+            donor_key, _ = pins(donor)
+            if donor == target or donor_key != key:
+                fail("donor and target pins differ")
+            source = (donor / ".lake/packages").resolve(strict=True)
+            validate_packages(source, revisions)
+            roots = _build_roots(source, donor / ".lake/build", revisions)
+            source_bytes = sum(tree_digest(path)[1] for path in roots.values())
+            dry_run_headroom(directory, 3 * source_bytes)
+            print(f"would create Git-object snapshot from {donor}")
+        else:
+            source_bytes = record["source_bytes"]
+            print(f"verified snapshot checksum {directory}; candidate source checks deferred")
+        disk_headroom(target, source_bytes)
+        print(f"would privately seed fresh {target} from {directory}")
+        return
     with locked_directory(target, ".private-cache-seed.lock", create=False) as (target_fd, _pinned_target):
         verify_target_inode(target, target_fd)
         if lake_name.exists() or lake_name.is_symlink():
@@ -519,20 +598,12 @@ def seed(target: Path, donor: Path | None, *, verify: bool, dry_run: bool,
                     fail("donor and target pins differ")
                 source = (donor / ".lake/packages").resolve(strict=True)
                 build_source = donor / ".lake/build"
-                if dry_run:
-                    validate_packages(source, revisions)
-                    _build_roots(source, build_source, revisions)
-                    print(f"would create Git-object snapshot from {donor}")
-                    return
                 print(f"creating Git-object snapshot from {donor}", flush=True)
                 record = create_snapshot(snapshot_fd, snapshot, source, build_source,
                                          key, revisions, urls)
             else:
                 print(f"verified package snapshot {directory}", flush=True)
             disk_headroom(target, record["source_bytes"])
-            if dry_run:
-                print(f"would privately seed fresh {target} from {directory}")
-                return
             token = uuid.uuid4().hex
             stage_name = f".lake-stage-{token}"
             os.mkdir(stage_name, 0o700, dir_fd=target_fd)
@@ -554,6 +625,8 @@ def seed(target: Path, donor: Path | None, *, verify: bool, dry_run: bool,
                 for name, path in caches.items():
                     if tree_digest(path)[0] != record["cache_digests"][name]:
                         fail(f"extracted build cache differs from snapshot: {name}")
+                verified_links = verify_source_packages(stage / "packages", revisions,
+                                                        reader_git_dir=SOURCE_READER)
                 receipt_fd = os.open(READY, os.O_CREAT | os.O_EXCL | os.O_WRONLY |
                                      os.O_NOFOLLOW, 0o600, dir_fd=stage_fd)
                 try:
@@ -564,6 +637,7 @@ def seed(target: Path, donor: Path | None, *, verify: bool, dry_run: bool,
                     os.close(receipt_fd)
                 os.fsync(stage_fd)
                 verify_target_inode(target, target_fd)
+                scan_owned_child(target, stage_name, verified_links)
                 no_replace_rename(target_fd, stage_name, target_fd, ".lake", identity)
                 published = True
             finally:
