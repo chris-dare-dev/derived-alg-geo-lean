@@ -60,7 +60,8 @@ horizontal term reaches the next column, while the signed vertical term stays
 in the current column. Epi refinement supplies a preimage of the vertical
 cycle, and its boundary leaves all earlier columns zero. Finite iteration
 composes the epi refinements; the generic finite-support identity from
-`CategoryTheory.Limits.Sigma` makes the zero-coordinate residual a zero map.
+`CategoryTheory.Limits.Sigma.hom_eq_zero_of_finite_support` makes the
+zero-coordinate residual a zero map.
 
 ## References
 
