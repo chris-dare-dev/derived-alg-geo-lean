@@ -115,17 +115,17 @@ lemma toOpen_comp_fromTildeΓ_app (M : (Spec R).Modules) (f : R) :
 
 /-- **The base case: for `M = N^~` the restriction to `D(f)` is a localisation.**
 
-`AlgebraicGeometry.tilde.toOpen N ⊤` is an isomorphism and
-`AlgebraicGeometry.tilde.toOpen N ⊤ ≫ restriction = AlgebraicGeometry.tilde.toOpen N D(f)`
-by `AlgebraicGeometry.tilde.toOpen_res`, so the restriction inherits the localization property Mathlib already
-proves for `tilde.toOpen N D(f)`.
+`AlgebraicGeometry.tilde.toOpen N ⊤` is an isomorphism, and its composite with restriction to
+`D(f)` is `AlgebraicGeometry.tilde.toOpen N D(f)` by
+`AlgebraicGeometry.tilde.toOpen_res`. Thus the restriction inherits the localization property
+Mathlib proves for `AlgebraicGeometry.tilde.toOpen N D(f)`.
 
 This is what the general statement — the hypothesis of
 `AlgebraicGeometry.isIso_fromTildeΓ_of_isLocalizedModule` — has to be reduced to for a
-quasi-coherent `M`, and
-it is also the check that that hypothesis is satisfiable rather than vacuous: feeding this
-lemma to the reduction recovers `IsIso (tilde N).fromTildeΓ`, which Mathlib knows
-independently. -/
+quasi-coherent `M`. It also checks that the hypothesis is satisfiable rather than vacuous:
+feeding this lemma to the reduction recovers
+`CategoryTheory.IsIso (AlgebraicGeometry.tilde N).fromTildeΓ`, which Mathlib knows independently.
+-/
 instance isLocalizedModule_basicOpenRestriction_tilde (N : ModuleCat.{u} R) (f : R) :
     IsLocalizedModule (Submonoid.powers f) (basicOpenRestriction (tilde N) f).hom := by
   haveI : IsIso (tilde.toOpen N ⊤) := tilde.isIso_toOpen_top
@@ -204,7 +204,8 @@ lemma Scheme.Modules.basicOpenRestriction_naturality {M N : (Spec R).Modules} (�
 
 If `M` is in the essential image of `~` — equivalently, if its counit is an isomorphism — then
 restriction to each basic open is a localisation, by transporting
-`isLocalizedModule_basicOpenRestriction_tilde` across that isomorphism. -/
+`AlgebraicGeometry.Scheme.Modules.isLocalizedModule_basicOpenRestriction_tilde` across that
+isomorphism. -/
 theorem Scheme.Modules.isLocalizedModule_basicOpenRestriction_of_isIso (M : (Spec R).Modules)
     [IsIso M.fromTildeΓ] (f : R) :
     IsLocalizedModule (Submonoid.powers f) (M.basicOpenRestriction f).hom := by

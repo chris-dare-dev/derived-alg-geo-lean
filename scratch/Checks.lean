@@ -47,6 +47,7 @@ import DerivedAlgGeo.RingTheory.Spectrum.Prime.CoversTop
 #check @AlgebraicGeometry.Scheme.Modules.isUnit_algebraMap_end_of_le_basicOpen
 #check @AlgebraicGeometry.Scheme.Modules.toOpen_fromTildeΓ_app
 #check @AlgebraicGeometry.isIso_fromTildeΓ_of_presentation
+#check @AlgebraicGeometry.tilde
 #check @AlgebraicGeometry.tilde.toOpen
 #check @AlgebraicGeometry.tilde.toOpen_res
 #check @CategoryTheory.NatIso.isIso_app_of_isIso
