@@ -48,8 +48,9 @@ includes every canonical good truncation.
   augmentation is a quasi-isomorphism for strictly bounded-above inputs.
 * `quasiIso_freeYonedaSheafCoproductTotalAugmentation_truncLE` specializes
   this result to each canonical good truncation.
-* `quasiIso_freeYonedaSheafCoproductTotalAugmentation` passes the stagewise
-  quasi-isomorphisms through the good-truncation colimit for arbitrary inputs.
+* `AlgebraicGeometry.Scheme.Modules.quasiIso_freeYonedaSheafCoproductTotalAugmentation`
+  passes the stagewise quasi-isomorphisms through the good-truncation colimit
+  for arbitrary inputs.
 
 ## Implementation notes
 
