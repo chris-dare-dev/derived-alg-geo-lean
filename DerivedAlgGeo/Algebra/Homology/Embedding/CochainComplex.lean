@@ -110,8 +110,8 @@ private lemma inclusionComponentIsIso (K : CochainComplex C ℤ) [∀ i, K.HasHo
     exact K.op.isIso_restrictionToTruncGE' e m hnb
   infer_instance
 
-/-- The inclusion cocone on the canonical good-truncation tower. Its point is the
-original complex and its legs are the canonical inclusions. -/
+/-- The transition equation makes Mathlib's inclusions a cocone. Its point is
+definitionally `K`, allowing the degreewise colimit criterion to apply directly. -/
 noncomputable def truncLETowerCocone (K : CochainComplex C ℤ) [∀ i, K.HasHomology i] :
     Cocone (truncLETower K) where
   pt := K
@@ -146,8 +146,9 @@ private noncomputable def towerEvalIsColimit (K : CochainComplex C ℤ)
   haveI : IsIso (c.ι.app n) := inclusionComponentIsIso K (n : ℤ) p hp
   exact hF.isColimitOfIsIso c
 
-/-- Every cochain complex is the colimit of its canonical increasing good-truncation
-tower. This uses local homology assumptions needed to form the good truncations. -/
+/-- The colimit exists without ambient colimit assumptions: each evaluated cocone
+stabilizes beyond its degree, and the degreewise colimit criterion assembles them.
+Local homology assumptions are needed to form Mathlib's good truncations. -/
 noncomputable def isColimitTruncLETowerCocone (K : CochainComplex C ℤ)
     [∀ i, K.HasHomology i] : IsColimit (truncLETowerCocone K) :=
   HomologicalComplex.isColimitOfEval _ _ (towerEvalIsColimit K)
@@ -164,8 +165,8 @@ lemma truncLEToTruncLE_naturality {K L : CochainComplex C ℤ}
   simp only [Category.assoc, truncLEToTruncLE_comp_ιTruncLE,
     CochainComplex.ιTruncLE_naturality, truncLEToTruncLE_comp_ιTruncLE_assoc]
 
-/-- A morphism of complexes induces a map between their canonical good-truncation
-towers, degreewise by Mathlib's `CochainComplex.truncLEMap`. -/
+/-- Mathlib's fixed-cutoff `CochainComplex.truncLEMap` gives the components;
+transition naturality assembles them into a map of towers. -/
 noncomputable def truncLETowerMap {K L : CochainComplex C ℤ}
     [∀ i, K.HasHomology i] [∀ i, L.HasHomology i]
     (f : K ⟶ L) : truncLETower K ⟶ truncLETower L where
@@ -174,7 +175,7 @@ noncomputable def truncLETowerMap {K L : CochainComplex C ℤ}
     (truncLEToTruncLE_naturality f (by exact_mod_cast leOfHom g)).symm
 
 /-- Together with the colimit theorem, this identifies the map induced on colimit
-points by `truncLETowerMap f` with `f`. -/
+points by `CochainComplex.truncLETowerMap` with the original morphism `f`. -/
 lemma truncLETowerMap_ι {K L : CochainComplex C ℤ}
     [∀ i, K.HasHomology i] [∀ i, L.HasHomology i]
     (f : K ⟶ L) (n : ℕ) :
