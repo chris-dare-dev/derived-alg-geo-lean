@@ -14,20 +14,23 @@ Mathlib's degree-at-least stupid truncation has a canonical inclusion into
 its source cochain complex. Nested truncations have compatible inclusion maps
 in any category with zero morphisms and a zero object.
 
-## Main results
+## Main definitions
 
 * `HomologicalComplex.stupidTruncGEι` includes a tail in its source complex.
-* `HomologicalComplex.stupidTruncGEMap` includes a deeper tail in a shallower
-  one; `HomologicalComplex.stupidTruncGEMap_self` and
-  `HomologicalComplex.stupidTruncGEMap_comp` give its laws.
+* `HomologicalComplex.stupidTruncGEMap` includes a deeper tail in a shallower one.
 * `HomologicalComplex.stupidTruncGETower` and
   `HomologicalComplex.stupidTruncGETowerCocone` collect the nested tails.
-* `HomologicalComplex.isColimitStupidTruncGETowerCocone` proves that they
-  recover the original complex as a colimit.
-* `HomologicalComplex.stupidTrunc_d_eq` describes the retained differential.
 * `HomologicalComplex.stupidTruncGEXIso` chooses one component isomorphism at
   every retained integer degree, with a bicomplex specialization at
   `HomologicalComplex₂.stupidTruncGEXIso`.
+
+## Main results
+
+* `HomologicalComplex.stupidTruncGEMap_self` and
+  `HomologicalComplex.stupidTruncGEMap_comp` give the nested-tail laws.
+* `HomologicalComplex.isColimitStupidTruncGETowerCocone` proves that the tower
+  recovers the original complex as a colimit.
+* `HomologicalComplex.stupidTrunc_d_eq` describes the retained differential.
 
 ## Implementation notes
 
@@ -197,8 +200,9 @@ universe u v
 
 variable {C : Type u} [Category.{v} C] [HasZeroMorphisms C] [HasZeroObject C]
 
-/-- Stage `n` has lower cutoff `c - n`; for an upper-bounded `K` these stages
-have finite support. The colimit construction itself needs no upper bound. -/
+/-- Stage `n` has lower cutoff `c - n`. If the components of `K` vanish
+above some degree, each stage has finite degree support. The colimit
+construction needs no such bound. -/
 noncomputable def stupidTruncGETower (K : CochainComplex C ℤ) (c : ℤ) :
     ℕ ⥤ CochainComplex C ℤ where
   obj n := K.stupidTrunc (ComplexShape.embeddingUpIntGE (c - n))
@@ -210,7 +214,8 @@ noncomputable def stupidTruncGETower (K : CochainComplex C ℤ) (c : ℤ) :
     symm
     apply HomologicalComplex.stupidTruncGEMap_comp
 
-/-- The canonical inclusions from the increasing lower-tail tower into `K`. -/
+/-- The stage inclusions commute with the transition maps, and the vertex
+is definitionally `K`; this lets the degreewise colimit criterion apply directly. -/
 noncomputable def stupidTruncGETowerCocone (K : CochainComplex C ℤ) (c : ℤ) :
     Cocone (stupidTruncGETower K c) where
   pt := K
