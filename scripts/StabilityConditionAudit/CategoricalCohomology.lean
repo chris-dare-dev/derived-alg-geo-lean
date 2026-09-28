@@ -148,6 +148,9 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex.stupidTruncGEMap_comp_ι
 #print axioms HomologicalComplex.stupidTruncGEMap_comp_ι_assoc
 #print axioms HomologicalComplex.stupidTruncGEMap_self
+#print axioms HomologicalComplex.stupidTruncGETower
+#print axioms HomologicalComplex.stupidTruncGETowerCocone
+#print axioms HomologicalComplex.isColimitStupidTruncGETowerCocone
 #print axioms HomologicalComplex.stupidTruncGEι
 #print axioms HomologicalComplex.stupidTruncGEι_f_mono
 #print axioms HomologicalComplex.stupidTruncGEι_mono
