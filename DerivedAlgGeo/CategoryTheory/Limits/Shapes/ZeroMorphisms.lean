@@ -14,6 +14,32 @@ of its canonical projection-inclusion endomorphisms is the identity. Thus
 incoming maps are determined by those finitely many projections. The converse
 identifies the exact support premise needed by this finite identity. No
 ambient finite-coproduct assumption or replacement coproduct is introduced.
+
+## Main results
+
+* `CategoryTheory.Limits.Sigma.sum_π_ι_eq_id_of_isZero` gives the finite
+  projection-inclusion identity, and
+  `CategoryTheory.Limits.Sigma.isZero_of_sum_π_ι_eq_id` gives its converse.
+* `CategoryTheory.Limits.Sigma.hom_ext_of_finite_support` compares incoming maps
+  on the finite nonzero support.
+* `CategoryTheory.Limits.Sigma.hom_eq_zero_of_finite_support` detects a zero
+  incoming map.
+
+## Implementation notes
+
+The identity and its converse choose decidable equality locally. The two
+incoming-map lemmas use the caller's equality instance, since it determines
+the particular `Sigma.π` in their statements.
+
+## References
+
+Mathlib's `CategoryTheory.Limits.Sigma.π`,
+`CategoryTheory.Limits.Sigma.ι_π_eq_id`, and
+`CategoryTheory.Limits.Sigma.ι_π_of_ne` supply the projection laws.
+
+## Tags
+
+coproduct, finite support, projection, zero object
 -/
 
 open CategoryTheory Category
@@ -60,7 +86,7 @@ private lemma isZero_of_sum_π_ι_eq_id_chosen (s : Finset I)
 
 /-- Compose with the finite projection-inclusion identity for the given
 projection convention to compare incoming maps on their nonzero support. -/
-lemma hom_ext_of_finiteSupport (s : Finset I)
+lemma hom_ext_of_finite_support (s : Finset I)
     (hz : ∀ i, i ∉ s → IsZero (f i)) {A : C} {x y : A ⟶ ∐ f}
     (h : ∀ i ∈ s, x ≫ Sigma.π f i = y ≫ Sigma.π f i) : x = y := by
   calc
@@ -75,10 +101,10 @@ lemma hom_ext_of_finiteSupport (s : Finset I)
 
 /-- An incoming map is zero once its projections to the finite nonzero
 support vanish. The projection convention remains the caller's. -/
-lemma hom_eq_zero_of_finiteSupport (s : Finset I)
+lemma hom_eq_zero_of_finite_support (s : Finset I)
     (hz : ∀ i, i ∉ s → IsZero (f i)) {A : C} (x : A ⟶ ∐ f)
     (h : ∀ i ∈ s, x ≫ Sigma.π f i = 0) : x = 0 := by
-  apply hom_ext_of_finiteSupport f s hz
+  apply hom_ext_of_finite_support f s hz
   intro i hi
   simpa using h i hi
 
@@ -103,8 +129,8 @@ lemma isZero_of_sum_π_ι_eq_id (s : Finset I)
     (j : I) (hj : j ∉ s) : IsZero (f j) :=
   isZero_of_sum_π_ι_eq_id_chosen f s hid j hj
 
-/-- The finite projection-inclusion sum is the identity exactly when every
-summand outside the finite support is zero. -/
+/-- An omitted nonzero summand obstructs the identity: composing with its
+inclusion and projection would force its identity morphism to vanish. -/
 lemma sum_π_ι_eq_id_iff_isZero (s : Finset I) :
     (∑ i ∈ s, Sigma.π f i ≫ Sigma.ι f i = 𝟙 (∐ f)) ↔
       ∀ i, i ∉ s → IsZero (f i) :=

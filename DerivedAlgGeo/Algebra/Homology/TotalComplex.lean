@@ -41,10 +41,11 @@ nonzero support. The results assume the literal total already exists.
   differential at one direct-sum coordinate.
 * `HomologicalComplex₂.exists_totalCycleRefinement_zero_le` clears one
   coordinate of a generalized total cycle by an epi refinement.
-* `HomologicalComplex₂.total_exactAt_of_diagonal_bounds` proves exactness
-  from finite support and exactness on one total-degree diagonal.
-* `HomologicalComplex₂.total_acyclic_of_diagonal_bounds` allows a separate
-  finite support interval in every degree; `total_acyclic_of_upper_bounds`
+* `HomologicalComplex₂.total_exactAt_of_diagonal_bounds_of_column_exactAt`
+  proves exactness from finite support and exactness on one total-degree diagonal.
+* `HomologicalComplex₂.total_acyclic_of_diagonal_bounds_of_column_exactAt`
+  allows a separate finite support interval in every degree;
+  `HomologicalComplex₂.total_acyclic_of_upper_bounds_of_column_exactAt`
   derives the uniform-rectangle case.
 
 ## Implementation notes
@@ -432,7 +433,7 @@ private def diagonalEmbedding (n : ℤ) :
 
 /-- The finite-support coproduct identity detects a zero incoming map on a
 literal total-degree diagonal. This helper is confined to the exactness proof. -/
-private lemma total_eq_zero_of_finiteSupport (n : ℤ) (s : Finset ℤ)
+private lemma total_eq_zero_of_finite_support (n : ℤ) (s : Finset ℤ)
     (hz : ∀ p q, p+q=n → p ∉ s → IsZero ((K.X p).X q))
     {A : C} (x : A ⟶ (K.total (ComplexShape.up ℤ)).X n)
     (h : ∀ p ∈ s, x ≫ K.totalProjection p (n-p) n (by omega) = 0) : x = 0 := by
@@ -440,7 +441,7 @@ private lemma total_eq_zero_of_finiteSupport (n : ℤ) (s : Finset ℤ)
   let f := K.toGradedObject.mapObjFun
     (ComplexShape.π (ComplexShape.up ℤ) (ComplexShape.up ℤ)
       (ComplexShape.up ℤ)) n
-  apply Sigma.hom_eq_zero_of_finiteSupport f (s.map (diagonalEmbedding n)) ?_ x ?_
+  apply Sigma.hom_eq_zero_of_finite_support f (s.map (diagonalEmbedding n)) ?_ x ?_
   · intro i hi
     apply hz i.1.1 i.1.2 i.2
     intro hp
@@ -469,7 +470,7 @@ set_option backward.isDefEq.respectTransparency false in
 /-- Iterate the one-coordinate correction through a finite interval. The
 composite epi changes the source, while the accumulated boundary and residual
 keep the cycle equation and cleared lower coordinates. -/
-private theorem exists_finite_totalCycleRefinement (n a : ℤ) (m : ℕ)
+private theorem exists_finite_total_cycle_refinement (n a : ℤ) (m : ℕ)
     (hE : ∀ p : ℤ, a ≤ p → p < a + m →
       (ShortComplex.mk ((K.X p).d (n-p-1) (n-p))
         ((K.X p).d (n-p) (n-p+1)) ((K.X p).d_comp_d _ _ _)).Exact)
@@ -528,8 +529,8 @@ private theorem diagonal_exactAt_to_short (n p : ℤ)
 set_option backward.isDefEq.respectTransparency false in
 /-- Refine a total cycle through the finitely supported diagonal, then use
 the finite projection identity to make its residual zero. The abelian
-exactness criterion turns that epi-refined boundary into `ExactAt`. -/
-theorem total_exactAt_of_diagonal_bounds (n a b : ℤ)
+exactness criterion then makes the literal total exact at `n`. -/
+theorem total_exactAt_of_diagonal_bounds_of_column_exactAt (n a b : ℤ)
     (hLower : ∀ p q : ℤ, p + q = n → p < a → IsZero ((K.X p).X q))
     (hUpper : ∀ p q : ℤ, p + q = n → b < p → IsZero ((K.X p).X q))
     (hExact : ∀ p : ℤ, a ≤ p → p ≤ b → (K.X p).ExactAt (n-p)) :
@@ -541,13 +542,13 @@ theorem total_exactAt_of_diagonal_bounds (n a b : ℤ)
   · have hcount : ((b+1-a).toNat : ℤ) = b+1-a :=
       Int.toNat_of_nonneg (by omega)
     obtain ⟨B, π, hπ, t, hcycle, hzero⟩ :=
-      exists_finite_totalCycleRefinement K n a (b+1-a).toNat
+      exists_finite_total_cycle_refinement K n a (b+1-a).toNat
         (fun p hp hpb => diagonal_exactAt_to_short K n p
           (hExact p hp (by omega))) x hx
         (fun p q hpq hp => (hLower p q hpq hp).eq_of_tgt _ _)
     refine ⟨B, π, hπ, t, ?_⟩
     apply sub_eq_zero.mp
-    apply total_eq_zero_of_finiteSupport K n (Finset.Icc a b)
+    apply total_eq_zero_of_finite_support K n (Finset.Icc a b)
     · intro p q hpq hp
       rw [Finset.mem_Icc] at hp
       by_cases hpa : p < a
@@ -559,7 +560,7 @@ theorem total_exactAt_of_diagonal_bounds (n a b : ℤ)
         omega)
   · refine ⟨A, 𝟙 A, inferInstance, 0, ?_⟩
     simp only [Category.id_comp, zero_comp]
-    apply total_eq_zero_of_finiteSupport K n ∅
+    apply total_eq_zero_of_finite_support K n ∅
     · intro p q hpq _
       by_cases hpa : p < a
       · exact hLower p q hpq hpa
@@ -568,7 +569,7 @@ theorem total_exactAt_of_diagonal_bounds (n a b : ℤ)
 
 /-- Apply degree-local exactness to each diagonal, allowing the support
 interval and required column exactness to vary with total degree. -/
-theorem total_acyclic_of_diagonal_bounds
+theorem total_acyclic_of_diagonal_bounds_of_column_exactAt
     (hData : ∀ n : ℤ, ∃ a b : ℤ,
       (∀ p q : ℤ, p + q = n → p < a → IsZero ((K.X p).X q)) ∧
       (∀ p q : ℤ, p + q = n → b < p → IsZero ((K.X p).X q)) ∧
@@ -576,17 +577,17 @@ theorem total_acyclic_of_diagonal_bounds
     (K.total (ComplexShape.up ℤ)).Acyclic := by
   intro n
   obtain ⟨a, b, hLower, hUpper, hExact⟩ := hData n
-  exact total_exactAt_of_diagonal_bounds K n a b hLower hUpper hExact
+  exact total_exactAt_of_diagonal_bounds_of_column_exactAt K n a b hLower hUpper hExact
 
 /-- A uniform upper rectangle gives finite support on every diagonal. Only
 columns and degrees inside that rectangle need the exactness premise. -/
-theorem total_acyclic_of_upper_bounds (b c : ℤ)
+theorem total_acyclic_of_upper_bounds_of_column_exactAt (b c : ℤ)
     (hp : ∀ p q : ℤ, b < p → IsZero ((K.X p).X q))
     (hq : ∀ p q : ℤ, c < q → IsZero ((K.X p).X q))
     (hExact : ∀ p q : ℤ, p ≤ b → q ≤ c → (K.X p).ExactAt q) :
     (K.total (ComplexShape.up ℤ)).Acyclic := by
   intro n
-  apply total_exactAt_of_diagonal_bounds K n (n-c) b
+  apply total_exactAt_of_diagonal_bounds_of_column_exactAt K n (n-c) b
   · intro p q hpq hpl
     exact hq p q (by omega)
   · intro p q hpq hpu
