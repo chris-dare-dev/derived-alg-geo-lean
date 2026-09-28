@@ -3,9 +3,10 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.Algebra.Homology.Embedding.StupidTrunc
+import Mathlib.Algebra.Homology.HomologicalBicomplex
 
 /-!
-# Inclusions between degree-at-least stupid truncations
+# Degree-at-least stupid truncations and retained components
 
 Mathlib's degree-at-least stupid truncation has a canonical inclusion into
 its source cochain complex. Nested truncations have compatible inclusion maps
@@ -18,6 +19,9 @@ in any category with zero morphisms and a zero object.
   one; `HomologicalComplex.stupidTruncGEMap_self` and
   `HomologicalComplex.stupidTruncGEMap_comp` give its laws.
 * `HomologicalComplex.stupidTrunc_d_eq` describes the retained differential.
+* `HomologicalComplex.stupidTruncGEXIso` chooses one component isomorphism at
+  every retained integer degree, with a bicomplex specialization at
+  `HomologicalComplex₂.stupidTruncGEXIso`.
 
 ## Implementation notes
 
@@ -45,6 +49,30 @@ private lemma geIndex_spec (p i : ℤ) (h : p ≤ i) :
   change p + ((i - p).toNat : ℤ) = i
   rw [Int.toNat_of_nonneg (by omega)]
   omega
+
+/-- The component of a degree-at-least stupid truncation at a retained integer degree.
+This chooses the normalized index `(i - p).toNat` for Mathlib's
+`HomologicalComplex.stupidTruncXIso`;
+`HomologicalComplex.stupidTruncXIso_eq_stupidTruncGEXIso` identifies every
+retained-index presentation with this one. -/
+noncomputable def stupidTruncGEXIso
+    (K : HomologicalComplex C (ComplexShape.up ℤ)) (p i : ℤ) (hi : p ≤ i) :
+    (K.stupidTrunc (ComplexShape.embeddingUpIntGE p)).X i ≅ K.X i :=
+  K.stupidTruncXIso (ComplexShape.embeddingUpIntGE p) (geIndex_spec p i hi)
+
+lemma stupidTruncXIso_eq_stupidTruncGEXIso
+    (K : HomologicalComplex C (ComplexShape.up ℤ)) (p i : ℤ) (k : ℕ)
+    (h : (ComplexShape.embeddingUpIntGE p).f k = i) :
+    K.stupidTruncXIso (ComplexShape.embeddingUpIntGE p) h =
+      stupidTruncGEXIso K p i (by
+        change p + (k : ℤ) = i at h
+        omega) := by
+  have hk : k = (i - p).toNat := by
+    change p + (k : ℤ) = i at h
+    rw [show i - p = (k : ℤ) by omega]
+    simp
+  subst k
+  rfl
 
 lemma stupidTrunc_d_eq (K : HomologicalComplex C (ComplexShape.up ℤ)) (p : ℤ)
     {i j : ℤ} (hi : p ≤ i) (hj : p ≤ j) :
@@ -153,3 +181,48 @@ lemma stupidTruncGEMap_comp (K : HomologicalComplex C (ComplexShape.up ℤ))
   simp
 
 end HomologicalComplex
+
+namespace HomologicalComplex₂
+
+universe w
+
+variable {C : Type w} [Category* C] [HasZeroMorphisms C] [HasZeroObject C]
+  (K : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ))
+
+/-- The bicomplex specialization of the normalized retained component
+`HomologicalComplex.stupidTruncGEXIso`. It is definitionally the same iso as
+Mathlib's `HomologicalComplex.stupidTruncXIso` at index `(i - p).toNat`. -/
+noncomputable def stupidTruncGEXIso (p i : ℤ) (hi : p ≤ i) :
+    (K.stupidTrunc (ComplexShape.embeddingUpIntGE p)).X i ≅ K.X i :=
+  HomologicalComplex.stupidTruncGEXIso K p i hi
+
+@[simp]
+lemma stupidTruncXIso_eq_stupidTruncGEXIso (p i : ℤ) (k : ℕ)
+    (h : (ComplexShape.embeddingUpIntGE p).f k = i) :
+    K.stupidTruncXIso (ComplexShape.embeddingUpIntGE p) h =
+      stupidTruncGEXIso K p i (by
+        change p + (k : ℤ) = i at h
+        omega) := by
+  exact HomologicalComplex.stupidTruncXIso_eq_stupidTruncGEXIso K p i k h
+
+@[reassoc (attr := simp)]
+lemma stupidTruncGEXIso_inv_hom_f (p i j : ℤ) (hi hi' : p ≤ i) :
+    (stupidTruncGEXIso K p i hi).inv.f j ≫
+      (stupidTruncGEXIso K p i hi').hom.f j = 𝟙 _ := by
+  have : hi = hi' := Subsingleton.elim _ _
+  subst this
+  rw [← HomologicalComplex.comp_f,
+    (stupidTruncGEXIso K p i hi).inv_hom_id,
+    HomologicalComplex.id_f]
+
+@[reassoc (attr := simp)]
+lemma stupidTruncGEXIso_hom_inv_f (p i j : ℤ) (hi hi' : p ≤ i) :
+    (stupidTruncGEXIso K p i hi).hom.f j ≫
+      (stupidTruncGEXIso K p i hi').inv.f j = 𝟙 _ := by
+  have : hi = hi' := Subsingleton.elim _ _
+  subst this
+  rw [← HomologicalComplex.comp_f,
+    (stupidTruncGEXIso K p i hi).hom_inv_id,
+    HomologicalComplex.id_f]
+
+end HomologicalComplex₂
