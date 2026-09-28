@@ -1842,7 +1842,7 @@ def _rule_prime_spectrum_covers_top(
 
 SF8_COMPONENT_OWNER = f"{LIBRARY}.Algebra.Homology.Embedding.StupidTruncGE"
 SF8_COMPONENT_CONSUMER = (
-    f"{LIBRARY}.Algebra.Homology.SpectralSequence.FilteredTotalComplexAdjacent"
+    f"{LIBRARY}.Algebra.Homology.SpectralSequence.FilteredTotalComplexAdjacentCore"
 )
 SF8_COMPONENT_GENERIC = {
     "stupidTruncGEXIso",
@@ -1901,6 +1901,78 @@ def _rule_sf8_component(modules: Modules, closure: Closure) -> tuple[list[str], 
         "the generic retained-component comparison and its bicomplex "
         "specialization live at the Embedding owner upstream of adjacent totals"
     )
+
+
+SF8_ADJACENT_CORE = (
+    f"{LIBRARY}.Algebra.Homology.SpectralSequence.FilteredTotalComplexAdjacentCore"
+)
+SF8_ADJACENT_PAGE = (
+    f"{LIBRARY}.Algebra.Homology.SpectralSequence.FilteredTotalComplexAdjacent"
+)
+SF8_FINITE_STRIP = f"{LIBRARY}.Algebra.Homology.SpectralSequence.FiniteStripTotal"
+SF8_ADJACENT_DECLARATIONS = {
+    "truncatedBicomplex",
+    "singleColumnBicomplex",
+    "adjacentColumnInclusion",
+    "adjacentColumnProjection",
+    "adjacentColumnBicomplexShortComplex",
+    "adjacentColumnTotalShortComplex",
+    "adjacentColumnTotalShortComplexMap",
+    "adjacentColumnTotalShortExact",
+}
+
+
+def _rule_sf8_finite_strip(modules: Modules, closure: Closure) -> tuple[list[str], str]:
+    """Keep the generic adjacent core upstream of page and finite-strip consumers."""
+    failures: list[str] = []
+    for name in (SF8_ADJACENT_CORE, SF8_ADJACENT_PAGE, SF8_FINITE_STRIP):
+        if name not in modules:
+            failures.append(f"missing SF8 finite-strip module {name}")
+    if SF8_ADJACENT_CORE in modules:
+        core_path, core_imports, _ = modules[SF8_ADJACENT_CORE]
+        missing = SF8_ADJACENT_DECLARATIONS - declared_names(
+            core_path.read_text(encoding="utf-8")
+        )
+        if missing:
+            failures.append(f"{SF8_ADJACENT_CORE}: missing canonical API {sorted(missing)}")
+        for forbidden in (
+            SF8_ADJACENT_PAGE,
+            SF8_FINITE_STRIP,
+            f"{LIBRARY}.Algebra.Homology.SpectralSequence.FilteredTotalComplex",
+            f"{LIBRARY}.Algebra.Homology.SpectralSequence.FilteredComplexSpectralObject",
+            f"{LIBRARY}.Algebra.Homology.SpectralSequence.TotalQuasiIso",
+        ):
+            if forbidden in closure.of(SF8_ADJACENT_CORE):
+                failures.append(f"{SF8_ADJACENT_CORE}: reaches downstream {forbidden}")
+        if any(dep.startswith(f"{LIBRARY}.AlgebraicGeometry.") for dep in closure.of(SF8_ADJACENT_CORE)):
+            failures.append(f"{SF8_ADJACENT_CORE}: reaches geometry")
+        for forbidden in (
+            "Mathlib.Algebra.Homology.SpectralObject.FirstPage",
+            "Mathlib.Algebra.Homology.HomologySequenceLemmas",
+        ):
+            if forbidden in core_imports:
+                failures.append(f"{SF8_ADJACENT_CORE}: directly imports {forbidden}")
+    for consumer in (SF8_ADJACENT_PAGE, SF8_FINITE_STRIP):
+        if consumer in modules:
+            path, direct_imports, _ = modules[consumer]
+            if SF8_ADJACENT_CORE not in direct_imports:
+                failures.append(f"{consumer}: must import the adjacent core directly")
+            duplicated = SF8_ADJACENT_DECLARATIONS & declared_names(
+                path.read_text(encoding="utf-8")
+            )
+            if duplicated:
+                failures.append(f"{consumer}: duplicates adjacent API {sorted(duplicated)}")
+    if SF8_FINITE_STRIP in modules:
+        strip_path, strip_imports, _ = modules[SF8_FINITE_STRIP]
+        if "finiteStrip_totalMap_quasiIso" not in declared_names(
+            strip_path.read_text(encoding="utf-8")
+        ):
+            failures.append(f"{SF8_FINITE_STRIP}: missing finite-strip theorem")
+        if f"{LIBRARY}.Algebra.Homology.SpectralSequence.TotalQuasiIso" in closure.of(SF8_FINITE_STRIP):
+            failures.append(f"{SF8_FINITE_STRIP}: reaches specialized total comparison")
+        if "Mathlib.Algebra.Homology.HomologySequenceLemmas" in strip_imports:
+            failures.append(f"{SF8_FINITE_STRIP}: imports generic homology-sequence lemmas")
+    return failures, "the generic adjacent core and triangle proof feed finite strips without spectral-page or specialized-total dependencies"
 
 
 SF8_TAIL_OWNER = SF8_COMPONENT_OWNER
@@ -1994,6 +2066,7 @@ MILESTONE_RULES: dict[str, MilestoneRule] = {
     "MO1.13": _rule_mo1_13,
     "PRIME-SPECTRUM-COVERS-TOP": _rule_prime_spectrum_covers_top,
     "SF8.5-component": _rule_sf8_component,
+    "SF8.5-finite-strip": _rule_sf8_finite_strip,
     "SF8.5-tail": _rule_sf8_tail,
 }
 

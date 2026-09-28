@@ -2552,13 +2552,27 @@ or exactness was strengthened by relocation.
   Mathlib's `HomologicalComplex.stupidTruncXIso` at the retained integer degree;
   the bicomplex presentation is its definitional specialization, with its
   existing fully qualified names and simp/reassociation behavior preserved.
-  The owner imports no spectral or geometric consumer, and the adjacent
-  construction imports the owner directly. This is a direct Mathlib API
-  extension (Tier 1); the import graph and the specialization map are separate
-  facts. The neutral adjacent short exact construction, finite-strip total
-  quasi-isomorphism, unbounded total comparison, K-flatness and arbitrary
-  derived pullback remain SF8 proof obligations, not consequences of these
-  source moves.
+  The owner imports no spectral or geometric consumer, and the adjacent core
+  imports the owner directly. This is a direct Mathlib API extension (Tier 1);
+  the import graph and the specialization map are separate facts.
+- The SF8 #554 adjacent-core cutover puts the truncation, single-column and
+  adjacent-short-complex declarations at
+  `SpectralSequence/FilteredTotalComplexAdjacentCore.lean`, retaining their
+  fully qualified names. The adjacent construction is now available in a
+  preadditive category with a zero object, with explicit tail-total existence;
+  adjacent exactness requires an abelian category. Its natural map is canonical
+  there. The core imports the Embedding owner and `SingleZeroTotal`, and reaches
+  no filtered spectral page, specialized total comparison or geometry.
+  `FilteredTotalComplexAdjacent.lean` imports it for the abelian-group
+  mapping-cone and first-page results; `TotalQuasiIso.lean` imports it for its
+  specialized first-quadrant theorem. Both use the same `stupidTruncGEMap` and
+  `total.map`, without a second carrier. The downstream
+  `FiniteStripTotal.lean` uses derived short-exact triangles to prove an actual
+  total-map quasi-isomorphism for columnwise quasi-isomorphisms supported on a
+  finite horizontal interval in any abelian category. Finite diagonal support
+  constructs its total objects. The original free-Yoneda bicomplex is
+  horizontally unbounded: its total comparison, K-flatness and arbitrary
+  derived pullback remain SF8 obligations.
 
 ## Confirmed next lanes
 

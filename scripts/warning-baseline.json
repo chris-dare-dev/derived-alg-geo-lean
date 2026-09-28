@@ -15,16 +15,6 @@
   1
  ],
  [
-  "DerivedAlgGeo/Algebra/Homology/SpectralSequence/FilteredTotalComplexAdjacent.lean",
-  "Definition `adjacentColumnTotalShortExact` is a proposition; use `theorem` instead of `def`",
-  1
- ],
- [
-  "DerivedAlgGeo/Algebra/Homology/SpectralSequence/FilteredTotalComplexAdjacent.lean",
-  "This simp argument is unused:",
-  4
- ],
- [
   "DerivedAlgGeo/Algebra/Homology/Subcomplex.lean",
   "Variable name `i` is not explicitly referenced.",
   1

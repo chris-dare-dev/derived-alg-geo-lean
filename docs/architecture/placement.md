@@ -48,6 +48,13 @@ and future upstream work; matching directories is not required to import Mathlib
 
 If two rows seem to apply, identify the API actually being extended, rather
 than choosing the weakest type appearing in the statement.
+Within the total-complex row, `FilteredTotalComplexAdjacentCore.lean` owns the
+generic adjacent-column short exact sequence and its natural map.
+`FiniteStripTotal.lean` consumes that core to prove the finite horizontal-strip
+comparison for the actual `HomologicalComplex₂.total.map`. The spectral-page
+and first-page files consume the core downstream; they do not define a second
+adjacent sequence. The retained truncation-component iso used by the core is
+owned separately by `Embedding/StupidTruncGE.lean`.
 `PrimeSpectrum.basicOpen_prod_eq_pi` is stated
 in the lattice of opens of a prime spectrum, but `PrimeSpectrum.basicOpen` is defined in
 `RingTheory/Spectrum/Prime/Topology.lean`, so it lives there and not in
