@@ -9,9 +9,10 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Restriction.OpenImmersion
 /-!
 # Affine-comparison bridges retained after the gluing proof moved upstream
 
-Mathlib v4.32 contains the full quasi-coherent affine comparison as
-`Scheme.Modules.isIso_fromTildeΓ_of_isQuasicoherent`. Before that theorem was upstream,
-this file proved it by the Hartshorne II.5.1 finite-basic-open gluing argument.
+Mathlib v4.32.1 contains the full quasi-coherent affine comparison as
+`AlgebraicGeometry.Scheme.Modules.isIso_fromTildeΓ_of_isQuasicoherent`, with its finite-cover
+presentation argument in `AlgebraicGeometry/Modules/Tilde.lean`. This file retains local bridges
+and does not reprove that comparison.
 
 Only two local bridges remain:
 
