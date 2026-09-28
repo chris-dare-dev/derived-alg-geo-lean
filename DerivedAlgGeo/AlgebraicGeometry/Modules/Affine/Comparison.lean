@@ -11,8 +11,8 @@ import DerivedAlgGeo.Topology.Sheaves.Basis
 
 For a commutative ring `R`, the affine comparison identifies a quasi-coherent sheaf on `Spec R`
 with the sheaf associated to its global sections. This is Stacks
-[01IA](https://stacks.math.columbia.edu/tag/01IA) and Hartshorne II.5.1. The pinned Mathlib
-v4.32.1 supplies the quasi-coherent case as
+[01IA](https://stacks.math.columbia.edu/tag/01IA). The pinned Mathlib v4.32.1 supplies the
+quasi-coherent case as
 `AlgebraicGeometry.Scheme.Modules.isIso_fromTildeΓ_of_isQuasicoherent` in
 `Mathlib/AlgebraicGeometry/Modules/Tilde.lean`.
 
@@ -31,8 +31,9 @@ The latter is a definitional restatement of the upstream criterion, not a second
 
 * `AlgebraicGeometry.isIso_fromTildeΓ_app_basicOpen` — the component of the counit at `D(f)`
   is an isomorphism under the hypothesis that restriction is a localisation at the powers of `f`.
-* `AlgebraicGeometry.isIso_fromTildeΓ_of_isLocalizedModule` — a local-map formulation of the
-  forward direction of the upstream criterion.
+* `AlgebraicGeometry.isIso_fromTildeΓ_of_isLocalizedModule` — the implication from localization
+  of every basic-open restriction to invertibility of the counit (the right-to-left direction of
+  the upstream criterion).
 * `AlgebraicGeometry.Scheme.Modules.isLocalizedModule_basicOpenRestriction_tilde` — the base
   case, `M = N^~`, where that hypothesis holds. It is both the starting point of the general
   argument and the check that the hypothesis is satisfiable rather than vacuous.
