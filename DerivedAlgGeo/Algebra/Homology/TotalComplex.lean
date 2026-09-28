@@ -57,7 +57,7 @@ assume the literal total already exists.
 * `HomologicalComplex₂.totalColumnConeIso` compares that literal total with
   the mapping cone of the literal total map, using a horizontal-degree sign
   on the source branch.
-* `HomologicalComplex₂.quasiIso_totalMap_of_four_diagonal_bounds` upgrades a
+* `HomologicalComplex₂.quasiIso_totalMap_of_four_diagonal_bounds_of_column_quasiIso` upgrades a
   columnwise quasi-isomorphism to a quasi-isomorphism of literal totals when
   source and target each have lower and upper finite-support bounds in every
   total degree.
@@ -1436,8 +1436,10 @@ end HomologicalComplex₂
 open ComplexShape
 
 namespace HomologicalComplex₂
-variable {C : Type*} [Category* C] [Abelian C]
+section Support
+variable {C : Type*} [Category* C] [Preadditive C]
   {K L : HomologicalComplex₂ C (up ℤ) (up ℤ)} (f : K ⟶ L)
+  [∀ p q : ℤ, HasBinaryBiproduct ((K.X p).X (q + 1)) ((L.X p).X q)]
 
 private noncomputable def columnConeColumnIso (p : ℤ) :
     (HomologicalComplex₂.columnCone f).X p ≅
@@ -1445,31 +1447,19 @@ private noncomputable def columnConeColumnIso (p : ℤ) :
   let H := HomologicalComplex.eval C (up ℤ) p
   letI : H.Additive := ⟨by intro X Y g h; rfl⟩
   letI : HomologicalComplex.HasHomotopyCofiber
-      ((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).map f) := inferInstance
+      ((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).map f) :=
+    hasHomotopyCofiber_flip_map f
   letI : HomologicalComplex.HasHomotopyCofiber (f.f p) := inferInstance
+  letI : HomologicalComplex.HasHomotopyCofiber
+      ((H.mapHomologicalComplex (up ℤ)).map
+        ((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).map f)) := by
+    change HomologicalComplex.HasHomotopyCofiber (f.f p)
+    infer_instance
   change ((H.mapHomologicalComplex (up ℤ)).obj
     (CochainComplex.mappingCone ((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).map f))) ≅
       CochainComplex.mappingCone ((H.mapHomologicalComplex (up ℤ)).map
         ((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).map f))
   exact CochainComplex.mappingCone.mapHomologicalComplexIso _ H
-
-
-private lemma quasiIso_iff_acyclic_mappingCone {A : Type*} [Category* A] [Abelian A]
-    {M N : CochainComplex A ℤ} (g : M ⟶ N) :
-    QuasiIso g ↔ (CochainComplex.mappingCone g).Acyclic := by
-  rw [← HomologicalComplex.mem_quasiIso_iff,
-    ← HomotopyCategory.quotient_map_mem_quasiIso_iff,
-    HomotopyCategory.quasiIso_eq_trW_subcategoryAcyclic]
-  exact ((HomotopyCategory.subcategoryAcyclic A).trW_iff_of_distinguished
-    (CochainComplex.mappingCone.triangleh g)
-    (HomotopyCategory.mappingCone_triangleh_distinguished g)).trans
-      (HomotopyCategory.quotient_obj_mem_subcategoryAcyclic_iff_acyclic _)
-
-private lemma exactAt_columnCone (hcol : ∀ p : ℤ, QuasiIso (f.f p))
-    (p q : ℤ) : ((HomologicalComplex₂.columnCone f).X p).ExactAt q := by
-  have hA : (CochainComplex.mappingCone (f.f p)).Acyclic :=
-    (quasiIso_iff_acyclic_mappingCone (f.f p)).1 (hcol p)
-  exact (hA q).of_iso (columnConeColumnIso f p).symm
 
 
 private lemma cone_lower_support
@@ -1503,13 +1493,38 @@ private lemma cone_upper_support
   exact hc.of_iso ((HomologicalComplex.eval C (up ℤ) q).mapIso (columnConeColumnIso f p))
 
 
+end Support
+
+section QuasiIso
+variable {C : Type*} [Category* C] [Abelian C]
+  {K L : HomologicalComplex₂ C (up ℤ) (up ℤ)} (f : K ⟶ L)
+
+private lemma quasiIso_iff_acyclic_mappingCone {A : Type*} [Category* A] [Abelian A]
+    {M N : CochainComplex A ℤ} (g : M ⟶ N) :
+    QuasiIso g ↔ (CochainComplex.mappingCone g).Acyclic := by
+  rw [← HomologicalComplex.mem_quasiIso_iff,
+    ← HomotopyCategory.quotient_map_mem_quasiIso_iff,
+    HomotopyCategory.quasiIso_eq_trW_subcategoryAcyclic]
+  exact ((HomotopyCategory.subcategoryAcyclic A).trW_iff_of_distinguished
+    (CochainComplex.mappingCone.triangleh g)
+    (HomotopyCategory.mappingCone_triangleh_distinguished g)).trans
+      (HomotopyCategory.quotient_obj_mem_subcategoryAcyclic_iff_acyclic _)
+
+private lemma exactAt_columnCone (hcol : ∀ p : ℤ, QuasiIso (f.f p))
+    (p q : ℤ) : ((HomologicalComplex₂.columnCone f).X p).ExactAt q := by
+  have hA : (CochainComplex.mappingCone (f.f p)).Acyclic :=
+    (quasiIso_iff_acyclic_mappingCone (f.f p)).1 (hcol p)
+  exact (hA q).of_iso (columnConeColumnIso f p).symm
+
+
 variable [K.HasTotal (up ℤ)] [L.HasTotal (up ℤ)]
 
-/-- A columnwise quasi-isomorphism induces a quasi-isomorphism of literal
-integer-indexed direct-sum totals when source and target have separately
-specified finite horizontal support on every total-degree diagonal. The
-four bounds may depend on the total degree and need not agree. -/
-theorem quasiIso_totalMap_of_four_diagonal_bounds
+/-- A columnwise quasi-isomorphism induces a quasi-isomorphism of literal totals
+under finite diagonal support. The proof applies total acyclicity to the column
+cone: its degree `n` support combines source bounds at `n + 1` with target bounds
+at `n`, then uses `HomologicalComplex₂.totalColumnConeIso`. These are bounds on
+the terms themselves; bounds on cohomology alone do not provide this support. -/
+theorem quasiIso_totalMap_of_four_diagonal_bounds_of_column_quasiIso
     (aK bK aL bL : ℤ → ℤ)
     (hKLower : ∀ n p q : ℤ, p + q = n → p < aK n → IsZero ((K.X p).X q))
     (hKUpper : ∀ n p q : ℤ, p + q = n → bK n < p → IsZero ((K.X p).X q))
@@ -1543,5 +1558,7 @@ theorem quasiIso_totalMap_of_four_diagonal_bounds
     exact (hA n).of_iso (HomologicalComplex₂.totalColumnConeIso f)
   exact (quasiIso_iff_acyclic_mappingCone
     (HomologicalComplex₂.total.map f (up ℤ))).2 hCone
+
+end QuasiIso
 
 end HomologicalComplex₂
