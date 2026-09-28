@@ -28,7 +28,7 @@ goal:
 generated_by: { agent: claude, at: "2026-09-27" }
 generations:
   - { rev: 1, at: "2026-09-27", note: "Created with the filing of the stacks-and-moduli plan: one milestone entry per new milestone and one milestone-direct task per filed issue; blocked_by mirrors the native blocked-by links set at filing." }
-  - { rev: 2, at: "2026-09-27", note: "SF9.5-SF9.8 (#1757, #1758, #1774, #1759) were filed without a milestone. Milestone #30 is roadmap-owned by stability-families.yaml, so they join it, and that roadmap, in the same change as the SF9 re-scope (#516, #522, #524, #525) that MO2.6 carries; until then they are listed nowhere, which RM-06 permits for milestone-less issues." }
+  - { rev: 2, at: "2026-09-28", note: "SF9.5-SF9.8 (#1757, #1758, #1774, #1759), filed on 2026-09-27 without a milestone, join milestone #30 with the SF9 re-scope and are listed below as milestone-direct tasks of stability-families-m9 (a cross-file parent: check_roadmap.py merges entries across files)." }
 items:
 
   # ============ MO2 ============
@@ -1756,6 +1756,55 @@ items:
     summary: "This issue proves Artin's criterion for algebraic stacks (Stacks Lemma 98.17.1, Tag 07Y4) and applies it to Lieblich's stack M_pug(X/S), for X ⟶ S projective, flat and of finite presentation over a Noetherian S. The result is Stacks Theorem 99.16.12 (Tag 0DLN) in its projective case."
     labels: [area:moduli, area:algebraic-geometry, type:feature, source:1902.08184v4]
     blocked_by: [1752, 1753, 1754, 1755, 1684, 1651, 1636, 1645, 1736, 1738, 1740, 1675]
+
+  # ------------ SF9 tasks (milestone #30, parent stability-families-m9) ------------
+  - id: stacks-and-moduli-sf9-5
+    gh_issue: 1757
+    kind: task
+    parent: stability-families-m9
+    title: "SF9.5: M_pug(𝒟/S) for a semiorthogonal component is cut out of M_pug(X/S) by an open property (BLMNPS Def 9.1, Prop 9.2, Lemma 9.3)"
+    status: planned
+    priority: must
+    size: M
+    summary: "BLMNPS §9.1. For an S-linear strong semiorthogonal component 𝒟 ⊂ Dᵇ(X), the moduli functor M_pug(𝒟/S) of universally gluable T-perfect objects whose fibres lie in 𝒟_t (Def 9.1) is cut out of Lieblich's M_pug(X/S) (#1735's Mpug X) by an open object property (Prop 9.2), so it is an open substack once Mpug X is an algebraic stack. The key input is Lemma 9.3: 1. a T-perfect E lies in 𝒟_T iff every fibre E_t lies in 𝒟_t; 2. the set {t | E_t ∈ 𝒟_t} is open."
+    labels: [area:moduli, area:derived, type:feature, source:1902.08184v4]
+    blocked_by: [1634, 1687, 1735, 1740, 1060, 554]
+
+  - id: stacks-and-moduli-sf9-6
+    gh_issue: 1758
+    kind: task
+    parent: stability-families-m9
+    title: "SF9.6: Extensions of bounded families are bounded (BLMNPS Lemma 9.6, with Lemma 8.9's first part)"
+    status: planned
+    priority: must
+    size: M
+    summary: "BLMNPS Lemma 9.6. Let S be Noetherian, M ⊂ M_pug(𝒟/S) an open substack, and M₁, M₂ bounded subfunctors (Def 9.4). If every E ∈ M(κ(s̄)) at every geometric point sits in a triangle E₁ → E → E₂ with Eᵢ ∈ Mᵢ(κ(s̄)), then M is bounded."
+    labels: [area:moduli, area:derived, type:feature, source:1902.08184v4]
+    blocked_by: [1692, 1737, 1735, 1733, 1740, 1757, 1687]
+
+  - id: stacks-and-moduli-sf9-8
+    gh_issue: 1759
+    kind: task
+    parent: stability-families-m9
+    title: "SF9.8: Research: the route to Θ-reductivity and S-completeness of M_σ(v, φ) (gap F3)"
+    status: planned
+    priority: should
+    size: M
+    summary: "A written verdict on how the repository proves BLMNPS gap F3: for a stability condition σ on 𝒟 over S, M_σ(v, φ) → S is Θ-reductive and S-complete with respect to DVRs essentially of finite type over S. The verdict comes with the specifications of the implementation issues."
+    labels: [research, type:spike, area:moduli, area:stability, source:1902.08184v4, source:2501.00710, ready]
+    blocked_by: []
+
+  - id: stacks-and-moduli-sf9-7
+    gh_issue: 1774
+    kind: task
+    parent: stability-families-m9
+    title: "SF9.7: M_σ(v, φ) → S satisfies the strong existence part of the valuative criterion (BLMNPS Lemma 21.22)"
+    status: planned
+    priority: must
+    size: M
+    summary: "BLMNPS Lemma 21.22 (quasi-properness). Let σ be a stability condition on 𝒟 over S, or more generally a flat family of fibrewise stability conditions with HN structures after Dedekind base change. Then for every v ∈ Λ and φ ∈ ℝ, the morphism M_σ(v, φ) → S satisfies the strong existence part of the valuative criterion (Def 11.8) for every DVR Spec R → S essentially of finite type (Def 11.16)."
+    labels: [area:moduli, area:stability, type:feature, source:1902.08184v4, source:2607.28411]
+    blocked_by: [522, 1771, 1772, 1773, 1763, 1767, 1693, 1697, 1740, 1066]
 
   # ------------ SF13 tasks ------------
   - id: stacks-and-moduli-sf13-0a
