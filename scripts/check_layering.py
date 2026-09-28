@@ -1910,13 +1910,27 @@ SF8_ADJACENT_PAGE = (
     f"{LIBRARY}.Algebra.Homology.SpectralSequence.FilteredTotalComplexAdjacent"
 )
 SF8_FINITE_STRIP = f"{LIBRARY}.Algebra.Homology.SpectralSequence.FiniteStripTotal"
+SF8_SPECIALIZED_TOTAL = f"{LIBRARY}.Algebra.Homology.SpectralSequence.TotalQuasiIso"
 SF8_ADJACENT_DECLARATIONS = {
     "truncatedBicomplex",
     "singleColumnBicomplex",
+    "singleColumnXIso",
+    "singleColumnXIso_hom_inv_f",
+    "singleColumnXIso_inv_hom_f",
     "adjacentColumnInclusion",
     "adjacentColumnProjection",
     "adjacentColumnBicomplexShortComplex",
+    "truncatedBicomplexMap",
+    "singleColumnBicomplexMap",
+    "singleColumnShiftIso",
+    "singleColumnHasTotal",
+    "singleColumnTotalIso",
     "adjacentColumnTotalShortComplex",
+    "adjacentColumnTotalRetraction",
+    "adjacentColumnTotalSection",
+    "adjacentColumnTotalDegreewiseSplitting",
+    "singleColumnShiftIso_naturality",
+    "singleColumnTotalIso_naturality",
     "adjacentColumnTotalShortComplexMap",
     "adjacentColumnTotalShortExact",
 }
@@ -1925,7 +1939,8 @@ SF8_ADJACENT_DECLARATIONS = {
 def _rule_sf8_finite_strip(modules: Modules, closure: Closure) -> tuple[list[str], str]:
     """Keep the generic adjacent core upstream of page and finite-strip consumers."""
     failures: list[str] = []
-    for name in (SF8_ADJACENT_CORE, SF8_ADJACENT_PAGE, SF8_FINITE_STRIP):
+    for name in (SF8_ADJACENT_CORE, SF8_ADJACENT_PAGE, SF8_FINITE_STRIP,
+                 SF8_SPECIALIZED_TOTAL):
         if name not in modules:
             failures.append(f"missing SF8 finite-strip module {name}")
     if SF8_ADJACENT_CORE in modules:
@@ -1940,7 +1955,7 @@ def _rule_sf8_finite_strip(modules: Modules, closure: Closure) -> tuple[list[str
             SF8_FINITE_STRIP,
             f"{LIBRARY}.Algebra.Homology.SpectralSequence.FilteredTotalComplex",
             f"{LIBRARY}.Algebra.Homology.SpectralSequence.FilteredComplexSpectralObject",
-            f"{LIBRARY}.Algebra.Homology.SpectralSequence.TotalQuasiIso",
+            SF8_SPECIALIZED_TOTAL,
         ):
             if forbidden in closure.of(SF8_ADJACENT_CORE):
                 failures.append(f"{SF8_ADJACENT_CORE}: reaches downstream {forbidden}")
@@ -1952,7 +1967,7 @@ def _rule_sf8_finite_strip(modules: Modules, closure: Closure) -> tuple[list[str
         ):
             if forbidden in core_imports:
                 failures.append(f"{SF8_ADJACENT_CORE}: directly imports {forbidden}")
-    for consumer in (SF8_ADJACENT_PAGE, SF8_FINITE_STRIP):
+    for consumer in (SF8_ADJACENT_PAGE, SF8_FINITE_STRIP, SF8_SPECIALIZED_TOTAL):
         if consumer in modules:
             path, direct_imports, _ = modules[consumer]
             if SF8_ADJACENT_CORE not in direct_imports:
@@ -1968,7 +1983,7 @@ def _rule_sf8_finite_strip(modules: Modules, closure: Closure) -> tuple[list[str
             strip_path.read_text(encoding="utf-8")
         ):
             failures.append(f"{SF8_FINITE_STRIP}: missing finite-strip theorem")
-        if f"{LIBRARY}.Algebra.Homology.SpectralSequence.TotalQuasiIso" in closure.of(SF8_FINITE_STRIP):
+        if SF8_SPECIALIZED_TOTAL in closure.of(SF8_FINITE_STRIP):
             failures.append(f"{SF8_FINITE_STRIP}: reaches specialized total comparison")
         if "Mathlib.Algebra.Homology.HomologySequenceLemmas" in strip_imports:
             failures.append(f"{SF8_FINITE_STRIP}: imports generic homology-sequence lemmas")
