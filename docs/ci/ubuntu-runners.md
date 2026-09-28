@@ -67,9 +67,19 @@ A read-only rescan on 2026-09-28 found 246 registered worktrees, 223 existing
 paths, and 107 `.lake/packages` links resolving to four shared targets. These
 are existing user worktrees; neither the runner installation nor the new
 worktree seeder deletes or rewrites them. On an idle migration, preserve the
-old worktree, create a new worktree at its commit, and run
-`bash scripts/seed_worktree_cache.sh --dry-run` followed by
-`bash scripts/seed_worktree_cache.sh` in the new one. The default seeder now
+old worktree, create a new worktree at its commit, and invoke the private-cache
+helper from an updated checkout containing this change, with the new worktree
+as its explicit `--target`:
+
+```bash
+SAFE_ROOT=/absolute/path/to/updated/derived-alg-geo-lean
+NEW=/absolute/path/to/new-worktree
+python3 "$SAFE_ROOT/scripts/private_package_cache.py" --target "$NEW" --dry-run
+python3 "$SAFE_ROOT/scripts/private_package_cache.py" --target "$NEW"
+```
+
+Do not run the seeder script *inside* a worktree at an older commit: that
+commit may still contain the link-producing implementation. The current helper
 requires private package/build caches and verifies their receipt. Compare the
 new source and Git index with the old worktree, carry any uncommitted and
 untracked work deliberately, and move the pickup path only after verification.

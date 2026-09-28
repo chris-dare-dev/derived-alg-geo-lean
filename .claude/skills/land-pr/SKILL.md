@@ -125,9 +125,12 @@ Two things to check before working in someone else's worktree:
 - **Its `.lake/packages` may be a symlink to another writable worktree**, or
   a dangling link if that donor was removed. Check with `ls -la .lake`. Do not
   repoint the link or run Lean through shared writable packages. Preserve this
-  checkout and cache, then create a fresh worktree at the intended commit and
-  run `bash scripts/seed_worktree_cache.sh --dry-run` followed by
-  `bash scripts/seed_worktree_cache.sh` there. The seeder verifies pins,
+  checkout and cache, then create a fresh worktree at the intended commit.
+  Invoke `python3 <updated-checkout>/scripts/private_package_cache.py
+  --target <fresh-worktree> --dry-run`, then the same command without
+  `--dry-run`; `<updated-checkout>` must contain the private-cache helper from
+  this change or later. Do not run a seeder script from the old commit: it may
+  still create shared package links. The current helper verifies pins,
   installs private packages/build output, and refuses an existing unreceipted
   `.lake`. Carry any source, index and untracked work deliberately before
   switching to the new path. This procedure does not delete or rewrite the
