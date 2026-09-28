@@ -18,6 +18,7 @@ and future upstream work; matching directories is not required to import Mathlib
 | --- | --- | --- |
 | `DerivedCategory C`, `Ext`, K-projectives, its t-structure, `Bounded` | `Algebra/Homology/DerivedCategory/` | `Algebra/Homology/DerivedCategory/` |
 | `HomotopyCategory`, `HomComplex`, bounded and plus variants | `Algebra/Homology/HomotopyCategory/` | `Algebra/Homology/HomotopyCategory/` |
+| `HomologicalComplex.stupidTrunc` inclusions between integer degree-at-least truncations | `Algebra/Homology/Embedding/StupidTrunc.lean` | `Algebra/Homology/Embedding/StupidTruncGE.lean` |
 | Spectral sequences and total complexes | `Algebra/Homology/SpectralSequence/` | `Algebra/Homology/SpectralSequence/` |
 | `SheafOfModules` and `PresheafOfModules` | `Algebra/Category/ModuleCat/{Sheaf,Presheaf}/` | `Algebra/Category/ModuleCat/{Sheaf,Presheaf}/` |
 | `ModuleCat`, `Grp` | `Algebra/Category/{ModuleCat,Grp}/` | `Algebra/Category/{ModuleCat,Grp}/` |
