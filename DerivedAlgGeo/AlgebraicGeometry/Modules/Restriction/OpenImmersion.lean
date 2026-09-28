@@ -415,7 +415,7 @@ noncomputable def restrictQuasicoherentData (M : Y.Modules)
       (f.restrictOverIso M (q.X i)).hom
 
 -- The mapped index witnesses require the same expensive iterated-slice identifications as the
--- data itself on Mathlib v4.32.
+-- data itself on Mathlib v4.32.1.
 set_option maxHeartbeats 1600000 in
 set_option synthInstance.maxHeartbeats 400000 in
 /-- Transporting finite local presentation data from the range slice to the source preserves
