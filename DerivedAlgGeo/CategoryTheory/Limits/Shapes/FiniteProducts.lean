@@ -8,8 +8,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.ZeroMorphisms
 /-!
 # Coproducts of finitely supported families
 
-A family of objects with only finitely many nonzero members has a coproduct when the category
-has finite coproducts. The colimit cocone uses the finite subfamily's coproduct and zero maps
+A family of objects with only finitely many nonzero members has a coproduct when its finite
+subfamily has a coproduct. The colimit cocone uses that subfamily's coproduct and zero maps
 from objects outside its support.
 
 ## Main result
@@ -20,12 +20,12 @@ from objects outside its support.
 ## Implementation notes
 
 The finite subfamily supplies the apex. Its coproduct inclusions are extended by zero
-maps outside the support, where the zero-object premise proves the colimit property.
+maps outside the support, where `IsZero` makes every cocone leg unique.
 An empty support is allowed.
 
 ## References
 
-This extends Mathlib's `CategoryTheory.Limits.HasFiniteCoproducts` and
+This extends Mathlib's `CategoryTheory.Limits.HasCoproduct` and
 `CategoryTheory.Limits.Cofan` APIs for a finitely supported family.
 -/
 
@@ -60,10 +60,11 @@ private noncomputable def finiteSupportCofanIsColimit {I : Type w} (X : I → C)
     rw [Sigma.ι_desc]
     simpa [finiteSupportCofan, i.property] using hm i
 
-/-- Finite coproducts suffice to form the coproduct of a family whose objects outside a
-specified finite support are zero. The support may be empty. -/
-theorem hasCoproduct_of_finite_support [HasFiniteCoproducts C]
-    {I : Type w} (X : I → C) (s : Finset I)
+/-- Extend the coproduct cocone of a finite subfamily by zero maps on all other indices.
+The `IsZero` hypothesis makes those other cocone legs unique, so the extended cocone is
+colimiting, even when the finite support is empty. -/
+theorem hasCoproduct_of_finite_support
+    {I : Type w} (X : I → C) (s : Finset I) [HasCoproduct (fun i : s => X i)]
     (hzero : ∀ i, i ∉ s → IsZero (X i)) : HasCoproduct X :=
   ⟨⟨finiteSupportCofan X s, finiteSupportCofanIsColimit X s hzero⟩⟩
 

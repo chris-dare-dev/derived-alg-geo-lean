@@ -18,13 +18,13 @@ spectral sequence with vertical column homology.
 
 ## Main definitions and results
 
-* `adjacentColumnConeToShift` compares the adjacent-tail mapping cone with the
+* `HomologicalComplex₂.adjacentColumnConeToShift` compares the adjacent-tail mapping cone with the
   shifted vertical column.
-* `columnFilteredAdjacentLayerConeToShift` makes that comparison for the
+* `HomologicalComplex₂.columnFilteredAdjacentLayerConeToShift` makes that comparison for the
   filtration's actual adjacent layer.
-* `columnFilteredInitialPageColumnHomologyIso` identifies the initial page
+* `HomologicalComplex₂.columnFilteredInitialPageColumnHomologyIso` identifies the initial page
   with vertical column homology.
-* `columnFilteredFirstPage_d_eq` identifies the first-page differential under
+* `HomologicalComplex₂.columnFilteredFirstPage_d_eq` identifies the first-page differential under
   those isomorphisms.
 
 ## Implementation notes

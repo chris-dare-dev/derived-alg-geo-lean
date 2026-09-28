@@ -38,23 +38,6 @@ universe u v
 
 namespace HomologicalComplex₂
 
-variable {C : Type u} [Category.{v} C] [Abelian C]
-variable {K L : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ)}
-
-/-- Naturality of the single-column total comparison identifies this literal total map,
-after the shift isomorphisms, with the shifted column map. Shifts preserve quasi-isomorphisms. -/
-private lemma singleColumnTotalMap_quasiIso_generic
-    (f : K ⟶ L) (p : ℤ) (h : QuasiIso (f.f p)) :
-    QuasiIso (total.map (singleColumnBicomplexMap f p) (ComplexShape.up ℤ)) := by
-  letI : QuasiIso (f.f p) := h
-  rw [← quasiIso_iff_comp_right _ (singleColumnTotalIso L p).hom]
-  rw [singleColumnTotalIso_naturality]
-  infer_instance
-
-end HomologicalComplex₂
-
-namespace HomologicalComplex₂
-
 variable {C : Type u} [Category.{v} C]
 
 /-- The tail beginning strictly above a supported upper bound has zero total complex.
@@ -133,7 +116,7 @@ private lemma finiteTailMap_quasiIso (f : K ⟶ L) (b : ℤ)
       (DerivedCategory.isIso_Q_map_iff_quasiIso C φ.τ₁).2 hprev
     have hq₃ : IsIso (DerivedCategory.Q.map φ.τ₃) :=
       (DerivedCategory.isIso_Q_map_iff_quasiIso C φ.τ₃).2
-        (singleColumnTotalMap_quasiIso_generic f p (hcol p (by omega)))
+        (totalMap_quasiIso_of_singleColumn f p (hcol p (by omega)))
     have hq₂ : IsIso (DerivedCategory.Q.map φ.τ₂) := by
       let ψ := DerivedCategory.triangleOfSES.map hS₁ hS₂ φ
       exact Pretriangulated.isIso₂_of_isIso₁₃ ψ

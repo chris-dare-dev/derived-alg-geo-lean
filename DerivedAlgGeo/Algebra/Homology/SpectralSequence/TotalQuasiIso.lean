@@ -12,6 +12,10 @@ import Mathlib.Algebra.Homology.QuasiIso
 /-!
 # Quasi-isomorphisms and filtered total complexes
 
+Quasi-isomorphism criteria for filtered total complexes of first-quadrant
+bicomplexes of abelian groups, together with a middle-term criterion for
+short exact sequences of cochain complexes.
+
 ## Main definitions
 
 * `HomologicalComplex₂.IsVerticallyConnective` records vanishing in negative
@@ -21,8 +25,8 @@ import Mathlib.Algebra.Homology.QuasiIso
 
 ## Main results
 
-* `HomologySequence.quasiIso_τ₂` compares the middle terms of short exact
-  cochain-complex sequences when the outer maps are quasi-isomorphisms.
+* `HomologicalComplex.HomologySequence.quasiIso_τ₂` compares the middle terms of short
+  exact cochain-complex sequences when the outer maps are quasi-isomorphisms.
 * `HomologicalComplex₂.totalMap_quasiIso` compares total complexes of
   first-quadrant bicomplexes of abelian groups under columnwise
   quasi-isomorphisms.
@@ -34,6 +38,11 @@ The first-quadrant comparison uses the canonical adjacent-column maps from
 downstream finite-strip comparison in `FiniteStripTotal` uses derived
 short-exact triangles directly; it does not depend on the specialized
 middle-term lemma here.
+
+## References
+
+This extends Mathlib's `HomologicalComplex.HomologySequence` and
+`HomologicalComplex₂.total` APIs.
 -/
 
 open CategoryTheory Category Limits
@@ -238,16 +247,6 @@ def IsHorizontallyConnective
       (ComplexShape.up ℤ) (ComplexShape.up ℤ)) : Prop :=
   ∀ p q : ℤ, p < 0 → IsZero ((K.X p).X q)
 
-/-- A quasi-isomorphism on one vertical column induces a quasi-isomorphism on its single-column
-total complex. -/
-private lemma singleColumnTotalMap_quasiIso (f : K ⟶ L) (p : ℤ)
-    (h : QuasiIso (f.f p)) :
-    QuasiIso (total.map (singleColumnBicomplexMap f p) (ComplexShape.up ℤ)) := by
-  letI : QuasiIso (f.f p) := h
-  rw [← quasiIso_iff_comp_right _ (singleColumnTotalIso L p).hom]
-  rw [singleColumnTotalIso_naturality]
-  infer_instance
-
 /-- The morphism between the mapping cones of two adjacent-column inclusions induced by a
 bicomplex morphism. -/
 private noncomputable def adjacentColumnConeMap (f : K ⟶ L) (p : ℤ) :
@@ -263,7 +262,7 @@ of the corresponding adjacent-column inclusion. -/
 private lemma adjacentColumnConeMap_quasiIso (f : K ⟶ L) (p : ℤ)
     (h : QuasiIso (f.f p)) : QuasiIso (adjacentColumnConeMap f p) := by
   have h₃ : QuasiIso (adjacentColumnTotalShortComplexMap f p).τ₃ := by
-    exact singleColumnTotalMap_quasiIso f p h
+    exact totalMap_quasiIso_of_singleColumn f p h
   letI : QuasiIso (adjacentColumnTotalShortComplexMap f p).τ₃ := h₃
   letI : QuasiIso (CochainComplex.mappingCone.descShortComplex
       (adjacentColumnTotalShortComplex L p)) :=

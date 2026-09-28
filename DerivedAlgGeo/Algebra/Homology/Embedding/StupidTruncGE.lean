@@ -114,8 +114,8 @@ noncomputable def stupidTruncGEι (K : HomologicalComplex C (ComplexShape.up ℤ
       rw [ComplexShape.notMem_range_embeddingUpIntGE_iff]
       omega
 
-/-- The inclusion of the degree-at-least tail is natural in a morphism of
-cochain complexes. -/
+/-- On retained degrees, the naturality square commutes by Mathlib's canonical
+truncation isomorphisms; below the cutoff its source is zero. -/
 @[reassoc]
 lemma stupidTruncMap_comp_stupidTruncGEι
     {K L : HomologicalComplex C (ComplexShape.up ℤ)} (f : K ⟶ L) (p : ℤ) :
@@ -132,8 +132,8 @@ lemma stupidTruncMap_comp_stupidTruncGEι
     rw [ComplexShape.notMem_range_embeddingUpIntGE_iff]
     omega
 
-/-- If all components below the cutoff vanish, the canonical inclusion of
-the degree-at-least tail is an isomorphism. -/
+/-- The inclusion is the canonical component isomorphism above the cutoff and
+the unique map between zero objects below it. -/
 lemma stupidTruncGEι_isIso_of_isZero
     (K : HomologicalComplex C (ComplexShape.up ℤ)) (p : ℤ)
     (hK : ∀ i : ℤ, i < p → IsZero (K.X i)) :

@@ -188,6 +188,7 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex₂.singleColumnShiftIso_naturality
 #print axioms HomologicalComplex₂.singleColumnShiftIso_naturality_assoc
 #print axioms HomologicalComplex₂.singleColumnTotalIso
+#print axioms HomologicalComplex₂.totalMap_quasiIso_of_singleColumn
 #print axioms HomologicalComplex₂.singleColumnTotalIso_naturality
 #print axioms HomologicalComplex₂.singleColumnTotalIso_naturality_assoc
 #print axioms HomologicalComplex₂.singleColumnXIso

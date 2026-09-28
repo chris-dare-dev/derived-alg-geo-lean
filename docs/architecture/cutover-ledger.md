@@ -2565,7 +2565,8 @@ or exactness was strengthened by relocation.
   fully qualified names. The adjacent construction is now available in a
   preadditive category with a zero object, with explicit tail-total existence;
   adjacent exactness requires an abelian category. Its natural map is canonical
-  there. The core imports the Embedding owner and `SingleZeroTotal`, and reaches
+  there, as is the generic single-column total-map quasi-isomorphism criterion.
+  The core imports the Embedding owner and `SingleZeroTotal`, and reaches
   no filtered spectral page, specialized total comparison or geometry.
   `FilteredTotalComplexAdjacent.lean` imports it for the abelian-group
   mapping-cone and first-page results; `TotalQuasiIso.lean` imports it for its

@@ -6,28 +6,35 @@ import DerivedAlgGeo.Algebra.Homology.Embedding.StupidTruncGE
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence.SingleZeroTotal
 import Mathlib.Algebra.Homology.HomotopyCategory.ShortExact
 import Mathlib.Algebra.Homology.HomotopyCategory.SingleFunctors
+import Mathlib.Algebra.Homology.QuasiIso
 import Mathlib.Algebra.Homology.TotalComplexShift
 
 /-!
 # Adjacent-column short complexes of total complexes
 
 For a cohomological bicomplex in a preadditive category with a zero object, the totals of two
-consecutive stupid column truncations form a degreewise split short complex, provided the two
-diagonal coproducts exist. Its quotient is the newly added column, whose total is canonically
-that column shifted by its horizontal degree. These constructions are natural in the bicomplex.
+consecutive stupid column truncations form a degreewise split short complex, provided diagonal
+coproducts exist in every degree for both truncated bicomplexes. Its quotient is the newly added
+column, whose total is canonically that column shifted by its horizontal degree. These
+constructions are natural in the bicomplex.
 In an abelian category the short complex is short exact. `FiniteStripTotal` consumes its
 natural map downstream, using the derived-category triangle of a short exact sequence.
 
 ## Main definitions and results
 
-* `truncatedBicomplex` and `singleColumnBicomplex` use Mathlib's stupid truncation and
+* `HomologicalComplex₂.truncatedBicomplex` and
+  `HomologicalComplex₂.singleColumnBicomplex` use Mathlib's stupid truncation and
   single-object functor to select a tail and one column.
-* `singleColumnTotalIso` identifies the signed total of one column with its shifted
-  vertical complex.
-* `adjacentColumnTotalShortComplex` and `adjacentColumnTotalDegreewiseSplitting`
-  exhibit consecutive tail totals and their one-column quotient as degreewise split.
-* `adjacentColumnTotalShortComplexMap` is the natural map of these short complexes;
-  `adjacentColumnTotalShortExact` proves exactness when the target category is abelian.
+* `HomologicalComplex₂.singleColumnTotalIso` identifies the signed total of one column
+  with its shifted vertical complex.
+* `HomologicalComplex₂.totalMap_quasiIso_of_singleColumn` transfers a quasi-isomorphism of
+  columns to the literal map between their single-column totals.
+* `HomologicalComplex₂.adjacentColumnTotalShortComplex` and
+  `HomologicalComplex₂.adjacentColumnTotalDegreewiseSplitting` exhibit consecutive tail
+  totals and their one-column quotient as degreewise split.
+* `HomologicalComplex₂.adjacentColumnTotalShortComplexMap` is the natural map of these
+  short complexes; `HomologicalComplex₂.adjacentColumnTotalShortExact` proves exactness
+  when the target category is abelian.
 
 ## Implementation notes
 
@@ -89,6 +96,8 @@ noncomputable def singleColumnXIso (p i : ℤ) (hi : i = p) :
   subst i
   exact HomologicalComplex.singleObjXSelf (ComplexShape.up ℤ) p (K.X p)
 
+/-- At the retained column, the canonical component comparison and its inverse cancel;
+this form places the forward comparison first in degreewise splitting calculations. -/
 @[reassoc (attr := simp)]
 lemma singleColumnXIso_hom_inv_f (p i j : ℤ) (hi hi' : i = p) :
     (singleColumnXIso K p i hi).hom.f j ≫
@@ -96,6 +105,8 @@ lemma singleColumnXIso_hom_inv_f (p i j : ℤ) (hi hi' : i = p) :
   subst i
   simp [singleColumnXIso, ← HomologicalComplex.comp_f]
 
+/-- At the retained column, the inverse component comparison followed by the forward
+comparison is the identity, as used in the opposite splitting composite. -/
 @[reassoc (attr := simp)]
 lemma singleColumnXIso_inv_hom_f (p i j : ℤ) (hi hi' : i = p) :
     (singleColumnXIso K p i hi).inv.f j ≫
@@ -371,7 +382,9 @@ noncomputable def adjacentColumnTotalDegreewiseSplitting (p n : ℤ)
 
 variable {K} {L : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ)}
 
-/-- The identification of a single column with a shifted degree-zero column is natural. -/
+/-- The canonical single-column shift comparison commutes with a bicomplex morphism
+because it is the inverse component of Mathlib's natural shift isomorphism for
+the single-object functor. -/
 @[reassoc]
 lemma singleColumnShiftIso_naturality (f : K ⟶ L) (p : ℤ) :
     singleColumnBicomplexMap f p ≫ (singleColumnShiftIso L p).hom =
@@ -384,8 +397,10 @@ lemma singleColumnShiftIso_naturality (f : K ⟶ L) (p : ℤ) :
 
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
-/-- The standard identification of a single-column total complex with the shifted column is
-natural. -/
+/-- The total map of a single column is conjugate to the shifted vertical map.
+This combines naturality of the single-object shift comparison, Mathlib's total/shift
+comparison, and the degree-zero-column total iso; it is the bridge used to transfer
+quasi-isomorphisms to literal total maps. -/
 @[reassoc]
 lemma singleColumnTotalIso_naturality (f : K ⟶ L) (p : ℤ) :
     total.map (singleColumnBicomplexMap f p) (ComplexShape.up ℤ) ≫
@@ -491,6 +506,20 @@ end Preadditive
 section Abelian
 
 variable {C : Type u} [Category.{v} C] [Abelian C]
+  {K L : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ)}
+
+/-- A quasi-isomorphism on a vertical column induces a quasi-isomorphism on the literal
+total map of its canonical single-column bicomplexes. The natural total comparison
+identifies that map with the shifted column map, and shifts preserve quasi-isomorphisms. -/
+lemma totalMap_quasiIso_of_singleColumn
+    (f : K ⟶ L) (p : ℤ) (h : QuasiIso (f.f p)) :
+    QuasiIso (total.map (singleColumnBicomplexMap f p) (ComplexShape.up ℤ)) := by
+  letI : QuasiIso (f.f p) := h
+  rw [← quasiIso_iff_comp_right _ (singleColumnTotalIso L p).hom]
+  rw [singleColumnTotalIso_naturality]
+  infer_instance
+
+variable
   (K : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ))
 
 /-- Adjacent column tails form a short exact sequence after totalization in an

@@ -50,7 +50,8 @@ and future upstream work; matching directories is not required to import Mathlib
 If two rows seem to apply, identify the API actually being extended, rather
 than choosing the weakest type appearing in the statement.
 Within the total-complex row, `FilteredTotalComplexAdjacentCore.lean` owns the
-generic adjacent-column short exact sequence and its natural map.
+generic adjacent-column short exact sequence, its natural map, and the
+single-column total-map quasi-isomorphism criterion.
 `FiniteStripTotal.lean` consumes that core to prove the finite horizontal-strip
 comparison for the actual `HomologicalComplex₂.total.map`. The spectral-page
 and first-page files consume the core downstream; they do not define a second
