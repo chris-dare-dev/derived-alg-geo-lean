@@ -165,6 +165,27 @@ def disk_headroom(path: Path, required: int) -> None:
         fail(f"insufficient disk at {path}: need {required + MIN_FREE_BYTES} bytes, have {free}")
 
 
+def dry_run_headroom(path: Path, required: int) -> None:
+    """Check the target filesystem through existing no-follow ancestors only."""
+    if not path.is_absolute() or ".." in path.parts:
+        fail("snapshot store path must be absolute and normalized")
+    fd = os.open("/", DIR_FLAGS)
+    try:
+        for part in path.parts[1:]:
+            try:
+                child = os.open(part, DIR_FLAGS, dir_fd=fd)
+            except FileNotFoundError:
+                break
+            os.close(fd)
+            fd = child
+        capacity = os.fstatvfs(fd)
+        free = capacity.f_bavail * capacity.f_frsize
+        if free < required + MIN_FREE_BYTES:
+            fail(f"insufficient disk at {path}: need {required + MIN_FREE_BYTES} bytes, have {free}")
+    finally:
+        os.close(fd)
+
+
 def snapshot_dir(key: str) -> Path:
     base = os.environ.get("DAG_PRIVATE_PACKAGE_SNAPSHOT_DIR")
     if not base:
@@ -440,6 +461,7 @@ def _read_receipt(lake: Path) -> dict:
 
 
 def verify_ready(target: Path) -> None:
+    """Check private ownership and pins; build caches may change after Lake runs."""
     key, revisions = pins(target)
     urls = package_urls(target, revisions)
     lake = target / ".lake"
@@ -453,18 +475,19 @@ def verify_ready(target: Path) -> None:
             fail(f"private package remote differs from manifest: {name}")
     caches = {name: lake / "packages" / name / ".lake/build" for name in revisions}
     caches["project"] = lake / "build"
+    digests = record.get("cache_digests")
+    if not isinstance(digests, dict) or set(digests) != set(caches):
+        fail("private-cache receipt inventory is incomplete")
     for name, path in caches.items():
         if not path.is_dir() or path.is_symlink():
             fail(f"private build cache missing or linked: {name}")
         require_owner_writable(path)
-    packages_digest, _ = tree_digest(lake / "packages")
-    project_digest, _ = tree_digest(lake / "build")
-    if (packages_digest != record.get("packages_sha256") or
-            project_digest != record.get("build_sha256")):
-        fail("private-cache receipt content differs from target")
-    for name, path in caches.items():
-        if tree_digest(path)[0] != record.get("cache_digests", {}).get(name):
-            fail(f"private build cache differs from receipt: {name}")
+    # The snapshot and extracted candidate were byte-checked before the atomic
+    # publish. Afterwards Lake owns these writable trees: even a no-op build
+    # can update package Git indexes. Rechecks enforce private roots and safe
+    # links, not equality to their pre-build bytes.
+    tree_digest(lake / "packages")
+    tree_digest(lake / "build")
 
 
 def default_donor(target: Path) -> Path:
@@ -504,6 +527,26 @@ def seed(target: Path, donor: Path | None, *, verify: bool, dry_run: bool,
     directory = snapshot_dir(key)
     if directory.is_relative_to(target):
         fail("snapshot store must be outside the target")
+    if dry_run:
+        dry_run_headroom(directory, 0)
+        record = checked_snapshot(directory, key, revisions, urls)
+        if record is None:
+            donor = default_donor(target) if donor is None else donor.resolve(strict=True)
+            donor_key, _ = pins(donor)
+            if donor == target or donor_key != key:
+                fail("donor and target pins differ")
+            source = (donor / ".lake/packages").resolve(strict=True)
+            validate_packages(source, revisions)
+            roots = _build_roots(source, donor / ".lake/build", revisions)
+            source_bytes = sum(tree_digest(path)[1] for path in roots.values())
+            dry_run_headroom(directory, 3 * source_bytes)
+            print(f"would create Git-object snapshot from {donor}")
+        else:
+            source_bytes = record["source_bytes"]
+            print(f"verified package snapshot {directory}")
+        disk_headroom(target, source_bytes)
+        print(f"would privately seed fresh {target} from {directory}")
+        return
     with locked_directory(target, ".private-cache-seed.lock", create=False) as (target_fd, _pinned_target):
         verify_target_inode(target, target_fd)
         if lake_name.exists() or lake_name.is_symlink():
@@ -519,20 +562,12 @@ def seed(target: Path, donor: Path | None, *, verify: bool, dry_run: bool,
                     fail("donor and target pins differ")
                 source = (donor / ".lake/packages").resolve(strict=True)
                 build_source = donor / ".lake/build"
-                if dry_run:
-                    validate_packages(source, revisions)
-                    _build_roots(source, build_source, revisions)
-                    print(f"would create Git-object snapshot from {donor}")
-                    return
                 print(f"creating Git-object snapshot from {donor}", flush=True)
                 record = create_snapshot(snapshot_fd, snapshot, source, build_source,
                                          key, revisions, urls)
             else:
                 print(f"verified package snapshot {directory}", flush=True)
             disk_headroom(target, record["source_bytes"])
-            if dry_run:
-                print(f"would privately seed fresh {target} from {directory}")
-                return
             token = uuid.uuid4().hex
             stage_name = f".lake-stage-{token}"
             os.mkdir(stage_name, 0o700, dir_fd=target_fd)

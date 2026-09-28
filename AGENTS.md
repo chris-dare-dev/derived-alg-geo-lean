@@ -443,19 +443,28 @@ A fresh worktree builds all ~5850 modules from cold before it reaches the file
 you changed. It does not have to:
 
 ```bash
-bash scripts/seed_worktree_cache.sh --dry-run   # pick a donor, say what it would do
-bash scripts/seed_worktree_cache.sh             # copy it in
+bash scripts/seed_worktree_cache.sh --dry-run   # check pins, cache and disk
+bash scripts/seed_worktree_cache.sh             # install private caches
 ```
 
-This copies `.lake/build` from the most-built worktree of this clone and links
-`.lake/packages` to the shared dependency set. Lake verifies every trace against
-the source it finds, so anything your branch changes is still rebuilt and
-nothing stale is trusted. It **copies rather than hardlinks**, because Lean
-writes an `.olean` at its final path and a hardlink would let a rebuild in one
-worktree write through into another's cache.
+The default now installs a private `.lake` with ten pinned package checkouts,
+their warm build caches and the project build cache. It verifies the package
+Git revisions, a checked snapshot, and a receipt before returning. Each
+worktree owns its writable package and build bytes; a shortage of disk space
+refuses the seed. Lake still verifies traces against the source it finds, so
+anything your branch changes is rebuilt. A second invocation verifies the
+receipt, pins and private layout rather than copying again; mutable cache
+bytes are checked against the snapshot before publication, not after Lake has
+written to them. `--from <donor>` selects a quiet donor if a
+snapshot for these pins does not yet exist.
 
-The script only ever writes to the worktree you run it in, and refuses a target
-that already has a build cache unless you pass `--force`.
+An existing `.lake` without a private receipt is preserved and refused, even
+with `--force`. For an older worktree whose `.lake/packages` is linked, keep it
+intact while creating a new worktree at its commit, seed the new one, carry
+over any source/index/untracked changes deliberately, and switch work to the
+new path only after checking them. This is an on-demand, non-destructive
+migration; it does not rewrite an active checkout or claim that old links have
+been removed. The current helper requires Linux descriptor and rename support.
 
 `lake env lean scratch.lean` is **not** restricted and is not meant to be. It is
 the seconds-long probe interactive proof work depends on; routing each attempt at

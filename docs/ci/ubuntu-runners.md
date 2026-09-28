@@ -63,6 +63,20 @@ the pin/toolchain inputs, run the focused build, then switch the pickup path.
 Keep the old checkout and cache until the new one is verified. No active
 service, checkout or cache was changed for this inventory.
 
+A read-only rescan on 2026-09-28 found 246 registered worktrees, 223 existing
+paths, and 107 `.lake/packages` links resolving to four shared targets. These
+are existing user worktrees; neither the runner installation nor the new
+worktree seeder deletes or rewrites them. On an idle migration, preserve the
+old worktree, create a new worktree at its commit, and run
+`bash scripts/seed_worktree_cache.sh --dry-run` followed by
+`bash scripts/seed_worktree_cache.sh` in the new one. The default seeder now
+requires private package/build caches and verifies their receipt. Compare the
+new source and Git index with the old worktree, carry any uncommitted and
+untracked work deliberately, and move the pickup path only after verification.
+An old linked `.lake` refuses seeding in place, including with `--force`.
+Each migrated worktree needs its own disk space; the current seeder checks
+headroom and refuses before publication when it is insufficient.
+
 The user services invoke the runner's `runsvc.sh` entrypoint and restart after
 failures. User lingering makes them start at boot and survive logout. Inspect:
 

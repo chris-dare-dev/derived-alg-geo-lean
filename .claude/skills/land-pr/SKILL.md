@@ -122,20 +122,16 @@ Two things to check before working in someone else's worktree:
 
 - **It must be clean.** A dirty worktree is unfinished human work — halt and
   report, exactly as in step 0. Never stash it.
-- **Its `.lake/packages` is often a symlink to a sibling worktree**, and those
-  siblings get deleted. A dangling symlink shows up as a baffling
-  `mkdir: .lake/packages: No such file or directory` from `lake build` even
-  though `.lake` plainly exists. Check with `ls -la .lake`, and repoint it at
-  the main checkout's packages when it dangles:
-
-  For a fresh worktree, use `scripts/seed_worktree_cache.sh --dry-run` to
-  inspect a suitable donor. For an existing cache, resolve the actual shared
-  package location before repairing the symlink. Never reuse a hard-coded
-  path from another machine.
-
-  Only do this once `lean-toolchain` and `lakefile.toml` are identical to
-  `origin/main`, which after step 2's rebase they are. Sharing a package set
-  across differing pins would be silent corruption, not a repair.
+- **Its `.lake/packages` may be a symlink to another writable worktree**, or
+  a dangling link if that donor was removed. Check with `ls -la .lake`. Do not
+  repoint the link or run Lean through shared writable packages. Preserve this
+  checkout and cache, then create a fresh worktree at the intended commit and
+  run `bash scripts/seed_worktree_cache.sh --dry-run` followed by
+  `bash scripts/seed_worktree_cache.sh` there. The seeder verifies pins,
+  installs private packages/build output, and refuses an existing unreceipted
+  `.lake`. Carry any source, index and untracked work deliberately before
+  switching to the new path. This procedure does not delete or rewrite the
+  older checkout.
 
 A conflict needs a declaration-level review. Preserve the selected PR's intended
 work and current main; do not resolve by a blanket preference for either side.
