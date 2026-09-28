@@ -9,8 +9,10 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Gluing
 /-!
 # Affine module comparison
 
-Mathlib provides the affine-scheme and quasi-coherent module-sheaf comparison foundations;
-this directory adds localization criteria, basic-open presentation covers, and bridges. See the
+Mathlib provides the affine-scheme, quasi-coherent module-sheaf, and general localization-criterion
+foundations; this directory retains a local formulation using
+`AlgebraicGeometry.Scheme.Modules.basicOpenRestriction` and adds
+basic-open presentation covers and bridges. See the
 [affine and projective spectrum placement map](../../../docs/architecture/placement.md) for the
 source owners and the existing Proj chart dependency.
 
@@ -22,15 +24,19 @@ source owners and the existing Proj chart dependency.
 ## Main results
 
 * `AlgebraicGeometry.Scheme.Modules.isIso_fromTildeΓ_iff_isLocalizedModule` characterizes the
-  counit by localization on every basic open.
+  counit by localization on every basic open, restating Mathlib's
+  `AlgebraicGeometry.isIso_fromTildeΓ_iff_isLocalizing` in terms of this directory's explicit
+  restriction map.
 * `AlgebraicGeometry.Scheme.Modules.exists_basicOpen_presentation_cover` refines a quasi-coherent
   presentation cover to a basic-open cover.
 
 ## Implementation notes
 
 This umbrella re-exports `BasicOpen`, `Comparison`, `Epi`, `Equivalence`, `Extension`,
-`Finiteness`, and `Gluing`. The quasi-coherent affine comparison itself is upstream in Mathlib;
-the local files provide a general localization criterion and DerivedAlgGeo-specific bridges.
+`Finiteness`, and `Gluing`. Mathlib owns the `AlgebraicGeometry.IsLocalizing` predicate and its
+whole-counit equivalence; the local API restates it using
+`AlgebraicGeometry.Scheme.Modules.basicOpenRestriction`. The local files also provide
+presentation-cover and DerivedAlgGeo-specific bridges.
 Projective module charts consume `Extension` through
 `AlgebraicGeometry/ProjectiveSpectrum/Modules/ChartExtension.lean`.
 

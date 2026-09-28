@@ -16,9 +16,11 @@ v4.32.1 supplies the quasi-coherent case as
 `AlgebraicGeometry.Scheme.Modules.isIso_fromTildeΓ_of_isQuasicoherent` in
 `Mathlib/AlgebraicGeometry/Modules/Tilde.lean`.
 
-This file develops a more general localization criterion for the counit
-`AlgebraicGeometry.Scheme.Modules.fromTildeΓ`: it is an isomorphism **if and only if** restriction
-to every basic open is a localization. It does not reprove the upstream quasi-coherent comparison.
+Mathlib also defines `AlgebraicGeometry.IsLocalizing` and proves
+`AlgebraicGeometry.isIso_fromTildeΓ_iff_isLocalizing` for arbitrary module sheaves. This file
+retains the explicit map `AlgebraicGeometry.Scheme.Modules.basicOpenRestriction` and states the
+same criterion as `AlgebraicGeometry.Scheme.Modules.isIso_fromTildeΓ_iff_isLocalizedModule`.
+The latter is a definitional restatement of the upstream criterion, not a second general theorem.
 
 ## Main definitions
 
@@ -29,8 +31,8 @@ to every basic open is a localization. It does not reprove the upstream quasi-co
 
 * `AlgebraicGeometry.isIso_fromTildeΓ_app_basicOpen` — the component of the counit at `D(f)`
   is an isomorphism under the hypothesis that restriction is a localisation at the powers of `f`.
-* `AlgebraicGeometry.isIso_fromTildeΓ_of_isLocalizedModule` — hence the counit is an
-  isomorphism as soon as every such restriction is a localisation.
+* `AlgebraicGeometry.isIso_fromTildeΓ_of_isLocalizedModule` — a local-map formulation of the
+  forward direction of the upstream criterion.
 * `AlgebraicGeometry.Scheme.Modules.isLocalizedModule_basicOpenRestriction_tilde` — the base
   case, `M = N^~`, where that hypothesis holds. It is both the starting point of the general
   argument and the check that the hypothesis is satisfiable rather than vacuous.
@@ -38,12 +40,18 @@ to every basic open is a localization. It does not reprove the upstream quasi-co
   converse of the reduction, obtained by transporting the base case along the counit.
 * `AlgebraicGeometry.Scheme.Modules.isLocalizedModule_basicOpenRestriction_of_presentation` —
   a presentation on `Spec R` makes restriction to each basic open a localization.
-* `AlgebraicGeometry.Scheme.Modules.isIso_fromTildeΓ_iff_isLocalizedModule` — the two put
-  together: **`IsIso M.fromTildeΓ ↔ ∀ f, IsLocalizedModule (powers f) (restriction to D(f))`.**
-  This is the statement to quote.
+* `AlgebraicGeometry.Scheme.Modules.isIso_fromTildeΓ_iff_isLocalizedModule` — the upstream
+  `AlgebraicGeometry.isIso_fromTildeΓ_iff_isLocalizing` restated using
+  `AlgebraicGeometry.Scheme.Modules.basicOpenRestriction`. Its statement is
+  `IsIso M.fromTildeΓ ↔ ∀ f, IsLocalizedModule (powers f) (restriction to D(f))`.
+  This is the statement to quote when using the local restriction map.
 
 ## Implementation notes
 
+Mathlib's `AlgebraicGeometry.IsLocalizing` is defined on
+`AlgebraicGeometry.modulesSpecToSheaf.obj M`; its condition is definitionally equal to the
+quantified `AlgebraicGeometry.Scheme.Modules.basicOpenRestriction` condition. Mathlib's
+`AlgebraicGeometry.isIso_fromTildeΓ_iff_isLocalizing` proves the equivalence for that predicate.
 `AlgebraicGeometry.Scheme.Modules.fromTildeΓ` is *built* by
 `TopCat.Sheaf.restrictHomEquivHom` along
 `PrimeSpectrum.isBasis_basic_opens`, with its component at `D(f)` given by
@@ -57,18 +65,22 @@ isomorphism. The separate converse and if-and-only-if statement concern the whol
 unconditional equivalence for a single component. The whole-counit result is
 `AlgebraicGeometry.Scheme.Modules.isIso_fromTildeΓ_iff_isLocalizedModule`.
 
-Nothing in this local criterion needs quasi-coherence. Mathlib states
+Neither Mathlib's general criterion nor the local-map restatement needs
+quasi-coherence. Mathlib states
 `AlgebraicGeometry.Scheme.Modules.isUnit_algebraMap_end_of_le_basicOpen` for an *arbitrary*
 `M : (AlgebraicGeometry.Spec R).Modules`,
 not only for tildes. The quasi-coherent application is provided by Mathlib's pinned instance; the
-local criterion remains available when a caller supplies the localization hypotheses directly.
+local-map formulation remains available when a caller supplies the localization
+hypotheses directly.
 
 ### Relation to the local bridges
 
 `AlgebraicGeometry.Modules.Affine.Gluing` documents the current division of work: Mathlib owns the
 finite-cover proof of the quasi-coherent comparison, while the local file retains the
 restriction-to-chart linear equivalence and wrappers for DerivedAlgGeo's explicit
-quasi-coherent-data and localization APIs. In particular,
+quasi-coherent-data and localization APIs. The local whole-counit theorem restates the upstream
+`AlgebraicGeometry.isIso_fromTildeΓ_iff_isLocalizing` using this file's restriction map. In
+particular,
 `AlgebraicGeometry.Scheme.Modules.isLocalizedModule_basicOpenRestriction_of_isQuasicoherent` is a
 bridge to the upstream result, not a second proof of it. The scheme/slice transport used by these
 local bridges is in `AlgebraicGeometry.Modules.Restriction.OpenImmersion`.

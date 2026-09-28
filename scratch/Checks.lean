@@ -17,6 +17,9 @@ import DerivedAlgGeo.RingTheory.Spectrum.Prime.CoversTop
 #check @AlgebraicGeometry.Scheme.Spec
 #check @AlgebraicGeometry.ΓSpec.adjunction
 #check @AlgebraicGeometry.AffineScheme.equivCommRingCat
+#check @AlgebraicGeometry.IsLocalizing
+#check @AlgebraicGeometry.modulesSpecToSheaf
+#check @AlgebraicGeometry.isIso_fromTildeΓ_iff_isLocalizing
 #check @AlgebraicGeometry.tildeEquiv
 #check @AlgebraicGeometry.Scheme.Modules.isIso_fromTildeΓ_of_isQuasicoherent
 
@@ -57,3 +60,8 @@ import DerivedAlgGeo.RingTheory.Spectrum.Prime.CoversTop
 #check @IsLocalizedModule.lift
 #check @Submonoid.powers
 #check @IsLocalizedModule
+
+example {R : CommRingCat} (M : (AlgebraicGeometry.Spec R).Modules) :
+    AlgebraicGeometry.IsLocalizing (AlgebraicGeometry.modulesSpecToSheaf.obj M) ↔
+      ∀ f : R, IsLocalizedModule (Submonoid.powers f)
+        (M.basicOpenRestriction f).hom := Iff.rfl
