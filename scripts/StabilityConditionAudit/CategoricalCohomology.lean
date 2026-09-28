@@ -48,6 +48,7 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms CochainComplex.truncLETowerMap_id
 #print axioms CochainComplex.truncLETowerMap_comp
 #print axioms CochainComplex.isColimitTruncLETowerCocone
+#print axioms CochainComplex.isColimitMapTruncLETowerCocone
 #print axioms HomologicalComplex₂.singleMapHomologicalComplexFlipIso
 #print axioms HomologicalComplex₂.singleExtendMapFlipIso
 #print axioms HomologicalComplex.singleCompExtendIso
