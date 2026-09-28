@@ -24,9 +24,11 @@ ambient finite-coproduct assumption or replacement coproduct is introduced.
   universal converse and characterization;
   `CategoryTheory.Limits.Sigma.sum_π_ι_eq_id_of_isZero` selects one without
   requiring a caller instance, and
-  `CategoryTheory.Limits.Sigma.isZero_of_sum_π_ι_eq_id_of_not_mem` gives its converse.
+  `CategoryTheory.Limits.Sigma.isZero_of_sum_π_ι_eq_id_of_not_mem` gives its
+  converse, and `CategoryTheory.Limits.Sigma.sum_π_ι_eq_id_iff_isZero` gives
+  the selected characterization.
 * `CategoryTheory.Limits.Sigma.hom_ext_of_finite_support` compares incoming maps
-  on the finite nonzero support.
+  on a finite set containing every nonzero summand.
 * `CategoryTheory.Limits.Sigma.hom_eq_zero_of_finite_support` detects a zero
   incoming map.
 
