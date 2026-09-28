@@ -9,10 +9,35 @@ import Mathlib.Algebra.Homology.HomologicalComplexLimits
 /-!
 # Canonical good-truncation towers
 
-A cochain complex is the colimit of its increasing tower of canonical good
-truncations at natural-number cutoffs. The tower, its inclusion cocone, and their maps
-under morphisms use the existing `CochainComplex.truncLE`, `CochainComplex.ιTruncLE`,
-and `CochainComplex.truncLEMap` constructions.
+Mathlib's good truncations assemble into a natural ℕ-indexed tower. Under
+local homology hypotheses, their inclusion cocone is colimiting.
+
+## Main definitions
+
+`CochainComplex.truncLEToTruncLE` gives the transitions;
+`CochainComplex.truncLETower` and `CochainComplex.truncLETowerCocone`
+assemble the diagram and its inclusions; `CochainComplex.truncLETowerMap`
+acts on morphisms.
+
+## Main results
+
+`CochainComplex.isColimitTruncLETowerCocone` proves the colimit property.
+
+## Implementation notes
+
+At degree `p`, the inclusion is an isomorphism when the cutoff is strictly
+greater than `p`; at the cutoff the truncation contains cycles. Evaluation
+is eventually constant, and degreewise colimits assemble into a colimit of
+complexes.
+
+## References
+
+This extends Mathlib's `CochainComplex.truncLE`, `CochainComplex.ιTruncLE`,
+and `CochainComplex.truncLEMap`.
+
+## Tags
+
+good truncation, cochain complexes, colimits
 -/
 
 open CategoryTheory CategoryTheory.Limits
@@ -23,8 +48,8 @@ namespace CochainComplex
 
 variable {C : Type u} [Category.{v} C] [HasZeroMorphisms C] [HasZeroObject C]
 
-/-- The canonical map from a good truncation at `n` to the good truncation at a later
-cutoff `m`. -/
+/-- The transition is characterized by its composite with the monic inclusion into `K`:
+that composite is the inclusion at the earlier cutoff. -/
 noncomputable def truncLEToTruncLE (K : CochainComplex C ℤ) [∀ i, K.HasHomology i]
     {n m : ℤ} (h : n ≤ m) : K.truncLE n ⟶ K.truncLE m := by
   letI : (K.truncLE n).IsStrictlyLE m :=
@@ -32,8 +57,8 @@ noncomputable def truncLEToTruncLE (K : CochainComplex C ℤ) [∀ i, K.HasHomol
   exact (asIso ((K.truncLE n).ιTruncLE m)).inv ≫
     CochainComplex.truncLEMap (K.ιTruncLE n) m
 
-/-- A transition in the truncation tower followed by its inclusion is the original
-inclusion at the earlier cutoff. -/
+/-- Monicity of the later inclusion makes this equation the uniqueness principle used to
+prove the tower's functor laws. -/
 @[reassoc]
 lemma truncLEToTruncLE_comp_ιTruncLE (K : CochainComplex C ℤ) [∀ i, K.HasHomology i]
     {n m : ℤ} (h : n ≤ m) :
@@ -44,7 +69,8 @@ lemma truncLEToTruncLE_comp_ιTruncLE (K : CochainComplex C ℤ) [∀ i, K.HasHo
   rw [Category.assoc, CochainComplex.ιTruncLE_naturality]
   simp
 
-/-- The canonical increasing diagram of good truncations of a cochain complex. -/
+/-- Natural-number cutoffs are cofinal among integer cutoffs; at each fixed degree,
+components stabilize once the cutoff is strictly above that degree. -/
 noncomputable def truncLETower (K : CochainComplex C ℤ) [∀ i, K.HasHomology i] :
     ℕ ⥤ CochainComplex C ℤ where
   obj n := K.truncLE (n : ℤ)
@@ -126,7 +152,8 @@ noncomputable def isColimitTruncLETowerCocone (K : CochainComplex C ℤ)
     [∀ i, K.HasHomology i] : IsColimit (truncLETowerCocone K) :=
   HomologicalComplex.isColimitOfEval _ _ (towerEvalIsColimit K)
 
-/-- A morphism of complexes commutes with transitions between good truncations. -/
+/-- Composing both sides with the monic later inclusion reduces this compatibility to
+naturality of Mathlib's truncation inclusions. -/
 lemma truncLEToTruncLE_naturality {K L : CochainComplex C ℤ}
     [∀ i, K.HasHomology i] [∀ i, L.HasHomology i]
     (f : K ⟶ L) {n m : ℤ} (h : n ≤ m) :
@@ -146,7 +173,8 @@ noncomputable def truncLETowerMap {K L : CochainComplex C ℤ}
   naturality {n m} g :=
     (truncLEToTruncLE_naturality f (by exact_mod_cast leOfHom g)).symm
 
-/-- A tower map commutes with the canonical inclusion cocones. -/
+/-- Together with the colimit theorem, this identifies the map induced on colimit
+points by `truncLETowerMap f` with `f`. -/
 lemma truncLETowerMap_ι {K L : CochainComplex C ℤ}
     [∀ i, K.HasHomology i] [∀ i, L.HasHomology i]
     (f : K ⟶ L) (n : ℕ) :
@@ -154,14 +182,14 @@ lemma truncLETowerMap_ι {K L : CochainComplex C ℤ}
       (truncLETowerCocone K).ι.app n ≫ f :=
   CochainComplex.ιTruncLE_naturality f (n : ℤ)
 
-/-- The tower map of an identity is the identity tower map. -/
+/-- The identity law follows stagewise from Mathlib's fixed-cutoff truncation map law. -/
 lemma truncLETowerMap_id (K : CochainComplex C ℤ) [∀ i, K.HasHomology i] :
     truncLETowerMap (𝟙 K) = 𝟙 (truncLETower K) := by
   apply NatTrans.ext
   funext n
   exact HomologicalComplex.truncLEMap_id K (ComplexShape.embeddingUpIntLE (n : ℤ))
 
-/-- Tower maps respect composition. -/
+/-- The composition law follows stagewise from Mathlib's fixed-cutoff truncation map law. -/
 lemma truncLETowerMap_comp {K L M : CochainComplex C ℤ}
     [∀ i, K.HasHomology i] [∀ i, L.HasHomology i] [∀ i, M.HasHomology i]
     (f : K ⟶ L) (g : L ⟶ M) :
