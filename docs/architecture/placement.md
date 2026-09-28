@@ -82,19 +82,21 @@ directory move or unimplemented target.
 
 The dependency is concrete and one-way: `ProjectiveSpectrum/Modules/ChartExtension.lean` imports
 `Modules/Affine/Extension.lean`, which imports Mathlib's
-`AlgebraicGeometry/Modules/Tilde.lean`. `ChartExtension.lean` defines `chartRing` as an
-`abbrev` for `HomogeneousLocalization.Away` and defines `awayRestrict` by restricting
-along Mathlib's existing open immersion `AlgebraicGeometry.Proj.awayι`. It does not define another affine chart or
-spectrum.
+`AlgebraicGeometry/Modules/Tilde.lean`. `ChartExtension.lean` defines
+`AlgebraicGeometry.Proj.chartRing` as an `abbrev` for `HomogeneousLocalization.Away` and defines
+`AlgebraicGeometry.Proj.awayRestrict` by restricting along Mathlib's existing open immersion
+`AlgebraicGeometry.Proj.awayι`. It does not define another affine chart or spectrum.
 
-For a graded ring `A` and homogeneous `f` of positive degree, Mathlib's
-`AlgebraicGeometry.Proj.basicOpenIsoSpec` identifies the scheme on `D₊(f)` with
-`Spec (HomogeneousLocalization.Away 𝒜 f)`, the degree-zero localization usually written
-`(A[f⁻¹])₀` or `A_{(f)}`. This is the degree-zero homogeneous localization, not the full ordinary
-localization `Localization.Away f`. `AlgebraicGeometry.Proj.affineOpenCover` packages these charts into an affine
-open cover, and `AlgebraicGeometry.Proj.toSpecZero` is the structure map `Proj A ⟶ Spec A₀`. The lemma
-`AlgebraicGeometry.Proj.awayι_toSpecZero` verifies that each chart immersion followed by this structure map is the
-map induced from `A₀` to the chart ring.
+For a graded ring `𝒜` and homogeneous `f` of positive degree, Mathlib's
+`AlgebraicGeometry.Proj.basicOpenIsoSpec` gives the chart isomorphism
+`(AlgebraicGeometry.Proj.basicOpen 𝒜 f).toScheme ≅ AlgebraicGeometry.Spec (CommRingCat.of (HomogeneousLocalization.Away 𝒜 f))`.
+The chart ring is the degree-zero homogeneous localization usually written `(A[f⁻¹])₀` or
+`A_{(f)}`, not the full ordinary localization `Localization.Away f`.
+`AlgebraicGeometry.Proj.affineOpenCover` packages these charts into an affine open cover, and
+`AlgebraicGeometry.Proj.toSpecZero` is the structure map
+`AlgebraicGeometry.Proj 𝒜 ⟶ AlgebraicGeometry.Spec (CommRingCat.of (𝒜 0))`.
+`AlgebraicGeometry.Proj.awayι_toSpecZero` verifies that each chart immersion followed by this
+structure map is the map induced from `𝒜 0` to the chart ring.
 
 Keep the relationships distinct:
 
@@ -105,9 +107,9 @@ Keep the relationships distinct:
 - **Dependency:** the local Proj module-chart extension imports the affine module extension, which
   uses Mathlib's module-sheaf API.
 - **Comparison maps:** `AlgebraicGeometry.ΓSpec.adjunction` relates global sections and `Spec`;
-  `AlgebraicGeometry.AffineScheme.equivCommRingCat` identifies affine schemes with opposite commutative rings;
-  `AlgebraicGeometry.tildeEquiv` and
-  `AlgebraicGeometry.Scheme.Modules.isIso_fromTildeΓ_of_isQuasicoherent` gives the affine module comparison;
+  `AlgebraicGeometry.AffineScheme.equivCommRingCat` identifies affine schemes with opposite
+  commutative rings; `AlgebraicGeometry.tildeEquiv` and
+  `AlgebraicGeometry.Scheme.Modules.isIso_fromTildeΓ_of_isQuasicoherent` give the affine module comparison;
   `AlgebraicGeometry.Proj.awayι_toSpecZero` relates each standard chart to the structure map.
 
 The size of a local directory measures the additional DerivedAlgGeo extensions and proofs it
