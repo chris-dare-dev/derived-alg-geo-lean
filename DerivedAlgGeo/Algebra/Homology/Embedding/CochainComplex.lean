@@ -21,7 +21,9 @@ acts on morphisms.
 
 ## Main results
 
-`CochainComplex.isColimitTruncLETowerCocone` proves the colimit property.
+`CochainComplex.isColimitTruncLETowerCocone` proves the colimit property;
+`CochainComplex.isColimitMapTruncLETowerCocone` proves it after applying a
+zero-morphism-preserving functor degreewise.
 
 ## Implementation notes
 
@@ -152,6 +154,48 @@ Local homology assumptions are needed to form Mathlib's good truncations. -/
 noncomputable def isColimitTruncLETowerCocone (K : CochainComplex C ℤ)
     [∀ i, K.HasHomology i] : IsColimit (truncLETowerCocone K) :=
   HomologicalComplex.isColimitOfEval _ _ (towerEvalIsColimit K)
+
+/-- A functor preserving zero morphisms sends this particular good-truncation
+inclusion cocone to a colimit cocone of complexes. At every fixed degree its
+legs eventually become isomorphisms, and the functor preserves those
+isomorphisms. No ambient colimit-preservation hypothesis is needed. -/
+noncomputable def isColimitMapTruncLETowerCocone {D : Type*}
+    [Category D] [HasZeroMorphisms D]
+    (F : C ⥤ D) [F.PreservesZeroMorphisms]
+    (K : CochainComplex C ℤ) [∀ i, K.HasHomology i] :
+    IsColimit ((F.mapHomologicalComplex (ComplexShape.up ℤ)).mapCocone
+      (truncLETowerCocone K)) := by
+  let H := F.mapHomologicalComplex (ComplexShape.up ℤ)
+  let s := H.mapCocone (truncLETowerCocone K)
+  change IsColimit s
+  refine HomologicalComplex.isColimitOfEval
+    (F := truncLETower K ⋙ H) s ?_
+  intro p
+  let n : ℕ := p.toNat + 1
+  have hp : p < (n : ℤ) := by dsimp [n]; omega
+  let T := truncLETower K ⋙ H ⋙
+    HomologicalComplex.eval D (ComplexShape.up ℤ) p
+  have hT : T.IsEventuallyConstantFrom n := by
+    intro m f
+    have hnm : (n : ℤ) ≤ (m : ℤ) := by exact_mod_cast leOfHom f
+    haveI : IsIso ((K.ιTruncLE (n : ℤ)).f p) :=
+      inclusionComponentIsIso K (n : ℤ) p hp
+    haveI : IsIso ((K.ιTruncLE (m : ℤ)).f p) :=
+      inclusionComponentIsIso K (m : ℤ) p (by omega)
+    have heq := congrArg (fun z => z.f p)
+      (truncLEToTruncLE_comp_ιTruncLE K hnm)
+    haveI : IsIso (((truncLETower K).map f).f p) := by
+      change IsIso ((truncLEToTruncLE K hnm).f p)
+      exact IsIso.of_isIso_fac_right heq
+    change IsIso (F.map (((truncLETower K).map f).f p))
+    infer_instance
+  let c : Cocone T :=
+    (HomologicalComplex.eval D (ComplexShape.up ℤ) p).mapCocone s
+  haveI : IsIso (c.ι.app n) := by
+    change IsIso (F.map ((K.ιTruncLE (n : ℤ)).f p))
+    haveI := inclusionComponentIsIso K (n : ℤ) p hp
+    infer_instance
+  exact hT.isColimitOfIsIso c
 
 /-- Composing both sides with the monic later inclusion reduces this compatibility to
 naturality of Mathlib's truncation inclusions. -/
