@@ -37,6 +37,17 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex.extendCyclesIso_naturality_assoc
 #print axioms HomologicalComplex.extendHomologyIso_naturality
 #print axioms HomologicalComplex.extendHomologyIso_naturality_assoc
+#print axioms CochainComplex.truncLEToTruncLE
+#print axioms CochainComplex.truncLEToTruncLE_comp_ιTruncLE
+#print axioms CochainComplex.truncLEToTruncLE_comp_ιTruncLE_assoc
+#print axioms CochainComplex.truncLEToTruncLE_naturality
+#print axioms CochainComplex.truncLETower
+#print axioms CochainComplex.truncLETowerCocone
+#print axioms CochainComplex.truncLETowerMap
+#print axioms CochainComplex.truncLETowerMap_ι
+#print axioms CochainComplex.truncLETowerMap_id
+#print axioms CochainComplex.truncLETowerMap_comp
+#print axioms CochainComplex.isColimitTruncLETowerCocone
 #print axioms HomologicalComplex₂.singleMapHomologicalComplexFlipIso
 #print axioms HomologicalComplex₂.singleExtendMapFlipIso
 #print axioms HomologicalComplex.singleCompExtendIso
