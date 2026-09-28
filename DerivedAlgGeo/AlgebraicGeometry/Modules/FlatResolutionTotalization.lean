@@ -22,6 +22,8 @@ has terms flat over the identity, and the signed total of the normalized
 target is naturally the input complex.
 The final augmentation is a constructed map, without an unbounded total
 quasi-isomorphism or K-flatness claim.
+On every canonical good truncation, strict termwise support and the
+nonpositive resolution degree make its total augmentation a quasi-isomorphism.
 
 ## Main definitions
 
@@ -39,6 +41,8 @@ quasi-isomorphism or K-flatness claim.
 * `freeYonedaSheafCoproductTotalAugmentation_eq_toSingleZero_comp_targetIso`
   identifies the normalized total map with the earlier total-to-single-zero map
   followed by the target isomorphism.
+* `AlgebraicGeometry.Scheme.Modules.quasiIso_freeYonedaSheafCoproductTotalAugmentation_truncLE`
+  proves the augmentation is a quasi-isomorphism after each good truncation.
 
 ## Implementation notes
 
@@ -47,6 +51,9 @@ The normalized map composes the existing row augmentation with
 Its row maps stay quasi-isomorphisms because the second map is an isomorphism.
 `HomologicalComplex₂.singleZeroFlipTotalNatIso` supplies the signed total
 comparison. The original target type is retained for downstream consumers.
+For a good truncation at `c`, both bicomplexes vanish in outer degrees above
+`c` and inner degrees above zero. Reduced left resolution preserves zero
+terms, so the four-bound total-map criterion applies on each diagonal.
 
 ## References
 
@@ -302,5 +309,128 @@ theorem freeYonedaSheafCoproductTotalComplexFunctor_obj_X_isFlatOverId
   apply isFlatOverId_coprod_small X _
   intro i
   exact resolutionBicomplexUpInt_obj_X_isFlatOverId X K i.1.1 i.1.2
+
+section BoundedAugmentation
+
+variable (X : Scheme.{u}) (M : CochainComplex X.Modules ℤ) (c : ℤ)
+
+private theorem isZero_resolutionBicomplexUpInt_truncLE_X_of_gt (p : ℤ) (hp : c < p) :
+    IsZero (((freeYonedaSheafCoproductResolutionBicomplexUpInt X).obj (M.truncLE c)).X p) := by
+  let Λ := freeYonedaSheafCoproductReducedLeftResolution X
+  letI : Λ.chainComplexFunctor.PreservesZeroMorphisms := ⟨fun A B =>
+    freeYonedaSheafCoproductReducedLeftResolution_chainComplexMap_zero X⟩
+  let ι := ObjectProperty.ι (fun N : X.Modules => IsFlatOver (𝟙 X) N)
+  let E := ι.mapHomologicalComplex (ComplexShape.down ℕ) ⋙
+    ComplexShape.embeddingDownNat.extendFunctor X.Modules
+  letI : E.PreservesZeroMorphisms := by infer_instance
+  have hM : IsZero ((M.truncLE c).X p) :=
+    CochainComplex.isZero_of_isStrictlyLE (M.truncLE c) c p hp
+  have hΛ : IsZero (Λ.chainComplexFunctor.obj ((M.truncLE c).X p)) :=
+    Λ.chainComplexFunctor.map_isZero hM
+  have hE : IsZero (E.obj (Λ.chainComplexFunctor.obj ((M.truncLE c).X p))) :=
+    E.map_isZero hΛ
+  exact hE
+
+
+private theorem isZero_resolutionBicomplexUpInt_inner_of_pos (p q : ℤ) (hq : 0 < q) :
+    IsZero (((((freeYonedaSheafCoproductResolutionBicomplexUpInt X).obj
+      M).X p).X q)) := by
+  let Λ := freeYonedaSheafCoproductReducedLeftResolution X
+  let ι := ObjectProperty.ι (fun N : X.Modules => IsFlatOver (𝟙 X) N)
+  let D := (ι.mapHomologicalComplex (ComplexShape.down ℕ)).obj
+    (Λ.chainComplexFunctor.obj (M.X p))
+  change IsZero ((D.extend ComplexShape.embeddingDownNat).X q)
+  exact CochainComplex.isZero_of_isStrictlyLE
+    (D.extend ComplexShape.embeddingDownNat) 0 q (by omega)
+
+private theorem isZero_singleZeroFlip_inner_of_ne (p q : ℤ) (hq : q ≠ 0) :
+    IsZero ((((((HomologicalComplex.single
+      (CochainComplex X.Modules ℤ) (ComplexShape.up ℤ) 0) ⋙
+      HomologicalComplex₂.flipFunctor X.Modules (ComplexShape.up ℤ)
+        (ComplexShape.up ℤ)).obj M).X p).X q)) := by
+  change IsZero ((((HomologicalComplex.single
+    (CochainComplex X.Modules ℤ) (ComplexShape.up ℤ) 0).obj M).X q).X p)
+  exact (HomologicalComplex.eval X.Modules (ComplexShape.up ℤ) p).map_isZero
+    (HomologicalComplex.isZero_single_obj_X (ComplexShape.up ℤ) 0 M q hq)
+
+private theorem isZero_singleZeroFlip_truncLE_X_of_gt (p q : ℤ) (hp : c < p) :
+    IsZero ((((((HomologicalComplex.single
+      (CochainComplex X.Modules ℤ) (ComplexShape.up ℤ) 0) ⋙
+      HomologicalComplex₂.flipFunctor X.Modules (ComplexShape.up ℤ)
+        (ComplexShape.up ℤ)).obj (M.truncLE c)).X p).X q)) := by
+  have hM : IsZero ((M.truncLE c).X p) :=
+    CochainComplex.isZero_of_isStrictlyLE (M.truncLE c) c p hp
+  change IsZero ((((HomologicalComplex.single
+    (CochainComplex X.Modules ℤ) (ComplexShape.up ℤ) 0).obj (M.truncLE c)).X q).X p)
+  by_cases hq : q = 0
+  · subst q
+    simpa only [HomologicalComplex.single_obj_X_self] using hM
+  · exact (HomologicalComplex.eval X.Modules (ComplexShape.up ℤ) p).map_isZero
+      (HomologicalComplex.isZero_single_obj_X (ComplexShape.up ℤ) 0 (M.truncLE c) q hq)
+
+
+private theorem isZero_resolutionBicomplexUpInt_truncLE_diagonal_of_lt
+    (n p q : ℤ) (hn : p + q = n) (hp : p < n) :
+    IsZero (((((freeYonedaSheafCoproductResolutionBicomplexUpInt X).obj
+      (M.truncLE c)).X p).X q)) := by
+  exact isZero_resolutionBicomplexUpInt_inner_of_pos X (M.truncLE c) p q (by omega)
+
+private theorem isZero_singleZeroFlip_truncLE_diagonal_of_lt
+    (n p q : ℤ) (hn : p + q = n) (hp : p < n) :
+    IsZero ((((((HomologicalComplex.single
+      (CochainComplex X.Modules ℤ) (ComplexShape.up ℤ) 0) ⋙
+      HomologicalComplex₂.flipFunctor X.Modules (ComplexShape.up ℤ)
+        (ComplexShape.up ℤ)).obj (M.truncLE c)).X p).X q)) := by
+  exact isZero_singleZeroFlip_inner_of_ne X (M.truncLE c) p q (by omega)
+
+private theorem quasiIso_normalizedBicomplexAugmentation_totalMap_truncLE :
+    QuasiIso (HomologicalComplex₂.total.map
+      ((normalizedBicomplexAugmentation X).app (M.truncLE c))
+      (ComplexShape.up ℤ)) := by
+  let K := (freeYonedaSheafCoproductResolutionBicomplexUpInt X).obj (M.truncLE c)
+  let L := ((HomologicalComplex.single
+      (CochainComplex X.Modules ℤ) (ComplexShape.up ℤ) 0) ⋙
+      HomologicalComplex₂.flipFunctor X.Modules (ComplexShape.up ℤ)
+        (ComplexShape.up ℤ)).obj (M.truncLE c)
+  let f : K ⟶ L := (normalizedBicomplexAugmentation X).app (M.truncLE c)
+  have hKLower : ∀ n p q : ℤ, p + q = n → p < n → IsZero ((K.X p).X q) := by
+    intro n p q hpq hp
+    exact isZero_resolutionBicomplexUpInt_truncLE_diagonal_of_lt X M c n p q hpq hp
+  have hKUpper : ∀ n p q : ℤ, p + q = n → c < p → IsZero ((K.X p).X q) := by
+    intro n p q _ hp
+    exact (HomologicalComplex.eval X.Modules (ComplexShape.up ℤ) q).map_isZero
+      (isZero_resolutionBicomplexUpInt_truncLE_X_of_gt X M c p hp)
+  have hLLower : ∀ n p q : ℤ, p + q = n → p < n → IsZero ((L.X p).X q) := by
+    intro n p q hpq hp
+    exact isZero_singleZeroFlip_truncLE_diagonal_of_lt X M c n p q hpq hp
+  have hLUpper : ∀ n p q : ℤ, p + q = n → c < p → IsZero ((L.X p).X q) := by
+    intro n p q _ hp
+    exact isZero_singleZeroFlip_truncLE_X_of_gt X M c p q hp
+  exact HomologicalComplex₂.quasiIso_totalMap_of_four_diagonal_bounds_of_column_quasiIso
+    f (fun n => n) (fun _ => c) (fun n => n) (fun _ => c)
+    hKLower hKUpper hLLower hLUpper
+    (normalizedBicomplexAugmentation_row_quasiIso X (M.truncLE c))
+
+/-- The free-Yoneda total augmentation is a quasi-isomorphism on every
+canonical good truncation. The strict cutoff and nonpositive resolution degree
+give finite support on each total diagonal; the unbounded augmentation needs a
+separate colimit argument. -/
+theorem quasiIso_freeYonedaSheafCoproductTotalAugmentation_truncLE :
+    QuasiIso ((freeYonedaSheafCoproductTotalAugmentation X).app (M.truncLE c)) := by
+  haveI : QuasiIso (HomologicalComplex₂.total.map
+      ((normalizedBicomplexAugmentation X).app (M.truncLE c))
+      (ComplexShape.up ℤ)) := quasiIso_normalizedBicomplexAugmentation_totalMap_truncLE X M c
+  let f := HomologicalComplex₂.total.map
+      ((normalizedBicomplexAugmentation X).app (M.truncLE c)) (ComplexShape.up ℤ)
+  let g := (HomologicalComplex₂.singleZeroFlipTotalNatIso
+      (C := X.Modules)).hom.app (M.truncLE c)
+  change QuasiIso (f ≫ g)
+  haveI hIso : IsIso g := by infer_instance
+  haveI hQI : QuasiIso g := by exact quasiIso_of_isIso g
+  exact quasiIso_comp
+    (hφ := quasiIso_normalizedBicomplexAugmentation_totalMap_truncLE X M c)
+    (hφ' := hQI) f g
+
+end BoundedAugmentation
 
 end AlgebraicGeometry.Scheme.Modules
