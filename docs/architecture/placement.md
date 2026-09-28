@@ -72,10 +72,10 @@ scheme API adds its structure sheaf and locally ringed-space structure. The owne
 | --- | --- | --- |
 | Prime-spectrum carrier, topology, and basic opens | [`RingTheory/Spectrum/Prime/Defs.lean`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/RingTheory/Spectrum/Prime/Defs.lean#L34): `PrimeSpectrum`; [`Topology.lean`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/RingTheory/Spectrum/Prime/Topology.lean#L517): `basicOpen`; [`Topology.lean`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/RingTheory/Spectrum/Prime/Topology.lean#L628): `iSup_basicOpen_eq_top_iff` | `RingTheory/Spectrum/Prime/`, including `PrimeSpectrum.coversTop_basicOpen_of_span_eq_top` as the scheme-free basic-open covering bridge |
 | Spectrum as a locally ringed space and as a scheme | [`AlgebraicGeometry.Spec.topObj`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/AlgebraicGeometry/Spec.lean#L58); [`AlgebraicGeometry.Spec.toLocallyRingedSpace`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/AlgebraicGeometry/Spec.lean#L265); [`AlgebraicGeometry.Spec`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/AlgebraicGeometry/Scheme.lean#L482); [`AlgebraicGeometry.Scheme.Spec`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/AlgebraicGeometry/Scheme.lean#L513) | Scheme-specific results stay in `AlgebraicGeometry/`; affine module-sheaf results stay in `AlgebraicGeometry/Modules/Affine/` |
-| Global-sections/Spec adjunction and affine schemes | [`GammaSpecAdjunction.lean`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/AlgebraicGeometry/GammaSpecAdjunction.lean#L390): `ΓSpec.adjunction`; [`AffineScheme.lean`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/AlgebraicGeometry/AffineScheme.lean#L217): `AffineScheme.equivCommRingCat` | These are the upstream Spec/affine-scheme comparison APIs, not local declarations |
-| Associated modules and the affine quasi-coherent equivalence | [`AlgebraicGeometry/Modules/Tilde.lean`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/AlgebraicGeometry/Modules/Tilde.lean#L833): `Scheme.Modules.isIso_fromTildeΓ_of_isQuasicoherent` and [`AlgebraicGeometry.tildeEquiv`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/AlgebraicGeometry/Modules/Tilde.lean#L881) | `Modules/Affine/` adds localization criteria and bridges that consume the upstream comparison |
-| Proj's standard affine charts, cover, and structure map | [`ProjectiveSpectrum/Basic.lean`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/AlgebraicGeometry/ProjectiveSpectrum/Basic.lean#L161): `Proj.basicOpenIsoSpec`, `Proj.awayι`, `Proj.affineOpenCover`, `Proj.toSpecZero` | `AlgebraicGeometry/ProjectiveSpectrum/` develops further scheme and module-sheaf results on these existing charts |
-| The chart ring used by Proj | [`RingTheory/GradedAlgebra/HomogeneousLocalization.lean`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/RingTheory/GradedAlgebra/HomogeneousLocalization.lean#L601): `HomogeneousLocalization.Away` | `Proj.chartRing` is only an `abbrev` bundling this ring as `CommRingCat` |
+| Global-sections/Spec adjunction and affine schemes | [`GammaSpecAdjunction.lean`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/AlgebraicGeometry/GammaSpecAdjunction.lean#L390): `AlgebraicGeometry.ΓSpec.adjunction`; [`AffineScheme.lean`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/AlgebraicGeometry/AffineScheme.lean#L217): `AlgebraicGeometry.AffineScheme.equivCommRingCat` | These are the upstream Spec/affine-scheme comparison APIs, not local declarations |
+| Associated modules and the affine quasi-coherent equivalence | [`AlgebraicGeometry/Modules/Tilde.lean`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/AlgebraicGeometry/Modules/Tilde.lean#L833): `AlgebraicGeometry.Scheme.Modules.isIso_fromTildeΓ_of_isQuasicoherent` and [`AlgebraicGeometry.tildeEquiv`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/AlgebraicGeometry/Modules/Tilde.lean#L881) | `Modules/Affine/` adds localization criteria and bridges that consume the upstream comparison |
+| Proj's standard affine charts, cover, and structure map | [`ProjectiveSpectrum/Basic.lean`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/AlgebraicGeometry/ProjectiveSpectrum/Basic.lean#L161): `AlgebraicGeometry.Proj.basicOpenIsoSpec`, `AlgebraicGeometry.Proj.awayι`, `AlgebraicGeometry.Proj.affineOpenCover`, `AlgebraicGeometry.Proj.toSpecZero` | `AlgebraicGeometry/ProjectiveSpectrum/` develops further scheme and module-sheaf results on these existing charts |
+| The chart ring used by Proj | [`RingTheory/GradedAlgebra/HomogeneousLocalization.lean`](https://github.com/leanprover-community/mathlib4/blob/520045ab14e26149ee970e2e617ca04b09bde5d6/Mathlib/RingTheory/GradedAlgebra/HomogeneousLocalization.lean#L601): `HomogeneousLocalization.Away` | `AlgebraicGeometry.Proj.chartRing` is only an `abbrev` bundling this ring as `CommRingCat` |
 
 These are the implemented owners and paths after the #1607 cutover; the map records no proposed
 directory move or unimplemented target.
@@ -84,16 +84,16 @@ The dependency is concrete and one-way: `ProjectiveSpectrum/Modules/ChartExtensi
 `Modules/Affine/Extension.lean`, which imports Mathlib's
 `AlgebraicGeometry/Modules/Tilde.lean`. `ChartExtension.lean` defines `chartRing` as an
 `abbrev` for `HomogeneousLocalization.Away` and defines `awayRestrict` by restricting
-along Mathlib's existing open immersion `Proj.awayι`. It does not define another affine chart or
+along Mathlib's existing open immersion `AlgebraicGeometry.Proj.awayι`. It does not define another affine chart or
 spectrum.
 
 For a graded ring `A` and homogeneous `f` of positive degree, Mathlib's
-`Proj.basicOpenIsoSpec` identifies the scheme on `D₊(f)` with
+`AlgebraicGeometry.Proj.basicOpenIsoSpec` identifies the scheme on `D₊(f)` with
 `Spec (HomogeneousLocalization.Away 𝒜 f)`, the degree-zero localization usually written
 `(A[f⁻¹])₀` or `A_{(f)}`. This is the degree-zero homogeneous localization, not the full ordinary
-localization `Localization.Away f`. `Proj.affineOpenCover` packages these charts into an affine
-open cover, and `Proj.toSpecZero` is the structure map `Proj A ⟶ Spec A₀`. The lemma
-`Proj.awayι_toSpecZero` verifies that each chart immersion followed by this structure map is the
+localization `Localization.Away f`. `AlgebraicGeometry.Proj.affineOpenCover` packages these charts into an affine
+open cover, and `AlgebraicGeometry.Proj.toSpecZero` is the structure map `Proj A ⟶ Spec A₀`. The lemma
+`AlgebraicGeometry.Proj.awayι_toSpecZero` verifies that each chart immersion followed by this structure map is the
 map induced from `A₀` to the chart ring.
 
 Keep the relationships distinct:
@@ -104,11 +104,11 @@ Keep the relationships distinct:
   `ProjectiveSpectrum/`.
 - **Dependency:** the local Proj module-chart extension imports the affine module extension, which
   uses Mathlib's module-sheaf API.
-- **Comparison maps:** `ΓSpec.adjunction` relates global sections and `Spec`;
-  `AffineScheme.equivCommRingCat` identifies affine schemes with opposite commutative rings;
+- **Comparison maps:** `AlgebraicGeometry.ΓSpec.adjunction` relates global sections and `Spec`;
+  `AlgebraicGeometry.AffineScheme.equivCommRingCat` identifies affine schemes with opposite commutative rings;
   `AlgebraicGeometry.tildeEquiv` and
-  `Scheme.Modules.isIso_fromTildeΓ_of_isQuasicoherent` give the affine module comparison;
-  `Proj.awayι_toSpecZero` relates each standard chart to the structure map.
+  `AlgebraicGeometry.Scheme.Modules.isIso_fromTildeΓ_of_isQuasicoherent` gives the affine module comparison;
+  `AlgebraicGeometry.Proj.awayι_toSpecZero` relates each standard chart to the structure map.
 
 The size of a local directory measures the additional DerivedAlgGeo extensions and proofs it
 contains, not how much affine or projective spectrum theory is available to consumers: the core

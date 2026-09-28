@@ -13,18 +13,18 @@ For a commutative ring `R`, the affine comparison identifies a quasi-coherent sh
 with the sheaf associated to its global sections. This is Stacks
 [01IA](https://stacks.math.columbia.edu/tag/01IA) and Hartshorne II.5.1. The pinned Mathlib
 v4.32.1 supplies the quasi-coherent case as
-`Scheme.Modules.isIso_fromTildeΓ_of_isQuasicoherent` in
+`AlgebraicGeometry.Scheme.Modules.isIso_fromTildeΓ_of_isQuasicoherent` in
 `Mathlib/AlgebraicGeometry/Modules/Tilde.lean`.
 
 This file develops a more general localization criterion for the counit
-`Scheme.Modules.fromTildeΓ`: it is an isomorphism **if and only if** restriction to every basic
-open is a localization. It does not reprove the upstream quasi-coherent comparison.
+`AlgebraicGeometry.Scheme.Modules.fromTildeΓ`: it is an isomorphism **if and only if** restriction
+to every basic open is a localization. It does not reprove the upstream quasi-coherent comparison.
 
 ## Main results
 
 * `AlgebraicGeometry.Scheme.Modules.basicOpenRestriction` — restriction of global sections to `D(f)`.
 * `AlgebraicGeometry.isIso_fromTildeΓ_app_basicOpen` — the component of the counit at `D(f)`
-  is an isomorphism exactly when that restriction is a localisation at the powers of `f`.
+  is an isomorphism under the hypothesis that restriction is a localisation at the powers of `f`.
 * `AlgebraicGeometry.isIso_fromTildeΓ_of_isLocalizedModule` — hence the counit is an
   isomorphism as soon as every such restriction is a localisation.
 * `AlgebraicGeometry.Scheme.Modules.isLocalizedModule_basicOpenRestriction_tilde` — the base
@@ -40,16 +40,19 @@ open is a localization. It does not reprove the upstream quasi-coherent comparis
 
 ## Why this is the right reduction
 
-`Scheme.Modules.fromTildeΓ` is *built* by `TopCat.Sheaf.restrictHomEquivHom` along
+`AlgebraicGeometry.Scheme.Modules.fromTildeΓ` is *built* by
+`TopCat.Sheaf.restrictHomEquivHom` along
 `PrimeSpectrum.isBasis_basic_opens`, with its component at `D(f)` given by
-`IsLocalizedModule.lift`. Mathlib's `Scheme.Modules.toOpen_fromTildeΓ_app` records the
-resulting triangle: the component composed with `tilde.toOpen` is the restriction map. Since
-`tilde.toOpen` at `D(f)` is a localisation at `Submonoid.powers f` — Mathlib supplies that
-instance — the component is the comparison map between two candidate localisations, and is an
-isomorphism precisely when the second one is a localisation too.
+`IsLocalizedModule.lift`. Mathlib's
+`AlgebraicGeometry.Scheme.Modules.toOpen_fromTildeΓ_app` records the
+resulting triangle: the component composed with `AlgebraicGeometry.tilde.toOpen` is the restriction
+map. Since `AlgebraicGeometry.tilde.toOpen` at `D(f)` is a localisation at `Submonoid.powers f` —
+Mathlib supplies that instance — the component is the comparison map between two candidate
+localisations, and is an isomorphism precisely when the second one is a localisation too.
 
 Nothing in this local criterion needs quasi-coherence. Mathlib states
-`Scheme.Modules.isUnit_algebraMap_end_of_le_basicOpen` for an *arbitrary* `M : (Spec R).Modules`,
+`AlgebraicGeometry.Scheme.Modules.isUnit_algebraMap_end_of_le_basicOpen` for an *arbitrary*
+`M : (AlgebraicGeometry.Spec R).Modules`,
 not only for tildes. The quasi-coherent application is provided by Mathlib's pinned instance; the
 local criterion remains available when a caller supplies the localization hypotheses directly.
 
@@ -59,9 +62,9 @@ local criterion remains available when a caller supplies the localization hypoth
 finite-cover proof of the quasi-coherent comparison, while the local file retains the
 restriction-to-chart linear equivalence and wrappers for DerivedAlgGeo's explicit
 quasi-coherent-data and localization APIs. In particular,
-`Scheme.Modules.isLocalizedModule_basicOpenRestriction_of_isQuasicoherent` is a bridge to the
-upstream result, not a second proof of it. The scheme/slice transport used by these local bridges
-is in `AlgebraicGeometry.Modules.Restriction.OpenImmersion`.
+`AlgebraicGeometry.Scheme.Modules.isLocalizedModule_basicOpenRestriction_of_isQuasicoherent` is a
+bridge to the upstream result, not a second proof of it. The scheme/slice transport used by these
+local bridges is in `AlgebraicGeometry.Modules.Restriction.OpenImmersion`.
 
 ## References
 
