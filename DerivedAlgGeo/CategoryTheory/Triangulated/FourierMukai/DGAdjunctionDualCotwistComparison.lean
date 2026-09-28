@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionTwistComparison
+import DerivedAlgGeo.CategoryTheory.Triangulated.FunctorIsoShiftCompatibility
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DualCotwistKernel
 
 /-!
@@ -165,6 +166,10 @@ namespace ShiftCompatibility
 
 open CounitKernelConeData.PresentedCounitComparisonData.ShiftCompatibility
 
+/-- The transported `H⁰` twist shift structure used by the dual cotwist. -/
+noncomputable local instance : (K.transportedTwist eA).CommShift ℤ :=
+  K.twist.transportedH0CommShift
+
 /-- Supply the selected Fourier--Mukai dual-cotwist shift structure and
 compatibility of the dg comparison.  The result is the existing twist
 compatibility record viewed through the semantic facade. -/
@@ -175,9 +180,10 @@ def ofCommShift
         K.twist.transportedH0CommShift
       letI : T.dualCotwist.CommShift ℤ := dualCotwistCommShift
       NatTrans.CommShift N.transportedDualCotwistIso.hom ℤ) :
-    N.ShiftCompatibility where
-  twistCommShift := dualCotwistCommShift
-  transportedTwistIso_commShift := transportedDualCotwistIso_commShift
+    CategoryTheory.Triangulated.FunctorIsoShiftCompatibility
+      (K.transportedTwist eA) T.dualCotwist N.transportedDualCotwistIso where
+  targetCommShift := dualCotwistCommShift
+  hom_commShift := transportedDualCotwistIso_commShift
 
 variable (h : N.ShiftCompatibility)
 

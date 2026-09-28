@@ -35,10 +35,8 @@ CategoryTheory	CategoryTheory.Triangulated.BidirectionalPrefixBlockEmbeddingData
 CategoryTheory	CategoryTheory.Triangulated.CofiltrationData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.ComponentTopologicalLinearLocalModel	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.CompatibleClassMaps	recorded before the reason column existed; reason not yet written
-CategoryTheory	CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernelConeData.PresentedUnitComparisonData.ShiftCompatibility	records compatibility with the shift structure the realization chose; the docstring is explicit that it does not manufacture one
 CategoryTheory	CategoryTheory.Triangulated.FourierMukai.CoherentConvolutionData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.FourierMukai.ConstituentLeftAdjoints	recorded before the reason column existed; reason not yet written
-CategoryTheory	CategoryTheory.Triangulated.FourierMukai.CounitKernelConeData.PresentedCounitComparisonData.ShiftCompatibility	twist counterpart of the cotwist `ShiftCompatibility`; same externally chosen structure
 CategoryTheory	CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.FourierMukai.GeneratedBlockExtensionSequenceData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.FourierMukai.GeneratedExtensionSequenceData	recorded before the reason column existed; reason not yet written
