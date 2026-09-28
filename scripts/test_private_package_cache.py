@@ -12,6 +12,7 @@ import signal
 import subprocess
 import tarfile
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -103,8 +104,7 @@ class PrivatePackageCacheTest(unittest.TestCase):
         self.assertEqual(git("-C", str(second / ".lake/packages/mathlib"),
                              "remote", "get-url", "origin"),
                          "https://example.invalid/mathlib")
-        with self.assertRaisesRegex(ValueError, "receipt content"):
-            cache.verify_ready(first)
+        cache.verify_ready(first)  # Private build output is writable after seeding.
 
     def test_git_suppressed_tracked_modification_is_not_snapshotted(self) -> None:
         package = self.donor / ".lake/packages/mathlib"
@@ -165,6 +165,22 @@ class PrivatePackageCacheTest(unittest.TestCase):
         self._seed(second)
         cache.verify_ready(second)
 
+    def test_dry_run_leaves_no_locks_or_stages(self) -> None:
+        target = self._target("dry-run")
+        cache.seed(target, self.donor, verify=False, dry_run=True, force=False)
+        self.assertFalse((target / ".private-cache-seed.lock").exists())
+        self.assertFalse((target / ".lake").exists())
+        self.assertFalse(self.store.exists())
+
+    def test_dry_run_checks_snapshot_headroom_without_writing(self) -> None:
+        target = self._target("dry-run-low-disk")
+        with patch.object(cache.os, "fstatvfs", return_value=SimpleNamespace(
+                f_bavail=1, f_frsize=1)):
+            with self.assertRaisesRegex(ValueError, "insufficient disk"):
+                cache.seed(target, self.donor, verify=False, dry_run=True, force=False)
+        self.assertFalse((target / ".private-cache-seed.lock").exists())
+        self.assertFalse(self.store.exists())
+
     def test_missing_dependency_build_refuses_warm_seed(self) -> None:
         shutil.rmtree(self.donor / ".lake/packages/mathlib/.lake/build")
         target = self._target("missing-cache")
@@ -185,7 +201,7 @@ class PrivatePackageCacheTest(unittest.TestCase):
             self._seed(target)
         self.assertFalse((target / ".lake").exists())
 
-    def test_receipt_binds_manifest_and_build_bytes(self) -> None:
+    def test_receipt_binds_manifest_and_refuses_escaping_mutations(self) -> None:
         target = self._target("receipt")
         self._seed(target)
         (target / "lean-toolchain").write_text("changed\n")
@@ -193,7 +209,12 @@ class PrivatePackageCacheTest(unittest.TestCase):
             cache.verify_ready(target)
         (target / "lean-toolchain").write_text("leanprover/lean:v4.23.0\n")
         (target / ".lake/build/lib/Project.olean").write_bytes(b"tampered")
-        with self.assertRaisesRegex(ValueError, "receipt content"):
+        cache.verify_ready(target)  # Lake is expected to rewrite its private cache.
+        (target / ".lake/build/lib/Project.olean").unlink()
+        outside = self.root / "external-olean"
+        outside.write_bytes(b"external")
+        (target / ".lake/build/lib/Project.olean").symlink_to(outside)
+        with self.assertRaisesRegex(ValueError, "link escapes tree"):
             cache.verify_ready(target)
 
     def test_receipt_requires_writable_build_roots(self) -> None:
@@ -206,6 +227,42 @@ class PrivatePackageCacheTest(unittest.TestCase):
                 cache.verify_ready(target)
         finally:
             project_build.chmod(0o755)
+
+    def test_compound_lake_symlink_cannot_reach_sibling(self) -> None:
+        target = self._target("compound-link")
+        self._seed(target)
+        sibling = self.root / "sibling-worktree"
+        sibling.mkdir()
+        (sibling / "keep").write_text("unchanged")
+        (target / ".lake/dir").mkdir()
+        (target / ".lake/dir/back").symlink_to("..")
+        (target / ".lake/config").symlink_to("dir/back/../../sibling-worktree")
+        with self.assertRaisesRegex(ValueError, "not pinned"):
+            cache.verify_ready(target)
+        self.assertEqual((sibling / "keep").read_text(), "unchanged")
+
+    def test_legacy_receipt_is_read_only_and_rejects_duplicate_keys(self) -> None:
+        target = self._target("legacy-receipt")
+        self._seed(target)
+        receipt = target / ".lake/private-cache-ready.json"
+        original = receipt.read_bytes()
+        (target / ".lake/build/lib/Project.olean").write_bytes(b"normal Lake update")
+        cache.verify_ready(target)
+        self.assertEqual(receipt.read_bytes(), original)
+        receipt.write_bytes(original[:-2] + b',"format":4}\n')
+        with self.assertRaisesRegex(ValueError, "duplicate private-cache record key"):
+            cache.verify_ready(target)
+        self.assertEqual((target / ".lake/build/lib/Project.olean").read_bytes(),
+                         b"normal Lake update")
+
+    def test_oversized_receipt_refuses_without_repair(self) -> None:
+        target = self._target("oversized-receipt")
+        self._seed(target)
+        receipt = target / ".lake/private-cache-ready.json"
+        receipt.write_bytes(b" " * (cache.MAX_RECORD_BYTES + 1))
+        with self.assertRaisesRegex(ValueError, "bounded private file"):
+            cache.verify_ready(target)
+        self.assertEqual(receipt.stat().st_size, cache.MAX_RECORD_BYTES + 1)
 
     def test_preplaced_target_stage_link_refuses_without_sibling_write(self) -> None:
         self._seed(self._target("snapshot-first"))

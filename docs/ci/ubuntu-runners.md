@@ -63,6 +63,42 @@ the pin/toolchain inputs, run the focused build, then switch the pickup path.
 Keep the old checkout and cache until the new one is verified. No active
 service, checkout or cache was changed for this inventory.
 
+A read-only rescan on 2026-09-28 found 246 registered worktrees, 223 existing
+paths, and 107 `.lake/packages` links resolving to four shared targets. These
+are existing user worktrees; neither the runner installation nor the new
+worktree seeder deletes or rewrites them. On an idle migration, preserve the
+old worktree, create a new worktree at its commit, and invoke the private-cache
+helper from an updated checkout containing this change, with the new worktree
+as its explicit `--target`:
+
+```bash
+SAFE_ROOT=/absolute/path/to/updated/derived-alg-geo-lean
+NEW=/absolute/path/to/new-worktree
+python3 "$SAFE_ROOT/scripts/private_package_cache.py" --target "$NEW" --dry-run
+python3 "$SAFE_ROOT/scripts/private_package_cache.py" --target "$NEW"
+```
+
+Do not run the seeder script *inside* a worktree at an older commit: that
+commit may still contain the link-producing implementation. The current helper
+requires private package/build caches and verifies their receipt. Compare the
+new source and Git index with the old worktree, carry any uncommitted and
+untracked work deliberately, and move the pickup path only after verification.
+An old linked `.lake` refuses seeding in place, including with `--force`.
+Each migrated worktree needs its own disk space; the current seeder checks
+headroom and refuses before publication when it is insufficient.
+
+The updated helper reads pinned package source through the tracked minimal
+`scripts/private-reader.git` and rechecks source bytes independently of Git's
+index flags. It scans the whole private `.lake` for hardlinks, mount aliases
+and symlinks other than the exact tracked package-source links before
+publication and on reuse. A build may change its
+private Git indexes and build output, but a tracked source edit refuses reuse.
+The supported post-build check is the targeted Mathlib build; tracked
+ProofWidgets/npm outputs retain their pinned bytes. This is a quiescent pickup
+check among cooperating processes, not a barrier against later same-account
+mutation. It refuses ambiguous bind-mounted worktree ancestry rather than
+repointing or repairing it.
+
 The user services invoke the runner's `runsvc.sh` entrypoint and restart after
 failures. User lingering makes them start at boot and survive logout. Inspect:
 
