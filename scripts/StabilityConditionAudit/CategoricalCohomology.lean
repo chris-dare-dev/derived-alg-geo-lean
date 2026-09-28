@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence
 import DerivedAlgGeo.Algebra.Homology.HomologicalBicomplex
+import DerivedAlgGeo.Algebra.Homology.TotalComplex
 import DerivedAlgGeo.Algebra.Homology.Embedding
 import DerivedAlgGeo.Algebra.Homology.Embedding.StupidTruncGE
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Coproducts
@@ -51,6 +52,8 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms CochainComplex.isColimitMapTruncLETowerCocone
 #print axioms HomologicalComplex₂.singleMapHomologicalComplexFlipIso
 #print axioms HomologicalComplex₂.singleExtendMapFlipIso
+#print axioms HomologicalComplex₂.isColimitTotalFunctorMapCocone
+#print axioms HomologicalComplex₂.totalFunctor_preservesColimitsOfShape
 #print axioms HomologicalComplex.singleCompExtendIso
 #print axioms HomologicalComplex.singleCompExtendAtImageIso
 #print axioms CategoryTheory.Triangulated.SpectralObject.mapHomologicalFunctor

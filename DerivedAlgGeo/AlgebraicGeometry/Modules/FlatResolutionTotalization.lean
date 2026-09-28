@@ -3,6 +3,8 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Modules.FlatGenerators
+import DerivedAlgGeo.Algebra.Homology.Embedding.CochainComplex
+import DerivedAlgGeo.Algebra.Homology.TotalComplex
 import DerivedAlgGeo.Algebra.Homology.HomologicalBicomplex
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence.SingleZeroTotal
 import Mathlib.Algebra.Homology.Embedding.Extend
@@ -81,6 +83,38 @@ noncomputable def freeYonedaSheafCoproductTotalComplexFunctor (X : Scheme.{u}) :
   freeYonedaSheafCoproductResolutionBicomplexUpInt X ⋙
     HomologicalComplex₂.totalFunctor X.Modules (ComplexShape.up ℤ)
       (ComplexShape.up ℤ) (ComplexShape.up ℤ)
+
+set_option maxHeartbeats 1000000 in
+set_option backward.isDefEq.respectTransparency false in
+/-- The literal total free-Yoneda resolution of the canonical good-truncation
+tower has a colimiting cocone. The mapped bicomplex cocone is colimiting
+degreewise, and direct-sum totalization preserves its colimit. This does not
+assert that the total augmentation is a quasi-isomorphism. -/
+noncomputable def isColimitFreeYonedaSheafCoproductTotalTruncLETowerCocone
+    (X : Scheme.{u}) (K : CochainComplex X.Modules ℤ) :
+    IsColimit
+      ((freeYonedaSheafCoproductTotalComplexFunctor X).mapCocone
+        (CochainComplex.truncLETowerCocone K)) := by
+  let Λ := freeYonedaSheafCoproductReducedLeftResolution X
+  let ι := ObjectProperty.ι (fun M : X.Modules => IsFlatOver (𝟙 X) M)
+  let E := ι.mapHomologicalComplex (ComplexShape.down ℕ) ⋙
+    ComplexShape.embeddingDownNat.extendFunctor X.Modules
+  haveI : Λ.chainComplexFunctor.PreservesZeroMorphisms :=
+    ⟨fun M N => freeYonedaSheafCoproductReducedLeftResolution_chainComplexMap_zero X⟩
+  haveI : E.PreservesZeroMorphisms := by infer_instance
+  haveI : (Λ.chainComplexFunctor ⋙ E).PreservesZeroMorphisms := by infer_instance
+  have hB := CochainComplex.isColimitMapTruncLETowerCocone
+    (Λ.chainComplexFunctor ⋙ E) K
+  change IsColimit
+    ((freeYonedaSheafCoproductResolutionBicomplexUpInt X).mapCocone
+      (CochainComplex.truncLETowerCocone K)) at hB
+  have hT := isColimitOfPreserves
+    (HomologicalComplex₂.totalFunctor X.Modules (ComplexShape.up ℤ)
+      (ComplexShape.up ℤ) (ComplexShape.up ℤ)) hB
+  change IsColimit
+    ((freeYonedaSheafCoproductTotalComplexFunctor X).mapCocone
+      (CochainComplex.truncLETowerCocone K)) at hT
+  exact hT
 
 /-- Apply the natural augmentation of each free-Yoneda left resolution in the
 resolution direction. The target retains the input complex in resolution degree
