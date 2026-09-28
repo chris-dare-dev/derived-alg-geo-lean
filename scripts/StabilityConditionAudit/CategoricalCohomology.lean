@@ -66,6 +66,7 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex₂.totalColumnConeIso
 #print axioms HomologicalComplex₂.ι_totalColumnConeIso_hom_source
 #print axioms HomologicalComplex₂.ι_totalColumnConeIso_hom_target
+#print axioms HomologicalComplex₂.quasiIso_totalMap_of_four_diagonal_bounds_of_column_quasiIso
 #print axioms HomologicalComplex.singleCompExtendIso
 #print axioms HomologicalComplex.singleCompExtendAtImageIso
 #print axioms CategoryTheory.Triangulated.SpectralObject.mapHomologicalFunctor
