@@ -228,6 +228,19 @@ class PrivatePackageCacheTest(unittest.TestCase):
         finally:
             project_build.chmod(0o755)
 
+    def test_compound_lake_symlink_cannot_reach_sibling(self) -> None:
+        target = self._target("compound-link")
+        self._seed(target)
+        sibling = self.root / "sibling-worktree"
+        sibling.mkdir()
+        (sibling / "keep").write_text("unchanged")
+        (target / ".lake/dir").mkdir()
+        (target / ".lake/dir/back").symlink_to("..")
+        (target / ".lake/config").symlink_to("dir/back/../../sibling-worktree")
+        with self.assertRaisesRegex(ValueError, "not pinned"):
+            cache.verify_ready(target)
+        self.assertEqual((sibling / "keep").read_text(), "unchanged")
+
     def test_legacy_receipt_is_read_only_and_rejects_duplicate_keys(self) -> None:
         target = self._target("legacy-receipt")
         self._seed(target)

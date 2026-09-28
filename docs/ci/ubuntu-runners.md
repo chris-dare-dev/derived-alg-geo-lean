@@ -89,8 +89,9 @@ headroom and refuses before publication when it is insufficient.
 
 The updated helper reads pinned package source through the tracked minimal
 `scripts/private-reader.git` and rechecks source bytes independently of Git's
-index flags. It scans the whole private `.lake` for hardlinks, escaping links
-and mount aliases before publication and on reuse. A build may change its
+index flags. It scans the whole private `.lake` for hardlinks, mount aliases
+and symlinks other than the exact tracked package-source links before
+publication and on reuse. A build may change its
 private Git indexes and build output, but a tracked source edit refuses reuse.
 The supported post-build check is the targeted Mathlib build; tracked
 ProofWidgets/npm outputs retain their pinned bytes. This is a quiescent pickup

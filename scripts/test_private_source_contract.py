@@ -89,6 +89,13 @@ class SourceContractTests(unittest.TestCase):
         (self.package / "Run.sh").chmod(0o644)
         self.refused()
 
+    def test_owner_execute_bit_matches_git_mode(self) -> None:
+        script = self.package / "Run.sh"
+        script.chmod(0o654)  # Group execution remains, but Git sees 100644.
+        self.refused()
+        script.chmod(0o755)
+        self.check()
+
     def test_tracked_symlink_text_and_target(self) -> None:
         link = self.package / "docs/link"
         link.unlink()

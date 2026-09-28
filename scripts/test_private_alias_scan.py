@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """Filesystem alias regressions for private Lake worktrees."""
 
+import io
 import os
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
+import private_alias_scan as aliases
 from private_alias_scan import scan_private_lake
 
 
@@ -64,6 +67,31 @@ class PrivateAliasScanTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "link escapes tree"):
             scan_private_lake(self.target)
         self.assertEqual((sibling / "keep").read_text(), "unchanged")
+
+    def test_mount_inventory_refuses_cache_exposed_as_bind_source(self) -> None:
+        real_open = open
+        with real_open("/proc/self/mountinfo", encoding="utf-8") as stream:
+            inventory = stream.read()
+        parent_fd = os.open(self.target.parent, aliases.DIR)
+        try:
+            mount = aliases._mount_id(parent_fd)
+        finally:
+            os.close(parent_fd)
+        current = next(line.split() for line in inventory.splitlines()
+                       if line.split()[0] == str(mount))
+        mountpoint = Path(aliases._mount_path(current[4]))
+        relative = (self.target / ".lake/build").relative_to(mountpoint)
+        backing = "/" + relative.as_posix()
+        alias_line = f"999999 {mount} {current[2]} {backing} /unrelated-alias rw - tmpfs none rw\n"
+
+        def opened(path, *args, **kwargs):
+            if path == "/proc/self/mountinfo":
+                return io.StringIO(inventory + alias_line)
+            return real_open(path, *args, **kwargs)
+
+        with patch("builtins.open", side_effect=opened):
+            with self.assertRaisesRegex(ValueError, "exposed by another mount"):
+                scan_private_lake(self.target)
 
 
 if __name__ == "__main__":

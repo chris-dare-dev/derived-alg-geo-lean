@@ -503,9 +503,10 @@ def verify_ready(target: Path) -> None:
     lake = target / ".lake"
     record = _read_receipt(lake)
     _validate_record(record, key, revisions, urls, "receipt")
-    scan_private_lake(target)
     validate_packages(lake / "packages", revisions)
-    verify_source_packages(lake / "packages", revisions, reader_git_dir=SOURCE_READER)
+    verified_links = verify_source_packages(lake / "packages", revisions,
+                                            reader_git_dir=SOURCE_READER)
+    scan_private_lake(target, verified_links)
     for name, url in urls.items():
         if git("-C", str(lake / "packages" / name), "remote", "get-url", "origin") != url:
             fail(f"private package remote differs from manifest: {name}")
@@ -624,8 +625,8 @@ def seed(target: Path, donor: Path | None, *, verify: bool, dry_run: bool,
                 for name, path in caches.items():
                     if tree_digest(path)[0] != record["cache_digests"][name]:
                         fail(f"extracted build cache differs from snapshot: {name}")
-                verify_source_packages(stage / "packages", revisions,
-                                       reader_git_dir=SOURCE_READER)
+                verified_links = verify_source_packages(stage / "packages", revisions,
+                                                        reader_git_dir=SOURCE_READER)
                 receipt_fd = os.open(READY, os.O_CREAT | os.O_EXCL | os.O_WRONLY |
                                      os.O_NOFOLLOW, 0o600, dir_fd=stage_fd)
                 try:
@@ -636,7 +637,7 @@ def seed(target: Path, donor: Path | None, *, verify: bool, dry_run: bool,
                     os.close(receipt_fd)
                 os.fsync(stage_fd)
                 verify_target_inode(target, target_fd)
-                scan_owned_child(target, stage_name)
+                scan_owned_child(target, stage_name, verified_links)
                 no_replace_rename(target_fd, stage_name, target_fd, ".lake", identity)
                 published = True
             finally:

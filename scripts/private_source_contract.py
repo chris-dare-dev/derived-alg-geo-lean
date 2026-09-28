@@ -316,7 +316,7 @@ def _check_worktree(package_fd: int, tracked: dict[tuple[bytes, ...], tuple[byte
                     if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
                         _refuse("tracked source is linked or special")
                     payload = objects.get(oid, b"blob")
-                    if bool(info.st_mode & 0o111) != (mode == b"100755"):
+                    if bool(info.st_mode & stat.S_IXUSR) != (mode == b"100755"):
                         _refuse("tracked executable bit differs from pin")
                     if _read_file(fd, name, len(payload)) != payload:
                         _refuse("tracked source bytes differ from pin")
@@ -325,12 +325,13 @@ def _check_worktree(package_fd: int, tracked: dict[tuple[bytes, ...], tuple[byte
 
 
 def verify_source_packages(packages_root: Path, revisions: dict[str, str], *,
-                           reader_git_dir: Path) -> None:
+                           reader_git_dir: Path) -> dict[str, str]:
     """Raise ValueError/OSError if any package differs from its SHA-1 commit.
 
     ``reader_git_dir`` is a preprovisioned minimal bare reader outside package
-    roots. The function is read-only. It exempts only untracked root .git/.lake
-    directories, and the current aesop empty gitlink.
+    roots. The function is read-only and returns exact authenticated symlink
+    paths/text for the separate whole-Lake ownership scan. It exempts only
+    untracked root .git/.lake directories and the current aesop empty gitlink.
     """
     if not revisions or any(not isinstance(name, str) or not _NAME.fullmatch(name) or
                             not isinstance(rev, str) or
@@ -338,6 +339,7 @@ def verify_source_packages(packages_root: Path, revisions: dict[str, str], *,
                             for name, rev in revisions.items()):
         _refuse("invalid package names or SHA-1 revisions")
     _check_reader(reader_git_dir)
+    verified_links: dict[str, str] = {}
     root_fd = os.open(packages_root, _DIR)
     try:
         if {os.fsencode(x) for x in os.listdir(root_fd)} != {name.encode() for name in revisions}:
@@ -356,6 +358,11 @@ def verify_source_packages(packages_root: Path, revisions: dict[str, str], *,
                         commit = objects.get(revision.encode(), b"commit")
                         tracked = _tracked(objects, _commit_tree(commit), name)
                         _check_worktree(package_fd, tracked, objects)
+                        for path, (mode, oid) in tracked.items():
+                            if mode == b"120000":
+                                relative = "/".join(("packages", name,
+                                                     *(os.fsdecode(part) for part in path)))
+                                verified_links[relative] = os.fsdecode(objects.get(oid, b"blob"))
                     finally:
                         objects.close()
                 finally:
@@ -364,3 +371,4 @@ def verify_source_packages(packages_root: Path, revisions: dict[str, str], *,
                 os.close(package_fd)
     finally:
         os.close(root_fd)
+    return verified_links
