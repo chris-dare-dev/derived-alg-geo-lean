@@ -51,6 +51,7 @@ import DerivedAlgGeo.RingTheory.Spectrum.Prime.CoversTop
 #check @AlgebraicGeometry.tilde.toOpen
 #check @AlgebraicGeometry.tilde.toOpen_res
 #check @CategoryTheory.NatIso.isIso_app_of_isIso
+#check @CategoryTheory.IsIso
 #check @TopCat.Sheaf.restrictHomEquivHom
 #check @IsLocalizedModule.lift
 #check @Submonoid.powers
