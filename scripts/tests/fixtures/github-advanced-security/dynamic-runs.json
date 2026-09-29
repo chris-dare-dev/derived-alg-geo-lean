@@ -1,0 +1,15 @@
+{
+  "source": "GitHub Actions run and job API responses, redacted to identity/outcome fields; diagnostics from owner-only redacted logs",
+  "workflow_id": 360047049,
+  "path": "dynamic/agents/github-advanced-security",
+  "event": "dynamic",
+  "actor": {"id": 62310815, "login": "github-advanced-security[bot]"},
+  "check_app": {"id": 15368, "slug": "github-actions"},
+  "runs": [
+    {"pr": 1415, "run_id": 35530799100, "suite_id": 96201735650, "check_id": 106130918882, "head_sha": "e7fc1c1a0c54fe9c5c7316e045faa6b90a75f361", "conclusion": "failure", "diagnostic": "Copilot session HTTP 403 authentication before analysis"},
+    {"pr": 1419, "run_id": 35530798806, "suite_id": 96201734914, "check_id": 106130918769, "head_sha": "23a60f401f3f131b6e30fb12b89df92e124429ca", "conclusion": "failure", "diagnostic": "Copilot session HTTP 403 authentication before analysis"},
+    {"pr": 1424, "run_id": 35530799092, "suite_id": 96201735624, "check_id": 106130918968, "head_sha": "836c80a308834db9b51dfa2acb02998aca7bfac5", "conclusion": "failure", "diagnostic": "Copilot session HTTP 403 authentication before analysis"},
+    {"pr": 1427, "run_id": 35530798284, "suite_id": 96201733935, "check_id": 106130917005, "head_sha": "f7a85f60b5833db824e95c2ff55490467dd6b608", "conclusion": "failure", "diagnostic": "Copilot session HTTP 403 authentication before analysis"},
+    {"pr": 1426, "run_id": 35519740464, "suite_id": 96174038266, "check_id": 106101652414, "head_sha": "4a3b3820bd898604dd981b3d9252565521a24c1d", "conclusion": "success", "diagnostic": "all changed files excluded; no prompt or model session"}
+  ]
+}

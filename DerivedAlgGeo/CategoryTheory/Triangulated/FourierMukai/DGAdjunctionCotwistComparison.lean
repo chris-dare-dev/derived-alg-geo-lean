@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.AdjunctionCotwistPresentation
+import DerivedAlgGeo.CategoryTheory.Triangulated.FunctorIsoShiftCompatibility
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.AdjunctionUnitKernel
 import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.DGAdjunctionPresentation
 
@@ -300,27 +301,36 @@ noncomputable def cotwistKernelAutoequivalence
 
 variable (N : S.PresentedUnitComparisonData adj H K hE)
 
-/-- Compatibility of the supplied conventional dg/Fourier--Mukai cotwist
-comparison with an independently selected shift structure on the
-Fourier--Mukai cotwist.
-
-The source uses the canonical sign-correct shift structure on the conventional
-pointwise `[-1]` cotwist.  Compatibility of the intermediate comparison from
-the actual shifted dg cone is derived canonically and is not stored here. -/
-structure ShiftCompatibility where
-  /-- The selected shift structure on the Fourier--Mukai cotwist. -/
-  cotwistCommShift : S.cotwist.CommShift ℤ
-  /-- The conventional cotwist comparison respects the source and target
-  shift structures. -/
-  transportedCotwistIso_commShift :
-    letI : (K.transportedCotwist eA).CommShift ℤ :=
-      K.transportedCotwistCommShift (eC := eA)
-    letI : S.cotwist.CommShift ℤ := cotwistCommShift
-    NatTrans.CommShift N.transportedCotwistIso.hom ℤ
+/-- The cotwist-specific specialization of the shared comparison-shift
+package. The source is fixed to the canonical sign-correct shift structure on
+the conventional pointwise `[-1]` cotwist. Compatibility of the intermediate
+comparison from the actual shifted dg cone is derived canonically and is not
+stored here. -/
+abbrev ShiftCompatibility :=
+  letI : (K.transportedCotwist eA).CommShift ℤ :=
+    K.transportedCotwistCommShift (eC := eA)
+  CategoryTheory.Triangulated.FunctorIsoShiftCompatibility
+    (K.transportedCotwist eA) S.cotwist N.transportedCotwistIso
 
 namespace ShiftCompatibility
 
+open CategoryTheory.Triangulated (FunctorIsoShiftCompatibility)
+
+/-- The sign-correct shift structure on the conventional pointwise `[-1]` cotwist. -/
+noncomputable local instance : (K.transportedCotwist eA).CommShift ℤ :=
+  K.transportedCotwistCommShift (eC := eA)
+
 variable (h : N.ShiftCompatibility)
+
+/-- The selected shift structure on the Fourier--Mukai cotwist. -/
+abbrev cotwistCommShift : S.cotwist.CommShift ℤ := h.targetCommShift
+
+/-- The conventional cotwist comparison respects its selected source and
+target shift structures. -/
+@[nolint defsWithUnderscore]
+abbrev transportedCotwistIso_commShift :
+    letI : S.cotwist.CommShift ℤ := h.cotwistCommShift
+    NatTrans.CommShift N.transportedCotwistIso.hom ℤ := h.hom_commShift
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The composite comparison from the actual shifted dg cotwist to the
@@ -353,12 +363,9 @@ theorem cotwistIsTriangulated [eA.functor.IsTriangulated] :
     S.cotwist.IsTriangulated := by
   letI : (K.transportedCotwist eA).CommShift ℤ :=
     K.transportedCotwistCommShift (eC := eA)
-  letI : S.cotwist.CommShift ℤ := h.cotwistCommShift
-  letI : NatTrans.CommShift N.transportedCotwistIso.hom ℤ :=
-    h.transportedCotwistIso_commShift
   letI : (K.transportedCotwist eA).IsTriangulated :=
     K.transportedCotwistIsTriangulated (eC := eA)
-  exact Functor.isTriangulated_of_iso N.transportedCotwistIso
+  exact h.is_triangulated_of_iso
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The kernel autoequivalence of the selected Fourier--Mukai cotwist is an
@@ -374,11 +381,11 @@ theorem cotwistKernelAutoequivalenceIsTriangulated
     (cotwistKernelAutoequivalence adj H K S hE N hK).equiv.IsTriangulated := by
   letI : (cotwistKernelAutoequivalence adj H K S hE N hK).equiv.functor.CommShift ℤ :=
     h.cotwistCommShift
-  letI : (cotwistKernelAutoequivalence adj H K S hE N hK).equiv.inverse.CommShift ℤ :=
-    (cotwistKernelAutoequivalence adj H K S hE N hK).equiv.commShiftInverse ℤ
-  letI : (cotwistKernelAutoequivalence adj H K S hE N hK).equiv.CommShift ℤ :=
-    (cotwistKernelAutoequivalence adj H K S hE N hK).equiv.commShift_of_functor ℤ
-  exact Equivalence.IsTriangulated.mk' _ h.cotwistIsTriangulated
+  letI : (K.transportedCotwist eA).CommShift ℤ :=
+    K.transportedCotwistCommShift (eC := eA)
+  letI : (K.transportedCotwist eA).IsTriangulated :=
+    K.transportedCotwistIsTriangulated (eC := eA)
+  exact FunctorIsoShiftCompatibility.is_triangulated_of_equivalence_functor_eq h rfl
 
 end ShiftCompatibility
 
