@@ -2,6 +2,7 @@
 """Focused failure and isolation tests for fresh private Lake cache bootstrap."""
 
 from concurrent.futures import ThreadPoolExecutor
+import fcntl
 import io
 import json
 import multiprocessing
@@ -547,6 +548,63 @@ class PrivatePackageCacheTest(unittest.TestCase):
         self.assertEqual((sibling / "keep").read_text(), "unchanged")
         self.assertEqual([p.name for p in sibling.iterdir()], ["keep"])
 
+
+    def _checkout(self) -> Path:
+        """A Git checkout whose HEAD commits the fixture pins."""
+        checkout = self._target("checkout")
+        git("-C", str(checkout), "init", "-q")
+        git("-C", str(checkout), "add", "lean-toolchain", "lake-manifest.json")
+        git("-C", str(checkout), "-c", "user.name=Fixture",
+            "-c", "user.email=fixture@example.test", "commit", "-qm", "pins")
+        return checkout
+
+    def test_evict_removes_stale_snapshots_and_keeps_the_pinned_one(self) -> None:
+        self._seed(self._target("seeded"))
+        key, _ = cache.pins(self.donor)
+        stale = self.store / ("0" * 64)
+        (stale / "current").mkdir(parents=True)
+        (stale / "current/cache.tar").write_bytes(b"older pins")
+        (stale / "current/cache.tar").chmod(0o444)
+        interrupted = self.store / ".removing-0123"
+        (interrupted / "partial").mkdir(parents=True)
+        (self.store / "not-a-key").mkdir()
+        checkout = self._checkout()
+        cache.evict_snapshots(checkout, ["HEAD"], dry_run=True)
+        self.assertTrue(stale.exists() and interrupted.exists())
+        cache.evict_snapshots(checkout, ["HEAD"], dry_run=False)
+        self.assertFalse(stale.exists())
+        self.assertFalse(interrupted.exists())
+        self.assertTrue((self.store / "not-a-key").is_dir())
+        self.assertTrue((self.store / key / "current/cache.tar").is_file())
+        shutil.rmtree(self.donor / ".lake")
+        after = self._target("after-eviction")
+        self._seed(after)  # the kept snapshot still seeds without a donor
+        cache.verify_ready(after)
+
+    def test_evict_skips_a_snapshot_whose_lock_is_held(self) -> None:
+        held = self.store / ("1" * 64)
+        held.mkdir(parents=True)
+        lock = os.open(held / ".lock", os.O_CREAT | os.O_RDWR, 0o600)
+        self.addCleanup(os.close, lock)
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        cache.evict_snapshots(self._checkout(), ["HEAD"], dry_run=False)
+        self.assertTrue(held.is_dir())
+
+    def test_evict_reads_pins_from_the_ref_not_the_worktree(self) -> None:
+        checkout = self._checkout()
+        key, _ = cache.pins(checkout)
+        (self.store / key).mkdir(parents=True)
+        (checkout / "lake-manifest.json").write_text('{"packages": []}')
+        cache.evict_snapshots(checkout, ["HEAD"], dry_run=False)
+        self.assertTrue((self.store / key).is_dir())
+
+    def test_evict_refuses_a_linked_store(self) -> None:
+        real = self.root / "real-store"
+        (real / ("2" * 64)).mkdir(parents=True)
+        self.store.symlink_to(real, target_is_directory=True)
+        with self.assertRaises(OSError):
+            cache.evict_snapshots(self._checkout(), ["HEAD"], dry_run=False)
+        self.assertTrue((real / ("2" * 64)).is_dir())
 
 if __name__ == "__main__":
     unittest.main()
