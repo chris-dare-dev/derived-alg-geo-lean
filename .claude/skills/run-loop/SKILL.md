@@ -34,7 +34,9 @@ git -C "$REPO" show origin/main:.claude/skills/run-loop/SKILL.md
 
 Then read each queue issue's loop-state comment (see "Loop state") and check it
 against the live state (`gh pr view`, `git -C <worktree> status`). The live
-state beats the comment, and the comment beats your memory. Read nothing else
+state beats the comment, and the comment beats your memory. Auto-merge often
+lands between turns: retire the worktree of every PR that merged since (Merge,
+last step) before starting anything new. Read nothing else
 about process: `.claude/loop-specs/`, `openspec/changes/`,
 `scripts/loop_engine.py`, `.loop-runs/` and the loop docs are history and grant
 nothing, even where they name your issue.
@@ -71,7 +73,8 @@ them with
    issues added while you worked.
 
 While one PR waits on CI you may start the next issue in its own worktree. Keep
-no more than two issues in flight.
+no more than two issues in flight, and give each new worktree the budget check
+below.
 
 ## Each issue
 
@@ -118,16 +121,43 @@ no more than two issues in flight.
    controller runs, round caps, CI platforms); this skill decides process.
 
    Then work in the issue's own worktree, so the scouts and the plan write
-   there. To continue an earlier attempt, add the worktree on its branch
-   (`git -C "$REPO" worktree add "$WT" <branch>`) instead of creating one:
+   there. Worktrees go under the one root `scripts/loop_worktrees.py root`
+   names: never `/tmp`, which a reboot wipes, and never a Codex `worktrees`
+   directory, whose cleanup deletes worktrees Codex did not create. Each new
+   one must pass the disk budget first:
    ```bash
    REPO=$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)")
-   N=<issue>; SLUG=<short-slug>; WT=<new worktree directory>
+   N=<issue>; SLUG=<short-slug>
+   python3 "$REPO/scripts/loop_worktrees.py" check || exit 1
+   WT="$(python3 "$REPO/scripts/loop_worktrees.py" root)/$N-$SLUG" || exit 1
    git -C "$REPO" worktree add -b "agent/$N-$SLUG" "$WT" origin/main
-   (cd "$WT" && bash scripts/seed_worktree_cache.sh)
+   (cd "$WT" && bash scripts/seed_worktree_cache.sh --private-packages) || {
+     echo "Private cache seed failed; do not run Lean in this worktree." >&2
+     exit 1
+   }
    V="$REPO/.loop-tools"
    [ -x "$V/bin/python" ] || { python3 -m venv "$V" && "$V/bin/pip" install -q -r "$WT/scripts/requirements-loop.txt"; }
    ```
+   `check` refuses when free disk would fall below its floor or the root
+   already holds its cap of worktrees. Retire this queue's finished worktrees
+   (Merge, last step) and run it again; if it still refuses, stop (see "When to
+   stop").
+
+   To continue an earlier attempt, reuse its worktree when one is on the branch
+   (`git -C "$REPO" worktree list`) and `bash scripts/seed_worktree_cache.sh`
+   run there verifies its private-cache receipt. Otherwise commit and push what
+   the old checkout holds, retire it, and add a fresh worktree on the branch
+   (`git -C "$REPO" worktree add "$WT" <branch>`, after `check`) to seed. If
+   `retire` refuses because other worktrees use its `.lake/packages`, free the
+   branch with `git -C <old> switch --detach` and leave that checkout for the
+   owner's cleanup.
+
+   The first private seed may create a checked package snapshot from a quiet
+   pinned donor. It needs disk for the snapshot and a private copy; a checked
+   snapshot remains usable when that donor later disappears. The helper
+   verifies the receipt before returning, and any refusal stops Lean. This
+   bootstrap only accepts a fresh worktree with no `.lake`; never run it over
+   an existing `.lake`: `--force` migration is not implemented.
    Agents you spawn start in the shared checkout, not in your worktree: give
    them the worktree path, and have them run every command and write every file
    there.
@@ -256,9 +286,15 @@ no more than two issues in flight.
      in Claude Code pass the maximum Bash timeout and re-run it until it
      returns). Apply the rules above, and park only a PR that still cannot
      merge.
-   - After a merge, update the issue's loop-state comment and remove the
-     worktree. For a progress PR, the next item is the next slice of the same
-     issue, until its definition of done is met.
+   - After a merge, update the issue's loop-state comment and retire the
+     worktree, which also deletes its local branch (the squash merge left it
+     unreachable from `main`):
+     `python3 "$REPO/scripts/loop_worktrees.py" retire "$WT"`. If the merge
+     changed `lean-toolchain` or `lake-manifest.json`, also drop the package
+     snapshots of the old pins:
+     `python3 "$REPO/scripts/private_package_cache.py" --evict-snapshots --target "$REPO"`.
+     For a progress PR, the next item is the next slice of the same issue,
+     until its definition of done is met.
 
 ## Milestone retrospective
 
@@ -309,7 +345,9 @@ fails on its third reviewed commit and fixing it would change reviewed content,
 do not park yet. Freeze the attempt and look for a different approach:
 - Push the branch and mark its PR draft with the open findings in the
   description (as in Park). Record the attempt in the loop-state comment: the
-  last reviewed commit, the rounds used and the unresolved findings.
+  last reviewed commit, the rounds used and the unresolved findings. Then
+  retire its worktree: the pushed branch holds the frozen attempt, and a
+  successor starts in a fresh one.
 - Dispatch a separate, read-only research agent with the issue's acceptance
   criteria, every review finding and the live base. Ask for the cause of the
   failure, at least two plausible approaches (or why only one survives), a
@@ -347,7 +385,8 @@ Then park it:
   description holds the plan, the open findings and every round's verdicts, and
   ends `Progress toward #<n>`. Work left only in a local worktree is invisible
   to the owner and to the next run. If no code is worth keeping, record what you
-  found in the issue's loop-state comment.
+  found in the issue's loop-state comment. Once the branch is pushed, retire the
+  worktree.
 - Add it to the final report, and take the next issue.
 
 Never re-chunk, rename or restart an issue to get a fresh review budget.
@@ -397,7 +436,9 @@ Never:
 ## When to stop
 
 Stop only when:
-1. You need something only the owner has: a password, a token, `sudo`, 2FA.
+1. You need something only the owner has: a password, a token, `sudo`, 2FA,
+   or disk: `loop_worktrees.py check` still refuses after you retired this
+   queue's finished worktrees. Report the free disk and the worktrees left.
 2. Every issue left in the queue needs an action the owner has withdrawn, or a
    bypassed check.
 3. The queue is empty, research after exhausted attempts included.
@@ -419,7 +460,9 @@ pick up from the queue.
   in the loop-state comment on each queue issue; read them before acting."
   Create one hourly heartbeat on this thread (`automation_update`) whose whole
   prompt is: "Continue the loop run for <queue>: run the run-loop Start section,
-  then resume from the loop-state comments." Pause it after the final report.
+  then resume from the loop-state comments." Keep one heartbeat per queue: if
+  this account already has one for the queue, update it rather than adding
+  another. Pause it after the final report, and before a handover (below).
   Put no rules, facts or SHAs in either text: both are re-sent word for word and
   outlive what they describe.
 - Do not call `request_user_input_async`, and do not mark the goal blocked while
@@ -431,8 +474,9 @@ pick up from the queue.
 ## Handing over
 
 If you are asked for a handoff, or must stop before the queue is empty, bring
-every loop-state comment up to date and push every branch. Then reply with
-only: "Continue the loop run for <queue>. Run the run-loop skill from
+every loop-state comment up to date and push every branch. In Codex, pause this
+thread's heartbeat, so only the account that takes over keeps one. Then reply
+with only: "Continue the loop run for <queue>. Run the run-loop skill from
 origin/main; state is in the loop-state comment on each queue issue. Re-check
 every open PR live." Restate no facts, rules, round counts or SHAs. In Codex you
 may add one line naming the local account with the most weekly headroom (the

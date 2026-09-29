@@ -16,6 +16,7 @@ import DerivedAlgGeo.Algebra.Homology.Localization
 import DerivedAlgGeo.Algebra.Homology.LeftResolution
 import DerivedAlgGeo.Algebra.Homology.ShortComplex
 import DerivedAlgGeo.Algebra.Homology.Subcomplex
+import DerivedAlgGeo.Algebra.Homology.TotalComplex
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence
 import DerivedAlgGeo.Algebra.Homology.EulerCharacteristic
 
