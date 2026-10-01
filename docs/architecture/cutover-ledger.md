@@ -2562,6 +2562,20 @@ or exactness was strengthened by relocation.
 
 ## Confirmed next lanes
 
+The SF8 #554 Route B review on 2026-09-27 confirmed one pending
+declaration-level cutover: the canonical integer-tail API
+`HomologicalComplex.stupidTruncGEι`, `stupidTruncGEMap`, their laws and
+naturality, and the associated component isomorphism currently sit in the
+filtered-total consumer. Their target owner is
+`Algebra/Homology/Embedding/StupidTruncGE.lean`, beside Mathlib's embedding
+and stupid-truncation APIs. The target is not implemented on `main` by this
+ledger entry; draft #1619 is frozen after three review rounds. Its future
+source PR must move the existing declarations without a second root or an
+import shim, update imports and audits, and keep the neutral adjacent total
+short exact construction downstream. The accompanying source change moves
+`HomologicalComplex.HomologySequence.quasiIso_τ₂` to the repository's
+`HomologySequenceLemmas` owner; only the tail cutover remains pending here.
+
 Every path lane confirmed by the 2026-09-01 audit has landed, and so have
 both lanes recorded after it: the `ObjectProperty` lift block (2026-09-02)
 and the left-orthogonal colimit closure (2026-09-03). Both are entries under

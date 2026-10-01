@@ -9,6 +9,7 @@ import DerivedAlgGeo.Algebra.Homology.Embedding
 import DerivedAlgGeo.Algebra.Homology.HomologicalComplexLimits
 import DerivedAlgGeo.Algebra.Homology.HomologicalBicomplex
 import DerivedAlgGeo.Algebra.Homology.HomologicalComplexFiniteDescent
+import DerivedAlgGeo.Algebra.Homology.HomologySequenceLemmas
 import DerivedAlgGeo.Algebra.Homology.Homotopy
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory
 import DerivedAlgGeo.Algebra.Homology.Localization
