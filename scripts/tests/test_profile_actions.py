@@ -32,7 +32,7 @@ class ProfileActionTests(unittest.TestCase):
         self.assertEqual(result["failures"], [])
         self.assertIsNone(result["phase_durations_seconds"]["queue"])
         self.assertEqual(result["workflow_start_delay_seconds"], 120.0)
-        self.assertGreater(result["wall_clock_seconds"], 0)
+        self.assertIsNone(result["wall_clock_seconds"])
 
     def test_profile_rejects_run_with_only_pending_jobs(self) -> None:
         payload = copy.deepcopy(SAMPLE)
@@ -115,9 +115,9 @@ class ProfileActionTests(unittest.TestCase):
         payload["jobs"].extend([
             {
                 "id": 2, "name": "roadmap", "created_at": "2026-09-20T18:00:00Z",
-                "started_at": "2026-09-20T18:00:00Z",
+                "started_at": "2026-09-20T18:02:00Z",
                 "completed_at": "2026-09-20T18:05:00Z", "conclusion": "success",
-                "steps": [{"name": "Roadmap", "started_at": "2026-09-20T18:00:00Z",
+                "steps": [{"name": "Roadmap", "started_at": "2026-09-20T18:02:00Z",
                            "completed_at": "2026-09-20T18:05:00Z"}],
             },
             {
@@ -147,8 +147,10 @@ class ProfileActionTests(unittest.TestCase):
         result = profile_actions.profile_run(payload)
         cancelled = next(job for job in result["jobs"] if job["name"] == "cancelled")
         self.assertIsNone(cancelled["duration_seconds"])
-        self.assertEqual(cancelled["runner_queue_seconds"], 61.0)
-        self.assertTrue(any("precedes start" in item for item in result["timestamp_anomalies"]))
+        self.assertEqual(cancelled["attribution"], "uncertain")
+        self.assertIsNone(cancelled["runner_queue_seconds"])
+        self.assertEqual(result["attribution_uncertain_failures"][0]["class"], "cancelled")
+        self.assertTrue(any("inverted" in item for item in result["timestamp_anomalies"]))
 
     def test_inverted_step_marks_affected_phase_unknown(self) -> None:
         payload = copy.deepcopy(SAMPLE)
@@ -156,7 +158,8 @@ class ProfileActionTests(unittest.TestCase):
         audit["completed_at"] = "2026-09-20T18:09:47Z"
         result = profile_actions.profile_run(payload)
         self.assertIsNone(result["phase_durations_seconds"]["audit"])
-        self.assertEqual(result["phase_durations_seconds"]["reset"], 468.0)
+        self.assertIsNone(result["phase_durations_seconds"]["reset"])
+        self.assertEqual(result["jobs"][0]["attribution"], "uncertain")
 
     def test_executed_job_without_steps_does_not_claim_zero_phase_time(self) -> None:
         payload = copy.deepcopy(SAMPLE)
@@ -186,6 +189,7 @@ class ProfileActionTests(unittest.TestCase):
         run = {
             "id": 36334136413, "run_attempt": 2, "head_sha": SAMPLE["head_sha"],
             "event": "pull_request", "status": "completed", "conclusion": "success",
+            "path": ".github/workflows/ci.yml",
             "created_at": "2026-09-27T17:27:02Z", "run_started_at": "2026-09-27T17:27:02Z",
         }
         old = {
@@ -215,6 +219,7 @@ class ProfileActionTests(unittest.TestCase):
         self.assertIsNone(result["jobs"][0]["duration_seconds"])
         self.assertEqual(result["phase_durations_seconds"]["lake_build"], 0.0)
         self.assertEqual(result["wall_clock_seconds"], 92.0)
+        self.assertEqual(result["selected_job_active_seconds"], 92.0)
         self.assertEqual(result["run"]["platform"], "github-hosted-ubuntu")
 
         # GitHub may report the attempt start one second before created_at.
@@ -223,8 +228,8 @@ class ProfileActionTests(unittest.TestCase):
         current["steps"][0]["started_at"] = run["run_started_at"]
         result = profile_actions.profile_bundle(bundle, {"build": [], "roadmap": []})
         self.assertFalse(result["jobs"][1]["carried_forward"])
-        self.assertFalse(result["jobs"][1]["attribution_uncertain"])
-        self.assertEqual(result["wall_clock_seconds"], 97.0)
+        self.assertTrue(result["jobs"][1]["attribution_uncertain"])
+        self.assertIsNone(result["wall_clock_seconds"])
 
     def test_overlap_before_attempt_start_is_uncertain(self) -> None:
         payload = copy.deepcopy(SAMPLE)
@@ -256,6 +261,8 @@ class ProfileActionTests(unittest.TestCase):
         self.assertEqual(ci["dependency_wait_seconds"], 2820.0)
         self.assertEqual(ci["scheduler_gap_seconds"], 1.0)
         self.assertEqual(ci["runner_queue_seconds"], 2.0)
+        self.assertEqual(result["wall_clock_seconds"], 2704.0)
+        self.assertEqual(result["selected_job_active_seconds"], 2701.0)
 
     def test_duplicate_job_name_rejected_when_graph_is_ambiguous(self) -> None:
         payload = copy.deepcopy(SAMPLE)
@@ -269,6 +276,7 @@ class ProfileActionTests(unittest.TestCase):
         run = {
             "id": SAMPLE["id"], "run_attempt": 1,
             "head_sha": SAMPLE["head_sha"], "event": SAMPLE["event"],
+            "path": ".github/workflows/ci.yml",
             "status": "completed", "conclusion": "success",
             "created_at": SAMPLE["created_at"],
             "run_started_at": SAMPLE["run_started_at"],
@@ -298,6 +306,7 @@ class ProfileActionTests(unittest.TestCase):
         run = {
             "id": SAMPLE["id"], "run_attempt": 1,
             "head_sha": SAMPLE["head_sha"], "event": SAMPLE["event"],
+            "path": ".github/workflows/ci.yml",
             "status": "completed", "conclusion": "success",
             "created_at": SAMPLE["created_at"],
             "run_started_at": SAMPLE["run_started_at"],
@@ -322,6 +331,15 @@ class ProfileActionTests(unittest.TestCase):
         altered["jobs_pages"][0]["response"]["jobs"] = []
         with self.assertRaisesRegex(ValueError, "differ from flattened"):
             profile_actions.profile_bundle(altered)
+
+        for field, value in (("event", "pull_request"),
+                             ("path", ".github/workflows/other.yml")):
+            with self.subTest(field=field):
+                altered = copy.deepcopy(bundle)
+                altered["attempt"] = copy.deepcopy(altered["attempt"])
+                altered["attempt"][field] = value
+                with self.assertRaisesRegex(ValueError, "identity is inconsistent"):
+                    profile_actions.profile_bundle(altered)
 
 
 if __name__ == "__main__":
