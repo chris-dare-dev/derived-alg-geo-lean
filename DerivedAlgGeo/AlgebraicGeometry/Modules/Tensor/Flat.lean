@@ -16,23 +16,32 @@ and its termwise action preserves quasi-isomorphisms of complexes of any shape.
 These results treat a flat sheaf fixed in degree zero; K-flatness of a complex
 of flat sheaves and arbitrary derived pullback remain separate.
 
-## Proof ingredients
-
-`PresheafOfModules.stalkTensorEquiv` and
-`PresheafOfModules.stalkMapAdd_whiskerLeft` transfer
-`Module.Flat.lTensor_preserves_injective_linearMap` to sheaf stalks. Joint
-stalk reflection then gives mono preservation. Tensor colimits supply
-cokernels, so `Functor.preservesHomology_of_preservesMonos_and_cokernels`
-gives homology preservation. A private natural tensor-commutativity isomorphism
-handles the right slot. `HomologicalComplex.quasiIso_map_of_preservesHomology`
-gives the arbitrary-shape quasi-isomorphism corollaries.
-
 ## Main results
 
 * `AlgebraicGeometry.Scheme.Modules.tensorLeftFunctor_preservesHomology_of_isFlatOverId`
 * `AlgebraicGeometry.Scheme.Modules.tensorRight_preservesHomology_of_isFlatOverId`
 * `AlgebraicGeometry.Scheme.Modules.quasiIso_map_tensorLeftFunctor_of_isFlatOverId`
 * `AlgebraicGeometry.Scheme.Modules.quasiIso_map_tensorRight_of_isFlatOverId`
+
+## Implementation notes
+
+`PresheafOfModules.stalkTensorEquiv` and
+`PresheafOfModules.stalkMapAdd_whiskerLeft` transfer
+`Module.Flat.lTensor_preserves_injective_linearMap` to sheaf stalks. Joint
+stalk reflection then gives mono preservation. Tensor colimits supply
+cokernels, so
+`CategoryTheory.Functor.preservesHomology_of_preservesMonos_and_cokernels`
+gives homology preservation. A private natural tensor-commutativity isomorphism
+handles the right slot. `HomologicalComplex.quasiIso_map_of_preservesHomology`
+gives the arbitrary-shape quasi-isomorphism corollaries.
+
+## References
+
+* Mathlib/RingTheory/Flat/Basic.lean: flat-module tensor injectivity.
+* Mathlib/CategoryTheory/Abelian/Exact.lean: homology preservation from
+  monomorphisms and cokernels.
+* Mathlib/Algebra/Homology/QuasiIso.lean: mapped quasi-isomorphisms under a
+  homology-preserving functor.
 -/
 
 open CategoryTheory CategoryTheory.Limits MonoidalCategory Opposite TopologicalSpace
@@ -50,7 +59,7 @@ private local instance (X : Scheme.{u}) : MonoidalCategory X.PresheafOfModules :
 private local instance (X : Scheme.{u}) : SymmetricCategory X.PresheafOfModules :=
   _root_.PresheafOfModules.symmetricCategory (R := X.presheaf)
 
-private def flatTensorStalkComparison (X : Scheme.{u}) (P : _root_.PresheafOfModules.{u}
+private def presheafModuleStalkLinearEquiv (X : Scheme.{u}) (P : _root_.PresheafOfModules.{u}
     (X.presheaf ⋙ forget₂ CommRingCat RingCat)) (x : X) :
     ((presheafModuleStalkFunctor X x).obj P) ≃ₗ[X.presheaf.stalk x]
       ↑(TopCat.Presheaf.stalk P.presheaf x) := by
@@ -103,7 +112,7 @@ private lemma mono_tensorLeft_of_isFlatOverId (X : Scheme.{u}) (L : X.Modules)
       change Module.Flat (X.presheaf.stalk x) ((moduleStalkFunctor X x).obj L)
       infer_instance
     haveI : Module.Flat (X.presheaf.stalk x) ↑(TopCat.Presheaf.stalk LP.presheaf x) :=
-      Module.Flat.of_linearEquiv (flatTensorStalkComparison X LP x).symm
+      Module.Flat.of_linearEquiv (presheafModuleStalkLinearEquiv X LP x).symm
     have hf : Function.Injective (_root_.PresheafOfModules.stalkMap g x) :=
       (ModuleCat.mono_iff_injective ((moduleStalkFunctor X x).map f)).mp inferInstance
     have hg : Function.Injective (_root_.PresheafOfModules.stalkMapAdd (LP ◁ g) x) :=
