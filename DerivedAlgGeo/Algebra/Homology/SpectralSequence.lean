@@ -1,5 +1,6 @@
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence.FilteredComplexSpectralObject
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence.FilteredTotalComplex
+import DerivedAlgGeo.Algebra.Homology.SpectralSequence.FilteredTotalComplexAdjacentCore
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence.FilteredTotalComplexAdjacent
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence.ExtendHomologyNaturality
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence.FilteredTotalComplexFirstPageDifferential

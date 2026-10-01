@@ -2,7 +2,8 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.Algebra.Homology.SpectralSequence.FilteredTotalComplexAdjacent
+import DerivedAlgGeo.Algebra.Homology.SpectralSequence.FilteredTotalComplexAdjacentCore
+import Mathlib.Algebra.Category.Grp.Abelian
 import Mathlib.Algebra.Homology.DerivedCategory.HomologySequence
 import Mathlib.Algebra.Homology.QuasiIso
 
@@ -29,8 +30,9 @@ first-quadrant total complexes of abelian groups.
 The composition result uses the octahedral mapping-cone triangle in the
 derived category. The total result compares finite-column cones through
 adjacent-column maps, then identifies the connective tail with the full
-total. The middle-term short-exact comparison lives at the separate generic
-homology-sequence owner.
+total. The generic adjacent-column maps and their cone quasi-isomorphism are
+in `FilteredTotalComplexAdjacentCore`. The middle-term short-exact comparison
+lives at the separate generic homology-sequence owner.
 
 ## References
 
@@ -199,167 +201,6 @@ def IsHorizontallyConnective
       (ComplexShape.up ℤ) (ComplexShape.up ℤ)) : Prop :=
   ∀ p q : ℤ, p < 0 → IsZero ((K.X p).X q)
 
-/-- Stupid column truncation is natural in the bicomplex. -/
-private noncomputable def truncatedBicomplexMap (f : K ⟶ L) (p : ℤ) :
-    truncatedBicomplex K p ⟶ truncatedBicomplex L p :=
-  HomologicalComplex.stupidTruncMap f (ComplexShape.embeddingUpIntGE p)
-
-/-- The single-column construction is natural in the bicomplex. -/
-private noncomputable def singleColumnBicomplexMap (f : K ⟶ L) (p : ℤ) :
-    singleColumnBicomplex K p ⟶ singleColumnBicomplex L p :=
-  (CochainComplex.singleFunctor (CochainComplex AddCommGrpCat.{w} ℤ) p).map (f.f p)
-
-/-- The identification of a single column with a shifted degree-zero column is natural. -/
-@[reassoc]
-private lemma singleColumnShiftIso_naturality (f : K ⟶ L) (p : ℤ) :
-    singleColumnBicomplexMap f p ≫ (singleColumnShiftIso L p).hom =
-      (singleColumnShiftIso K p).hom ≫
-        (shiftFunctor₁ AddCommGrpCat.{w} (-p)).map
-          (singleZeroBicomplexMap (f.f p)) := by
-  exact ((CochainComplex.singleFunctors
-    (CochainComplex AddCommGrpCat.{w} ℤ)).shiftIso
-      (-p) p 0 (by omega)).inv.naturality (f.f p)
-
-set_option backward.defeqAttrib.useBackward true in
-set_option backward.isDefEq.respectTransparency false in
-/-- The standard identification of a single-column total complex with the shifted column is
-natural. -/
-@[reassoc]
-private lemma singleColumnTotalIso_naturality (f : K ⟶ L) (p : ℤ) :
-    total.map (singleColumnBicomplexMap f p) (ComplexShape.up ℤ) ≫
-        (singleColumnTotalIso L p).hom =
-      (singleColumnTotalIso K p).hom ≫ (f.f p)⟦-p⟧' := by
-  dsimp only [singleColumnTotalIso, Iso.trans_hom]
-  simp only [HomologicalComplex₂.total.mapIso_hom, Functor.mapIso_hom,
-    Category.assoc]
-  rw [← Category.assoc, ← total.map_comp]
-  rw [singleColumnShiftIso_naturality]
-  rw [total.map_comp]
-  rw [Category.assoc]
-  rw [HomologicalComplex₂.totalShift₁Iso_hom_naturality_assoc]
-  rw [← Functor.map_comp]
-  rw [singleZeroTotalIso_naturality]
-  rw [Functor.map_comp]
-
-/-- A quasi-isomorphism on one vertical column induces a quasi-isomorphism on its single-column
-total complex. -/
-private lemma singleColumnTotalMap_quasiIso (f : K ⟶ L) (p : ℤ)
-    (h : QuasiIso (f.f p)) :
-    QuasiIso (total.map (singleColumnBicomplexMap f p) (ComplexShape.up ℤ)) := by
-  letI : QuasiIso (f.f p) := h
-  rw [← quasiIso_iff_comp_right _ (singleColumnTotalIso L p).hom]
-  rw [singleColumnTotalIso_naturality]
-  infer_instance
-
-set_option backward.defeqAttrib.useBackward true in
-set_option backward.isDefEq.respectTransparency false in
-/-- A bicomplex morphism maps the adjacent-column short exact sequence of its source to that of
-its target. -/
-private noncomputable def adjacentColumnTotalShortComplexMap (f : K ⟶ L) (p : ℤ) :
-    adjacentColumnTotalShortComplex K p ⟶ adjacentColumnTotalShortComplex L p where
-  τ₁ := total.map (truncatedBicomplexMap f (p + 1)) (ComplexShape.up ℤ)
-  τ₂ := total.map (truncatedBicomplexMap f p) (ComplexShape.up ℤ)
-  τ₃ := total.map (singleColumnBicomplexMap f p) (ComplexShape.up ℤ)
-  comm₁₂ := by
-    dsimp [adjacentColumnTotalShortComplex, adjacentColumnBicomplexShortComplex]
-    rw [← total.map_comp, ← total.map_comp]
-    congr 1
-    apply HomologicalComplex.Hom.ext
-    funext i
-    by_cases hi : p + 1 ≤ i
-    · dsimp [adjacentColumnInclusion, HomologicalComplex.stupidTruncGEMap]
-      rw [dif_pos hi, dif_pos hi]
-      let eK₀ := stupidTruncGEXIso K (p + 1) i hi
-      let eK₁ := stupidTruncGEXIso K p i (by omega)
-      let eL₀ := stupidTruncGEXIso L (p + 1) i hi
-      let eL₁ := stupidTruncGEXIso L p i (by omega)
-      change (truncatedBicomplexMap f (p + 1)).f i ≫ eL₀.hom ≫ eL₁.inv =
-        eK₀.hom ≫ eK₁.inv ≫ (truncatedBicomplexMap f p).f i
-      dsimp [truncatedBicomplexMap, truncatedBicomplex]
-      rw [← cancel_mono eL₁.hom]
-      simp only [Category.assoc, eL₁.inv_hom_id, Category.comp_id]
-      rw [← Category.assoc, ← Category.assoc]
-      dsimp [eK₀, eK₁, eL₀, eL₁, stupidTruncGEXIso,
-        HomologicalComplex.stupidTruncGEXIso]
-      rw [HomologicalComplex.stupidTruncMap_stupidTruncXIso_hom]
-      simp only [Category.assoc]
-      rw [HomologicalComplex.stupidTruncMap_stupidTruncXIso_hom]
-      simp
-    · apply IsZero.eq_of_src
-      apply HomologicalComplex.isZero_stupidTrunc_X
-      rw [ComplexShape.notMem_range_embeddingUpIntGE_iff]
-      omega
-  comm₂₃ := by
-    dsimp [adjacentColumnTotalShortComplex, adjacentColumnBicomplexShortComplex]
-    rw [← total.map_comp, ← total.map_comp]
-    congr 1
-    apply HomologicalComplex.Hom.ext
-    funext i
-    by_cases hi : i = p
-    · subst i
-      let eK := K.stupidTruncXIso (ComplexShape.embeddingUpIntGE p)
-        (i := 0) (i' := p) (by simp [ComplexShape.embeddingUpIntGE])
-      let eL := L.stupidTruncXIso (ComplexShape.embeddingUpIntGE p)
-        (i := 0) (i' := p) (by simp [ComplexShape.embeddingUpIntGE])
-      let sK := singleColumnXIso K p p rfl
-      let sL := singleColumnXIso L p p rfl
-      rw [HomologicalComplex.comp_f, HomologicalComplex.comp_f]
-      dsimp [adjacentColumnProjection]
-      rw [dif_pos rfl, dif_pos rfl]
-      simp only [Category.id_comp]
-      change (truncatedBicomplexMap f p).f p ≫ eL.hom ≫ sL.inv =
-        eK.hom ≫ sK.inv ≫ (singleColumnBicomplexMap f p).f p
-      rw [← cancel_mono sL.hom]
-      simp only [Category.assoc, sL.inv_hom_id, Category.comp_id]
-      dsimp [truncatedBicomplexMap, truncatedBicomplex, singleColumnBicomplexMap, eK, eL]
-      rw [HomologicalComplex.stupidTruncMap_stupidTruncXIso_hom]
-      rw [cancel_epi (K.stupidTruncXIso
-        (ComplexShape.embeddingUpIntGE p) (i := 0) (i' := p)
-          (by simp [ComplexShape.embeddingUpIntGE])).hom]
-      dsimp [sK, sL, singleColumnXIso, singleColumnBicomplex]
-      change f.f p =
-        (HomologicalComplex.singleObjXSelf (ComplexShape.up ℤ) p (K.X p)).inv ≫
-          ((HomologicalComplex.single (CochainComplex AddCommGrpCat.{w} ℤ)
-            (ComplexShape.up ℤ) p).map (f.f p)).f p ≫
-          (HomologicalComplex.singleObjXSelf (ComplexShape.up ℤ) p (L.X p)).hom
-      rw [HomologicalComplex.single_map_f_self]
-      simp
-    · apply IsZero.eq_of_tgt
-      apply HomologicalComplex.isZero_single_obj_X
-      exact hi
-
-/-- The morphism between the mapping cones of two adjacent-column inclusions induced by a
-bicomplex morphism. -/
-private noncomputable def adjacentColumnConeMap (f : K ⟶ L) (p : ℤ) :
-    CochainComplex.mappingCone (adjacentColumnTotalShortComplex K p).f ⟶
-      CochainComplex.mappingCone (adjacentColumnTotalShortComplex L p).f :=
-  CochainComplex.mappingCone.map _ _
-    (adjacentColumnTotalShortComplexMap f p).τ₁
-    (adjacentColumnTotalShortComplexMap f p).τ₂
-    (adjacentColumnTotalShortComplexMap f p).comm₁₂.symm
-
-/-- A quasi-isomorphism on one vertical column induces a quasi-isomorphism on the mapping cone
-of the corresponding adjacent-column inclusion. -/
-private lemma adjacentColumnConeMap_quasiIso (f : K ⟶ L) (p : ℤ)
-    (h : QuasiIso (f.f p)) : QuasiIso (adjacentColumnConeMap f p) := by
-  have h₃ : QuasiIso (adjacentColumnTotalShortComplexMap f p).τ₃ := by
-    exact singleColumnTotalMap_quasiIso f p h
-  letI : QuasiIso (adjacentColumnTotalShortComplexMap f p).τ₃ := h₃
-  letI : QuasiIso (CochainComplex.mappingCone.descShortComplex
-      (adjacentColumnTotalShortComplex L p)) :=
-    CochainComplex.mappingCone.quasiIso_descShortComplex
-      (adjacentColumnTotalShortExact L p)
-  letI : QuasiIso (CochainComplex.mappingCone.descShortComplex
-      (adjacentColumnTotalShortComplex K p)) :=
-    CochainComplex.mappingCone.quasiIso_descShortComplex
-      (adjacentColumnTotalShortExact K p)
-  rw [← quasiIso_iff_comp_right _
-    (CochainComplex.mappingCone.descShortComplex
-      (adjacentColumnTotalShortComplex L p))]
-  dsimp [adjacentColumnConeMap]
-  rw [CochainComplex.mappingCone.map_descShortComplex]
-  infer_instance
-
 /-- The inclusion of the tail beginning in column `n + 1` into the tail beginning in column
 zero.  Its cone is the finite quotient containing columns `0, …, n`. -/
 private noncomputable def tailToZero
@@ -404,31 +245,8 @@ private lemma truncatedBicomplexMap_naturality_inclusion (f : K ⟶ L)
   dsimp [truncatedTotalMap]
   rw [← total.map_comp, ← total.map_comp]
   congr 1
-  apply HomologicalComplex.Hom.ext
-  funext i
-  by_cases hi : q ≤ i
-  · dsimp [HomologicalComplex.stupidTruncGEMap]
-    rw [dif_pos hi, dif_pos hi]
-    let eK₀ := stupidTruncGEXIso K q i hi
-    let eK₁ := stupidTruncGEXIso K p i (hpq.trans hi)
-    let eL₀ := stupidTruncGEXIso L q i hi
-    let eL₁ := stupidTruncGEXIso L p i (hpq.trans hi)
-    change (truncatedBicomplexMap f q).f i ≫ eL₀.hom ≫ eL₁.inv =
-      eK₀.hom ≫ eK₁.inv ≫ (truncatedBicomplexMap f p).f i
-    dsimp [truncatedBicomplexMap, truncatedBicomplex]
-    rw [← cancel_mono eL₁.hom]
-    simp only [Category.assoc, eL₁.inv_hom_id, Category.comp_id]
-    rw [← Category.assoc, ← Category.assoc]
-    dsimp [eK₀, eK₁, eL₀, eL₁, stupidTruncGEXIso,
-      HomologicalComplex.stupidTruncGEXIso]
-    rw [HomologicalComplex.stupidTruncMap_stupidTruncXIso_hom]
-    simp only [Category.assoc]
-    rw [HomologicalComplex.stupidTruncMap_stupidTruncXIso_hom]
-    simp
-  · apply IsZero.eq_of_src
-    apply HomologicalComplex.isZero_stupidTrunc_X
-    rw [ComplexShape.notMem_range_embeddingUpIntGE_iff]
-    omega
+  simpa only [truncatedBicomplexMap] using
+    (HomologicalComplex.stupidTruncGEMap_naturality f p q hpq)
 
 /-- The direct inclusion of a column tail is natural in the bicomplex. -/
 private lemma tailToZero_naturality (f : K ⟶ L) (n : ℕ) :
