@@ -3,6 +3,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Pushforward.Affine
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pushforward.BaseChange
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pushforward.ClosedImmersion
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pushforward.Iso
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Pushforward.Monoidal
 
 /-! # Pushforward of module sheaves
 

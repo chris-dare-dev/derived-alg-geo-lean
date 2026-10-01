@@ -7,5 +7,6 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Colimits
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Complex
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Invertible
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Linear
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Sections
 
 /-! # Tensor products of module sheaves -/
