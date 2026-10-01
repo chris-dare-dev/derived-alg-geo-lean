@@ -19,6 +19,8 @@ specialization retains the scalar presentation used by scheme stalks.
 
 * `PresheafOfModules.stalkRingCocone` and `PresheafOfModules.stalkRingIsColimit` lift the
   ring-stalk colimit through the forgetful functor to rings.
+* `PresheafOfModules.stalkFunctorOfIsColimit` takes module stalks using a chosen
+  colimit cocone of the neighborhood ring diagram.
 * `PresheafOfModules.neighborhoodStalkFunctor` takes the module colimit on open neighborhoods
   over a general ring presheaf.
 * `PresheafOfModules.stalkFunctor` first restricts a module presheaf to neighborhoods.
@@ -90,6 +92,16 @@ theorem stalkRingComparisonIso_hom_germ (U : Opens X) (hx : x ∈ U)
       (colimit.isColimit ((OpenNhds.inclusion x).op ⋙ R ⋙ forget₂ CommRingCat RingCat))
       (stalkRingIsColimit X R x) (op ⟨U, hx⟩)) r
 
+/-- Restrict module presheaves to neighborhoods and take their colimit over a
+chosen colimit cocone of rings. Both the ordinary ring stalk and the
+commutative-ring stalk presentation specialize this construction. -/
+def stalkFunctorOfIsColimit (X : TopCat.{u}) (S : X.Presheaf RingCat.{u}) (x : X)
+    {c : Cocone ((OpenNhds.inclusion x).op ⋙ S)} (hc : IsColimit c) :
+    PresheafOfModules.{u} S ⥤ ModuleCat.{u} c.pt :=
+  letI : InitiallySmall.{u} (OpenNhds x) := initiallySmall_of_essentiallySmall _
+  PresheafOfModules.pushforward₀ (OpenNhds.inclusion x) S ⋙
+    PresheafOfModules.colimitFunctor hc
+
 /-- Module colimit on neighborhoods of a point over an arbitrary ring presheaf. -/
 def neighborhoodStalkFunctor (X : TopCat.{u}) (S : X.Presheaf RingCat.{u}) (x : X) :
     PresheafOfModules.{u} ((OpenNhds.inclusion x).op ⋙ S) ⥤ ModuleCat.{u} (S.stalk x) :=
@@ -100,9 +112,7 @@ def neighborhoodStalkFunctor (X : TopCat.{u}) (S : X.Presheaf RingCat.{u}) (x : 
 over the ring stalk. -/
 def stalkFunctor (X : TopCat.{u}) (S : X.Presheaf RingCat.{u}) (x : X) :
     PresheafOfModules.{u} S ⥤ ModuleCat.{u} (S.stalk x) :=
-  letI : InitiallySmall.{u} (OpenNhds x) := initiallySmall_of_essentiallySmall _
-  PresheafOfModules.pushforward₀ (OpenNhds.inclusion x) S ⋙
-    PresheafOfModules.colimitFunctor (colimit.isColimit ((OpenNhds.inclusion x).op ⋙ S))
+  stalkFunctorOfIsColimit X S x (colimit.isColimit ((OpenNhds.inclusion x).op ⋙ S))
 
 /-- The bundled module stalk and the germ stalk have the same elements and scalar action. -/
 def stalkLinearEquiv (X : TopCat.{u}) (S : X.Presheaf RingCat.{u}) (x : X)
@@ -134,9 +144,8 @@ def commNeighborhoodStalkFunctor :
 /-- The commutative stalk-ring presentation, used by scheme stalks. -/
 def commStalkFunctor : PresheafOfModules.{u} (R ⋙ forget₂ CommRingCat RingCat) ⥤
     ModuleCat.{u} (R.stalk x) :=
-  letI : InitiallySmall.{u} (OpenNhds x) := initiallySmall_of_essentiallySmall _
-  PresheafOfModules.pushforward₀ (OpenNhds.inclusion x) (R ⋙ forget₂ CommRingCat RingCat) ⋙
-    PresheafOfModules.colimitFunctor (stalkRingIsColimit X R x)
+  stalkFunctorOfIsColimit X (R ⋙ forget₂ CommRingCat RingCat) x
+    (stalkRingIsColimit X R x)
 
 /-- Identity on germs identifies the commutative stalk-ring presentation with
 the ordinary germ stalk as modules over the commutative-ring stalk. -/

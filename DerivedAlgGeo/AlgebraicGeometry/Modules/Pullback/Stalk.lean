@@ -13,7 +13,7 @@ import Mathlib.Topology.Sheaves.Abelian
 import Mathlib.Topology.Sheaves.Sheafify
 import Mathlib.Topology.Sheaves.Skyscraper
 import DerivedAlgGeo.CategoryTheory.Limits.Preserves.Reflective
-import DerivedAlgGeo.Topology.Sheaves.ModuleStalk
+import DerivedAlgGeo.Topology.Sheaves.ModuleStalkSheafification
 
 /-!
 # Module stalks and pullback
@@ -104,63 +104,40 @@ abbrev presheafModuleStalkFunctor (X : Scheme.{u}) (x : X) :
 
 This refines the usual abelian-group-valued stalk functor with the canonical
 local-ring module structure. -/
-def moduleStalkFunctor (X : Scheme.{u}) (x : X) :
+abbrev moduleStalkFunctor (X : Scheme.{u}) (x : X) :
     X.Modules ⥤ ModuleCat.{u} (X.presheaf.stalk x) :=
-  Scheme.Modules.toPresheafOfModules X ⋙
-    presheafModuleStalkFunctor X x
+  _root_.PresheafOfModules.sheafStalkFunctor X X.ringCatSheaf.obj x
+    (moduleStalkRingIsColimit X x) X.ringCatSheaf.property
 
 /-- The module map on stalks induced by the unit from a presheaf of modules
 to its module sheafification. -/
-def presheafModuleStalkToSheafificationApp
+abbrev presheafModuleStalkToSheafificationApp
     (X : Scheme.{u}) (x : X)
     (M : _root_.PresheafOfModules.{u} X.ringCatSheaf.obj) :
     (presheafModuleStalkFunctor X x).obj M ⟶
       (moduleStalkFunctor X x).obj
         ((_root_.PresheafOfModules.sheafification
           (R := X.ringCatSheaf) (𝟙 X.ringCatSheaf.obj)).obj M) :=
-  (presheafModuleStalkFunctor X x).map
-    ((_root_.PresheafOfModules.sheafificationAdjunction
-      (R := X.ringCatSheaf) (𝟙 X.ringCatSheaf.obj)).unit.app M)
+  _root_.PresheafOfModules.stalkSheafificationApp X X.ringCatSheaf.obj x
+    (moduleStalkRingIsColimit X x) X.ringCatSheaf.property M
 
 /-- Module sheafification induces an isomorphism on every module stalk. -/
 theorem presheafModuleStalkToSheafificationApp_isIso
     (X : Scheme.{u}) (x : X)
     (M : _root_.PresheafOfModules.{u} X.ringCatSheaf.obj) :
-    IsIso (presheafModuleStalkToSheafificationApp X x M) := by
-  rw [← isIso_iff_of_reflects_iso _
-    (forget₂ (ModuleCat.{u} (X.presheaf.stalk x)) AddCommGrpCat.{u})]
-  change IsIso ((TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} x).map
-    (CategoryTheory.toSheafify (Opens.grothendieckTopology X) M.presheaf))
-  exact TopCat.Presheaf.stalkFunctor_map_unit_toSheafify_isIso
-    x AddCommGrpCat M.presheaf
+    IsIso (presheafModuleStalkToSheafificationApp X x M) :=
+  _root_.PresheafOfModules.stalkSheafificationApp_isIso X X.ringCatSheaf.obj x
+    (moduleStalkRingIsColimit X x) X.ringCatSheaf.property M
 
 /-- Taking a module stalk commutes naturally with module sheafification. -/
-def presheafModuleStalkSheafificationIso
+abbrev presheafModuleStalkSheafificationIso
     (X : Scheme.{u}) (x : X) :
     presheafModuleStalkFunctor X x ≅
       _root_.PresheafOfModules.sheafification
           (R := X.ringCatSheaf) (𝟙 X.ringCatSheaf.obj) ⋙
         moduleStalkFunctor X x :=
-  NatIso.ofComponents
-    (fun M ↦
-      @asIso _ _ _ _ (presheafModuleStalkToSheafificationApp X x M)
-        (presheafModuleStalkToSheafificationApp_isIso X x M))
-    (fun {M N} f ↦ by
-      rw [asIso_hom, asIso_hom]
-      change (presheafModuleStalkFunctor X x).map f ≫
-          (presheafModuleStalkFunctor X x).map
-            ((_root_.PresheafOfModules.sheafificationAdjunction
-              (R := X.ringCatSheaf) (𝟙 X.ringCatSheaf.obj)).unit.app N) =
-        (presheafModuleStalkFunctor X x).map
-            ((_root_.PresheafOfModules.sheafificationAdjunction
-              (R := X.ringCatSheaf) (𝟙 X.ringCatSheaf.obj)).unit.app M) ≫
-          (presheafModuleStalkFunctor X x).map
-            (((_root_.PresheafOfModules.sheafification
-              (R := X.ringCatSheaf) (𝟙 X.ringCatSheaf.obj)).map f).val)
-      rw [← CategoryTheory.Functor.map_comp, ← CategoryTheory.Functor.map_comp]
-      exact congr_arg (presheafModuleStalkFunctor X x).map
-        ((_root_.PresheafOfModules.sheafificationAdjunction
-          (R := X.ringCatSheaf) (𝟙 X.ringCatSheaf.obj)).unit.naturality f))
+  _root_.PresheafOfModules.stalkSheafificationIso X X.ringCatSheaf.obj x
+    (moduleStalkRingIsColimit X x) X.ringCatSheaf.property
 
 /-- Forgetting the local-ring action on
 `AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor` recovers the
