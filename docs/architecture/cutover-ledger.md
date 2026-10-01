@@ -2585,6 +2585,27 @@ or exactness was strengthened by relocation.
   `AlgebraicGeometry.Scheme.Modules.isKFlat_freeYonedaSheafCoproductTotalComplexFunctor_obj`.
   Arbitrary nonflat derived pullback remains open.
 
+## SF8 #554 scheme-module presentation transport (2026-10-01)
+
+The preceding finite-strip status is historical: #1827 subsequently built the
+ambient arbitrary pullback from a K-flat resolution. Preservation of the
+quasi-coherent derived locus remains open.
+
+This completed source cutover places the finiteness-free construction upstream
+of its two independent consumers:
+
+| Declaration | Previous owner | Canonical owner | Consumers and routes |
+| --- | --- | --- | --- |
+| `AlgebraicGeometry.Scheme.Modules.pullbackPresentationOver` | `AlgebraicGeometry/Modules/Coherent/Pullback.lean` | `AlgebraicGeometry/Modules/Pullback/Presentation.lean` | `Modules/Coherent/Pullback.lean` retains the finite-presentation proof; `Modules/Quasicoherent/Pullback.lean` uses the same transport for ordinary quasi-coherence. Both import the neutral leaf, and `Modules/Pullback.lean` and `Modules/Quasicoherent.lean` export their children. |
+
+The declaration name and defining expression are unchanged. The coherent
+module remains a consumer, so no path is retired and no import shim is used.
+Generic ringed-site presentation transport is a separate proposed lift:
+its comparison data and consumers are not built by this cutover. The new
+`AlgebraicGeometry.Scheme.Modules.isQuasicoherent_pullback` theorem belongs
+with the quasi-coherent owner. This underived result does not establish
+preservation of quasi-coherent cohomology by arbitrary derived pullback.
+
 ## Confirmed next lanes
 
 The SF8 #554 Route B review on 2026-09-27 confirmed one pending
