@@ -18,15 +18,21 @@ the statement that taking stalks commutes with the tensor product of presheaves 
 ## Main definitions
 
 * `PresheafOfModules.stalkTensorBackward` — `Mₓ ⊗[Rₓ] Pₓ → (M ⊗ P)ₓ`, built from the biadditive
-  `germTmulBiadd` by `TensorProduct.lift`;
+  `PresheafOfModules.germTmulBiadd` by `TensorProduct.lift`;
 * `PresheafOfModules.stalkTensorForward` — `(M ⊗ P)ₓ → Mₓ ⊗[Rₓ] Pₓ`, the colimit map of the
   cocone whose legs send `m ⊗ p` to `germ m ⊗ germ p`;
 * `PresheafOfModules.stalkTensorEquiv` — the two assembled into an `Rₓ`-linear equivalence;
 * `PresheafOfModules.stalkMap` — the stalk map of a morphism of presheaves of modules, as an
-  `Rₓ`-linear map;
+  `Rₓ`-linear map.
+
+## Main results
+
+* `PresheafOfModules.stalkTensorEquiv_naturality` — naturality of the tensor-stalk
+  equivalence in both module-presheaf inputs;
 * `PresheafOfModules.isIso_stalkMapAdd_whiskerLeft` — **whiskering preserves stalkwise
   isomorphisms**, for an arbitrary whiskering factor. Tensoring is only right exact, but
-  tensoring with an isomorphism is an isomorphism, and `stalkTensorEquiv` is what makes that
+  tensoring with an isomorphism is an isomorphism, and `PresheafOfModules.stalkTensorEquiv` is what
+  makes that
   visible on stalks.
 
 Every declaration in this module intrinsically uses the topology of `X` through open
@@ -35,10 +41,20 @@ by `DerivedAlgGeo.Topology.Sheaves.ModuleTensor`, not ordinary `ModuleCat` algeb
 
 ## Implementation notes
 
-The backward map is the harder direction: a section of `M ⊗ P` near `x` is a sum of pure tensors
-whose two factors live over *different* neighbourhoods, so the map is built in two colimit stages
-(`germTmulRight`, then `germTmulBiadd`), additively first and upgraded to `Rₓ`-bilinear afterwards.
-The key input is `PresheafOfModules.germ_smul`, which makes germs `Rₓ`-linear.
+The backward map starts with tensors of stalk elements, whose representatives may lie over
+different neighbourhoods. It restricts both representatives to their intersection and descends
+through two colimits, first via `PresheafOfModules.germTmulRight` and then via
+`PresheafOfModules.germTmulBiadd`. The identity `PresheafOfModules.germ_smul` expresses
+compatibility with scalars along the ring germ map; choosing a common neighbourhood for a scalar
+and both sections then establishes bilinearity over the stalk ring.
+
+## References
+
+The comparison extends Mathlib's module-presheaf stalk and monoidal APIs.
+
+## Tags
+
+module presheaf, stalk, tensor product, naturality
 -/
 
 universe u
@@ -93,7 +109,7 @@ noncomputable def stalkTensorBilin (U : Opens X) (hx : x ∈ U) :
 
 
 /-- Restriction of a section, stated at the plain module type rather than through
-`restrictScalars`. Reducible, so that `rw` still sees through it. -/
+`ModuleCat.restrictScalars`. Reducible, so that `rw` still sees through it. -/
 @[reducible] noncomputable def resSec {N : PresheafOfModules.{u} (R ⋙ forget₂ CommRingCat RingCat)}
     {U V : Opens X} (h : V ≤ U) (n : N.obj (op U)) : N.obj (op V) :=
   N.map (homOfLE h).op n
@@ -149,7 +165,8 @@ lemma germTmul_res_right {U V V' : Opens X} (h : V' ≤ V) (hxU : x ∈ U) (hxV'
       ← ConcreteCategory.comp_apply, ← Functor.map_comp]
     congr 2
 
-/-- `germTmul` depends only on the two germs, not on the sections representing them. -/
+/-- `PresheafOfModules.germTmul` depends only on the two germs, not on the sections representing
+  them. -/
 lemma germTmul_congr {U U' V V' : Opens X} (hxU : x ∈ U) (hxU' : x ∈ U')
     (hxV : x ∈ V) (hxV' : x ∈ V')
     (m : M.obj (op U)) (m' : M.obj (op U')) (p : P.obj (op V)) (p' : P.obj (op V'))
@@ -172,7 +189,8 @@ lemma germTmul_congr {U U' V V' : Opens X} (hxU : x ∈ U) (hxU' : x ∈ U')
   -- `congr` discharges the two component goals with `hW` and `hW'` from context
   congr 1
 
-/-- Over a single neighbourhood, `germTmul` is just the germ of the pure tensor. -/
+/-- Over a single neighbourhood, `PresheafOfModules.germTmul` is just the germ of the pure tensor.
+  -/
 lemma germTmul_self {U : Opens X} (hxU : x ∈ U)
     (m : M.obj (op U)) (p : P.obj (op U)) :
     germTmul M P x hxU hxU m p
@@ -197,7 +215,8 @@ lemma germ_smul_germTmul_self {U : Opens X} (hxU : x ∈ U)
   -- what remains is `r • (m ⊗ₜ p) = (r • m) ⊗ₜ p`, definitional for the `ModuleCat` tensor
   congr 1
 
-/-- `Rₓ`-linearity of `germTmul` in the `M` slot, with the scalar, the section of `M` and the
+/-- `Rₓ`-linearity of `PresheafOfModules.germTmul` in the `M` slot, with the scalar, the section of
+  `M` and the
 section of `P` over three different neighbourhoods. -/
 lemma germ_smul_germTmul {W U V : Opens X} (hxW : x ∈ W) (hxU : x ∈ U) (hxV : x ∈ V)
     (r : R.obj (op W)) (m : M.obj (op U)) (p : P.obj (op V)) :
@@ -230,7 +249,8 @@ lemma germ_smul_germTmul {W U V : Opens X} (hxW : x ∈ W) (hxU : x ∈ U) (hxV 
     rw [← ConcreteCategory.comp_apply, ← Functor.map_comp]
     rfl
 
-/-- `germTmul` is additive in the `M` slot, over a fixed pair of neighbourhoods. -/
+/-- `PresheafOfModules.germTmul` is additive in the `M` slot, over a fixed pair of neighbourhoods.
+  -/
 lemma germTmul_add_left {U V : Opens X} (hxU : x ∈ U) (hxV : x ∈ V)
     (m m' : M.obj (op U)) (p : P.obj (op V)) :
     germTmul M P x hxU hxV (m + m') p
@@ -247,7 +267,8 @@ lemma germTmul_add_left {U V : Opens X} (hxU : x ∈ U) (hxV : x ∈ V)
   rw [h]
   exact (congrArg _ h2).trans (map_add _ _ _)
 
-/-- `germTmul` is additive in the `P` slot, over a fixed pair of neighbourhoods. -/
+/-- `PresheafOfModules.germTmul` is additive in the `P` slot, over a fixed pair of neighbourhoods.
+  -/
 lemma germTmul_add_right {U V : Opens X} (hxU : x ∈ U) (hxV : x ∈ V)
     (m : M.obj (op U)) (p p' : P.obj (op V)) :
     germTmul M P x hxU hxV m (p + p')
@@ -265,7 +286,8 @@ lemma germTmul_add_right {U V : Opens X} (hxU : x ∈ U) (hxV : x ∈ V)
   exact (congrArg _ h2).trans (map_add _ _ _)
 
 /-- For a fixed section `m` of `M` over `U`, the germs `m ⊗ p` form a cocone on the `P`-diagram:
-the legs are additive by `germTmul_add_right` and natural by `germTmul_res_right`. -/
+the legs are additive by `PresheafOfModules.germTmul_add_right` and natural by
+  `PresheafOfModules.germTmul_res_right`. -/
 noncomputable def germTmulCoconeRight (U : Opens X) (hxU : x ∈ U) (m : M.obj (op U)) :
     Limits.Cocone ((OpenNhds.inclusion x).op ⋙ P.presheaf) where
   pt := AddCommGrpCat.of (ToType (TopCat.Presheaf.stalk
@@ -287,7 +309,8 @@ noncomputable def germTmulRight (U : Opens X) (hxU : x ∈ U) (m : M.obj (op U))
         (MonoidalCategory.tensorObj (C := PresheafOfModules.{u} _) M P).presheaf x)) :=
   Limits.colimit.desc _ (germTmulCoconeRight M P x U hxU m)
 
-/-- The defining computation rule for `germTmulRight`, which is a `colimit.desc` and so is
+/-- The defining computation rule for `PresheafOfModules.germTmulRight`, which is a
+  `CategoryTheory.Limits.colimit.desc` and so is
 pinned down entirely by its values on germs. Every later proof about it goes through here. -/
 lemma germTmulRight_germ (U V : Opens X) (hxU : x ∈ U) (hxV : x ∈ V)
     (m : M.obj (op U)) (p : P.obj (op V)) :
@@ -296,7 +319,8 @@ lemma germTmulRight_germ (U V : Opens X) (hxU : x ∈ U) (hxV : x ∈ V)
   ConcreteCategory.congr_hom
     (Limits.colimit.ι_desc (germTmulCoconeRight M P x U hxU m) (op ⟨V, hxV⟩)) p
 
-/-- `germTmulRight` is unchanged by shrinking the neighbourhood of `m`: the naturality the outer
+/-- `PresheafOfModules.germTmulRight` is unchanged by shrinking the neighbourhood of `m`: the
+  naturality the outer
 cocone needs, now at the level of the induced morphism rather than of germs. -/
 lemma germTmulRight_res_left {U U' : Opens X} (h : U' ≤ U) (hxU' : x ∈ U')
     (m : M.obj (op U)) :
@@ -310,7 +334,7 @@ lemma germTmulRight_res_left {U U' : Opens X} (h : U' ≤ U) (hxU' : x ∈ U')
   rw [germTmulRight_germ, germTmulRight_germ]
   exact germTmul_res_left M P x h hxU' hxV m p
 
-/-- `germTmulRight` is additive in `m`, pointwise on the stalk of `P`. -/
+/-- `PresheafOfModules.germTmulRight` is additive in `m`, pointwise on the stalk of `P`. -/
 lemma germTmulRight_add (U : Opens X) (hxU : x ∈ U) (m m' : M.obj (op U))
     (ξ : ToType (TopCat.Presheaf.stalk P.presheaf x)) :
     germTmulRight M P x U hxU (m + m') ξ
@@ -319,8 +343,10 @@ lemma germTmulRight_add (U : Opens X) (hxU : x ∈ U) (m m' : M.obj (op U))
   rw [germTmulRight_germ, germTmulRight_germ, germTmulRight_germ]
   exact germTmul_add_left M P x hxU hxV m m' p
 
-/-- The outer cocone, in the `M` variable: legs additive by `germTmulRight_add`, natural by
-`germTmulRight_res_left`. Its point is the additive maps out of the stalk of `P`. -/
+/-- The outer cocone, in the `M` variable: legs additive by `PresheafOfModules.germTmulRight_add`,
+  natural by
+`PresheafOfModules.germTmulRight_res_left`. Its point is the additive maps out of the stalk of `P`.
+  -/
 noncomputable def germTmulCoconeLeft :
     Limits.Cocone ((OpenNhds.inclusion x).op ⋙ M.presheaf) where
   pt := AddCommGrpCat.of (ToType (TopCat.Presheaf.stalk P.presheaf x) →+
@@ -347,7 +373,8 @@ noncomputable def germTmulBiadd :
   Limits.colimit.desc _ (germTmulCoconeLeft M P x)
 
 /-- Both colimit stages unwound at once. Since every element of a stalk is a germ, this and
-additivity determine `germTmulBiadd` completely — it is the only handle the bilinearity and
+additivity determine `PresheafOfModules.germTmulBiadd` completely — it is the only handle the
+  bilinearity and
 inverse proofs use. -/
 lemma germTmulBiadd_germ (U V : Opens X) (hxU : x ∈ U) (hxV : x ∈ V)
     (m : M.obj (op U)) (p : P.obj (op V)) :
@@ -361,7 +388,8 @@ lemma germTmulBiadd_germ (U V : Opens X) (hxU : x ∈ U) (hxV : x ∈ V)
   rw [h]
   exact germTmulRight_germ M P x U V hxU hxV m p
 
-/-- Right-slot analogue of `germ_smul_germTmul_self`: over a single neighbourhood the scalar
+/-- Right-slot analogue of `PresheafOfModules.germ_smul_germTmul_self`: over a single neighbourhood
+  the scalar
 may be moved into the `P` factor. Unlike the `M` slot this is not definitional — it is
 `TensorProduct.tmul_smul`, and so uses commutativity of `R(U)`. -/
 lemma germ_smul_germTmul_self_right {U : Opens X} (hxU : x ∈ U)
@@ -374,7 +402,7 @@ lemma germ_smul_germTmul_self_right {U : Opens X} (hxU : x ∈ U)
   congr 1
   exact (TensorProduct.tmul_smul (R := ↑(R.obj (op U))) r m p).symm
 
-/-- `germTmulBiadd` is `Rₓ`-linear in the `M` slot. -/
+/-- `PresheafOfModules.germTmulBiadd` is `Rₓ`-linear in the `M` slot. -/
 lemma germTmulBiadd_smul_left (r : R.stalk x)
     (ξ : ToType (TopCat.Presheaf.stalk M.presheaf x))
     (η : ToType (TopCat.Presheaf.stalk P.presheaf x)) :
@@ -387,7 +415,7 @@ lemma germTmulBiadd_smul_left (r : R.stalk x)
     ← germ_smul M x V hxV, germTmulBiadd_germ, germTmulBiadd_germ,
     germ_smul_germTmul_self]
 
-/-- `germTmulBiadd` is `Rₓ`-linear in the `P` slot. -/
+/-- `PresheafOfModules.germTmulBiadd` is `Rₓ`-linear in the `P` slot. -/
 lemma germTmulBiadd_smul_right (r : R.stalk x)
     (ξ : ToType (TopCat.Presheaf.stalk M.presheaf x))
     (η : ToType (TopCat.Presheaf.stalk P.presheaf x)) :
@@ -400,7 +428,7 @@ lemma germTmulBiadd_smul_right (r : R.stalk x)
     ← germ_smul P x V hxV, germTmulBiadd_germ, germTmulBiadd_germ,
     germ_smul_germTmul_self_right]
 
-/-- `germTmulBiadd` is additive in the `M` slot, at the level of stalks. -/
+/-- `PresheafOfModules.germTmulBiadd` is additive in the `M` slot, at the level of stalks. -/
 lemma germTmulBiadd_add_left (ξ ξ' : ToType (TopCat.Presheaf.stalk M.presheaf x))
     (η : ToType (TopCat.Presheaf.stalk P.presheaf x)) :
     germTmulBiadd M P x (ξ + ξ') η
@@ -485,7 +513,7 @@ lemma stalkTensorLeg_res {U V : Opens X} (h : V ≤ U) (hxV : x ∈ V)
     rw [e]
     exact (map_add _ _ _).trans (((congrArg₂ (· + ·) ha hb)).trans (map_add _ _ _).symm)
 
-/-- The cocone on the `(M ⊗ P)`-diagram whose legs are `stalkTensorLeg`. -/
+/-- The cocone on the `(M ⊗ P)`-diagram whose legs are `PresheafOfModules.stalkTensorLeg`. -/
 noncomputable def stalkTensorForwardCocone :
     Limits.Cocone ((OpenNhds.inclusion x).op ⋙
       (MonoidalCategory.tensorObj (C := PresheafOfModules.{u} _) M P).presheaf) where
@@ -515,7 +543,7 @@ lemma stalkTensorForward_germ (U : Opens X) (hxU : x ∈ U)
     (Limits.colimit.ι_desc (stalkTensorForwardCocone M P x) (op ⟨U, hxU⟩)) z
 
 /-- The forward map computes on the germs of pure tensors: this is the exact converse of
-`stalkTensorBackward_germ_tmul_germ`. -/
+`PresheafOfModules.stalkTensorBackward_germ_tmul_germ`. -/
 @[simp]
 lemma stalkTensorForward_germTmul {U V : Opens X} (hxU : x ∈ U) (hxV : x ∈ V)
     (m : M.obj (op U)) (p : P.obj (op V)) :
@@ -587,7 +615,7 @@ noncomputable def stalkTensorEquiv :
     left_inv := stalkTensorForward_backward M P x
     right_inv := stalkTensorBackward_forward M P x }
 
-/-- `stalkTensorEquiv` computes on a pure tensor of germs. -/
+/-- `PresheafOfModules.stalkTensorEquiv` computes on a pure tensor of germs. -/
 lemma stalkTensorEquiv_germ_tmul_germ (U V : Opens X) (hxU : x ∈ U) (hxV : x ∈ V)
     (m : M.obj (op U)) (p : P.obj (op V)) :
     stalkTensorEquiv M P x
@@ -596,7 +624,7 @@ lemma stalkTensorEquiv_germ_tmul_germ (U V : Opens X) (hxU : x ∈ U) (hxV : x �
       = germTmul M P x hxU hxV m p :=
   germTmulBiadd_germ M P x U V hxU hxV m p
 
-/-- The inverse of `stalkTensorEquiv` computes on a germ. -/
+/-- The inverse of `PresheafOfModules.stalkTensorEquiv` computes on a germ. -/
 lemma stalkTensorEquiv_symm_germ (U : Opens X) (hxU : x ∈ U)
     (z : (MonoidalCategory.tensorObj (C := PresheafOfModules.{u} _) M P).presheaf.obj (op U)) :
     (stalkTensorEquiv M P x).symm
@@ -638,7 +666,8 @@ noncomputable def stalkMap :
     congr 1
     exact map_smul (g.app (op U)).hom _ _
 
-/-- `stalkMap` has the same computation rule as `stalkMapAdd`; the two differ only in carrying
+/-- `PresheafOfModules.stalkMap` has the same computation rule as `PresheafOfModules.stalkMapAdd`;
+  the two differ only in carrying
 the `Rₓ`-module structure. -/
 lemma stalkMap_germ (U : Opens X) (hxU : x ∈ U) (m : M.obj (op U)) :
     stalkMap g x (TopCat.Presheaf.germ M.presheaf U x hxU m)
@@ -646,6 +675,36 @@ lemma stalkMap_germ (U : Opens X) (hxU : x ∈ U) (m : M.obj (op U)) :
   stalkMapAdd_germ g x U hxU m
 
 end StalkMap
+
+/-- The tensor-stalk equivalence is natural in both module-presheaf inputs.
+The proof computes on pure tensors of germs and then uses additivity. -/
+theorem stalkTensorEquiv_naturality
+    {M M' P P' : PresheafOfModules.{u} (R ⋙ forget₂ CommRingCat RingCat)}
+    (f : M ⟶ M') (g : P ⟶ P') (x : X) (t : StalkTensor M P x) :
+    stalkMapAdd (f ⊗ₘ g) x (stalkTensorEquiv M P x t) =
+      stalkTensorEquiv M' P' x
+        (TensorProduct.map (stalkMap f x) (stalkMap g x) t) := by
+  refine TensorProduct.induction_on t ?_ ?_ ?_
+  · simp
+  · intro ξ η
+    obtain ⟨U, hxU, m, rfl⟩ := TopCat.Presheaf.exists_germ_eq M.presheaf ξ
+    obtain ⟨V, hxV, p, rfl⟩ := TopCat.Presheaf.exists_germ_eq P.presheaf η
+    rw [TensorProduct.map_tmul, stalkMap_germ, stalkMap_germ,
+      stalkTensorEquiv_germ_tmul_germ, stalkTensorEquiv_germ_tmul_germ]
+    show stalkMapAdd (f ⊗ₘ g) x (TopCat.Presheaf.germ
+        (MonoidalCategory.tensorObj (C := PresheafOfModules.{u} _) M P).presheaf
+        (U ⊓ V) x ⟨hxU, hxV⟩
+        (M.map (homOfLE inf_le_left).op m ⊗ₜ P.map (homOfLE inf_le_right).op p)) = _
+    rw [stalkMapAdd_germ]
+    show TopCat.Presheaf.germ
+        (MonoidalCategory.tensorObj (C := PresheafOfModules.{u} _) M' P').presheaf
+        (U ⊓ V) x ⟨hxU, hxV⟩
+        (f.app (op (U ⊓ V)) (M.map (homOfLE inf_le_left).op m) ⊗ₜ
+          g.app (op (U ⊓ V)) (P.map (homOfLE inf_le_right).op p)) = _
+    rw [naturality_apply, naturality_apply]
+    rfl
+  · intro a b ha hb
+    simp only [map_add, ha, hb]
 
 section Whisker
 
@@ -656,7 +715,8 @@ variable (M : PresheafOfModules.{u} (R ⋙ forget₂ CommRingCat RingCat))
 lemma whiskerLeft_app_tmul (W : Opens X) (m : M.obj (op W)) (p : P.obj (op W)) :
     (M ◁ g).app (op W) (m ⊗ₜ p) = m ⊗ₜ g.app (op W) p := rfl
 
-/-- **`stalkTensorEquiv` is natural in the second variable.** Under the identification of
+/-- **`PresheafOfModules.stalkTensorEquiv` is natural in the second variable.** Under the
+  identification of
 `(M ⊗ P)ₓ` with `Mₓ ⊗ Pₓ`, the stalk map of `M ◁ g` is `Mₓ ⊗ (stalk map of g)`. This is what
 turns a stalkwise iso into a stalkwise iso after whiskering. -/
 lemma stalkMapAdd_whiskerLeft (t : StalkTensor M P x) :
@@ -688,7 +748,8 @@ lemma stalkMapAdd_whiskerLeft (t : StalkTensor M P x) :
 
 /-- **Whiskering preserves stalkwise isomorphisms.** If `g` is a stalk isomorphism at `x`, so is
 `M ◁ g` — for *any* `M`, with no flatness or local-freeness hypothesis. Tensoring is only right
-exact in general, but tensoring with an isomorphism is an isomorphism, and `stalkTensorEquiv`
+exact in general, but tensoring with an isomorphism is an isomorphism, and
+  `PresheafOfModules.stalkTensorEquiv`
 is what makes that visible on stalks. -/
 lemma isIso_stalkMapAdd_whiskerLeft [IsIso (stalkMapAdd g x)] :
     IsIso (stalkMapAdd (M ◁ g) x) := by
