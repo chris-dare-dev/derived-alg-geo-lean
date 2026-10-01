@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.Algebra.Homology.TotalComplex
+import Mathlib.Algebra.Homology.Embedding.CochainComplex
 import Mathlib.Algebra.Homology.TotalComplexShift
 import Mathlib.Algebra.Homology.HomotopyCategory.MappingCone
 import Mathlib.Algebra.Homology.HomotopyCategory.Acyclic
@@ -41,6 +42,9 @@ assume the literal total already exists.
 
 * `HomologicalComplex₂.totalFunctor_preservesColimitsOfShape` exposes
   colimit preservation to typeclass search.
+* `HomologicalComplex₂.isZero_total_X_of_diagonal` detects zero terms of a
+  literal total from its bidegree summands. The three `isStrictlyLE_total_*`
+  results specialize it to upper support bounds for cochain bicomplexes.
 * `HomologicalComplex₂.total_d_comp_totalProjection` computes the incoming
   differential at one direct-sum coordinate.
 * `HomologicalComplex₂.exists_totalCycleRefinement_zero_le` clears one
@@ -171,6 +175,66 @@ open Category HomologicalComplex
 namespace HomologicalComplex₂
 
 variable {C : Type u} [Category.{v} C]
+
+section Support
+
+open ComplexShape
+
+/-- A term of a literal total is zero when every bidegree summand on its
+diagonal is zero. No exactness or boundedness is required. -/
+theorem isZero_total_X_of_diagonal [Preadditive C]
+    {I₁ I₂ I₁₂ : Type*} {c₁ : ComplexShape I₁} {c₂ : ComplexShape I₂}
+    (K : HomologicalComplex₂ C c₁ c₂) (c₁₂ : ComplexShape I₁₂)
+    [TotalComplexShape c₁ c₂ c₁₂] [DecidableEq I₁₂] [K.HasTotal c₁₂]
+    (n : I₁₂)
+    (h : ∀ p q, ComplexShape.π c₁ c₂ c₁₂ (p, q) = n → IsZero ((K.X p).X q)) :
+    IsZero ((K.total c₁₂).X n) := by
+  rw [IsZero.iff_id_eq_zero]
+  apply HomologicalComplex₂.total.hom_ext c₁₂
+  intro p q hpq
+  exact (h p q hpq).eq_of_src _ _
+
+/-- This diagonal criterion permits support regions without separate bounds on
+the two coordinates: only their sum controls the total. -/
+theorem isStrictlyLE_total_of_diagonal [Preadditive C]
+    (K : HomologicalComplex₂ C (up ℤ) (up ℤ)) [K.HasTotal (up ℤ)]
+    (c : ℤ) (h : ∀ p q, c < p + q → IsZero ((K.X p).X q)) :
+    CochainComplex.IsStrictlyLE (K.total (up ℤ)) c := by
+  rw [CochainComplex.isStrictlyLE_iff]
+  intro n hn
+  apply isZero_total_X_of_diagonal K (up ℤ) n
+  intro p q hpq
+  change p + q = n at hpq
+  exact h p q (by omega)
+
+/-- Above the sum of the coordinate bounds, every summand lies beyond at least
+one bound, so the diagonal vanishing criterion applies. -/
+theorem isStrictlyLE_total_of_upper_bounds [Preadditive C]
+    (K : HomologicalComplex₂ C (up ℤ) (up ℤ)) [K.HasTotal (up ℤ)]
+    (a b : ℤ)
+    (hOuter : ∀ p q, a < p → IsZero ((K.X p).X q))
+    (hInner : ∀ p q, b < q → IsZero ((K.X p).X q)) :
+    CochainComplex.IsStrictlyLE (K.total (up ℤ)) (a + b) := by
+  apply isStrictlyLE_total_of_diagonal K
+  intro p q hpq
+  by_cases hp : a < p
+  · exact hOuter p q hp
+  · exact hInner p q (by omega)
+
+/-- This form accepts zero outer rows directly: evaluation converts row
+vanishing to term vanishing, so nonpositive resolution rows retain the input's
+upper bound. -/
+theorem isStrictlyLE_total_of_nonpositive_rows [Preadditive C]
+    (K : HomologicalComplex₂ C (up ℤ) (up ℤ)) [K.HasTotal (up ℤ)]
+    (c : ℤ)
+    (hOuter : ∀ p, c < p → IsZero (K.X p))
+    (hInner : ∀ p q, 0 < q → IsZero ((K.X p).X q)) :
+    CochainComplex.IsStrictlyLE (K.total (up ℤ)) c := by
+  simpa using isStrictlyLE_total_of_upper_bounds K c 0
+    (fun p q hp => (HomologicalComplex.eval C (up ℤ) q).map_isZero (hOuter p hp))
+    hInner
+
+end Support
 
 section Components
 variable [Preadditive C]

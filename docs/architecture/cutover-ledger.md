@@ -2576,10 +2576,14 @@ or exactness was strengthened by relocation.
   total-map quasi-isomorphism for columnwise quasi-isomorphisms supported on a
   finite horizontal interval in any abelian category. Finite diagonal support
   constructs its total objects using the independent finite-support coproduct
-  result in `CategoryTheory/Limits/Shapes/FiniteProducts.lean`. The original
-  free-Yoneda bicomplex is
-  horizontally unbounded: its total comparison, K-flatness and arbitrary
-  derived pullback remain SF8 obligations.
+  result in `CategoryTheory/Limits/Shapes/FiniteProducts.lean`. At that
+  finite-strip cutover, the original horizontally unbounded free-Yoneda
+  bicomplex's total comparison, K-flatness and arbitrary derived pullback were
+  still SF8 obligations. Subsequent work proved the arbitrary-input total
+  augmentation quasi-isomorphism, and this cut constructs
+  `AlgebraicGeometry.DerivedCategory.freeYonedaSchemeKFlatResolution` using
+  `AlgebraicGeometry.Scheme.Modules.isKFlat_freeYonedaSheafCoproductTotalComplexFunctor_obj`.
+  Arbitrary nonflat derived pullback remains open.
 
 ## Confirmed next lanes
 
