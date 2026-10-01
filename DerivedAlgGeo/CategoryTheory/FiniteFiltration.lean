@@ -671,6 +671,31 @@ theorem spliceStep_gradedObjects (F : FiniteFiltration C M) (i : Fin F.length)
     FiniteExactTower.take_gradedObjects, FiniteExactTower.drop_gradedObjects]
   simp only [Fin.val_castSucc, Fin.val_succ]
 
+/-- Transport the filtered object of a finite filtration along an isomorphism.
+
+Only the top identification changes: the stages, inclusions and graded pieces are those of `F`.
+This is how a filtration of an object presented as an image under an exact functor is regarded as
+a filtration of any object isomorphic to that image. -/
+def ofIso (F : FiniteFiltration C M) {M' : C} (e : M ≅ M') : FiniteFiltration C M' where
+  toFiniteExactTower := F.toFiniteExactTower
+  initialIsZero := F.initialIsZero
+  terminalIso := F.terminalIso ≪≫ e
+
+@[simp]
+theorem ofIso_length (F : FiniteFiltration C M) {M' : C} (e : M ≅ M') :
+    (F.ofIso e).length = F.length :=
+  rfl
+
+@[simp]
+theorem ofIso_object (F : FiniteFiltration C M) {M' : C} (e : M ≅ M')
+    (i : Fin (F.length + 1)) : (F.ofIso e).object i = F.object i :=
+  rfl
+
+@[simp]
+theorem ofIso_graded (F : FiniteFiltration C M) {M' : C} (e : M ≅ M') (i : Fin F.length) :
+    (F.ofIso e).graded i = F.graded i :=
+  rfl
+
 end FiniteFiltration
 
 namespace FiniteFiltration
@@ -940,6 +965,52 @@ theorem refineAll_gradedObjects :
     (refineAll F R).toFiniteExactTower.gradedObjects =
       (List.ofFn fun i => (R i).toFiniteExactTower.gradedObjects).flatten := by
   simp [refineAll]
+
+private theorem getElem?_flatten_ofFn_uniform {α : Type*} (n : ℕ) :
+    ∀ (m : ℕ) (L : Fin m → List α) (_ : ∀ i, (L i).length = n) (i : Fin m) (j : ℕ) (_ : j < n),
+      (List.ofFn L).flatten[i * n + j]? = (L i)[j]? := by
+  intro m
+  induction m with
+  | zero => intro L _ i; exact i.elim0
+  | succ m ih =>
+    intro L hL i j hj
+    rw [List.ofFn_succ, List.flatten_cons]
+    induction i using Fin.cases with
+    | zero =>
+      simp only [Fin.val_zero, zero_mul, zero_add]
+      rw [List.getElem?_append_left (by rw [hL 0]; exact hj)]
+    | succ i' =>
+      have hlen : (L 0).length ≤ (i'.succ : ℕ) * n + j := by
+        rw [hL 0, Fin.val_succ, Nat.succ_mul]; omega
+      rw [List.getElem?_append_right hlen]
+      have : (i'.succ : ℕ) * n + j - (L 0).length = i' * n + j := by
+        rw [hL 0, Fin.val_succ, Nat.succ_mul]; omega
+      rw [this]
+      exact ih (fun k => L k.succ) (fun k => hL _) i' j hj
+
+/-- When every refining filtration has the same length `n`, the graded piece of `refineAll` in the
+outer-major position `i * n + j` is the `j`th graded piece of the `i`th refinement.
+
+The statement is an equality of objects because `refineAll_gradedObjects` is: the concatenation is
+only known to preserve the list of quotients, so each position is recovered by indexing it. -/
+theorem refineAll_graded_eq (n : ℕ) (hlen : ∀ i, (R i).length = n) (i : Fin F.length)
+    (j : Fin n) (k : Fin (refineAll F R).length) (hk : (k : ℕ) = i * n + j) :
+    (refineAll F R).graded k = (R i).graded (Fin.cast (hlen i).symm j) := by
+  have h := congrArg (fun l => l[(k : ℕ)]?) (refineAll_gradedObjects F R)
+  have hL : ∀ i, (List.ofFn (R i).toFiniteExactTower.graded).length = n := fun i => by
+    simp [hlen i]
+  simp only [FiniteExactTower.gradedObjects] at h
+  rw [List.getElem?_ofFn, hk] at h
+  rw [getElem?_flatten_ofFn_uniform n F.length (fun i => List.ofFn (R i).graded) hL i j j.2,
+    List.getElem?_ofFn] at h
+  have hkl : (i : ℕ) * n + j < (F.refineAll R).length := hk ▸ k.2
+  rw [dif_pos hkl] at h
+  have hj : (j : ℕ) < (R i).length := by rw [hlen i]; exact j.2
+  rw [dif_pos hj] at h
+  have h2 := Option.some.inj h
+  have hkeq : k = ⟨(i : ℕ) * n + j, hkl⟩ := Fin.ext hk
+  subst hkeq
+  exact h2
 
 end AllStepsRefinement
 

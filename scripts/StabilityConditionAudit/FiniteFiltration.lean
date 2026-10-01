@@ -106,3 +106,8 @@ import DerivedAlgGeo.CategoryTheory.FiniteFiltration
 #print axioms CategoryTheory.FiniteFiltration.refineAll
 #print axioms CategoryTheory.FiniteFiltration.refineAll_length
 #print axioms CategoryTheory.FiniteFiltration.refineAll_gradedObjects
+#print axioms CategoryTheory.FiniteFiltration.ofIso
+#print axioms CategoryTheory.FiniteFiltration.ofIso_length
+#print axioms CategoryTheory.FiniteFiltration.ofIso_object
+#print axioms CategoryTheory.FiniteFiltration.ofIso_graded
+#print axioms CategoryTheory.FiniteFiltration.refineAll_graded_eq
