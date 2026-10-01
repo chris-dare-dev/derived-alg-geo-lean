@@ -2587,6 +2587,10 @@ or exactness was strengthened by relocation.
 
 ## SF8 #554 scheme-module presentation transport (2026-10-01)
 
+The preceding finite-strip status is historical: #1827 subsequently built the
+ambient arbitrary pullback from a K-flat resolution. Preservation of the
+quasi-coherent derived locus remains open.
+
 This completed source cutover places the finiteness-free construction upstream
 of its two independent consumers:
 
