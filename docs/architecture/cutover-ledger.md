@@ -2577,9 +2577,10 @@ or exactness was strengthened by relocation.
   finite horizontal interval in any abelian category. Finite diagonal support
   constructs its total objects using the independent finite-support coproduct
   result in `CategoryTheory/Limits/Shapes/FiniteProducts.lean`. The original
-  free-Yoneda bicomplex is
-  horizontally unbounded: its total comparison, K-flatness and arbitrary
-  derived pullback remain SF8 obligations.
+  free-Yoneda bicomplex is horizontally unbounded. Subsequent SF8 work proved
+  its total comparison and K-flatness, and constructed the canonical
+  `AlgebraicGeometry.DerivedCategory.freeYonedaSchemeKFlatResolution`.
+  Arbitrary nonflat derived pullback remains an SF8 obligation.
 
 ## Confirmed next lanes
 

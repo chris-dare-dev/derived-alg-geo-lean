@@ -194,7 +194,8 @@ theorem isZero_total_X_of_diagonal [Preadditive C]
   intro p q hpq
   exact (h p q hpq).eq_of_src _ _
 
-/-- Vanishing above a total-degree bound gives strict upper term support. -/
+/-- This diagonal criterion permits support regions without separate bounds on
+the two coordinates: only their sum controls the total. -/
 theorem isStrictlyLE_total_of_diagonal [Preadditive C]
     (K : HomologicalComplex₂ C (up ℤ) (up ℤ)) [K.HasTotal (up ℤ)]
     (c : ℤ) (h : ∀ p q, c < p + q → IsZero ((K.X p).X q)) :
@@ -206,8 +207,8 @@ theorem isStrictlyLE_total_of_diagonal [Preadditive C]
   change p + q = n at hpq
   exact h p q (by omega)
 
-/-- Bounds on both bicomplex coordinates add to a strict upper bound on its
-literal total. -/
+/-- Above the sum of the coordinate bounds, every summand lies beyond at least
+one bound, so the diagonal vanishing criterion applies. -/
 theorem isStrictlyLE_total_of_upper_bounds [Preadditive C]
     (K : HomologicalComplex₂ C (up ℤ) (up ℤ)) [K.HasTotal (up ℤ)]
     (a b : ℤ)
@@ -220,8 +221,9 @@ theorem isStrictlyLE_total_of_upper_bounds [Preadditive C]
   · exact hOuter p q hp
   · exact hInner p q (by omega)
 
-/-- A bicomplex with no rows above `c` and no positive inner terms has a
-literal total with no terms above `c`. -/
+/-- This form accepts zero outer rows directly: evaluation converts row
+vanishing to term vanishing, so nonpositive resolution rows retain the input's
+upper bound. -/
 theorem isStrictlyLE_total_of_nonpositive_rows [Preadditive C]
     (K : HomologicalComplex₂ C (up ℤ) (up ℤ)) [K.HasTotal (up ℤ)]
     (c : ℤ)

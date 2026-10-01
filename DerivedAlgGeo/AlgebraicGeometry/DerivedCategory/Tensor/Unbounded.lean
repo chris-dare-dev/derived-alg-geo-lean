@@ -13,8 +13,10 @@ This file specializes the generic K-flat localization construction to the total 
 unbounded complexes of `𝒪_X`-modules. A `SchemeKFlatResolution X` is therefore concrete data for
 the actual sheafified tensor bifunctor, rather than an arbitrary derived-category operation.
 
-Constructing these resolutions, proving that the result preserves quasicoherent cohomology, and
-then restricting it to `Dqc X` are the remaining geometric steps.
+`AlgebraicGeometry.DerivedCategory.freeYonedaSchemeKFlatResolution` now gives a
+canonical functorial resolution for every scheme. Proving that derived tensor
+preserves quasicoherent cohomology and then restricting it to `Dqc X` remain
+geometric steps.
 
 ## Which tensor product this is
 

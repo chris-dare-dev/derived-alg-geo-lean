@@ -22,8 +22,9 @@ normalizes to a flipped single-zero bicomplex and is a quasi-isomorphism in
 each resolution-direction row. Its integer-extended direct-sum total complex
 has terms flat over the identity, and the signed total of the normalized
 target is naturally the input complex.
-The final augmentation is a quasi-isomorphism for arbitrary inputs. K-flatness
-remains a separate obligation.
+The final augmentation is a quasi-isomorphism for arbitrary inputs.
+`AlgebraicGeometry.Scheme.Modules.isKFlat_freeYonedaSheafCoproductTotalComplexFunctor_obj`
+proves K-flatness of this total downstream in the derived-tensor owner.
 For every strictly bounded-above input, termwise support and the nonpositive
 resolution degree make its total augmentation a quasi-isomorphism. This
 includes every canonical good truncation.
@@ -39,6 +40,8 @@ includes every canonical good truncation.
 
 ## Main results
 
+All unqualified names in this list are in `AlgebraicGeometry.Scheme.Modules`.
+
 * `AlgebraicGeometry.Scheme.Modules.normalizedBicomplexAugmentation_row_quasiIso`
   proves each resolution-direction row is a quasi-isomorphism.
 * `freeYonedaSheafCoproductTotalAugmentation_eq_toSingleZero_comp_targetIso`
@@ -51,7 +54,7 @@ includes every canonical good truncation.
 * `AlgebraicGeometry.Scheme.Modules.quasiIso_freeYonedaSheafCoproductTotalAugmentation`
   passes the stagewise quasi-isomorphisms through the good-truncation colimit
   for arbitrary inputs.
-* `AlgebraicGeometry.Scheme.Modules.freeYonedaSheafCoproductTotalComplexFunctor_obj_isStrictlyLE`
+* `AlgebraicGeometry.Scheme.Modules.isStrictlyLE_freeYonedaSheafCoproductTotalComplexFunctor_obj`
   retains a strict upper term bound through the nonpositive resolution total.
 
 ## Implementation notes
@@ -101,8 +104,9 @@ noncomputable def freeYonedaSheafCoproductResolutionBicomplexUpInt
     E.mapHomologicalComplex (ComplexShape.up ℤ)
 
 /-- The direct-sum total complex of the functorial free-Yoneda flat-resolution bicomplex.
-The augmentation to the input and its quasi-isomorphism are proved below;
-K-flatness remains a separate obligation. -/
+The augmentation to the input and its quasi-isomorphism are proved below.
+K-flatness is proved downstream by
+`AlgebraicGeometry.Scheme.Modules.isKFlat_freeYonedaSheafCoproductTotalComplexFunctor_obj`. -/
 noncomputable def freeYonedaSheafCoproductTotalComplexFunctor (X : Scheme.{u}) :
     CochainComplex X.Modules ℤ ⥤ CochainComplex X.Modules ℤ :=
   freeYonedaSheafCoproductResolutionBicomplexUpInt X ⋙
@@ -364,7 +368,7 @@ private theorem isZero_resolutionBicomplexUpInt_inner_of_pos (p q : ℤ) (hq : 0
 /-- The free-Yoneda resolution total of a strictly bounded-above input remains
 strictly bounded above at the same term degree. The resolution contributes only
 nonpositive inner degrees; this is a term-support claim, not K-flatness. -/
-theorem freeYonedaSheafCoproductTotalComplexFunctor_obj_isStrictlyLE
+theorem isStrictlyLE_freeYonedaSheafCoproductTotalComplexFunctor_obj
     [M.IsStrictlyLE c] :
     CochainComplex.IsStrictlyLE
       ((freeYonedaSheafCoproductTotalComplexFunctor X).obj M) c := by

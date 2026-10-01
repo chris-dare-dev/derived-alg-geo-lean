@@ -39,8 +39,9 @@ acyclicity under arbitrary nonflat scheme pullback.
 ## References
 
 The support bound comes from `FlatResolutionTotalization.lean`; the stagewise
-criterion is `isKFlat_totalTensor_of_boundedAbove_flatTerms`; colimit closure
-is `CategoryTheory.CochainComplex.IsKFlat.colimit`.
+criterion is
+`AlgebraicGeometry.Scheme.Modules.isKFlat_totalTensor_of_boundedAbove_flatTerms`;
+colimit closure is `CategoryTheory.CochainComplex.IsKFlat.colimit`.
 
 ## Tags
 
@@ -77,7 +78,7 @@ theorem isKFlat_freeYonedaSheafCoproductTotalComplexFunctor_obj
     intro n
     haveI hBound : (T.obj n).IsStrictlyLE (n : ℤ) := by
       change CochainComplex.IsStrictlyLE (H.obj (K.truncLE (n : ℤ))) (n : ℤ)
-      exact freeYonedaSheafCoproductTotalComplexFunctor_obj_isStrictlyLE
+      exact isStrictlyLE_freeYonedaSheafCoproductTotalComplexFunctor_obj
         X (K.truncLE (n : ℤ)) (n : ℤ)
     apply isKFlat_totalTensor_of_boundedAbove_flatTerms X (T.obj n) (n : ℤ)
     intro p
