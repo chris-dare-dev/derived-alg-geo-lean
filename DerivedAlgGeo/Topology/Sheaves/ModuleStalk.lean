@@ -149,7 +149,8 @@ def commStalkLinearEquiv
     (stalkRingIsColimit X R x) (colimit.isColimit _) _ _
 
 /-- The two module-colimit presentations have the same germ elements. This
-objectwise additive comparison complements `stalkRingComparisonIso` on scalars. -/
+objectwise additive comparison complements `PresheafOfModules.stalkRingComparisonIso`
+on scalars. -/
 def commStalkAddEquiv
     (M : PresheafOfModules.{u} (R ⋙ forget₂ CommRingCat RingCat)) :
     (commStalkFunctor X R x).obj M ≃+
