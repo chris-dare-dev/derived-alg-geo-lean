@@ -14,7 +14,7 @@ import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Morphism
 
 An ordinary sheaf of types on an arbitrary site determines a stack in
 discrete groupoids, and natural transformations induce stack morphisms through
-`discretePseudofunctorMap` and `StackInGroupoids.discreteMap`. This construction
+`CategoryTheory.discretePseudofunctorMap` and `CategoryTheory.StackInGroupoids.discreteMap`. This construction
 is purely site-theoretic; algebraic geometry consumes it for representable
 stacks.
 -/
@@ -147,7 +147,7 @@ def stackInGroupoidsOfSheaf
   fiberIsGroupoid _ := inferInstance
   isStack := discretePseudofunctor_isStack hP
 
-/-- Restricting `stackInGroupoidsOfSheaf` to a coarser topology agrees with
+/-- Restricting `CategoryTheory.stackInGroupoidsOfSheaf` to a coarser topology agrees with
 constructing its discrete stack from the restricted sheaf condition. This
 requires only a sheaf proof for the finer topology, with no representability
 or subcanonicity assumption. -/
@@ -159,8 +159,8 @@ theorem stackInGroupoidsOfSheaf_ofLE
   rfl
 
 /-- A natural transformation between sheaves induces a morphism between the
-stacks supplied by `stackInGroupoidsOfSheaf`. This is
-`discretePseudofunctorMap` on their underlying pseudofunctors. -/
+stacks supplied by `CategoryTheory.stackInGroupoidsOfSheaf`. This is
+`CategoryTheory.discretePseudofunctorMap` on their underlying pseudofunctors. -/
 def StackInGroupoids.discreteMap
     {C : Type u} [Category.{v} C] {J : GrothendieckTopology C}
     {P Q : Cᵒᵖ ⥤ Type w} (hP : Presieve.IsSheaf J P)
@@ -168,7 +168,7 @@ def StackInGroupoids.discreteMap
     StackMorphism (stackInGroupoidsOfSheaf J P hP) (stackInGroupoidsOfSheaf J Q hQ) :=
   discretePseudofunctorMap φ
 
-/-- The component functor of `StackInGroupoids.discreteMap` applies the
+/-- The component functor of `CategoryTheory.StackInGroupoids.discreteMap` applies the
 underlying natural transformation to each object, definitionally. -/
 @[simp]
 theorem StackInGroupoids.discreteMap_app_obj

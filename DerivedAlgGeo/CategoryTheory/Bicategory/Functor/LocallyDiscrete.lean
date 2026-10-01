@@ -11,9 +11,11 @@ import Mathlib.CategoryTheory.Bicategory.NaturalTransformation.Pseudo
 Mathlib promotes an ordinary functor into a strict bicategory to a pseudofunctor on the locally
 discrete source. This module promotes its natural transformations as well.
 
-## Main definitions and results
+## Main definitions
 
 * `CategoryTheory.NatTrans.toStrongTrans` promotes a natural transformation to a strong one.
+## Main results
+
 * `CategoryTheory.NatTrans.toStrongTrans_app` identifies its component with the original one.
 
 ## Implementation notes
