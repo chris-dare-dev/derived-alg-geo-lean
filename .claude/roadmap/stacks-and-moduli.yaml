@@ -731,7 +731,7 @@ items:
     kind: task
     parent: stacks-and-moduli-dq1
     title: "DQ1.2a: Module-sheaf pullback is strong monoidal; the projection formula for invertible sheaves"
-    status: done
+    status: planned
     priority: must
     size: M
     summary: "Pullback of module sheaves along any morphism of schemes is strong monoidal for the sheafified tensor product: f^*(M ⊗ N) ≅ f^*M ⊗ f^*N and f^*𝒪_Y ≅ 𝒪_X, coherently (Stacks 01CD)."
