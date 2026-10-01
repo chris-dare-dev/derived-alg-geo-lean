@@ -12,36 +12,63 @@ import Mathlib.Algebra.Category.ModuleCat.Sheaf.PullbackFree
 /-!
 # Pullback of module sheaves is strong monoidal
 
-For every morphism of schemes `f : X ⟶ Y`, the pullback `f^* : Y.Modules ⥤ X.Modules` is strong
-monoidal for the sheafified tensor product (Stacks, Tag 01CD): `f^*(M ⊗ N) ≅ f^*M ⊗ f^*N` and
-`f^*𝒪_Y ≅ 𝒪_X`. The instance `pullbackMonoidal : (pullback f).Monoidal` is built by upgrading the
-oplax monoidal structure that Mathlib's doctrinal adjunction attaches to the left adjoint of the lax
-monoidal functor `pushforward f` (`Modules/Pushforward/Monoidal.lean`):
-`Adjunction.leftAdjointOplaxMonoidal` for `pullbackPushforwardAdjunction f`. No monoidal structure
-is supplied as a field or a hypothesis, and no second oplax structure is written by hand.
+For every morphism of schemes f : X ⟶ Y, pullback of module sheaves from Y to X is strong monoidal
+for the sheafified tensor product: f^*(M ⊗ N) ≅ f^*M ⊗ f^*N and f^*𝒪_Y ≅ 𝒪_X. The canonical instance
+is built by upgrading the oplax monoidal structure that Mathlib's doctrinal adjunction attaches to
+the left adjoint of the lax monoidal pushforward.
 
-The oplax structure maps are isomorphisms:
+## Main definitions
 
-* the unit comparison `f^*𝒪_Y ⟶ 𝒪_X` is Mathlib's `SheafOfModules.pullbackObjUnitToUnit`, an
-  isomorphism because inverse image on opens is final;
-* the tensor comparison `pullbackTensorHom f M N : f^*(M ⊗ N) ⟶ f^*M ⊗ f^*N` is an isomorphism
-  because it is one on every stalk (`isIso_stalkMap_pullbackTensorHom`). On the stalk at `x`, both
-  sides are `𝒪_{X,x} ⊗_{𝒪_{Y,fx}} (M ⊗ N)_{fx}`: the stalk of the pullback is the extension of
-  scalars of the stalk (`pullbackStalkIso`, with `pullbackStalkIso_inv_app_one_tmul_germ` saying
-  that its inverse sends `1 ⊗ germ m` to the germ of the unit), the stalk of a sheafified tensor
-  product is the tensor product of the stalks (`moduleStalkTensorEquiv`), and extension of scalars
-  is monoidal. No flatness is used.
-
-The two comparisons `pullbackTensorIso` and `pullbackUnitIso` are then read off the
-`Functor.Monoidal` structure, with no instance argument.
+* `AlgebraicGeometry.Scheme.Modules.pullbackTensorHom`: the oplax tensor comparison f^*(M ⊗ N) ⟶
+  f^*M ⊗ f^*N, the mate of the tensorator of the pushforward.
+* `AlgebraicGeometry.Scheme.Modules.pullbackOplaxMonoidal`: the oplax monoidal structure of the
+  doctrinal adjunction.
+* `AlgebraicGeometry.Scheme.Modules.pullbackMonoidal`: the strong monoidal structure on pullback.
+* `AlgebraicGeometry.Scheme.Modules.pullbackTensorIso` and
+  `AlgebraicGeometry.Scheme.Modules.pullbackUnitIso`: the tensor and unit comparison isomorphisms
+  read off the strong monoidal structure.
 
 ## Main results
 
-* `Scheme.Modules.pullbackTensorHom`: the oplax tensor comparison of pullback.
-* `Scheme.Modules.isIso_pullbackTensorHom`: it is an isomorphism.
-* `Scheme.Modules.pullbackMonoidal`: the instance `(pullback f).Monoidal`.
-* `Scheme.Modules.pullbackMonoidal_toOplaxMonoidal`: its oplax part is the doctrinal one.
-* `Scheme.Modules.pullbackTensorIso`, `Scheme.Modules.pullbackUnitIso`: the standard comparisons.
+* `AlgebraicGeometry.Scheme.Modules.isIso_stalkMap_pullbackTensorHom` and
+  `AlgebraicGeometry.Scheme.Modules.isIso_pullbackTensorHom`: the tensor comparison is an
+  isomorphism on every stalk, hence an isomorphism.
+* `AlgebraicGeometry.Scheme.Modules.pullbackMonoidal_toOplaxMonoidal`: the oplax part of the strong
+  structure is the one induced by the adjunction.
+* `AlgebraicGeometry.Scheme.Modules.pullbackTensorHom_unit_app_tmulSection`: the tensor comparison
+  on the unit image of a pure tensor.
+* `AlgebraicGeometry.Scheme.Modules.pullbackTensorIso_inv` and
+  `AlgebraicGeometry.Scheme.Modules.pullbackUnitIso_hom`: the comparisons are the oplax structure
+  maps.
+
+## Implementation notes
+
+The unit comparison is Mathlib's `SheafOfModules.pullbackObjUnitToUnit`, an isomorphism because
+inverse image on opens is final. The tensor comparison is shown invertible on stalks, which jointly
+reflect isomorphisms
+(`AlgebraicGeometry.Scheme.Modules.moduleStalkFunctors_jointlyReflectIsomorphisms`). At a point x,
+the inverse of `AlgebraicGeometry.Scheme.Modules.pullbackStalkIso` sends 1 ⊗ germ m to the germ of
+the unit image of m (`AlgebraicGeometry.Scheme.Modules.pullbackStalkIso_inv_app_one_tmul_germ`), the
+stalk of a sheafified tensor product is the tensor product of the stalks
+(`AlgebraicGeometry.Scheme.Modules.moduleStalkTensorEquiv`), and extension of scalars is monoidal;
+the stalk of the comparison is checked equal to the resulting isomorphism on the generators 1 ⊗
+germ(m ⊗ n). No flatness hypothesis is used. The strong structure is obtained from
+`CategoryTheory.Adjunction.leftAdjointOplaxMonoidal` with
+`CategoryTheory.Functor.Monoidal.ofOplaxMonoidal`, so there is no second oplax structure on
+pullback. The lax monoidal structure of the pushforward is
+`AlgebraicGeometry.Scheme.Modules.pushforwardLaxMonoidal`.
+
+## References
+
+* The Stacks Project, Tag 01CB (Lemma 17.16.1, the stalk of a tensor product of modules on a ringed
+  space), Tag 01CD (Lemma 17.16.4, pullback of a tensor product of modules on ringed spaces) and Tag
+  01E8 (Lemma 20.54.2, the projection formula for a finite locally free module). The statements were
+  not obtained verbatim: only summaries of those pages were fetched, so these tags give the
+  literature context and are not quoted.
+
+## Tags
+
+pullback, inverse image, strong monoidal functor, tensor product, sheaf of modules, stalk
 -/
 
 open CategoryTheory CategoryTheory.Limits Opposite TopologicalSpace AlgebraicGeometry
@@ -101,10 +128,11 @@ private abbrev stalkExtend (x : X) :
 
 open TensorProduct in
 /-- **Stalkwise, the tensor comparison of pullback is an isomorphism.** On the stalk at `x`, both
-`f^*(M ⊗ N)` and `f^*M ⊗ f^*N` are `𝒪_{X,x} ⊗ (M ⊗ N)_{f x}` (extension of scalars is monoidal,
-the stalk of a pullback is the extension of the stalk, the stalk of a tensor product is the tensor
-product of the stalks), and the comparison is that identification: it is checked on the
-generators `1 ⊗ germ(m ⊗ n)` using `pullbackStalkIso_inv_app_one_tmul_germ`. -/
+`f^*(M ⊗ N)` and `f^*M ⊗ f^*N` are `𝒪_{X,x} ⊗ (M ⊗ N)_{f x}` (extension of scalars is monoidal, the
+stalk of a pullback is the extension of the stalk, the stalk of a tensor product is the tensor
+product of the stalks), and the comparison is that identification: it is checked on the generators
+`1 ⊗ germ(m ⊗ n)` using `AlgebraicGeometry.Scheme.Modules.pullbackStalkIso_inv_app_one_tmul_germ`.
+-/
 theorem isIso_stalkMap_pullbackTensorHom (M N : Y.Modules) (x : X) :
     IsIso ((moduleStalkFunctor X x).map (pullbackTensorHom f M N)) := by
   letI : Algebra (Y.presheaf.stalk (f x)) (X.presheaf.stalk x) := (f.stalkMap x).hom.toAlgebra
@@ -210,10 +238,12 @@ abbrev pullbackOplaxMonoidal : (pullback f).OplaxMonoidal :=
 
 /-- **Stacks, Tag 01CD: pullback of module sheaves is strong monoidal.**
 
-The oplax structure is `leftAdjointOplaxMonoidal` for `pullbackPushforwardAdjunction f` and the lax
-structure of `pushforward f` (`pushforwardLaxMonoidal`); its comparison maps are isomorphisms:
-`pullbackObjUnitToUnit` for the unit, and `isIso_pullbackTensorHom` (a stalkwise check) for the
-tensor product. This is the only monoidal structure on `pullback f`. -/
+The oplax structure is `CategoryTheory.Adjunction.leftAdjointOplaxMonoidal` for
+`pullbackPushforwardAdjunction f` and the lax structure of `pushforward f`
+(`AlgebraicGeometry.Scheme.Modules.pushforwardLaxMonoidal`); its comparison maps are isomorphisms:
+`SheafOfModules.pullbackObjUnitToUnit` for the unit, and
+`AlgebraicGeometry.Scheme.Modules.isIso_pullbackTensorHom` (a stalkwise check) for the tensor
+product. This is the only monoidal structure on `pullback f`. -/
 noncomputable instance pullbackMonoidal : (pullback f).Monoidal :=
   letI := pullbackOplaxMonoidal f
   haveI : IsIso (Functor.OplaxMonoidal.η (pullback f)) :=
@@ -222,8 +252,8 @@ noncomputable instance pullbackMonoidal : (pullback f).Monoidal :=
     fun M N => isIso_pullbackTensorHom f M N
   Functor.Monoidal.ofOplaxMonoidal (pullback f)
 
-/-- The oplax part of `pullbackMonoidal` is the one induced by the doctrinal adjunction; there
-is no second oplax structure on `pullback f`. -/
+/-- The oplax part of `AlgebraicGeometry.Scheme.Modules.pullbackMonoidal` is the one induced by the
+doctrinal adjunction; there is no second oplax structure on `pullback f`. -/
 theorem pullbackMonoidal_toOplaxMonoidal :
     (pullbackMonoidal f).toOplaxMonoidal = pullbackOplaxMonoidal f :=
   rfl
@@ -243,18 +273,19 @@ noncomputable def pullbackUnitIso (f : X ⟶ Y) :
   change (pullback f).obj (𝟙_ Y.Modules) ≅ 𝟙_ X.Modules
   exact (Functor.Monoidal.εIso (pullback f)).symm
 
-/-- The inverse of the tensor comparison is the oplax tensorator `pullbackTensorHom`. -/
+/-- The inverse of the tensor comparison is the oplax tensorator
+`AlgebraicGeometry.Scheme.Modules.pullbackTensorHom`. -/
 theorem pullbackTensorIso_inv (M N : Y.Modules) :
     (pullbackTensorIso f M N).inv = pullbackTensorHom f M N :=
   rfl
 
-/-- The unit comparison is Mathlib's `pullbackObjUnitToUnit`. -/
+/-- The unit comparison is Mathlib's `SheafOfModules.pullbackObjUnitToUnit`. -/
 theorem pullbackUnitIso_hom :
     (pullbackUnitIso f).hom = SheafOfModules.pullbackObjUnitToUnit f.toRingCatSheafHom :=
   rfl
 
-/-- The two comparisons elaborate with no `Functor.Monoidal` argument: the instance is
-canonical. -/
+/-- The two comparisons elaborate with no `CategoryTheory.Functor.Monoidal` argument: the instance
+is canonical. -/
 example (M N : Y.Modules) :
     tensorObj ((pullback f).obj M) ((pullback f).obj N) ≅
       (pullback f).obj (tensorObj M N) :=

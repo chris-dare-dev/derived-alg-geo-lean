@@ -7,55 +7,54 @@ import Mathlib.CategoryTheory.Monoidal.Functor
 /-!
 # The projection morphism of a monoidal adjunction
 
-Let `adj : F ⊣ G` be an adjunction between monoidal categories, with `F : C ⥤ D` (op)lax
-monoidal, `G : D ⥤ C` lax monoidal, and `[adj.IsMonoidal]` (Mathlib's compatibility between
-the two structures). For `M : D` and `K : C` the *projection morphism* is the composite
+Let F ⊣ G be an adjunction between monoidal categories C and D, with F : C ⥤ D oplax monoidal, G : D
+⥤ C lax monoidal, and `CategoryTheory.Adjunction.IsMonoidal` expressing the compatibility of the two
+structures. For M in D and K in C the projection morphism is the composite G(M) ⊗ K ⟶ G(M) ⊗ G(F(K))
+⟶ G(M ⊗ F(K)) of the unit of the adjunction and the tensorator of G. For F the pullback and G the
+pushforward of module sheaves, it is the morphism of the projection formula.
 
-`G.obj M ⊗ K ⟶ G.obj M ⊗ G.obj (F.obj K) ⟶ G.obj (M ⊗ F.obj K)`
-
-of the unit of the adjunction and the tensorator of `G`. In algebraic geometry, with
-`F = f^*` and `G = f_*`, this is the morphism of the projection formula
-`f_* M ⊗ K ⟶ f_* (M ⊗ f^* K)`.
-
-This file proves the abstract projection formula for tensor-invertible objects: if `F` is
-monoidal and `K` has a two-sided tensor inverse, then the projection morphism is an
-isomorphism for every `M`. No rigidity, symmetry or braiding is assumed.
-
-The declarations about the adjunction live in the namespace `CategoryTheory.Adjunction`,
-next to Mathlib's `Adjunction.IsMonoidal` API, so they are available by dot notation on
-`adj`. The structure `TensorInverse` lives in `CategoryTheory.MonoidalCategory`.
+If F is monoidal and K has a two-sided tensor inverse, the projection morphism is an isomorphism for
+every M. No rigidity, symmetry or braiding is assumed.
 
 ## Main definitions
 
-* `CategoryTheory.Adjunction.projectionMorphism`: the projection morphism
-  `G.obj M ⊗ K ⟶ G.obj (M ⊗ F.obj K)`.
+* `CategoryTheory.Adjunction.projectionMorphism`: the projection morphism.
 * `CategoryTheory.MonoidalCategory.TensorInverse`: a two-sided tensor inverse of an object.
-* `CategoryTheory.Adjunction.projectionIso`: the projection isomorphism for an object with a
-  tensor inverse.
+* `CategoryTheory.Adjunction.projectionIso`: the projection isomorphism at an object with a tensor
+  inverse.
 
 ## Main results
 
-* `CategoryTheory.Adjunction.projectionMorphism_naturality_left`,
-  `CategoryTheory.Adjunction.projectionMorphism_naturality_right`: naturality in `M` and `K`.
-* `CategoryTheory.Adjunction.projectionMorphism_tensor`: compatibility with the tensor product
-  in the variable `K`.
-* `CategoryTheory.Adjunction.projectionMorphism_tensorUnit`: the projection morphism at the
-  tensor unit is a structural isomorphism.
-* `CategoryTheory.Adjunction.isIso_projectionMorphism`: the projection morphism at an object
-  with a two-sided tensor inverse is an isomorphism.
+* `CategoryTheory.Adjunction.projectionMorphism_naturality_left` and
+  `CategoryTheory.Adjunction.projectionMorphism_naturality_right`: naturality in M and in K.
+* `CategoryTheory.Adjunction.projectionMorphism_tensor`: compatibility with the tensor product in K.
+* `CategoryTheory.Adjunction.projectionMorphism_tensorUnit`: the projection morphism at the tensor
+  unit is a structural isomorphism.
+* `CategoryTheory.Adjunction.isIso_projectionMorphism`: the projection morphism at an object with a
+  two-sided tensor inverse is an isomorphism.
 
 ## Implementation notes
 
-The proof of `isIso_projectionMorphism` is formal. For `K ⊗ K' ≅ 𝟙_ C` the tensor
-compatibility exhibits the isomorphism `p_{M, K ⊗ K'}` as a composite
-`p_{M,K} ▷ K' ≫ p_{M ⊗ F K, K'}` up to isomorphisms, so the second factor is a split
-epimorphism. The same argument with the roles of `K` and `K'` exchanged shows that
-`p_{N,K'} ▷ K` is a monomorphism for every `N`; right whiskering by `K` is reflected
-because `K ⊗ K' ≅ 𝟙_ C`. Hence `p_{M ⊗ F K, K'}` is an isomorphism, so is `p_{M,K} ▷ K'`,
-and so is `p_{M,K}`.
+The declarations about the adjunction are in the namespace `CategoryTheory.Adjunction`, next to
+Mathlib's `CategoryTheory.Adjunction.IsMonoidal`, so they are available by dot notation on the
+adjunction. The proof of `CategoryTheory.Adjunction.isIso_projectionMorphism` is formal. For K ⊗ K'
+≅ 𝟙, the tensor compatibility expresses the projection morphism at K ⊗ K' as the projection morphism
+at K whiskered by K', followed by the projection morphism at K' on M ⊗ F(K), up to isomorphisms, so
+the second factor is a split epimorphism. Exchanging the roles of K and K' shows it is also a
+monomorphism, hence an isomorphism, hence so is the whiskered first factor, and whiskering by K'
+reflects isomorphisms. Several proofs set `backward.isDefEq.respectTransparency false`, because the
+components of the unit have source `(𝟭 C).obj K`, which is not reducibly K.
 
-Several proofs set `backward.isDefEq.respectTransparency false`: the components of
-`adj.unit` have source `(𝟭 C).obj K`, which is not reducibly `K`.
+## References
+
+* The Stacks Project, Tag 01E8 (Lemma 20.54.2, the projection formula for a finite locally free
+  module on a ringed space), as the geometric statement of which this is the formal categorical form
+  for invertible objects. The statement was not obtained verbatim: only a summary of that page was
+  fetched, so the tag gives literature context and is not quoted.
+
+## Tags
+
+monoidal adjunction, projection formula, projection morphism, tensor inverse, invertible object
 -/
 
 namespace CategoryTheory
@@ -270,7 +269,7 @@ noncomputable def projectionIso (M : D) {K : C} (h : TensorInverse K) :
   have := adj.isIso_projectionMorphism_of_tensorInverse M h
   asIso (adj.projectionMorphism M K)
 
-/-- The forward morphism of `projectionIso` is the projection morphism. -/
+/-- The forward morphism of `CategoryTheory.Adjunction.projectionIso` is the projection morphism. -/
 @[simp]
 lemma projectionIso_hom (M : D) {K : C} (h : TensorInverse K) :
     (adj.projectionIso M h).hom = adj.projectionMorphism M K :=

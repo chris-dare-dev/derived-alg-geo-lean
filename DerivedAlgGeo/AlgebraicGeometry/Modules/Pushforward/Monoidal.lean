@@ -8,20 +8,49 @@ import Mathlib.Algebra.Category.ModuleCat.Sheaf.PullbackFree
 /-!
 # Pushforward of module sheaves is lax monoidal
 
-For a morphism of schemes `f : X ⟶ Y`, the pushforward `f_* : X.Modules ⥤ Y.Modules` is lax
-monoidal for the sheafified tensor product (Stacks, Tag 01CD is the dual statement for the
-pullback, which this structure induces through the doctrinal adjunction).
-
-The tensorator `f_*M ⊗ f_*N ⟶ f_*(M ⊗ N)` is multiplication of sections: a pure tensor of
-sections of `M` and `N` over `f⁻¹ U` is a section of `M ⊗ N` over `f⁻¹ U`. It is built from
-`TensorLiftData` and checked on pure tensors, so no sheafification is computed.
+For a morphism of schemes f : X ⟶ Y, the pushforward of module sheaves from X to Y is lax monoidal
+for the sheafified tensor product. The tensorator f_*M ⊗ f_*N ⟶ f_*(M ⊗ N) multiplies sections: a
+pure tensor of sections of M and N over the preimage of an open set is a section of M ⊗ N over that
+preimage. The unit is the ring map from the structure sheaf of Y to the pushforward of the structure
+sheaf of X.
 
 ## Main definitions
 
-* `Scheme.Modules.pushforwardTensorHom`: the tensorator.
-* `Scheme.Modules.pushforwardUnitHom`: the unit `𝒪_Y ⟶ f_*𝒪_X`, Mathlib's
+* `AlgebraicGeometry.Scheme.Modules.pushforwardTensorData`: the sectionwise multiplication data.
+* `AlgebraicGeometry.Scheme.Modules.pushforwardTensorHom`: the tensorator, built with
+  `AlgebraicGeometry.Scheme.Modules.TensorLiftData.lift`.
+* `AlgebraicGeometry.Scheme.Modules.pushforwardUnitHom`: the unit, Mathlib's
   `SheafOfModules.unitToPushforwardObjUnit`.
-* `Scheme.Modules.pushforwardLaxMonoidal`: the instance `(pushforward f).LaxMonoidal`.
+
+## Main results
+
+* `AlgebraicGeometry.Scheme.Modules.pushforwardLaxMonoidal`: the instance of the lax monoidal
+  structure on the pushforward.
+* `AlgebraicGeometry.Scheme.Modules.pushforwardTensorHom_app_tmulSection` and
+  `AlgebraicGeometry.Scheme.Modules.pushforwardUnitHom_app`: the tensorator and the unit on
+  sections.
+
+## Implementation notes
+
+Each coherence equation of the lax structure (naturality of the tensorator, associativity and the
+two unitality equations) is checked on pure tensors, using
+`AlgebraicGeometry.Scheme.Modules.tensorObj_hom_ext`,
+`AlgebraicGeometry.Scheme.Modules.tensorObj_tensorObj_hom_ext` and the pure-tensor formulas of
+`DerivedAlgGeo/AlgebraicGeometry/Modules/Tensor/Sections.lean`. The doctrinal adjunction turns this
+structure into the oplax structure on pullback used in
+`DerivedAlgGeo/AlgebraicGeometry/Modules/Pullback/Monoidal.lean`.
+
+## References
+
+* The Stacks Project, Tag 01CB (Lemma 17.16.1, the stalk of a tensor product of modules on a ringed
+  space), Tag 01CD (Lemma 17.16.4, pullback of a tensor product of modules on ringed spaces) and Tag
+  01E8 (Lemma 20.54.2, the projection formula for a finite locally free module). The statements were
+  not obtained verbatim: only summaries of those pages were fetched, so these tags give the
+  literature context and are not quoted.
+
+## Tags
+
+pushforward, direct image, lax monoidal functor, tensor product, sheaf of modules
 -/
 
 open CategoryTheory MonoidalCategory Opposite TopologicalSpace
@@ -72,7 +101,8 @@ theorem pushforwardUnitHom_app (U : Y.Opens) (r : Γ(𝟙_ Y.Modules, U)) :
 /-- **Pushforward of module sheaves is lax monoidal** for the sheafified tensor product: the
 tensorator `f_*M ⊗ f_*N ⟶ f_*(M ⊗ N)` is multiplication of sections, and the unit is the ring map
 `𝒪_Y → f_*𝒪_X`. Every coherence equation is checked on pure tensors
-(`tensorObj_hom_ext`, `tensorObj_tensorObj_hom_ext`). -/
+(`AlgebraicGeometry.Scheme.Modules.tensorObj_hom_ext`,
+`AlgebraicGeometry.Scheme.Modules.tensorObj_tensorObj_hom_ext`). -/
 noncomputable instance pushforwardLaxMonoidal : (pushforward f).LaxMonoidal where
   ε := pushforwardUnitHom f
   μ M N := pushforwardTensorHom f M N

@@ -8,25 +8,58 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Monoidal
 /-!
 # Sections of the sheafified tensor product
 
-The monoidal structure on `X.Modules` is the sheafification of the objectwise tensor product of
-presheaves of modules. Everything that is known about it at the level of sections is routed
-through `tmulSection M N U a b`, the image of a pure tensor under the sheafification unit.
+The monoidal structure on module sheaves of a scheme is the sheafification of the objectwise tensor
+product of presheaves of modules. Section-level information about it goes through
+`AlgebraicGeometry.Scheme.Modules.tmulSection`, the image of a pure tensor under the sheafification
+unit. This file shows that a morphism out of a sheafified tensor product is determined by its values
+on pure tensors, computes the tensor of morphisms, the unitors and the associator on pure tensors,
+and builds morphisms out of a sheafified tensor product from sectionwise bilinear data.
 
-This file collects the section-level calculus that lets coherence equations between morphisms
-out of a sheafified tensor product be checked on pure tensors, without computing sheafification:
+## Main definitions
 
-* `section_ext_of_locally`: sections of a module sheaf that agree locally agree;
-* `tensorObj_hom_ext`, `tensorObj_tensorObj_hom_ext`: morphisms out of `M ⊗ N` (respectively
-  `(M ⊗ N) ⊗ P`) are determined by their values on pure tensors;
-* `tensorHom_tmulSection`, `tensorUnitLeftIso_hom_tmulSection`,
-  `tensorUnitRightIso_hom_tmulSection`, `tensorAssocIso_hom_tmulSection`: the tensor of
-  morphisms, the unitors and the associator, on pure tensors;
-* `TensorLiftData`, `TensorLiftData.lift`: the universal property of `M ⊗ N` as the sheafified
-  tensor product, i.e. a morphism out of `M ⊗ N` from sectionwise bilinear data that is
-  compatible with restriction, with `TensorLiftData.lift_app_tmulSection`.
+* `AlgebraicGeometry.Scheme.Modules.TensorLiftData`: sectionwise bilinear data between module
+  sheaves, additive and linear over the structure sheaf in each variable and compatible with
+  restriction.
+* `AlgebraicGeometry.Scheme.Modules.TensorLiftData.lift`: the morphism out of the sheafified tensor
+  product attached to such data.
 
-None of this is new mathematics; it is the interface that `tmulSection` always lacked, in the
-form needed to build structure maps (lax and oplax monoidal comparisons) out of sections.
+## Main results
+
+* `AlgebraicGeometry.Scheme.Modules.section_ext_of_locally`: sections of a module sheaf that agree
+  locally are equal.
+* `AlgebraicGeometry.Scheme.Modules.tensorObj_hom_ext` and
+  `AlgebraicGeometry.Scheme.Modules.tensorObj_tensorObj_hom_ext`: a morphism out of a tensor
+  product, respectively an iterated tensor product, is determined by its values on pure tensors.
+* `AlgebraicGeometry.Scheme.Modules.tensorHom_tmulSection`,
+  `AlgebraicGeometry.Scheme.Modules.tensorUnitLeftIso_hom_tmulSection`,
+  `AlgebraicGeometry.Scheme.Modules.tensorUnitRightIso_hom_tmulSection` and
+  `AlgebraicGeometry.Scheme.Modules.tensorAssocIso_hom_tmulSection`: the tensor of morphisms, the
+  unitors and the associator evaluated on pure tensors.
+* `AlgebraicGeometry.Scheme.Modules.TensorLiftData.lift_app_tmulSection`: the morphism built from
+  bilinear data acts on a pure tensor by that data.
+* `AlgebraicGeometry.Scheme.Modules.tmulSection_add_right`: the pure tensor is additive in its
+  second factor.
+
+## Implementation notes
+
+Locally a section of a tensor product is a finite sum of pure tensors
+(`AlgebraicGeometry.Scheme.Modules.exists_eq_sum_tmulSection`), and morphisms of module sheaves
+commute with restriction and sums, which gives the extensionality statements. The morphism attached
+to bilinear data is the sheafification adjunct of a morphism of presheaves of modules out of the
+objectwise tensor product, so no sheafification is computed on sections. The auxiliary instance of
+the monoidal structure on presheaves of modules is private to the file.
+
+## References
+
+* The Stacks Project, Tag 01CB (Lemma 17.16.1, the stalk of a tensor product of modules on a ringed
+  space), Tag 01CD (Lemma 17.16.4, pullback of a tensor product of modules on ringed spaces) and Tag
+  01E8 (Lemma 20.54.2, the projection formula for a finite locally free module). The statements were
+  not obtained verbatim: only summaries of those pages were fetched, so these tags give the
+  literature context and are not quoted.
+
+## Tags
+
+sheaf of modules, tensor product, pure tensor, sheafification, scheme
 -/
 
 open CategoryTheory MonoidalCategory Opposite TopologicalSpace
@@ -52,12 +85,11 @@ theorem section_ext_of_locally (G : X.Modules) {U : X.Opens} (s t : Γ(G, U))
     exact hst x.1 x.2
 
 
-/-- **A morphism out of a sheafified tensor product is determined by its values on pure
-tensors.**
+/-- **A morphism out of a sheafified tensor product is determined by its values on pure tensors.**
 
-Locally a section of `M ⊗ N` is a finite sum of `tmulSection`s
-(`exists_eq_sum_tmulSection`), and morphisms of module sheaves commute with restriction and
-sums. -/
+Locally a section of `M ⊗ N` is a finite sum of `AlgebraicGeometry.Scheme.Modules.tmulSection`s
+(`AlgebraicGeometry.Scheme.Modules.exists_eq_sum_tmulSection`), and morphisms of module sheaves
+commute with restriction and sums. -/
 theorem tensorObj_hom_ext {A B C : X.Modules} (φ ψ : tensorObj A B ⟶ C)
     (h : ∀ (U : X.Opens) (a : Γ(A, U)) (b : Γ(B, U)),
       φ.app U (tmulSection A B (op U) a b) = ψ.app U (tmulSection A B (op U) a b)) :
@@ -79,7 +111,7 @@ private local instance sectionsPresheafMonoidalCategory : MonoidalCategory X.Pre
   PresheafOfModules.monoidalCategory (R := X.presheaf)
 
 /-- **The pure tensor is additive in its second factor** -- the companion of
-`tmulSection_add_left`. -/
+`AlgebraicGeometry.Scheme.Modules.tmulSection_add_left`. -/
 theorem tmulSection_add_right (M N : X.Modules) (U : X.Opensᵒᵖ)
     (t : Γ(M, U.unop)) (y y' : Γ(N, U.unop)) :
     tmulSection M N U t (y + y') = tmulSection M N U t y + tmulSection M N U t y' := by
@@ -239,7 +271,7 @@ structure TensorLiftData (A B C : X.Modules) where
     C.presheaf.map (homOfLE h).op (toFun U a b) =
       toFun V (A.presheaf.map (homOfLE h).op a) (B.presheaf.map (homOfLE h).op b)
 
-/-- The presheaf-level morphism attached to `TensorLiftData`. -/
+/-- The presheaf-level morphism attached to `AlgebraicGeometry.Scheme.Modules.TensorLiftData`. -/
 def TensorLiftData.toPre (β : TensorLiftData A B C) :
     (toPresheafOfModules X).obj A ⊗ (toPresheafOfModules X).obj B ⟶
       (toPresheafOfModules X).obj C where
@@ -248,12 +280,13 @@ def TensorLiftData.toPre (β : TensorLiftData A B C) :
   naturality {U V} i := ModuleCat.MonoidalCategory.tensor_ext (fun a b => by
     exact (β.res i.unop.le a b).symm)
 
-/-- The morphism out of the sheafified tensor product attached to `TensorLiftData`. -/
+/-- The morphism out of the sheafified tensor product attached to
+`AlgebraicGeometry.Scheme.Modules.TensorLiftData`. -/
 def TensorLiftData.lift (β : TensorLiftData A B C) : tensorObj A B ⟶ C :=
   ((sheafAdj X).homEquiv _ C).symm β.toPre
 
-/-- **A morphism built by `TensorLiftData.lift` acts on a pure tensor by the given bilinear
-data.** -/
+/-- **A morphism built by `AlgebraicGeometry.Scheme.Modules.TensorLiftData.lift` acts on a pure
+tensor by the given bilinear data.** -/
 theorem TensorLiftData.lift_app_tmulSection (β : TensorLiftData A B C) (U : X.Opens)
     (a : Γ(A, U)) (b : Γ(B, U)) :
     β.lift.app U (tmulSection A B (op U) a b) = β.toFun U a b := by

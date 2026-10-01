@@ -16,25 +16,56 @@ import DerivedAlgGeo.CategoryTheory.Limits.Preserves.Reflective
 /-!
 # Module stalks and pullback
 
-This file equips stalks of scheme-module sheaves with their canonical local-ring
-module structure. These stalk functors preserve finite limits and coproducts and jointly
-reflect isomorphisms.  Pullback followed by a module stalk is identified with
-the source stalk followed by extension of scalars along the local-ring map.
+This file equips stalks of scheme-module sheaves with their canonical local-ring module structure.
+These stalk functors preserve finite limits and coproducts and jointly reflect isomorphisms.
+Pullback followed by a module stalk is identified with the source stalk followed by extension of
+scalars along the local-ring map, and the inverse of this identification sends 1 ⊗ germ m to the
+germ of the image of m under the unit of the pullback and pushforward adjunction.
 
-The pullback comparison is first constructed for presheaves via a private
-module-valued skyscraper adjunction, then transported through module
-sheafification.  It assumes no flatness and does not assert that pullback along
-an arbitrary scheme morphism is exact.
+## Main definitions
+
+* `AlgebraicGeometry.Scheme.Modules.presheafModuleStalkFunctor` and
+  `AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor` bundle a presheaf stalk, and a sheaf stalk,
+  over the local ring.
+* `AlgebraicGeometry.Scheme.Modules.presheafModuleGerm` and
+  `AlgebraicGeometry.Scheme.Modules.moduleStalkGerm`: the germ of a section over a neighbourhood of
+  the point, as an element of the module stalk.
+* `AlgebraicGeometry.Scheme.Modules.presheafModulePullbackStalkIso` and
+  `AlgebraicGeometry.Scheme.Modules.pullbackStalkIso`: the comparison of pullback followed by a
+  stalk with extension of scalars of the stalk, for presheaves and for sheaves.
 
 ## Main results
 
-* `moduleStalkFunctor` bundles a sheaf stalk over the local ring.
-* `moduleStalkFunctor_preservesColimitsOfShape` preserves indexed coproducts.
-* `preservesFiniteLimits_of_stalkwise` reduces finite-limit preservation to
-  module stalks.
-* `presheafModulePullbackStalkIso` compares presheaf pullback with extension of
-  scalars on stalks.
-* `pullbackStalkIso` gives the corresponding comparison for module sheaves.
+* `AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor_preservesColimitsOfShape` preserves indexed
+  coproducts.
+* `AlgebraicGeometry.Scheme.Modules.moduleStalkFunctors_jointlyReflectIsomorphisms`: the module
+  stalk functors jointly reflect isomorphisms.
+* `AlgebraicGeometry.Scheme.Modules.preservesFiniteLimits_of_stalkwise` reduces finite-limit
+  preservation to module stalks.
+* `AlgebraicGeometry.Scheme.Modules.presheafModuleStalkFunctor_map_germ`: the stalk functor sends a
+  germ to the germ of the image.
+* `AlgebraicGeometry.Scheme.Modules.presheafModulePullbackStalkIso_inv_app_one_tmul_germ` and
+  `AlgebraicGeometry.Scheme.Modules.pullbackStalkIso_inv_app_one_tmul_germ`: the inverse of the
+  pullback stalk isomorphism sends 1 ⊗ germ m to the germ of the unit image of m.
+
+## Implementation notes
+
+The pullback comparison is first constructed for presheaves via a private module-valued skyscraper
+adjunction, then transported through module sheafification. It assumes no flatness and does not
+assert that pullback along an arbitrary scheme morphism is exact. The germ formulas are proved by
+unfolding the comparison through its conjugate characterization as a left adjoint, evaluating on
+sections through the skyscraper presheaf, and identifying the unit of the sheaf adjunction with the
+unit of the presheaf construction.
+
+## References
+
+* `Mathlib/Algebra/Category/ModuleCat/Presheaf/ColimitFunctor.lean`: the colimit-module construction
+  used to bundle stalks as modules over the local ring. The constructions of this file are otherwise
+  standard and cite no further source.
+
+## Tags
+
+stalk, germ, pullback, extension of scalars, sheaf of modules, skyscraper
 -/
 
 namespace AlgebraicGeometry.Scheme.Modules
@@ -158,8 +189,8 @@ def presheafModuleStalkSheafificationIso
         ((_root_.PresheafOfModules.sheafificationAdjunction
           (R := X.ringCatSheaf) (𝟙 X.ringCatSheaf.obj)).unit.naturality f))
 
-/-- Forgetting the local-ring action on `moduleStalkFunctor` recovers the
-usual stalk of the underlying sheaf of abelian groups. -/
+/-- Forgetting the local-ring action on `AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor`
+recovers the usual stalk of the underlying sheaf of abelian groups. -/
 def moduleStalkForgetIso (X : Scheme.{u}) (x : X) :
     moduleStalkFunctor X x ⋙
         forget₂ (ModuleCat.{u} (X.presheaf.stalk x)) AddCommGrpCat.{u} ≅
@@ -1223,9 +1254,9 @@ private theorem moduleSkyscraperPositiveEquiv_stalkUnit (X : Scheme.{u}) (x : X)
   rfl
 
 open TensorProduct in
-/-- The inverse of `presheafModulePullbackStalkIso` sends `1 ⊗ germ(p)` to the germ at `x`
-of the image of `p` under the unit of the presheaf pullback/pushforward adjunction, viewed as
-a section of the pullback over `f⁻¹ V`. -/
+/-- The inverse of `AlgebraicGeometry.Scheme.Modules.presheafModulePullbackStalkIso` sends
+`1 ⊗ germ(p)` to the germ at `x` of the image of `p` under the unit of the presheaf
+pullback/pushforward adjunction, viewed as a section of the pullback over `f⁻¹ V`. -/
 theorem presheafModulePullbackStalkIso_inv_app_one_tmul_germ {X Y : Scheme.{u}} (f : X ⟶ Y)
     (x : X) (P : Y.PresheafOfModules) (V : Y.Opens) (hV : f x ∈ V) (p : P.obj (op V)) :
     letI : Algebra (Y.presheaf.stalk (f x)) (X.presheaf.stalk x) :=
@@ -1293,9 +1324,9 @@ theorem presheafModuleStalkFunctor_map_germ (X : Scheme.{u}) (x : X)
   exact _root_.PresheafOfModules.ModuleColimit.map_apply _ _ _ _ _
 
 open TensorProduct in
-/-- The inverse of `pullbackStalkIso` sends `1 ⊗ germ(m)` to the germ at `x` of the image of
-`m` under the unit of the pullback/pushforward adjunction of module sheaves, viewed as a
-section of the pullback over `f⁻¹ V`. -/
+/-- The inverse of `AlgebraicGeometry.Scheme.Modules.pullbackStalkIso` sends `1 ⊗ germ(m)` to the
+germ at `x` of the image of `m` under the unit of the pullback/pushforward adjunction of module
+sheaves, viewed as a section of the pullback over `f⁻¹ V`. -/
 theorem pullbackStalkIso_inv_app_one_tmul_germ {X Y : Scheme.{u}} (f : X ⟶ Y) (x : X)
     (M : Y.Modules) (V : Y.Opens) (hV : f x ∈ V) (m : Γ(M, V)) :
     letI : Algebra (Y.presheaf.stalk (f x)) (X.presheaf.stalk x) := (f.stalkMap x).hom.toAlgebra

@@ -8,14 +8,41 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.ProjectionFormula
 /-!
 # The projection formula for an intrinsically invertible sheaf
 
-`Modules/Pullback/ProjectionFormula.lean` proves that the projection map
-`f_*M ⊗ L ⟶ f_*(M ⊗ f^*L)` is an isomorphism when `L` comes with an explicit tensor inverse
-(`isIso_projectionMap`, for `LineBundleData`). This file is the one place where that meets the
-sheafified dual of `Divisors/Dual.lean`, which is the tensor inverse of any intrinsically
-invertible sheaf: `isIso_projectionMap_of_isInvertible` (Stacks, Tag 01E8 at `q = 0`, rank one).
+For a morphism of schemes f : X ⟶ Y, a module sheaf M on X and an intrinsically invertible module
+sheaf L on Y, the projection map f_*M ⊗ L ⟶ f_*(M ⊗ f^*L) is an isomorphism. The tensor inverse of L
+is its sheafified dual.
 
-It is its own leaf so that the pullback root stays independent of the divisor and dual
-constructions, as `Divisors/FiniteLocallyFreePullback.lean` does for local freeness.
+## Main definitions
+
+This file has no definitions.
+
+## Main results
+
+* `AlgebraicGeometry.Scheme.Modules.isIso_projectionMap_of_isInvertible`: the projection map
+  `AlgebraicGeometry.Scheme.Modules.projectionMap` is an isomorphism when the target sheaf is
+  intrinsically invertible.
+
+## Implementation notes
+
+`AlgebraicGeometry.Scheme.Modules.isIso_projectionMap` proves the statement when the line bundle
+comes with an explicit tensor inverse. This file supplies the inverse
+`AlgebraicGeometry.Scheme.Modules.dualLine` with the isomorphism
+`AlgebraicGeometry.Scheme.Modules.tensorDualIso` from
+`DerivedAlgGeo/AlgebraicGeometry/Divisors/Dual.lean`, and the isomorphism in the other order from
+`AlgebraicGeometry.Scheme.Modules.tensorCommIso`. It is a separate file so that the pullback files
+do not import the construction of duals.
+
+## References
+
+* The Stacks Project, Tag 01CB (Lemma 17.16.1, the stalk of a tensor product of modules on a ringed
+  space), Tag 01CD (Lemma 17.16.4, pullback of a tensor product of modules on ringed spaces) and Tag
+  01E8 (Lemma 20.54.2, the projection formula for a finite locally free module). The statements were
+  not obtained verbatim: only summaries of those pages were fetched, so these tags give the
+  literature context and are not quoted.
+
+## Tags
+
+projection formula, invertible sheaf, dual, pushforward, pullback
 -/
 
 open CategoryTheory MonoidalCategory

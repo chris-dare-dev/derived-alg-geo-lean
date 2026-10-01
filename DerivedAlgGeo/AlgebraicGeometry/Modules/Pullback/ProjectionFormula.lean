@@ -7,37 +7,58 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.LineBundle
 import DerivedAlgGeo.CategoryTheory.Monoidal.ProjectionMorphism
 
 /-!
-# The projection formula for invertible module sheaves
+# The projection formula for line bundles
 
-For a morphism of schemes `f : X ⟶ Y`, a module sheaf `M` on `X` and a module sheaf `L` on `Y`,
-the projection map
-
-`projectionMap f M L : f_*M ⊗ L ⟶ f_*(M ⊗ f^*L)`
-
-is the unit `L ⟶ f_*f^*L` tensored with `f_*M`, followed by the tensorator of the lax monoidal
-functor `pushforward f` (`pushforwardLaxMonoidal`). It is the projection morphism of the monoidal
-adjunction `pullback f ⊣ pushforward f` (`CategoryTheory.Adjunction.projectionMorphism`), whose
-monoidal structure is the strong structure `pullbackMonoidal` of `Modules/Pullback/Monoidal.lean`
-and the lax structure of `Modules/Pushforward/Monoidal.lean`: there is one projection morphism
-in each degree, and `projectionMap_eq` unfolds it to the two pieces just named.
-
-When `L` is invertible, the projection map is an isomorphism (the case `q = 0` of the projection
-formula of Stacks, Tag 01E8): `isIso_projectionMap` for explicit `LineBundleData`, and
-`Divisors/ProjectionFormula.lean` for an intrinsically invertible `L`, whose tensor inverse is the
-sheafified dual. The proof is formal and global: a tensor-invertible object is dualizable, so the
-projection morphism of a monoidal adjunction is an isomorphism for it
-(`CategoryTheory.Adjunction.isIso_projectionMorphism`). It does not need a trivializing cover.
+For a morphism of schemes f : X ⟶ Y, a module sheaf M on X and a module sheaf L on Y, the projection
+map f_*M ⊗ L ⟶ f_*(M ⊗ f^*L) is the unit L ⟶ f_*f^*L tensored with f_*M, followed by the tensorator
+of the lax monoidal pushforward. For a line bundle L, with an explicit tensor inverse, it is an
+isomorphism, which is the underived case of the projection formula.
 
 ## Main definitions
 
-* `Scheme.Modules.projectionMap`: the projection map `f_*M ⊗ L ⟶ f_*(M ⊗ f^*L)`.
-* `Scheme.Modules.projectionIso`: the projection isomorphism for `L : LineBundleData Y`.
-* `Scheme.Modules.projectionNatIso`: the natural isomorphism
-  `f_*(-) ⊗ L ≅ f_*(- ⊗ f^*L)` of functors in `M`.
+* `AlgebraicGeometry.Scheme.Modules.projectionMap`: the projection map.
+* `AlgebraicGeometry.Scheme.Modules.LineBundleData.tensorInverse`: the two-sided tensor inverse data
+  of a line bundle.
+* `AlgebraicGeometry.Scheme.Modules.projectionIso`: the projection isomorphism for a line bundle.
+* `AlgebraicGeometry.Scheme.Modules.projectionNatIso`: the natural isomorphism, in M, between the
+  functors M ↦ f_*M ⊗ L and M ↦ f_*(M ⊗ f^*L).
 
 ## Main results
 
-* `Scheme.Modules.isIso_projectionMap`: the projection map is an isomorphism for a line bundle.
+* `AlgebraicGeometry.Scheme.Modules.isIso_projectionMap`: the projection map is an isomorphism for a
+  line bundle.
+* `AlgebraicGeometry.Scheme.Modules.projectionMap_eq`: the projection map is the unit tensored with
+  the pushforward, followed by `AlgebraicGeometry.Scheme.Modules.pushforwardTensorHom`, and nothing
+  else.
+* `AlgebraicGeometry.Scheme.Modules.projectionMap_naturality` and
+  `AlgebraicGeometry.Scheme.Modules.projectionMap_naturality_right`: naturality in M and in L.
+* `AlgebraicGeometry.Scheme.Modules.pullbackPushforwardAdjunction_isMonoidal`: the adjunction
+  between pullback and pushforward is monoidal for the structures of
+  `AlgebraicGeometry.Scheme.Modules.pullbackMonoidal` and
+  `AlgebraicGeometry.Scheme.Modules.pushforwardLaxMonoidal`.
+
+## Implementation notes
+
+The projection map is `CategoryTheory.Adjunction.projectionMorphism` of the adjunction between
+pullback and pushforward, whose invertibility at an object with a two-sided tensor inverse is
+`CategoryTheory.Adjunction.isIso_projectionMorphism`. The argument is global: it needs no
+trivializing cover and no restriction to opens. The statement for an intrinsically invertible sheaf,
+whose tensor inverse is the sheafified dual, is
+`AlgebraicGeometry.Scheme.Modules.isIso_projectionMap_of_isInvertible` in
+`DerivedAlgGeo/AlgebraicGeometry/Divisors/ProjectionFormula.lean`; it is kept in that file so that
+this file does not depend on the construction of duals.
+
+## References
+
+* The Stacks Project, Tag 01CB (Lemma 17.16.1, the stalk of a tensor product of modules on a ringed
+  space), Tag 01CD (Lemma 17.16.4, pullback of a tensor product of modules on ringed spaces) and Tag
+  01E8 (Lemma 20.54.2, the projection formula for a finite locally free module). The statements were
+  not obtained verbatim: only summaries of those pages were fetched, so these tags give the
+  literature context and are not quoted.
+
+## Tags
+
+projection formula, pushforward, pullback, line bundle, invertible sheaf, tensor product
 -/
 
 open CategoryTheory MonoidalCategory
@@ -50,8 +71,9 @@ variable {X Y : Scheme.{u}} (f : X ⟶ Y)
 
 noncomputable section
 
-/-- The monoidal structures on the adjunction `pullback f ⊣ pushforward f` are compatible: the
-oplax part of `pullbackMonoidal` is the one induced by the lax structure of `pushforward f`. -/
+/-- The monoidal structures on the adjunction `pullback f ⊣ pushforward f` are compatible: the oplax
+part of `AlgebraicGeometry.Scheme.Modules.pullbackMonoidal` is the one induced by the lax structure
+of `pushforward f`. -/
 instance pullbackPushforwardAdjunction_isMonoidal :
     (pullbackPushforwardAdjunction f).IsMonoidal :=
   Adjunction.instIsMonoidal_1 (pullbackPushforwardAdjunction f)
@@ -64,7 +86,8 @@ def projectionMap (M : X.Modules) (L : Y.Modules) :
   (pullbackPushforwardAdjunction f).projectionMorphism M L
 
 /-- The projection map is built from the unit of the adjunction and the tensorator
-`pushforwardTensorHom` of `pushforwardLaxMonoidal`, and from nothing else. -/
+`AlgebraicGeometry.Scheme.Modules.pushforwardTensorHom` of
+`AlgebraicGeometry.Scheme.Modules.pushforwardLaxMonoidal`, and from nothing else. -/
 theorem projectionMap_eq (M : X.Modules) (L : Y.Modules) :
     projectionMap f M L =
       tensorHom (𝟙 ((pushforward f).obj M)) ((pullbackPushforwardAdjunction f).unit.app L) ≫
@@ -105,7 +128,8 @@ def projectionIso (M : X.Modules) (L : LineBundleData Y) :
   haveI := isIso_projectionMap f M L
   asIso (projectionMap f M L.line)
 
-/-- The forward map of `projectionIso` is `projectionMap`. -/
+/-- The forward map of `AlgebraicGeometry.Scheme.Modules.projectionIso` is
+`AlgebraicGeometry.Scheme.Modules.projectionMap`. -/
 @[simp]
 theorem projectionIso_hom (M : X.Modules) (L : LineBundleData Y) :
     (projectionIso f M L).hom = projectionMap f M L.line :=
