@@ -1239,3 +1239,25 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   wrapper, but some compatibility evidence cannot be dropped from the
   transported-triangulation proof.
 - state:              FALSIFIED (literal compatibility-evidence deletion fails)
+
+### 2026-09-30 — `Lattice.pairCharge` over a nonsymmetric form (issue #1230, withdrawn)
+- chunk:              none (owner decision on #1230)
+- reviewing commit:   3f6453a3
+- found by:           second-consumer research agent, spot-checked by hand
+- proposed ancestor:  a `LinearAlgebra/BilinearForm/` root `pairCharge b x y v`
+  with `b` not assumed symmetric, above `PeriodDomain.centralCharge`
+  (`QuadraticForm/ComplexPairing.lean:79`) and `Mukai.expCharge`
+  (`CentralCharge/Mukai/Charge.lean:50`)
+- weaker hypotheses:  a real bilinear form with no symmetry. Neither leaf's API
+  uses symmetry except `expCharge_apply`, which needs it through
+  `polar_realForm`.
+- pin status:         not applicable; no Mathlib declaration is involved
+- source note:        `expCharge` is `centralCharge (realForm b)` by definition,
+  so the two were already one root. For nonsymmetric `b`, `polar (realForm b)` is
+  the symmetrization of `realPairing b`, so `expCharge = pairCharge (realPairing
+  b)` fails. The surviving Lift is add/smul/zero/kernel lemmas of about one line
+  each with no consumer. The one hand-rolled copy of the form is `cPair`
+  (`Exponential/Divisorial.lean:101`), which is symmetric (follow-up #1810). `Mukai.Graded.pairing`
+  has no consumer: n = 2 is `realPairing (LinearMap.mul ℝ ℝ)` and the odd form is
+  a recorded negative result.
+- state:              FALSIFIED (as motivated: nonsymmetry admits no leaf, and `expCharge ≠ pairCharge (realPairing b)` for nonsymmetric `b`)
