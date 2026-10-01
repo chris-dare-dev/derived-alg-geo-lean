@@ -265,7 +265,7 @@ items:
       - "`Lattice.pairCharge` exists and both the period-domain and exponential charges are proved to be it, or the root is withdrawn and the bridge theorems are the whole delivery."
       - "`Mukai.Graded.pairing` at n = 2 is a comparison theorem, never a second definition."
       - "The Mukai pairing is generalised over its coefficient ring in place; no new name is introduced."
-      - "The two-consumer obligation for any new structure is answered in writing in the pull request, because `check_single_instantiation.py` does not scan these paths."
+      - "Each new carrier is classified by the proof-witness test (`abstraction-tree.md` clause 2a) in the pull request, because `check_single_instantiation.py` does not scan these paths: a Lift needs no consumer count, a carrier with content names its consumers, an empty carrier is refused."
       - "Zero sorries; all gates green, including `check_roadmap.py --require-api`."
   - id: charge-abstraction-e11
     gh_issue: 1229
@@ -286,12 +286,12 @@ items:
     kind: epic
     parent: charge-abstraction-m3
     title: "The lattice charge root"
-    status: planned
-    summary: "`Lattice.pairCharge b x y v = ⟪x,v⟫ + i⟪y,v⟫` with b NOT assumed symmetric, which is what admits odd dimension, plus proofs that `PeriodDomain.centralCharge` (`QuadraticForm/ComplexPairing.lean:48`) and `Mukai.expCharge` (`CentralCharge/Mukai/Charge.lean:36`) are one root with two presentations. BLOCKED ON A ROOT-REVIEW OBLIGATION, not on mathematics: `abstraction-tree.md` requires two independent consumers named before implementation, and the graded pairing's only named n ≠ 2 consumers are a negative result about itself and a fourfold layer that does not exist. `check_single_instantiation.py` does not scan these paths, so CI will not catch it. e11 either supplies the second consumer or shows this root is unnecessary. MO1.02 therefore retained the existing functional and bridges rather than inventing this root."
+    status: refuted
+    summary: "WITHDRAWN 2026-09-30. `Lattice.pairCharge` and `Mukai.Graded.pairing` were proposed as a nonsymmetric root of `PeriodDomain.centralCharge` and `Mukai.expCharge`. Research found `expCharge` is already `centralCharge` at `realForm b`; neither leaf's API uses symmetry of `b`; for nonsymmetric `b`, `expCharge ≠ pairCharge (realPairing b)`; the remaining Lift (add/smul/zero/kernel) has no consumer; the odd graded form is a recorded negative result with no consumer. The bridge theorems of e11 are the whole delivery. Residual cleanup, if wanted: `cPair` in `Exponential/Divisorial.lean` may call `centralCharge` directly."
     priority: should
     size: M
-    tags: [lean, lattice, root, blocked]
-    labels: [area:lean, type:feature, blocked, sev:medium]
+    tags: [lean, lattice, root, withdrawn]
+    labels: [area:lean, type:feature, gate:owner, sev:medium]
     blocked_by: [1229]
   - id: charge-abstraction-m4
     gh_milestone: null
@@ -322,7 +322,7 @@ items:
     parent: charge-abstraction-m4
     title: "Cubic fourfold Ku(X): the charge on the algebraic lattice"
     status: planned
-    summary: "NOT FILED: blocked on the geometry frontier. Plain `pairCharge` on the algebraic Mukai lattice of the component, signature (2,ρ), which for a very general cubic fourfold IS the A₂ lattice. No restriction is involved. Needs the Mukai lattice of Ku(X) and its signature, neither of which exists in the tree; `grep -rni kuznetsov DerivedAlgGeo` returns two disclaimers and no construction."
+    summary: "NOT FILED: blocked on the geometry frontier. Plain `PeriodDomain.centralCharge` on the algebraic Mukai lattice of the component, signature (2,ρ), which for a very general cubic fourfold IS the A₂ lattice. No restriction is involved. Needs the Mukai lattice of Ku(X) and its signature, neither of which exists in the tree; `grep -rni kuznetsov DerivedAlgGeo` returns two disclaimers and no construction."
     priority: should
     size: L
     tags: [lean, noncommutative, blocked]
@@ -334,7 +334,7 @@ items:
     parent: charge-abstraction-m4
     title: "Cubic fourfold Ku(X): the period domain on the A2 complement"
     status: planned
-    summary: "NOT FILED: blocked on the geometry frontier. `pairCharge.restrict` along the inclusion of A₂^⊥, signature (2,20), with the `HasSignatureTwo` witness PROVED from sig H̃ = (4,20) plus A₂ positive definite of rank 2, via `QuadraticMap.sigPos_eq_add` (`SignatureAdditive.lean:202`). Separate from e14 and must stay separate: the two live on lattices that are orthogonal complements for a very general X, so no comparison theorem between them can exist, and filing them together would invite exactly the fusion the audit refuted. Landing it requires de-privatising `QuadraticMap.polar_restrict` (`SignatureAdditive.lean:62`) rather than copying it."
+    summary: "NOT FILED: blocked on the geometry frontier. `PeriodDomain.centralCharge` restricted along the inclusion of A₂^⊥, signature (2,20), with the `HasSignatureTwo` witness PROVED from sig H̃ = (4,20) plus A₂ positive definite of rank 2, via `QuadraticMap.sigPos_eq_add` (`SignatureAdditive.lean:202`). Separate from e14 and must stay separate: the two live on lattices that are orthogonal complements for a very general X, so no comparison theorem between them can exist, and filing them together would invite exactly the fusion the audit refuted. Landing it requires de-privatising `QuadraticMap.polar_restrict` (`SignatureAdditive.lean:62`) rather than copying it."
     priority: should
     size: L
     tags: [lean, noncommutative, blocked]

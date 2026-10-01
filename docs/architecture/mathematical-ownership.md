@@ -87,9 +87,9 @@ the option to withdraw an unjustified new graded root.
 `StabilityCondition/CentralCharge/`; determinant-alignment loci remain below
 `Walls/`, and full quadratic support statements remain below `Support/`.
 Neutral paired-functional, continuity, coercivity and Hodge-index owners are
-below `LinearAlgebra/`. Issue #1230 has not supplied its conditional
-`Lattice.pairCharge`, so the established paired functional and its existing
-bridges remain the root for this cutover.
+below `LinearAlgebra/`. Issue #1230 withdrew its conditional
+`Lattice.pairCharge` on 2026-09-30, so the established paired functional and its
+existing bridges are the root.
 
 **Name the locus that was defined.** Distinguish `Z(δ) = 0`, determinant
 alignment, a signed ray condition, and an actual destabilization wall.

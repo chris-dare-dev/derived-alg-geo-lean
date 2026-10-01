@@ -98,8 +98,8 @@ Settled here so MO1.02--MO1.06 and CA1--CA3 cannot drift apart:
 - **Single roots are preserved.** `#1223` and `#1230` keep the single charge
   kernel, the public `Mukai.pairing` root and the weighted/factor-of-two
   comparisons. No row creates a second charge carrier, a second pairing root,
-  or a competing graded root; the optional graded root remains CA3's decision
-  and may still conclude that none is justified.
+  or a competing graded root; CA3's optional graded root was withdrawn on
+  2026-09-30 for want of a consumer.
 
 ### The owner map
 
@@ -273,8 +273,9 @@ the entire `CentralCharge/` subtree. No second common central-charge record is
 introduced merely to improve names.
 
 **Landed 2026-09-13** in #1313; see "Charge construction upstream of walls"
-under Completed roots. Issue #1230 remains open and blocked on its independent
-two-consumer obligation, so this cutover retains `PeriodDomain.centralCharge`
+under Completed roots. Issue #1230 withdrew `Lattice.pairCharge` and the graded pairing on
+2026-09-30 (see "Recorded negative results" in `abstraction-tree.md`), so this
+cutover retains `PeriodDomain.centralCharge`
 and `Mukai.expCharge` with their existing bridges instead of inventing
 `Lattice.pairCharge` or a graded pairing.
 
@@ -973,8 +974,7 @@ or SF8 mathematics is finished, and none of the trust boundaries those lanes
 carry is discharged here:
 
 - CA1--CA3 retain their canonical roots and their independent state. #1230's
-  `pairCharge` remains a conditional proposal under its two-consumer review
-  obligation, and the CA path contract above is unchanged by this section.
+  `pairCharge` was withdrawn on 2026-09-30 (#1230), and the CA path contract above is unchanged by this section.
 - SRF1 #897--#899 keeps full faithfulness, equivalence/shift transport and the
   geometric Serre-duality obligations (row 05).
 - DT1 #892, #928--#931 keeps tensor inhabitation; #795/#796 keep transform
@@ -1078,8 +1078,8 @@ or exactness was strengthened by relocation.
   Rule 8 pins these structure owners, rejects transitive wall or geometry
   imports from the central-charge tree, and rejects all stability or geometry
   imports from the neutral roots. The old motivational paths are retired, not
-  shimmed. Issue #1230 has not introduced `Lattice.pairCharge`: it remains open
-  on a separate two-consumer review obligation, so this delivery deliberately
+  shimmed. Issue #1230 never introduced `Lattice.pairCharge` and was withdrawn on
+  2026-09-30, so this delivery deliberately
   retains the existing functional and bridge theorems. Tilt-dependent
   rotation remains downstream and does not enter `CentralCharge/Family.lean`.
 

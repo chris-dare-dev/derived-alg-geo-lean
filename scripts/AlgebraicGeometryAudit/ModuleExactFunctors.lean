@@ -7,6 +7,12 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules
 #print axioms AlgebraicGeometry.Scheme.Modules.reflectsEpimorphisms_toSheaf
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorLeft_preservesColimitsOfShape
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorRight_preservesColimitsOfShape
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorRightFiniteColimits
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorRightAdditive
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorLeftFunctor_preservesHomology_of_isFlatOverId
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorRight_preservesHomology_of_isFlatOverId
+#print axioms AlgebraicGeometry.Scheme.Modules.quasiIso_map_tensorLeftFunctor_of_isFlatOverId
+#print axioms AlgebraicGeometry.Scheme.Modules.quasiIso_map_tensorRight_of_isFlatOverId
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorLeftFunctor_preservesFiniteColimits
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorLeftFunctor_additive
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorLeftFunctor_preservesFiniteLimits

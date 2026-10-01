@@ -115,8 +115,7 @@ items:
     split surface and threefold construction from their wall equations, moved divisorial charge data and
     supplied Todd corrections upstream, extracted neutral paired-functional, continuity, bounds and Hodge
     owners under LinearAlgebra, and moved full divisorial support under Support. Rule 8 pins the owners and
-    transitive import boundaries with forbidden fixtures. Issue #1230 remains open on its two-consumer
-    obligation, so this cutover retains PeriodDomain.centralCharge and Mukai.expCharge with their existing
+    transitive import boundaries with forbidden fixtures. Issue #1230 was withdrawn on 2026-09-30 as a clause 2a root review, so this cutover retains PeriodDomain.centralCharge and Mukai.expCharge with their existing
     bridges; no pairCharge or graded root was invented.'
   summary: Split the linear-algebra functional/kernel/bounds API from its stability interpretation, and
     move the existing ChargeFamily and exponential/divisorial constructors to their agreed owners upstream
@@ -153,9 +152,8 @@ items:
   - Update the divisorial-root assertions in the layering/single-owner gates with the move. Demonstrate
     imports of neutral pairing, charge-family core and Exp kernel do not reach their wall or geometric
     consumers.
-  - 'If #1230 introduces pairCharge, use that root; if its review withdraws it, retain the existing functional
-    plus its bridges. Settle that branch explicitly without making the placement split wait for an unjustified
-    graded structure.'
+  - '#1230 withdrew pairCharge on 2026-09-30: retain the existing functional plus its bridges. No placement split
+    waits on a graded structure.'
   - 'Keep the existing tilt-dependent rotation comparison downstream of the neutral ChargeFamily core;
     accommodate #1226–#1228 without importing tilting into it.'
   blocked_by:
@@ -247,8 +245,7 @@ items:
   - Preserve the odd-degree alternating obstruction, the polarization weight and the loss of information
     at higher divisor rank. Integrality and Euler-pairing identifications are proved or supplied geometric
     inputs.
-  - 'Treat #1230’s pairCharge and any graded pairing as separate decisions. Honor its two-consumer review/withdrawal
-    alternative; no speculative graded parent is needed for this extraction.'
+  - 'Treat #1230’s pairCharge and any graded pairing as separate decisions. #1230 was withdrawn on 2026-09-30; no speculative graded parent is needed for this extraction.'
   blocked_by:
   - 1312
   - 1223
