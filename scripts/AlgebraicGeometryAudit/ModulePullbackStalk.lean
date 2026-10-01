@@ -22,3 +22,15 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Stalk
 #print axioms AlgebraicGeometry.Scheme.Modules.pullbackStalkPresheafIso
 #print axioms AlgebraicGeometry.Scheme.Modules.presheafModulePullbackStalkIso
 #print axioms AlgebraicGeometry.Scheme.Modules.pullbackStalkIso
+
+/-! ## Germs, and the germ of the unit (issue #1664)
+
+`presheafModuleGerm`, `moduleStalkGerm` are the germ maps into the module stalks, and the inverse of
+the pullback stalk isomorphism sends `1 ⊗ germ m` to the germ of the unit image of `m`.
+-/
+
+#print axioms AlgebraicGeometry.Scheme.Modules.presheafModuleGerm
+#print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkGerm
+#print axioms AlgebraicGeometry.Scheme.Modules.presheafModuleStalkFunctor_map_germ
+#print axioms AlgebraicGeometry.Scheme.Modules.presheafModulePullbackStalkIso_inv_app_one_tmul_germ
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackStalkIso_inv_app_one_tmul_germ

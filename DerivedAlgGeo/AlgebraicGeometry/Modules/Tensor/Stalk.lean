@@ -40,7 +40,8 @@ noncomputable section
 variable (X : Scheme.{u}) (x : X)
 
 /-- **Every element of the module stalk is a germ of a section over some neighbourhood.** -/
-theorem presheafModuleGerm_exists (P : X.PresheafOfModules) (ξ : (presheafModuleStalkFunctor X x).obj P) :
+theorem presheafModuleGerm_exists (P : X.PresheafOfModules)
+    (ξ : (presheafModuleStalkFunctor X x).obj P) :
     ∃ (U : X.Opens) (hx : x ∈ U) (p : P.obj (op U)), presheafModuleGerm X x P U hx p = ξ := by
   letI : InitiallySmall.{u} (OpenNhds x) := initiallySmall_of_essentiallySmall _
   obtain ⟨⟨⟨U, hx⟩⟩, p, hp⟩ := PresheafOfModules.ModuleColimit.ιM_jointly_surjective
@@ -62,7 +63,8 @@ theorem presheafModuleGerm_smul (P : X.PresheafOfModules) (U : X.Opens) (hx : x 
 /-- **A germ does not change on restriction to a smaller neighbourhood.** -/
 theorem presheafModuleGerm_res (P : X.PresheafOfModules) {U V : X.Opens} (h : V ≤ U)
     (hx : x ∈ V) (p : P.obj (op U)) :
-    presheafModuleGerm X x P V hx (P.map (homOfLE h).op p) = presheafModuleGerm X x P U (h hx) p := by
+    presheafModuleGerm X x P V hx (P.map (homOfLE h).op p) =
+      presheafModuleGerm X x P U (h hx) p := by
   letI : InitiallySmall.{u} (OpenNhds x) := initiallySmall_of_essentiallySmall _
   have := ConcreteCategory.congr_hom ((colimit.cocone ((_root_.PresheafOfModules.pushforward₀
     (OpenNhds.inclusion x) X.ringCatSheaf.obj).obj P).presheaf).w
@@ -73,9 +75,10 @@ theorem presheafModuleGerm_res (P : X.PresheafOfModules) {U V : X.Opens} (h : V 
 Mathlib's module structure on `TopCat.Presheaf.stalk`.** Both are characterized by their
 compatibility with germs. -/
 theorem presheafModuleStalk_smul_eq
-    (P : _root_.PresheafOfModules.{u} (X.presheaf ⋙ forget₂ CommRingCat RingCat)) (r : X.presheaf.stalk x)
-    (ξ : (presheafModuleStalkFunctor X x).obj P) :
-    (show ToType (TopCat.Presheaf.stalk P.presheaf x) from r • ξ) = r • (show ToType (TopCat.Presheaf.stalk P.presheaf x) from ξ) := by
+    (P : _root_.PresheafOfModules.{u} (X.presheaf ⋙ forget₂ CommRingCat RingCat))
+    (r : X.presheaf.stalk x) (ξ : (presheafModuleStalkFunctor X x).obj P) :
+    (show ToType (TopCat.Presheaf.stalk P.presheaf x) from r • ξ) =
+      r • (show ToType (TopCat.Presheaf.stalk P.presheaf x) from ξ) := by
   obtain ⟨U, hx, p, rfl⟩ := presheafModuleGerm_exists X x P ξ
   obtain ⟨V, hxV, r₀, rfl⟩ := TopCat.Presheaf.exists_germ_eq X.presheaf r
   have hW : x ∈ U ⊓ V := ⟨hx, hxV⟩
@@ -97,7 +100,7 @@ def presheafModuleStalkBridge
       ToType (TopCat.Presheaf.stalk P.presheaf x) :=
   { AddEquiv.refl _ with map_smul' := fun r ξ => presheafModuleStalk_smul_eq X x P r ξ }
 
-local instance tensorStalkPresheafMonoidal : MonoidalCategory X.PresheafOfModules :=
+private local instance tensorStalkPresheafMonoidal : MonoidalCategory X.PresheafOfModules :=
   PresheafOfModules.monoidalCategory (R := X.presheaf)
 
 open TensorProduct in
@@ -122,15 +125,29 @@ theorem presheafModuleStalkTensorEquiv_germ_tmul_germ (P Q : X.PresheafOfModules
   exact this
 
 
+/-- **Two germs of module sheaves at one point come from sections over one common
+neighbourhood.** -/
+theorem moduleStalkGerm_exists_pair (M N : X.Modules)
+    (a : (moduleStalkFunctor X x).obj M) (b : (moduleStalkFunctor X x).obj N) :
+    ∃ (V : X.Opens) (hV : x ∈ V) (m : Γ(M, V)) (n : Γ(N, V)),
+      moduleStalkGerm X x M V hV m = a ∧ moduleStalkGerm X x N V hV n = b := by
+  obtain ⟨U₁, h₁, m, rfl⟩ := presheafModuleGerm_exists X x ((toPresheafOfModules X).obj M) a
+  obtain ⟨U₂, h₂, n, rfl⟩ := presheafModuleGerm_exists X x ((toPresheafOfModules X).obj N) b
+  refine ⟨U₁ ⊓ U₂, ⟨h₁, h₂⟩, M.presheaf.map (homOfLE inf_le_left).op m,
+    N.presheaf.map (homOfLE inf_le_right).op n, ?_, ?_⟩
+  · exact presheafModuleGerm_res X x ((toPresheafOfModules X).obj M) inf_le_left ⟨h₁, h₂⟩ m
+  · exact presheafModuleGerm_res X x ((toPresheafOfModules X).obj N) inf_le_right ⟨h₁, h₂⟩ n
+
 open TensorProduct in
 /-- The stalk of a sheafified tensor product of module sheaves is the tensor product of the
 stalks. -/
 def moduleStalkTensorEquiv (A B : X.Modules) :
-    (moduleStalkFunctor X x).obj A ⊗[X.presheaf.stalk x] (moduleStalkFunctor X x).obj B ≃ₗ[X.presheaf.stalk x]
-      (moduleStalkFunctor X x).obj (tensorObj A B) :=
+    (moduleStalkFunctor X x).obj A ⊗[X.presheaf.stalk x] (moduleStalkFunctor X x).obj B
+      ≃ₗ[X.presheaf.stalk x] (moduleStalkFunctor X x).obj (tensorObj A B) :=
   letI := presheafModuleStalkToSheafificationApp_isIso X x
     ((toPresheafOfModules X).obj A ⊗ (toPresheafOfModules X).obj B)
-  presheafModuleStalkTensorEquiv X x ((toPresheafOfModules X).obj A) ((toPresheafOfModules X).obj B) ≪≫ₗ
+  presheafModuleStalkTensorEquiv X x ((toPresheafOfModules X).obj A)
+      ((toPresheafOfModules X).obj B) ≪≫ₗ
     (asIso (presheafModuleStalkToSheafificationApp X x
       ((toPresheafOfModules X).obj A ⊗ (toPresheafOfModules X).obj B))).toLinearEquiv
 

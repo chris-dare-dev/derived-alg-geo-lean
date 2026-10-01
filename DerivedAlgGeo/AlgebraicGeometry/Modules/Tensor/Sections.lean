@@ -44,7 +44,8 @@ theorem section_ext_of_locally (G : X.Modules) {U : X.Opens} (s t : Γ(G, U))
   classical
   choose! V hV hxV hst using h
   let F : TopCat.Sheaf Ab X := ⟨G.presheaf, G.isSheaf⟩
-  refine TopCat.Sheaf.eq_of_locally_eq' F (fun x : U => V x.1) U (fun x => homOfLE (hV x.1 x.2)) ?_ s t ?_
+  refine TopCat.Sheaf.eq_of_locally_eq' F (fun x : U => V x.1) U
+    (fun x => homOfLE (hV x.1 x.2)) ?_ s t ?_
   · intro x hx
     exact (TopologicalSpace.Opens.mem_iSup.mpr ⟨⟨x, hx⟩, hxV x hx⟩)
   · intro x
@@ -74,7 +75,7 @@ theorem tensorObj_hom_ext {A B C : X.Modules} (φ ψ : tensorObj A B ⟶ C)
 
 noncomputable section
 
-local instance sectionsPresheafMonoidalCategory : MonoidalCategory X.PresheafOfModules :=
+private local instance sectionsPresheafMonoidalCategory : MonoidalCategory X.PresheafOfModules :=
   PresheafOfModules.monoidalCategory (R := X.presheaf)
 
 /-- **The pure tensor is additive in its second factor** -- the companion of
@@ -134,7 +135,8 @@ theorem tensorUnitLeftIso_hom_tmulSection (M : X.Modules) (U : X.Opens)
   have h1 := sheafification_map_unit_app (λ_ ((toPresheafOfModules X).obj M)).hom U t₀
   have h2 := counit_app_unit_app M U ((λ_ ((toPresheafOfModules X).obj M)).hom.app (op U) t₀)
   unfold tensorUnitLeftIso tmulSection
-  exact (congrArg (fun z => (((sheafAdj X).counit.app M).val.app (op U)).hom z) h1).trans (h2.trans rfl)
+  exact (congrArg (fun z => (((sheafAdj X).counit.app M).val.app (op U)).hom z) h1).trans
+    (h2.trans rfl)
 
 /-- **The right unitor, on a pure tensor, is scalar multiplication.** -/
 theorem tensorUnitRightIso_hom_tmulSection (M : X.Modules) (U : X.Opens)
@@ -148,7 +150,8 @@ theorem tensorUnitRightIso_hom_tmulSection (M : X.Modules) (U : X.Opens)
   have h1 := sheafification_map_unit_app (ρ_ ((toPresheafOfModules X).obj M)).hom U t₀
   have h2 := counit_app_unit_app M U ((ρ_ ((toPresheafOfModules X).obj M)).hom.app (op U) t₀)
   unfold tensorUnitRightIso tmulSection
-  exact (congrArg (fun z => (((sheafAdj X).counit.app M).val.app (op U)).hom z) h1).trans (h2.trans rfl)
+  exact (congrArg (fun z => (((sheafAdj X).counit.app M).val.app (op U)).hom z) h1).trans
+    (h2.trans rfl)
 
 
 /-- **The associator, on iterated pure tensors, reassociates them.** -/
@@ -165,8 +168,9 @@ theorem tensorAssocIso_hom_tmulSection (L M N : X.Modules) (U : X.Opens)
       (((sheafAdj X).unit.app (P ⊗ (toPresheafOfModules X).obj N)).app (op U) z) =
       tmulSection (tensorObj L M) N (op U) (tmulSection L M (op U) l m) n :=
     sheafification_map_unit_app _ U z
-  have hα : (((PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map (α_ ((toPresheafOfModules X).obj L)
-      ((toPresheafOfModules X).obj M) ((toPresheafOfModules X).obj N)).hom).val.app (op U)).hom
+  have hα : (((PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
+      (α_ ((toPresheafOfModules X).obj L)
+        ((toPresheafOfModules X).obj M) ((toPresheafOfModules X).obj N)).hom).val.app (op U)).hom
       (((sheafAdj X).unit.app (P ⊗ (toPresheafOfModules X).obj N)).app (op U) z) =
       ((sheafAdj X).unit.app ((toPresheafOfModules X).obj L ⊗ Q)).app (op U) z' :=
     sheafification_map_unit_app _ U z
@@ -184,8 +188,9 @@ theorem tensorAssocIso_hom_tmulSection (L M N : X.Modules) (U : X.Opens)
     exact this
   rw [← hR]
   change ((tensorSheafificationComparisonLeft L Q).val.app (op U)).hom
-    ((((PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map (α_ ((toPresheafOfModules X).obj L)
-      ((toPresheafOfModules X).obj M) ((toPresheafOfModules X).obj N)).hom).val.app (op U)).hom
+    ((((PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).map
+      (α_ ((toPresheafOfModules X).obj L)
+        ((toPresheafOfModules X).obj M) ((toPresheafOfModules X).obj N)).hom).val.app (op U)).hom
       (((inv (tensorSheafificationComparisonRight P N)).val.app (op U)).hom
       (((tensorSheafificationComparisonRight P N).val.app (op U)).hom _))) = _
   rw [hinv, hα, hL]
@@ -219,11 +224,17 @@ variable {A B C : X.Modules}
 
 /-- Bilinear data over the structure sheaf on sections, compatible with restriction. -/
 structure TensorLiftData (A B C : X.Modules) where
+  /-- The bilinear map on sections over each open. -/
   toFun : ∀ U : X.Opens, Γ(A, U) → Γ(B, U) → Γ(C, U)
+  /-- Additivity in the first variable. -/
   add_left : ∀ U a a' b, toFun U (a + a') b = toFun U a b + toFun U a' b
+  /-- Linearity over `Γ(X, U)` in the first variable. -/
   smul_left : ∀ U (r : Γ(X, U)) a b, toFun U (r • a) b = r • toFun U a b
+  /-- Additivity in the second variable. -/
   add_right : ∀ U a b b', toFun U a (b + b') = toFun U a b + toFun U a b'
+  /-- Linearity over `Γ(X, U)` in the second variable. -/
   smul_right : ∀ U (r : Γ(X, U)) a b, toFun U a (r • b) = r • toFun U a b
+  /-- Compatibility with restriction to a smaller open. -/
   res : ∀ {U V : X.Opens} (h : V ≤ U) a b,
     C.presheaf.map (homOfLE h).op (toFun U a b) =
       toFun V (A.presheaf.map (homOfLE h).op a) (B.presheaf.map (homOfLE h).op b)
@@ -252,7 +263,8 @@ theorem TensorLiftData.lift_app_tmulSection (β : TensorLiftData A B C) (U : X.O
   have h2 := counit_app_unit_app C U (β.toPre.app (op U) t₀)
   unfold TensorLiftData.lift tmulSection
   rw [Adjunction.homEquiv_counit]
-  exact (congrArg (fun z => (((sheafAdj X).counit.app C).val.app (op U)).hom z) h1).trans (h2.trans rfl)
+  exact (congrArg (fun z => (((sheafAdj X).counit.app C).val.app (op U)).hom z) h1).trans
+    (h2.trans rfl)
 
 end TensorLift
 

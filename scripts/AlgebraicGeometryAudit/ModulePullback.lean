@@ -7,8 +7,8 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pullback
 This slice checks the neutral pullback root independently of line-bundle, determinant, divisor,
 and Picard-group consumers. Intrinsic rank-one invertibility is inherited through Mathlib's
 existing scheme-module pullback rather than stored in a parallel carrier. Strong monoidality is
-likewise consumed through Mathlib's standard `Functor.Monoidal` class rather than a parallel
-capability record.
+a theorem (`pullbackMonoidal`, Stacks 01CD): the standard `Functor.Monoidal` class is inhabited for
+every morphism, not stored in a parallel capability record.
 -/
 
 open CategoryTheory
@@ -69,14 +69,47 @@ variable {X Y : Scheme.{u}} (f : X ⟶ Y) (M : Y.Modules)
 #print axioms AlgebraicGeometry.Coh.pullback_preservesFiniteLimits
 #print axioms AlgebraicGeometry.Coh.pullback_additive
 
-/-! ## Monoidal comparisons
+/-! ## Monoidal structure (Stacks 01CD, issue #1664)
 
-The tensor and unit comparisons are read off a standard `Functor.Monoidal` structure on module
-pullback; the repository stores no parallel capability record for them.
+`pullbackMonoidal` is the strong monoidal structure on module-sheaf pullback along every morphism
+of schemes, obtained by upgrading the doctrinal oplax structure of the lax monoidal pushforward;
+`pullbackTensorIso` and `pullbackUnitIso` are its comparison isomorphisms.
 -/
 
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackTensorHom
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackTensorHom_unit_app_tmulSection
+#print axioms AlgebraicGeometry.Scheme.Modules.isIso_stalkMap_pullbackTensorHom
+#print axioms AlgebraicGeometry.Scheme.Modules.isIso_pullbackTensorHom
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackOplaxMonoidal
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackMonoidal
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackMonoidal_toOplaxMonoidal
 #print axioms AlgebraicGeometry.Scheme.Modules.pullbackTensorIso
 #print axioms AlgebraicGeometry.Scheme.Modules.pullbackUnitIso
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackTensorIso_inv
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackUnitIso_hom
+
+/-! ## The projection formula (Stacks 01E8 at `q = 0`, issue #1664)
+
+`projectionMap f M L : f_*M ⊗ L ⟶ f_*(M ⊗ f^*L)` is built from the unit and the lax structure of
+`f_*`; it is an isomorphism for an invertible `L`.
+-/
+
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackPushforwardAdjunction_isMonoidal
+#print axioms AlgebraicGeometry.Scheme.Modules.projectionMap
+#print axioms AlgebraicGeometry.Scheme.Modules.projectionMap_eq
+#print axioms AlgebraicGeometry.Scheme.Modules.projectionMap_naturality
+#print axioms AlgebraicGeometry.Scheme.Modules.projectionMap_naturality_right
+#print axioms AlgebraicGeometry.Scheme.Modules.LineBundleData.tensorInverse
+#print axioms AlgebraicGeometry.Scheme.Modules.isIso_projectionMap
+#print axioms AlgebraicGeometry.Scheme.Modules.projectionIso
+#print axioms AlgebraicGeometry.Scheme.Modules.projectionIso_hom
+#print axioms AlgebraicGeometry.Scheme.Modules.projectionNatIso
+
+-- The two comparisons elaborate with no `Functor.Monoidal` argument: the instance is canonical.
+noncomputable example (f : X ⟶ Y) (M N : Y.Modules) :
+    Scheme.Modules.tensorObj ((pullback f).obj M) ((pullback f).obj N) ≅
+      (pullback f).obj (Scheme.Modules.tensorObj M N) :=
+  Scheme.Modules.pullbackTensorIso f M N
 
 example [SheafOfModules.IsInvertible.{u, u, u}
     (show SheafOfModules Y.ringCatSheaf from M)] :

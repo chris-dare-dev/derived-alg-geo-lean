@@ -17,8 +17,8 @@ monoidal for the sheafified tensor product (Stacks, Tag 01CD): `f^*(M ⊗ N) ≅
 `f^*𝒪_Y ≅ 𝒪_X`. The instance `pullbackMonoidal : (pullback f).Monoidal` is built by upgrading the
 oplax monoidal structure that Mathlib's doctrinal adjunction attaches to the left adjoint of the lax
 monoidal functor `pushforward f` (`Modules/Pushforward/Monoidal.lean`):
-`Adjunction.leftAdjointOplaxMonoidal` for `pullbackPushforwardAdjunction f`. No monoidal structure is
-supplied as a field or a hypothesis, and no second oplax structure is written by hand.
+`Adjunction.leftAdjointOplaxMonoidal` for `pullbackPushforwardAdjunction f`. No monoidal structure
+is supplied as a field or a hypothesis, and no second oplax structure is written by hand.
 
 The oplax structure maps are isomorphisms:
 
@@ -32,8 +32,8 @@ The oplax structure maps are isomorphisms:
   product is the tensor product of the stalks (`moduleStalkTensorEquiv`), and extension of scalars
   is monoidal. No flatness is used.
 
-The two comparisons `pullbackTensorIso` and `pullbackUnitIso` are then read off the `Functor.Monoidal`
-structure, with no instance argument.
+The two comparisons `pullbackTensorIso` and `pullbackUnitIso` are then read off the
+`Functor.Monoidal` structure, with no instance argument.
 
 ## Main results
 
@@ -63,6 +63,9 @@ def pullbackTensorHom (M N : Y.Modules) :
     (((pullbackPushforwardAdjunction f).unit.app M ⊗ₘ
         (pullbackPushforwardAdjunction f).unit.app N) ≫ pushforwardTensorHom f _ _)
 
+/-- **The oplax tensorator on the image of a pure tensor under the unit.** The mate
+`f^*(M ⊗ N) ⟶ f^*M ⊗ f^*N` sends the unit image `η(m ⊗ n)` of a pure tensor to the pure tensor of
+the unit images `η m ⊗ η n`, as sections of the pullback over `f⁻¹ V`. -/
 theorem pullbackTensorHom_unit_app_tmulSection (M N : Y.Modules) (V : Y.Opens)
     (m : Γ(M, V)) (n : Γ(N, V)) :
     (pullbackTensorHom f M N).app (f ⁻¹ᵁ V)
@@ -91,23 +94,17 @@ theorem pullbackTensorHom_unit_app_tmulSection (M N : Y.Modules) (V : Y.Opens)
     (pushforwardTensorHom_app_tmulSection f _ _ V _ _)
 
 
-theorem moduleStalkGerm_exists_pair (y : Y) (M N : Y.Modules)
-    (a : (moduleStalkFunctor Y y).obj M) (b : (moduleStalkFunctor Y y).obj N) :
-    ∃ (V : Y.Opens) (hV : y ∈ V) (m : Γ(M, V)) (n : Γ(N, V)),
-      moduleStalkGerm Y y M V hV m = a ∧ moduleStalkGerm Y y N V hV n = b := by
-  obtain ⟨U₁, h₁, m, rfl⟩ := presheafModuleGerm_exists Y y ((toPresheafOfModules Y).obj M) a
-  obtain ⟨U₂, h₂, n, rfl⟩ := presheafModuleGerm_exists Y y ((toPresheafOfModules Y).obj N) b
-  refine ⟨U₁ ⊓ U₂, ⟨h₁, h₂⟩, M.presheaf.map (homOfLE inf_le_left).op m,
-    N.presheaf.map (homOfLE inf_le_right).op n, ?_, ?_⟩
-  · exact presheafModuleGerm_res Y y ((toPresheafOfModules Y).obj M) inf_le_left ⟨h₁, h₂⟩ m
-  · exact presheafModuleGerm_res Y y ((toPresheafOfModules Y).obj N) inf_le_right ⟨h₁, h₂⟩ n
-
 /-- Extension of scalars along the local-ring map at `x`. -/
-abbrev stalkExtend (x : X) :
+private abbrev stalkExtend (x : X) :
     ModuleCat.{u} (Y.presheaf.stalk (f x)) ⥤ ModuleCat.{u} (X.presheaf.stalk x) :=
   ModuleCat.extendScalars (f.stalkMap x).hom
 
 open TensorProduct in
+/-- **Stalkwise, the tensor comparison of pullback is an isomorphism.** On the stalk at `x`, both
+`f^*(M ⊗ N)` and `f^*M ⊗ f^*N` are `𝒪_{X,x} ⊗ (M ⊗ N)_{f x}` (extension of scalars is monoidal,
+the stalk of a pullback is the extension of the stalk, the stalk of a tensor product is the tensor
+product of the stalks), and the comparison is that identification: it is checked on the
+generators `1 ⊗ germ(m ⊗ n)` using `pullbackStalkIso_inv_app_one_tmul_germ`. -/
 theorem isIso_stalkMap_pullbackTensorHom (M N : Y.Modules) (x : X) :
     IsIso ((moduleStalkFunctor X x).map (pullbackTensorHom f M N)) := by
   letI : Algebra (Y.presheaf.stalk (f x)) (X.presheaf.stalk x) := (f.stalkMap x).hom.toAlgebra
@@ -135,7 +132,7 @@ theorem isIso_stalkMap_pullbackTensorHom (M N : Y.Modules) (x : X) :
       rw [map_zero, TensorProduct.tmul_zero]
       exact (map_zero (ModuleCat.Hom.hom _)).trans (map_zero (ModuleCat.Hom.hom _)).symm
     | tmul a b =>
-      obtain ⟨V, hV, m, n, rfl, rfl⟩ := moduleStalkGerm_exists_pair (f x) M N a b
+      obtain ⟨V, hV, m, n, rfl, rfl⟩ := moduleStalkGerm_exists_pair Y (f x) M N a b
       have hL : (ΦT.inv ≫ (moduleStalkFunctor X x).map (pullbackTensorHom f M N)).hom
           ((1 : X.presheaf.stalk x) ⊗ₜ[Y.presheaf.stalk (f x)]
             (moduleStalkTensorEquiv Y (f x) M N)
@@ -171,7 +168,8 @@ theorem isIso_stalkMap_pullbackTensorHom (M N : Y.Modules) (x : X) :
               moduleStalkGerm Y (f x) M V hV m ⊗ₜ[Y.presheaf.stalk (f x)]
                 moduleStalkGerm Y (f x) N V hV n :=
             (moduleStalkTensorEquiv Y (f x) M N).symm_apply_apply _
-          exact (ModuleCat.ExtendScalars.map_tmul (f.stalkMap x).hom ωY.inv 1 _).trans (congrArg _ e0)
+          exact (ModuleCat.ExtendScalars.map_tmul (f.stalkMap x).hom ωY.inv 1 _).trans
+            (congrArg _ e0)
         have e2 := ModuleCat.extendScalars_δ_tmul (f.stalkMap x).hom A B
           (moduleStalkGerm Y (f x) M V hV m) (moduleStalkGerm Y (f x) N V hV n)
         have e3 := ModuleCat.MonoidalCategory.tensorHom_tmul ΦM.inv ΦN.inv
@@ -179,8 +177,8 @@ theorem isIso_stalkMap_pullbackTensorHom (M N : Y.Modules) (x : X) :
           ((1 : X.presheaf.stalk x) ⊗ₜ[Y.presheaf.stalk (f x)] moduleStalkGerm Y (f x) N V hV n)
         have e4 := pullbackStalkIso_inv_app_one_tmul_germ f x M V hV m
         have e5 := pullbackStalkIso_inv_app_one_tmul_germ f x N V hV n
-        have e6 := moduleStalkTensorEquiv_germ_tmul_germ X x ((pullback f).obj M) ((pullback f).obj N)
-          (f ⁻¹ᵁ V) hV (((pullbackPushforwardAdjunction f).unit.app M).app V m)
+        have e6 := moduleStalkTensorEquiv_germ_tmul_germ X x ((pullback f).obj M)
+          ((pullback f).obj N) (f ⁻¹ᵁ V) hV (((pullbackPushforwardAdjunction f).unit.app M).app V m)
           (((pullbackPushforwardAdjunction f).unit.app N).app V n)
         refine (congrArg (fun z => ωX.hom.hom ((ΦM.inv ⊗ₘ ΦN.inv).hom
           ((Functor.OplaxMonoidal.δ (stalkExtend f x) A B).hom z))) e1).trans ?_

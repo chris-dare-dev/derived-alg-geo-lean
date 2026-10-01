@@ -2,7 +2,6 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.Divisors.Dual
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Monoidal
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.LineBundle
 import DerivedAlgGeo.CategoryTheory.Monoidal.ProjectionMorphism
@@ -22,11 +21,11 @@ monoidal structure is the strong structure `pullbackMonoidal` of `Modules/Pullba
 and the lax structure of `Modules/Pushforward/Monoidal.lean`: there is one projection morphism
 in each degree, and `projectionMap_eq` unfolds it to the two pieces just named.
 
-When `L` is invertible, the projection map is an isomorphism (Stacks, Tag 01E8 in degree
-`q = 0`, for a finite locally free sheaf of rank one): `isIso_projectionMap` for explicit
-`LineBundleData`, and `isIso_projectionMap_of_isInvertible` for an intrinsically invertible `L`.
-The proof is formal and global: a tensor-invertible object is dualizable, so the projection
-morphism of a monoidal adjunction is an isomorphism for it
+When `L` is invertible, the projection map is an isomorphism (the case `q = 0` of the projection
+formula of Stacks, Tag 01E8): `isIso_projectionMap` for explicit `LineBundleData`, and
+`Divisors/ProjectionFormula.lean` for an intrinsically invertible `L`, whose tensor inverse is the
+sheafified dual. The proof is formal and global: a tensor-invertible object is dualizable, so the
+projection morphism of a monoidal adjunction is an isomorphism for it
 (`CategoryTheory.Adjunction.isIso_projectionMorphism`). It does not need a trivializing cover.
 
 ## Main definitions
@@ -38,7 +37,7 @@ morphism of a monoidal adjunction is an isomorphism for it
 
 ## Main results
 
-* `Scheme.Modules.isIso_projectionMap`, `Scheme.Modules.isIso_projectionMap_of_isInvertible`.
+* `Scheme.Modules.isIso_projectionMap`: the projection map is an isomorphism for a line bundle.
 -/
 
 open CategoryTheory MonoidalCategory
@@ -98,16 +97,6 @@ theorem isIso_projectionMap (M : X.Modules) (L : LineBundleData Y) :
     IsIso (projectionMap f M L.line) :=
   (pullbackPushforwardAdjunction f).isIso_projectionMorphism_of_tensorInverse M
     L.tensorInverse
-
-/-- **The projection formula for an intrinsically invertible sheaf.** The tensor inverse is the
-sheafified dual `dualLine L`. -/
-theorem isIso_projectionMap_of_isInvertible (M : X.Modules) (L : Y.Modules)
-    [SheafOfModules.IsInvertible.{u, u, u} (show SheafOfModules Y.ringCatSheaf from L)] :
-    IsIso (projectionMap f M L) :=
-  (pullbackPushforwardAdjunction f).isIso_projectionMorphism_of_tensorInverse M
-    { obj := dualLine L
-      rightIso := tensorDualIso L
-      leftIso := tensorCommIso (dualLine L) L ≪≫ tensorDualIso L }
 
 /-- The projection isomorphism `f_*M ⊗ L ≅ f_*(M ⊗ f^*L)` for a line bundle `L` on `Y`. -/
 def projectionIso (M : X.Modules) (L : LineBundleData Y) :

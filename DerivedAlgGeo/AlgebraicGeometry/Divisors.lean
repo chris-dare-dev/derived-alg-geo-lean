@@ -8,6 +8,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Divisors.EffectiveLineBundle
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.LineBundleDual
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.FiniteLocallyFreePullback
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.PicardGroup
+import DerivedAlgGeo.AlgebraicGeometry.Divisors.ProjectionFormula
 import DerivedAlgGeo.AlgebraicGeometry.Divisors.Symmetric
 
 /-! # Divisors and invertible sheaves -/

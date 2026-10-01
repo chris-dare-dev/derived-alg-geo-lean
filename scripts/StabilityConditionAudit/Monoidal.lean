@@ -14,3 +14,30 @@ import DerivedAlgGeo.CategoryTheory.Monoidal
 #print axioms CategoryTheory.MonoidalCategory.IsCompatibleWithTriangulation.tensorFlipAdditive
 #print axioms CategoryTheory.MonoidalCategory.IsCompatibleWithTriangulation.tensorFlipCommShift
 #print axioms CategoryTheory.MonoidalCategory.IsCompatibleWithTriangulation.tensorFlipIsTriangulated
+
+-- The projection morphism of a monoidal adjunction and its invertibility at a tensor-invertible
+-- object (issue #1664, DQ1.2a).
+#print axioms CategoryTheory.MonoidalCategory.TensorInverse
+#print axioms CategoryTheory.MonoidalCategory.TensorInverse.mk.inj
+#print axioms CategoryTheory.MonoidalCategory.TensorInverse.mk.sizeOf_spec
+#print axioms CategoryTheory.MonoidalCategory.TensorInverse.obj
+#print axioms CategoryTheory.MonoidalCategory.TensorInverse.rightIso
+#print axioms CategoryTheory.MonoidalCategory.TensorInverse.leftIso
+#print axioms CategoryTheory.Adjunction.projectionMorphism
+#print axioms CategoryTheory.Adjunction.projectionMorphism_naturality_left
+#print axioms CategoryTheory.Adjunction.projectionMorphism_naturality_left_assoc
+#print axioms CategoryTheory.Adjunction.projectionMorphism_naturality_right
+#print axioms CategoryTheory.Adjunction.projectionMorphism_naturality_right_assoc
+#print axioms CategoryTheory.Adjunction.isIso_projectionMorphism_of_iso
+#print axioms CategoryTheory.Adjunction.projectionMorphism_tensor
+#print axioms CategoryTheory.Adjunction.projectionMorphism_tensor_assoc
+#print axioms CategoryTheory.Adjunction.projectionMorphism_tensorUnit
+#print axioms CategoryTheory.Adjunction.projectionMorphism_tensorUnit_assoc
+#print axioms CategoryTheory.Adjunction.projectionMorphism_tensor_eq
+#print axioms CategoryTheory.Adjunction.projectionMorphism_tensorUnit_eq
+#print axioms CategoryTheory.Adjunction.isIso_projectionMorphism_tensorUnit
+#print axioms CategoryTheory.Adjunction.isIso_projectionMorphism_whiskerRight_comp
+#print axioms CategoryTheory.Adjunction.isIso_projectionMorphism
+#print axioms CategoryTheory.Adjunction.isIso_projectionMorphism_of_tensorInverse
+#print axioms CategoryTheory.Adjunction.projectionIso
+#print axioms CategoryTheory.Adjunction.projectionIso_hom

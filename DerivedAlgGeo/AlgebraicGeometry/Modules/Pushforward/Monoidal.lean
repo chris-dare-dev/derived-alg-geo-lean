@@ -66,7 +66,8 @@ def pushforwardUnitHom : 𝟙_ Y.Modules ⟶ (pushforward f).obj (𝟙_ X.Module
 
 /-- The unit of pushforward is the ring map `f.app U` on sections. -/
 theorem pushforwardUnitHom_app (U : Y.Opens) (r : Γ(𝟙_ Y.Modules, U)) :
-    (pushforwardUnitHom f).app U r = (show Γ(𝟙_ X.Modules, f ⁻¹ᵁ U) from f.app U (show Γ(Y, U) from r)) := rfl
+    (pushforwardUnitHom f).app U r =
+      (show Γ(𝟙_ X.Modules, f ⁻¹ᵁ U) from f.app U (show Γ(Y, U) from r)) := rfl
 
 /-- **Pushforward of module sheaves is lax monoidal** for the sheafified tensor product: the
 tensorator `f_*M ⊗ f_*N ⟶ f_*(M ⊗ N)` is multiplication of sections, and the unit is the ring map
@@ -79,15 +80,18 @@ noncomputable instance pushforwardLaxMonoidal : (pushforward f).LaxMonoidal wher
     refine tensorObj_hom_ext _ _ fun U a b => ?_
     change (pushforwardTensorHom f _ M').app U ((tensorHom ((pushforward f).map g) (𝟙 _)).app U
       (tmulSection _ _ (op U) a b)) =
-      ((pushforward f).map (tensorHom g (𝟙 _))).app U ((pushforwardTensorHom f _ M').app U (tmulSection _ _ (op U) a b))
-    rw [tensorHom_tmulSection, pushforwardTensorHom_app_tmulSection, pushforwardTensorHom_app_tmulSection]
+      ((pushforward f).map (tensorHom g (𝟙 _))).app U
+        ((pushforwardTensorHom f _ M').app U (tmulSection _ _ (op U) a b))
+    rw [tensorHom_tmulSection, pushforwardTensorHom_app_tmulSection,
+      pushforwardTensorHom_app_tmulSection]
     rw [pushforward_map_app, pushforward_map_app]
     exact (tensorHom_tmulSection g (𝟙 M') (f ⁻¹ᵁ U) a b).symm
   μ_natural_right M' g := by
     refine tensorObj_hom_ext _ _ fun U a b => ?_
     change (pushforwardTensorHom f M' _).app U ((tensorHom (𝟙 _) ((pushforward f).map g)).app U
       (tmulSection _ _ (op U) a b)) =
-      ((pushforward f).map (tensorHom (𝟙 M') g)).app U ((pushforwardTensorHom f M' _).app U (tmulSection _ _ (op U) a b))
+      ((pushforward f).map (tensorHom (𝟙 M') g)).app U
+        ((pushforwardTensorHom f M' _).app U (tmulSection _ _ (op U) a b))
     have e1 := tensorHom_tmulSection (𝟙 ((pushforward f).obj M')) ((pushforward f).map g) U a b
     rw [e1, pushforward_map_app, pushforwardTensorHom_app_tmulSection]
     have h2 := pushforwardTensorHom_app_tmulSection f M' _ U a b
@@ -95,10 +99,14 @@ noncomputable instance pushforwardLaxMonoidal : (pushforward f).LaxMonoidal wher
     exact (tensorHom_tmulSection (𝟙 M') g (f ⁻¹ᵁ U) a b).symm
   associativity M N P := by
     refine tensorObj_tensorObj_hom_ext _ _ fun U a b c => ?_
-    change ((pushforward f).map (tensorAssocIso M N P).hom).app U ((pushforwardTensorHom f (tensorObj M N) P).app U
-      ((tensorHom (pushforwardTensorHom f M N) (𝟙 _)).app U (tmulSection _ _ (op U) (tmulSection _ _ (op U) a b) c))) =
-      (pushforwardTensorHom f M (tensorObj N P)).app U ((tensorHom (𝟙 _) (pushforwardTensorHom f N P)).app U
-        ((tensorAssocIso _ _ _).hom.app U (tmulSection _ _ (op U) (tmulSection _ _ (op U) a b) c)))
+    change ((pushforward f).map (tensorAssocIso M N P).hom).app U
+      ((pushforwardTensorHom f (tensorObj M N) P).app U
+        ((tensorHom (pushforwardTensorHom f M N) (𝟙 _)).app U
+          (tmulSection _ _ (op U) (tmulSection _ _ (op U) a b) c))) =
+      (pushforwardTensorHom f M (tensorObj N P)).app U
+        ((tensorHom (𝟙 _) (pushforwardTensorHom f N P)).app U
+          ((tensorAssocIso _ _ _).hom.app U
+            (tmulSection _ _ (op U) (tmulSection _ _ (op U) a b) c)))
     rw [tensorAssocIso_hom_tmulSection]
     have e1 := tensorHom_tmulSection (pushforwardTensorHom f M N) (𝟙 ((pushforward f).obj P)) U
       (((pushforward f).obj M).tmulSection ((pushforward f).obj N) (op U) a b) c
