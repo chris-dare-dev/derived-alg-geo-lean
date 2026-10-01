@@ -3,7 +3,6 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.Functor
-import DerivedAlgGeo.Algebra.Homology.DGCategory.QuasiEquivalence
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.Triangle
 
 /-!
@@ -484,19 +483,6 @@ theorem h0IsTriangulated
   letI : F.h0.CommShift ℤ := h0CommShift F
   exact isTriangulated_of_preservesShifts_and_chosenCones F
     (preservesShifts F) (preservesChosenCones F)
-
-/-- **A quasi-equivalence of pretriangulated dg categories induces a
-triangulated equivalence on `H⁰`.**
-
-The equivalence of `h0Equivalence` is an equivalence of ordinary categories
-whose functor is `H⁰ F`, so the triangulated structure of `h0IsTriangulated`
-transfers along `h0Equivalence_functor` with no further hypothesis. -/
-theorem h0Equivalence_isTriangulated
-    (F : DGFunctor C D) (hF : F.IsQuasiEquivalence)
-    [IsPretriangulated C] [IsPretriangulated D] :
-    letI : (F.h0Equivalence hF).functor.CommShift ℤ := h0CommShift F
-    (F.h0Equivalence hF).functor.IsTriangulated :=
-  h0IsTriangulated F
 
 end DGFunctor
 

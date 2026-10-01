@@ -514,6 +514,8 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.transportedH0CommShift
 #print axioms CategoryTheory.DGFunctor.transportedH0IsTriangulated
 #print axioms CategoryTheory.DGFunctor.transportedH0EquivalenceIsTriangulated
+#print axioms CategoryTheory.DGFunctor.isTriangulated_h0AsEquivalence
+#print axioms CategoryTheory.DGFunctor.isTriangulated_h0Equivalence
 
 -- The instance itself (dg-enhancements-e6, #377): the completion axiom for
 -- arbitrary distinguished triangles, the five axioms H⁰ proves, and the
@@ -924,7 +926,6 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.isEquivalence_h0
 #print axioms CategoryTheory.DGFunctor.h0Equivalence
 #print axioms CategoryTheory.DGFunctor.h0Equivalence_functor
-#print axioms CategoryTheory.DGFunctor.h0Equivalence_isTriangulated
 
 -- Shifting twice agrees with shifting once, and shifting by zero changes
 -- nothing -- both up to a canonical comparison that is closed and invertible,

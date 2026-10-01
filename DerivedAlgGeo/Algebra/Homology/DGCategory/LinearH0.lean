@@ -19,9 +19,9 @@ A scalar-preserving dg functor therefore induces a Mathlib-linear functor on
 
 This leaf packages linearity only. Exactness of `H⁰ F` is a separate
 capability: `DGFunctor.PreservesShifts` and `DGFunctor.PreservesChosenCones`
-(`DGCategory/Pretriangulated/Functor.lean`) hold for every dg functor, and
-`DGFunctor.h0IsTriangulated` (`DGCategory/Pretriangulated/H0/Functor.lean`)
-spends them on `H⁰ F`.
+(`DGCategory/Pretriangulated/Functor.lean`) hold for every dg functor, and,
+between pretriangulated dg categories, `DGFunctor.h0IsTriangulated`
+(`DGCategory/Pretriangulated/H0/Functor.lean`) spends them on `H⁰ F`.
 
 The other seam this file used to flag, identifying a general `H⁰`-Hom quotient
 with Mathlib's chosen homology object, is crossed in

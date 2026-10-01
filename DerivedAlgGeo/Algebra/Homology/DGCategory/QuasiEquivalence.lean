@@ -49,7 +49,8 @@ structure: the equivalence produced here is an equivalence of ordinary
 categories, and `h0Equivalence_functor` says its functor is `H⁰ F`.  Exactness
 of `H⁰ F` is proved separately, for every dg functor between pretriangulated
 dg categories, as `DGFunctor.h0IsTriangulated`; the two meet in
-`DGFunctor.h0Equivalence_isTriangulated`.
+`DGFunctor.isTriangulated_h0Equivalence`, the induced equivalence being
+triangulated in Mathlib's sense `Equivalence.IsTriangulated`.
 -/
 
 set_option autoImplicit false
