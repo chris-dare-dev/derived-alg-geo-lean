@@ -1,4 +1,5 @@
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Invertible
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.KFlatQuasiIso
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.AffineLocalizationUnit
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.AffineSpec
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.FixedBaseSections

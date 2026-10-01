@@ -1,4 +1,5 @@
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.StalkQuasiIso
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.KFlatQuasiIso
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Stalk
 
 #print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkRingCocone
@@ -34,3 +35,5 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Stalk
 /-! ## Tensor products and module stalks (#554) -/
 
 #print axioms AlgebraicGeometry.Scheme.Modules.fixedLeftTensorStalkIso
+#print axioms AlgebraicGeometry.Scheme.Modules.quasiIso_pullback_of_tensorRight_inverts
+#print axioms AlgebraicGeometry.Scheme.Modules.quasiIso_pullback_of_isKFlat
