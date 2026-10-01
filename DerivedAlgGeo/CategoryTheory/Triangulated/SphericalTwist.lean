@@ -16,6 +16,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.EnhancedFunctorH
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.EnhancedFunctorK0
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.ObjectTwistK0
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.LinearObjectTwistK0
+import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.ObjectTwistData
 
 /-! # The spherical twist
 

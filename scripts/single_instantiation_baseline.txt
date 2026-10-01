@@ -54,6 +54,8 @@ CategoryTheory	CategoryTheory.Triangulated.QuasiAbelian	recorded before the reas
 CategoryTheory	CategoryTheory.Triangulated.SlicingOrderPreimageData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.SlopeData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.SphericalTwist.AdjointComparisonConditions	asserts H0-invertibility of the canonical comparisons; a hypothesis on supplied cone data, not a construction
+CategoryTheory	CategoryTheory.Triangulated.SphericalTwist.AutoequivalenceStatement	supplied statement of the Seidel-Thomas autoequivalence theorem: carries its conclusion as a field, nothing constructs an inhabitant, and the theorem is external, as its docstring states
+CategoryTheory	CategoryTheory.Triangulated.SphericalTwist.BraidStatement	supplied statement of the Seidel-Thomas braid isomorphism: its single field is that isomorphism, nothing constructs an inhabitant, and the theorem is external, as its docstring states
 CategoryTheory	CategoryTheory.Triangulated.SphericalTwist.EnhancedAdjunctionCones	`.chosen` selects the five cones; consumers take an arbitrary one as a parameter
 CategoryTheory	CategoryTheory.Triangulated.SphericalTwist.MukaiRealization	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.SphericalTwist.SphericalPairData	recorded before the reason column existed; reason not yet written

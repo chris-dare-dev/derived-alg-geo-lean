@@ -8,11 +8,20 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.Definition
 /-!
 # The functorial braid relation: a supplied statement, and its `K₀` shadow
 
-For an `A₂`-configuration `(A, B)` the Seidel--Thomas theorem (*Braid group actions on derived
-categories of coherent sheaves*) is the
-isomorphism of functors `T_A T_B T_A ≅ T_B T_A T_B`. It is **stated here, never proved and never
-asserted**: `BraidStatement dA dB` carries that isomorphism as its single field, and nothing
-constructs an inhabitant.
+For an `A₂`-configuration `(A, B)` the Seidel--Thomas theorem is the isomorphism of functors
+`T_A T_B T_A ≅ T_B T_A T_B`. It is **stated here, never proved and never asserted**:
+`BraidStatement dA dB` carries that isomorphism as its single field, and nothing constructs an
+inhabitant.
+
+## Sources
+
+Seidel--Thomas, [arXiv:math/0001043v2](https://arxiv.org/abs/math/0001043v2). Definition 1.1(b): an
+`A_m`-configuration is a family of `m` spherical objects with `dim Hom^•(E_i, E_j) = 1` for
+`|i - j| = 1` and `0` for `|i - j| ≥ 2`, the dimension being total over all degrees. Theorem 1.2
+(second part) gives `T_{E_i} T_{E_{i+1}} T_{E_i} ≅ T_{E_{i+1}} T_{E_i} T_{E_{i+1}}` for such a
+family, up to graded natural isomorphism, and Theorem 2.17 is the abstract form. Proposition 2.13
+proves the displayed isomorphism for two `n`-spherical objects with `n > 0` and total
+`dim Hom^•(E_2, E_1) = 1`.
 
 ## What is proved: only the `K₀` shadow, and only in one direction
 
@@ -34,10 +43,10 @@ functors.
 ## What the statement is not
 
 `SphericalPairData` is the Euler-form shadow of an `A₂`-configuration, not the configuration
-itself. The literature's hypothesis also asks for a one-dimensional total `Hom(A, B)`; the
-structure here records no hypothesis at all, so an inhabitant is a claim about a specific pair and
-must be supplied only for a genuine `A₂`-configuration. The isomorphism is of underlying functors;
-its compatibility with the shift isomorphisms is not recorded.
+itself: it does not record that `Hom^•(A, B)` is one-dimensional. The structure here records no
+hypothesis at all, so an inhabitant is a claim about a specific pair and must be supplied only for a
+genuine `A₂`-configuration. The isomorphism is of underlying functors; the graded natural
+isomorphism of Seidel--Thomas also respects the shift isomorphisms, which is not recorded.
 -/
 
 universe w v u
@@ -48,8 +57,7 @@ open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 
 variable {k : Type w} [DivisionRing k] {C : Type u} [Category.{v} C] [Preadditive C]
   [Linear k C] [HasZeroObject C] [HasShift C ℤ]
-  [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
-  [HomFiniteBounded k C] [∀ n : ℤ, (shiftFunctor C n).Linear k]
+  [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C] [HomFiniteBounded k C]
 
 /-- **The functorial braid relation `T_A T_B T_A ≅ T_B T_A T_B`, as a supplied statement.**
 Supplied, not proved; see the module docstring for what an inhabitant claims. -/
@@ -59,6 +67,10 @@ structure BraidStatement {A B : C} (dA : SphericalTwistData k C A)
   iso : dA.T ⋙ dB.T ⋙ dA.T ≅ dB.T ⋙ dA.T ⋙ dB.T
 
 variable {A B : C} (dA : SphericalTwistData k C A) (dB : SphericalTwistData k C B)
+
+section Twist
+
+variable [∀ n : ℤ, (shiftFunctor C n).Linear k]
 
 /-- The `K₀` map of the three-fold composite `T_A T_B T_A` is the composite of the three twists. -/
 theorem map_braid_left :
@@ -72,6 +84,8 @@ theorem map_braid_of_pair (h : SphericalPairData k C A B) :
     K₀.map (dA.T ⋙ dB.T ⋙ dA.T) = K₀.map (dB.T ⋙ dA.T ⋙ dB.T) := by
   rw [map_braid_left, map_braid_left, twistK₀_braid h]
 
+end Twist
+
 namespace BraidStatement
 
 variable {dA dB} (S : BraidStatement dA dB)
@@ -82,6 +96,8 @@ include S
 Euler-form data. -/
 theorem map_braid : K₀.map (dA.T ⋙ dB.T ⋙ dA.T) = K₀.map (dB.T ⋙ dA.T ⋙ dB.T) :=
   K₀.map_congr S.iso
+
+variable [∀ n : ℤ, (shiftFunctor C n).Linear k]
 
 /-- The same, as the identity `τ_A τ_B τ_A = τ_B τ_A τ_B` of `K₀` twists. -/
 theorem twistK₀_braid :
