@@ -14,8 +14,8 @@ import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Morphism
 
 An ordinary sheaf of types on an arbitrary site determines a stack in
 discrete groupoids, and natural transformations induce stack morphisms through
-`CategoryTheory.discretePseudofunctorMap` and `CategoryTheory.StackInGroupoids.discreteMap`. This construction
-is purely site-theoretic; algebraic geometry consumes it for representable
+`CategoryTheory.discretePseudofunctorMap` and `CategoryTheory.StackInGroupoids.discreteMap`.
+This construction is purely site-theoretic; algebraic geometry consumes it for representable
 stacks.
 -/
 
