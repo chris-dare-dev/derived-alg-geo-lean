@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.Unbounded
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.FiniteKFlat
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.LeftDerivedTensor
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.BoundedCoherent
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.BoundedMonoidal
@@ -14,6 +15,13 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.Relative
 
 The geometry-level owner of derived tensor: one localization-facing interface and three
 deliberately separate derived-tensor tiers.
+
+## Main definitions
+
+This umbrella introduces no definitions. It exports the scheme-derived tensor
+interfaces and their existing constructions.
+
+## Main results
 
 | Interface | Module | What it supplies |
 | --- | --- | --- |
@@ -29,18 +37,31 @@ deliberately separate derived-tensor tiers.
 derived-tensor construction: it supplies `HasMonoidalDerivedPullback` for derived pullback along
 a morphism.
 
+`Tensor/FiniteKFlat.lean` proves that a finite supported complex with flat
+scheme-module terms is K-flat for the existing total tensor.
+
+## Implementation notes
+
 The tiers are separate because they are not each other's restrictions.  The unbounded
 bifunctor does **not** restrict to `Dᵇ(Coh Z)`: that category is not closed under
 arbitrary derived tensor on a singular scheme, so the bounded coherent tiers are
 contracts a caller discharges rather than theorems proved from the tier above them.
 
 Fourier--Mukai consumes all of this and owns none of it; see
-`DerivedCategory/FourierMukai/`.  Declarations in this subtree keep the
-`AlgebraicGeometry.DerivedCategory.FourierMukai` namespace they were introduced with, per
-the cutover ledger's standing decision that paths move and namespaces do not, except in
-`Tensor/Unbounded.lean`, which was already `AlgebraicGeometry.DerivedCategory`.
+`DerivedCategory/FourierMukai/`. The tensor cutover kept the historical
+`AlgebraicGeometry.DerivedCategory.FourierMukai` namespace in
+`Tensor/BoundedCoherent.lean`, `Tensor/Coherent.lean`, and `Tensor/Relative.lean`.
+`Tensor/Unbounded.lean`, `Tensor/LeftDerivedTensor.lean`, and
+`Tensor/BoundedMonoidal.lean` use `AlgebraicGeometry.DerivedCategory`.
+`Tensor/FiniteKFlat.lean` uses `AlgebraicGeometry.Scheme.Modules`, the namespace of
+the total tensor it specializes. Paths follow ownership without imposing one
+namespace on every declaration in the subtree.
 
 ## References
 
 * `docs/architecture/cutover-ledger.md`, row 10 (#1321).
+
+## Tags
+
+derived tensor, scheme-module sheaves, K-flat complexes, bounded coherent derived category
 -/
