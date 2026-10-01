@@ -1423,3 +1423,16 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   counterexample. The associated discrete pseudofunctor fails the `⊤` stack
   condition by the compiled direct descent proof.
 - state: `FALSIFIED (compiled counterexample)`
+
+### 2026-09-30 — dropping the open-map premise from QC comparison (issue #1635)
+- chunk: 1635-representable-stacks
+- reviewing commit: 068871899ba704007712939699dbbe7dc5c00d8f
+- found by: mathematics-adversary
+- proposed ancestor: `AlgebraicGeometry/Sites/QuasiCompact.lean`
+- weaker hypotheses: arbitrary scheme morphism property, without the open-map premise
+- source note: The review's compiled point-family counterexample takes an infinite affine
+  scheme and its residue-field points. The family is jointly surjective, hence a cover for
+  the unrestricted property, but cannot satisfy the quasi-compact covering condition:
+  finitely many source point opens cover only finitely many target points. The empty-cover
+  and point-family proof witnesses are kept in the private transcript supplement for #1635.
+- state: FALSIFIED (infinite affine residue-field point family)

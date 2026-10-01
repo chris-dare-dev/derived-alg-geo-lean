@@ -8,10 +8,28 @@ import Mathlib.CategoryTheory.Bicategory.NaturalTransformation.Pseudo
 /-!
 # Natural transformations into strict bicategories
 
-Mathlib's `Functor.toPseudofunctor'` promotes an ordinary functor into a
-strict bicategory to a pseudofunctor on the locally discrete source. Here
-`NatTrans.toStrongTrans` promotes its natural transformations, retaining
-their components and turning the naturality equalities into 2-isomorphisms.
+Mathlib promotes an ordinary functor into a strict bicategory to a pseudofunctor on the locally
+discrete source. This module promotes its natural transformations as well.
+
+## Main definitions and results
+
+* `CategoryTheory.NatTrans.toStrongTrans` promotes a natural transformation to a strong one.
+* `CategoryTheory.NatTrans.toStrongTrans_app` identifies its component with the original one.
+
+## Implementation notes
+
+Strictness turns the coherence maps into equality-induced isomorphisms. The ordinary
+naturality equality supplies the naturality 2-isomorphism, while the components remain
+definitionally unchanged.
+
+## References
+
+Mathlib's `CategoryTheory/Bicategory/Functor/LocallyDiscrete.lean` defines
+`CategoryTheory.Functor.toPseudofunctor'`, the promotion extended here.
+
+## Tags
+
+bicategories, locally discrete, natural transformations
 -/
 
 namespace CategoryTheory.NatTrans

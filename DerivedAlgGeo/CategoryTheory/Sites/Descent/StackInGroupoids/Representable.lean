@@ -9,12 +9,30 @@ import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Morphism
 /-!
 # Representable stacks on subcanonical sites
 
-`StackInGroupoids.representable J X` is the discrete stack of `yoneda.obj X`
-for a subcanonical topology `J`. `StackInGroupoids.representableMap` induces
-its morphisms by postcomposition, and `StackInGroupoids.representable_ofLE`
-identifies the constructions after restriction to a coarser subcanonical
-topology. The stack property is the existing sheaf-to-stack construction
-applied to subcanonicity; no new descent hypothesis is supplied.
+A subcanonical topology makes every Yoneda presheaf a sheaf and hence a discrete stack.
+
+## Main definitions and results
+
+* `CategoryTheory.StackInGroupoids.representable` constructs the stack represented by an object.
+* `CategoryTheory.StackInGroupoids.representableMap` induces its maps by postcomposition.
+* `CategoryTheory.StackInGroupoids.representableMap_app_obj` records the definitional action.
+* `CategoryTheory.StackInGroupoids.representable_ofLE` identifies restriction to a coarser site.
+
+## Implementation notes
+
+The construction reuses `CategoryTheory.stackInGroupoidsOfSheaf`: subcanonicity supplies its
+sheaf proof, rather than an additional descent hypothesis. Fibres currently lie in `Cat.{v, v}`,
+the universe of the Yoneda presheaf; #1637 will generalize this in place after #1631.
+
+## References
+
+Mathlib's `CategoryTheory/Sites/Canonical.lean` supplies the represented-sheaf theorem.
+[Stacks Project, Tag 0268](https://stacks.math.columbia.edu/tag/0268) describes stacks by their
+fibre-to-descent-data equivalences, the condition carried by the existing sheaf-to-stack root.
+
+## Tags
+
+subcanonical sites, representable stacks, discrete groupoids
 -/
 
 namespace CategoryTheory

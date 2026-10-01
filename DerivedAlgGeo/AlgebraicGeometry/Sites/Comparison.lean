@@ -40,22 +40,26 @@ open CategoryTheory MorphismProperty
 
 universe u
 
-/-- The fppf precoverage already satisfies the quasi-compact covering condition. -/
+/-- Flat morphisms locally of finite presentation are open, so the generic open-map criterion
+supplies the finite local refinements required by quasi-compact covers. -/
 lemma fppfPrecoverage_eq_propQCPrecoverage :
     fppfPrecoverage.{u} = propQCPrecoverage (@Flat ⊓ @LocallyOfFinitePresentation) :=
   precoverage_eq_propQCPrecoverage_of_isOpenMap fun _ _ f ⟨_, _⟩ ↦ f.isOpenMap
 
-/-- The fppf topology is the quasi-compact topology for flat, locally finitely presented maps. -/
+/-- Compare precoverages before generating the topology, using openness of flat, locally
+finitely presented morphisms rather than a new descent theorem. -/
 lemma fppfTopology_eq_propQCTopology :
     fppfTopology.{u} = propQCTopology (@Flat ⊓ @LocallyOfFinitePresentation) :=
   congrArg Precoverage.toGrothendieck fppfPrecoverage_eq_propQCPrecoverage
 
-/-- The étale precoverage already satisfies the quasi-compact covering condition. -/
+/-- Étale morphisms are open, so their jointly surjective covering families satisfy the
+quasi-compact covering condition without requiring each arrow to be quasi-compact. -/
 lemma etalePrecoverage_eq_propQCPrecoverage :
     etalePrecoverage.{u} = propQCPrecoverage @Etale :=
   precoverage_eq_propQCPrecoverage_of_isOpenMap fun _ _ f _ ↦ f.isOpenMap
 
-/-- The étale topology is the quasi-compact topology for étale maps. -/
+/-- Generate both topologies from the equal precoverages; the comparison requires no
+additional finiteness hypothesis beyond étaleness. -/
 lemma etaleTopology_eq_propQCTopology :
     etaleTopology.{u} = propQCTopology @Etale :=
   congrArg Precoverage.toGrothendieck etalePrecoverage_eq_propQCPrecoverage
