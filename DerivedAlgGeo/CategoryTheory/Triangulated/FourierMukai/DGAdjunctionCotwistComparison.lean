@@ -314,6 +314,8 @@ abbrev ShiftCompatibility :=
 
 namespace ShiftCompatibility
 
+open CategoryTheory.Triangulated (FunctorIsoShiftCompatibility)
+
 /-- The sign-correct shift structure on the conventional pointwise `[-1]` cotwist. -/
 noncomputable local instance : (K.transportedCotwist eA).CommShift ℤ :=
   K.transportedCotwistCommShift (eC := eA)
@@ -363,7 +365,7 @@ theorem cotwistIsTriangulated [eA.functor.IsTriangulated] :
     K.transportedCotwistCommShift (eC := eA)
   letI : (K.transportedCotwist eA).IsTriangulated :=
     K.transportedCotwistIsTriangulated (eC := eA)
-  exact h.targetIsTriangulated
+  exact h.is_triangulated_of_iso
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The kernel autoequivalence of the selected Fourier--Mukai cotwist is an
@@ -383,7 +385,7 @@ theorem cotwistKernelAutoequivalenceIsTriangulated
     K.transportedCotwistCommShift (eC := eA)
   letI : (K.transportedCotwist eA).IsTriangulated :=
     K.transportedCotwistIsTriangulated (eC := eA)
-  exact CategoryTheory.Triangulated.FunctorIsoShiftCompatibility.equivalenceIsTriangulatedOfEq h rfl
+  exact FunctorIsoShiftCompatibility.is_triangulated_of_equivalence_functor_eq h rfl
 
 end ShiftCompatibility
 

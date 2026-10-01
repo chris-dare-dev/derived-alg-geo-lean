@@ -6,7 +6,7 @@ import Mathlib.CategoryTheory.Triangulated.Adjunction
 import Mathlib.CategoryTheory.Triangulated.Functor
 
 /-!
-# Shift-compatible isomorphisms of triangulated functors
+# Transferring triangulatedness across shift-compatible isomorphisms
 
 This file packages the selected source and target shift structures for an
 isomorphism of functors and transfers triangulatedness across that isomorphism.
@@ -21,9 +21,9 @@ the caller-selected source structure.
 
 ## Main results
 
-`CategoryTheory.Triangulated.FunctorIsoShiftCompatibility.targetIsTriangulated`
+`CategoryTheory.Triangulated.FunctorIsoShiftCompatibility.is_triangulated_of_iso`
 transfers triangulatedness across the comparison.
-`CategoryTheory.Triangulated.FunctorIsoShiftCompatibility.equivalenceIsTriangulatedOfEq`
+`CategoryTheory.Triangulated.FunctorIsoShiftCompatibility.is_triangulated_of_equivalence_functor_eq`
 applies this transfer to an equivalence whose forward functor is the target.
 
 ## Implementation notes
@@ -79,10 +79,11 @@ variable {C D : Type*} [Category* C] [Category* D]
   {G F : C ⥤ D} [G.CommShift ℤ] {α : G ≅ F}
   (h : FunctorIsoShiftCompatibility G F α)
 
-/-- Use the supplied shift compatibility to transport distinguished triangles
-across the isomorphism, as required by
-`CategoryTheory.Functor.isTriangulated_of_iso`. -/
-theorem targetIsTriangulated [G.IsTriangulated] :
+/-- Install the selected target shift and supplied compatibility so that
+`CategoryTheory.Functor.isTriangulated_of_iso` can transport distinguished
+triangles from the source functor. The source shift remains caller-selected,
+which preserves presentation-specific conventions such as the cotwist sign. -/
+theorem is_triangulated_of_iso [G.IsTriangulated] :
     letI : F.CommShift ℤ := h.targetCommShift
     F.IsTriangulated := by
   letI : F.CommShift ℤ := h.targetCommShift
@@ -93,7 +94,7 @@ theorem targetIsTriangulated [G.IsTriangulated] :
 comparison target. Mathlib derives the inverse and equivalence shift structures
 from the selected forward structure before constructing the triangulated
 equivalence. -/
-theorem equivalenceIsTriangulatedOfEq {E : C ≌ D}
+theorem is_triangulated_of_equivalence_functor_eq {E : C ≌ D}
     (hEF : E.functor = F) [G.IsTriangulated] :
     letI : E.functor.CommShift ℤ := hEF ▸ h.targetCommShift
     letI : E.inverse.CommShift ℤ := E.commShiftInverse ℤ
@@ -103,7 +104,7 @@ theorem equivalenceIsTriangulatedOfEq {E : C ≌ D}
   letI : E.functor.CommShift ℤ := h.targetCommShift
   letI : E.inverse.CommShift ℤ := E.commShiftInverse ℤ
   letI : E.CommShift ℤ := E.commShift_of_functor ℤ
-  exact Equivalence.IsTriangulated.mk' E h.targetIsTriangulated
+  exact Equivalence.IsTriangulated.mk' E h.is_triangulated_of_iso
 
 end FunctorIsoShiftCompatibility
 

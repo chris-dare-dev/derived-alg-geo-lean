@@ -4,7 +4,9 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence
 import DerivedAlgGeo.Algebra.Homology.HomologicalBicomplex
+import DerivedAlgGeo.Algebra.Homology.TotalComplex
 import DerivedAlgGeo.Algebra.Homology.Embedding
+import DerivedAlgGeo.Algebra.Homology.Embedding.StupidTruncGE
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Coproducts
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyClassLocalization
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyHomotopy
@@ -36,7 +38,35 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex.extendCyclesIso_naturality_assoc
 #print axioms HomologicalComplex.extendHomologyIso_naturality
 #print axioms HomologicalComplex.extendHomologyIso_naturality_assoc
+#print axioms CochainComplex.truncLEToTruncLE
+#print axioms CochainComplex.truncLEToTruncLE_comp_ιTruncLE
+#print axioms CochainComplex.truncLEToTruncLE_comp_ιTruncLE_assoc
+#print axioms CochainComplex.truncLEToTruncLE_naturality
+#print axioms CochainComplex.truncLETower
+#print axioms CochainComplex.truncLETowerCocone
+#print axioms CochainComplex.truncLETowerMap
+#print axioms CochainComplex.truncLETowerMap_ι
+#print axioms CochainComplex.truncLETowerMap_id
+#print axioms CochainComplex.truncLETowerMap_comp
+#print axioms CochainComplex.isColimitTruncLETowerCocone
+#print axioms CochainComplex.isColimitMapTruncLETowerCocone
 #print axioms HomologicalComplex₂.singleMapHomologicalComplexFlipIso
+#print axioms HomologicalComplex₂.singleExtendMapFlipIso
+#print axioms HomologicalComplex₂.isColimitTotalFunctorMapCocone
+#print axioms HomologicalComplex₂.totalFunctor_preservesColimitsOfShape
+#print axioms HomologicalComplex₂.totalProjection
+#print axioms HomologicalComplex₂.total_d_comp_totalProjection
+#print axioms HomologicalComplex₂.comp_totalProjection_comp_d_eq_zero_of_total_component_eq_zero_of_horizontal_eq_zero
+#print axioms HomologicalComplex₂.exists_totalCycleRefinement_zero_le
+#print axioms HomologicalComplex₂.exactAt_total_of_diagonal_bounds_of_column_exactAt
+#print axioms HomologicalComplex₂.acyclic_total_of_diagonal_bounds_of_column_exactAt
+#print axioms HomologicalComplex₂.acyclic_total_of_upper_bounds_of_column_exactAt
+#print axioms HomologicalComplex₂.columnCone
+#print axioms HomologicalComplex₂.hasTotal_columnCone
+#print axioms HomologicalComplex₂.totalColumnConeIso
+#print axioms HomologicalComplex₂.ι_totalColumnConeIso_hom_source
+#print axioms HomologicalComplex₂.ι_totalColumnConeIso_hom_target
+#print axioms HomologicalComplex₂.quasiIso_totalMap_of_four_diagonal_bounds_of_column_quasiIso
 #print axioms HomologicalComplex.singleCompExtendIso
 #print axioms HomologicalComplex.singleCompExtendAtImageIso
 #print axioms CategoryTheory.Triangulated.SpectralObject.mapHomologicalFunctor
@@ -118,6 +148,9 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex.stupidTruncGEMap_comp_ι
 #print axioms HomologicalComplex.stupidTruncGEMap_comp_ι_assoc
 #print axioms HomologicalComplex.stupidTruncGEMap_self
+#print axioms HomologicalComplex.stupidTruncGETower
+#print axioms HomologicalComplex.stupidTruncGETowerCocone
+#print axioms HomologicalComplex.isColimitStupidTruncGETowerCocone
 #print axioms HomologicalComplex.stupidTruncGEι
 #print axioms HomologicalComplex.stupidTruncGEι_f_mono
 #print axioms HomologicalComplex.stupidTruncGEι_mono
@@ -186,8 +219,12 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex₂.singleZeroTotalXIso
 #print axioms HomologicalComplex₂.singleZeroXIso
 #print axioms HomologicalComplex₂.singleZeroFlipTotalIso
+#print axioms HomologicalComplex₂.singleZeroFlipTotalNatIso
+#print axioms HomologicalComplex₂.singleExtendMapTotalIso
 #print axioms HomologicalComplex₂.singleZeroFlipTotalIso_naturality
 #print axioms HomologicalComplex₂.singleZeroFlipTotalIso_naturality_assoc
+#print axioms HomologicalComplex.stupidTruncGEXIso
+#print axioms HomologicalComplex.stupidTruncXIso_eq_stupidTruncGEXIso
 #print axioms HomologicalComplex₂.stupidTruncGEXIso
 #print axioms HomologicalComplex₂.stupidTruncGEXIso_hom_inv_f
 #print axioms HomologicalComplex₂.stupidTruncGEXIso_hom_inv_f_assoc

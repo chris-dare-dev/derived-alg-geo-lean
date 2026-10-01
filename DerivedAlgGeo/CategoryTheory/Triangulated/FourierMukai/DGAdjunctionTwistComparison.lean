@@ -240,6 +240,8 @@ abbrev ShiftCompatibility :=
 
 namespace ShiftCompatibility
 
+open CategoryTheory.Triangulated (FunctorIsoShiftCompatibility)
+
 /-- The selected transported `H⁰` shift structure on the dg twist. -/
 noncomputable local instance : (K.transportedTwist eB).CommShift ℤ :=
   K.twist.transportedH0CommShift
@@ -266,7 +268,7 @@ theorem twistIsTriangulated [eB.functor.IsTriangulated] :
     K.twist.transportedH0CommShift
   letI : (K.transportedTwist eB).IsTriangulated :=
     K.twist.transportedH0IsTriangulated
-  exact h.targetIsTriangulated
+  exact h.is_triangulated_of_iso
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The kernel autoequivalence of the selected Fourier--Mukai twist is an
@@ -286,7 +288,7 @@ theorem twistKernelAutoequivalenceIsTriangulated
     K.twist.transportedH0CommShift
   letI : (K.transportedTwist eB).IsTriangulated :=
     K.twist.transportedH0IsTriangulated
-  exact CategoryTheory.Triangulated.FunctorIsoShiftCompatibility.equivalenceIsTriangulatedOfEq h rfl
+  exact FunctorIsoShiftCompatibility.is_triangulated_of_equivalence_functor_eq h rfl
 
 end ShiftCompatibility
 

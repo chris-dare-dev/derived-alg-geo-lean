@@ -101,6 +101,7 @@ generations:
   - { rev: 28, at: "2026-09-03", note: "Twenty-first slice of #1033, the phase shift for the Ind-slicing, and with it the slicing P_l itself modulo Harder-Narasimhan existence. ObjectProperty.coprodClosure_le_shift_of_le_shift (Triangulated/CompactlyGenerated.lean) transports the coproduct-and-extension closure into a shift of a DIFFERENT property, which is what distinguishes it from the homogeneous coprodClosure_le_shift of CompactlyGenerated/Existence.lean; the aisles it compares sit at two phases. coprodClosure_map_obj cannot do it, for a library reason rather than a mathematical one: Mathlib installs no CommShift instance on shiftFunctor C n, three rotations of a distinguished triangle returning the shift with all three morphisms negated, so only a sign-corrected commutation isomorphism makes the shift triangulated and none is registered. The signs land on the morphisms, and coprodClosure constrains only the OBJECTS of the triangle in its extension constructor, so Pretriangulated.Triangle.shift_distinguished suffices and the induction goes through. With Slicing.geProp_shift and closure of Q under the shift that gives boundedAisle_shift, hence isLE_zero_shift: the aisles of the Ind-extensions shift with the phase. Definition A.22 asserts nothing relating two phases (rev 27 recorded le_zero_anti, the aisle inclusion, as the only relation), so this is a theorem and not an axiom, resting on clause (i) of Lemma A.14 pinning each aisle to Coprod(P(>= phi)). isGE_one_shift follows without a second argument, the coaisle being the right orthogonal of the aisle (isGE_iff_orthogonal) and the shift fully faithful. largePhase_shift and largePhase_shift_iff are the phase shift Phat(phi) shifted by one equals Phat(phi+1); with largePhase_isClosedUnderIsomorphisms and largePhase_of_isZero these are the three formal Slicing axioms for largePhase. Slicing.IndExtensions.largePreimage (Phase/Transfer/Inducing.lean) then assembles the slicing: five of Slicing's six fields are discharged -- the three formal ones, the shift law transported through F.commShiftIso, and hom_vanishing from rev 27 -- and only hn_exists remains, as a hypothesis. This is Corollary A.23's output in the shape Theorem 2.8(1) needs; identifying it with P_l still wants the primed/unprimed cut comparison (2.8(1) pins P_l by the cuts Phat(> phi) and Phat(<= phi+1) of the UNPRIMED family, while largePhase is the intersection of the primed cuts), and the geometric inputs hzero, hG/htC, htrunc and hbdd remain open for pi. Categorically only hn_exists is left, and it cannot be got the bounded twin's way: Slicing.InducedTStructures.hn_exists lifts a TARGET HN filtration and the ambient category carries no slicing, so it needs the finite phase-truncation argument run on the source, which is what rev 27's Step 4 boundedness field was kept for. Next: that argument, after which Theorem 2.8(1) closes categorically; then Lemma 3.10(1.a)." }
   - { rev: 29, at: "2026-09-12", note: "PF5 materialized as milestone #48 for the mass-Hom lane. e14 rewritten as the bound itself (#1177) with six deliverables #1178--#1183 in dependency order: root predicate and HLR v2 pin, Lemma 2.8 reductions, Corollary 2.14(1)/Remark 7.3 from the existing stabilityDist mass comparison, Lemma 7.4 transfer on e7's preimage carrier, Example 2.9 base case, Theorem 7.5. Two consumer epics filed on the same milestone: e19 (#1184, Cheng arXiv:2608.14540: mass-Hom bound implies the full support property) and e20 (#1185, Theorem 8.23 = HLR v2 Theorem 2.35, with inequality (8.4) as the ownable slice and the HLR/BLMNPS chain as named hypotheses on e10). Tilt comparisons split off as e21, unfiled. Source facts pinned: the bound is HLR arXiv:2501.00710v2 Definition 2.7 (v1 Theorem 2.31 is v2 Theorem 2.35; v2 moved its appendix to arXiv:2606.00396, which does not use the bound); the paper cites v2 numbering." }
   - { rev: 30, at: "2026-09-12", note: "Dependency update from SF11.1 (#1060): the K-flat base-change category layer now includes perfect, quasicoherent, and bounded semiorthogonal sequences plus componentwise and sequence-level pullback, pushforward, tensor, adjunction, and projection-formula interfaces. This removes the missing categorical shape recorded by e7, but it does not yet supply the geometric semiorthogonality/fullness, projection amplitude and cocontinuity, bounded-preservation, or general Lemma 3.18 witnesses. Consequently #1033 remains gated on SF11's geometric discharge and the later S-local/noetherian-heart work; no HN-existence claim is inferred from the new interfaces." }
+  - { rev: 31, at: "2026-09-28", note: "Stacks-and-moduli re-scope: #1185 (e20) gains the native blocker #1713 (GM1.5), whose good-moduli definition replaces the ProperGoodModuli : Prop parameter; #1203 moves to PF5 (#48) as task projective-families-t1203. The PF2 e4/e6 and PF5 e13 dispositions stay with MO2.6 (#1629)." }
 items:
   - id: projective-families-m1
     gh_milestone: 33
@@ -467,7 +468,7 @@ items:
     gh_sub_issues: []
     kind: epic
     parent: projective-families-m5
-    blocked_by: [1033, 1178]
+    blocked_by: [1033, 1178, 1713]
     title: "Theorem 8.23: the mass-Hom bound as the input to HLR's good-moduli theorem"
     status: blocked
     priority: should
@@ -475,6 +476,16 @@ items:
     summary: "Theorem 8.23 (HLR v2 Theorem 2.35 = v1 Theorem 2.31): on smooth projective X a mass-Hom bound makes σ a stability condition over k, hence proper good moduli in characteristic 0. Ownable now: inequality (8.4), the bound uniform over finite-type field extensions (Zariski's lemma, adjunction, π_* preserves HN filtrations from e7's Theorem 2.8 lane). The HLR/BLMNPS chain (Theorem 2.35(1)⇒(2), Propositions 2.38/2.41, Lemma 8.22, [7, 21.24]) is recorded as named hypotheses on e10's Definition 8.17 interface, never as conclusion fields. Selvaggi arXiv:2603.29053 Theorem 2.42 is the relative literature pointer."
     tags: [mass-hom, good-moduli, consumer]
     labels: [area:stability, area:moduli, area:lean, type:feature, source:2501.00710, source:2607.28411]
+
+  - id: projective-families-t1203
+    gh_issue: 1203
+    kind: task
+    parent: projective-families-m5
+    title: "Derive phase-slice Jordan–Hölder filtrations from local finiteness"
+    status: planned
+    priority: should
+    summary: "Follow-up to #1179, moved to PF5 by the stacks-and-moduli re-scope; its stale process paragraph is replaced by a Definition of done (#1629)."
+    labels: [research, area:lean, area:stability, type:feature]
 
   - id: projective-families-e21
     gh_issue: null
