@@ -92,7 +92,8 @@ def main(argv: list[str] | None = None) -> int:
             if hashlib.sha256(path.read_bytes()).hexdigest() != expected:
                 print(f"case unavailable: source changed: {path}; re-adjudicate the case before refreshing its fingerprint", file=sys.stderr)
                 return 1
-        print(f"Role: {case['role']}.\nEvaluation case: {case['id']}\nWorktree: {args.worktree.resolve()}\n"
+        label = hashlib.sha256(case["id"].encode()).hexdigest()[:12]
+        print(f"Role: {case['role']}.\nEvaluation case: {label}\nWorktree: {args.worktree.resolve()}\n"
               f"Read .claude/agents/{case['role']}.md in this worktree.\n"
               f"Check this claim against the pinned sources; use your role's severity rules.\n\n{case['claim']}\n\n"
               f"Expected Mathlib pin: {fixture['pin']}. If it differs, report the case as unavailable.\n"

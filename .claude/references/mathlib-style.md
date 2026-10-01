@@ -27,7 +27,7 @@ Run by `.github/workflows/ci.yml` and by `CLAUDE.md`'s pre-push list.
 | `scripts/check_review_evidence.py docs` (precheck and CI) | absent primary documentation on new modules with commands; missing or misordered required sections in revised primary module docstrings; existing untouched documentation debt is preserved |
 
 Before a loop review, its `inventory` and compiled `probe` modes also cover
-reference occurrences in changed docstrings, changed Markdown sections and the
+reference occurrences in all docstrings of changed Lean modules, changed Markdown sections and the
 complete PR draft. Existence and type checks do not certify the meaning of prose,
 source attribution, novelty or an equivalence; reviewers still establish those.
 

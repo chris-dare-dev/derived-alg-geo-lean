@@ -106,7 +106,7 @@ class GitCorpusTests(unittest.TestCase):
                 git("config", "user.name", "Test")
                 Path("DerivedAlgGeo").mkdir()
                 old = Path("DerivedAlgGeo/Old.lean")
-                old.write_text("/-! # Existing incomplete doc -/\n/-- Existing declaration notes. -/\ndef x := 1\n")
+                old.write_text("/-! # Existing incomplete doc -/\n/-- Existing `ExistingName` declaration notes. -/\ndef x := 1\n")
                 git("add", ".")
                 git("commit", "-m", "base")
                 base = git("rev-parse", "HEAD")
@@ -119,18 +119,23 @@ class GitCorpusTests(unittest.TestCase):
                 new.write_text("/-!\n" + COMPLETE + "\n-/\n#check PrimeSpectrum\n")
                 git("add", str(new))
                 corpus = evidence.corpus(evidence.changed_files(base), base)
-                self.assertEqual([e[0] for e in corpus], [str(new)])
+                self.assertEqual({e[0] for e in corpus}, {str(old), str(new)})
+                self.assertFalse(any(e[3] for e in corpus if e[0] == str(old)))
                 self.assertEqual(evidence.doc_errors(corpus), [])
                 new.write_text(new.read_text() + "\n/-! ## An explanatory section\nSee `PrimeSpectrum`. -/\n")
                 corpus = evidence.corpus(evidence.changed_files(base), base)
                 self.assertEqual(evidence.doc_errors(corpus), [])
                 self.assertFalse(corpus[-1][3])
-                old.write_text(old.read_text() + "\n/-- Existing declaration notes. -/\ndef y := 2\n")
+                old.write_text(old.read_text() + "\n/-- Existing `ExistingName` declaration notes. -/\ndef y := 2\n")
                 corpus = evidence.corpus(evidence.changed_files(base), base)
                 added = [entry for entry in corpus if entry[0] == str(old)]
-                self.assertEqual(len(added), 1)
-                self.assertFalse(added[0][3])
-                self.assertIn("Existing declaration notes", added[0][2])
+                self.assertEqual(len(added), 3)
+                self.assertFalse(any(e[3] for e in added))
+                self.assertEqual(len(evidence.references(corpus)["ExistingName"]), 2)
+                old.write_text(old.read_text().replace("ExistingName", "RepairedName", 1))
+                refs = evidence.references(evidence.corpus(evidence.changed_files(base), base))
+                self.assertEqual(len(refs["ExistingName"]), 1)
+                self.assertEqual(len(refs["RepairedName"]), 1)
                 draft = Path("draft.md")
                 draft.write_text("Check `PrimeSpectrum`.\n")
                 output = Path("scratch/Checks.lean")
@@ -221,13 +226,15 @@ class EvaluationTests(unittest.TestCase):
             source = wt / "Source.lean"
             source.write_text("def original := 1\n")
             (wt / "lake-manifest.json").write_text(json.dumps({"packages": [{"name": "mathlib", "rev": SHA}]}))
-            fixture = {"pin": SHA, "cases": [{"id": "test", "role": "mathematics-adversary", "claim": "A claim.",
+            fixture = {"pin": SHA, "cases": [{"id": "correct-do-not-leak", "role": "mathematics-adversary", "claim": "A claim.",
                        "sources": [source.name], "source_sha256": {source.name: hashlib.sha256(source.read_bytes()).hexdigest()}}]}
             path = wt / "fixture.json"
             path.write_text(json.dumps(fixture))
-            with patch.object(evaluation, "FIXTURE", path), contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-                args = ["prompt", "test", "--worktree", str(wt)]
+            captured = io.StringIO()
+            with patch.object(evaluation, "FIXTURE", path), contextlib.redirect_stdout(captured), contextlib.redirect_stderr(io.StringIO()):
+                args = ["prompt", "correct-do-not-leak", "--worktree", str(wt)]
                 self.assertEqual(evaluation.main(args), 0)
+                self.assertNotIn("correct-do-not-leak", captured.getvalue())
                 source.write_text("def changed := 2\n")
                 self.assertEqual(evaluation.main(args), 1)
                 del fixture["cases"][0]["source_sha256"]

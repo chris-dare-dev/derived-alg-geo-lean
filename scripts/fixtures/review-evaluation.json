@@ -104,7 +104,7 @@
         "doc-completeness": "should-fix"
       },
       "source_sha256": {
-        ".claude/references/mathlib-style.md": "2922a6d12feb1960e52a9ed0b8dfa16e91e525962edbb1044abcd040a0df43e9",
+        ".claude/references/mathlib-style.md": "283949c6dba3d3d81fd69e09a63776cb9b58363b1a6ae17e72a5fa8b6bdf8989",
         "scripts/check_mathlib_style.py": "909729a9db3fc508d5b21a75c0d50b5b435d1c1d0462755be1584d7675fd0df6"
       }
     },

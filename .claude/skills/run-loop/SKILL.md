@@ -206,7 +206,7 @@ below.
      module-scoped `runLinter`. Run the source-only emission check; durable Lean
      probes belong in Development with sweep coverage, never tracked scratch.
      Run `python3 scripts/check_review_evidence.py inventory --base <base SHA>
-     --draft scratch/pr-<n>.md` over all changed docstrings, documentation and the
+     --draft scratch/pr-<n>.md` over all docstrings in changed Lean modules, documentation and the
      draft. Resolve every occurrence; classify non-declarations with a reason
      in a `## Reference classifications` table (`Token | Kind | Reason`). Kinds
      are declaration, parameter, historical, path, code or formula. Review

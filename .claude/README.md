@@ -82,7 +82,7 @@ only in new or changed primary module docstrings, preserving existing debt;
 new modules with commands also need a primary docstring. Import-only umbrellas
 and mid-file section notes do not need the full module template. `inventory`
 with `--draft scratch/pr-N.md` reports every inline reference occurrence in
-changed docstrings, changed Markdown sections and the complete draft; `probe`
+all docstrings in changed Lean modules, changed Markdown sections and the complete draft; `probe`
 with `--output scratch/ReferenceChecks.lean --run` checks all declaration tokens
 at root scope. Put justified non-declaration classifications in the draft's
 `## Reference classifications` table (`Token | Kind | Reason`). Paths are
@@ -106,6 +106,8 @@ and effort; unavailable fields remain unavailable.
 `scripts/review_evaluation.py prompt <case> --worktree <path>` emits a synthetic
 challenge without answers. Prompts require the pinned Mathlib and each source's content
 fingerprint; a changed source makes the case unavailable until re-adjudication.
+Dispatch the emitted plaintext, which uses opaque labels; keep descriptive case
+ids and the command used to select the case outside the reviewer's context.
 A separate reviewer adjudicates each report into a local JSON list with `case`
 and `findings`; each finding has `id`, `severity`,
 `evidence`, `evidence_supported` (boolean), and an `adjudication` reason. `score
