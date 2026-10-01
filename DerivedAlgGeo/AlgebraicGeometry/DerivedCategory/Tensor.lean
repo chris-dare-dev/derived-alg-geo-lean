@@ -45,7 +45,8 @@ scheme-module terms is K-flat for the existing total tensor.
 `Tensor/BoundedAboveKFlat.lean` extends this to strictly bounded-above
 flat-term complexes through the lower stupid-truncation colimit.
 `Tensor/FreeYonedaKFlat.lean` proves the functorial free-Yoneda total is
-K-flat for every input and inhabits the existing `AlgebraicGeometry.DerivedCategory.SchemeKFlatResolution`.
+K-flat for every input and inhabits the existing
+`AlgebraicGeometry.DerivedCategory.SchemeKFlatResolution`.
 Arbitrary nonflat pullback acyclicity remains a separate geometric theorem.
 
 ## Implementation notes
