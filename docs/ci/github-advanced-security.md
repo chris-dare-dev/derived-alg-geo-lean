@@ -1,114 +1,84 @@
-# GitHub Advanced Security integration diagnosis
+# Security scanner decision and evidence
 
-The optional `github-advanced-security` check has produced provider failures,
-later provider-success runs without coverage proof, and newer PR heads with no
-security-check observation. The most recent observed provider failure is from
-2026-09-23; absence of a check on newer heads is unknown, not a clean scan or
-proof that the integration was retired.
+The optional `github-advanced-security` check was GitHub's provider-generated
+**AI Scan for pull requests**, not a checked-in workflow or a separate check
+app. Its workflow ID was `360047049`, path
+`dynamic/agents/github-advanced-security`, event `dynamic`, and actor
+`github-advanced-security[bot]`. Its check-run app was `github-actions` (ID
+`15368`). Matching the check name alone, or expecting an app slug of
+`github-advanced-security`, misidentifies it.
 
-The workflow is provider-generated (`dynamic/agents/github-advanced-security`)
-and is not checked into this repository. Repository code cannot grant an
-entitlement to the identity used by that external workflow. Do not edit
-`ci.yml`, weaken branch protection, suppress provider errors, or change the
-provider configuration as a workaround for the failed runs.
+As observed on 2026-09-27, `GET /code-scanning/ai-scan` reported
+`pr_scan: disabled`; CodeQL default setup reported `state: not-configured`
+with `actions` and `python` detected. These are dated settings observations,
+not a present scan or an owner-approved retirement. AI Scan's last observed
+run was [35812428038](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35812428038)
+on 2026-09-23. No later absent check is a passing scan. The protected branch
+requires `ci`; this scanner is optional, so its failure remains visible but
+does not become a required-check failure.
 
-## Original provider failures
+At 2026-09-27 17:24 UTC, the setting was still `disabled`. A paginated read
+of **all five then-open PR heads** found no dynamic AI Scan run and no
+`github-advanced-security` check on [#1601](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1601),
+[#1602](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1602),
+[#1603](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1603),
+[#1604](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1604), or
+[#1605](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1605).
+The head SHA, run/check counts, setting response and request interval are in
+the owner-only archive's `probes/1433-security/open-pr-heads-2026-09-27T1724Z.json`
+(SHA-256 `558ac56cc9f3234700987352caf7f75a9b34e8779fb8507c96a359c98b647172`).
+This is a bounded snapshot, not a claim about later PRs.
 
-All four target runs failed during Copilot SDK session initialization with an
-HTTP 403 authentication/licensing response, before the scanner could report
-findings. They are provider failures, not vulnerability findings and not clean
-scans.
+## Historical diagnosis
 
-| PR | Observed (UTC) | Run / job log | Candidate revision | Classification |
-|---:|---|---|---|---|
-| [#1415](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1415) | 2026-09-20 18:59:14 | [run 35530799100](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35530799100) / [job 106130918882](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35530799100/job/106130918882) | [`e7fc1c1a0c54fe9c5c7316e045faa6b90a75f361`](https://github.com/chris-dare-dev/derived-alg-geo-lean/commit/e7fc1c1a0c54fe9c5c7316e045faa6b90a75f361) | `provider_failure` before scan |
-| [#1419](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1419) | 2026-09-20 18:59:13 | [run 35530798806](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35530798806) / [job 106130918769](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35530798806/job/106130918769) | [`23a60f401f3f131b6e30fb12b89df92e124429ca`](https://github.com/chris-dare-dev/derived-alg-geo-lean/commit/23a60f401f3f131b6e30fb12b89df92e124429ca) | `provider_failure` before scan |
-| [#1424](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1424) | 2026-09-20 18:59:14 | [run 35530799092](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35530799092) / [job 106130918968](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35530799092/job/106130918968) | [`836c80a308834db9b51dfa2acb02998aca7bfac5`](https://github.com/chris-dare-dev/derived-alg-geo-lean/commit/836c80a308834db9b51dfa2acb02998aca7bfac5) | `provider_failure` before scan |
-| [#1427](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1427) | 2026-09-20 18:59:13 | [run 35530798284](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35530798284) / [job 106130917005](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35530798284/job/106130917005) | [`f7a85f60b5833db824e95c2ff55490467dd6b608`](https://github.com/chris-dare-dev/derived-alg-geo-lean/commit/f7a85f60b5833db824e95c2ff55490467dd6b608) | `provider_failure` before scan |
+The four target runs all constructed a prompt, then failed while creating a
+Copilot session with HTTP 403 `SessionModelError: You are not licensed to use
+Copilot` (`errorType: authentication`). They stopped before analysis and did
+not report vulnerability findings.
 
-## Additional provider observations
+| PR | Provider run | Check/job | Classification |
+| --- | --- | ---: | --- |
+| [#1415](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1415) | [35530799100](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35530799100) | 106130918882 | Entitlement failure before analysis |
+| [#1419](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1419) | [35530798806](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35530798806) | 106130918769 | Entitlement failure before analysis |
+| [#1424](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1424) | [35530799092](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35530799092) | 106130918968 | Entitlement failure before analysis |
+| [#1427](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1427) | [35530798284](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35530798284) | 106130917005 | Entitlement failure before analysis |
 
-| PR | Observed (UTC) | Run / job log | Candidate revision | Observation |
-|---:|---|---|---|---|
-| [#1426](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1426) | 2026-09-20 15:38:31 | [run 35520220048](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35520220048) / [job 106102898252](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35520220048/job/106102898252) | [`b434dc682842d1778f7c491af98fe66583347fe9`](https://github.com/chris-dare-dev/derived-alg-geo-lean/commit/b434dc682842d1778f7c491af98fe66583347fe9) | Provider workflow succeeded and reported a `ccr_security` result to `sweagentd`, but its log says sessions are not supported for code scanning. No bound result artifact or executed negative-fixture proof was found; this is successful-but-unverified execution, not `verified_scan`. |
-| [#1427](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1427) | 2026-09-21 23:12:52 | [run 35666505192](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35666505192) / [job 106553349308](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35666505192/job/106553349308) | [`deafef42b66b2f7ea9160247b13f62d2176a184f`](https://github.com/chris-dare-dev/derived-alg-geo-lean/commit/deafef42b66b2f7ea9160247b13f62d2176a184f) | Provider workflow succeeded, but no bound result artifact or executed negative-fixture proof was found; coverage remains unverified. |
-| [#1473](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1473) | 2026-09-23 02:57:40 | [run 35812428038](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35812428038) / [job 107026703282](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/35812428038/job/107026703282) | [`edcf0b6213d9e5508ec85381f3d78e64c8d6feae`](https://github.com/chris-dare-dev/derived-alg-geo-lean/commit/edcf0b6213d9e5508ec85381f3d78e64c8d6feae) | Repeated Copilot SDK HTTP 403 authentication/licensing failure before scan; `provider_failure`. |
+The owner-only archived recount at
+`~/.loop-runs/transcripts/analysis/2026-09-27-m54-recovery/probes/1433-security/`
+classifies all 237 dynamic runs from September 16–23: 201 failed at that
+Copilot entitlement step; 36 succeeded only after all changed files matched
+the provider exclusion list and no prompt or model session was opened. That
+green state is **vacuous**. The apparent #1426 and #1427 successes do not
+demonstrate analysed clean changes; #1426 also predates the four target
+failures. The archived redacted logs and `t4_classification.tsv` support the
+counts; GitHub check colours alone do not.
 
-## Current open PR-head snapshot
+Current check absence must be bound to a PR head SHA, a complete paginated
+check/run query, a request time and the provider setting response. A missing
+run has no run or job ID. A disabled setting plus no run means
+`disabled_by_setting`; an enabled setting plus no run means `missing`; an
+unavailable setting means `provider_state_unknown`. A failed dynamic run is
+`unclassified_failure` from check colour alone; the archived four 403
+diagnoses use redacted logs. It is not automatically a security finding. A
+raw green dynamic run does not prove analysis or zero findings. Keep the raw
+conclusion and evidence separately. Schema-6 `security_scan` evidence retains
+the setting response and complete head-run query even when the optional gate
+has no check ID. Its warning names the observed state. A later publication
+verifier rereads the provider; if the setting or head runs changed, it cannot
+certify the earlier absence from current provider state.
 
-Captured at **2026-09-27 02:19:48 UTC** from PR metadata, check-runs API
-responses, and the live `main` required-status-check endpoint. These were all
-three PRs open in the repository at capture. Each check-runs request used
-`GET /repos/chris-dare-dev/derived-alg-geo-lean/commits/{head_sha}/check-runs?per_page=100&page=1`;
-the total counts were below 100, so each complete response fit on the first
-page. The snapshot artifact records the exact request URL, head SHA, `total_count`,
-returned names/statuses, and result links:
-[current-check-runs-20260927T021948Z.json](../../openspec/changes/ci1-1433-security-evidence-refresh/evidence/current-check-runs-20260927T021948Z.json)
-(SHA-256 `7ed7a19b1d4b7f5a95f8183ccb8976ede3edcea97330fcf221d2a4e60211942a`).
+## Decision record for the owner
 
-| PR head | Check-runs response | Returned checks at capture |
-|---|---|---|
-| [#1566](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1566), [`06079755b65fb71c14d8f655832829e4b8bf65fd`](https://github.com/chris-dare-dev/derived-alg-geo-lean/commit/06079755b65fb71c14d8f655832829e4b8bf65fd) | [API response](https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/commits/06079755b65fb71c14d8f655832829e4b8bf65fd/check-runs?per_page=100&page=1), `total_count: 3` | `ci`, `build`, and `roadmap` all succeeded in [run 36273289044](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36273289044); no security check was returned. |
-| [#1570](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1570), [`b03e2a5b54b2af28a279049e5803e3ee79d76c8e`](https://github.com/chris-dare-dev/derived-alg-geo-lean/commit/b03e2a5b54b2af28a279049e5803e3ee79d76c8e) | [API response](https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/commits/b03e2a5b54b2af28a279049e5803e3ee79d76c8e/check-runs?per_page=100&page=1), `total_count: 6` | Two `ci`/`build`/`roadmap` runs succeeded, including [run 36284578168](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36284578168); no security check was returned. |
-| [#1571](https://github.com/chris-dare-dev/derived-alg-geo-lean/pull/1571), [`54f7afb99d411fb51dafe2c50175b18a55a71911`](https://github.com/chris-dare-dev/derived-alg-geo-lean/commit/54f7afb99d411fb51dafe2c50175b18a55a71911) | [API response](https://api.github.com/repos/chris-dare-dev/derived-alg-geo-lean/commits/54f7afb99d411fb51dafe2c50175b18a55a71911/check-runs?per_page=100&page=1), `total_count: 3` | `ci`, `build`, and `roadmap` succeeded in [run 36285293310](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/36285293310); no security check was returned. |
+No path has been selected or applied. The minimum legitimate choices are:
 
-For each exact PR revision, the missing check is an API-level observation bound
-to the expected check identity `github-advanced-security`, candidate SHA,
-check-runs endpoint and query, capture time, total count, and complete returned
-first page in the saved artifact. No provider run/job ID exists for a missing
-check, so none is fabricated. These observations do not show that the
-provider permanently retired the check, that a scan was clean, or that any
-failure should be suppressed. Recheck the exact head before using this dated
-snapshot as operational evidence.
+| Choice | Owner action and evidence needed | Coverage |
+| --- | --- | --- |
+| Repair AI Scan | Confirm the GitHub Advanced Security and Copilot entitlements and AI-credit implications; re-enable `pr_scan`; run an eligible disposable PR through analysis and show a benign finding in a provider-defined, head/run-linked result channel. If only a green check or prompt build is visible, the result remains unknown. | [GitHub documents AI Scan](https://docs.github.com/en/code-security/concepts/code-scanning/ai-powered-security-detections) as PR-only and advisory during preview. Neither a `main` scan nor Lean/Markdown coverage is established here. |
+| Replace with CodeQL | Approve default setup or a separately chosen advanced setup; observe its actual check identity and successful analyses on the selected PR and `main` revisions; prove an expected finding on a disposable unmerged fixture. Retire the old optional gate only after recording the replacement and its scope. | [CodeQL lists Python and GitHub Actions](https://codeql.github.com/docs/codeql-overview/supported-languages-and-frameworks/) but not Lean. [Default setup](https://docs.github.com/en/code-security/concepts/code-scanning/setup-types) can scan PRs, default-branch pushes and on a schedule, subject to its configured eligibility. |
+| Retire AI Scan without replacement | Explicitly approve the loss of code-analysis coverage, preserve the historical 403/vacuous record and name a follow-up. Do not call retirement a scan success. | Secret scanning and push protection remain distinct; neither proves code analysis. |
 
-The checked-in `scripts/ci_gate_inventory.json` classifies this check as
-auxiliary and `required: false`, applicable to PRs. At the same capture time,
-the live required-status-check endpoint reported `strict: true` and only `ci`
-as a required context. Optional status does not mean invisible: provider
-failures remain reportable, and `ci` remains required.
-
-## Owner decision paths
-
-The minimum repair and valid alternatives are:
-
-| Path | Required action | Coverage and authority |
-|---|---|---|
-| Repair the existing integration | First identify whether the dynamic workflow, GitHub app, or ruleset owner controls the identity. For the verified-scan path, that owner must correct the Copilot SDK authentication/licensing configuration and provide successful runs for the required PR and `main` revisions where configured, plus a benign negative fixture whose expected finding is observed. | An owner/admin entitlement or account action may be required and could involve a license. No repository change can grant that entitlement. Report `verified_scan` only with the workflow/run/job, candidate revision, scanner scope, hashed result artifact, and executed negative-fixture proof bound together. |
-| Replace the integration | The owner selects and names a replacement and records the coverage it provides. To claim a verified replacement scan, provide separate successful PR and `main` executions where configured and the negative fixture. | A written coverage inventory and owner acceptance of gaps are required for the replacement disposition. GitHub documents CodeQL code scanning as available for public repositories and lists Python and GitHub Actions among its supported languages; Lean is not on the supported list, so CodeQL alone would not cover the Lean source. See [Code scanning with CodeQL](https://docs.github.com/en/code-security/concepts/code-scanning/codeql/codeql-code-scanning) and [About GitHub Advanced Security](https://docs.github.com/en/get-started/learning-about-github/about-github-advanced-security). |
-| Retire the integration | The owner explicitly approves retirement, records the reason and exact reviewed revision, assigns a follow-up for removed coverage, and retires the provider-owned check through its actual owner. | Retirement is a separate disposition with a coverage loss. It does not require successful scan evidence, is not a passing scan, and must not be normalized to `verified_scan`. |
-
-Until an owner selects and completes one of these paths, keep the issue open and
-the provider's errors visible. Do not add `continue-on-error`, fabricate a
-success status, weaken required `ci`, or remove the check to make a PR green.
-
-## Evidence contract and validator boundary
-
-For a verified-scan outcome, require separate successful execution records for
-the current PR revision and for `main` where configured. Each record must bind
-its own workflow, run, job, candidate SHA, scanner scope, hashed result
-artifact, and executed negative fixture with its expected finding observed. A
-single run's free-form scope list is not evidence of both environments. A
-separately owner-approved replacement or retirement may instead be recorded as
-the issue disposition with its exact reviewed revision, reason, timestamp,
-follow-up, and explicit coverage tradeoff. That disposition does not establish
-or claim a `verified_scan`.
-
-The existing `scripts/security_evidence.py` validator checks one JSON execution
-record at a time. For `verified_scan`, it checks the run/job and candidate-SHA
-bindings, artifact digest fields, negative-fixture fields, and zero findings;
-however, it only requires `scope` to be a non-empty string array. It does not
-aggregate a PR record with a separate `main` record or enforce which scopes are
-supported. Its current test accepts `pull_request` and `push:main` in the scope
-array of one run. Therefore a valid single-record result from
-`security_evidence.py` is not, by itself, proof of the issue's separate
-PR-and-`main` evidence requirement for the verified scan path.
-
-The labels `successful-but-unverified` and `missing/unknown` in this diagnosis
-are documentation classifications. The current JSON validator has no separate
-successful-but-unverified or missing-check disposition and requires workflow,
-run/job IDs, provider, phase, and conclusion. A missing-check observation is
-instead recorded from the check-runs API snapshot above; it is not a validator
-input and does not invent a run ID. An unverified success, an absent check, or
-an empty proof is not coverage. Replacement or retirement decisions require
-an owner, reason, timestamp, exact reviewed revision, and follow-up; they
-remain distinct from scan outcomes.
+The existing `scripts/security_evidence.py` validates one normalized execution
+observation. It cannot by itself prove distinct PR and `main` analyses for a
+replacement or establish a provider-defined zero-findings result. The first
+progress slice fixes evidence classification only. Issue #1433 remains open
+until a selected path is applied and its own closure evidence is verified.

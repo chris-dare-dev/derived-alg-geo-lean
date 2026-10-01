@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+from contextlib import redirect_stdout
 from pathlib import Path
 import subprocess
 import tarfile
@@ -41,6 +42,66 @@ def capacity(base: Path) -> dict[str, dict[str, int]]:
 
 
 class HostPickupTests(unittest.TestCase):
+    def test_capacity_report_shows_both_deficits_without_admitting(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            def show(unit: str, *properties: str) -> dict[str, str]:
+                if unit == "dag-runner@main.service":
+                    return {"ActiveState": "active", "UnitFileState": "enabled",
+                            "CPUQuotaPerSecUSec": "3s", "MemoryMax": str(12 * host_pickup.GIB)}
+                return {"ActiveState": "inactive", "UnitFileState": "disabled"}
+            with patch.object(host_pickup, "_systemctl_show", side_effect=show), \
+                 patch.object(host_pickup.os, "sched_getaffinity", return_value=set(range(16))), \
+                 patch.object(host_pickup, "_mem_available", return_value=28 * host_pickup.GIB), \
+                 patch.object(host_pickup.shutil, "disk_usage", return_value=Mock(free=20 * host_pickup.GIB)), \
+                 patch.object(host_pickup, "_host_id", return_value="fixture-host"), \
+                 patch.object(host_pickup.runner_state, "acquire_lease") as lease, \
+                 patch.object(host_pickup, "_prepare") as prepare, \
+                 patch.object(host_pickup, "_registration_token") as token, \
+                 patch.object(host_pickup, "_run_scope") as scope:
+                before = list(base.iterdir())
+                output = io.StringIO()
+                with redirect_stdout(output):
+                    self.assertEqual(host_pickup.main([
+                        "capacity-report", "--base", str(base), "--profile", "build",
+                    ]), 0)
+                build = json.loads(output.getvalue())
+                self.assertEqual(build["measured"]["memory_bytes"], 28 * host_pickup.GIB)
+                self.assertEqual(build["measured"]["disk_bytes"], 20 * host_pickup.GIB)
+                self.assertEqual(build["legacy_reservations"]["disk_bytes"], 16 * host_pickup.GIB)
+                self.assertEqual(build["deficit"], {
+                    "cpu_threads": 0, "memory_bytes": 4 * host_pickup.GIB,
+                    "disk_bytes": 28 * host_pickup.GIB,
+                })
+                self.assertFalse(build["profile_fits_snapshot"])
+                self.assertTrue(build["legacy_units"][0]["reserved"])
+                self.assertFalse(build["legacy_units"][1]["reserved"])
+                probe = host_pickup.capacity_report(base, "probe")
+                self.assertEqual(probe["deficit"]["disk_bytes"], 6 * host_pickup.GIB)
+                self.assertFalse(probe["profile_fits_snapshot"])
+                self.assertEqual(list(base.iterdir()), before)
+                lease.assert_not_called()
+                prepare.assert_not_called()
+                token.assert_not_called()
+                scope.assert_not_called()
+
+    def test_capacity_report_refuses_unknown_legacy_state(self) -> None:
+        for active, unit_file in (("activating", "enabled"), ("active", None),
+                                  ("inactive", "unknown")):
+            with self.subTest(active=active, unit_file=unit_file), \
+                 tempfile.TemporaryDirectory() as directory:
+                base = Path(directory)
+                data = {"ActiveState": active, "CPUQuotaPerSecUSec": "3s",
+                        "MemoryMax": str(12 * host_pickup.GIB)}
+                if unit_file is not None:
+                    data["UnitFileState"] = unit_file
+                with patch.object(host_pickup, "_systemctl_show", return_value=data), \
+                     patch.object(host_pickup.runner_state, "acquire_lease") as lease:
+                    with self.assertRaisesRegex(ValueError, "unknown state"):
+                        host_pickup.capacity_report(base, "build")
+                    self.assertEqual(list(base.iterdir()), [])
+                    lease.assert_not_called()
+
     def test_ephemeral_runner_lease_precedes_first_runner_write_and_archives_logs(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             base, _, _ = fixture(Path(directory))
@@ -48,7 +109,7 @@ class HostPickupTests(unittest.TestCase):
             with tarfile.open(archive, "w:gz") as bundle:
                 for name, body in (
                     ("config.sh", "#!/bin/sh\nexit 0\n"),
-                    ("run.sh", "#!/bin/sh\nmkdir -p _diag _work/derived-alg-geo-lean/derived-alg-geo-lean\necho kept > _diag/trace.log\n"),
+                    ("run.sh", "#!/bin/sh\ntest ! -e ../registration-token || exit 42\nmkdir -p _diag _work/derived-alg-geo-lean/derived-alg-geo-lean\necho kept > _diag/trace.log\n"),
                 ):
                     data = body.encode()
                     member = tarfile.TarInfo(name)
@@ -92,6 +153,86 @@ class HostPickupTests(unittest.TestCase):
             archive = base / "logs/abc123"
             self.assertTrue((archive / "diag/pickup.json").is_symlink())
             self.assertTrue((archive / "pickup.json").is_file())
+
+    def test_runner_parent_symlink_cannot_copy_external_diagnostics(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            base, _, _ = fixture(Path(directory))
+            root, _ = host_pickup._prepare(base, "abc123")
+            outside = Path(directory) / "outside"
+            (outside / "_diag").mkdir(parents=True)
+            (outside / "_diag/trace.log").write_text("keep\n", encoding="utf-8")
+            (root / "runner").symlink_to(outside, target_is_directory=True)
+            record = host_pickup._record("abc123", root, "build", kind="runner")
+            with self.assertRaisesRegex(ValueError, "diagnostic directory escapes"):
+                host_pickup._archive_runner_logs(base, root, "abc123", record)
+            self.assertEqual(list((base / "logs").iterdir()), [])
+            self.assertEqual((outside / "_diag/trace.log").read_text(), "keep\n")
+
+    def test_failed_runner_configuration_keeps_token_out_of_argv_and_error(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            base, _, _ = fixture(Path(directory))
+            archive = Path(directory) / "runner.tar.gz"
+            with tarfile.open(archive, "w:gz") as bundle:
+                body = ("#!/bin/sh\n"
+                        "[ \"$ACTIONS_RUNNER_INPUT_TOKEN\" = fixture-secret ] || exit 91\n"
+                        "for arg in \"$@\"; do [ \"$arg\" != fixture-secret ] || exit 92; done\n"
+                        "exit 17\n").encode()
+                member = tarfile.TarInfo("config.sh")
+                member.mode = 0o755
+                member.size = len(body)
+                bundle.addfile(member, io.BytesIO(body))
+            digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+            root, identity = host_pickup._prepare(base, "abc123")
+            (root / "registration-token").write_text("fixture-secret\n", encoding="ascii")
+            with self.assertRaisesRegex(ValueError, "exit code 17") as failure:
+                host_pickup._runner_worker(archive, digest, "owner-linux", root, identity)
+            self.assertNotIn("fixture-secret", str(failure.exception))
+            self.assertFalse((root / "registration-token").exists())
+
+    def test_absent_leaf_below_escaped_symlink_invalidates_inventory(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            base, _, _ = fixture(Path(directory))
+            root, _ = host_pickup._prepare(base, "abc123")
+            checkout = root / "runner/_work/derived-alg-geo-lean/derived-alg-geo-lean"
+            checkout.mkdir(parents=True)
+            outside = Path(directory) / "outside"
+            outside.mkdir()
+            (checkout / ".lake").symlink_to(outside, target_is_directory=True)
+            record = host_pickup._record("abc123", root, "build", kind="runner")
+            with self.assertRaisesRegex(ValueError, "lake_build"):
+                host_pickup._archive_runner_logs(base, root, "abc123", record)
+            metadata = json.loads((base / "logs/abc123/pickup.json").read_text())
+            self.assertFalse(metadata["inventory_valid"])
+            self.assertFalse(metadata["writable_path_inventory"]["lake_build"]["exists"])
+            self.assertEqual(metadata["writable_path_inventory"]["lake_build"]["resolved_path"],
+                             str(outside / "build"))
+
+    def test_diagnostic_copy_failure_leaves_recoverable_runner_lease(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            base, _, _ = fixture(Path(directory))
+            archive = Path(directory) / "fixture.tar.gz"
+            archive.write_bytes(b"fixture")
+            def run_scope(unit: str, root: Path, profile: str, command: list[str]) -> int:
+                (root / "runner/_diag").mkdir(parents=True)
+                (root / "runner/_diag/trace.log").write_text("kept\n", encoding="utf-8")
+                (root / "runner/_work/derived-alg-geo-lean/derived-alg-geo-lean").mkdir(parents=True)
+                return 0
+            with patch.object(host_pickup, "_verify_runner_archive"), \
+                 patch.object(host_pickup, "_capacity", side_effect=capacity), \
+                 patch.object(host_pickup, "_registration_token", return_value="fixture-secret"), \
+                 patch.object(host_pickup, "_run_scope", side_effect=run_scope), \
+                 patch.object(host_pickup, "_scope_cleared", return_value=True), \
+                 patch.object(host_pickup, "_runner_registered", return_value=False):
+                with patch.object(host_pickup.shutil, "copytree", side_effect=OSError("copy failed")):
+                    with self.assertRaisesRegex(OSError, "copy failed"):
+                        host_pickup.runner_once(base, archive, "0" * 64, "owner-linux")
+                lease = next((base / "leases").glob("*.json"))
+                self.assertEqual(list((base / "logs").iterdir()), [])
+                self.assertTrue((base / "jobs" / lease.stem).is_dir())
+                host_pickup.recover(base, lease.stem)
+            self.assertFalse(lease.exists())
+            self.assertEqual(list((base / "jobs").iterdir()), [])
+            self.assertEqual((base / "logs" / lease.stem / "diag/trace.log").read_text(), "kept\n")
 
     def test_registered_runner_retains_lease_and_recovery_denies(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -139,6 +280,57 @@ class HostPickupTests(unittest.TestCase):
             token.assert_not_called()
             self.assertEqual(list((base / "jobs").iterdir()), [])
             self.assertEqual(list((base / "leases").glob("*.json")), [])
+
+    def test_runner_archive_accepts_in_tree_file_symlink(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            archive = Path(directory) / "runner.tar.gz"
+            target = "./externals/node24/lib/node_modules/npm/bin/npm-cli.js"
+            link = "./externals/node24/bin/npm"
+            with tarfile.open(archive, "w:gz") as bundle:
+                member = tarfile.TarInfo(link)
+                member.type = tarfile.SYMTYPE
+                member.linkname = "../lib/node_modules/npm/bin/npm-cli.js"
+                bundle.addfile(member)
+                body = b"safe npm target\n"
+                member = tarfile.TarInfo(target)
+                member.size = len(body)
+                bundle.addfile(member, io.BytesIO(body))
+            digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+            host_pickup._verify_runner_archive(archive, digest)
+            destination = Path(directory) / "unpacked"
+            destination.mkdir()
+            with tarfile.open(archive, "r:gz") as bundle:
+                bundle.extractall(destination, filter="data")
+            self.assertEqual((destination / link).read_bytes(), body)
+
+    def test_runner_archive_rejects_symlink_escape_and_missing_target(self) -> None:
+        for linkname in ("/outside", "../../../../outside", "../missing"):
+            with self.subTest(linkname=linkname), tempfile.TemporaryDirectory() as directory:
+                archive = Path(directory) / "unsafe.tar.gz"
+                with tarfile.open(archive, "w:gz") as bundle:
+                    member = tarfile.TarInfo("./externals/node24/bin/npm")
+                    member.type = tarfile.SYMTYPE
+                    member.linkname = linkname
+                    bundle.addfile(member)
+                digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+                with self.assertRaisesRegex(ValueError, "unsafe symlink"):
+                    host_pickup._verify_runner_archive(archive, digest)
+
+    def test_runner_archive_rejects_member_below_symlink(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            archive = Path(directory) / "unsafe.tar.gz"
+            with tarfile.open(archive, "w:gz") as bundle:
+                link = tarfile.TarInfo("alias")
+                link.type = tarfile.SYMTYPE
+                link.linkname = "target"
+                bundle.addfile(link)
+                for name in ("target", "alias/child"):
+                    member = tarfile.TarInfo(name)
+                    member.size = 1
+                    bundle.addfile(member, io.BytesIO(b"x"))
+            digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+            with self.assertRaisesRegex(ValueError, "below a symlink"):
+                host_pickup._verify_runner_archive(archive, digest)
 
     def test_runner_failure_before_checkout_can_recover_without_token(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
