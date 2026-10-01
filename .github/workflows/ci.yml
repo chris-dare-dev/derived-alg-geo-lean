@@ -571,6 +571,18 @@ jobs:
         # that quietly stops firing is how #1359 reached the Lean parser.
         run: python3 scripts/check_mathlib_style.py --self-test
 
+      - name: Changed module documentation
+        id: review_docs
+        continue-on-error: true
+        env:
+          REVIEW_BASE: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha || github.event.before || 'HEAD^' }}
+        run: python3 scripts/check_review_evidence.py docs --base "$REVIEW_BASE"
+
+      - name: Emitter source reachability and eligibility
+        id: emission_sources
+        continue-on-error: true
+        run: python3 scripts/check_emission_coverage.py --source-only
+
       - name: Mathlib-style baseline ratchet
         id: style_ratchet
         continue-on-error: true
@@ -1187,6 +1199,8 @@ jobs:
             console_encoding=${{ steps.console_encoding.outcome }}
             style_fixtures=${{ steps.style_fixtures.outcome }}
             style_ratchet=${{ steps.style_ratchet.outcome }}
+            review_docs=${{ steps.review_docs.outcome }}
+            emission_sources=${{ steps.emission_sources.outcome }}
             source_independence=${{ steps.source_independence.outcome }}
             subject_layering=${{ steps.subject_layering.outcome }}
             neutral_stability_imports=${{ steps.neutral_stability_imports.outcome }}
