@@ -11,22 +11,29 @@ import DerivedAlgGeo.Topology.Sheaves.Basis
 
 For a commutative ring `R`, the affine comparison identifies a quasi-coherent sheaf on `Spec R`
 with the sheaf associated to its global sections. This is Stacks
-[01IA](https://stacks.math.columbia.edu/tag/01IA) and Hartshorne II.5.1. The pinned Mathlib
-v4.32.1 supplies the quasi-coherent case as
+[01IA](https://stacks.math.columbia.edu/tag/01IA). The pinned Mathlib v4.32.1 supplies the
+quasi-coherent case as
 `AlgebraicGeometry.Scheme.Modules.isIso_fromTildeΓ_of_isQuasicoherent` in
 `Mathlib/AlgebraicGeometry/Modules/Tilde.lean`.
 
-This file develops a more general localization criterion for the counit
-`AlgebraicGeometry.Scheme.Modules.fromTildeΓ`: it is an isomorphism **if and only if** restriction
-to every basic open is a localization. It does not reprove the upstream quasi-coherent comparison.
+Mathlib also defines `AlgebraicGeometry.IsLocalizing` and proves
+`AlgebraicGeometry.isIso_fromTildeΓ_iff_isLocalizing` for arbitrary module sheaves. This file
+retains the explicit map `AlgebraicGeometry.Scheme.Modules.basicOpenRestriction` and states the
+same criterion as `AlgebraicGeometry.Scheme.Modules.isIso_fromTildeΓ_iff_isLocalizedModule`.
+The latter is a definitional restatement of the upstream criterion, not a second general theorem.
+
+## Main definitions
+
+* `AlgebraicGeometry.Scheme.Modules.basicOpenRestriction` is restriction of global sections to
+  the basic open `D(f)`.
 
 ## Main results
 
-* `AlgebraicGeometry.Scheme.Modules.basicOpenRestriction` — restriction of global sections to `D(f)`.
 * `AlgebraicGeometry.isIso_fromTildeΓ_app_basicOpen` — the component of the counit at `D(f)`
   is an isomorphism under the hypothesis that restriction is a localisation at the powers of `f`.
-* `AlgebraicGeometry.isIso_fromTildeΓ_of_isLocalizedModule` — hence the counit is an
-  isomorphism as soon as every such restriction is a localisation.
+* `AlgebraicGeometry.isIso_fromTildeΓ_of_isLocalizedModule` — the implication from localization
+  of every basic-open restriction to invertibility of the counit (the right-to-left direction of
+  the upstream criterion).
 * `AlgebraicGeometry.Scheme.Modules.isLocalizedModule_basicOpenRestriction_tilde` — the base
   case, `M = N^~`, where that hypothesis holds. It is both the starting point of the general
   argument and the check that the hypothesis is satisfiable rather than vacuous.
@@ -34,12 +41,18 @@ to every basic open is a localization. It does not reprove the upstream quasi-co
   converse of the reduction, obtained by transporting the base case along the counit.
 * `AlgebraicGeometry.Scheme.Modules.isLocalizedModule_basicOpenRestriction_of_presentation` —
   a presentation on `Spec R` makes restriction to each basic open a localization.
-* `AlgebraicGeometry.Scheme.Modules.isIso_fromTildeΓ_iff_isLocalizedModule` — the two put
-  together: **`IsIso M.fromTildeΓ ↔ ∀ f, IsLocalizedModule (powers f) (restriction to D(f))`.**
-  This is the statement to quote.
+* `AlgebraicGeometry.Scheme.Modules.isIso_fromTildeΓ_iff_isLocalizedModule` — the upstream
+  `AlgebraicGeometry.isIso_fromTildeΓ_iff_isLocalizing` restated using
+  `AlgebraicGeometry.Scheme.Modules.basicOpenRestriction`. Its statement is
+  `IsIso M.fromTildeΓ ↔ ∀ f, IsLocalizedModule (powers f) (restriction to D(f))`.
+  This is the statement to quote when using the local restriction map.
 
-## Why this is the right reduction
+## Implementation notes
 
+Mathlib's `AlgebraicGeometry.IsLocalizing` is defined on
+`AlgebraicGeometry.modulesSpecToSheaf.obj M`; its condition is definitionally equal to the
+quantified `AlgebraicGeometry.Scheme.Modules.basicOpenRestriction` condition. Mathlib's
+`AlgebraicGeometry.isIso_fromTildeΓ_iff_isLocalizing` proves the equivalence for that predicate.
 `AlgebraicGeometry.Scheme.Modules.fromTildeΓ` is *built* by
 `TopCat.Sheaf.restrictHomEquivHom` along
 `PrimeSpectrum.isBasis_basic_opens`, with its component at `D(f)` given by
@@ -48,27 +61,40 @@ to every basic open is a localization. It does not reprove the upstream quasi-co
 resulting triangle: the component composed with `AlgebraicGeometry.tilde.toOpen` is the restriction
 map. Since `AlgebraicGeometry.tilde.toOpen` at `D(f)` is a localisation at `Submonoid.powers f` —
 Mathlib supplies that instance — the component is the comparison map between two candidate
-localisations, and is an isomorphism precisely when the second one is a localisation too.
+localisations. Under the localization hypothesis, the component theorem proves this map is an
+isomorphism. The separate converse and if-and-only-if statement concern the whole counit, not an
+unconditional equivalence for a single component. The whole-counit result is
+`AlgebraicGeometry.Scheme.Modules.isIso_fromTildeΓ_iff_isLocalizedModule`.
 
-Nothing in this local criterion needs quasi-coherence. Mathlib states
+Neither Mathlib's general criterion nor the local-map restatement needs
+quasi-coherence. Mathlib states
 `AlgebraicGeometry.Scheme.Modules.isUnit_algebraMap_end_of_le_basicOpen` for an *arbitrary*
 `M : (AlgebraicGeometry.Spec R).Modules`,
 not only for tildes. The quasi-coherent application is provided by Mathlib's pinned instance; the
-local criterion remains available when a caller supplies the localization hypotheses directly.
+local-map formulation remains available when a caller supplies the localization
+hypotheses directly.
 
-## Relation to the local bridges
+### Relation to the local bridges
 
 `AlgebraicGeometry.Modules.Affine.Gluing` documents the current division of work: Mathlib owns the
 finite-cover proof of the quasi-coherent comparison, while the local file retains the
 restriction-to-chart linear equivalence and wrappers for DerivedAlgGeo's explicit
-quasi-coherent-data and localization APIs. In particular,
+quasi-coherent-data and localization APIs. The local whole-counit theorem restates the upstream
+`AlgebraicGeometry.isIso_fromTildeΓ_iff_isLocalizing` using this file's restriction map. In
+particular,
 `AlgebraicGeometry.Scheme.Modules.isLocalizedModule_basicOpenRestriction_of_isQuasicoherent` is a
 bridge to the upstream result, not a second proof of it. The scheme/slice transport used by these
 local bridges is in `AlgebraicGeometry.Modules.Restriction.OpenImmersion`.
 
 ## References
 
-* [Stacks, Tag 01IA](https://stacks.math.columbia.edu/tag/01IA)
+* [Stacks, Tag 01IA](https://stacks.math.columbia.edu/tag/01IA).
+* See the [affine and projective spectrum placement map](../../../../docs/architecture/placement.md)
+  for pinned Mathlib source links.
+
+## Tags
+
+affine scheme, quasi-coherent modules, global sections, basic-open localization, tilde, counit
 -/
 
 universe u
@@ -102,15 +128,17 @@ lemma toOpen_comp_fromTildeΓ_app (M : (Spec R).Modules) (f : R) :
 
 /-- **The base case: for `M = N^~` the restriction to `D(f)` is a localisation.**
 
-`tilde.toOpen N ⊤` is an isomorphism and `tilde.toOpen N ⊤ ≫ restriction = tilde.toOpen N D(f)`
-by `tilde.toOpen_res`, so the restriction inherits the localisation property Mathlib already
-proves for `tilde.toOpen N D(f)`.
+`AlgebraicGeometry.tilde.toOpen N ⊤` is an isomorphism, and its composite with restriction to
+`D(f)` is `AlgebraicGeometry.tilde.toOpen N D(f)` by
+`AlgebraicGeometry.tilde.toOpen_res`. Thus the restriction inherits the localization property
+Mathlib proves for `AlgebraicGeometry.tilde.toOpen N D(f)`.
 
 This is what the general statement — the hypothesis of
-`isIso_fromTildeΓ_of_isLocalizedModule` — has to be reduced to for a quasi-coherent `M`, and
-it is also the check that that hypothesis is satisfiable rather than vacuous: feeding this
-lemma to the reduction recovers `IsIso (tilde N).fromTildeΓ`, which Mathlib knows
-independently. -/
+`AlgebraicGeometry.isIso_fromTildeΓ_of_isLocalizedModule` — has to be reduced to for a
+quasi-coherent `M`. It also checks that the hypothesis is satisfiable rather than vacuous:
+feeding this lemma to the reduction recovers
+`CategoryTheory.IsIso (AlgebraicGeometry.tilde N).fromTildeΓ`, which Mathlib knows independently.
+-/
 instance isLocalizedModule_basicOpenRestriction_tilde (N : ModuleCat.{u} R) (f : R) :
     IsLocalizedModule (Submonoid.powers f) (basicOpenRestriction (tilde N) f).hom := by
   haveI : IsIso (tilde.toOpen N ⊤) := tilde.isIso_toOpen_top
@@ -185,17 +213,19 @@ lemma Scheme.Modules.basicOpenRestriction_naturality {M N : (Spec R).Modules} (�
       (modulesSpecToSheaf.map φ).hom.app (op ⊤) ≫ N.basicOpenRestriction f :=
   (modulesSpecToSheaf.map φ).hom.naturality _
 
-/-- **The converse of `isIso_fromTildeΓ_of_isLocalizedModule`.**
+/-- **The converse of `AlgebraicGeometry.isIso_fromTildeΓ_of_isLocalizedModule`.**
 
 If `M` is in the essential image of `~` — equivalently, if its counit is an isomorphism — then
 restriction to each basic open is a localisation, by transporting
-`isLocalizedModule_basicOpenRestriction_tilde` across that isomorphism. -/
+`AlgebraicGeometry.Scheme.Modules.isLocalizedModule_basicOpenRestriction_tilde` across that
+isomorphism. -/
 theorem Scheme.Modules.isLocalizedModule_basicOpenRestriction_of_isIso (M : (Spec R).Modules)
     [IsIso M.fromTildeΓ] (f : R) :
     IsLocalizedModule (Submonoid.powers f) (M.basicOpenRestriction f).hom := by
   set N := (modulesSpecToSheaf.obj M).presheaf.obj (op ⊤) with hN
   -- `modulesSpecToSheaf` sends the counit to an isomorphism of sheaves; `sheafToPresheaf`
-  -- carries that to the underlying natural transformation, and `NatIso.isIso_app_of_isIso`
+  -- carries that to the underlying natural transformation, and
+  -- `CategoryTheory.NatIso.isIso_app_of_isIso`
   -- then makes every component invertible.
   haveI : IsIso (modulesSpecToSheaf.map M.fromTildeΓ) := inferInstance
   haveI : IsIso (modulesSpecToSheaf.map M.fromTildeΓ).hom := by
