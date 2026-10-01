@@ -16,7 +16,11 @@ import DerivedAlgGeo.AlgebraicGeometry.Morphisms
 #print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.mk.sizeOf_spec
 #print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.instIsClosedImmersionInclusion
 #print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.ofIso
+#print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.ofIso_support
+#print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.ofIso_inclusion
+#print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.ofIso_baseIso
 #print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.identity
+#print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.identity_baseIso
 #print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.comp
 #print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.comp_support
 #print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.comp_inclusion

@@ -20,7 +20,8 @@ canonically recover the relative automorphisms appearing in Definition 3.19.
 
 Monomorphisms, and in particular isomorphisms, are the first inhabitants
 (`FiltrationProperty.ofMono`, `HasFiltrationProperty.of_mono`, `HasFiltrationProperty.of_isIso`).
-This is Example 3.20(1) with the trivial Galois group, and
+The mono case is not in the paper: for an isomorphism it is Example 3.20(1) with trivial Galois
+group, and for a general monomorphism `X ×_Y X ≅ X`, so the only graph is the diagonal.
 `FiltrationProperty.ofMono_automorphism_eq_refl` records that the recovered automorphism is the
 identity.
 
@@ -103,7 +104,8 @@ end Witness
 For a monomorphism `f` both projections of `X ×_Y X` are isomorphisms and agree
 (`CategoryTheory.Limits.fst_eq_snd_of_mono_eq`).  So `AlmostDisconnected.isoWitness` for the first
 projection is a one-step kernel witness, and Lemma B.4 requires `p₂|_{X₁}` to be an isomorphism as
-well, which holds because `p₂ = p₁`.  Separatedness is Mathlib's `isSeparated_of_mono`. -/
+well, which holds because `p₂ = p₁`.  Separatedness is Mathlib's
+`AlgebraicGeometry.IsSeparated.isSeparated_of_mono`. -/
 noncomputable def ofMono (f : X ⟶ Y) [Mono f] : Witness f where
   isSeparated := inferInstance
   kernel := AlmostDisconnected.isoWitness (pullback.fst f f)
@@ -112,8 +114,9 @@ noncomputable def ofMono (f : X ⟶ Y) [Mono f] : Witness f where
     change (asIso (pullback.snd f f)).hom = 𝟙 _ ≫ pullback.snd f f
     simp
 
-/-- For a monomorphism `f`, the group `G = Aut_Y(X)` of Example 3.20(1) is trivial: the
-automorphism `p₂ ∘ (p₁)|_{X₁}⁻¹` recovered in Lemma B.4 is the identity, because `p₁ = p₂`. -/
+/-- For a monomorphism `f`, the automorphism `p₂ ∘ (p₁)|_{X₁}⁻¹` that the witness `ofMono f`
+recovers in Lemma B.4 is the identity, because `p₁ = p₂`
+(`CategoryTheory.Limits.fst_eq_snd_of_mono_eq`). -/
 theorem ofMono_automorphism_eq_refl (f : X ⟶ Y) [Mono f]
     (i : Fin (ofMono f).kernel.filtration.length) :
     (ofMono f).automorphism i = Iso.refl X := by

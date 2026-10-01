@@ -75,7 +75,8 @@ instance (D : SupportData p) : IsClosedImmersion D.inclusion :=
 target by the morphism itself.
 
 The identification `baseIso := asIso p` is forced: the compatibility field then reads
-`p = 𝟙 X ≫ p`.  Taking `p = 𝟙 X` recovers `identity`. -/
+`p = 𝟙 X ≫ p`.  Taking `p = 𝟙 X` recovers
+`AlmostDisconnected.SupportData.identity`. -/
 noncomputable def ofIso (p : X ⟶ Y) [IsIso p] : SupportData p where
   support := X
   inclusion := 𝟙 X
@@ -83,9 +84,28 @@ noncomputable def ofIso (p : X ⟶ Y) [IsIso p] : SupportData p where
   baseIso := asIso p
   baseIso_hom := by simp
 
-/-- The tautological support datum for an identity morphism. -/
+@[simp]
+theorem ofIso_support (p : X ⟶ Y) [IsIso p] : (ofIso p).support = X :=
+  rfl
+
+@[simp]
+theorem ofIso_inclusion (p : X ⟶ Y) [IsIso p] : (ofIso p).inclusion = 𝟙 X :=
+  rfl
+
+@[simp]
+theorem ofIso_baseIso (p : X ⟶ Y) [IsIso p] : (ofIso p).baseIso = asIso p :=
+  rfl
+
+/-- The tautological support datum for an identity morphism; an abbreviation for `ofIso (𝟙 X)`,
+so that it unfolds to the general isomorphism case. -/
 noncomputable abbrev identity (X : Scheme.{u}) : SupportData (𝟙 X) :=
   ofIso (𝟙 X)
+
+/-- The identification of the identity support with the base is `Iso.refl X`, as in the original
+definition of `identity`: the choice of inverse in `asIso (𝟙 X)` is irrelevant. -/
+theorem identity_baseIso (X : Scheme.{u}) : (identity X).baseIso = Iso.refl X := by
+  ext
+  simp [identity]
 
 /-- Compose two support data.
 
@@ -261,7 +281,8 @@ private noncomputable def identityFiltration (X : Scheme.{u}) :
   terminalIso := Iso.refl _
 
 /-- Explicit almost-disconnected data for an isomorphism: the one-step filtration `0 ⊂ 𝒪_X`
-whose only support is the whole source, with line bundle `𝒪_X` (`LineBundleData.unit`). -/
+whose only support is the whole source, with line bundle `𝒪_X`
+(`Scheme.Modules.LineBundleData.unit`). -/
 noncomputable def isoWitness (p : X ⟶ Y) [IsIso p] : Witness p where
   filtration := identityFiltration X
   piece := fun _ =>
@@ -272,7 +293,8 @@ noncomputable def isoWitness (p : X ⟶ Y) [IsIso p] : Witness p where
           (Scheme.Modules.pushforward (𝟙 X)).obj (structureSheaf X)
         exact ((Scheme.Modules.pushforwardId X).app (structureSheaf X)).symm }
 
-/-- Explicit almost-disconnected data for the identity morphism. -/
+/-- Explicit almost-disconnected data for the identity morphism; an abbreviation for
+`isoWitness (𝟙 X)`. -/
 noncomputable abbrev identityWitness (X : Scheme.{u}) : Witness (𝟙 X) :=
   isoWitness (𝟙 X)
 
@@ -286,9 +308,8 @@ def IsAlmostDisconnected : MorphismProperty Scheme :=
 namespace IsAlmostDisconnected
 
 /-- An isomorphism is almost disconnected: Definition B.1 with `m = 1`, `X₁ = X` and
-`L₁ = 𝒪_X`, so the filtration is `0 ⊂ 𝒪_X` and `p|_{X₁} = p` is the required isomorphism.  This is
-the first inhabitant of the property besides the identity; closure under composition and flat base
-change (Lemma B.2) is not yet available, see the module docstring. -/
+`L₁ = 𝒪_X`, so the filtration is `0 ⊂ 𝒪_X` and `p|_{X₁} = p` is the required isomorphism.  See
+the module docstring for the closure properties of Lemma B.2. -/
 theorem of_isIso {X Y : Scheme.{u}} (p : X ⟶ Y) [IsIso p] : IsAlmostDisconnected p :=
   ⟨AlmostDisconnected.isoWitness p⟩
 
