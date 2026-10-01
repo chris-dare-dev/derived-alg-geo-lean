@@ -15,6 +15,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Morphisms
 #print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.mk.inj
 #print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.mk.sizeOf_spec
 #print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.instIsClosedImmersionInclusion
+#print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.ofIso
 #print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.identity
 #print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.comp
 #print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.comp_support
@@ -44,8 +45,10 @@ import DerivedAlgGeo.AlgebraicGeometry.Morphisms
 #print axioms AlgebraicGeometry.AlmostDisconnected.Witness.compositionSupportData
 #print axioms AlgebraicGeometry.AlmostDisconnected.Witness.compositionSupportData_support
 #print axioms AlgebraicGeometry.AlmostDisconnected.Witness.compositionSupportData_inclusion
+#print axioms AlgebraicGeometry.AlmostDisconnected.isoWitness
 #print axioms AlgebraicGeometry.AlmostDisconnected.identityWitness
 #print axioms AlgebraicGeometry.IsAlmostDisconnected
+#print axioms AlgebraicGeometry.IsAlmostDisconnected.of_isIso
 #print axioms AlgebraicGeometry.IsAlmostDisconnected.id
 #print axioms AlgebraicGeometry.IsAlmostDisconnected.instContainsIdentitiesScheme
 
@@ -60,4 +63,9 @@ import DerivedAlgGeo.AlgebraicGeometry.Morphisms
 #print axioms AlgebraicGeometry.FiltrationProperty.Witness.automorphism_hom_over
 #print axioms AlgebraicGeometry.FiltrationProperty.Witness.automorphism_inv_over
 #print axioms AlgebraicGeometry.FiltrationProperty.Witness.overAutomorphism
+#print axioms AlgebraicGeometry.FiltrationProperty.fst_eq_snd_of_isIso
+#print axioms AlgebraicGeometry.FiltrationProperty.isIso_snd_of_isIso
+#print axioms AlgebraicGeometry.FiltrationProperty.ofIso
+#print axioms AlgebraicGeometry.FiltrationProperty.ofIso_automorphism
 #print axioms AlgebraicGeometry.HasFiltrationProperty
+#print axioms AlgebraicGeometry.HasFiltrationProperty.of_isIso

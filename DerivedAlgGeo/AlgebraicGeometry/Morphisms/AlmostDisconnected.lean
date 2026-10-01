@@ -68,13 +68,18 @@ variable {p : X ⟶ Y}
 instance (D : SupportData p) : IsClosedImmersion D.inclusion :=
   D.inclusion_isClosedImmersion
 
-/-- The tautological support datum for an identity morphism. -/
-def identity (X : Scheme.{u}) : SupportData (𝟙 X) where
+/-- The tautological support datum for an isomorphism: the whole source, identified with the
+target by the morphism itself. -/
+noncomputable def ofIso (p : X ⟶ Y) [IsIso p] : SupportData p where
   support := X
   inclusion := 𝟙 X
   inclusion_isClosedImmersion := inferInstance
-  baseIso := Iso.refl X
+  baseIso := asIso p
   baseIso_hom := by simp
+
+/-- The tautological support datum for an identity morphism. -/
+noncomputable abbrev identity (X : Scheme.{u}) : SupportData (𝟙 X) :=
+  ofIso (𝟙 X)
 
 /-- Compose two support data.
 
@@ -249,16 +254,21 @@ private noncomputable def identityFiltration (X : Scheme.{u}) :
     exact isZero_zero _
   terminalIso := Iso.refl _
 
-/-- Explicit almost-disconnected data for the identity morphism. -/
-noncomputable def identityWitness (X : Scheme.{u}) : Witness (𝟙 X) where
+/-- Explicit almost-disconnected data for an isomorphism: the one-step filtration whose only
+support is the whole source. -/
+noncomputable def isoWitness (p : X ⟶ Y) [IsIso p] : Witness p where
   filtration := identityFiltration X
   piece := fun _ =>
-    { toSupportData := SupportData.identity X
+    { toSupportData := SupportData.ofIso p
       lineBundle := Scheme.Modules.LineBundleData.unit X
       gradedIso := by
         change structureSheaf X ≅
           (Scheme.Modules.pushforward (𝟙 X)).obj (structureSheaf X)
         exact ((Scheme.Modules.pushforwardId X).app (structureSheaf X)).symm }
+
+/-- Explicit almost-disconnected data for the identity morphism. -/
+noncomputable abbrev identityWitness (X : Scheme.{u}) : Witness (𝟙 X) :=
+  isoWitness (𝟙 X)
 
 end AlmostDisconnected
 
@@ -269,9 +279,13 @@ def IsAlmostDisconnected : MorphismProperty Scheme :=
 
 namespace IsAlmostDisconnected
 
+/-- Every isomorphism is almost disconnected. -/
+theorem of_isIso {X Y : Scheme.{u}} (p : X ⟶ Y) [IsIso p] : IsAlmostDisconnected p :=
+  ⟨AlmostDisconnected.isoWitness p⟩
+
 /-- The identity morphism is almost disconnected. -/
 theorem id (X : Scheme.{u}) : IsAlmostDisconnected (𝟙 X) :=
-  ⟨AlmostDisconnected.identityWitness X⟩
+  of_isIso (𝟙 X)
 
 instance : IsAlmostDisconnected.ContainsIdentities where
   id_mem := id

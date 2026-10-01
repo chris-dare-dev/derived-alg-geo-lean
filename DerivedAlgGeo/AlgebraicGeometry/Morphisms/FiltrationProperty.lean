@@ -92,11 +92,48 @@ noncomputable def overAutomorphism (i : Fin W.kernel.filtration.length) :
 
 end Witness
 
+/-- Over an isomorphism the two projections of `X ×_Y X` agree. -/
+theorem fst_eq_snd_of_isIso (f : X ⟶ Y) [IsIso f] : pullback.fst f f = pullback.snd f f := by
+  rw [← cancel_mono f]
+  exact pullback.condition
+
+/-- The second projection of `X ×_Y X` is an isomorphism when `f` is. -/
+instance isIso_snd_of_isIso (f : X ⟶ Y) [IsIso f] : IsIso (pullback.snd f f) := by
+  rw [← fst_eq_snd_of_isIso f]
+  infer_instance
+
+/-- The filtration property of an isomorphism, with the single support `X ×_Y X ≅ X`.
+
+Both projections of `X ×_Y X` are isomorphisms when `f` is, so the one-step identity witness of
+the first projection also identifies its support with `X` by the second projection. -/
+noncomputable def ofIso (f : X ⟶ Y) [IsIso f] : Witness f where
+  isSeparated := inferInstance
+  kernel := AlmostDisconnected.isoWitness (pullback.fst f f)
+  secondProjectionIso := fun _ => (asIso (pullback.snd f f) : pullback f f ≅ X)
+  secondProjectionIso_hom := fun _ => by
+    change (asIso (pullback.snd f f)).hom = 𝟙 _ ≫ pullback.snd f f
+    simp
+
+/-- For an isomorphism, the automorphism recovered by Lemma B.4 is the identity. -/
+theorem ofIso_automorphism (f : X ⟶ Y) [IsIso f] (i : Fin (ofIso f).kernel.filtration.length) :
+    (ofIso f).automorphism i = Iso.refl X := by
+  ext
+  change (asIso (pullback.fst f f)).inv ≫ (asIso (pullback.snd f f)).hom = 𝟙 _
+  simp [fst_eq_snd_of_isIso f]
+
 end FiltrationProperty
 
 /-- The filtration property of Definition 3.19, represented by the equivalent scheme-theoretic
 criterion of Lemma B.4 of arXiv:2607.28411v1. -/
 def HasFiltrationProperty : MorphismProperty Scheme :=
   fun _ _ f => Nonempty (FiltrationProperty.Witness f)
+
+namespace HasFiltrationProperty
+
+/-- Every isomorphism has the filtration property. -/
+theorem of_isIso {X Y : Scheme.{u}} (f : X ⟶ Y) [IsIso f] : HasFiltrationProperty f :=
+  ⟨FiltrationProperty.ofIso f⟩
+
+end HasFiltrationProperty
 
 end AlgebraicGeometry
