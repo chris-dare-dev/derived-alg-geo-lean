@@ -18,7 +18,8 @@ flatness evidence is needed there.
 ## Main definitions
 
 This module introduces no new definitions. It specializes the existing
-`CochainComplex.IsKFlat` predicate to `AlgebraicGeometry.Scheme.Modules.totalTensor`.
+`CategoryTheory.CochainComplex.IsKFlat` predicate to
+`AlgebraicGeometry.Scheme.Modules.totalTensor`.
 
 ## Main results
 
