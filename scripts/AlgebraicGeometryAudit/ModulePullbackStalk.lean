@@ -1,4 +1,4 @@
-import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Stalk
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.StalkQuasiIso
 
 #print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkRingCocone
 #print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkRingIsColimit
@@ -22,3 +22,8 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Stalk
 #print axioms AlgebraicGeometry.Scheme.Modules.pullbackStalkPresheafIso
 #print axioms AlgebraicGeometry.Scheme.Modules.presheafModulePullbackStalkIso
 #print axioms AlgebraicGeometry.Scheme.Modules.pullbackStalkIso
+#print axioms AlgebraicGeometry.Scheme.Modules.exists_sheaf_with_stalk
+#print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor_additive
+#print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor_preservesParallelPairColimits
+#print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor_preservesHomology
+#print axioms AlgebraicGeometry.Scheme.Modules.quasiIso_iff_stalkwise

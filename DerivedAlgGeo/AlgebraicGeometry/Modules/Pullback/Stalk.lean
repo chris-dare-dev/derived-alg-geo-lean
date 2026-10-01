@@ -26,15 +26,39 @@ module-valued skyscraper adjunction, then transported through module
 sheafification.  It assumes no flatness and does not assert that pullback along
 an arbitrary scheme morphism is exact.
 
+## Main definitions
+
+`AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor` bundles a sheaf stalk over the local ring.
+
 ## Main results
 
-* `moduleStalkFunctor` bundles a sheaf stalk over the local ring.
-* `moduleStalkFunctor_preservesColimitsOfShape` preserves indexed coproducts.
-* `preservesFiniteLimits_of_stalkwise` reduces finite-limit preservation to
+* `AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor_preservesColimitsOfShape`
+  preserves indexed coproducts.
+* `AlgebraicGeometry.Scheme.Modules.preservesFiniteLimits_of_stalkwise`
+  reduces finite-limit preservation to
   module stalks.
-* `presheafModulePullbackStalkIso` compares presheaf pullback with extension of
+* `AlgebraicGeometry.Scheme.Modules.presheafModulePullbackStalkIso`
+  compares presheaf pullback with extension of
   scalars on stalks.
-* `pullbackStalkIso` gives the corresponding comparison for module sheaves.
+* `AlgebraicGeometry.Scheme.Modules.pullbackStalkIso`
+  gives the corresponding comparison for module sheaves.
+* `AlgebraicGeometry.Scheme.Modules.exists_sheaf_with_stalk`
+  realizes any local-ring module as a sheaf stalk.
+
+## Implementation notes
+
+The realization sheaf is the sheafification of the existing module skyscraper
+presheaf. The proof uses the module-stalk adjunction and its comparison with
+the underlying additive stalk.
+
+## References
+
+The stalk and skyscraper constructions extend Mathlib's module-sheaf and
+topological-sheaf APIs at the pinned revision.
+
+## Tags
+
+module stalk, scheme module sheaf, pullback, skyscraper
 -/
 
 namespace AlgebraicGeometry.Scheme.Modules
@@ -143,7 +167,8 @@ def presheafModuleStalkSheafificationIso
         ((_root_.PresheafOfModules.sheafificationAdjunction
           (R := X.ringCatSheaf) (𝟙 X.ringCatSheaf.obj)).unit.naturality f))
 
-/-- Forgetting the local-ring action on `moduleStalkFunctor` recovers the
+/-- Forgetting the local-ring action on
+`AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor` recovers the
 usual stalk of the underlying sheaf of abelian groups. -/
 def moduleStalkForgetIso (X : Scheme.{u}) (x : X) :
     moduleStalkFunctor X x ⋙
@@ -1178,6 +1203,56 @@ def pullbackStalkIso {X Y : Scheme.{u}} (f : X ⟶ Y) (x : X) :
     CategoryTheory.Functor.isoWhiskerLeft (toPresheafOfModules Y)
       (presheafModulePullbackStalkIso f x) ≪≫
     (CategoryTheory.Functor.associator _ _ _).symm
+
+private def skyscraperStalkMap (X : Scheme.{u}) (x : X)
+    (N : ModuleCat.{u} (X.presheaf.stalk x)) :
+    (presheafModuleStalkFunctor X x).obj (moduleSkyscraperPresheaf X x N) ⟶ N := by
+  letI : InitiallySmall.{u} (OpenNhds x) := initiallySmall_of_essentiallySmall _
+  exact ((_root_.PresheafOfModules.colimitAdjunction
+    (moduleStalkRingIsColimit X x)).homEquiv _ _).symm
+      (neighborhoodModuleSkyscraperIso X x N).hom
+
+set_option backward.isDefEq.respectTransparency false in
+private theorem skyscraperStalkMap_isIso (X : Scheme.{u}) (x : X)
+    (N : ModuleCat.{u} (X.presheaf.stalk x)) :
+    IsIso (skyscraperStalkMap X x N) := by
+  classical
+  letI : InitiallySmall.{u} (OpenNhds x) := initiallySmall_of_essentiallySmall _
+  let e := skyscraperPresheafStalkOfSpecializes x
+    ((forget₂ (ModuleCat (X.presheaf.stalk x)) AddCommGrpCat).obj N)
+    (specializes_refl x)
+  apply (isIso_iff_of_reflects_iso _
+    (forget₂ (ModuleCat (X.presheaf.stalk x)) AddCommGrpCat)).mp
+  have h : (forget₂ (ModuleCat (X.presheaf.stalk x)) AddCommGrpCat).map
+      (skyscraperStalkMap X x N) = e.hom := by
+    ext m
+    obtain ⟨U, hxU, m, rfl⟩ :=
+      TopCat.Presheaf.exists_germ_eq (moduleSkyscraperPresheaf X x N).presheaf m
+    change skyscraperStalkMap X x N
+        (TopCat.Presheaf.germ (moduleSkyscraperPresheaf X x N).presheaf U x hxU m) =
+      e.hom (TopCat.Presheaf.germ (moduleSkyscraperPresheaf X x N).presheaf U x hxU m)
+    exact (_root_.PresheafOfModules.colimitAdjunction_homEquiv_symm_apply
+      (moduleStalkRingIsColimit X x) (neighborhoodModuleSkyscraperIso X x N).hom
+      (X := op ⟨U, hxU⟩) m).trans
+      (CategoryTheory.congr_fun
+      (germ_skyscraperPresheafStalkOfSpecializes_hom x
+        ((forget₂ (ModuleCat (X.presheaf.stalk x)) AddCommGrpCat).obj N)
+        (specializes_refl x) U hxU) m).symm
+  rw [h]
+  infer_instance
+
+/-- Every module over the local ring at a point is the stalk of some sheaf of
+modules. The sheaf is obtained by sheafifying the existing module skyscraper
+presheaf. -/
+theorem exists_sheaf_with_stalk (X : Scheme.{u}) (x : X)
+    (N : ModuleCat.{u} (X.presheaf.stalk x)) :
+    ∃ M : X.Modules, Nonempty ((moduleStalkFunctor X x).obj M ≅ N) := by
+  let P := moduleSkyscraperPresheaf X x N
+  let M := (_root_.PresheafOfModules.sheafification
+    (𝟙 X.ringCatSheaf.obj)).obj P
+  letI := skyscraperStalkMap_isIso X x N
+  exact ⟨M, ⟨((presheafModuleStalkSheafificationIso X x).app P).symm ≪≫
+    asIso (skyscraperStalkMap X x N)⟩⟩
 
 end
 
