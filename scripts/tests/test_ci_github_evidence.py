@@ -424,6 +424,11 @@ class ClientTests(unittest.TestCase):
             ],
             [1, 2],
         )
+        pages = client.get_pages("/commits/example/check-suites", key="check_suites")
+        self.assertEqual([page["request_url"] for page in pages], [first, second])
+        self.assertEqual(pages[0]["response_headers"]["link"], f'<{second}>; rel="next"')
+        self.assertEqual(pages[0]["pagination_links"]["next"], second)
+        self.assertEqual([page["response"]["total_count"] for page in pages], [2, 2])
 
     def test_truncated_page_denies_completion(self) -> None:
         client = GitHubClient(
