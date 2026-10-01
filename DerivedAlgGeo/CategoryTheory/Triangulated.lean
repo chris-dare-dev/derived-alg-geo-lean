@@ -15,6 +15,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.ExtensionClosure
 import DerivedAlgGeo.CategoryTheory.Triangulated.Generators
 import DerivedAlgGeo.CategoryTheory.Triangulated.Dimension
 import DerivedAlgGeo.CategoryTheory.Triangulated.ExactFunctorFamily
+import DerivedAlgGeo.CategoryTheory.Triangulated.FunctorIsoShiftCompatibility
 import DerivedAlgGeo.CategoryTheory.Triangulated.FullSubcategory
 import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition
 import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor

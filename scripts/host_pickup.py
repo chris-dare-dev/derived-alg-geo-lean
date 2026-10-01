@@ -9,6 +9,7 @@ is explicit; a fresh pickup never guesses that a stale lease is disposable.
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 import hashlib
 import json
 import os
@@ -21,6 +22,7 @@ import stat
 import subprocess
 import sys
 import tarfile
+import tempfile
 from typing import Any
 
 if __package__ in (None, ""):
@@ -56,39 +58,76 @@ def _systemctl_show(unit: str, *properties: str) -> dict[str, str]:
     return dict(line.split("=", 1) for line in result.stdout.splitlines() if "=" in line)
 
 
-def _legacy_reservations() -> dict[str, int]:
+def _legacy_observation() -> tuple[dict[str, int], list[dict[str, Any]]]:
     total = {name: 0 for name in runner_state.RESOURCE_FIELDS}
+    units: list[dict[str, Any]] = []
     for name in LEGACY_UNITS:
         data = _systemctl_show(
             f"dag-runner@{name}.service", "ActiveState", "UnitFileState",
             "CPUQuotaPerSecUSec", "MemoryMax"
         )
-        if data.get("ActiveState") == "inactive" and data.get("UnitFileState") == "disabled":
-            continue
-        if data.get("ActiveState") not in ("active", "inactive"):
+        if (data.get("ActiveState") not in ("active", "inactive") or
+                data.get("UnitFileState") not in ("enabled", "disabled")):
             raise ValueError(f"legacy runner {name} has unknown state; capacity denied")
+        inactive = data["ActiveState"] == "inactive" and data["UnitFileState"] == "disabled"
+        if inactive:
+            units.append({"unit": name, "active_state": "inactive", "unit_file_state": "disabled",
+                          "reserved": False, "resources": {key: 0 for key in total}})
+            continue
         quota = data.get("CPUQuotaPerSecUSec", "")
         memory = data.get("MemoryMax", "")
         if not quota.endswith("s") or not quota[:-1].isdigit() or not memory.isdigit():
             raise ValueError(f"unmeasured active legacy runner: {name}")
         # systemd reports CPUQuotaPerSecUSec in seconds per second.
-        total["cpu_threads"] += int(quota[:-1])
-        total["memory_bytes"] += int(memory)
-        total["disk_bytes"] += LEGACY_DISK_RESERVATION
+        resources = {"cpu_threads": int(quota[:-1]), "memory_bytes": int(memory),
+                     "disk_bytes": LEGACY_DISK_RESERVATION}
+        for key, value in resources.items():
+            total[key] += value
+        units.append({"unit": name, "active_state": data["ActiveState"],
+                      "unit_file_state": data["UnitFileState"],
+                      "reserved": True, "resources": resources})
+    return total, units
+
+
+def _legacy_reservations() -> dict[str, int]:
+    total, _ = _legacy_observation()
     return total
+
+
+def _capacity_observation(base: Path) -> dict[str, Any]:
+    """Read the same physical-host inputs used for admission, without a lease."""
+    legacy, units = _legacy_observation()
+    measured = {"cpu_threads": len(os.sched_getaffinity(0)),
+                "memory_bytes": _mem_available(), "disk_bytes": shutil.disk_usage(base).free}
+    headroom = {"cpu_threads": HOST_CPU_HEADROOM,
+                "memory_bytes": HOST_MEMORY_HEADROOM, "disk_bytes": HOST_DISK_HEADROOM}
+    available = {key: measured[key] - headroom[key] - legacy[key] for key in measured}
+    return {"measured": measured, "headroom": headroom, "legacy_reservations": legacy,
+            "legacy_units": units, "capacity_after_legacy": available}
 
 
 def _capacity(base: Path) -> dict[str, dict[str, int]]:
     """Measure one physical host, reserving active old services first."""
-    legacy = _legacy_reservations()
-    cpu = len(os.sched_getaffinity(0)) - HOST_CPU_HEADROOM - legacy["cpu_threads"]
-    available_memory = _mem_available() - HOST_MEMORY_HEADROOM - legacy["memory_bytes"]
-    available_disk = shutil.disk_usage(base).free - HOST_DISK_HEADROOM - legacy["disk_bytes"]
-    if min(cpu, available_memory, available_disk) <= 0:
+    available = _capacity_observation(base)["capacity_after_legacy"]
+    if min(available.values()) <= 0:
         raise ValueError("host has no measured capacity after legacy reservations and headroom")
-    return {_host_id(): {
-        "cpu_threads": cpu, "memory_bytes": available_memory, "disk_bytes": available_disk,
-    }}
+    return {_host_id(): available}
+
+
+def capacity_report(base: Path, profile: str) -> dict[str, Any]:
+    """Report a measurement, never an admission decision or reservation."""
+    if not base.is_absolute() or profile not in PROFILES:
+        raise ValueError("absolute host base and known profile are required")
+    observed = _capacity_observation(base)
+    available = observed["capacity_after_legacy"]
+    requested = PROFILES[profile]
+    deficit = {key: max(0, requested[key] - available[key]) for key in requested}
+    return {"schema": "derived-alg-geo-lean.host-capacity-report/v1",
+            "observed_at_utc": datetime.now(timezone.utc).isoformat(),
+            "host_id": _host_id(), "profile": profile, "requested": requested,
+            **observed, "deficit": deficit,
+            "profile_fits_snapshot": all(value == 0 for value in deficit.values()),
+            "admission": "not attempted; live leases and subsequent measurements may deny pickup"}
 
 
 def _mem_available() -> int:
@@ -445,11 +484,16 @@ def _runner_worker_started(archive: Path, digest: str, label: str, root: Path,
     if not token:
         raise ValueError("registration token is missing")
     name = f"dag-{root.name}"
-    subprocess.run([
-        "./config.sh", "--unattended", "--ephemeral", "--disableupdate",
-        "--url", f"https://github.com/{REPOSITORY}", "--token", token,
-        "--name", name, "--labels", label, "--work", "_work",
-    ], cwd=runner_dir, check=True)
+    try:
+        configured = subprocess.run([
+            "./config.sh", "--unattended", "--ephemeral", "--disableupdate",
+            "--url", f"https://github.com/{REPOSITORY}",
+            "--name", name, "--labels", label, "--work", "_work",
+        ], cwd=runner_dir, env={**os.environ, "ACTIONS_RUNNER_INPUT_TOKEN": token}, check=False)
+    finally:
+        _unlink_registration_token(root, expected)
+    if configured.returncode != 0:
+        raise ValueError(f"runner configuration failed with exit code {configured.returncode}")
     return subprocess.run(["./run.sh"], cwd=runner_dir, check=False).returncode
 
 
@@ -496,7 +540,7 @@ def _archive_runner_logs(base: Path, root: Path, namespace: str,
     try:
         archived_info = destination.lstat()
     except FileNotFoundError:
-        destination.mkdir(mode=0o700)
+        pass
     else:
         if (not stat.S_ISDIR(archived_info.st_mode) or archived_info.st_uid != os.getuid() or
                 stat.S_IMODE(archived_info.st_mode) != 0o700):
@@ -513,10 +557,10 @@ def _archive_runner_logs(base: Path, root: Path, namespace: str,
             raise ValueError("runner log archive identity or inventory is invalid")
         return
     source = root / "runner/_diag"
-    if source.is_symlink():
-        raise ValueError("runner diagnostic directory is a symlink; lease retained")
-    if source.is_dir():
-        shutil.copytree(source, destination / "diag", symlinks=True)
+    resolved_source = source.resolve(strict=False)
+    if (source.is_symlink() or
+            (resolved_source != root and root not in resolved_source.parents)):
+        raise ValueError("runner diagnostic directory escapes job root; lease retained")
     checkout = root / "runner/_work/derived-alg-geo-lean/derived-alg-geo-lean"
     actual_paths = {
         "checkout": checkout,
@@ -541,8 +585,8 @@ def _archive_runner_logs(base: Path, root: Path, namespace: str,
         else:
             entry.update({"exists": True, "device": info.st_dev, "inode": info.st_ino,
                           "symlink": stat.S_ISLNK(info.st_mode)})
-            if observed != root and root not in observed.parents:
-                escaped.append(key)
+        if observed != root and root not in observed.parents:
+            escaped.append(key)
         inventory[key] = entry
     checkout_observed = bool(inventory["checkout"]["exists"])
     inventory_valid = not escaped
@@ -554,16 +598,26 @@ def _archive_runner_logs(base: Path, root: Path, namespace: str,
         "reservation": record["resources"],
         "host_capacity_at_admission": record.get("host_capacity_at_admission"),
     }, sort_keys=True, indent=2) + "\n"
-    descriptor = os.open(destination, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    stage = Path(tempfile.mkdtemp(prefix=f".{namespace}.", dir=logs))
     try:
-        metadata_fd = os.open("pickup.json", os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW,
-                              0o600, dir_fd=descriptor)
-        with os.fdopen(metadata_fd, "w", encoding="utf-8") as stream:
-            stream.write(metadata)
-            stream.flush()
-            os.fsync(stream.fileno())
-    finally:
-        os.close(descriptor)
+        if source.is_dir():
+            shutil.copytree(source, stage / "diag", symlinks=True)
+        descriptor = os.open(stage, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        try:
+            metadata_fd = os.open("pickup.json", os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW,
+                                  0o600, dir_fd=descriptor)
+            with os.fdopen(metadata_fd, "w", encoding="utf-8") as stream:
+                stream.write(metadata)
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.fsync(descriptor)
+        finally:
+            os.close(descriptor)
+        stage.rename(destination)
+    except BaseException:
+        if stage.exists():
+            shutil.rmtree(stage)
+        raise
     if escaped:
         raise ValueError(f"runner writable paths escaped job root: {', '.join(escaped)}")
     if require_checkout and not checkout_observed:
@@ -697,6 +751,9 @@ def recover(base: Path, namespace: str) -> None:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="action", required=True)
+    report = sub.add_parser("capacity-report")
+    report.add_argument("--base", required=True, type=Path)
+    report.add_argument("--profile", choices=PROFILES, required=True)
     run = sub.add_parser("agent")
     run.add_argument("--base", required=True, type=Path)
     run.add_argument("--repo", required=True, type=Path)
@@ -727,6 +784,9 @@ def main(argv: list[str] | None = None) -> int:
     runner_worker.add_argument("inode", type=int)
     args = parser.parse_args(argv)
     try:
+        if args.action == "capacity-report":
+            print(json.dumps(capacity_report(args.base, args.profile), sort_keys=True))
+            return 0
         if args.action == "_worker":
             return _worker(args.repo, args.revision, args.root,
                            (args.device, args.inode), args.command)

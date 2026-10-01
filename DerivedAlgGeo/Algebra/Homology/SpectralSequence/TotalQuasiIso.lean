@@ -23,7 +23,6 @@ five lemma and mapping-cone composition comparison used by the finite argument.
 -/
 
 open CategoryTheory Category Limits
-open HomologicalComplex (stupidTruncGEXIso stupidTruncXIso_eq_stupidTruncGEXIso)
 open CategoryTheory.Pretriangulated
 
 universe w

@@ -310,6 +310,11 @@ RETIRED_BY_CUTOVER: dict[str, tuple[str, ...]] = {
         # The generic open-square comparison moved to Modules/Pushforward/BaseChange.lean.
         "AlgebraicGeometry/Modules/Coherent/Pushforward/BaseChange.lean",
     ),
+    "2026-09-27 prime-spectrum-covers-top": (
+        # The basic-open covering bridge follows PrimeSpectrum's Mathlib owner.
+        # Its former geometry-owned leaf held no scheme-level construction.
+        "AlgebraicGeometry/Spec",
+    ),
     "MO1.02": (
         # 2026-09-13 MO1.02: charge construction moved upstream of wall loci.
         "LinearAlgebra/QuadraticForm/CentralCharge.lean",
@@ -1777,6 +1782,188 @@ def _rule_mo1_13(
     )
 
 
+def _rule_prime_spectrum_covers_top(
+    modules: Modules, closure: Closure
+) -> tuple[list[str], str]:
+    """The basic-open cover bridge extends PrimeSpectrum and has no scheme dependency."""
+    failures: list[str] = []
+    owner = f"{LIBRARY}.RingTheory.Spectrum.Prime.CoversTop"
+    entry = modules.get(owner)
+    if entry is None:
+        failures.append(f"missing {owner}: it owns the prime-spectrum cover bridge")
+    else:
+        path, imports, namespaces = entry
+        text = path.read_text(encoding="utf-8")
+        if "PrimeSpectrum" not in namespaces:
+            failures.append(f"{owner}: the extension must use PrimeSpectrum's namespace")
+        if "[CommSemiring R]" not in text:
+            failures.append(
+                f"{owner}: the covering bridge is expected to use the "
+                "weakest supported algebraic hypothesis, [CommSemiring R]"
+            )
+        if any(
+            in_tree(dep, GEOMETRY) or in_tree(dep, MATHLIB_GEOMETRY)
+            for dep in imports
+        ):
+            failures.append(f"{owner}: directly imports scheme geometry")
+        reached_geometry = sorted(
+            dep for dep in closure.of(owner) if in_tree(dep, GEOMETRY)
+        )
+        if reached_geometry:
+            failures.append(
+                f"{owner}: reaches {reached_geometry[0]} through a local import; "
+                "prime-spectrum topology must remain scheme-free"
+            )
+        if not re.search(
+            r"(?m)^lemma coversTop_basicOpen_of_span_eq_top\b", text
+        ):
+            failures.append(
+                f"{owner}: must declare coversTop_basicOpen_of_span_eq_top at the canonical owner"
+            )
+
+    declaration_sites = [
+        module
+        for module, (path, _imports, _namespaces) in modules.items()
+        if re.search(
+            r"(?m)^lemma coversTop_basicOpen_of_span_eq_top\b",
+            path.read_text(encoding="utf-8"),
+        )
+    ]
+    if declaration_sites != [owner]:
+        failures.append(
+            "coversTop_basicOpen_of_span_eq_top must be declared exactly once at "
+            f"{owner}; found {declaration_sites}"
+        )
+    return failures, (
+        "the basic-open cover bridge is declared once at PrimeSpectrum's "
+        "scheme-free owner with commutative-semiring hypotheses"
+    )
+
+
+SF8_COMPONENT_OWNER = f"{LIBRARY}.Algebra.Homology.Embedding.StupidTruncGE"
+SF8_COMPONENT_CONSUMER = (
+    f"{LIBRARY}.Algebra.Homology.SpectralSequence.FilteredTotalComplexAdjacent"
+)
+SF8_COMPONENT_GENERIC = {
+    "stupidTruncGEXIso",
+    "stupidTruncXIso_eq_stupidTruncGEXIso",
+}
+SF8_COMPONENT_BICOMPLEX = {
+    "stupidTruncGEXIso",
+    "stupidTruncXIso_eq_stupidTruncGEXIso",
+    "stupidTruncGEXIso_inv_hom_f",
+    "stupidTruncGEXIso_hom_inv_f",
+}
+
+
+def _rule_sf8_component(modules: Modules, closure: Closure) -> tuple[list[str], str]:
+    """Keep the normalized retained-component API at its embedding owner."""
+    failures: list[str] = []
+    if SF8_COMPONENT_OWNER not in modules:
+        failures.append(f"missing normalized component owner {SF8_COMPONENT_OWNER}")
+    else:
+        owner_text = modules[SF8_COMPONENT_OWNER][0].read_text(encoding="utf-8")
+        generic_text, separator, bicomplex_text = owner_text.partition(
+            "namespace HomologicalComplex₂"
+        )
+        if not separator:
+            failures.append(f"{SF8_COMPONENT_OWNER}: missing bicomplex specialization")
+        else:
+            generic_missing = SF8_COMPONENT_GENERIC - declared_names(generic_text)
+            bicomplex_missing = SF8_COMPONENT_BICOMPLEX - declared_names(bicomplex_text)
+            if generic_missing:
+                failures.append(
+                    f"{SF8_COMPONENT_OWNER}: missing generic component API "
+                    f"{sorted(generic_missing)}"
+                )
+            if bicomplex_missing:
+                failures.append(
+                    f"{SF8_COMPONENT_OWNER}: missing bicomplex specialization "
+                    f"{sorted(bicomplex_missing)}"
+                )
+    if SF8_COMPONENT_CONSUMER not in modules:
+        failures.append(f"missing adjacent consumer {SF8_COMPONENT_CONSUMER}")
+    else:
+        consumer_path, direct_imports, _ = modules[SF8_COMPONENT_CONSUMER]
+        duplicated = SF8_COMPONENT_BICOMPLEX & declared_names(
+            consumer_path.read_text(encoding="utf-8")
+        )
+        if duplicated:
+            failures.append(
+                f"{SF8_COMPONENT_CONSUMER}: still declares normalized component API "
+                f"{sorted(duplicated)}"
+            )
+        if SF8_COMPONENT_OWNER not in direct_imports:
+            failures.append(
+                f"{SF8_COMPONENT_CONSUMER}: must import {SF8_COMPONENT_OWNER} directly"
+            )
+    return failures, (
+        "the generic retained-component comparison and its bicomplex "
+        "specialization live at the Embedding owner upstream of adjacent totals"
+    )
+
+
+SF8_TAIL_OWNER = SF8_COMPONENT_OWNER
+SF8_TAIL_CONSUMER = (
+    f"{LIBRARY}.Algebra.Homology.SpectralSequence.FilteredTotalComplex"
+)
+SF8_TAIL_DECLARATIONS = {
+    "stupidTrunc_d_eq",
+    "stupidTruncGEι",
+    "stupidTruncGEι_f_mono",
+    "stupidTruncGEι_mono",
+    "stupidTruncGEMap",
+    "stupidTruncGEMap_comp_ι",
+    "stupidTruncGEMap_self",
+    "stupidTruncGEMap_comp",
+}
+
+
+def _rule_sf8_tail(modules: Modules, closure: Closure) -> tuple[list[str], str]:
+    """Keep the canonical integer-tail API upstream of filtered totals."""
+    failures: list[str] = []
+    if SF8_TAIL_OWNER not in modules:
+        failures.append(f"missing canonical tail owner {SF8_TAIL_OWNER}")
+    else:
+        owner_path = modules[SF8_TAIL_OWNER][0]
+        declared = declared_names(owner_path.read_text(encoding="utf-8"))
+        missing = SF8_TAIL_DECLARATIONS - declared
+        if missing:
+            failures.append(
+                f"{SF8_TAIL_OWNER}: missing canonical declarations {sorted(missing)}"
+            )
+        forbidden = sorted(
+            dep for dep in closure.of(SF8_TAIL_OWNER)
+            if in_tree(dep, f"{LIBRARY}.Algebra.Homology.SpectralSequence")
+            or in_tree(dep, f"{LIBRARY}.AlgebraicGeometry")
+        )
+        if forbidden:
+            failures.append(
+                f"{SF8_TAIL_OWNER}: reaches downstream {forbidden[0]}"
+            )
+    if SF8_TAIL_CONSUMER not in modules:
+        failures.append(f"missing filtered-total consumer {SF8_TAIL_CONSUMER}")
+    else:
+        consumer_path = modules[SF8_TAIL_CONSUMER][0]
+        old_names = declared_names(consumer_path.read_text(encoding="utf-8"))
+        duplicated = SF8_TAIL_DECLARATIONS & old_names
+        if duplicated:
+            failures.append(
+                f"{SF8_TAIL_CONSUMER}: still declares moved tail API "
+                f"{sorted(duplicated)}"
+            )
+        if SF8_TAIL_OWNER not in closure.of(SF8_TAIL_CONSUMER):
+            failures.append(
+                f"{SF8_TAIL_CONSUMER}: must import {SF8_TAIL_OWNER}"
+            )
+    return failures, (
+        "the canonical integer-tail maps live in Embedding/StupidTruncGE "
+        "upstream of filtered totals"
+    )
+
+
+
+
 # Every milestone that pins a claim used to append TWICE: a block at the end
 # of main() and a clause at the end of the `ok:` string. Both are the same
 # shape of edit -- insert before a fixed closing line -- so two milestones in
@@ -1805,6 +1992,9 @@ MILESTONE_RULES: dict[str, MilestoneRule] = {
     "MO1.11": _rule_mo1_11,
     "MO1.12": _rule_mo1_12,
     "MO1.13": _rule_mo1_13,
+    "PRIME-SPECTRUM-COVERS-TOP": _rule_prime_spectrum_covers_top,
+    "SF8.5-component": _rule_sf8_component,
+    "SF8.5-tail": _rule_sf8_tail,
 }
 
 

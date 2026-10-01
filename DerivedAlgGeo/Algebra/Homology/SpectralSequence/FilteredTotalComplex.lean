@@ -14,10 +14,9 @@ For a cohomological bicomplex, the stupid truncations in the first degree form t
 decreasing column filtration.  Reindexing the truncation bound by `p ↦ -p` makes this an
 increasing filtration indexed by `ℤ`.
 
-The degree-at-least truncation inclusions are supplied in
-`Embedding/StupidTruncGE.lean`, beside Mathlib's embedding API. Here those
-inclusions organize the filtration maps before totalization and spectral
-object construction.
+The canonical inclusion and maps between nested degree-at-least truncations
+live in `Embedding/StupidTruncGE.lean`. This module reindexes that filtration
+and totalizes its stages.
 -/
 
 open CategoryTheory Category Limits

@@ -16,7 +16,6 @@ that this connecting morphism is induced by the horizontal differential of the b
 universe w
 
 open CategoryTheory Category Limits
-open HomologicalComplex (stupidTruncGEXIso stupidTruncXIso_eq_stupidTruncGEXIso)
 
 namespace HomologicalComplex₂
 
@@ -209,7 +208,7 @@ private lemma adjacentProjectionIota (p q n : ℤ) (h : p + q = n) :
   dsimp [adjacentColumnTotalShortComplex,
     adjacentColumnBicomplexShortComplex, totalFunctor]
   slice_lhs 2 3 => erw [HomologicalComplex₂.ιTotal_map]
-  simp [adjacentColumnProjection, singleColumnBicomplex]
+  simp [adjacentColumnProjection, singleColumnBicomplex, stupidTruncGEXIso]
 
 /-- One horizontal step in the adjacent-column connecting construction is the horizontal
 differential of the original bicomplex.  The vertical part of the total differential vanishes

@@ -12,15 +12,18 @@ import Mathlib.CategoryTheory.Limits.Constructions.Over.Products
 # Presentations on a basic-open cover
 
 A quasi-coherent sheaf on an affine scheme has presentations on the members of some cover of the
-open-set site. This file refines that cover to basic opens. The result is the geometric input to
-the remaining gluing argument in the affine comparison theorem.
+open-set site. This file refines that cover to basic opens. Mathlib v4.32.1 supplies the global
+quasi-coherent affine comparison; this local refinement remains a separate presentation-cover
+result.
 
-## Main result
+## Main results
 
-* `AlgebraicGeometry.Scheme.Modules.exists_basicOpen_presentation_cover` produces basic opens
-  `D(gᵢ)` carrying presentations and with the `gᵢ` generating the unit ideal.
+* `AlgebraicGeometry.Scheme.Modules.exists_basicOpen_presentation_cover_of_quasicoherentData`
+  refines explicit quasi-coherent data to a cover by basic opens carrying presentations.
+* `AlgebraicGeometry.Scheme.Modules.exists_basicOpen_presentation_cover` does the same for a
+  quasi-coherent sheaf and records that the defining elements generate the unit ideal.
 
-## Implementation
+## Implementation notes
 
 The cover index consists of a member `U` of the quasi-coherent presentation cover together with
 a basic open contained in `U`. Every point lies in one of the original cover members, and the
@@ -28,9 +31,22 @@ basis theorem for principal opens supplies a contained `D(g)` through that point
 `PrimeSpectrum.iSup_basicOpen_eq_top_iff` then turns the resulting topological cover into the
 unit-ideal condition.
 
-Restriction of presentations and quasicoherent data to arbitrary over sites is supplied by
+Restriction of presentations and quasi-coherent data to arbitrary over sites is supplied by
 `Algebra.Category.ModuleCat.Sheaf.Presentation.Over`; this file begins when the open-set site
-is that of `Spec R` and the cover is refined to distinguished opens.
+is that of `Spec R` and the cover is refined to distinguished opens. Mathlib's finite-cover
+comparison proof is in `AlgebraicGeometry/Modules/Tilde.lean`; this result is not an input to
+that upstream proof.
+
+## References
+
+* [Stacks, Tag 01IA](https://stacks.math.columbia.edu/tag/01IA), for the affine quasi-coherent
+  comparison context.
+* See the [affine and projective spectrum placement map](../../../../docs/architecture/placement.md)
+  for the pinned source of the basic-open cover criterion.
+
+## Tags
+
+affine scheme, basic opens, quasi-coherent data, presentations, unit-ideal cover
 -/
 
 universe u

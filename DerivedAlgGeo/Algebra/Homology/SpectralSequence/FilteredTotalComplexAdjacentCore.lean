@@ -43,7 +43,6 @@ The proofs use Mathlib's `HomologicalComplex₂.total`,
 namespace HomologicalComplex₂
 
 open CategoryTheory Category Limits
-open HomologicalComplex (stupidTruncGEXIso stupidTruncXIso_eq_stupidTruncGEXIso)
 
 universe u v w
 
@@ -130,28 +129,6 @@ noncomputable def adjacentColumnBicomplexShortComplex (p : ℤ) :
         apply HomologicalComplex.isZero_stupidTrunc_X
         rw [ComplexShape.notMem_range_embeddingUpIntGE_iff]
         omega)
-
-/-- Cancellation is independent of the chosen proof that the index lies in the tail. -/
-@[reassoc (attr := simp)]
-lemma stupidTruncGEXIso_inv_hom_f (p i j : ℤ) (hi hi' : p ≤ i) :
-    (stupidTruncGEXIso K p i hi).inv.f j ≫
-      (stupidTruncGEXIso K p i hi').hom.f j = 𝟙 _ := by
-  have : hi = hi' := Subsingleton.elim _ _
-  subst this
-  rw [← HomologicalComplex.comp_f,
-    (stupidTruncGEXIso K p i hi).inv_hom_id,
-    HomologicalComplex.id_f]
-
-/-- The reverse cancellation also ignores the proof of tail membership. -/
-@[reassoc (attr := simp)]
-lemma stupidTruncGEXIso_hom_inv_f (p i j : ℤ) (hi hi' : p ≤ i) :
-    (stupidTruncGEXIso K p i hi).hom.f j ≫
-      (stupidTruncGEXIso K p i hi').inv.f j = 𝟙 _ := by
-  have : hi = hi' := Subsingleton.elim _ _
-  subst this
-  rw [← HomologicalComplex.comp_f,
-    (stupidTruncGEXIso K p i hi).hom_inv_id,
-    HomologicalComplex.id_f]
 
 variable {K} {L : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ)}
 

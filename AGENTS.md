@@ -371,7 +371,8 @@ reviewers are the check. Claude Code and Codex follow the same
 [run-loop skill](.claude/skills/run-loop/SKILL.md).
 
 A run stops only when:
-- it needs something only the owner has (a password, a token, `sudo`);
+- it needs something only the owner has (a password, a token, `sudo`, or disk
+  the worktree budget still refuses after it retired its finished worktrees);
 - every remaining issue needs an action the owner has withdrawn;
 - its queue is empty.
 
@@ -443,19 +444,38 @@ A fresh worktree builds all ~5850 modules from cold before it reaches the file
 you changed. It does not have to:
 
 ```bash
-bash scripts/seed_worktree_cache.sh --dry-run   # pick a donor, say what it would do
-bash scripts/seed_worktree_cache.sh             # copy it in
+bash scripts/seed_worktree_cache.sh --dry-run   # say what it would do
+bash scripts/seed_worktree_cache.sh             # seed a fresh worktree
 ```
 
-This copies `.lake/build` from the most-built worktree of this clone and links
-`.lake/packages` to the shared dependency set. Lake verifies every trace against
-the source it finds, so anything your branch changes is still rebuilt and
-nothing stale is trusted. It **copies rather than hardlinks**, because Lean
-writes an `.olean` at its final path and a hardlink would let a rebuild in one
-worktree write through into another's cache.
+This gives the worktree its own private copy of the pinned packages and all
+eleven build trees, from a checked snapshot under
+`~/.cache/derived-alg-geo-lean/package-snapshots/` (#1786). Every copy has its
+own inodes (#1435): nothing is linked, so a rebuild in one worktree cannot
+write into another's cache. Lake still verifies every trace against the source
+it finds, so anything your branch changes is rebuilt. The script only accepts
+a worktree with no `.lake`; where one already has a private receipt, it
+verifies the receipt instead, and `--force` refuses.
 
-The script only ever writes to the worktree you run it in, and refuses a target
-that already has a build cache unless you pass `--force`.
+Hardlinks are no way around the copy. Lean v4.32.1 replaces an `.olean`,
+`.ilean` or `.c` by renaming a new file into place, but Lake rewrites a
+`.trace` in place, so hardlinked trees would share their rebuild records; the
+seeder's alias scan refuses hardlinked files.
+
+Each seed costs about 10 GB, so worktrees are budgeted, and the run-loop skill
+applies all three of these:
+
+```bash
+python3 scripts/loop_worktrees.py check           # refuse below the disk floor or at the cap
+python3 scripts/loop_worktrees.py retire <path>   # remove a worktree whose work is merged or pushed
+python3 scripts/private_package_cache.py --evict-snapshots --target .   # drop snapshots main no longer pins
+```
+
+New worktrees go under `python3 scripts/loop_worktrees.py root` (default
+`~/wt/<checkout name>`, or `git config dag.worktreeRoot`), never `/tmp` or a
+Codex `worktrees` directory. The floor (60 GiB free after a 12 GiB seed) and
+the cap (20 worktrees under the root) are `git config dag.worktreeMinFreeGiB`,
+`dag.worktreeSeedGiB` and `dag.worktreeMax`.
 
 `lake env lean scratch.lean` is **not** restricted and is not meant to be. It is
 the seconds-long probe interactive proof work depends on; routing each attempt at

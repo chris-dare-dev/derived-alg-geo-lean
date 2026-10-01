@@ -4,35 +4,49 @@ Released under the MIT license.
 -/
 import Mathlib.Algebra.Homology.Embedding.CochainComplex
 import Mathlib.Algebra.Homology.Embedding.StupidTrunc
+import Mathlib.Algebra.Homology.HomologicalBicomplex
+import Mathlib.Algebra.Homology.HomologicalComplexLimits
+import Mathlib.CategoryTheory.Limits.Constructions.EventuallyConstant
 
 /-!
-# Inclusions between stupid truncations of cochain complexes
+# Degree-at-least stupid truncations and retained components
 
-Mathlib's degree-at-least stupid truncation has a canonical inclusion into the
-original complex. Nested truncations inherit compatible inclusions in any
-category with zero morphisms and a zero object.
+Mathlib's degree-at-least stupid truncation has a canonical inclusion into
+its source cochain complex. Nested truncations have compatible inclusion maps
+in any category with zero morphisms and a zero object.
 
-## Main definitions and results
+## Main definitions
 
-* `HomologicalComplex.stupidTruncGEXIso` supplies a stable integer-indexed
-  component comparison for Mathlib's natural-number-indexed tail embedding.
 * `HomologicalComplex.stupidTruncGEι` includes a tail in its source complex.
-* `HomologicalComplex.stupidTruncGEMap` includes a deeper tail in a shallower
-  one; `stupidTruncGEMap_self` and `stupidTruncGEMap_comp` give its identity
-  and composition laws.
+* `HomologicalComplex.stupidTruncGEMap` includes a deeper tail in a shallower one.
+* `HomologicalComplex.stupidTruncGETower` and
+  `HomologicalComplex.stupidTruncGETowerCocone` collect the nested tails.
+* `HomologicalComplex.stupidTruncGEXIso` chooses one component isomorphism at
+  every retained integer degree, with a bicomplex specialization at
+  `HomologicalComplex₂.stupidTruncGEXIso`.
+
+## Main results
+
+* `HomologicalComplex.stupidTruncGEMap_self` and
+  `HomologicalComplex.stupidTruncGEMap_comp` give the nested-tail laws.
+* `HomologicalComplex.isColimitStupidTruncGETowerCocone` proves that the tower
+  recovers the original complex as a colimit.
+* `HomologicalComplex.stupidTrunc_d_eq` describes the retained differential.
 * `HomologicalComplex.stupidTruncGEMap_naturality` commutes tail inclusion
   with a cochain map.
 
 ## Implementation notes
 
 On retained degrees, the maps use Mathlib's canonical truncation isomorphism;
-outside the tail they use zero morphisms. The tail inclusion is monic, so its
-composition with the original-complex inclusion characterizes nested maps.
+outside the tail they use zero morphisms. The inclusion into the source is
+monic, so it characterizes the nested maps and proves their laws.
+At each fixed degree, the lower-tail tower eventually becomes constant;
+Mathlib's degreewise colimit criterion assembles these into a complex colimit.
 
 ## References
 
-The construction extends `HomologicalComplex.stupidTrunc` and
-`HomologicalComplex.stupidTruncXIso` from Mathlib's
+This extends Mathlib's `HomologicalComplex.stupidTrunc` and
+`HomologicalComplex.stupidTruncXIso` in
 `Algebra/Homology/Embedding/StupidTrunc.lean`.
 -/
 
@@ -50,9 +64,33 @@ private lemma geIndex_spec (p i : ℤ) (h : p ≤ i) :
   rw [Int.toNat_of_nonneg (by omega)]
   omega
 
-/-- Restrict the differential to the retained degrees, then extend it back
-across the embedding. The two canonical term isomorphisms identify this
-restriction-extension differential with the original differential. -/
+/-- The component of a degree-at-least stupid truncation at a retained integer degree.
+This chooses the normalized index `(i - p).toNat` for Mathlib's
+`HomologicalComplex.stupidTruncXIso`;
+`HomologicalComplex.stupidTruncXIso_eq_stupidTruncGEXIso` identifies every
+retained-index presentation with this one. -/
+noncomputable def stupidTruncGEXIso
+    (K : HomologicalComplex C (ComplexShape.up ℤ)) (p i : ℤ) (hi : p ≤ i) :
+    (K.stupidTrunc (ComplexShape.embeddingUpIntGE p)).X i ≅ K.X i :=
+  K.stupidTruncXIso (ComplexShape.embeddingUpIntGE p) (geIndex_spec p i hi)
+
+/-- The embedding equation forces `k = (i - p).toNat`. Substituting that
+unique index identifies Mathlib's component isomorphism with the normalized
+one, independent of the caller's witness. -/
+lemma stupidTruncXIso_eq_stupidTruncGEXIso
+    (K : HomologicalComplex C (ComplexShape.up ℤ)) (p i : ℤ) (k : ℕ)
+    (h : (ComplexShape.embeddingUpIntGE p).f k = i) :
+    K.stupidTruncXIso (ComplexShape.embeddingUpIntGE p) h =
+      stupidTruncGEXIso K p i (by
+        change p + (k : ℤ) = i at h
+        omega) := by
+  have hk : k = (i - p).toNat := by
+    change p + (k : ℤ) = i at h
+    rw [show i - p = (k : ℤ) by omega]
+    simp
+  subst k
+  rfl
+
 lemma stupidTrunc_d_eq (K : HomologicalComplex C (ComplexShape.up ℤ)) (p : ℤ)
     {i j : ℤ} (hi : p ≤ i) (hj : p ≤ j) :
     (K.stupidTrunc (ComplexShape.embeddingUpIntGE p)).d i j =
@@ -69,37 +107,9 @@ lemma stupidTrunc_d_eq (K : HomologicalComplex C (ComplexShape.up ℤ)) (p : ℤ
   simp [stupidTruncXIso, restrictionXIso, Category.assoc]
   all_goals aesop
 
-/-- Mathlib indexes the degree-at-least embedding by natural numbers. The
-canonical choice `(i - p).toNat` gives one integer-indexed component comparison
-that subsequent adjacent-column formulas can reuse. -/
-noncomputable def stupidTruncGEXIso
-    (K : HomologicalComplex C (ComplexShape.up ℤ)) (p i : ℤ) (hi : p ≤ i) :
-    (K.stupidTrunc (ComplexShape.embeddingUpIntGE p)).X i ≅ K.X i :=
-  K.stupidTruncXIso (ComplexShape.embeddingUpIntGE p)
-    (i := (i - p).toNat) (by
-      change p + ((i - p).toNat : ℤ) = i
-      rw [Int.toNat_of_nonneg (by omega)]
-      omega)
-
-/-- The embedding equation forces `k = (i - p).toNat`. Substituting that
-unique index identifies Mathlib's component isomorphism with the normalized
-one, independent of the caller's witness. -/
-@[simp]
-lemma stupidTruncXIso_eq_stupidTruncGEXIso
-    (K : HomologicalComplex C (ComplexShape.up ℤ)) (p i : ℤ) (k : ℕ)
-    (h : (ComplexShape.embeddingUpIntGE p).f k = i) :
-    K.stupidTruncXIso (ComplexShape.embeddingUpIntGE p) h =
-      stupidTruncGEXIso K p i (by
-        change p + (k : ℤ) = i at h
-        omega) := by
-  have hk : k = (i - p).toNat := by
-    change p + (k : ℤ) = i at h
-    rw [show i - p = (k : ℤ) by omega]
-    simp
-  subst k
-  rfl
-
-/-- The inclusion of the stupid truncation in degrees at least `p` into the original complex. -/
+/-- On retained degrees this uses `HomologicalComplex.stupidTruncXIso`; below
+`p` its source component is zero. The resulting map is monic without an
+abelian-category assumption. -/
 noncomputable def stupidTruncGEι (K : HomologicalComplex C (ComplexShape.up ℤ)) (p : ℤ) :
     K.stupidTrunc (ComplexShape.embeddingUpIntGE p) ⟶ K where
   f i := if hi : p ≤ i then
@@ -134,9 +144,9 @@ noncomputable instance stupidTruncGEι_mono
     Mono (stupidTruncGEι K p) :=
   mono_of_mono_f _ (fun _ ↦ inferInstance)
 
-/-- Include the `q`-tail into the `p`-tail when `p ≤ q`. Its components are
-the supported-degree isomorphisms or zero; composing with the monic inclusion
-of the `p`-tail into the original complex characterizes the map. -/
+/-- Compatibility with the monic `HomologicalComplex.stupidTruncGEι` maps
+characterizes this nested-tail inclusion; cancellation gives its identity and
+composition laws. -/
 noncomputable def stupidTruncGEMap (K : HomologicalComplex C (ComplexShape.up ℤ))
     (p q : ℤ) (hpq : p ≤ q) :
     K.stupidTrunc (ComplexShape.embeddingUpIntGE q) ⟶
@@ -160,8 +170,6 @@ noncomputable def stupidTruncGEMap (K : HomologicalComplex C (ComplexShape.up �
       rw [ComplexShape.notMem_range_embeddingUpIntGE_iff]
       omega
 
-/-- Nested inclusion followed by inclusion into the original complex agrees
-with direct inclusion of the smaller tail. -/
 @[reassoc (attr := simp)]
 lemma stupidTruncGEMap_comp_ι (K : HomologicalComplex C (ComplexShape.up ℤ))
     (p q : ℤ) (hpq : p ≤ q) :
@@ -175,17 +183,12 @@ lemma stupidTruncGEMap_comp_ι (K : HomologicalComplex C (ComplexShape.up ℤ))
     rw [ComplexShape.notMem_range_embeddingUpIntGE_iff]
     omega
 
-/-- The nested inclusion at an unchanged bound is the identity, by monicity
-of the truncation's inclusion into the original complex. -/
 @[simp]
 lemma stupidTruncGEMap_self (K : HomologicalComplex C (ComplexShape.up ℤ)) (p : ℤ) :
     stupidTruncGEMap K p p le_rfl = 𝟙 _ := by
   rw [← cancel_mono (stupidTruncGEι K p)]
   simp
 
-/-- Postcompose both candidate maps with the monic inclusion of the `p`-tail
-into the original complex. Their composites coincide by the nested-tail
-inclusion law, so the candidate maps are equal. -/
 @[reassoc (attr := simp)]
 lemma stupidTruncGEMap_comp (K : HomologicalComplex C (ComplexShape.up ℤ))
     (p q r : ℤ) (hpq : p ≤ q) (hqr : q ≤ r) :
@@ -217,7 +220,7 @@ lemma stupidTruncGEMap_naturality
     let eL₁ := stupidTruncGEXIso L p i (hpq.trans hi)
     simp only [stupidTruncXIso_eq_stupidTruncGEXIso]
     rw [← cancel_mono eL₁.hom]
-    simp only [Category.assoc, eL₁.inv_hom_id, Category.comp_id]
+    simp only [Category.assoc]
     rw [← Category.assoc, ← Category.assoc]
     dsimp [eK₀, eK₁, eL₀, eL₁, stupidTruncGEXIso]
     rw [HomologicalComplex.stupidTruncMap_stupidTruncXIso_hom]
@@ -230,3 +233,123 @@ lemma stupidTruncGEMap_naturality
     omega
 
 end HomologicalComplex
+
+
+namespace HomologicalComplex
+
+universe u v
+
+variable {C : Type u} [Category.{v} C] [HasZeroMorphisms C] [HasZeroObject C]
+
+/-- Stage `n` has lower cutoff `c - n`. If the components of `K` vanish
+above some degree, each stage has finite degree support. The colimit
+construction needs no such bound. -/
+noncomputable def stupidTruncGETower (K : CochainComplex C ℤ) (c : ℤ) :
+    ℕ ⥤ CochainComplex C ℤ where
+  obj n := K.stupidTrunc (ComplexShape.embeddingUpIntGE (c - n))
+  map {n m} f := HomologicalComplex.stupidTruncGEMap K (c - m) (c - n) (by
+    have := leOfHom f
+    omega)
+  map_id n := by simp
+  map_comp {n m l} f g := by
+    symm
+    apply HomologicalComplex.stupidTruncGEMap_comp
+
+/-- The stage inclusions commute with the transition maps, and the vertex
+is definitionally `K`; this lets the degreewise colimit criterion apply directly. -/
+noncomputable def stupidTruncGETowerCocone (K : CochainComplex C ℤ) (c : ℤ) :
+    Cocone (stupidTruncGETower K c) where
+  pt := K
+  ι := {
+    app n := HomologicalComplex.stupidTruncGEι K (c - n)
+    naturality := by
+      intro n m f
+      change HomologicalComplex.stupidTruncGEMap K (c - m) (c - n)
+        (by have := leOfHom f; omega) ≫
+        HomologicalComplex.stupidTruncGEι K (c - m) =
+        HomologicalComplex.stupidTruncGEι K (c - n) ≫ 𝟙 K
+      simp
+  }
+
+private lemma stupidTruncGEι_component_isIso (K : CochainComplex C ℤ) (p i : ℤ) (hi : p ≤ i) :
+    IsIso ((HomologicalComplex.stupidTruncGEι K p).f i) := by
+  dsimp [HomologicalComplex.stupidTruncGEι]
+  rw [dif_pos hi]
+  infer_instance
+
+private noncomputable def isColimitStupidTruncGETowerEval (K : CochainComplex C ℤ) (c i : ℤ) :
+    IsColimit ((HomologicalComplex.eval C (ComplexShape.up ℤ) i).mapCocone
+      (stupidTruncGETowerCocone K c)) := by
+  let n : ℕ := (c - i).toNat
+  have hi : c - (n : ℤ) ≤ i := by dsimp [n]; omega
+  let F := stupidTruncGETower K c ⋙ HomologicalComplex.eval C (ComplexShape.up ℤ) i
+  have hF : F.IsEventuallyConstantFrom n := by
+    intro m f
+    have hnm : (n : ℤ) ≤ (m : ℤ) := by exact_mod_cast leOfHom f
+    haveI : IsIso ((HomologicalComplex.stupidTruncGEι K (c - n)).f i) :=
+      stupidTruncGEι_component_isIso K (c - n) i hi
+    haveI : IsIso ((HomologicalComplex.stupidTruncGEι K (c - m)).f i) :=
+      stupidTruncGEι_component_isIso K (c - m) i (by omega)
+    have heq := congrArg (fun z => z.f i)
+      (HomologicalComplex.stupidTruncGEMap_comp_ι K (c - m) (c - n) (by omega))
+    change IsIso
+      ((HomologicalComplex.stupidTruncGEMap K (c - m) (c - n) (by omega)).f i)
+    exact IsIso.of_isIso_fac_right heq
+  let s := (HomologicalComplex.eval C (ComplexShape.up ℤ) i).mapCocone
+    (stupidTruncGETowerCocone K c)
+  haveI : IsIso (s.ι.app n) := stupidTruncGEι_component_isIso K (c - n) i hi
+  exact hF.isColimitOfIsIso s
+
+/-- The lower stupid truncations recover every complex: at each fixed degree,
+the inclusions are eventually isomorphisms. No upper bound or ambient colimits
+are required. -/
+noncomputable def isColimitStupidTruncGETowerCocone (K : CochainComplex C ℤ) (c : ℤ) :
+    IsColimit (stupidTruncGETowerCocone K c) :=
+  HomologicalComplex.isColimitOfEval _ _ (isColimitStupidTruncGETowerEval K c)
+
+end HomologicalComplex
+
+namespace HomologicalComplex₂
+
+universe w
+
+variable {C : Type w} [Category* C] [HasZeroMorphisms C] [HasZeroObject C]
+  (K : HomologicalComplex₂ C (ComplexShape.up ℤ) (ComplexShape.up ℤ))
+
+/-- The bicomplex specialization of the normalized retained component
+`HomologicalComplex.stupidTruncGEXIso`. It is definitionally the same iso as
+Mathlib's `HomologicalComplex.stupidTruncXIso` at index `(i - p).toNat`. -/
+noncomputable def stupidTruncGEXIso (p i : ℤ) (hi : p ≤ i) :
+    (K.stupidTrunc (ComplexShape.embeddingUpIntGE p)).X i ≅ K.X i :=
+  HomologicalComplex.stupidTruncGEXIso K p i hi
+
+@[simp]
+lemma stupidTruncXIso_eq_stupidTruncGEXIso (p i : ℤ) (k : ℕ)
+    (h : (ComplexShape.embeddingUpIntGE p).f k = i) :
+    K.stupidTruncXIso (ComplexShape.embeddingUpIntGE p) h =
+      stupidTruncGEXIso K p i (by
+        change p + (k : ℤ) = i at h
+        omega) := by
+  exact HomologicalComplex.stupidTruncXIso_eq_stupidTruncGEXIso K p i k h
+
+@[reassoc (attr := simp)]
+lemma stupidTruncGEXIso_inv_hom_f (p i j : ℤ) (hi hi' : p ≤ i) :
+    (stupidTruncGEXIso K p i hi).inv.f j ≫
+      (stupidTruncGEXIso K p i hi').hom.f j = 𝟙 _ := by
+  have : hi = hi' := Subsingleton.elim _ _
+  subst this
+  rw [← HomologicalComplex.comp_f,
+    (stupidTruncGEXIso K p i hi).inv_hom_id,
+    HomologicalComplex.id_f]
+
+@[reassoc (attr := simp)]
+lemma stupidTruncGEXIso_hom_inv_f (p i j : ℤ) (hi hi' : p ≤ i) :
+    (stupidTruncGEXIso K p i hi).hom.f j ≫
+      (stupidTruncGEXIso K p i hi').inv.f j = 𝟙 _ := by
+  have : hi = hi' := Subsingleton.elim _ _
+  subst this
+  rw [← HomologicalComplex.comp_f,
+    (stupidTruncGEXIso K p i hi).hom_inv_id,
+    HomologicalComplex.id_f]
+
+end HomologicalComplex₂
