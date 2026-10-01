@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import Mathlib.AlgebraicGeometry.Sites.Etale
 import Mathlib.AlgebraicGeometry.Sites.Fpqc
+import DerivedAlgGeo.AlgebraicGeometry.Sites.QuasiCompact
 
 /-!
 # Comparing the big Zariski, étale, fppf and fpqc sites
@@ -26,6 +27,11 @@ representables, transported along topology inequalities.
 
 These are direct extensions of Mathlib's site API, stated about Mathlib's own
 topologies.  Nothing here is about stacks, moduli, or algebraicity.
+
+The fppf and étale precoverages also agree with their quasi-compact property precoverages:
+flat morphisms locally of finite presentation, and étale morphisms, are open maps. The resulting
+topology equalities extend Mathlib's `AlgebraicGeometry/Sites/Fpqc.lean` and
+`AlgebraicGeometry/Sites/Etale.lean`, their respective upstream owners.
 -/
 
 namespace AlgebraicGeometry.Scheme
@@ -33,6 +39,26 @@ namespace AlgebraicGeometry.Scheme
 open CategoryTheory MorphismProperty
 
 universe u
+
+/-- The fppf precoverage already satisfies the quasi-compact covering condition. -/
+lemma fppfPrecoverage_eq_propQCPrecoverage :
+    fppfPrecoverage.{u} = propQCPrecoverage (@Flat ⊓ @LocallyOfFinitePresentation) :=
+  precoverage_eq_propQCPrecoverage_of_isOpenMap fun _ _ f ⟨_, _⟩ ↦ f.isOpenMap
+
+/-- The fppf topology is the quasi-compact topology for flat, locally finitely presented maps. -/
+lemma fppfTopology_eq_propQCTopology :
+    fppfTopology.{u} = propQCTopology (@Flat ⊓ @LocallyOfFinitePresentation) :=
+  congrArg Precoverage.toGrothendieck fppfPrecoverage_eq_propQCPrecoverage
+
+/-- The étale precoverage already satisfies the quasi-compact covering condition. -/
+lemma etalePrecoverage_eq_propQCPrecoverage :
+    etalePrecoverage.{u} = propQCPrecoverage @Etale :=
+  precoverage_eq_propQCPrecoverage_of_isOpenMap fun _ _ f _ ↦ f.isOpenMap
+
+/-- The étale topology is the quasi-compact topology for étale maps. -/
+lemma etaleTopology_eq_propQCTopology :
+    etaleTopology.{u} = propQCTopology @Etale :=
+  congrArg Precoverage.toGrothendieck etalePrecoverage_eq_propQCPrecoverage
 
 /-- Every étale covering family is an fppf covering family: an étale morphism
 is smooth, hence flat and locally of finite presentation. -/

@@ -463,7 +463,7 @@ items:
     kind: task
     parent: stacks-and-moduli-stk2
     title: "STK2.1: One representable stack for every subcanonical topology, collapsing the scheme-level copies"
-    status: planned
+    status: done
     priority: must
     size: S
     summary: "Every subcanonical Grothendieck topology J on a category C gives one stack in groupoids StackInGroupoids.representable J X for each object X, and one stack morphism StackInGroupoids.representableMap J f for each arrow f : X ⟶ Y. Both are the discrete stack of yoneda.obj X and the map induced by yoneda.map f."

@@ -2,18 +2,21 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import Mathlib.CategoryTheory.Bicategory.Functor.LocallyDiscrete
 import Mathlib.CategoryTheory.Bicategory.FunctorBicategory.Pseudo
 import Mathlib.CategoryTheory.Groupoid.Discrete
 import Mathlib.CategoryTheory.Sites.EffectiveEpimorphic
+import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.LocallyDiscrete
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Morphism
 
 /-!
 # Discrete stacks from sheaves of types
 
 An ordinary sheaf of types on an arbitrary site determines a stack in
-discrete groupoids.  This construction is purely site-theoretic; algebraic
-geometry consumes it for representable big-Zariski stacks.
+discrete groupoids, and natural transformations induce stack morphisms through
+`discretePseudofunctorMap` and `StackInGroupoids.discreteMap`. This construction
+is purely site-theoretic; algebraic geometry consumes it for representable
+stacks.
 -/
 
 namespace CategoryTheory
@@ -29,6 +32,14 @@ def discretePseudofunctor {C : Type u} [Category.{v} C]
     (P : Functor Cᵒᵖ (Type w)) :
     Pseudofunctor (LocallyDiscrete Cᵒᵖ) Cat.{w, w} :=
   (P ⋙ typeToCat).toPseudofunctor'
+
+/-- A natural transformation of presheaves induces a strong transformation
+between their discrete pseudofunctors. Its component functors apply the
+components of the original natural transformation directly. -/
+def discretePseudofunctorMap {C : Type u} [Category.{v} C]
+    {P Q : Cᵒᵖ ⥤ Type w} (φ : P ⟶ Q) :
+    Pseudofunctor.StrongTrans (discretePseudofunctor P) (discretePseudofunctor Q) :=
+  (Functor.whiskerRight φ typeToCat).toStrongTrans
 
 instance discretePseudofunctor_obj_isDiscrete
     {C : Type u} [Category.{v} C] (P : Functor Cᵒᵖ (Type w))
@@ -135,6 +146,38 @@ def stackInGroupoidsOfSheaf
   presheaf := discretePseudofunctor P
   fiberIsGroupoid _ := inferInstance
   isStack := discretePseudofunctor_isStack hP
+
+/-- Restricting `stackInGroupoidsOfSheaf` to a coarser topology agrees with
+constructing its discrete stack from the restricted sheaf condition. This
+requires only a sheaf proof for the finer topology, with no representability
+or subcanonicity assumption. -/
+theorem stackInGroupoidsOfSheaf_ofLE
+    {C : Type u} [Category.{v} C] {J₁ J₂ : GrothendieckTopology C}
+    (h : J₁ ≤ J₂) (P : Cᵒᵖ ⥤ Type w) (hP : Presieve.IsSheaf J₂ P) :
+    (stackInGroupoidsOfSheaf J₂ P hP).ofLE h =
+      stackInGroupoidsOfSheaf J₁ P (Presieve.isSheaf_of_le _ h hP) :=
+  rfl
+
+/-- A natural transformation between sheaves induces a morphism between the
+stacks supplied by `stackInGroupoidsOfSheaf`. This is
+`discretePseudofunctorMap` on their underlying pseudofunctors. -/
+def StackInGroupoids.discreteMap
+    {C : Type u} [Category.{v} C] {J : GrothendieckTopology C}
+    {P Q : Cᵒᵖ ⥤ Type w} (hP : Presieve.IsSheaf J P)
+    (hQ : Presieve.IsSheaf J Q) (φ : P ⟶ Q) :
+    StackMorphism (stackInGroupoidsOfSheaf J P hP) (stackInGroupoidsOfSheaf J Q hQ) :=
+  discretePseudofunctorMap φ
+
+/-- The component functor of `StackInGroupoids.discreteMap` applies the
+underlying natural transformation to each object, definitionally. -/
+@[simp]
+theorem StackInGroupoids.discreteMap_app_obj
+    {C : Type u} [Category.{v} C] {J : GrothendieckTopology C}
+    {P Q : Cᵒᵖ ⥤ Type w} (hP : Presieve.IsSheaf J P)
+    (hQ : Presieve.IsSheaf J Q) (φ : P ⟶ Q) (T : C) (x : P.obj (op T)) :
+    ((StackInGroupoids.discreteMap hP hQ φ).app T).obj (Discrete.mk x) =
+      Discrete.mk (φ.app (op T) x) :=
+  rfl
 
 end
 

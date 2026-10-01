@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Discrete
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Morphism
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Representable
 
 /-!
 # Descent and stacks

@@ -66,42 +66,8 @@ universe u
 representable big-Zariski stacks by postcomposition on every test scheme. -/
 def representableZariskiStackMap {X Y : Scheme.{u}} (f : X ⟶ Y) :
     StackMorphism (representableZariskiStack X)
-      (representableZariskiStack Y) where
-  app T := Discrete.functor
-    (Discrete.mk ∘ fun g : T.as.unop ⟶ X ↦ g ≫ f) |>.toCatHom
-  naturality {S T} g := by
-    exact Cat.Hom.isoMk (NatIso.ofComponents
-      (fun h : Discrete (S.as.unop ⟶ X) ↦ Discrete.eqToIso (by
-        change (g.as.unop ≫ h.as) ≫ f =
-          g.as.unop ≫ (h.as ≫ f)
-        simp))
-      (by
-        intro A B h
-        letI : IsDiscrete
-            ((representableZariskiStack Y).presheaf.obj T) := by
-          exact discretePseudofunctor_obj_isDiscrete (yoneda.obj Y) T
-        apply Subsingleton.elim))
-  naturality_naturality {S T} {g h} η := by
-    letI : IsDiscrete
-        ((representableZariskiStack Y).presheaf.obj T) :=
-      discretePseudofunctor_obj_isDiscrete (yoneda.obj Y) T
-    apply Cat.Hom₂.ext
-    ext
-    apply Subsingleton.elim
-  naturality_id S := by
-    letI : IsDiscrete
-        ((representableZariskiStack Y).presheaf.obj S) :=
-      discretePseudofunctor_obj_isDiscrete (yoneda.obj Y) S
-    apply Cat.Hom₂.ext
-    ext
-    apply Subsingleton.elim
-  naturality_comp {S T U} _ _ := by
-    letI : IsDiscrete
-        ((representableZariskiStack Y).presheaf.obj U) :=
-      discretePseudofunctor_obj_isDiscrete (yoneda.obj Y) U
-    apply Cat.Hom₂.ext
-    ext
-    apply Subsingleton.elim
+      (representableZariskiStack Y) :=
+  StackInGroupoids.representableMap Scheme.zariskiTopology f
 
 @[simp]
 theorem representableZariskiStackMap_obj {X Y T : Scheme.{u}}
