@@ -8,6 +8,7 @@ import Mathlib.Algebra.Category.ModuleCat.Presheaf.ColimitFunctor
 import Mathlib.Algebra.Module.TransferInstance
 import Mathlib.AlgebraicGeometry.Modules.Sheaf
 import Mathlib.CategoryTheory.Functor.ReflectsIso.Limits
+import Mathlib.CategoryTheory.Limits.Preserves.Finite
 import Mathlib.Topology.Sheaves.Abelian
 import Mathlib.Topology.Sheaves.Sheafify
 import Mathlib.Topology.Sheaves.Skyscraper
@@ -26,15 +27,40 @@ module-valued skyscraper adjunction, then transported through module
 sheafification.  It assumes no flatness and does not assert that pullback along
 an arbitrary scheme morphism is exact.
 
+## Main definitions
+
+`AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor` bundles a sheaf stalk over the local ring.
+
 ## Main results
 
-* `moduleStalkFunctor` bundles a sheaf stalk over the local ring.
-* `moduleStalkFunctor_preservesColimitsOfShape` preserves indexed coproducts.
-* `preservesFiniteLimits_of_stalkwise` reduces finite-limit preservation to
+* `AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor_preservesSmallColimits`
+  preserves arbitrary small colimits; the existing coproduct theorem is its
+  discrete-diagram specialization.
+* `AlgebraicGeometry.Scheme.Modules.preservesFiniteLimits_of_stalkwise`
+  reduces finite-limit preservation to
   module stalks.
-* `presheafModulePullbackStalkIso` compares presheaf pullback with extension of
+* `AlgebraicGeometry.Scheme.Modules.presheafModulePullbackStalkIso`
+  compares presheaf pullback with extension of
   scalars on stalks.
-* `pullbackStalkIso` gives the corresponding comparison for module sheaves.
+* `AlgebraicGeometry.Scheme.Modules.pullbackStalkIso`
+  gives the corresponding comparison for module sheaves.
+* `AlgebraicGeometry.Scheme.Modules.exists_sheaf_with_stalk`
+  realizes any local-ring module as a sheaf stalk.
+
+## Implementation notes
+
+The realization sheaf is the sheafification of the existing module skyscraper
+presheaf. The proof uses the module-stalk adjunction and its comparison with
+the underlying additive stalk.
+
+## References
+
+The stalk and skyscraper constructions extend Mathlib's module-sheaf and
+topological-sheaf APIs at the pinned revision.
+
+## Tags
+
+module stalk, scheme module sheaf, pullback, skyscraper
 -/
 
 namespace AlgebraicGeometry.Scheme.Modules
@@ -44,7 +70,7 @@ open AlgebraicGeometry
 
 noncomputable section
 
-universe u
+universe u v
 
 /-- The cocone of underlying rings whose point is the local ring of `X` at
 `x`.  It is the image of the standard commutative-ring stalk cocone. -/
@@ -143,7 +169,8 @@ def presheafModuleStalkSheafificationIso
         ((_root_.PresheafOfModules.sheafificationAdjunction
           (R := X.ringCatSheaf) (𝟙 X.ringCatSheaf.obj)).unit.naturality f))
 
-/-- Forgetting the local-ring action on `moduleStalkFunctor` recovers the
+/-- Forgetting the local-ring action on
+`AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor` recovers the
 usual stalk of the underlying sheaf of abelian groups. -/
 def moduleStalkForgetIso (X : Scheme.{u}) (x : X) :
     moduleStalkFunctor X x ⋙
@@ -153,45 +180,51 @@ def moduleStalkForgetIso (X : Scheme.{u}) (x : X) :
           TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} x) :=
   CategoryTheory.Functor.associator _ _ _
 
-/-- Indexed sheaf coproducts are preserved by the underlying additive sheaf stalk;
-the forgetful module functor reflects and preserves these colimits. -/
-theorem moduleStalkFunctor_preservesColimitsOfShape
-    (X : Scheme.{u}) (x : X) (I : Type u) :
-    PreservesColimitsOfShape (Discrete I) (moduleStalkFunctor X x) := by
+/-- Arbitrary small colimits of module sheaves are preserved by the underlying
+additive sheaf stalk. The forgetful module functor reflects and preserves the
+corresponding module colimits. -/
+theorem moduleStalkFunctor_preservesSmallColimits
+    (X : Scheme.{u}) (x : X) (J : Type u) [Category.{u} J] :
+    PreservesColimitsOfShape J (moduleStalkFunctor X x) := by
   let forgetModule := forget₂ (ModuleCat.{u} (X.presheaf.stalk x)) AddCommGrpCat.{u}
+  let α := 𝟙 X.ringCatSheaf.obj
+  letI : PreservesColimitsOfShape J
+      (PresheafOfModules.sheafification α ⋙ SheafOfModules.toSheaf X.ringCatSheaf) := by
+    exact inferInstanceAs (PreservesColimitsOfShape J
+      (PresheafOfModules.toPresheaf X.ringCatSheaf.obj ⋙
+        presheafToSheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}))
+  have hF : PreservesColimitsOfShape J
+      (SheafOfModules.toSheaf X.ringCatSheaf) :=
+    (PresheafOfModules.sheafificationAdjunction α).preservesColimitsOfShape_of_comp_left
+      (K := J) (SheafOfModules.toSheaf X.ringCatSheaf)
   let G := TopCat.Sheaf.forget AddCommGrpCat.{u} X ⋙
     TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} x
-  have hF : PreservesColimitsOfShape (Discrete I)
-      (SheafOfModules.toSheaf X.ringCatSheaf) := by
-    let α := 𝟙 X.ringCatSheaf.obj
-    haveI : PreservesColimitsOfShape (Discrete I)
-        (PresheafOfModules.sheafification α ⋙ SheafOfModules.toSheaf X.ringCatSheaf) := by
-      exact inferInstanceAs (PreservesColimitsOfShape (Discrete I)
-        (PresheafOfModules.toPresheaf X.ringCatSheaf.obj ⋙
-          presheafToSheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}))
-    exact (PresheafOfModules.sheafificationAdjunction α).preservesColimitsOfShape_of_comp_left
-      (K := Discrete I) (SheafOfModules.toSheaf X.ringCatSheaf)
-  have hG : PreservesColimitsOfShape (Discrete I)
-      (TopCat.Sheaf.forget AddCommGrpCat.{u} X ⋙
-        TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} x) := inferInstance
-  have hFG : PreservesColimitsOfShape (Discrete I)
+  have hG : PreservesColimitsOfShape J G := inferInstance
+  have hFG : PreservesColimitsOfShape J
       (SheafOfModules.toSheaf X.ringCatSheaf ⋙ G) := by
     exact @comp_preservesColimitsOfShape _ _ _ _ _ _ _ _
       (SheafOfModules.toSheaf X.ringCatSheaf) G hF hG
-  have hFGi : PreservesColimitsOfShape (Discrete I)
-      (SheafOfModules.toSheaf X.ringCatSheaf ⋙
-        (TopCat.Sheaf.forget AddCommGrpCat.{u} X ⋙
-          TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} x)) := by
-    change PreservesColimitsOfShape (Discrete I)
-      (SheafOfModules.toSheaf X.ringCatSheaf ⋙ G)
-    exact hFG
-  have hComposite : PreservesColimitsOfShape (Discrete I)
-      (moduleStalkFunctor X x ⋙ forgetModule) := by
-    exact (preservesColimitsOfShape_iff_of_natIso
-      (moduleStalkForgetIso X x)).mp hFGi
-  letI := hComposite
+  letI : PreservesColimitsOfShape J
+      (moduleStalkFunctor X x ⋙ forgetModule) :=
+    (preservesColimitsOfShape_iff_of_natIso (moduleStalkForgetIso X x)).mpr hFG
   exact preservesColimitsOfShape_of_reflects_of_preserves
     (moduleStalkFunctor X x) forgetModule
+
+/-- The established indexed-coproduct API is the discrete-diagram case of
+general small-colimit preservation. -/
+theorem moduleStalkFunctor_preservesColimitsOfShape
+    (X : Scheme.{u}) (x : X) (I : Type u) :
+    PreservesColimitsOfShape (Discrete I) (moduleStalkFunctor X x) :=
+  moduleStalkFunctor_preservesSmallColimits X x (Discrete I)
+
+/-- Finite colimits follow from the general small-colimit theorem after
+transporting a finite indexing category to the scheme's universe. -/
+theorem moduleStalkFunctor_preservesFiniteColimits
+    (X : Scheme.{u}) (x : X) :
+    PreservesFiniteColimits (moduleStalkFunctor X x) := by
+  apply preservesFiniteColimits_of_preservesFiniteColimitsOfSize
+  intro J _ _
+  exact moduleStalkFunctor_preservesSmallColimits X x J
 
 /-- Taking the stalk of a sheaf of modules preserves finite limits. -/
 theorem moduleStalkFunctor_preservesFiniteLimits
@@ -1178,6 +1211,56 @@ def pullbackStalkIso {X Y : Scheme.{u}} (f : X ⟶ Y) (x : X) :
     CategoryTheory.Functor.isoWhiskerLeft (toPresheafOfModules Y)
       (presheafModulePullbackStalkIso f x) ≪≫
     (CategoryTheory.Functor.associator _ _ _).symm
+
+private def skyscraperStalkMap (X : Scheme.{u}) (x : X)
+    (N : ModuleCat.{u} (X.presheaf.stalk x)) :
+    (presheafModuleStalkFunctor X x).obj (moduleSkyscraperPresheaf X x N) ⟶ N := by
+  letI : InitiallySmall.{u} (OpenNhds x) := initiallySmall_of_essentiallySmall _
+  exact ((_root_.PresheafOfModules.colimitAdjunction
+    (moduleStalkRingIsColimit X x)).homEquiv _ _).symm
+      (neighborhoodModuleSkyscraperIso X x N).hom
+
+set_option backward.isDefEq.respectTransparency false in
+private theorem skyscraperStalkMap_isIso (X : Scheme.{u}) (x : X)
+    (N : ModuleCat.{u} (X.presheaf.stalk x)) :
+    IsIso (skyscraperStalkMap X x N) := by
+  classical
+  letI : InitiallySmall.{u} (OpenNhds x) := initiallySmall_of_essentiallySmall _
+  let e := skyscraperPresheafStalkOfSpecializes x
+    ((forget₂ (ModuleCat (X.presheaf.stalk x)) AddCommGrpCat).obj N)
+    (specializes_refl x)
+  apply (isIso_iff_of_reflects_iso _
+    (forget₂ (ModuleCat (X.presheaf.stalk x)) AddCommGrpCat)).mp
+  have h : (forget₂ (ModuleCat (X.presheaf.stalk x)) AddCommGrpCat).map
+      (skyscraperStalkMap X x N) = e.hom := by
+    ext m
+    obtain ⟨U, hxU, m, rfl⟩ :=
+      TopCat.Presheaf.exists_germ_eq (moduleSkyscraperPresheaf X x N).presheaf m
+    change skyscraperStalkMap X x N
+        (TopCat.Presheaf.germ (moduleSkyscraperPresheaf X x N).presheaf U x hxU m) =
+      e.hom (TopCat.Presheaf.germ (moduleSkyscraperPresheaf X x N).presheaf U x hxU m)
+    exact (_root_.PresheafOfModules.colimitAdjunction_homEquiv_symm_apply
+      (moduleStalkRingIsColimit X x) (neighborhoodModuleSkyscraperIso X x N).hom
+      (X := op ⟨U, hxU⟩) m).trans
+      (CategoryTheory.congr_fun
+      (germ_skyscraperPresheafStalkOfSpecializes_hom x
+        ((forget₂ (ModuleCat (X.presheaf.stalk x)) AddCommGrpCat).obj N)
+        (specializes_refl x) U hxU) m).symm
+  rw [h]
+  infer_instance
+
+/-- Every module over the local ring at a point is the stalk of some sheaf of
+modules. The sheaf is obtained by sheafifying the existing module skyscraper
+presheaf. -/
+theorem exists_sheaf_with_stalk (X : Scheme.{u}) (x : X)
+    (N : ModuleCat.{u} (X.presheaf.stalk x)) :
+    ∃ M : X.Modules, Nonempty ((moduleStalkFunctor X x).obj M ≅ N) := by
+  let P := moduleSkyscraperPresheaf X x N
+  let M := (_root_.PresheafOfModules.sheafification
+    (𝟙 X.ringCatSheaf.obj)).obj P
+  letI := skyscraperStalkMap_isIso X x N
+  exact ⟨M, ⟨((presheafModuleStalkSheafificationIso X x).app P).symm ≪≫
+    asIso (skyscraperStalkMap X x N)⟩⟩
 
 end
 

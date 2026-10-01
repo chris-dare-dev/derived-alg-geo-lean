@@ -11,5 +11,6 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.ScalarExtendedSections
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.ScalarExtendedOpenSections
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.ScalarExtendedTwoOpen
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Stalk
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.StalkQuasiIso
 
 /-! # Pullback of scheme-module sheaves -/
