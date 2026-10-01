@@ -74,7 +74,7 @@ theorem tensorObj_hom_ext {A B C : X.Modules} (φ ψ : tensorObj A B ⟶ C)
 
 noncomputable section
 
-local instance : MonoidalCategory X.PresheafOfModules :=
+local instance sectionsPresheafMonoidalCategory : MonoidalCategory X.PresheafOfModules :=
   PresheafOfModules.monoidalCategory (R := X.presheaf)
 
 /-- **The pure tensor is additive in its second factor** -- the companion of
