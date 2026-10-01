@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.Unbounded
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.FiniteKFlat
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.BoundedAboveKFlat
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.LeftDerivedTensor
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.BoundedCoherent
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.BoundedMonoidal
@@ -30,15 +31,18 @@ interfaces and their existing constructions.
 | Derived-tensor tier | Module | What it supplies |
 | --- | --- | --- |
 | Unbounded | `Tensor/Unbounded.lean` | the K-flat tensor bifunctor on complexes of module sheaves, **constructed** from a supplied resolution |
-| Bounded coherent | `Tensor/BoundedCoherent.lean` | `HasDerivedTensor`, a **supplied capability** on `Dᵇ(Coh Z)` with two-slot exactness |
-| Bounded coherent, monoidal | `Tensor/Coherent.lean` | `HasCoherentDerivedTensor`, the same capability with full monoidal coherence, mapping one way into the tier above |
+| Bounded coherent | `Tensor/BoundedCoherent.lean` | `AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor`, a **supplied capability** on `Dᵇ(Coh Z)` with two-slot exactness |
+| Bounded coherent, monoidal | `Tensor/Coherent.lean` | `AlgebraicGeometry.DerivedCategory.FourierMukai.HasCoherentDerivedTensor`, the same capability with full monoidal coherence, mapping one way into the tier above |
 
 `Tensor/Relative.lean` is the compatibility layer for the bounded coherent tiers, not a fourth
-derived-tensor construction: it supplies `HasMonoidalDerivedPullback` for derived pullback along
-a morphism.
+derived-tensor construction: it supplies
+`AlgebraicGeometry.DerivedCategory.FourierMukai.HasMonoidalDerivedPullback`
+for derived pullback along a morphism.
 
 `Tensor/FiniteKFlat.lean` proves that a finite supported complex with flat
 scheme-module terms is K-flat for the existing total tensor.
+`Tensor/BoundedAboveKFlat.lean` extends this to strictly bounded-above
+flat-term complexes through the lower stupid-truncation colimit.
 
 ## Implementation notes
 
@@ -53,8 +57,9 @@ Fourier--Mukai consumes all of this and owns none of it; see
 `Tensor/BoundedCoherent.lean`, `Tensor/Coherent.lean`, and `Tensor/Relative.lean`.
 `Tensor/Unbounded.lean`, `Tensor/LeftDerivedTensor.lean`, and
 `Tensor/BoundedMonoidal.lean` use `AlgebraicGeometry.DerivedCategory`.
-`Tensor/FiniteKFlat.lean` uses `AlgebraicGeometry.Scheme.Modules`, the namespace of
-the total tensor it specializes. Paths follow ownership without imposing one
+`Tensor/FiniteKFlat.lean` and `Tensor/BoundedAboveKFlat.lean` use
+`AlgebraicGeometry.Scheme.Modules`, the namespace of the total tensor they
+specialize. Paths follow ownership without imposing one
 namespace on every declaration in the subtree.
 
 ## References
