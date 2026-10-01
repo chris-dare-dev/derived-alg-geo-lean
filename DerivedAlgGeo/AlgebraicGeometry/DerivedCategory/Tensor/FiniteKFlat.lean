@@ -27,7 +27,7 @@ This module introduces no new definitions. It specializes the existing
   sends a quasi-isomorphism through the second slot of total tensor.
 * `AlgebraicGeometry.Scheme.Modules.quasiIso_totalTensor_map_right_of_finiteFlatTerms`
   sends a quasi-isomorphism through the first slot.
-* `AlgebraicGeometry.Scheme.Modules.totalTensor_isKFlat_of_finiteFlatTerms`
+* `AlgebraicGeometry.Scheme.Modules.isKFlat_totalTensor_of_finiteFlatTerms`
   packages both directions into the generic K-flat predicate.
 
 ## Implementation notes
@@ -62,8 +62,9 @@ noncomputable section
 
 attribute [local instance] HasDerivedCategory.standard
 
-/-- Finite term support and flatness of each supported sheaf make total
-tensor in the second slot preserve quasi-isomorphisms. -/
+/-- Flatness gives quasi-isomorphisms columnwise, and finite support lets the
+finite-strip criterion pass them to the total. No flatness witness is needed
+outside the support interval. -/
 theorem quasiIso_totalTensor_map_left_of_finiteFlatTerms
     (X : Scheme.{u}) (K : CochainComplex X.Modules ℤ) (a b : ℤ)
     (hLower : ∀ p, p < a → IsZero (K.X p))
@@ -80,8 +81,9 @@ theorem quasiIso_totalTensor_map_left_of_finiteFlatTerms
   exact HomologicalComplex.quasiIso_mapBifunctorMap_id_left_of_finite_support_of_column_quasiIso
     (curriedTensor X.Modules) K f a b hLower hUpper hcol
 
-/-- Finite term support and flatness of each supported sheaf make total
-tensor in the first slot preserve quasi-isomorphisms. -/
+/-- The generic signed-flip comparison applies the finite-strip criterion with
+the supported complex fixed on the right, without a braiding instance on
+complexes. -/
 theorem quasiIso_totalTensor_map_right_of_finiteFlatTerms
     (X : Scheme.{u}) (K : CochainComplex X.Modules ℤ) (a b : ℤ)
     (hLower : ∀ p, p < a → IsZero (K.X p))
@@ -98,9 +100,10 @@ theorem quasiIso_totalTensor_map_right_of_finiteFlatTerms
   exact HomologicalComplex.quasiIso_mapBifunctorMap_id_right_of_finite_support_of_column_quasiIso
     (curriedTensor X.Modules) K f a b hLower hUpper hcol
 
-/-- A finite complex of identity-flat scheme-module sheaves is K-flat for the
-literal total tensor in both slots. -/
-theorem totalTensor_isKFlat_of_finiteFlatTerms
+/-- The two total-map results supply the localization clauses of the generic
+K-flat predicate. This proves K-flatness of the supplied complex without
+constructing a resolution. -/
+theorem isKFlat_totalTensor_of_finiteFlatTerms
     (X : Scheme.{u}) (K : CochainComplex X.Modules ℤ) (a b : ℤ)
     (hLower : ∀ p, p < a → IsZero (K.X p))
     (hUpper : ∀ p, b < p → IsZero (K.X p))
