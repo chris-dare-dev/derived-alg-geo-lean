@@ -39,6 +39,7 @@ noncomputable section
 
 variable (X : Scheme.{u}) (x : X)
 
+/-- **Every element of the module stalk is a germ of a section over some neighbourhood.** -/
 theorem presheafModuleGerm_exists (P : X.PresheafOfModules) (ξ : (presheafModuleStalkFunctor X x).obj P) :
     ∃ (U : X.Opens) (hx : x ∈ U) (p : P.obj (op U)), presheafModuleGerm X x P U hx p = ξ := by
   letI : InitiallySmall.{u} (OpenNhds x) := initiallySmall_of_essentiallySmall _
@@ -48,6 +49,7 @@ theorem presheafModuleGerm_exists (P : X.PresheafOfModules) (ξ : (presheafModul
       X.ringCatSheaf.obj).obj P).presheaf) ξ
   exact ⟨U, hx, p, hp⟩
 
+/-- **Germs are linear over the germ of the structure sheaf.** -/
 theorem presheafModuleGerm_smul (P : X.PresheafOfModules) (U : X.Opens) (hx : x ∈ U)
     (r : Γ(X, U)) (p : P.obj (op U)) :
     (X.presheaf.germ U x hx).hom r • presheafModuleGerm X x P U hx p =
@@ -57,16 +59,7 @@ theorem presheafModuleGerm_smul (P : X.PresheafOfModules) (U : X.Opens) (hx : x 
     (hcM := colimit.isColimit ((_root_.PresheafOfModules.pushforward₀ (OpenNhds.inclusion x)
       X.ringCatSheaf.obj).obj P).presheaf) (U := op ⟨U, hx⟩) r p
 
-theorem presheafModuleStalkFunctor_map_germ {P Q : X.PresheafOfModules} (g : P ⟶ Q) (U : X.Opens)
-    (hx : x ∈ U) (p : P.obj (op U)) :
-    ((presheafModuleStalkFunctor X x).map g).hom (presheafModuleGerm X x P U hx p) =
-      presheafModuleGerm X x Q U hx (g.app (op U) p) := by
-  letI : InitiallySmall.{u} (OpenNhds x) := initiallySmall_of_essentiallySmall _
-  exact PresheafOfModules.ModuleColimit.map_apply (moduleStalkRingIsColimit X x) _ _
-    ((_root_.PresheafOfModules.pushforward₀ (OpenNhds.inclusion x) X.ringCatSheaf.obj).map g)
-    (U := op ⟨U, hx⟩) p
-
-
+/-- **A germ does not change on restriction to a smaller neighbourhood.** -/
 theorem presheafModuleGerm_res (P : X.PresheafOfModules) {U V : X.Opens} (h : V ≤ U)
     (hx : x ∈ V) (p : P.obj (op U)) :
     presheafModuleGerm X x P V hx (P.map (homOfLE h).op p) = presheafModuleGerm X x P U (h hx) p := by
@@ -76,6 +69,9 @@ theorem presheafModuleGerm_res (P : X.PresheafOfModules) {U V : X.Opens} (h : V 
       (show op (⟨U, h hx⟩ : OpenNhds x) ⟶ op ⟨V, hx⟩ from (homOfLE h).op)) p
   exact this
 
+/-- **The module structure of `presheafModuleStalkFunctor` on a presheaf stalk agrees with
+Mathlib's module structure on `TopCat.Presheaf.stalk`.** Both are characterized by their
+compatibility with germs. -/
 theorem presheafModuleStalk_smul_eq
     (P : _root_.PresheafOfModules.{u} (X.presheaf ⋙ forget₂ CommRingCat RingCat)) (r : X.presheaf.stalk x)
     (ξ : (presheafModuleStalkFunctor X x).obj P) :
@@ -115,6 +111,7 @@ def presheafModuleStalkTensorEquiv (P Q : X.PresheafOfModules) :
 
 
 open TensorProduct in
+/-- `presheafModuleStalkTensorEquiv` computes on a pure tensor of germs over one neighbourhood. -/
 theorem presheafModuleStalkTensorEquiv_germ_tmul_germ (P Q : X.PresheafOfModules) (U : X.Opens)
     (hx : x ∈ U) (p : P.obj (op U)) (q : Q.obj (op U)) :
     presheafModuleStalkTensorEquiv X x P Q
@@ -138,6 +135,8 @@ def moduleStalkTensorEquiv (A B : X.Modules) :
       ((toPresheafOfModules X).obj A ⊗ (toPresheafOfModules X).obj B))).toLinearEquiv
 
 open TensorProduct in
+/-- `moduleStalkTensorEquiv` sends a pure tensor of germs to the germ of the pure tensor of
+sections. -/
 theorem moduleStalkTensorEquiv_germ_tmul_germ (A B : X.Modules) (U : X.Opens)
     (hx : x ∈ U) (a : Γ(A, U)) (b : Γ(B, U)) :
     moduleStalkTensorEquiv X x A B
