@@ -148,6 +148,7 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex.stupidTruncGEMap_comp_assoc
 #print axioms HomologicalComplex.stupidTruncGEMap_comp_ι
 #print axioms HomologicalComplex.stupidTruncGEMap_comp_ι_assoc
+#print axioms HomologicalComplex.stupidTruncGEMap_naturality
 #print axioms HomologicalComplex.stupidTruncGEMap_self
 #print axioms HomologicalComplex.stupidTruncGETower
 #print axioms HomologicalComplex.stupidTruncGETowerCocone
@@ -166,6 +167,8 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex₂.columnFiltrationBicomplex
 #print axioms HomologicalComplex₂.columnFiltrationIndex
 #print axioms HomologicalComplex₂.adjacentColumnBicomplexShortComplex
+#print axioms HomologicalComplex₂.adjacentColumnConeMap
+#print axioms HomologicalComplex₂.adjacentColumnConeMap_quasiIso
 #print axioms HomologicalComplex₂.adjacentColumnConeToShift
 #print axioms HomologicalComplex₂.adjacentColumnConeToShift_quasiIso
 #print axioms HomologicalComplex₂.adjacentColumnInclusion
@@ -388,3 +391,14 @@ end CanonicalIntegerClassLocalizationClient
 #print axioms HomologicalComplex.SubcomplexData.top_d
 #print axioms HomologicalComplex.SubcomplexData.top_X
 #print axioms HomologicalComplex.SubcomplexData.X
+
+-- Generic adjacent-column totalization and naturality.
+#print axioms HomologicalComplex₂.adjacentColumnTotalShortComplexMap
+#print axioms HomologicalComplex₂.singleColumnBicomplexMap
+#print axioms HomologicalComplex₂.singleColumnTotalMap_quasiIso
+#print axioms HomologicalComplex₂.singleColumnHasTotal
+#print axioms HomologicalComplex₂.singleColumnShiftIso_naturality
+#print axioms HomologicalComplex₂.singleColumnShiftIso_naturality_assoc
+#print axioms HomologicalComplex₂.singleColumnTotalIso_naturality
+#print axioms HomologicalComplex₂.singleColumnTotalIso_naturality_assoc
+#print axioms HomologicalComplex₂.truncatedBicomplexMap

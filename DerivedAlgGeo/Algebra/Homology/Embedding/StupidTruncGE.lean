@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import Mathlib.Algebra.Homology.Embedding.CochainComplex
 import Mathlib.Algebra.Homology.Embedding.StupidTrunc
 import Mathlib.Algebra.Homology.HomologicalBicomplex
 import Mathlib.Algebra.Homology.HomologicalComplexLimits
@@ -31,6 +32,8 @@ in any category with zero morphisms and a zero object.
 * `HomologicalComplex.isColimitStupidTruncGETowerCocone` proves that the tower
   recovers the original complex as a colimit.
 * `HomologicalComplex.stupidTrunc_d_eq` describes the retained differential.
+* `HomologicalComplex.stupidTruncGEMap_naturality` commutes tail inclusion
+  with a cochain map.
 
 ## Implementation notes
 
@@ -71,6 +74,9 @@ noncomputable def stupidTruncGEXIso
     (K.stupidTrunc (ComplexShape.embeddingUpIntGE p)).X i ≅ K.X i :=
   K.stupidTruncXIso (ComplexShape.embeddingUpIntGE p) (geIndex_spec p i hi)
 
+/-- The embedding equation forces `k = (i - p).toNat`. Substituting that
+unique index identifies Mathlib's component isomorphism with the normalized
+one, independent of the caller's witness. -/
 lemma stupidTruncXIso_eq_stupidTruncGEXIso
     (K : HomologicalComplex C (ComplexShape.up ℤ)) (p i : ℤ) (k : ℕ)
     (h : (ComplexShape.embeddingUpIntGE p).f k = i) :
@@ -190,6 +196,41 @@ lemma stupidTruncGEMap_comp (K : HomologicalComplex C (ComplexShape.up ℤ))
       stupidTruncGEMap K p r (hpq.trans hqr) := by
   rw [← cancel_mono (stupidTruncGEι K p), Category.assoc]
   simp
+
+set_option backward.defeqAttrib.useBackward true in
+set_option backward.isDefEq.respectTransparency false in
+/-- A cochain map commutes with nested-tail inclusion. On retained degrees,
+both composites reduce to the same map after transporting through the
+stupid-truncation degreewise isomorphisms; elsewhere the source is zero. -/
+lemma stupidTruncGEMap_naturality
+    {K L : HomologicalComplex C (ComplexShape.up ℤ)} (f : K ⟶ L)
+    (p q : ℤ) (hpq : p ≤ q) :
+    stupidTruncMap f (ComplexShape.embeddingUpIntGE q) ≫
+        stupidTruncGEMap L p q hpq =
+      stupidTruncGEMap K p q hpq ≫
+        stupidTruncMap f (ComplexShape.embeddingUpIntGE p) := by
+  apply HomologicalComplex.Hom.ext
+  funext i
+  by_cases hi : q ≤ i
+  · dsimp [stupidTruncGEMap]
+    rw [dif_pos hi, dif_pos hi]
+    let eK₀ := stupidTruncGEXIso K q i hi
+    let eK₁ := stupidTruncGEXIso K p i (hpq.trans hi)
+    let eL₀ := stupidTruncGEXIso L q i hi
+    let eL₁ := stupidTruncGEXIso L p i (hpq.trans hi)
+    simp only [stupidTruncXIso_eq_stupidTruncGEXIso]
+    rw [← cancel_mono eL₁.hom]
+    simp only [Category.assoc]
+    rw [← Category.assoc, ← Category.assoc]
+    dsimp [eK₀, eK₁, eL₀, eL₁, stupidTruncGEXIso]
+    rw [HomologicalComplex.stupidTruncMap_stupidTruncXIso_hom]
+    simp only [Category.assoc]
+    rw [HomologicalComplex.stupidTruncMap_stupidTruncXIso_hom]
+    simp
+  · apply IsZero.eq_of_src
+    apply HomologicalComplex.isZero_stupidTrunc_X
+    rw [ComplexShape.notMem_range_embeddingUpIntGE_iff]
+    omega
 
 end HomologicalComplex
 
