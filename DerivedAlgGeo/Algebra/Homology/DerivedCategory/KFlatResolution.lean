@@ -9,19 +9,37 @@ import Mathlib.CategoryTheory.Localization.Bifunctor
 /-!
 # Derived bifunctors from K-flat resolutions
 
-This file isolates the categorical core of the unbounded derived tensor product. Given a tensor
-bifunctor on cochain complexes, a `KFlatResolution C tensor` is a functorial quasi-isomorphic
-replacement by objects for which tensoring in either variable sends quasi-isomorphisms to
-isomorphisms after derived localization.
+This file isolates the categorical core of the unbounded derived tensor product.
+
+## Main definitions
+
+Given a tensor bifunctor on cochain complexes, a `KFlatResolution C tensor` is a functorial
+quasi-isomorphic replacement by objects for which tensoring in either variable sends
+quasi-isomorphisms to isomorphisms after derived localization.
+
+## Main results
+
+`CategoryTheory.CochainComplex.isIso_Q_map_tensorRight_of_pointwiseReplacement` transports
+inversion across one pointwise replacement. The resolution specializes this result in both slots.
+
+## Implementation notes
 
 Resolving both inputs makes the complex-level tensor bifunctor invert quasi-isomorphisms in both
-variables. `Localization.lift₂` therefore constructs an honest bifunctor on the unbounded derived
-category, together with its comparison to the underived bifunctor.
+variables. `CategoryTheory.Localization.lift₂` therefore constructs an honest bifunctor on the
+unbounded derived category, together with its comparison to the underived bifunctor.
 
 Only a bifunctor is required here, rather than a monoidal structure on complexes: associativity,
 unit, and symmetry play no role in localization. Existence of K-flat resolutions is deliberately
 separate. Scheme-module sheaves will supply the complex tensor and its resolutions through total
 tensor, K-flat replacement, and descent.
+
+## References
+
+This construction uses Mathlib's derived localization and bifunctor localization.
+
+## Tags
+
+derived tensor, K-flat resolution, localization
 -/
 
 namespace CategoryTheory
@@ -143,6 +161,32 @@ end ExactColimits
 
 end IsKFlat
 
+/-- A pointwise replacement `q : P ⟶ M` transports right-slot tensor inversion from
+`P` to `M` when tensoring by either endpoint inverts `q`. No functorial
+resolution of arbitrary complexes is needed for this square. -/
+theorem isIso_Q_map_tensorRight_of_pointwiseReplacement
+    {tensor : CochainComplex C ℤ ⥤ CochainComplex C ℤ ⥤ CochainComplex C ℤ}
+    {K L : CochainComplex C ℤ}
+    (hK : W.IsInvertedBy (tensor.obj K ⋙ DerivedCategory.Q))
+    (hL : W.IsInvertedBy (tensor.obj L ⋙ DerivedCategory.Q))
+    (g : K ⟶ L) (hg : W g) (M P : CochainComplex C ℤ)
+    (q : P ⟶ M) (hq : W q)
+    (hP : W.IsInvertedBy (tensor.flip.obj P ⋙ DerivedCategory.Q)) :
+    IsIso (DerivedCategory.Q.map ((tensor.map g).app M)) := by
+  let a := (tensor.obj K).map q
+  let b := (tensor.obj L).map q
+  haveI ha : IsIso (DerivedCategory.Q.map a) := hK q hq
+  haveI hb : IsIso (DerivedCategory.Q.map b) := hL q hq
+  haveI ht : IsIso (DerivedCategory.Q.map ((tensor.map g).app P)) := hP g hg
+  have heq : DerivedCategory.Q.map a ≫ DerivedCategory.Q.map ((tensor.map g).app M) =
+      DerivedCategory.Q.map ((tensor.map g).app P) ≫ DerivedCategory.Q.map b := by
+    simp only [← Functor.map_comp]
+    exact congrArg (fun t => DerivedCategory.Q.map t) ((tensor.map g).naturality q)
+  haveI hc : IsIso (DerivedCategory.Q.map a ≫ DerivedCategory.Q.map ((tensor.map g).app M)) := by
+    rw [heq]
+    exact IsIso.comp_isIso' ht hb
+  exact (isIso_comp_left_iff (DerivedCategory.Q.map a) _).mp hc
+
 /-- A functorial replacement of cochain complexes equipped with a
 componentwise quasi-isomorphic comparison to the identity functor preserves
 quasi-isomorphisms.
@@ -207,45 +251,29 @@ lemma map_quasiIso (R : KFlatResolution C tensor) {K L : CochainComplex C ℤ}
     (f : K ⟶ L) (hf : W f) : W (R.resolution.map f) :=
   CochainComplex.quasiIso_map_of_comparison R.comparison R.comparison_quasiIso f hf
 
-/-- A quasi-isomorphism between K-flat complexes stays a quasi-isomorphism after tensoring
-on the right with any complex. The resolution of the other factor supplies the intermediate
-K-flat tensor, while the two K-flat endpoints invert its comparison map. -/
-theorem tensorRight_map_between_kflat (R : KFlatResolution C tensor)
+/-- The K-flat resolution supplies a pointwise replacement for right-slot
+tensor transport; only the left-inversion clauses at the two endpoints are
+needed. -/
+theorem isIso_Q_map_tensorRight_of_inverts (R : KFlatResolution C tensor)
     {K L : CochainComplex C ℤ}
-    (hK : CochainComplex.IsKFlat tensor K)
-    (hL : CochainComplex.IsKFlat tensor L)
+    (hK : W.IsInvertedBy (tensor.obj K ⋙ DerivedCategory.Q))
+    (hL : W.IsInvertedBy (tensor.obj L ⋙ DerivedCategory.Q))
     (g : K ⟶ L) (hg : W g) (M : CochainComplex C ℤ) :
-    IsIso (DerivedCategory.Q.map ((tensor.map g).app M)) := by
-  let a := (tensor.obj K).map (R.comparison.app M)
-  let b := (tensor.obj L).map (R.comparison.app M)
-  haveI ha : IsIso (DerivedCategory.Q.map a) :=
-    hK.tensorLeft_inverts (R.comparison.app M) (R.comparison_quasiIso M)
-  haveI hb : IsIso (DerivedCategory.Q.map b) :=
-    hL.tensorLeft_inverts (R.comparison.app M) (R.comparison_quasiIso M)
-  haveI ht : IsIso (DerivedCategory.Q.map ((tensor.map g).app (R.resolution.obj M))) :=
-    (R.isKFlat M).tensorRight_inverts g hg
-  have heq : DerivedCategory.Q.map a ≫ DerivedCategory.Q.map ((tensor.map g).app M) =
-      DerivedCategory.Q.map ((tensor.map g).app (R.resolution.obj M)) ≫
-        DerivedCategory.Q.map b := by
-    simp only [← Functor.map_comp]
-    exact congrArg (fun t => DerivedCategory.Q.map t)
-      ((tensor.map g).naturality (R.comparison.app M))
-  haveI hc : IsIso (DerivedCategory.Q.map a ≫ DerivedCategory.Q.map ((tensor.map g).app M)) := by
-    rw [heq]
-    exact IsIso.comp_isIso' ht hb
-  exact (isIso_comp_left_iff (DerivedCategory.Q.map a) _).mp hc
+    IsIso (DerivedCategory.Q.map ((tensor.map g).app M)) :=
+  CochainComplex.isIso_Q_map_tensorRight_of_pointwiseReplacement hK hL g hg
+    M (R.resolution.obj M) (R.comparison.app M) (R.comparison_quasiIso M) (R.isKFlat M).2
 
-/-- A quasi-isomorphism between K-flat complexes stays a quasi-isomorphism after tensoring
-on the left with any complex. This is the right-variable result for the flipped bifunctor. -/
-theorem tensorLeft_map_between_kflat (R : KFlatResolution C tensor)
+/-- The flipped pointwise transport gives left-slot tensor inversion; only
+the right-inversion clauses at the two endpoints are needed. -/
+theorem isIso_Q_map_tensorLeft_of_inverts (R : KFlatResolution C tensor)
     {K L : CochainComplex C ℤ}
-    (hK : CochainComplex.IsKFlat tensor K)
-    (hL : CochainComplex.IsKFlat tensor L)
+    (hK : W.IsInvertedBy (tensor.flip.obj K ⋙ DerivedCategory.Q))
+    (hL : W.IsInvertedBy (tensor.flip.obj L ⋙ DerivedCategory.Q))
     (g : K ⟶ L) (hg : W g) (M : CochainComplex C ℤ) :
-    IsIso (DerivedCategory.Q.map ((tensor.obj M).map g)) := by
-  let R' : KFlatResolution C tensor.flip :=
-    { R with isKFlat K := ⟨(R.isKFlat K).2, (R.isKFlat K).1⟩ }
-  exact tensorRight_map_between_kflat R' ⟨hK.2, hK.1⟩ ⟨hL.2, hL.1⟩ g hg M
+    IsIso (DerivedCategory.Q.map ((tensor.obj M).map g)) :=
+  CochainComplex.isIso_Q_map_tensorRight_of_pointwiseReplacement
+    (tensor := tensor.flip) hK hL g hg M (R.resolution.obj M)
+    (R.comparison.app M) (R.comparison_quasiIso M) (R.isKFlat M).1
 
 /-- Apply `tensor` after K-flat replacement in both inputs and then localize. -/
 def resolvedTensor (R : KFlatResolution C tensor) :

@@ -470,8 +470,9 @@ the `HomFiniteBounded` model built on it is audited with the Euler form. -/
 #print axioms CategoryTheory.KFlatResolution.resolvedTensorComparison
 #print axioms CategoryTheory.KFlatResolution.resolvedTensor_inverts
 #print axioms CategoryTheory.KFlatResolution.resolvedTensor_obj_obj
-#print axioms CategoryTheory.KFlatResolution.tensorLeft_map_between_kflat
-#print axioms CategoryTheory.KFlatResolution.tensorRight_map_between_kflat
+#print axioms CategoryTheory.CochainComplex.isIso_Q_map_tensorRight_of_pointwiseReplacement
+#print axioms CategoryTheory.KFlatResolution.isIso_Q_map_tensorLeft_of_inverts
+#print axioms CategoryTheory.KFlatResolution.isIso_Q_map_tensorRight_of_inverts
 #print axioms CategoryTheory.ObjectProperty.instEssSurjPreimageLift
 #print axioms CategoryTheory.ObjectProperty.lift₂
 #print axioms CategoryTheory.ObjectProperty.lift₂CompιIso
