@@ -172,6 +172,13 @@ below.
    - **Done means**: one row per acceptance item of the issue, giving the item,
      the declaration, docstring, issue comment or gate that meets it, and how to
      check it. A progress PR marks the rows it leaves open.
+   - **Claim evidence**: a table headed exactly
+     `Claim | Declaration | Hypotheses | Owner | Pinned source | Check`.
+     Cover each substantive statement, including definition owners versus
+     re-exports, novelty, equivalence, proof dependencies and literature
+     attribution. Record the actual versioned source statement and a checkable
+     witness; do not extrapolate from old docstrings. If there are no mathematical
+     claims, record that fact with the scoped diff and its check, not an empty table.
    - **Source**: for each cited theorem, lemma or Stacks tag, its statement
      copied from the fetched source (number, hypotheses, conventions) with the
      versioned URL, or "not fetchable" and why. Never paraphrase a source from
@@ -195,16 +202,24 @@ below.
      (`LEAN_NUM_THREADS=2 ~/.elan/bin/lake build <Module>`) and with
      `PATH="$V/bin:$PATH" scripts/precheck.sh`, after the variable line from
      Start. `git add` new files first: several gates read only tracked files.
-   - Before each review round, run
-     `LEAN_NUM_THREADS=2 ~/.elan/bin/lake exe runLinter <Module>` for every
-     changed module. Then write `scratch/Checks.lean`, importing the changed
-     modules, and run it with
-     `LEAN_NUM_THREADS=2 ~/.elan/bin/lake env lean scratch/Checks.lean` from
-     the worktree: `#print axioms` for each new public declaration, and
-     `#check @<Name>` for each backticked declaration name in changed
-     docstrings and in the PR description draft. Give the output to the
-     reviewers. CI runs the linters and audits on the whole library, and a
-     failure there after four passes costs a round.
+   - Before each review round, commit the tracked change and run precheck and
+     module-scoped `runLinter`. Run the source-only emission check; durable Lean
+     probes belong in Development with sweep coverage, never tracked scratch.
+     Run `python3 scripts/check_review_evidence.py inventory --base <base SHA>
+     --draft scratch/pr-<n>.md` over all changed docstrings, documentation and the
+     draft. Resolve every occurrence; classify non-declarations with a reason
+     in a `## Reference classifications` table (`Token | Kind | Reason`). Kinds
+     are declaration, parameter, historical, path, code or formula. Review
+     automatic path classifications too; a classification is not mathematical
+     evidence. Rerun the whole inventory after a repair, including companions.
+   - Generate and compile its complete root-scope probe with
+     `python3 scripts/check_review_evidence.py probe --base <base SHA>
+     --draft scratch/pr-<n>.md --output scratch/ReferenceChecks.lean
+     --import <narrow module if needed> --run`. Capture the actual output in
+     `scratch/review-checks.txt`, together with precheck, linters and
+     `#print axioms` for new public declarations. The generator stamps its source
+     commit and corpus digest. Exit zero without named coverage is not a check.
+     CI's full emitted-artifact, audit and contract checks remain the merge gate.
    - Push the branch after each commit. After the first push, bring in
      `origin/main` by merging, never by rebasing. A push starts no CI until the
      PR exists.
@@ -222,8 +237,21 @@ below.
      and retry. In Claude Code, start a new Agent. Never re-task or message a
      reviewer after dispatch, never give one another role, PR or issue, and
      never let an agent that wrote code in this run review in it.
-   - Brief each reviewer with exactly this and nothing else of yours, never
-     another reviewer's verdict:
+   - In Codex, generate the isolated call with `scripts/review_dispatch.py
+     prepare --role <role> --worktree <worktree> --issue <n> --commit <SHA>
+     --base <SHA> --draft <worktree>/scratch/pr-<n>.md
+     --checks <worktree>/scratch/review-checks.txt
+     --task-name review_<role with underscores>_<attempt and round>
+     --model <frontier model offered by this runtime> --capability frontier
+     --maximum-effort <highest offered> --effort <same highest offered>`.
+     Submit its JSON unchanged to spawn_agent. The helper validates HEAD, a clean
+     tracked diff, the claim table, check stamp, explicit model and isolated
+     context. Capability is the harness's assertion from available models, not
+     inferred from a name. Repository hooks cannot intercept Codex collaboration;
+     audit actual dispatch metadata in the transcript. Claude's Agent/Task hook
+     rejects resumed reviewers and inherited model selection.
+   - Brief each reviewer with exactly these facts and nothing else of yours,
+     never another reviewer's verdict:
      ```
      Role: <role>. Read your instructions with
        git -C <worktree> show origin/main:.claude/agents/<role>.md
@@ -237,6 +265,10 @@ below.
      CI runs after the PR opens, and the merge waits for it. Do not dispatch or wait for a workflow.
      ```
    - Do not change the worktree until all four verdicts are in.
+   - Save each returned report in ignored scratch and validate it with
+     `python3 scripts/review_dispatch.py verdict <report> --role <role>
+     --commit <SHA>`; inspect the substantive evidence as well. This stateless
+     validator is not a review ledger and does not grant publishing authority.
    - A verdict counts only if it ends with the exact two-line trailer, its
      `Reviewed commit:` equals that SHA, and its `Close:` is `PASS`,
      `PASS_WITH_LIFT`, `NEEDS_CHANGES` or `BLOCKED`. Dispatch that role again
@@ -307,6 +339,17 @@ matter to the milestone. Supplement the archive when it omits nested tool
 calls or their outcomes. Record tool, documentation, stale-state and reviewer
 friction, the recovery taken, and exact commits or links. Raw transcripts stay
 in the owner-only local archive, never in Git.
+
+Report merge requests, auto-merge arming/disarming and observed GitHub merged
+state separately. Fetch `gh pr view <n> --json number,url,state,mergedAt` after
+landing; command exit zero is not an observed merge. Report CI steps as passed,
+failed or skipped under their actual conditions; never predict a skipped step.
+For reviewer improvements, replay `scripts/review_evaluation.py` synthetic cases
+with fresh isolated agents outside implementation rounds and have their reports
+independently adjudicated. Score missed defects, unsupported findings, severity,
+recurrence after repair and supported evidence; finding count alone is no score.
+The fixtures reconstruct mistakes, not archived transcripts, and a partial suite
+or unavailable source pin is not a model ranking.
 
 Examine the agents and tools actually used. Name one or two additional or
 differently scoped agents or tools that would have saved work, the concrete

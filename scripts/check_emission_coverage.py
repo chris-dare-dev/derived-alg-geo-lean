@@ -32,11 +32,14 @@ Exclusions are deliberate, and each is justified below in EXCLUDED_PREFIXES.
 """
 
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
 
 from _output import force_utf8_output
+from check_mathlib_style import code_only
+from check_umbrella_coverage import CoverageError, lean_header_imports
 
 DEFAULT_EMISSION = Path("attest/lean-emission.json")
 
@@ -79,7 +82,55 @@ def tracked_modules() -> dict[str, str]:
     }
 
 
+def source_errors(tracked: dict[str, str], imports: dict[str, set[str]],
+                  root: str, filters: list[str]) -> list[str]:
+    """Check import reachability and emitter root eligibility independently."""
+    reachable = set()
+    stack = [root]
+    while stack:
+        module = stack.pop()
+        if module in reachable:
+            continue
+        reachable.add(module)
+        stack.extend(imports.get(module, ()))
+    errors = []
+    for module, path in sorted(tracked.items()):
+        if module not in reachable:
+            errors.append(f"{path}: {module} is not imported by {root}")
+        if not any(module == prefix or module.startswith(prefix + ".") for prefix in filters):
+            errors.append(f"{path}: {module} is outside emitter roots {filters}")
+    return errors
+
+
+def check_sources() -> int:
+    """Use pinned Lean's header parser without compiling or certifying axioms."""
+    code = "\n".join(code_only(Path("exe/Emit.lean").read_text(encoding="utf-8").splitlines()))
+    root = re.findall(r"\(rootLib\s*:=\s*`([\w.]+)\)", code)
+    extra = re.findall(r"\(additionalRoots\s*:=\s*\[([^\]]*)\]\)", code)
+    if len(root) != 1 or len(extra) != 1 or not re.fullmatch(r"\s*(?:`[\w.]+\s*,?\s*)*", extra[0]):
+        raise ValueError("cannot reconstruct emitter roots from exe/Emit.lean; update the source check")
+    filters = root + re.findall(r"`([\w.]+)", extra[0])
+    tracked = tracked_modules()
+    if root[0] not in tracked or not tracked:
+        raise ValueError("emitter root is absent from tracked source obligations")
+    headers = lean_header_imports([Path(p) for p in tracked.values()])
+    imports = {m: headers[Path(p)].all for m, p in tracked.items()}
+    errors = source_errors(tracked, imports, root[0], filters)
+    for error in errors:
+        print(f"error: {error}", file=sys.stderr)
+    if errors:
+        return 1
+    print(f"ok: {len(tracked)} tracked modules reachable and eligible for emission (source only; no axiom verdict)")
+    return 0
+
+
 def main(argv: list[str]) -> int:
+    if argv[1:] == ["--source-only"]:
+        try:
+            return check_sources()
+        except (ValueError, OSError, CoverageError) as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 1
     emission_path = Path(argv[1]) if len(argv) > 1 else DEFAULT_EMISSION
     try:
         doc = json.loads(emission_path.read_text(encoding="utf-8"))

@@ -268,6 +268,8 @@ gate loop-engine-tests python3 -m unittest discover -s scripts/tests -p "test_*.
 # -- the whole library under a target name -- for as long as it had existed.
 gate local-build scripts/test_local_build.sh
 gate mathlib-style mathlib_style
+gate review-docs python3 scripts/check_review_evidence.py docs --base origin/main
+gate emission-sources python3 scripts/check_emission_coverage.py --source-only
 gate explicit-numerical-data python3 scripts/check_explicit_numerical_data.py
 gate foundation-import-boundary python3 scripts/check_foundation_import_boundary.py
 gate build lake build
