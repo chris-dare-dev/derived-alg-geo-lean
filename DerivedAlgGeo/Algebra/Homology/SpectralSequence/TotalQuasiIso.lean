@@ -3,22 +3,39 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence.FilteredTotalComplexAdjacent
-import Mathlib.Algebra.Homology.HomologySequenceLemmas
 import Mathlib.Algebra.Homology.DerivedCategory.HomologySequence
 import Mathlib.Algebra.Homology.QuasiIso
 
 /-!
-# Quasi-isomorphisms and filtered total complexes
+# Quasi-isomorphisms for mapping cones and first-quadrant totals
 
-This file supplies two naturality lemmas missing from the upstream homology-sequence and total-
-complex APIs.  They are the comparison-theorem plumbing needed for the Cech bicomplex:
+This file proves quasi-isomorphism criteria for mapping-cone maps and
+first-quadrant total complexes of abelian groups.
 
-* in a morphism of short exact cochain-complex sequences, quasi-isomorphisms on the outer terms
-  imply a quasi-isomorphism on the middle term; and
-* a bicomplex morphism induces a morphism between its adjacent-column total short exact
-  sequences.
+## Main results
 
-Both statements are general and independent of sheaves.
+* `CochainComplex.mappingCone.quasiIso_compMap` deduces a quasi-isomorphism
+  for the cone map of a composite from quasi-isomorphisms for the two
+  constituent cone maps.
+* `CochainComplex.mappingCone.quasiIsoAt_inr_of_isZero_X` gives a
+  quasi-isomorphism at the cone inclusion in degree `n` when the source `A`
+  of the arrow `f : A ⟶ B` vanishes in degrees `n` and `n + 1`.
+* `HomologicalComplex₂.totalMap_quasiIso` turns a columnwise
+  quasi-isomorphism of first-quadrant bicomplexes of abelian groups into a
+  quasi-isomorphism of their totals.
+
+## Implementation notes
+
+The composition result uses the octahedral mapping-cone triangle in the
+derived category. The total result compares finite-column cones through
+adjacent-column maps, then identifies the connective tail with the full
+total. The middle-term short-exact comparison lives at the separate generic
+homology-sequence owner.
+
+## References
+
+These proofs use Mathlib's mapping-cone composition triangle, derived-category
+localization, and homological-complex totalization.
 -/
 
 open CategoryTheory Category Limits
@@ -163,47 +180,6 @@ lemma quasiIsoAt_inr_of_isZero_X
   exact isIso_of_mono_of_epi _
 
 end CochainComplex.mappingCone
-
-namespace HomologicalComplex
-
-variable {S₁ S₂ : ShortComplex (CochainComplex AddCommGrpCat.{w} ℤ)}
-  (φ : S₁ ⟶ S₂) (hS₁ : S₁.ShortExact) (hS₂ : S₂.ShortExact)
-
-include hS₁ hS₂
-
-set_option backward.defeqAttrib.useBackward true in
-set_option backward.isDefEq.respectTransparency false in
-/-- In a morphism of short exact sequences of integer-graded cochain complexes, if the maps on
-the outer terms are quasi-isomorphisms, then so is the map on the middle term.
-
-This is the missing `τ₂` companion to Mathlib's `HomologySequence.quasiIso_τ₃`.  The proof
-uses the two four lemmas on consecutive pieces of the long exact homology sequence. -/
-lemma HomologySequence.quasiIso_τ₂
-    (h₁ : QuasiIso φ.τ₁) (h₃ : QuasiIso φ.τ₃) : QuasiIso φ.τ₂ := by
-  rw [quasiIso_iff]
-  intro i
-  rw [quasiIsoAt_iff_isIso_homologyMap]
-  have hmono : Mono (homologyMap φ.τ₂ i) := by
-    have hi : (ComplexShape.up ℤ).Rel (i - 1) i := by simp
-    apply Abelian.mono_of_epi_of_mono_of_mono'' (n := 5) (k := 2) (by omega)
-      (HomologySequence.composableArrows₅_exact hS₁ (i - 1) i hi)
-      (HomologySequence.composableArrows₅_exact hS₂ (i - 1) i hi)
-      (HomologySequence.mapComposableArrows₅ φ hS₁ hS₂ (i - 1) i hi)
-      2 3 4 5 rfl rfl rfl rfl
-    all_goals dsimp
-    all_goals infer_instance
-  have hepi : Epi (homologyMap φ.τ₂ i) := by
-    have hi : (ComplexShape.up ℤ).Rel i (i + 1) := by simp
-    apply Abelian.epi_of_epi_of_epi_of_mono'' (n := 5) (k := 0) (by omega)
-      (HomologySequence.composableArrows₅_exact hS₁ i (i + 1) hi)
-      (HomologySequence.composableArrows₅_exact hS₂ i (i + 1) hi)
-      (HomologySequence.mapComposableArrows₅ φ hS₁ hS₂ i (i + 1) hi)
-      0 1 2 3 rfl rfl rfl rfl
-    all_goals dsimp
-    all_goals infer_instance
-  exact isIso_of_mono_of_epi _
-
-end HomologicalComplex
 
 namespace HomologicalComplex₂
 
