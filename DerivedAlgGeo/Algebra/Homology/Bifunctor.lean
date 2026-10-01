@@ -14,11 +14,17 @@ quasi-isomorphism criterion for literal bicomplex totals applies to this map.
 
 ## Main results
 
-* `HomologicalComplex.quasiIso_mapBifunctorMap_id_of_finite_support` passes
+* `HomologicalComplex.quasiIso_mapBifunctorMap_id_left_of_finite_support_of_column_quasiIso` passes
   quasi-isomorphic mapped columns in the second input to a quasi-isomorphism
   of literal totals under finite term support in the first.
-* `HomologicalComplex.quasiIso_mapBifunctorMap_id_right_of_finite_support`
+* `HomologicalComplex.quasiIso_mapBifunctorMap_id_right_of_finite_support_of_column_quasiIso`
   fixes finite support in the second input and maps the first by signed flip.
+
+## Implementation notes
+
+The fixed complex supplies constant horizontal support bounds for both
+bicomplexes. Outside those bounds, zero preservation makes the mapped columns
+zero; the right-slot result uses naturality of Mathlib's signed flip.
 
 ## References
 
@@ -42,7 +48,7 @@ set_option backward.isDefEq.respectTransparency false
 
 private theorem isZero_mapped_complex_of_isZero
     {C₁ C₂ D : Type*} [Category* C₁] [Category* C₂] [Category* D]
-    [HasZeroMorphisms C₁] [HasZeroMorphisms C₂] [Abelian D]
+    [HasZeroMorphisms C₁] [HasZeroMorphisms C₂] [HasZeroMorphisms D]
     (F : C₁ ⥤ C₂ ⥤ D) [F.PreservesZeroMorphisms]
     [∀ X, (F.obj X).PreservesZeroMorphisms]
     (X : C₁) (hX : IsZero X) (L : CochainComplex C₂ ℤ) :
@@ -55,7 +61,7 @@ private theorem isZero_mapped_complex_of_isZero
   change (𝟙 ((F.obj X).obj (L.X q))) = 0
   exact hq
 
-private theorem quasiIso_mapBifunctorMap_id_of_finite_support_all_columns
+private theorem quasiIso_mapBifunctorMap_id_left_of_finite_support_all_columns
     {C₁ C₂ D : Type*} [Category* C₁] [Category* C₂] [Category* D]
     [HasZeroMorphisms C₁] [HasZeroMorphisms C₂] [Abelian D]
     (F : C₁ ⥤ C₂ ⥤ D) [F.PreservesZeroMorphisms]
@@ -85,7 +91,7 @@ private theorem quasiIso_mapBifunctorMap_id_of_finite_support_all_columns
 pass through Mathlib's literal bifunctor total map. Only columns within the
 support interval need quasi-isomorphism evidence. The second map is unrestricted;
 the bounds concern terms, not cohomology. -/
-theorem quasiIso_mapBifunctorMap_id_of_finite_support
+theorem quasiIso_mapBifunctorMap_id_left_of_finite_support_of_column_quasiIso
     {C₁ C₂ D : Type*} [Category* C₁] [Category* C₂] [Category* D]
     [HasZeroMorphisms C₁] [HasZeroMorphisms C₂] [Abelian D]
     (F : C₁ ⥤ C₂ ⥤ D) [F.PreservesZeroMorphisms]
@@ -98,7 +104,7 @@ theorem quasiIso_mapBifunctorMap_id_of_finite_support
     (hcol : ∀ p, a ≤ p → p ≤ b →
       QuasiIso (((F.obj (K.X p)).mapHomologicalComplex (up ℤ)).map f)) :
     QuasiIso (mapBifunctorMap (𝟙 K) f F (up ℤ)) := by
-  apply quasiIso_mapBifunctorMap_id_of_finite_support_all_columns
+  apply quasiIso_mapBifunctorMap_id_left_of_finite_support_all_columns
     F K f a b hLower hUpper
   intro p
   by_cases hp : a ≤ p ∧ p ≤ b
@@ -118,7 +124,7 @@ theorem quasiIso_mapBifunctorMap_id_of_finite_support
 /-- Signed flipping turns finite term support in the second complex into the
 left-slot criterion, without a symmetric monoidal structure. Only supported
 columns need quasi-isomorphism evidence. -/
-theorem quasiIso_mapBifunctorMap_id_right_of_finite_support
+theorem quasiIso_mapBifunctorMap_id_right_of_finite_support_of_column_quasiIso
     {C₁ C₂ D : Type*} [Category* C₁] [Category* C₂] [Category* D]
     [HasZeroMorphisms C₁] [HasZeroMorphisms C₂] [Abelian D]
     (F : C₁ ⥤ C₂ ⥤ D) [F.PreservesZeroMorphisms]
@@ -131,7 +137,8 @@ theorem quasiIso_mapBifunctorMap_id_right_of_finite_support
     (hcol : ∀ p, a ≤ p → p ≤ b →
       QuasiIso (((F.flip.obj (K.X p)).mapHomologicalComplex (up ℤ)).map f)) :
     QuasiIso (mapBifunctorMap f (𝟙 K) F (up ℤ)) := by
-  haveI := quasiIso_mapBifunctorMap_id_of_finite_support F.flip K f a b hLower hUpper hcol
+  haveI := quasiIso_mapBifunctorMap_id_left_of_finite_support_of_column_quasiIso
+    F.flip K f a b hLower hUpper hcol
   have hnat := mapBifunctorFlipIso_hom_naturality f (𝟙 K) F (up ℤ)
   apply (quasiIso_iff_comp_left (mapBifunctorFlipIso L K F (up ℤ)).hom _).mp
   rw [← hnat]
