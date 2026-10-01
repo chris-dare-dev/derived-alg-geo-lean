@@ -7,3 +7,6 @@ import DerivedAlgGeo.CategoryTheory.Bicategory
 /-! ## Ordinary adjoint functors as adjunctions in `Cat` -/
 
 #print axioms CategoryTheory.Adjunction.bicategoricalEquiv
+
+#print axioms CategoryTheory.NatTrans.toStrongTrans
+#print axioms CategoryTheory.NatTrans.toStrongTrans_app
