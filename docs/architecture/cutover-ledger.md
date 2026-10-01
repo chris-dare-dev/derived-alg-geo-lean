@@ -2348,6 +2348,12 @@ or exactness was strengthened by relocation.
   arbitrary-factor strengthening. Scheme tensor objects, tensor closure,
   associativity, and Picard classes remain direct geometric consumers.
 - Stalk tensor products of module presheaves:
+  `Topology/Sheaves/ModuleStalk.lean` owns the module-valued stalk functor,
+  its ring-colimit witness, and its linear comparison with germs for an
+  arbitrary topological space and commutative-ring presheaf. The historical
+  scheme names in `AlgebraicGeometry/Modules/Pullback/Stalk.lean` are
+  definitionally transparent specializations of this root; geometric
+  pullback and skyscraper results stay there.
   `Topology/Sheaves/ModuleTensor/StalkTensor.lean` owns the comparison between
   the stalk of a tensor product and the tensor product of stalks, together with
   its open-neighbourhood, germ, and stalk-map infrastructure. The parent

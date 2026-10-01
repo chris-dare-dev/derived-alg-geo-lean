@@ -75,6 +75,11 @@ in the lattice of opens of a prime spectrum, but `PrimeSpectrum.basicOpen` is de
 topological open-site cover theorem. Stalks of module presheaves are stated with
 `TopCat`, germs, and stalk functors, which Mathlib defines in
 `Topology/Sheaves/`, so they live there.
+`Topology/Sheaves/ModuleStalk.lean` owns the module-valued stalk functor for
+an arbitrary commutative-ring presheaf on a topological space. The scheme
+names in `AlgebraicGeometry/Modules/Pullback/Stalk.lean` specialize its cocone
+and functors definitionally; geometric pullback and skyscraper comparisons
+remain downstream.
 
 ## Affine and projective spectrum foundations
 

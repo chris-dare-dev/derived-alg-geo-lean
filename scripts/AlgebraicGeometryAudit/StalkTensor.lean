@@ -4,6 +4,15 @@ append to different files (#480). `EnumDecls.libraryOf` routes the `Topology` su
 this audit. See the umbrella file for the contract.
 -/
 import DerivedAlgGeo.Topology.Sheaves.ModuleTensor.StalkTensor
+import DerivedAlgGeo.Topology.Sheaves.ModuleStalk
+
+/-! ## Module-valued stalks over a topological space (#554) -/
+
+#print axioms PresheafOfModules.stalkRingCocone
+#print axioms PresheafOfModules.stalkRingIsColimit
+#print axioms PresheafOfModules.neighborhoodStalkFunctor
+#print axioms PresheafOfModules.stalkFunctor
+#print axioms PresheafOfModules.stalkLinearEquiv
 
 /-! ## The stalk of a tensor product of presheaves of modules (#833)
 
