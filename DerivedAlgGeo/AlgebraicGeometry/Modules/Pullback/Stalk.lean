@@ -90,6 +90,21 @@ def moduleStalkFunctor (X : Scheme.{u}) (x : X) :
   Scheme.Modules.toPresheafOfModules X ⋙
     presheafModuleStalkFunctor X x
 
+/-- The germ at `x` of a section over an open neighbourhood `U` of `x` of a presheaf of modules,
+as an element of the module stalk. -/
+def presheafModuleGerm (X : Scheme.{u}) (x : X) (P : X.PresheafOfModules) (U : X.Opens)
+    (hx : x ∈ U) : P.obj (op U) →+ (presheafModuleStalkFunctor X x).obj P := by
+  letI : InitiallySmall.{u} (OpenNhds x) := initiallySmall_of_essentiallySmall _
+  exact (_root_.PresheafOfModules.ModuleColimit.ιM (hcR := moduleStalkRingIsColimit X x)
+    (hcM := colimit.isColimit ((_root_.PresheafOfModules.pushforward₀ (OpenNhds.inclusion x)
+      X.ringCatSheaf.obj).obj P).presheaf) (U := op ⟨U, hx⟩))
+
+/-- The germ at `x` of a section over an open neighbourhood `U` of `x` of a sheaf of modules, as
+an element of the module stalk. -/
+def moduleStalkGerm (X : Scheme.{u}) (x : X) (M : X.Modules) (U : X.Opens)
+    (hx : x ∈ U) : Γ(M, U) →+ (moduleStalkFunctor X x).obj M :=
+  presheafModuleGerm X x ((toPresheafOfModules X).obj M) U hx
+
 /-- The module map on stalks induced by the unit from a presheaf of modules
 to its module sheafification. -/
 def presheafModuleStalkToSheafificationApp
