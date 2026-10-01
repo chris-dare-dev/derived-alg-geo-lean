@@ -1,4 +1,5 @@
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.Pullback
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pullback
 
 /-!
@@ -50,13 +51,14 @@ variable {X Y : Scheme.{u}} (f : X ⟶ Y) (M : Y.Modules)
 #print axioms AlgebraicGeometry.Scheme.Modules.pullbackRestrictUnitIso
 #print axioms AlgebraicGeometry.Scheme.Modules.pullbackOverUnitIso
 #print axioms AlgebraicGeometry.Scheme.Hom.coversTop_preimage
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackPresentationOver
+#print axioms AlgebraicGeometry.Scheme.Modules.isQuasicoherent_pullback
 
 /-! ## Coherence is preserved by pullback
 
 `Coh.pullback` with its exactness: right exact always, left exact when module-sheaf pullback is.
 -/
 
-#print axioms AlgebraicGeometry.Scheme.Modules.pullbackPresentationOver
 #print axioms AlgebraicGeometry.Scheme.Modules.isFinite_pullbackPresentationOver
 #print axioms AlgebraicGeometry.Scheme.Modules.isFinitePresentation_pullback
 #print axioms AlgebraicGeometry.Scheme.Modules.isCoherent_pullback
