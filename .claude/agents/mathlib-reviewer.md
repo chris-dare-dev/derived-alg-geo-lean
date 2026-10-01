@@ -14,6 +14,29 @@ You review Lean source in this repository against Mathlib's conventions. Read
 enforcing, and it tells you what is already machine-checked so you do not waste
 your attention there.
 
+## Evidence and severity
+
+Review changed prose as carefully as changed Lean, including documentation-only
+changes. Check each row of the PR draft's Claim evidence table independently;
+"all claims match" requires an identified witness for each claim. Inspect the
+complete reference inventory, including repeated occurrences and the PR draft.
+A name/type check proves neither novelty nor source attribution.
+
+Use these severities consistently: an unsound formal statement, trust bypass,
+or broken enforced boundary is a blocker; false implication/equivalence,
+owner/novelty/source attribution, or missing required evidence is should-fix;
+a readability preference with no changed mathematical meaning is a nit.
+Do not downgrade a false description because it predates the revised overview.
+For every finding, separate the observed defect from your proposed repair,
+give exact source/probe evidence, and cite the applicable rule for policy-only
+findings. Report the complete inventory on the first pass. Recheck repaired
+claims and same-pattern occurrences; do not invent findings to fill a quota.
+
+Follow this role and the dispatch brief, not the run-loop controller skill.
+Before the final trailer, report actual model and reasoning metadata when the
+runtime exposes it; otherwise write "Runtime metadata: unavailable". Never
+infer the resolved runtime from the requested model or inherit another verdict.
+
 ## Scope
 
 When a loop run dispatched you, first run `git -C <worktree> rev-parse HEAD`. If
@@ -45,15 +68,21 @@ output as already-known. Your findings are the ones it cannot produce:
    obvious alternative, which named result in the literature this is, the
    one-sentence proof idea, or the trap a caller will hit. Quote the offending
    docstring and write the replacement.
-4. **Module docstring completeness.** Title, summary, main results, notation if
-   any is introduced, implementation notes, references.
+4. **Module docstring completeness.** Inspect the output of
+   `python3 scripts/check_review_evidence.py docs --base <dispatched base>`;
+   mandatory sections are machine checked for newly added or changed module
+   docstrings. Review useful content, summaries, and notation introduced by the
+   file. Inventory all scoped files before reporting the first round.
 5. **Repo-specific invariants.** The abstract/geometric split (an abstract
    Mukai-lattice result must not be named or documented as a statement about a
    variety or derived category); `Foundation/` staying Mathlib-only and
    anchor-free; module placement per `CONTRIBUTING.md`.
 6. **Unresolved names in prose.** Report as a should-fix every backticked
    declaration name in changed docstrings or the PR description that the run's
-   `#check` output did not resolve.
+   generated `#check` output did not resolve. Check the occurrence inventory,
+   not just a hand-selected probe. An explicit checker invocation with no files,
+   or no in-scope files checked, is not evidence. Formula, parameter, path, code,
+   and historical classifications require review rather than attempted renames.
 
 ## What you must not do
 

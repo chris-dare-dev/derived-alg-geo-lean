@@ -87,10 +87,10 @@ ARCHIVE_SCHEMA = "derived-alg-geo-lean.loop-run/v1/transcript-archive"
 RUN_SCHEMA = "derived-alg-geo-lean.loop-run/v1/transcript-run"
 #: Bump when a reader or the event model changes: every archived thread is
 #: then re-read, from its source or from its raw copy, on the next sync.
-PARSER_VERSION = 1
+PARSER_VERSION = 2
 #: Bump when `analyze` or a renderer changes: every run is then rewritten
 #: from its cached threads, without re-reading any transcript.
-ANALYSIS_VERSION = 3
+ANALYSIS_VERSION = 4
 DEFAULT_ARCHIVE = Path.home() / ".loop-runs" / "transcripts"
 RUNTIMES = ("codex", "claude")
 
@@ -356,6 +356,8 @@ class Event:
     cat: str = ""
     dur: float | None = None
     exit: int | None = None
+    output: str = ""
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -373,6 +375,7 @@ class Thread:
     branch: str = ""
     client: str = ""
     model: str = ""
+    reasoning_effort: str = ""
     repo_hits: int = 0
     usage: dict[str, int] = field(default_factory=dict)
     events: list[Event] = field(default_factory=list)
@@ -571,6 +574,19 @@ def read_codex_thread(path: Path, thread_id: str, titles: dict[str, str], matche
                     end = iso(parse_timestamp(stamp.group(1))) if stamp else ""
                     if event.kind == "tool":
                         event.dur = seconds_between(event.t, end) if end else None
+                        if event.cat == "agents" and event.metadata:
+                            try:
+                                result = json.loads(json.loads(line).get("payload", {}).get("output", "{}"))
+                                if isinstance(result, dict) and isinstance(result.get("agent_id"), str):
+                                    event.metadata["agent_id"] = result["agent_id"]
+                            except (TypeError, json.JSONDecodeError):
+                                pass
+                        if event.cat == "github":
+                            try:
+                                result = json.loads(line).get("payload", {}).get("output", "")
+                                event.output = redact(str(result))[:16384]
+                            except json.JSONDecodeError:
+                                pass
             continue
         try:
             entry = json.loads(line)
@@ -605,6 +621,7 @@ def read_codex_thread(path: Path, thread_id: str, titles: dict[str, str], matche
         if kind == "turn_context":
             if own_started and isinstance(payload.get("model"), str):
                 thread.model = payload["model"]
+                thread.reasoning_effort = str(payload.get("reasoning_effort") or payload.get("effort") or "")
             continue
         if kind == "token_usage_record":
             owner = payload.get("thread_id")
@@ -659,6 +676,14 @@ def read_codex_thread(path: Path, thread_id: str, titles: dict[str, str], matche
                 event = thread.add(stamp, "tool", name, cat="waiting")
             elif name in _AGENT_TOOLS:
                 event = thread.add(stamp, "tool", name, cat="agents")
+                if name.endswith("spawn_agent"):
+                    try:
+                        args = json.loads(payload.get("arguments", "{}"))
+                    except (TypeError, json.JSONDecodeError):
+                        args = {}
+                    if isinstance(args, dict) and args:
+                        event.metadata = {k: args[k] for k in ("task_name", "model", "reasoning_effort", "fork_turns") if k in args}
+                        event.metadata["fork_turns"] = args.get("fork_turns", "all")
             else:
                 event = thread.add(stamp, "tool", "browser js" if name == "js" else name, cat="other")
             if isinstance(payload.get("call_id"), str):
@@ -693,6 +718,8 @@ def _codex_item(item: dict[str, Any], stamp: str, thread: Thread, matcher: RepoM
         exit_code = item.get("exit_code")
         event = thread.add(stamp, "tool", command, cat=categorize_command(command), dur=_duration(item.get("duration")),
                            exit=exit_code if isinstance(exit_code, int) and not isinstance(exit_code, bool) else None)
+        if event.cat == "github":
+            event.output = redact(str(item.get("aggregated_output") or ""))[:16384]
         if event.exit not in (None, 0):
             event.text += "  ⟶ " + redact(_failure_tail(item.get("aggregated_output") or item.get("stderr")))
     elif kind == "FileChange":
@@ -841,6 +868,8 @@ def read_claude_thread(path: Path, thread_id: str, parent: str | None, matcher: 
 def _claude_result(event: Event, block: dict[str, Any], stamp: str) -> None:
     event.dur = seconds_between(event.t, stamp)
     result = _texts(block.get("content"))
+    if event.cat == "github":
+        event.output = redact(result)[:16384]
     if event.kind == "ask":
         event.text += "\n→ owner answered: " + redact(one_line(result, 400))
         return
@@ -870,7 +899,7 @@ def _claude_tool(block: dict[str, Any], stamp: str, thread: Thread, matcher: Rep
         return thread.add(stamp, "tool", f"{name.lower()} {target}", cat=categorize_paths([target], reading=True))
     if name in ("Agent", "Task"):
         label = f"{data.get('subagent_type') or 'agent'}: {data.get('description') or ''}"
-        thread.add(stamp, "spawn", label)
+        thread.add(stamp, "spawn", label, metadata={k: data[k] for k in ("model", "effort", "resume", "subagent_type") if k in data})
         return thread.add(stamp, "tool", "spawn " + label, cat="agents")
     if name == "AskUserQuestion":
         rendered = []
@@ -956,6 +985,41 @@ def root_of(thread_id: str, parents: dict[str, str | None]) -> str:
         current = parent
 
 
+def observed_merged_prs(event: Event) -> set[str]:
+    """Count observed GitHub state, never an auto-merge request or narrative."""
+    if event.exit not in (None, 0) or not event.output:
+        return set()
+    commands = list(invocations(event.text))
+    views = [words for words in commands if words[:3] == ["gh", "pr", "view"]
+             or words[:2] == ["gh", "api"]]
+    if not views:
+        return set()
+    try:
+        payload = json.loads(event.output)
+    except json.JSONDecodeError:
+        return set()
+    records = payload if isinstance(payload, list) else [payload]
+    found = set()
+    for record in records:
+        if not isinstance(record, dict):
+            continue
+        merged = record.get("state") == "MERGED" or record.get("merged") is True or bool(record.get("merged_at") or record.get("mergedAt"))
+        number = record.get("number")
+        url = record.get("url") or record.get("html_url") or ""
+        url_number = re.search(r"/pull/(\d+)(?:$|[/?#])", str(url))
+        if number is None and url_number:
+            number = int(url_number[1])
+        if number is None and len(views) == 1 and views[0][:3] == ["gh", "pr", "view"]:
+            number_arg = next((w for w in views[0][3:] if w.isdigit()), "")
+            number = int(number_arg) if number_arg else None
+        if not merged or not isinstance(number, int) or isinstance(number, bool):
+            continue
+        # Prefer repository-qualified identity when GitHub returns a PR URL.
+        match = re.search(r"https://[^/]+/([^/]+/[^/]+)/pull/\d+", str(url))
+        found.add(f"{match[1]}#{number}" if match else str(number))
+    return found
+
+
 def analyze(run: Run) -> dict[str, Any]:
     """The run-level facts that a digest and the cross-run reports are built from."""
 
@@ -1017,21 +1081,42 @@ def analyze(run: Run) -> dict[str, Any]:
     failures = 0
     created: set[str] = set()
     merged: set[str] = set()
+    requests: set[str] = set()
+    armed: set[str] = set()
+    disabled: set[str] = set()
+    dispatches = []
     for thread in run.threads:
         for event in thread.events:
             if event.kind != "tool":
+                if event.kind == "spawn" and event.metadata:
+                    dispatches.append({"t": event.t, "thread": thread.id, **event.metadata})
                 continue
+            merged.update(observed_merged_prs(event))
+            if event.cat == "agents" and "spawn_agent" in event.text:
+                dispatches.append({"t": event.t, "thread": thread.id, **event.metadata})
             if event.exit in (None, 0):
                 for words in invocations(event.text):
                     if len(words) >= 3 and words[:2] == ["gh", "pr"] and words[2] in ("create", "merge"):
                         number = next((w.lstrip("#") for w in words[3:] if w.lstrip("#").isdigit()), None)
-                        (created if words[2] == "create" else merged).add(number or f"{thread.id}@{event.t}")
+                        key = number or f"{thread.id}@{event.t}"
+                        if words[2] == "create":
+                            created.add(key)
+                        elif "--disable-auto" in words:
+                            disabled.add(key)
+                        elif "--auto" in words:
+                            armed.add(key)
+                        else:
+                            requests.add(key)
             bucket = profile.setdefault(event.cat or "other", {"calls": 0, "seconds": 0.0})
             bucket["calls"] += 1
             bucket["seconds"] += event.dur or 0.0
             failures += event.exit not in (None, 0)
             if event.cat == "lean-edit" and (not first_lean_edit or event.t < first_lean_edit):
                 first_lean_edit = event.t
+    # Do not double-count an earlier number-only observation followed by a URL.
+    for number in list(merged):
+        if number.isdigit() and any(key.endswith("#" + number) for key in merged):
+            merged.remove(number)
     end = max((t.end for t in run.threads if t.end), default=root.end)
     calls = sum(int(b["calls"]) for b in profile.values())
     share = lambda names: sum(int(profile.get(n, {}).get("calls", 0)) for n in names) / calls if calls else 0.0  # noqa: E731
@@ -1042,6 +1127,23 @@ def analyze(run: Run) -> dict[str, Any]:
         u = thread.usage or {}
         usage = usage + Usage(u.get("input_uncached", 0), u.get("input_cached", 0), u.get("cache_write", 0),
                               u.get("output", 0), u.get("reasoning_subset_of_output", 0))
+    children = {child.id: child for child in run.children}
+    for dispatch in dispatches:
+        child = children.get(dispatch.get("agent_id", ""))
+        dispatch["resolved_model"] = child.model if child and child.model else "unavailable"
+        dispatch["resolved_effort"] = child.reasoning_effort if child and child.reasoning_effort else "unavailable"
+        role = re.match(r"review_(mathematics_adversary|repository_boundary_adversary|abstraction_adversary|mathlib_reviewer)_",
+                        str(dispatch.get("task_name", "")))
+        dispatch["role"] = role[1].replace("_", "-") if role else "unavailable"
+        violations = []
+        if role:
+            if dispatch.get("fork_turns") != "none":
+                violations.append("context is not isolated")
+            if not dispatch.get("model") or dispatch.get("model") == "inherit":
+                violations.append("model selection inherited")
+            if dispatch.get("reasoning_effort") not in ("max", "ultra"):
+                violations.append("reasoning below max/ultra")
+        dispatch["violations"] = violations
     owner_stops = [s for s in stops if s["answered_by"] == "owner"]
     return {
         "schema": RUN_SCHEMA, "parser": PARSER_VERSION, "analysis": ANALYSIS_VERSION, "key": run.key, "runtime": root.runtime,
@@ -1068,6 +1170,9 @@ def analyze(run: Run) -> dict[str, Any]:
         "first_lean_edit": first_lean_edit,
         "first_lean_edit_after_s": seconds_between(root.start, first_lean_edit) if first_lean_edit else None,
         "profile": profile, "prs": prs, "prs_created": len(created), "prs_merged": len(merged),
+        "prs_merge_requested": len(requests), "prs_auto_merge_armed": len(armed),
+        "prs_auto_merge_disabled": len(disabled), "merged_prs_observed": sorted(merged),
+        "dispatches": dispatches,
         "usage": usage.as_dict(),
         "subagent_summaries": [_subagent_summary(t) for t in sorted(run.children, key=lambda t: t.start)],
     }
@@ -1078,6 +1183,7 @@ def _subagent_summary(thread: Thread) -> dict[str, Any]:
     final = final or next((e.text for e in reversed(thread.events) if e.kind == "commentary"), "")
     return {
         "id": thread.id, "role": thread.role, "title": thread.title, "start": thread.start,
+        "model": thread.model or "unavailable", "reasoning_effort": thread.reasoning_effort or "unavailable",
         "span_s": seconds_between(thread.start, thread.end),
         "tool_calls": sum(1 for e in thread.events if e.kind == "tool"),
         "outcome": one_line(final, 300),
@@ -1111,7 +1217,9 @@ def render_digest(run: Run, facts: dict[str, Any]) -> str:
                        f"mathematics {facts['mathematics_share']:.0%}"),
         ("Context compactions", str(facts["compactions"])),
         ("Billed tokens", f"{facts['usage']['billed_total']:,} ({facts['usage']['output']:,} output)"),
-        ("PRs", f"{facts['prs_created']} created and {facts['prs_merged']} merged by `gh`; mentioned: "
+        ("PRs", f"{facts['prs_created']} creation calls; {facts['prs_merged']} observed merged; "
+                f"{facts['prs_merge_requested']} direct merge requests; {facts['prs_auto_merge_armed']} auto-merge arm requests; "
+                f"{facts['prs_auto_merge_disabled']} disable requests; mentioned: "
                 + (", ".join(f"#{n}" for n in facts["prs"]) or "-")),
     ]
     lines = [f"# {root.title or '(untitled)'}", "",
@@ -1149,10 +1257,19 @@ def render_digest(run: Run, facts: dict[str, Any]) -> str:
     lines += ["## Timeline", "", *_timeline(root.events), ""]
 
     if facts["subagent_summaries"]:
-        lines += ["## Subagents", "", "| started | role | ran | calls | outcome |", "|---|---|---:|---:|---|"]
+        lines += ["## Subagents", "", "| started | role | resolved model / reasoning | ran | calls | outcome |", "|---|---|---|---:|---:|---|"]
         for sub in facts["subagent_summaries"]:
             role = cell(sub["role"] + (f" — {sub['title']}" if sub["title"] else ""), 70)
-            lines.append(f"| {clock(sub['start'])} | {role} | {human(sub['span_s'])} | {sub['tool_calls']} | {cell(sub['outcome'], 240)} |")
+            lines.append(f"| {clock(sub['start'])} | {role} | {sub['model']} / {sub['reasoning_effort']} | {human(sub['span_s'])} | {sub['tool_calls']} | {cell(sub['outcome'], 240)} |")
+        lines.append("")
+    if facts["dispatches"]:
+        lines += ["## Dispatch metadata", "", "Requested configuration; unavailable runtime metadata is never inferred. Scouts are included.", "",
+                  "| time | task | context | requested model / effort | resolved model / effort | dispatch violations |", "|---|---|---|---|---|---|"]
+        for dispatch in facts["dispatches"]:
+            lines.append(f"| {clock(dispatch['t'])} | {cell(str(dispatch.get('task_name') or dispatch.get('subagent_type') or 'unavailable'), 60)} | "
+                         f"{dispatch.get('fork_turns', 'unavailable')} | {dispatch.get('model', 'unavailable')} / "
+                         f"{dispatch.get('reasoning_effort') or dispatch.get('effort') or 'unavailable'} | "
+                         f"{dispatch['resolved_model']} / {dispatch['resolved_effort']} | {', '.join(dispatch['violations']) or ('none' if dispatch['role'] != 'unavailable' else 'role unavailable')} |")
         lines.append("")
     lines += [f"Every command of the run and its subagents: `{run.key}.commands.tsv`.", ""]
     return "\n".join(lines)
@@ -1624,7 +1741,7 @@ def command_list(args: argparse.Namespace) -> int:
               f"{one_line(s['title'] or '', 60)}")
     print(f"\n{len(runs)} runs in {archive.root}. own = owner messages; stops = for owner/auto-continued; "
           "idle = waiting on owner/waiting to be auto-revived; auto = longest stretch without owner input; "
-          "proto = protocol share of tool calls; merged = PRs merged with `gh pr merge`")
+          "proto = protocol share of tool calls; merged = GitHub merged state observed in tool output (unobserved outcomes are unknown)")
     return 0
 
 

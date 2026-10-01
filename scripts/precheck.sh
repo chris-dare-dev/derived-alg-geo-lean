@@ -216,6 +216,8 @@ gate loop-engine-tests python3 -m unittest discover -s scripts/tests -p "test_*.
 # the hook exists only on a developer's machine.
 gate local-build scripts/test_local_build.sh
 gate mathlib-style mathlib_style
+gate review-docs python3 scripts/check_review_evidence.py docs --base origin/main
+gate emission-sources python3 scripts/check_emission_coverage.py --source-only
 gate explicit-numerical-data python3 scripts/check_explicit_numerical_data.py
 gate foundation-import-boundary python3 scripts/check_foundation_import_boundary.py
 gate nolints-ratchet python3 scripts/check_nolints.py
