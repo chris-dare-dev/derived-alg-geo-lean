@@ -36,4 +36,4 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Stalk
 
 #print axioms AlgebraicGeometry.Scheme.Modules.fixedLeftTensorStalkIso
 #print axioms AlgebraicGeometry.Scheme.Modules.quasiIso_pullback_of_tensorRight_inverts
-#print axioms AlgebraicGeometry.Scheme.Modules.quasiIso_pullback_of_kflat
+#print axioms AlgebraicGeometry.Scheme.Modules.quasiIso_pullback_of_isKFlat

@@ -13,13 +13,42 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.KFlatQuasiIso
 # Derived pullback from K-flat resolutions
 
 A K-flat resolution on the source of pullback already supplies the functorial replacement,
-comparison, and quasi-isomorphism required by `PullbackAcyclicResolution`. This file isolates the
-two remaining operational facts about pullback of those replacements and constructs the genuine
-left-derived pullback universal property from them.
+comparison, and quasi-isomorphism required by
+`AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.PullbackAcyclicResolution`.
+This file isolates the two remaining operational facts about pullback of those
+replacements and constructs the genuine left-derived pullback universal property
+from them.
 
 Quasicoherence and compactness are reduced to the resolved complex-level pullback. Thus the
 base-change construction no longer needs independently supplied functors on derived categories:
 all categorical structure descends from one K-flat replacement and explicit geometric evidence.
+
+## Main definitions
+
+* `AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.KFlatPullbackAcyclic`
+  records the two pullback-acyclicity fields.
+* `AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.arbitraryLeftDerivedPullback`
+  uses the canonical free-Yoneda resolution.
+
+## Main results
+
+* `AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.kFlatPullbackAcyclic`
+  proves both fields for any K-flat resolution and morphism.
+
+## Implementation notes
+
+The caller-free constructor applies the existing left-derived universal-property
+construction to the canonical resolution and the acyclicity theorem.
+
+## References
+
+The resolution and derived functor constructions are in the repository's
+`DerivedCategory/Tensor/FreeYonedaKFlat.lean` and
+`DerivedCategory/Families/PullbackAcyclicResolution.lean` modules.
+
+## Tags
+
+scheme pullback, derived category, K-flat resolution
 -/
 
 attribute [local instance] HasDerivedCategory.standard
@@ -84,9 +113,10 @@ theorem kFlatPullbackAcyclic_ofFlat (R : SchemeKFlatResolution U.left) (f : T �
   kFlatPullbackAcyclic_ofExact R f
 
 /-- Every K-flat resolution is acyclic for pullback along an arbitrary scheme
-morphism. K-flatness of the resolved endpoints and the comparison map is
-enough; no exactness or flatness of the morphism is needed. -/
-theorem kFlatPullbackAcyclic_ofKFlat (R : SchemeKFlatResolution U.left) (f : T ⟶ U) :
+morphism. Both fields follow by applying pullback preservation to
+quasi-isomorphisms between resolved complexes; for the second field these are
+the once- and twice-resolved complexes. -/
+theorem kFlatPullbackAcyclic (R : SchemeKFlatResolution U.left) (f : T ⟶ U) :
     KFlatPullbackAcyclic R f where
   pullback_inverts := by
     intro K L g hg
@@ -94,12 +124,12 @@ theorem kFlatPullbackAcyclic_ofKFlat (R : SchemeKFlatResolution U.left) (f : T �
       ((complexPullback f).map (R.resolution.map g)))
     apply Localization.inverts (SchemeDerivedCategory.Q T.left)
       (HomologicalComplex.quasiIso T.left.Modules (ComplexShape.up ℤ))
-    exact Scheme.Modules.quasiIso_pullback_of_kflat f.left (R.resolution.map g)
+    exact Scheme.Modules.quasiIso_pullback_of_isKFlat f.left (R.resolution.map g)
       (R.map_quasiIso g hg) (R.isKFlat K) (R.isKFlat L)
   resolved_comparison_isIso K := by
     apply Localization.inverts (SchemeDerivedCategory.Q T.left)
       (HomologicalComplex.quasiIso T.left.Modules (ComplexShape.up ℤ))
-    exact Scheme.Modules.quasiIso_pullback_of_kflat f.left
+    exact Scheme.Modules.quasiIso_pullback_of_isKFlat f.left
       (R.comparison.app (R.resolution.obj K))
       (R.comparison_quasiIso (R.resolution.obj K))
       (R.isKFlat (R.resolution.obj K)) (R.isKFlat K)
@@ -118,6 +148,13 @@ def kFlatPullbackAcyclicResolution (R : SchemeKFlatResolution U.left) (f : T ⟶
 def kFlatLeftDerivedPullback (R : SchemeKFlatResolution U.left) (f : T ⟶ U)
     (hR : KFlatPullbackAcyclic R f) : LeftDerivedPullback f :=
   (kFlatPullbackAcyclicResolution R f hR).toLeftDerivedPullback
+
+/-- The left-derived pullback for any morphism in `Over S`, constructed using
+the canonical free-Yoneda K-flat resolution and its proved pullback acyclicity.
+No preservation assertion or resolution is supplied by the caller. -/
+def arbitraryLeftDerivedPullback (f : T ⟶ U) : LeftDerivedPullback f :=
+  kFlatLeftDerivedPullback (freeYonedaSchemeKFlatResolution U.left) f
+    (kFlatPullbackAcyclic _ f)
 
 /-- For exact pullback, the K-flat construction agrees canonically with the existing exact
 derived pullback. -/

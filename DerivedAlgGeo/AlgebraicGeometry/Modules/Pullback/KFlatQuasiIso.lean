@@ -25,7 +25,7 @@ fixed-left ordinary tensor/stalk natural isomorphism.
 
 ## Main results
 
-* `AlgebraicGeometry.Scheme.Modules.quasiIso_pullback_of_kflat` specializes
+* `AlgebraicGeometry.Scheme.Modules.quasiIso_pullback_of_isKFlat` specializes
   this to K-flat complexes.
 
 ## Implementation notes
@@ -51,8 +51,8 @@ attribute [local instance] HasDerivedCategory.standard
   AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor_additive
 
 private theorem qiso_congr_natIso
-    {C : Type u} [Category C] [Preadditive C]
-    {D : Type v} [Category D] [Abelian D] [HasDerivedCategory D]
+    {C : Type u} [Category C] [HasZeroMorphisms C]
+    {D : Type v} [Category D] [Abelian D]
     (F G : C ⥤ D) [F.PreservesZeroMorphisms] [G.PreservesZeroMorphisms]
     (e : F ≅ G) {K L : CochainComplex C ℤ} (g : K ⟶ L)
     (h : QuasiIso ((F.mapHomologicalComplex (ComplexShape.up ℤ)).map g)) :
@@ -70,7 +70,7 @@ private theorem qiso_congr_natIso
     (isIso_comp_left_iff _ _).mp hcomp
   exact (DerivedCategory.isIso_Q_map_iff_quasiIso _ _).1 hGi
 
-private theorem qiso_fixed_left_of_kflat
+private theorem quasiIso_tensorLeft_of_tensorRight_inverts
     (Y : Scheme.{u})
     {K L : CochainComplex Y.Modules ℤ} (g : K ⟶ L)
     (hg : HomologicalComplex.quasiIso Y.Modules (ComplexShape.up ℤ) g)
@@ -101,10 +101,11 @@ private theorem qiso_fixed_left_of_kflat
   exact (DerivedCategory.isIso_Q_map_iff_quasiIso _ _).1 hG
 
 private theorem qiso_restrictScalars_reflect
-    {R S : Type u} [CommRing R] [CommRing S] (r : R →+* S)
-    {K L : CochainComplex (ModuleCat.{u} S) ℤ} (g : K ⟶ L)
+    {R S : Type u} [Ring R] [Ring S] (r : R →+* S)
+    {ι : Type w} {c : ComplexShape ι}
+    {K L : HomologicalComplex (ModuleCat.{u} S) c} (g : K ⟶ L)
     (h : QuasiIso (((ModuleCat.restrictScalars r).mapHomologicalComplex
-      (ComplexShape.up ℤ)).map g)) : QuasiIso g := by
+      c).map g)) : QuasiIso g := by
   letI : (ModuleCat.restrictScalars r).Additive :=
     Functor.additive_of_preserves_binary_products _
   letI : (ModuleCat.restrictScalars r).PreservesHomology :=
@@ -140,7 +141,7 @@ theorem quasiIso_pullback_of_tensorRight_inverts
   let gy := (stY.mapHomologicalComplex (ComplexShape.up ℤ)).map g
   have hM : QuasiIso (((tensorLeft M).mapHomologicalComplex
       (ComplexShape.up ℤ)).map g) :=
-    qiso_fixed_left_of_kflat Y g hg hK hL M
+    quasiIso_tensorLeft_of_tensorRight_inverts Y g hg hK hL M
   letI : stY.PreservesHomology := Scheme.Modules.moduleStalkFunctor_preservesHomology Y (f x)
   have hMst : QuasiIso ((stY.mapHomologicalComplex (ComplexShape.up ℤ)).map
       (((tensorLeft M).mapHomologicalComplex (ComplexShape.up ℤ)).map g)) := by
@@ -176,9 +177,10 @@ theorem quasiIso_pullback_of_tensorRight_inverts
   exact hPull
 
 
-/-- A quasi-isomorphism between K-flat scheme-module complexes remains a
-quasi-isomorphism after pullback along any scheme morphism. -/
-theorem quasiIso_pullback_of_kflat
+/-- K-flatness supplies the right tensor-inversion hypotheses at both
+endpoints, so the stronger pullback criterion applies using only those halves
+of the K-flatness assumptions. -/
+theorem quasiIso_pullback_of_isKFlat
     {X Y : Scheme.{u}} (f : X ⟶ Y)
     {K L : CochainComplex Y.Modules ℤ} (g : K ⟶ L)
     (hg : HomologicalComplex.quasiIso Y.Modules (ComplexShape.up ℤ) g)
