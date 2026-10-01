@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.Unbounded
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.FiniteKFlat
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.BoundedAboveKFlat
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.FreeYonedaKFlat
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.LeftDerivedTensor
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.BoundedCoherent
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.BoundedMonoidal
@@ -43,6 +44,9 @@ for derived pullback along a morphism.
 scheme-module terms is K-flat for the existing total tensor.
 `Tensor/BoundedAboveKFlat.lean` extends this to strictly bounded-above
 flat-term complexes through the lower stupid-truncation colimit.
+`Tensor/FreeYonedaKFlat.lean` proves the functorial free-Yoneda total is
+K-flat for every input and inhabits the existing `SchemeKFlatResolution`.
+Arbitrary nonflat pullback acyclicity remains a separate geometric theorem.
 
 ## Implementation notes
 
@@ -59,7 +63,8 @@ Fourier--Mukai consumes all of this and owns none of it; see
 `Tensor/BoundedMonoidal.lean` use `AlgebraicGeometry.DerivedCategory`.
 `Tensor/FiniteKFlat.lean` and `Tensor/BoundedAboveKFlat.lean` use
 `AlgebraicGeometry.Scheme.Modules`, the namespace of the total tensor they
-specialize. Paths follow ownership without imposing one
+specialize. `Tensor/FreeYonedaKFlat.lean` also constructs the resolution in
+`AlgebraicGeometry.DerivedCategory`. Paths follow ownership without imposing one
 namespace on every declaration in the subtree.
 
 ## References

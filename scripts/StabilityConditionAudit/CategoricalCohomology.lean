@@ -57,6 +57,10 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex₂.singleExtendMapFlipIso
 #print axioms HomologicalComplex₂.isColimitTotalFunctorMapCocone
 #print axioms HomologicalComplex₂.totalFunctor_preservesColimitsOfShape
+#print axioms HomologicalComplex₂.isZero_total_X_of_diagonal
+#print axioms HomologicalComplex₂.isStrictlyLE_total_of_diagonal
+#print axioms HomologicalComplex₂.isStrictlyLE_total_of_upper_bounds
+#print axioms HomologicalComplex₂.isStrictlyLE_total_of_nonpositive_rows
 #print axioms HomologicalComplex₂.totalProjection
 #print axioms HomologicalComplex₂.total_d_comp_totalProjection
 #print axioms HomologicalComplex₂.comp_totalProjection_comp_d_eq_zero_of_total_component_eq_zero_of_horizontal_eq_zero

@@ -51,6 +51,8 @@ includes every canonical good truncation.
 * `AlgebraicGeometry.Scheme.Modules.quasiIso_freeYonedaSheafCoproductTotalAugmentation`
   passes the stagewise quasi-isomorphisms through the good-truncation colimit
   for arbitrary inputs.
+* `AlgebraicGeometry.Scheme.Modules.freeYonedaSheafCoproductTotalComplexFunctor_obj_isStrictlyLE`
+  retains a strict upper term bound through the nonpositive resolution total.
 
 ## Implementation notes
 
@@ -62,7 +64,7 @@ comparison. The original target type is retained for downstream consumers.
 For an input strictly supported at `c`, both bicomplexes vanish in outer
 degrees above `c` and inner degrees above zero. Reduced left resolution
 preserves zero terms, so the four-bound total-map criterion applies on each
-diagonal.
+diagonal. The same support bounds give a strict upper bound on the source total.
 The source and target good-truncation cocones are colimiting. Exact filtered
 colimits preserve stagewise quasi-isomorphisms, and naturality transports the
 result from the chosen colimit to the original input.
@@ -72,6 +74,10 @@ result from the chosen colimit to the original input.
 The construction uses Mathlib's `ComplexShape.Embedding.extendFunctor`,
 `HomologicalComplex₂.totalFunctor`, and the repository's natural
 single-extension, mapped-single/flip, and signed single-zero comparisons.
+
+## Tags
+
+free-Yoneda resolution, module sheaf, bicomplex, total complex, quasi-isomorphism
 -/
 
 universe u
@@ -354,6 +360,21 @@ private theorem isZero_resolutionBicomplexUpInt_inner_of_pos (p q : ℤ) (hq : 0
   change IsZero ((D.extend ComplexShape.embeddingDownNat).X q)
   exact CochainComplex.isZero_of_isStrictlyLE
     (D.extend ComplexShape.embeddingDownNat) 0 q (by omega)
+
+/-- The free-Yoneda resolution total of a strictly bounded-above input remains
+strictly bounded above at the same term degree. The resolution contributes only
+nonpositive inner degrees; this is a term-support claim, not K-flatness. -/
+theorem freeYonedaSheafCoproductTotalComplexFunctor_obj_isStrictlyLE
+    [M.IsStrictlyLE c] :
+    CochainComplex.IsStrictlyLE
+      ((freeYonedaSheafCoproductTotalComplexFunctor X).obj M) c := by
+  let B := (freeYonedaSheafCoproductResolutionBicomplexUpInt X).obj M
+  change CochainComplex.IsStrictlyLE (B.total (ComplexShape.up ℤ)) c
+  apply HomologicalComplex₂.isStrictlyLE_total_of_nonpositive_rows B c
+  · intro p hp
+    exact isZero_resolutionBicomplexUpInt_X_of_isStrictlyLE_of_lt X M c p hp
+  · intro p q hq
+    exact isZero_resolutionBicomplexUpInt_inner_of_pos X M p q hq
 
 private theorem isZero_singleZeroFlip_inner_of_ne (p q : ℤ) (hq : q ≠ 0) :
     IsZero ((((((HomologicalComplex.single
