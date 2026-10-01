@@ -8,18 +8,20 @@ import Mathlib.Algebra.Homology.BifunctorFlip
 import Mathlib.CategoryTheory.Limits.Shapes.Countable
 
 /-!
-# Finite-support bifunctor maps and colimits of cochain totals
+# Finite-support bifunctor maps and colimits of complex totals
 
 Mathlib's `HomologicalComplex.mapBifunctorMap` is a map between direct-sum totals.
 When the fixed input complex has finitely supported terms, a columnwise
 quasi-isomorphism criterion for literal bicomplex totals applies to this map.
-The same literal total preserves a diagram-shape colimit in either varying slot
-when the corresponding partial bifunctor preserves it termwise.
+For arbitrary compatible complex shapes, the literal total preserves a
+diagram-shape colimit in either varying slot when the corresponding partial
+bifunctor preserves it at the fixed complex's terms.
 
 ## Main definitions
 
 This module introduces no new public definitions; it studies Mathlib's existing
-`HomologicalComplex.mapBifunctorMap` and `CategoryTheory.Functor.map₂CochainComplex`.
+`HomologicalComplex.mapBifunctorMap`, `CategoryTheory.Functor.map₂HomologicalComplex`,
+and its cochain specialization `CategoryTheory.Functor.map₂CochainComplex`.
 
 ## Main results
 
@@ -28,10 +30,12 @@ This module introduces no new public definitions; it studies Mathlib's existing
   of literal totals under finite term support in the first.
 * `HomologicalComplex.quasiIso_mapBifunctorMap_id_right_of_finite_support_of_column_quasiIso`
   fixes finite support in the second input and maps the first by signed flip.
-* `CategoryTheory.Functor.map₂CochainComplex_obj_preservesColimitsOfShape` and
-  `CategoryTheory.Functor.map₂CochainComplex_flip_obj_preservesColimitsOfShape`
-  preserve a colimit in either varying slot from termwise preservation by the
-  corresponding partial bifunctor.
+* `CategoryTheory.Functor.preservesColimitsOfShape_map₂HomologicalComplex_obj` and
+  `CategoryTheory.Functor.preservesColimitsOfShape_map₂HomologicalComplex_flip_obj`
+  preserve a colimit in either varying slot for arbitrary compatible shapes.
+* `CategoryTheory.Functor.preservesColimitsOfShape_map₂CochainComplex_obj` and
+  `CategoryTheory.Functor.preservesColimitsOfShape_map₂CochainComplex_flip_obj`
+  specialize these results to integer cochain totals.
 
 ## Implementation notes
 
@@ -40,8 +44,9 @@ bicomplexes. The finite-strip total-map criterion needs columnwise evidence
 only inside it; the right-slot result uses naturality of Mathlib's signed flip.
 For colimits, two evaluations reduce the mapped bicomplex to the partial
 base functor at each bidegree. The existing total-functor colimit theorem
-then applies; private natural isomorphisms identify its composite with
-Mathlib's literal cochain map₂ functor in each slot.
+then applies under coproducts over each total-degree fiber; private natural
+isomorphisms identify its composite with Mathlib's literal map₂ functor in
+each slot. Countable coproducts suffice for the integer cochain case.
 
 ## References
 
@@ -51,13 +56,12 @@ These results extend Mathlib's `HomologicalComplex.mapBifunctorMap` and use
 
 ## Tags
 
-bifunctor, cochain complex, quasi-isomorphism, finite support, colimit
+bifunctor, homological complex, cochain complex, quasi-isomorphism, finite support, colimit
 -/
 
 open CategoryTheory CategoryTheory.Limits
 
 noncomputable section
-
 namespace HomologicalComplex
 
 open ComplexShape
@@ -127,61 +131,69 @@ namespace CategoryTheory.Functor
 
 open ComplexShape
 
-universe u₁ u₂ u₃ v₁ v₂ v₃ w z
+universe u₁ u₂ u₃ v₁ v₂ v₃ w z a b d
 
 set_option backward.isDefEq.respectTransparency false in
 private theorem bicomplex_left
     {C₁ : Type u₁} [Category.{v₁} C₁] [HasZeroMorphisms C₁]
     {C₂ : Type u₂} [Category.{v₂} C₂] [HasZeroMorphisms C₂]
-    {D : Type u₃} [Category.{v₃} D] [Preadditive D]
+    {D : Type u₃} [Category.{v₃} D] [HasZeroMorphisms D]
     {J : Type w} [Category.{z} J]
-    [HasColimitsOfShape J C₂] [HasColimitsOfShape J D]
+    [HasColimitsOfShape J C₂]
     (F : C₁ ⥤ C₂ ⥤ D) [F.PreservesZeroMorphisms]
     [∀ X, (F.obj X).PreservesZeroMorphisms]
-    [∀ X, PreservesColimitsOfShape J (F.obj X)]
-    (K : CochainComplex C₁ ℤ) :
+    {I₁ : Type a} {I₂ : Type b}
+    (c₁ : ComplexShape I₁) (c₂ : ComplexShape I₂)
+    (K : HomologicalComplex C₁ c₁)
+    [∀ p, PreservesColimitsOfShape J (F.obj (K.X p))] :
     PreservesColimitsOfShape J
-      ((F.mapBifunctorHomologicalComplex (up ℤ) (up ℤ)).obj K) := by
+      ((F.mapBifunctorHomologicalComplex c₁ c₂).obj K) := by
   apply HomologicalComplex.preservesColimitsOfShape_of_eval
   intro p
   apply HomologicalComplex.preservesColimitsOfShape_of_eval
   intro q
   change PreservesColimitsOfShape J
-    (HomologicalComplex.eval C₂ (up ℤ) q ⋙ F.obj (K.X p))
+    (HomologicalComplex.eval C₂ c₂ q ⋙ F.obj (K.X p))
   infer_instance
 
 set_option backward.isDefEq.respectTransparency false in
 private theorem bicomplex_right
     {C₁ : Type u₁} [Category.{v₁} C₁] [HasZeroMorphisms C₁]
     {C₂ : Type u₂} [Category.{v₂} C₂] [HasZeroMorphisms C₂]
-    {D : Type u₃} [Category.{v₃} D] [Preadditive D]
+    {D : Type u₃} [Category.{v₃} D] [HasZeroMorphisms D]
     {J : Type w} [Category.{z} J]
-    [HasColimitsOfShape J C₁] [HasColimitsOfShape J D]
+    [HasColimitsOfShape J C₁]
     (F : C₁ ⥤ C₂ ⥤ D) [F.PreservesZeroMorphisms]
     [∀ X, (F.obj X).PreservesZeroMorphisms]
-    [∀ Y, PreservesColimitsOfShape J (F.flip.obj Y)]
-    (K : CochainComplex C₂ ℤ) :
+    {I₁ : Type a} {I₂ : Type b}
+    (c₁ : ComplexShape I₁) (c₂ : ComplexShape I₂)
+    (K : HomologicalComplex C₂ c₂)
+    [∀ q, PreservesColimitsOfShape J (F.flip.obj (K.X q))] :
     PreservesColimitsOfShape J
-      ((F.mapBifunctorHomologicalComplex (up ℤ) (up ℤ)).flip.obj K) := by
+      ((F.mapBifunctorHomologicalComplex c₁ c₂).flip.obj K) := by
   apply HomologicalComplex.preservesColimitsOfShape_of_eval
   intro p
   apply HomologicalComplex.preservesColimitsOfShape_of_eval
   intro q
   change PreservesColimitsOfShape J
-    (HomologicalComplex.eval C₁ (up ℤ) p ⋙ F.flip.obj (K.X q))
+    (HomologicalComplex.eval C₁ c₁ p ⋙ F.flip.obj (K.X q))
   infer_instance
 
 set_option backward.isDefEq.respectTransparency false in
 private def totalIso_left
     {C₁ : Type u₁} [Category.{v₁} C₁] [HasZeroMorphisms C₁]
     {C₂ : Type u₂} [Category.{v₂} C₂] [HasZeroMorphisms C₂]
-    {D : Type u₃} [Category.{v₃} D] [Preadditive D] [HasCountableCoproducts D]
+    {D : Type u₃} [Category.{v₃} D] [Preadditive D]
     (F : C₁ ⥤ C₂ ⥤ D) [F.PreservesZeroMorphisms]
     [∀ X, (F.obj X).PreservesZeroMorphisms]
-    (K : CochainComplex C₁ ℤ) :
-    (F.mapBifunctorHomologicalComplex (up ℤ) (up ℤ)).obj K ⋙
-      HomologicalComplex₂.totalFunctor D (up ℤ) (up ℤ) (up ℤ) ≅
-    F.map₂CochainComplex.obj K :=
+    {I₁ : Type a} {I₂ : Type b} {I₁₂ : Type d}
+    (c₁ : ComplexShape I₁) (c₂ : ComplexShape I₂) (c₁₂ : ComplexShape I₁₂)
+    [TotalComplexShape c₁ c₂ c₁₂] [DecidableEq I₁₂]
+    [∀ n : I₁₂, HasCoproductsOfShape ((ComplexShape.π c₁ c₂ c₁₂) ⁻¹' {n}) D]
+    (K : HomologicalComplex C₁ c₁) :
+    (F.mapBifunctorHomologicalComplex c₁ c₂).obj K ⋙
+      HomologicalComplex₂.totalFunctor D c₁ c₂ c₁₂ ≅
+    (F.map₂HomologicalComplex c₁ c₂ c₁₂).obj K :=
   NatIso.ofComponents (fun _ => Iso.refl _) (by
     intros
     simp [HomologicalComplex.mapBifunctorMap])
@@ -190,22 +202,68 @@ set_option backward.isDefEq.respectTransparency false in
 private def totalIso_right
     {C₁ : Type u₁} [Category.{v₁} C₁] [HasZeroMorphisms C₁]
     {C₂ : Type u₂} [Category.{v₂} C₂] [HasZeroMorphisms C₂]
-    {D : Type u₃} [Category.{v₃} D] [Preadditive D] [HasCountableCoproducts D]
+    {D : Type u₃} [Category.{v₃} D] [Preadditive D]
     (F : C₁ ⥤ C₂ ⥤ D) [F.PreservesZeroMorphisms]
     [∀ X, (F.obj X).PreservesZeroMorphisms]
-    (K : CochainComplex C₂ ℤ) :
-    (F.mapBifunctorHomologicalComplex (up ℤ) (up ℤ)).flip.obj K ⋙
-      HomologicalComplex₂.totalFunctor D (up ℤ) (up ℤ) (up ℤ) ≅
-    F.map₂CochainComplex.flip.obj K :=
+    {I₁ : Type a} {I₂ : Type b} {I₁₂ : Type d}
+    (c₁ : ComplexShape I₁) (c₂ : ComplexShape I₂) (c₁₂ : ComplexShape I₁₂)
+    [TotalComplexShape c₁ c₂ c₁₂] [DecidableEq I₁₂]
+    [∀ n : I₁₂, HasCoproductsOfShape ((ComplexShape.π c₁ c₂ c₁₂) ⁻¹' {n}) D]
+    (K : HomologicalComplex C₂ c₂) :
+    (F.mapBifunctorHomologicalComplex c₁ c₂).flip.obj K ⋙
+      HomologicalComplex₂.totalFunctor D c₁ c₂ c₁₂ ≅
+    (F.map₂HomologicalComplex c₁ c₂ c₁₂).flip.obj K :=
   NatIso.ofComponents (fun _ => Iso.refl _) (by
     intros
     simp [HomologicalComplex.mapBifunctorMap])
 
-/-- Fixing the first cochain complex in Mathlib's literal bifunctor total
-preserves colimits of shape `J` when each partial base functor does. The
-countable coproducts construct every diagonal total; no exactness or homology
-preservation is required. -/
-theorem map₂CochainComplex_obj_preservesColimitsOfShape
+/-- For any compatible complex shapes, fixing the first complex preserves
+`J`-colimits of the literal bifunctor total when the partial functor at each
+term of that complex does. The total functor uses the stated coproducts over
+its degree fibers; no homology exactness is required. -/
+theorem preservesColimitsOfShape_map₂HomologicalComplex_obj
+    {C₁ : Type u₁} [Category.{v₁} C₁] [HasZeroMorphisms C₁]
+    {C₂ : Type u₂} [Category.{v₂} C₂] [HasZeroMorphisms C₂]
+    {D : Type u₃} [Category.{v₃} D] [Preadditive D]
+    {J : Type w} [Category.{z} J]
+    [HasColimitsOfShape J C₂] [HasColimitsOfShape J D]
+    (F : C₁ ⥤ C₂ ⥤ D) [F.PreservesZeroMorphisms]
+    [∀ X, (F.obj X).PreservesZeroMorphisms]
+    {I₁ : Type a} {I₂ : Type b} {I₁₂ : Type d}
+    (c₁ : ComplexShape I₁) (c₂ : ComplexShape I₂) (c₁₂ : ComplexShape I₁₂)
+    [TotalComplexShape c₁ c₂ c₁₂] [DecidableEq I₁₂]
+    [∀ n : I₁₂, HasCoproductsOfShape ((ComplexShape.π c₁ c₂ c₁₂) ⁻¹' {n}) D]
+    (K : HomologicalComplex C₁ c₁)
+    [∀ p, PreservesColimitsOfShape J (F.obj (K.X p))] :
+    PreservesColimitsOfShape J ((F.map₂HomologicalComplex c₁ c₂ c₁₂).obj K) := by
+  letI := bicomplex_left (J := J) F c₁ c₂ K
+  exact preservesColimitsOfShape_of_natIso (totalIso_left F c₁ c₂ c₁₂ K)
+
+/-- Fixing the second complex preserves `J`-colimits of the literal total
+when each partial functor at its terms does. The proof keeps the original
+bidegree order, evaluates twice, and transports through direct-sum totalization. -/
+theorem preservesColimitsOfShape_map₂HomologicalComplex_flip_obj
+    {C₁ : Type u₁} [Category.{v₁} C₁] [HasZeroMorphisms C₁]
+    {C₂ : Type u₂} [Category.{v₂} C₂] [HasZeroMorphisms C₂]
+    {D : Type u₃} [Category.{v₃} D] [Preadditive D]
+    {J : Type w} [Category.{z} J]
+    [HasColimitsOfShape J C₁] [HasColimitsOfShape J D]
+    (F : C₁ ⥤ C₂ ⥤ D) [F.PreservesZeroMorphisms]
+    [∀ X, (F.obj X).PreservesZeroMorphisms]
+    {I₁ : Type a} {I₂ : Type b} {I₁₂ : Type d}
+    (c₁ : ComplexShape I₁) (c₂ : ComplexShape I₂) (c₁₂ : ComplexShape I₁₂)
+    [TotalComplexShape c₁ c₂ c₁₂] [DecidableEq I₁₂]
+    [∀ n : I₁₂, HasCoproductsOfShape ((ComplexShape.π c₁ c₂ c₁₂) ⁻¹' {n}) D]
+    (K : HomologicalComplex C₂ c₂)
+    [∀ q, PreservesColimitsOfShape J (F.flip.obj (K.X q))] :
+    PreservesColimitsOfShape J ((F.map₂HomologicalComplex c₁ c₂ c₁₂).flip.obj K) := by
+  letI := bicomplex_right (J := J) F c₁ c₂ K
+  exact preservesColimitsOfShape_of_natIso (totalIso_right F c₁ c₂ c₁₂ K)
+
+/-- The cochain specialization of
+`preservesColimitsOfShape_map₂HomologicalComplex_obj`. Countable coproducts
+supply every integer-diagonal total. -/
+theorem preservesColimitsOfShape_map₂CochainComplex_obj
     {C₁ : Type u₁} [Category.{v₁} C₁] [HasZeroMorphisms C₁]
     {C₂ : Type u₂} [Category.{v₂} C₂] [HasZeroMorphisms C₂]
     {D : Type u₃} [Category.{v₃} D] [Preadditive D] [HasCountableCoproducts D]
@@ -213,16 +271,14 @@ theorem map₂CochainComplex_obj_preservesColimitsOfShape
     [HasColimitsOfShape J C₂] [HasColimitsOfShape J D]
     (F : C₁ ⥤ C₂ ⥤ D) [F.PreservesZeroMorphisms]
     [∀ X, (F.obj X).PreservesZeroMorphisms]
-    [∀ X, PreservesColimitsOfShape J (F.obj X)]
-    (K : CochainComplex C₁ ℤ) :
+    (K : CochainComplex C₁ ℤ)
+    [∀ p, PreservesColimitsOfShape J (F.obj (K.X p))] :
     PreservesColimitsOfShape J (F.map₂CochainComplex.obj K) := by
-  letI := bicomplex_left (J := J) F K
-  exact preservesColimitsOfShape_of_natIso (totalIso_left F K)
+  exact preservesColimitsOfShape_map₂HomologicalComplex_obj F (up ℤ) (up ℤ) (up ℤ) K
 
-/-- Fixing the second cochain complex preserves colimits of shape `J` when
-the corresponding partial functors in the first slot do. This is the
-flipped-slot counterpart for the same literal direct-sum total. -/
-theorem map₂CochainComplex_flip_obj_preservesColimitsOfShape
+/-- The fixed-second cochain specialization retains the original bicomplex
+degree order and uses countable coproducts for each total diagonal. -/
+theorem preservesColimitsOfShape_map₂CochainComplex_flip_obj
     {C₁ : Type u₁} [Category.{v₁} C₁] [HasZeroMorphisms C₁]
     {C₂ : Type u₂} [Category.{v₂} C₂] [HasZeroMorphisms C₂]
     {D : Type u₃} [Category.{v₃} D] [Preadditive D] [HasCountableCoproducts D]
@@ -230,10 +286,9 @@ theorem map₂CochainComplex_flip_obj_preservesColimitsOfShape
     [HasColimitsOfShape J C₁] [HasColimitsOfShape J D]
     (F : C₁ ⥤ C₂ ⥤ D) [F.PreservesZeroMorphisms]
     [∀ X, (F.obj X).PreservesZeroMorphisms]
-    [∀ Y, PreservesColimitsOfShape J (F.flip.obj Y)]
-    (K : CochainComplex C₂ ℤ) :
+    (K : CochainComplex C₂ ℤ)
+    [∀ q, PreservesColimitsOfShape J (F.flip.obj (K.X q))] :
     PreservesColimitsOfShape J (F.map₂CochainComplex.flip.obj K) := by
-  letI := bicomplex_right (J := J) F K
-  exact preservesColimitsOfShape_of_natIso (totalIso_right F K)
+  exact preservesColimitsOfShape_map₂HomologicalComplex_flip_obj F (up ℤ) (up ℤ) (up ℤ) K
 
 end CategoryTheory.Functor
