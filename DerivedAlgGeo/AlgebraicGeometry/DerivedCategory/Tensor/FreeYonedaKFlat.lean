@@ -18,7 +18,8 @@ two-slot total-tensor colimit preservation pass K-flatness to every input.
 ## Main definitions
 
 * `AlgebraicGeometry.DerivedCategory.freeYonedaSchemeKFlatResolution` inhabits
-  the existing `SchemeKFlatResolution` interface with the canonical functorial
+  the existing `AlgebraicGeometry.DerivedCategory.SchemeKFlatResolution` interface
+  with the canonical functorial
   free-Yoneda total and its already-proved quasi-isomorphic augmentation.
 
 ## Main results
