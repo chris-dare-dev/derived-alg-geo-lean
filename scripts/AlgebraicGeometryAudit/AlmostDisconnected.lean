@@ -63,9 +63,8 @@ import DerivedAlgGeo.AlgebraicGeometry.Morphisms
 #print axioms AlgebraicGeometry.FiltrationProperty.Witness.automorphism_hom_over
 #print axioms AlgebraicGeometry.FiltrationProperty.Witness.automorphism_inv_over
 #print axioms AlgebraicGeometry.FiltrationProperty.Witness.overAutomorphism
-#print axioms AlgebraicGeometry.FiltrationProperty.fst_eq_snd_of_isIso
-#print axioms AlgebraicGeometry.FiltrationProperty.isIso_snd_of_isIso
-#print axioms AlgebraicGeometry.FiltrationProperty.ofIso
-#print axioms AlgebraicGeometry.FiltrationProperty.ofIso_automorphism
+#print axioms AlgebraicGeometry.FiltrationProperty.ofMono
+#print axioms AlgebraicGeometry.FiltrationProperty.ofMono_automorphism_eq_refl
 #print axioms AlgebraicGeometry.HasFiltrationProperty
+#print axioms AlgebraicGeometry.HasFiltrationProperty.of_mono
 #print axioms AlgebraicGeometry.HasFiltrationProperty.of_isIso

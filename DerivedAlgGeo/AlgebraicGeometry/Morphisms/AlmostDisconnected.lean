@@ -19,6 +19,9 @@ The definition deliberately contains no stability-condition, moduli, or quotient
 data.  It is a `MorphismProperty`, so generic behavior belongs at this root and downstream
 stability adapters can consume it without owning it.
 
+An isomorphism is almost disconnected with one step (`AlmostDisconnected.SupportData.ofIso`,
+`AlmostDisconnected.isoWitness`, `IsAlmostDisconnected.of_isIso`): `m = 1`, `X₁ = X`, `L₁ = 𝒪_X`.
+
 The paper also proves flat-base-change and composition closure (Lemma B.2).  The geometric part
 of composition is implemented here at the common `SupportData` root.  The full closure theorems
 are not yet asserted: composition still needs line-bundle pullback and the tensor--pushforward
@@ -69,7 +72,10 @@ instance (D : SupportData p) : IsClosedImmersion D.inclusion :=
   D.inclusion_isClosedImmersion
 
 /-- The tautological support datum for an isomorphism: the whole source, identified with the
-target by the morphism itself. -/
+target by the morphism itself.
+
+The identification `baseIso := asIso p` is forced: the compatibility field then reads
+`p = 𝟙 X ≫ p`.  Taking `p = 𝟙 X` recovers `identity`. -/
 noncomputable def ofIso (p : X ⟶ Y) [IsIso p] : SupportData p where
   support := X
   inclusion := 𝟙 X
@@ -254,8 +260,8 @@ private noncomputable def identityFiltration (X : Scheme.{u}) :
     exact isZero_zero _
   terminalIso := Iso.refl _
 
-/-- Explicit almost-disconnected data for an isomorphism: the one-step filtration whose only
-support is the whole source. -/
+/-- Explicit almost-disconnected data for an isomorphism: the one-step filtration `0 ⊂ 𝒪_X`
+whose only support is the whole source, with line bundle `𝒪_X` (`LineBundleData.unit`). -/
 noncomputable def isoWitness (p : X ⟶ Y) [IsIso p] : Witness p where
   filtration := identityFiltration X
   piece := fun _ =>
@@ -279,7 +285,10 @@ def IsAlmostDisconnected : MorphismProperty Scheme :=
 
 namespace IsAlmostDisconnected
 
-/-- Every isomorphism is almost disconnected. -/
+/-- An isomorphism is almost disconnected: Definition B.1 with `m = 1`, `X₁ = X` and
+`L₁ = 𝒪_X`, so the filtration is `0 ⊂ 𝒪_X` and `p|_{X₁} = p` is the required isomorphism.  This is
+the first inhabitant of the property besides the identity; closure under composition and flat base
+change (Lemma B.2) is not yet available, see the module docstring. -/
 theorem of_isIso {X Y : Scheme.{u}} (p : X ⟶ Y) [IsIso p] : IsAlmostDisconnected p :=
   ⟨AlmostDisconnected.isoWitness p⟩
 

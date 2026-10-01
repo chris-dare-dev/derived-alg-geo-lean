@@ -18,6 +18,12 @@ This formulation is intentionally an independent consumer of `IsAlmostDisconnect
 sheaves and stability conditions do not enter the morphism root.  The two support isomorphisms
 canonically recover the relative automorphisms appearing in Definition 3.19.
 
+Monomorphisms, and in particular isomorphisms, are the first inhabitants
+(`FiltrationProperty.ofMono`, `HasFiltrationProperty.of_mono`, `HasFiltrationProperty.of_isIso`).
+This is Example 3.20(1) with the trivial Galois group, and
+`FiltrationProperty.ofMono_automorphism_eq_refl` records that the recovered automorphism is the
+identity.
+
 Lemma B.5 (flat-base-change stability) will follow from Lemma B.2 plus the standard comparison
 between base change of the relative self-product and the self-product after base change.  It is
 not asserted until the missing neutral flat-pullback/pushforward comparison documented in
@@ -92,21 +98,13 @@ noncomputable def overAutomorphism (i : Fin W.kernel.filtration.length) :
 
 end Witness
 
-/-- Over an isomorphism the two projections of `X ×_Y X` agree. -/
-theorem fst_eq_snd_of_isIso (f : X ⟶ Y) [IsIso f] : pullback.fst f f = pullback.snd f f := by
-  rw [← cancel_mono f]
-  exact pullback.condition
+/-- The filtration property of a monomorphism, with the single support `X ×_Y X ≅ X`.
 
-/-- The second projection of `X ×_Y X` is an isomorphism when `f` is. -/
-instance isIso_snd_of_isIso (f : X ⟶ Y) [IsIso f] : IsIso (pullback.snd f f) := by
-  rw [← fst_eq_snd_of_isIso f]
-  infer_instance
-
-/-- The filtration property of an isomorphism, with the single support `X ×_Y X ≅ X`.
-
-Both projections of `X ×_Y X` are isomorphisms when `f` is, so the one-step identity witness of
-the first projection also identifies its support with `X` by the second projection. -/
-noncomputable def ofIso (f : X ⟶ Y) [IsIso f] : Witness f where
+For a monomorphism `f` both projections of `X ×_Y X` are isomorphisms and agree
+(`CategoryTheory.Limits.fst_eq_snd_of_mono_eq`).  So `AlmostDisconnected.isoWitness` for the first
+projection is a one-step kernel witness, and Lemma B.4 requires `p₂|_{X₁}` to be an isomorphism as
+well, which holds because `p₂ = p₁`.  Separatedness is Mathlib's `isSeparated_of_mono`. -/
+noncomputable def ofMono (f : X ⟶ Y) [Mono f] : Witness f where
   isSeparated := inferInstance
   kernel := AlmostDisconnected.isoWitness (pullback.fst f f)
   secondProjectionIso := fun _ => (asIso (pullback.snd f f) : pullback f f ≅ X)
@@ -114,12 +112,14 @@ noncomputable def ofIso (f : X ⟶ Y) [IsIso f] : Witness f where
     change (asIso (pullback.snd f f)).hom = 𝟙 _ ≫ pullback.snd f f
     simp
 
-/-- For an isomorphism, the automorphism recovered by Lemma B.4 is the identity. -/
-theorem ofIso_automorphism (f : X ⟶ Y) [IsIso f] (i : Fin (ofIso f).kernel.filtration.length) :
-    (ofIso f).automorphism i = Iso.refl X := by
+/-- For a monomorphism `f`, the group `G = Aut_Y(X)` of Example 3.20(1) is trivial: the
+automorphism `p₂ ∘ (p₁)|_{X₁}⁻¹` recovered in Lemma B.4 is the identity, because `p₁ = p₂`. -/
+theorem ofMono_automorphism_eq_refl (f : X ⟶ Y) [Mono f]
+    (i : Fin (ofMono f).kernel.filtration.length) :
+    (ofMono f).automorphism i = Iso.refl X := by
   ext
   change (asIso (pullback.fst f f)).inv ≫ (asIso (pullback.snd f f)).hom = 𝟙 _
-  simp [fst_eq_snd_of_isIso f]
+  simp [fst_eq_snd_of_mono_eq f]
 
 end FiltrationProperty
 
@@ -130,9 +130,15 @@ def HasFiltrationProperty : MorphismProperty Scheme :=
 
 namespace HasFiltrationProperty
 
-/-- Every isomorphism has the filtration property. -/
+/-- A monomorphism has the filtration property: `X ×_Y X ≅ X`, the single graph is the diagonal
+and the automorphism is the identity (`FiltrationProperty.ofMono_automorphism_eq_refl`). -/
+theorem of_mono {X Y : Scheme.{u}} (f : X ⟶ Y) [Mono f] : HasFiltrationProperty f :=
+  ⟨FiltrationProperty.ofMono f⟩
+
+/-- An isomorphism has the filtration property.  This is Example 3.20(1) of arXiv:2607.28411v1
+for the trivial Galois group. -/
 theorem of_isIso {X Y : Scheme.{u}} (f : X ⟶ Y) [IsIso f] : HasFiltrationProperty f :=
-  ⟨FiltrationProperty.ofIso f⟩
+  of_mono f
 
 end HasFiltrationProperty
 
