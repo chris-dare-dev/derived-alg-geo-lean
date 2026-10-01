@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
-"""Seed a worktree from a checked, read-only package archive and a private build copy.
+"""Bootstrap a fresh worktree with private, pinned Lake caches.
 
-The archive is a download cache, never a Lake package root.  A seed verifies its
-checksum, extracts to a private staging directory, and publishes a ready marker
-only after both writable trees are private and complete.  Existing worktrees
-are migrated one at a time with ``--force``; their old paths survive until the
-new copies have passed every check.
+A checked snapshot contains Git-object checkouts of every manifest package and
+all eleven required build trees.  A fresh target receives the whole `.lake`
+generation with one no-replace rename.  Existing `.lake` trees are never
+changed; migration needs a separate quiescent protocol.
+
+`--evict-snapshots` removes snapshots whose pins no `--keep-ref` commits
+(default `origin/main`). Snapshots are never evicted otherwise, and each one
+holds a full private copy of the build trees, so a pin change strands the old
+one until eviction runs.
 """
 
 from __future__ import annotations
 
 import argparse
 import contextlib
+import ctypes
 import hashlib
 import json
 import os
@@ -27,93 +32,156 @@ import uuid
 
 try:
     import fcntl
-except ImportError:  # The private mode deliberately fails closed off Ubuntu/Linux.
+except ImportError:
     fcntl = None
 
+from private_archive_io import DIR_FLAGS, extract_checked_archive, remove_owned_tree
+from private_alias_scan import scan_owned_child, scan_private_lake
+from private_source_contract import verify_source_packages
 
 MIN_FREE_BYTES = 2 * 1024**3
 QUIET_SECONDS = 90
 READY = "private-cache-ready.json"
+STAGE_OWNER = ".private-stage-owner.json"
+FORMAT = 4
+RENAME_NOREPLACE = 1
+MAX_RECORD_BYTES = 256 * 1024
+SOURCE_READER = Path(__file__).resolve().parent / "private-reader.git"
 
 
 def fail(message: str) -> None:
     raise ValueError(message)
 
 
+def _unique_pairs(pairs: list[tuple[str, object]]) -> dict:
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            fail(f"duplicate private-cache record key: {key}")
+        result[key] = value
+    return result
+
+
+def _read_record(path: Path) -> dict:
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+    try:
+        info = os.fstat(fd)
+        if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1 or info.st_size > MAX_RECORD_BYTES:
+            fail("private-cache record is not one bounded private file")
+        raw = os.read(fd, MAX_RECORD_BYTES + 1)
+        if len(raw) > MAX_RECORD_BYTES:
+            fail("private-cache record is too large")
+        record = json.loads(raw, object_pairs_hook=_unique_pairs)
+        if not isinstance(record, dict):
+            fail("private-cache record must be an object")
+        return record
+    finally:
+        os.close(fd)
+
+
+def _validate_record(record: dict, key: str, revisions: dict[str, str],
+                     urls: dict[str, str], label: str) -> None:
+    expected = {"format", "key", "revisions", "urls", "cache_digests",
+                "packages_sha256", "build_sha256", "source_bytes", "archive_sha256"}
+    if (set(record) != expected or type(record.get("format")) is not int or
+            record["format"] != FORMAT or record.get("key") != key or
+            record.get("revisions") != revisions or record.get("urls") != urls):
+        fail(f"private-cache {label} pins or schema differ from target")
+    digests = record.get("cache_digests")
+    if (not isinstance(digests, dict) or set(digests) != set(revisions) | {"project"} or
+            type(record.get("source_bytes")) is not int or record["source_bytes"] <= 0):
+        fail("private-cache record inventory is incomplete")
+    for value in (record["archive_sha256"], record["packages_sha256"],
+                  record["build_sha256"], *digests.values()):
+        if (not isinstance(value, str) or len(value) != 64 or
+                any(ch not in "0123456789abcdef" for ch in value)):
+            fail("private-cache record has an invalid content digest")
+
+
 def digest_file(path: Path) -> str:
     h = hashlib.sha256()
-    with path.open("rb") as source:
-        for block in iter(lambda: source.read(4 * 1024 * 1024), b""):
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(4 * 1024 * 1024), b""):
             h.update(block)
     return h.hexdigest()
 
 
 def pins(root: Path) -> tuple[str, dict[str, str]]:
-    toolchain = (root / "lean-toolchain").read_bytes()
-    manifest = (root / "lake-manifest.json").read_bytes()
+    return pins_from_bytes((root / "lean-toolchain").read_bytes(),
+                           (root / "lake-manifest.json").read_bytes())
+
+
+def pins_from_bytes(toolchain: bytes, manifest: bytes) -> tuple[str, dict[str, str]]:
     parsed = json.loads(manifest)
     revisions = {p["name"]: p["rev"] for p in parsed["packages"]}
     if len(revisions) != len(parsed["packages"]) or "mathlib" not in revisions:
         fail("manifest has no pinned Mathlib package")
-    h = hashlib.sha256()
-    for part in (toolchain, manifest):
-        h.update(len(part).to_bytes(8, "big"))
-        h.update(part)
-    for part in (sys.platform.encode(), platform.machine().encode()):
+    h = hashlib.sha256(b"private-package-cache-v4\0")
+    for part in (toolchain, manifest, sys.platform.encode(), platform.machine().encode()):
         h.update(len(part).to_bytes(8, "big"))
         h.update(part)
     return h.hexdigest(), revisions
 
 
+def package_urls(root: Path, revisions: dict[str, str]) -> dict[str, str]:
+    packages = json.loads((root / "lake-manifest.json").read_text())["packages"]
+    urls = {p["name"]: p.get("url") for p in packages}
+    if set(urls) != set(revisions) or any(not isinstance(url, str) or not url for url in urls.values()):
+        fail("manifest package URLs are incomplete")
+    return urls
+
+
+def _git_environment() -> dict[str, str]:
+    environment = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    environment.update(GIT_CONFIG_NOSYSTEM="1", GIT_CONFIG_GLOBAL=os.devnull)
+    return environment
+
+
+def git(*args: str) -> str:
+    result = subprocess.run(["git", *args], check=True, capture_output=True,
+                            text=True, env=_git_environment())
+    return result.stdout.strip()
+
+
+def pins_at(repo: Path, ref: str) -> str:
+    """Snapshot key of the pins committed at `ref`, read from Git objects, not files."""
+    blobs = [subprocess.run(["git", "-C", str(repo), "cat-file", "blob", f"{ref}:{name}"],
+                            check=True, capture_output=True, env=_git_environment()).stdout
+             for name in ("lean-toolchain", "lake-manifest.json")]
+    return pins_from_bytes(*blobs)[0]
+
+
 def validate_packages(root: Path, revisions: dict[str, str]) -> None:
     if root.is_symlink() or not root.is_dir():
-        fail(f"package root is absent or linked: {root}")
-    actual = {p.name for p in root.iterdir() if p.is_dir()}
-    if actual != set(revisions):
-        fail(f"package directories differ from manifest: {actual ^ set(revisions)}")
+        fail(f"package root absent or linked: {root}")
+    names = {path.name for path in root.iterdir() if path.is_dir()}
+    if names != set(revisions):
+        fail(f"package directories differ from manifest: {names ^ set(revisions)}")
     for name, revision in revisions.items():
         package = root / name
-        real_package = package.resolve()
-        if package.is_symlink():
-            fail(f"package is linked rather than privately owned: {package}")
+        if package.is_symlink() or not package.is_dir():
+            fail(f"package is linked or absent: {package}")
         git_dir = package / ".git"
         if git_dir.is_symlink() or not git_dir.is_dir():
-            fail(f"{name} has external Git metadata (linked worktree or symlink)")
+            fail(f"{name} has external Git metadata")
         if (git_dir / "commondir").exists() or (git_dir / "objects/info/alternates").exists():
             fail(f"{name} has external Git common data or object alternates")
-        actual_git_dir = subprocess.run(
-            ["git", "-C", str(real_package), "rev-parse", "--absolute-git-dir"],
-            capture_output=True, text=True, check=True,
-        ).stdout.strip()
-        if Path(actual_git_dir).resolve() != git_dir.resolve():
-            fail(f"{name} resolves its Git index outside the package")
-        toplevel = subprocess.run(
-            ["git", "-C", str(real_package), "rev-parse", "--show-toplevel"],
-            capture_output=True, text=True, check=True,
-        ).stdout.strip()
-        if Path(toplevel).resolve() != package.resolve():
-            fail(f"{name} resolves its worktree outside the package")
-        head = subprocess.run(
-            ["git", "-C", str(real_package), "rev-parse", "HEAD"],
-            capture_output=True, text=True, check=True,
-        ).stdout.strip()
-        if head != revision:
-            fail(f"{name} is at {head}, manifest pins {revision}")
-        dirty = subprocess.run(
-            ["git", "--no-optional-locks", "-C", str(real_package),
-             "status", "--porcelain", "--untracked-files=all"],
-            capture_output=True, text=True, check=True,
-        ).stdout
-        if dirty:
-            fail(f"{name} has uncommitted package source")
-    if not next((root / "mathlib/.lake/build").rglob("*.olean"), None):
-        fail("Mathlib cache has no .olean; seeding would start a cold build")
+        if Path(git("-C", str(package), "rev-parse", "--absolute-git-dir")).resolve() != git_dir.resolve():
+            fail(f"{name} Git directory resolves outside package")
+        if Path(git("-C", str(package), "rev-parse", "--show-toplevel")).resolve() != package.resolve():
+            fail(f"{name} worktree resolves outside package")
+        if git("-C", str(package), "rev-parse", "HEAD") != revision:
+            fail(f"{name} differs from manifest revision")
 
 
 def tree_digest(root: Path) -> tuple[str, int]:
-    """Hash content, names and kinds; reject links escaping this package tree."""
+    """Hash names, types, permissions and bytes; refuse escaping links."""
     h = hashlib.sha256()
     size = 0
+    root_info = root.lstat()
+    if not stat.S_ISDIR(root_info.st_mode):
+        fail(f"cache root is not a directory: {root}")
+    h.update(b"ROOT" + (root_info.st_mode & 0o777).to_bytes(2, "big"))
     boundary = root.resolve()
     for parent, dirs, files in os.walk(root, topdown=True, followlinks=False):
         dirs.sort()
@@ -123,23 +191,20 @@ def tree_digest(root: Path) -> tuple[str, int]:
             rel = path.relative_to(root).as_posix().encode()
             info = path.lstat()
             if stat.S_ISLNK(info.st_mode):
-                raw_link = os.readlink(path)
-                if os.path.isabs(raw_link):
-                    fail(f"absolute package symlink is not portable to a private copy: {path}")
-                resolved = path.resolve()
-                if not resolved.is_relative_to(boundary):
-                    fail(f"package symlink escapes its tree: {path}")
-                kind, value = b"L", raw_link.encode()
+                raw = os.readlink(path)
+                if os.path.isabs(raw) or not path.resolve().is_relative_to(boundary):
+                    fail(f"package/cache link escapes tree: {path}")
+                kind, value = b"L", raw.encode()
             elif stat.S_ISDIR(info.st_mode):
                 kind, value = b"D", b""
             elif stat.S_ISREG(info.st_mode):
                 kind, value = b"F", bytes.fromhex(digest_file(path))
                 size += info.st_size
             else:
-                fail(f"special file in package tree: {path}")
+                fail(f"special file in cache tree: {path}")
             h.update(len(rel).to_bytes(8, "big") + rel + kind)
             h.update(len(value).to_bytes(8, "big") + value)
-            h.update((info.st_mode & 0o111).to_bytes(2, "big"))
+            h.update((info.st_mode & 0o777).to_bytes(2, "big"))
             if kind == b"L" and name in dirs:
                 dirs.remove(name)
     return h.hexdigest(), size
@@ -154,11 +219,13 @@ def recently_written(root: Path) -> bool:
     return False
 
 
-def snapshot_dir(key: str) -> Path:
-    base = os.environ.get("DAG_PRIVATE_PACKAGE_SNAPSHOT_DIR")
-    if not base:
-        base = str(Path.home() / ".cache/derived-alg-geo-lean/package-snapshots")
-    return Path(base).expanduser().resolve() / key
+def require_owner_writable(root: Path) -> None:
+    """Lake must be able to replace artifacts and create output below every dir."""
+    for parent, dirs, files in os.walk(root, followlinks=False):
+        for path in (Path(parent), *(Path(parent) / name for name in dirs + files)):
+            info = path.lstat()
+            if not stat.S_ISLNK(info.st_mode) and not info.st_mode & stat.S_IWUSR:
+                fail(f"private build cache entry is not owner-writable: {path}")
 
 
 def disk_headroom(path: Path, required: int) -> None:
@@ -167,294 +234,548 @@ def disk_headroom(path: Path, required: int) -> None:
         fail(f"insufficient disk at {path}: need {required + MIN_FREE_BYTES} bytes, have {free}")
 
 
-@contextlib.contextmanager
-def snapshot_lock(directory: Path):
-    if fcntl is None:
-        fail("private package seeding requires Linux file locking")
-    directory.mkdir(parents=True, exist_ok=True)
-    if directory.is_symlink():
-        fail("package snapshot directory is linked")
-    root_fd = os.open(directory, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+def dry_run_headroom(path: Path, required: int) -> None:
+    """Check the target filesystem through existing no-follow ancestors only."""
+    if not path.is_absolute() or ".." in path.parts:
+        fail("snapshot store path must be absolute and normalized")
+    fd = os.open("/", DIR_FLAGS)
     try:
-        lock_fd = os.open(".lock", os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW,
-                          0o600, dir_fd=root_fd)
-        with os.fdopen(lock_fd, "a+b") as stream:
-            if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
-                fail("package snapshot lock is not a regular file")
-            fcntl.flock(stream, fcntl.LOCK_EX)
-            actual = directory.lstat()
-            opened = os.fstat(root_fd)
-            if (directory.is_symlink() or
-                    (actual.st_dev, actual.st_ino) != (opened.st_dev, opened.st_ino)):
-                fail("package snapshot directory changed while waiting for its lock")
-            yield Path(f"/proc/self/fd/{root_fd}")
-    finally:
-        os.close(root_fd)
-
-
-def checked_snapshot(directory: Path, key: str, revisions: dict[str, str]) -> dict | None:
-    current = directory / "current"
-    if not current.exists() and not current.is_symlink():
-        return None
-    if current.is_symlink() or not current.is_dir():
-        fail("package snapshot generation is linked or is not a directory")
-    archive = current / "packages.tar"
-    metadata = current / "snapshot.json"
-    if not archive.is_file() or archive.is_symlink() or not metadata.is_file() or metadata.is_symlink():
-        fail("incomplete or linked package snapshot; refusing to repair it implicitly")
-    if archive.stat().st_mode & 0o222 or metadata.stat().st_mode & 0o222:
-        fail("package snapshot is writable")
-    record = json.loads(metadata.read_text())
-    if record.get("format") != 1 or record.get("key") != key or record.get("revisions") != revisions:
-        fail("package snapshot pins differ from target")
-    if record.get("archive_sha256") != digest_file(archive):
-        fail("package snapshot archive checksum failed")
-    return record
-
-
-def create_snapshot(directory: Path, source: Path, key: str,
-                    revisions: dict[str, str]) -> dict:
-    validate_packages(source, revisions)
-    if recently_written(source):
-        fail(f"package source changed in the last {QUIET_SECONDS} seconds: {source}")
-    before, source_bytes = tree_digest(source)
-    disk_headroom(directory, 2 * source_bytes)
-    token = uuid.uuid4().hex
-    stage = directory / f".stage-{token}"
-    archive_stage = stage / "packages.tar"
-    metadata_stage = stage / "snapshot.json"
-    try:
-        shutil.copytree(source, stage / "packages", symlinks=True)
-        after, _ = tree_digest(source)
-        copied, _ = tree_digest(stage / "packages")
-        if before != after or before != copied or recently_written(source):
-            fail("package source changed during snapshot copy")
-        validate_packages(stage / "packages", revisions)
-        with tarfile.open(archive_stage, "w") as tar:
-            tar.add(stage / "packages", arcname="packages")
-        record = {
-            "format": 1, "key": key, "revisions": revisions,
-            "tree_sha256": before, "source_bytes": source_bytes,
-            "archive_sha256": digest_file(archive_stage),
-        }
-        metadata_stage.write_text(json.dumps(record, sort_keys=True) + "\n")
-        archive_stage.chmod(0o444)
-        metadata_stage.chmod(0o444)
-        shutil.rmtree(stage / "packages")
-        os.replace(stage, directory / "current")
-        return record
-    finally:
-        shutil.rmtree(stage, ignore_errors=True)
-
-
-def remove_abandoned_snapshots(directory: Path) -> None:
-    """A killed creator leaves only a hidden staging generation under the lock."""
-    for path in directory.glob(".stage-*"):
-        remove_path(path)
-
-
-def safe_extract(archive: Path, destination: Path) -> None:
-    with tarfile.open(archive, "r") as tar:
-        for member in tar:
-            if not (member.isdir() or member.isfile() or member.issym()):
-                fail(f"unexpected member in package snapshot: {member.name}")
-            path = Path(member.name)
-            if not path.parts or path.is_absolute() or ".." in path.parts or path.parts[0] != "packages":
-                fail(f"unsafe package snapshot member: {member.name}")
-        tar.extractall(destination, filter="data")
-
-
-def remove_path(path: Path) -> None:
-    if path.is_symlink() or path.is_file():
-        path.unlink()
-    elif path.exists():
-        shutil.rmtree(path)
-
-
-def path_identity(path: Path) -> tuple | None:
-    """Capture the directory entry, including a link's target, without following it."""
-    try:
-        info = path.lstat()
-    except FileNotFoundError:
-        return None
-    link = os.readlink(path) if stat.S_ISLNK(info.st_mode) else None
-    return info.st_dev, info.st_ino, info.st_mode, link
-
-
-@contextlib.contextmanager
-def pinned_lake(path: Path):
-    """Keep every stage, rollback and cleanup below the opened target inode."""
-    if not Path("/proc/self/fd").is_dir():
-        fail("private package seeding requires Linux /proc/self/fd")
-    fd = os.open(path, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
-    info = os.fstat(fd)
-    pinned = Path(f"/proc/self/fd/{fd}")
-
-    def verify() -> None:
-        current = path.stat()
-        if (path.is_symlink() or path.resolve() != path or
-                (current.st_dev, current.st_ino) != (info.st_dev, info.st_ino)):
-            fail("target .lake changed identity or resolves outside the worktree")
-
-    try:
-        verify()
-        yield pinned, verify
+        for part in path.parts[1:]:
+            try:
+                child = os.open(part, DIR_FLAGS, dir_fd=fd)
+            except FileNotFoundError:
+                break
+            os.close(fd)
+            fd = child
+        capacity = os.fstatvfs(fd)
+        free = capacity.f_bavail * capacity.f_frsize
+        if free < required + MIN_FREE_BYTES:
+            fail(f"insufficient disk at {path}: need {required + MIN_FREE_BYTES} bytes, have {free}")
     finally:
         os.close(fd)
 
 
-def seed(target: Path, donor: Path, force: bool, dry_run: bool) -> None:
-    for name in ("GIT_DIR", "GIT_COMMON_DIR", "GIT_INDEX_FILE", "GIT_OBJECT_DIRECTORY",
-                 "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_WORK_TREE"):
-        if name in os.environ:
-            fail(f"Git environment override {name} would hide package ownership")
-    target = target.resolve()
-    donor = donor.resolve()
-    if target == donor:
-        fail("donor and target are the same worktree")
-    key, revisions = pins(target)
-    donor_key, _ = pins(donor)
-    if key != donor_key:
-        fail("donor and target have different lean-toolchain or lake-manifest.json")
-    source_hint = donor / ".lake/packages"
-    build_source = donor / ".lake/build"
-    if build_source.is_symlink() or not build_source.is_dir() or not next(build_source.rglob("*.olean"), None):
-        fail("donor has no built project modules")
-    lake_name = target / ".lake"
-    if lake_name.is_symlink() or (lake_name.exists() and not lake_name.is_dir()):
-        fail("target .lake is linked or is not a directory")
-    lake_name.mkdir(exist_ok=True)
-    with pinned_lake(lake_name) as (lake, verify_lake):
-        return _seed_at_lake(target, source_hint, build_source, key, revisions,
-                             force, dry_run, lake, verify_lake)
+def snapshot_store() -> Path:
+    base = os.environ.get("DAG_PRIVATE_PACKAGE_SNAPSHOT_DIR")
+    if not base:
+        base = str(Path.home() / ".cache/derived-alg-geo-lean/package-snapshots")
+    # Keep the spelling until each component has been opened with NOFOLLOW.
+    return Path(base).expanduser().absolute()
 
 
-def _seed_at_lake(target: Path, source_hint: Path, build_source: Path, key: str,
-                  revisions: dict[str, str], force: bool, dry_run: bool,
-                  lake: Path, verify_lake) -> None:
-    packages = lake / "packages"
-    build = lake / "build"
-    if not force and (packages.exists() or packages.is_symlink() or build.exists()):
-        fail("target already has a cache; use --force for a quiescent migration")
-    if recently_written(build_source) or (build.exists() and recently_written(build)):
-        fail("donor or target build changed in the last 90 seconds")
-    if force and (packages.exists() or packages.is_symlink()) and recently_written(packages):
-        fail("target package tree changed in the last 90 seconds; migration is not quiescent")
-    initial_state = tuple(path_identity(path) for path in (packages, build, lake / READY))
-    directory = snapshot_dir(key)
-    if directory.is_relative_to(source_hint.resolve()) or directory.is_relative_to(target):
-        fail("snapshot store must be outside the package source and target")
-    snapshot_name = directory
-    with snapshot_lock(directory) as locked_directory:
-        directory = locked_directory
-        verify_lake()
-        if tuple(path_identity(path) for path in (packages, build, lake / READY)) != initial_state:
-            fail("target cache changed while waiting for the snapshot lock")
-        if not force and (packages.exists() or packages.is_symlink() or build.exists() or
-                          (lake / READY).exists()):
-            fail("target already has a cache after acquiring the snapshot lock")
-        if (build.exists() and recently_written(build)) or (force and
-                (packages.exists() or packages.is_symlink()) and recently_written(packages)):
-            fail("target cache changed during admission")
-        if not dry_run:
-            remove_abandoned_snapshots(directory)
-        record = checked_snapshot(directory, key, revisions)
-        if record is None:
-            source = source_hint.resolve(strict=True)
-            validate_packages(source, revisions)
-            if dry_run:
-                print(f"would create checked package snapshot from {source}")
-                _, source_bytes = tree_digest(source)
-                record = {"source_bytes": source_bytes}
-            else:
-                print(f"creating checked package snapshot from {source}", flush=True)
-                record = create_snapshot(directory, source, key, revisions)
-        else:
-            print(f"verified package snapshot {snapshot_name}", flush=True)
-        build_before, build_bytes = tree_digest(build_source)
-        disk_headroom(lake, record["source_bytes"] + build_bytes)
-        if dry_run:
-            print(f"would privately seed {target} from snapshot {snapshot_name} and build {build_source}")
-            return
-        token = uuid.uuid4().hex
-        pkg_stage = lake / f".packages-seeding-{token}"
-        build_stage = lake / f".build-seeding-{token}"
-        pkg_old = lake / f".packages-previous-{token}"
-        build_old = lake / f".build-previous-{token}"
-        marker = lake / READY
-        marker_stage = lake / f".{READY}-{token}"
-        published_pkg = False
-        published_build = False
-        marker.unlink(missing_ok=True)
-        try:
-            safe_extract(directory / "current/packages.tar", pkg_stage)
-            extracted = pkg_stage / "packages"
-            got, _ = tree_digest(extracted)
-            if got != record["tree_sha256"]:
-                fail("extracted package tree differs from checked snapshot")
-            validate_packages(extracted, revisions)
-            shutil.copytree(build_source, build_stage, symlinks=True)
-            build_after, _ = tree_digest(build_source)
-            build_copied, _ = tree_digest(build_stage)
-            if build_before != build_after or build_before != build_copied or recently_written(build_source):
-                fail("donor build changed during cache copy")
-            verify_lake()
-            if force and (packages.exists() or packages.is_symlink()) and recently_written(packages):
-                fail("target package tree changed during migration")
-            if build.exists() and recently_written(build):
-                fail("target build changed during migration")
-            if packages.exists() or packages.is_symlink():
-                packages.rename(pkg_old)
-            if build.exists() or build.is_symlink():
-                build.rename(build_old)
-            extracted.rename(packages)
-            published_pkg = True
-            pkg_stage.rmdir()
-            build_stage.rename(build)
-            published_build = True
-            marker_stage.write_text(json.dumps({
-                "format": 1, "key": key,
-                "snapshot_sha256": record["archive_sha256"],
-            }, sort_keys=True) + "\n")
-            os.replace(marker_stage, marker)
-            verify_lake()
-        except BaseException:
-            marker.unlink(missing_ok=True)
-            if pkg_old.exists() or pkg_old.is_symlink():
-                remove_path(packages)
-                pkg_old.rename(packages)
-            elif published_pkg:
-                remove_path(packages)
-            if build_old.exists() or build_old.is_symlink():
-                remove_path(build)
-                build_old.rename(build)
-            elif published_build:
-                remove_path(build)
-            raise
-        finally:
-            remove_path(pkg_stage)
-            remove_path(build_stage)
-            marker_stage.unlink(missing_ok=True)
-        for old in (pkg_old, build_old):
+def snapshot_dir(key: str) -> Path:
+    return snapshot_store() / key
+
+
+def open_created_directory(path: Path) -> int:
+    """Create/open an absolute path component by component below pinned fds."""
+    if not path.is_absolute() or ".." in path.parts:
+        fail("snapshot store path must be absolute and normalized")
+    fd = os.open("/", DIR_FLAGS)
+    try:
+        for part in path.parts[1:]:
             try:
-                remove_path(old)
-            except OSError as error:
-                print(f"warning: private seed is ready but old cache cleanup needs attention: {error}",
-                      file=sys.stderr)
-        print(f"private package and build caches ready in {target}")
+                os.mkdir(part, 0o700, dir_fd=fd)
+            except FileExistsError:
+                pass
+            child = os.open(part, DIR_FLAGS, dir_fd=fd)
+            os.close(fd)
+            fd = child
+        return fd
+    except BaseException:
+        os.close(fd)
+        raise
+
+
+def open_existing_directory(path: Path) -> int | None:
+    """Open an absolute directory component by component without following links."""
+    if not path.is_absolute() or ".." in path.parts:
+        fail("snapshot store path must be absolute and normalized")
+    fd = os.open("/", DIR_FLAGS)
+    try:
+        for part in path.parts[1:]:
+            try:
+                child = os.open(part, DIR_FLAGS, dir_fd=fd)
+            except FileNotFoundError:
+                os.close(fd)
+                return None
+            os.close(fd)
+            fd = child
+        return fd
+    except BaseException:
+        os.close(fd)
+        raise
+
+
+@contextlib.contextmanager
+def locked_directory(directory: Path, lock_name: str, *, create: bool):
+    if fcntl is None or not Path("/proc/self/fd").is_dir():
+        fail("private seeding requires Linux flock and /proc/self/fd")
+    root_fd = open_created_directory(directory) if create else os.open(directory, DIR_FLAGS)
+    try:
+        lock_fd = os.open(lock_name, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW,
+                          0o600, dir_fd=root_fd)
+        with os.fdopen(lock_fd, "a+b") as stream:
+            if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
+                fail("cache lock is not regular")
+            fcntl.flock(stream, fcntl.LOCK_EX)
+            named = directory.lstat()
+            opened = os.fstat(root_fd)
+            if directory.is_symlink() or (named.st_dev, named.st_ino) != (opened.st_dev, opened.st_ino):
+                fail("locked directory changed identity")
+            yield root_fd, Path(f"/proc/self/fd/{root_fd}")
+    finally:
+        os.close(root_fd)
+
+
+def no_replace_rename(src_fd: int, src: str, dst_fd: int, dst: str,
+                      expected: tuple[int, int]) -> None:
+    named = os.stat(src, dir_fd=src_fd, follow_symlinks=False)
+    if (not stat.S_ISDIR(named.st_mode) or
+            (named.st_dev, named.st_ino) != expected):
+        fail("staged generation changed identity before publication")
+    _rename_noreplace(src_fd, src, dst_fd, dst)
+    published = os.stat(dst, dir_fd=dst_fd, follow_symlinks=False)
+    if ((published.st_dev, published.st_ino) != expected or
+            not stat.S_ISDIR(published.st_mode)):
+        # A concurrent same-UID writer may have replaced the random stage
+        # between the identity check and renameat2. Restore its old name if
+        # possible; never leave that substitution at the public destination.
+        try:
+            _rename_noreplace(dst_fd, dst, src_fd, src)
+        except OSError:
+            pass
+        fail("published generation differs from opened stage")
+
+
+def _rename_noreplace(src_fd: int, src: str, dst_fd: int, dst: str) -> None:
+    libc = ctypes.CDLL(None, use_errno=True)
+    renameat2 = getattr(libc, "renameat2", None)
+    if renameat2 is None:
+        fail("Linux renameat2 is unavailable")
+    renameat2.argtypes = [ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p,
+                          ctypes.c_uint]
+    renameat2.restype = ctypes.c_int
+    if renameat2(src_fd, os.fsencode(src), dst_fd, os.fsencode(dst), RENAME_NOREPLACE) != 0:
+        code = ctypes.get_errno()
+        raise OSError(code, os.strerror(code), dst)
+
+
+def checked_snapshot(directory: Path, key: str, revisions: dict[str, str],
+                     urls: dict[str, str]) -> dict | None:
+    current = directory / "current"
+    if not current.exists() and not current.is_symlink():
+        return None
+    if current.is_symlink() or not current.is_dir():
+        fail("snapshot generation is linked or incomplete")
+    archive, metadata = current / "cache.tar", current / "snapshot.json"
+    if (archive.is_symlink() or metadata.is_symlink() or not archive.is_file() or
+            not metadata.is_file()):
+        fail("snapshot files are linked or incomplete")
+    if archive.stat().st_mode & 0o222 or metadata.stat().st_mode & 0o222:
+        fail("snapshot files are writable")
+    record = _read_record(metadata)
+    _validate_record(record, key, revisions, urls, "snapshot")
+    if record.get("archive_sha256") != digest_file(archive):
+        fail("snapshot archive checksum failed")
+    return record
+
+
+def _build_roots(source: Path, build_source: Path, revisions: dict[str, str]) -> dict[str, Path]:
+    roots = {name: source / name / ".lake/build" for name in revisions}
+    roots["project"] = build_source
+    for name, path in roots.items():
+        if path.is_symlink() or path.parent.is_symlink() or not path.is_dir() or not next(path.rglob("*.olean"), None):
+            fail(f"required warm build cache missing or linked: {name}: {path}")
+        require_owner_writable(path)
+        if recently_written(path):
+            fail(f"required warm build cache is active: {name}: {path}")
+    return roots
+
+
+def write_stage_owner(stage_fd: int, kind: str, token: str) -> None:
+    fd = os.open(STAGE_OWNER, os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW,
+                 0o600, dir_fd=stage_fd)
+    try:
+        os.write(fd, json.dumps({"format": FORMAT, "kind": kind, "token": token},
+                                sort_keys=True).encode() + b"\n")
+        os.fsync(fd)
+    finally:
+        os.close(fd)
+
+
+def sweep_owned_stages(parent_fd: int, parent: Path, kind: str, prefix: str) -> None:
+    """Reap quiet abandoned generations under the same parent lock."""
+    for entry in list(os.scandir(parent_fd)):
+        if not (entry.name.startswith(prefix) or entry.name.startswith(".removing-")):
+            continue
+        try:
+            stage_fd = os.open(entry.name, DIR_FLAGS, dir_fd=parent_fd)
+        except OSError:
+            continue
+        try:
+            info = os.fstat(stage_fd)
+            marker_fd = os.open(STAGE_OWNER, os.O_RDONLY | os.O_NOFOLLOW,
+                                dir_fd=stage_fd)
+            try:
+                marker = json.loads(os.read(marker_fd, 4096))
+            finally:
+                os.close(marker_fd)
+            if (marker.get("format") != FORMAT or marker.get("kind") != kind or
+                    not isinstance(marker.get("token"), str) or
+                    (entry.name.startswith(prefix) and
+                     entry.name != prefix + marker["token"])):
+                continue
+            if time.time() - info.st_mtime < QUIET_SECONDS:
+                continue
+            if recently_written(parent / entry.name):
+                continue
+            identity = (info.st_dev, info.st_ino)
+        except (OSError, ValueError, json.JSONDecodeError):
+            continue
+        finally:
+            os.close(stage_fd)
+        remove_owned_tree(parent_fd, entry.name, identity)
+
+
+def install_cloned_build(package: Path, source: Path) -> None:
+    """Add a donor build to a pinned checkout without following tracked links."""
+    package_fd = os.open(package, DIR_FLAGS)
+    try:
+        try:
+            os.mkdir(".lake", 0o700, dir_fd=package_fd)
+        except FileExistsError:
+            pass
+        # A Git revision may track .lake as a symlink even when the donor's
+        # working tree replaced it with an ignored, ordinary build directory.
+        lake_fd = os.open(".lake", DIR_FLAGS, dir_fd=package_fd)
+        try:
+            try:
+                os.stat("build", dir_fd=lake_fd, follow_symlinks=False)
+            except FileNotFoundError:
+                pass
+            else:
+                fail(f"pinned package already contains .lake/build: {package}")
+            # /proc/self/fd pins the opened .lake even if an ancestor is renamed.
+            shutil.copytree(source, Path(f"/proc/self/fd/{lake_fd}/build"),
+                            symlinks=True)
+        finally:
+            os.close(lake_fd)
+    finally:
+        os.close(package_fd)
+
+
+def create_snapshot(directory_fd: int, directory: Path, source: Path,
+                    build_source: Path, key: str, revisions: dict[str, str],
+                    urls: dict[str, str]) -> dict:
+    validate_packages(source, revisions)
+    roots = _build_roots(source, build_source, revisions)
+    before = {name: tree_digest(path) for name, path in roots.items()}
+    source_bytes = sum(size for _, size in before.values())
+    disk_headroom(directory, 3 * source_bytes)
+    token = uuid.uuid4().hex
+    stage_name = f".stage-{token}"
+    os.mkdir(stage_name, 0o700, dir_fd=directory_fd)
+    stage_fd = os.open(stage_name, DIR_FLAGS, dir_fd=directory_fd)
+    stage_identity = (os.fstat(stage_fd).st_dev, os.fstat(stage_fd).st_ino)
+    published = False
+    try:
+        write_stage_owner(stage_fd, "snapshot", token)
+        # Git is a child process: its /proc/self would not own our descriptor.
+        stage = Path(f"/proc/{os.getpid()}/fd/{stage_fd}")
+        content = stage / "content"
+        packages = content / "packages"
+        packages.mkdir(parents=True)
+        for name, revision in revisions.items():
+            git("clone", "--no-local", "--no-checkout", "--", str(source / name),
+                str(packages / name))
+            git("-C", str(packages / name), "checkout", "--detach", "--force", revision)
+            git("-C", str(packages / name), "remote", "set-url", "origin", urls[name])
+            if git("-C", str(packages / name), "rev-parse", "HEAD") != revision:
+                fail(f"clone did not check out pinned {name}")
+            install_cloned_build(packages / name, roots[name])
+        shutil.copytree(roots["project"], content / "build", symlinks=True)
+        after = {name: tree_digest(path) for name, path in roots.items()}
+        copied = {name: tree_digest((packages / name / ".lake/build") if name != "project"
+                                    else content / "build") for name in roots}
+        if before != after or before != copied or any(recently_written(p) for p in roots.values()):
+            fail("donor build cache changed during snapshot construction")
+        validate_packages(packages, revisions)
+        package_digest, _ = tree_digest(packages)
+        project_digest, _ = tree_digest(content / "build")
+        archive = stage / "cache.tar"
+        with tarfile.open(archive, "w") as tar:
+            tar.add(packages, arcname="packages")
+            tar.add(content / "build", arcname="build")
+        record = {"format": FORMAT, "key": key, "revisions": revisions,
+                  "urls": urls,
+                  "cache_digests": {name: value[0] for name, value in before.items()},
+                  "packages_sha256": package_digest, "build_sha256": project_digest,
+                  "source_bytes": source_bytes, "archive_sha256": digest_file(archive)}
+        metadata = stage / "snapshot.json"
+        metadata.write_text(json.dumps(record, sort_keys=True) + "\n")
+        archive.chmod(0o444)
+        metadata.chmod(0o444)
+        content_info = (content.stat().st_dev, content.stat().st_ino)
+        remove_owned_tree(stage_fd, "content", content_info)
+        no_replace_rename(directory_fd, stage_name, directory_fd, "current",
+                          stage_identity)
+        published = True
+        return record
+    finally:
+        os.close(stage_fd)
+        if not published:
+            try:
+                remove_owned_tree(directory_fd, stage_name, stage_identity)
+            except (OSError, ValueError):
+                pass  # Leave an uncertain stage for manual recovery, never chase it.
+
+
+def _read_receipt(lake: Path) -> dict:
+    if lake.is_symlink() or not lake.is_dir():
+        fail("target .lake is absent or linked")
+    receipt = lake / READY
+    if receipt.is_symlink() or not receipt.is_file():
+        fail("target has no private-cache receipt")
+    return _read_record(receipt)
+
+
+def verify_ready(target: Path) -> None:
+    """Check private ownership and pins; build caches may change after Lake runs."""
+    key, revisions = pins(target)
+    urls = package_urls(target, revisions)
+    lake = target / ".lake"
+    record = _read_receipt(lake)
+    _validate_record(record, key, revisions, urls, "receipt")
+    validate_packages(lake / "packages", revisions)
+    verified_links = verify_source_packages(lake / "packages", revisions,
+                                            reader_git_dir=SOURCE_READER)
+    scan_private_lake(target, verified_links)
+    for name, url in urls.items():
+        if git("-C", str(lake / "packages" / name), "remote", "get-url", "origin") != url:
+            fail(f"private package remote differs from manifest: {name}")
+    caches = {name: lake / "packages" / name / ".lake/build" for name in revisions}
+    caches["project"] = lake / "build"
+    if set(record["cache_digests"]) != set(caches):
+        fail("private-cache receipt inventory is incomplete")
+    for name, path in caches.items():
+        if not path.is_dir() or path.is_symlink():
+            fail(f"private build cache missing or linked: {name}")
+        require_owner_writable(path)
+    # The snapshot and extracted candidate were byte-checked before the atomic
+    # publish. Afterwards Lake owns these writable trees: even a no-op build
+    # can update package Git indexes. Rechecks enforce private roots and safe
+    # links, not equality to their pre-build bytes.
+    tree_digest(lake / "packages")
+    tree_digest(lake / "build")
+
+
+def default_donor(target: Path) -> Path:
+    common = Path(git("-C", str(target), "rev-parse", "--path-format=absolute",
+                      "--git-common-dir"))
+    donor = common.parent
+    if donor == target or not donor.is_dir():
+        fail("no donor available to create pinned cache snapshot")
+    return donor
+
+
+def verify_target_inode(target: Path, target_fd: int) -> None:
+    """Require the user-facing worktree path to still name the opened root."""
+    named = target.lstat()
+    opened = os.fstat(target_fd)
+    if (stat.S_ISLNK(named.st_mode) or
+            (named.st_dev, named.st_ino) != (opened.st_dev, opened.st_ino)):
+        fail("target worktree changed identity during private seeding")
+
+
+def seed(target: Path, donor: Path | None, *, verify: bool, dry_run: bool,
+         force: bool) -> None:
+    if force:
+        fail("forced migration is not implemented; existing .lake is preserved")
+    if target.is_symlink():
+        fail("target worktree is linked")
+    target = target.resolve(strict=True)
+    if verify:
+        verify_ready(target)
+        print(f"private package and build caches verified in {target}")
+        return
+    lake_name = target / ".lake"
+    if lake_name.exists() or lake_name.is_symlink():
+        fail("target already has .lake; fresh-worktree bootstrap only")
+    key, revisions = pins(target)
+    urls = package_urls(target, revisions)
+    directory = snapshot_dir(key)
+    if directory.is_relative_to(target):
+        fail("snapshot store must be outside the target")
+    if dry_run:
+        dry_run_headroom(directory, 0)
+        record = checked_snapshot(directory, key, revisions, urls)
+        if record is None:
+            donor = default_donor(target) if donor is None else donor.resolve(strict=True)
+            donor_key, _ = pins(donor)
+            if donor == target or donor_key != key:
+                fail("donor and target pins differ")
+            source = (donor / ".lake/packages").resolve(strict=True)
+            validate_packages(source, revisions)
+            roots = _build_roots(source, donor / ".lake/build", revisions)
+            source_bytes = sum(tree_digest(path)[1] for path in roots.values())
+            dry_run_headroom(directory, 3 * source_bytes)
+            print(f"would create Git-object snapshot from {donor}")
+        else:
+            source_bytes = record["source_bytes"]
+            print(f"verified snapshot checksum {directory}; candidate source checks deferred")
+        disk_headroom(target, source_bytes)
+        print(f"would privately seed fresh {target} from {directory}")
+        return
+    with locked_directory(target, ".private-cache-seed.lock", create=False) as (target_fd, _pinned_target):
+        verify_target_inode(target, target_fd)
+        if lake_name.exists() or lake_name.is_symlink():
+            fail("target .lake appeared while waiting for the lock")
+        sweep_owned_stages(target_fd, _pinned_target, "target", ".lake-stage-")
+        with locked_directory(directory, ".lock", create=True) as (snapshot_fd, snapshot):
+            sweep_owned_stages(snapshot_fd, snapshot, "snapshot", ".stage-")
+            record = checked_snapshot(snapshot, key, revisions, urls)
+            if record is None:
+                donor = default_donor(target) if donor is None else donor.resolve(strict=True)
+                donor_key, _ = pins(donor)
+                if donor == target or donor_key != key:
+                    fail("donor and target pins differ")
+                source = (donor / ".lake/packages").resolve(strict=True)
+                build_source = donor / ".lake/build"
+                print(f"creating Git-object snapshot from {donor}", flush=True)
+                record = create_snapshot(snapshot_fd, snapshot, source, build_source,
+                                         key, revisions, urls)
+            else:
+                print(f"verified package snapshot {directory}", flush=True)
+            disk_headroom(target, record["source_bytes"])
+            token = uuid.uuid4().hex
+            stage_name = f".lake-stage-{token}"
+            os.mkdir(stage_name, 0o700, dir_fd=target_fd)
+            stage_fd = os.open(stage_name, DIR_FLAGS, dir_fd=target_fd)
+            identity = (os.fstat(stage_fd).st_dev, os.fstat(stage_fd).st_ino)
+            published = False
+            try:
+                write_stage_owner(stage_fd, "target", token)
+                extract_checked_archive(snapshot / "current/cache.tar", stage_fd,
+                                        record["archive_sha256"], set(revisions))
+                stage = Path(f"/proc/{os.getpid()}/fd/{stage_fd}")
+                validate_packages(stage / "packages", revisions)
+                if tree_digest(stage / "packages")[0] != record["packages_sha256"]:
+                    fail("extracted packages differ from snapshot")
+                if tree_digest(stage / "build")[0] != record["build_sha256"]:
+                    fail("extracted project build differs from snapshot")
+                caches = {name: stage / "packages" / name / ".lake/build" for name in revisions}
+                caches["project"] = stage / "build"
+                for name, path in caches.items():
+                    if tree_digest(path)[0] != record["cache_digests"][name]:
+                        fail(f"extracted build cache differs from snapshot: {name}")
+                verified_links = verify_source_packages(stage / "packages", revisions,
+                                                        reader_git_dir=SOURCE_READER)
+                receipt_fd = os.open(READY, os.O_CREAT | os.O_EXCL | os.O_WRONLY |
+                                     os.O_NOFOLLOW, 0o600, dir_fd=stage_fd)
+                try:
+                    receipt = json.dumps(record, sort_keys=True).encode() + b"\n"
+                    os.write(receipt_fd, receipt)
+                    os.fsync(receipt_fd)
+                finally:
+                    os.close(receipt_fd)
+                os.fsync(stage_fd)
+                verify_target_inode(target, target_fd)
+                scan_owned_child(target, stage_name, verified_links)
+                no_replace_rename(target_fd, stage_name, target_fd, ".lake", identity)
+                published = True
+            finally:
+                os.close(stage_fd)
+                if not published:
+                    try:
+                        remove_owned_tree(target_fd, stage_name, identity)
+                    except (OSError, ValueError):
+                        pass  # An uncertain stage is never treated as ready.
+    verify_ready(target)
+    print(f"private package and build caches ready in {target}")
+
+
+def _tree_bytes(path: Path) -> int:
+    total = 0
+    for parent, _, files in os.walk(path, followlinks=False):
+        for name in files:
+            with contextlib.suppress(OSError):
+                total += (Path(parent) / name).lstat().st_blocks * 512
+    return total
+
+
+def evict_snapshots(repo: Path, keep_refs: list[str], *, dry_run: bool) -> None:
+    """Remove snapshots whose pins no kept ref commits, skipping any a seed holds."""
+    if fcntl is None:
+        fail("snapshot eviction requires Linux flock")
+    keep = {pins_at(repo, ref) for ref in keep_refs}
+    store = snapshot_store()
+    store_fd = open_existing_directory(store)
+    if store_fd is None:
+        print(f"no snapshot store at {store}")
+        return
+    try:
+        for entry in sorted(os.scandir(store_fd), key=lambda e: e.name):
+            name = entry.name
+            is_key = len(name) == 64 and set(name) <= set("0123456789abcdef")
+            # `.removing-*` at this level can only be an interrupted eviction.
+            if (not (is_key or name.startswith(".removing-")) or
+                    not entry.is_dir(follow_symlinks=False)):
+                continue
+            if name in keep:
+                print(f"keep {name[:12]}: pinned by {', '.join(keep_refs)}")
+                continue
+            size = f"{_tree_bytes(store / name) / 1024**3:.1f} GiB"
+            if dry_run:
+                print(f"would evict {name[:12]} ({size})")
+                continue
+            key_fd = os.open(name, DIR_FLAGS, dir_fd=store_fd)
+            try:
+                lock_fd = os.open(".lock", os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600,
+                                  dir_fd=key_fd)
+                try:
+                    try:
+                        fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    except BlockingIOError:
+                        print(f"skip {name[:12]}: a seed holds its lock")
+                        continue
+                    info = os.fstat(key_fd)
+                    remove_owned_tree(store_fd, name, (info.st_dev, info.st_ino))
+                    print(f"evicted {name[:12]} ({size})")
+                finally:
+                    os.close(lock_fd)
+            finally:
+                os.close(key_fd)
+    finally:
+        os.close(store_fd)
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--target", type=Path, required=True)
-    parser.add_argument("--donor", type=Path, required=True)
+    parser.add_argument("--target", type=Path,
+                        help="worktree to seed; with --evict-snapshots, any checkout (default: .)")
+    parser.add_argument("--donor", type=Path)
     parser.add_argument("--force", action="store_true")
+    parser.add_argument("--verify", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--evict-snapshots", action="store_true",
+                        help="remove snapshots whose pins no --keep-ref commits")
+    parser.add_argument("--keep-ref", action="append", metavar="REF",
+                        help="ref whose pinned snapshot stays (repeatable; default origin/main)")
     args = parser.parse_args()
+    if not args.evict_snapshots and args.target is None:
+        parser.error("--target is required")
+    action = "snapshot eviction" if args.evict_snapshots else "private cache seed"
     try:
-        seed(args.target, args.donor, args.force, args.dry_run)
-    except (ValueError, OSError, subprocess.CalledProcessError, tarfile.TarError) as error:
-        print(f"private cache seed refused: {error}", file=sys.stderr)
+        if args.evict_snapshots:
+            evict_snapshots((args.target or Path.cwd()).resolve(strict=True),
+                            args.keep_ref or ["origin/main"], dry_run=args.dry_run)
+        else:
+            seed(args.target, args.donor, verify=args.verify, dry_run=args.dry_run,
+                 force=args.force)
+    except (ValueError, OSError, subprocess.CalledProcessError, tarfile.TarError,
+            KeyError) as error:
+        print(f"{action} refused: {error}", file=sys.stderr)
         return 1
     return 0
 

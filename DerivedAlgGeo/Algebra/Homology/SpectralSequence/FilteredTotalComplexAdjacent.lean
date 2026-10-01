@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence.FilteredTotalComplex
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence.SingleZeroTotal
+import DerivedAlgGeo.Algebra.Homology.Embedding.StupidTruncGE
 import Mathlib.Algebra.Category.Grp.Abelian
 import Mathlib.Algebra.Homology.HomotopyCategory.ShortExact
 import Mathlib.Algebra.Homology.TotalComplexShift
@@ -136,48 +137,6 @@ noncomputable def adjacentColumnTotalShortComplex (p : ℤ) :
       rw [ιTotal_map]
       simp)
 
-noncomputable def stupidTruncGEXIso (p i : ℤ) (hi : p ≤ i) :
-    (K.stupidTrunc (ComplexShape.embeddingUpIntGE p)).X i ≅ K.X i :=
-  K.stupidTruncXIso (ComplexShape.embeddingUpIntGE p)
-    (i := (i - p).toNat) (by
-      change p + ((i - p).toNat : ℤ) = i
-      rw [Int.toNat_of_nonneg (by omega)]
-      omega)
-
-@[simp]
-lemma stupidTruncXIso_eq_stupidTruncGEXIso (p i : ℤ) (k : ℕ)
-    (h : (ComplexShape.embeddingUpIntGE p).f k = i) :
-    K.stupidTruncXIso (ComplexShape.embeddingUpIntGE p) h =
-      stupidTruncGEXIso K p i (by
-        change p + (k : ℤ) = i at h
-        omega) := by
-  have hk : k = (i - p).toNat := by
-    change p + (k : ℤ) = i at h
-    rw [show i - p = (k : ℤ) by omega]
-    simp
-  subst k
-  rfl
-
-@[reassoc (attr := simp)]
-lemma stupidTruncGEXIso_inv_hom_f (p i j : ℤ) (hi hi' : p ≤ i) :
-    (stupidTruncGEXIso K p i hi).inv.f j ≫
-      (stupidTruncGEXIso K p i hi').hom.f j = 𝟙 _ := by
-  have : hi = hi' := Subsingleton.elim _ _
-  subst this
-  rw [← HomologicalComplex.comp_f,
-    (stupidTruncGEXIso K p i hi).inv_hom_id,
-    HomologicalComplex.id_f]
-
-@[reassoc (attr := simp)]
-lemma stupidTruncGEXIso_hom_inv_f (p i j : ℤ) (hi hi' : p ≤ i) :
-    (stupidTruncGEXIso K p i hi).hom.f j ≫
-      (stupidTruncGEXIso K p i hi').inv.f j = 𝟙 _ := by
-  have : hi = hi' := Subsingleton.elim _ _
-  subst this
-  rw [← HomologicalComplex.comp_f,
-    (stupidTruncGEXIso K p i hi).hom_inv_id,
-    HomologicalComplex.id_f]
-
 @[reassoc (attr := simp)]
 lemma complexIso_inv_hom_f {A B : CochainComplex AddCommGrpCat.{w} ℤ}
     (e : A ≅ B) (j : ℤ) : e.inv.f j ≫ e.hom.f j = 𝟙 _ := by
@@ -237,7 +196,7 @@ noncomputable def adjacentColumnTotalDegreewiseSplitting (p n : ℤ) :
       rw [Category.assoc, HomologicalComplex₂.ι_totalDesc]
       simp only [dif_pos hi]
       simp [adjacentColumnInclusion,
-        HomologicalComplex.stupidTruncGEMap, Category.assoc]
+        HomologicalComplex.stupidTruncGEMap, stupidTruncGEXIso, Category.assoc]
       rw [dif_pos hi]
       simp [HomologicalComplex.comp_f, Category.assoc]
     · apply IsZero.eq_of_src
