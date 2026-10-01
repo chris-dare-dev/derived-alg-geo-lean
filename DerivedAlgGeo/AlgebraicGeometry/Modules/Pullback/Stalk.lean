@@ -13,6 +13,7 @@ import Mathlib.Topology.Sheaves.Abelian
 import Mathlib.Topology.Sheaves.Sheafify
 import Mathlib.Topology.Sheaves.Skyscraper
 import DerivedAlgGeo.CategoryTheory.Limits.Preserves.Reflective
+import DerivedAlgGeo.Topology.Sheaves.ModuleStalk
 
 /-!
 # Module stalks and pullback
@@ -73,39 +74,31 @@ noncomputable section
 universe u v
 
 /-- The cocone of underlying rings whose point is the local ring of `X` at
-`x`.  It is the image of the standard commutative-ring stalk cocone. -/
-def moduleStalkRingCocone (X : Scheme.{u}) (x : X) :
+`x`, specialized from the topological module-stalk construction. -/
+abbrev moduleStalkRingCocone (X : Scheme.{u}) (x : X) :
     Cocone ((OpenNhds.inclusion x).op ⋙ X.presheaf ⋙
       forget₂ CommRingCat RingCat) :=
-  (forget₂ CommRingCat RingCat).mapCocone
-    (colimit.cocone ((OpenNhds.inclusion x).op ⋙ X.presheaf))
+  _root_.PresheafOfModules.stalkRingCocone X X.presheaf x
 
-/-- The underlying-ring stalk cocone is a colimit cocone. -/
-def moduleStalkRingIsColimit (X : Scheme.{u}) (x : X) :
+/-- Definitional specialization of `PresheafOfModules.stalkRingIsColimit` to
+the scheme's structure presheaf. -/
+abbrev moduleStalkRingIsColimit (X : Scheme.{u}) (x : X) :
     IsColimit (moduleStalkRingCocone X x) :=
-  isColimitOfPreserves (forget₂ CommRingCat RingCat)
-    (colimit.isColimit ((OpenNhds.inclusion x).op ⋙ X.presheaf))
+  _root_.PresheafOfModules.stalkRingIsColimit X X.presheaf x
 
-/-- The colimit over the neighborhood diagram of modules, bundled over the
-local ring at `x`. -/
-def neighborhoodModuleStalkFunctor (X : Scheme.{u}) (x : X) :
+/-- Definitional specialization of `PresheafOfModules.commNeighborhoodStalkFunctor`,
+using the scheme's local ring as its scalar ring. -/
+abbrev neighborhoodModuleStalkFunctor (X : Scheme.{u}) (x : X) :
     _root_.PresheafOfModules.{u}
         ((OpenNhds.inclusion x).op ⋙ X.ringCatSheaf.obj) ⥤
       ModuleCat.{u} (X.presheaf.stalk x) :=
-  letI : InitiallySmall.{u} (OpenNhds x) :=
-    initiallySmall_of_essentiallySmall _
-  _root_.PresheafOfModules.colimitFunctor (moduleStalkRingIsColimit X x)
+  _root_.PresheafOfModules.commNeighborhoodStalkFunctor X X.presheaf x
 
 /-- The stalk of a presheaf of modules, bundled over the local ring. -/
-def presheafModuleStalkFunctor (X : Scheme.{u}) (x : X) :
+abbrev presheafModuleStalkFunctor (X : Scheme.{u}) (x : X) :
     _root_.PresheafOfModules.{u} X.ringCatSheaf.obj ⥤
       ModuleCat.{u} (X.presheaf.stalk x) :=
-  letI : InitiallySmall.{u} (OpenNhds x) :=
-    initiallySmall_of_essentiallySmall _
-  _root_.PresheafOfModules.pushforward₀ (OpenNhds.inclusion x)
-      X.ringCatSheaf.obj ⋙
-    _root_.PresheafOfModules.colimitFunctor
-      (moduleStalkRingIsColimit X x)
+  _root_.PresheafOfModules.commStalkFunctor X X.presheaf x
 
 /-- The stalk of a sheaf of modules, bundled as a module over the local ring.
 
