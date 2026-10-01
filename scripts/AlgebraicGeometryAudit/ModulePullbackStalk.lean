@@ -1,4 +1,5 @@
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.StalkQuasiIso
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Stalk
 
 #print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkRingCocone
 #print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkRingIsColimit
@@ -29,3 +30,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.StalkQuasiIso
 #print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor_preservesParallelPairColimits
 #print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor_preservesHomology
 #print axioms AlgebraicGeometry.Scheme.Modules.quasiIso_iff_stalkwise
+
+/-! ## Tensor products and module stalks (#554) -/
+
+#print axioms AlgebraicGeometry.Scheme.Modules.fixedLeftTensorStalkIso

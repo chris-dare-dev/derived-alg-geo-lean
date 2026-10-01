@@ -3,6 +3,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Basic
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.LineBundle
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.LineBundleLinear
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Monoidal
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Stalk
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Colimits
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Flat
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Complex
@@ -29,6 +30,8 @@ small-shape colimit preservation to either fixed-input slot of the literal
 complex total; sequential diagrams are a specialization.
 `Tensor/Flat.lean` gives the termwise homology-preservation input for flat
 module sheaves.
+`Tensor/Stalk.lean` compares the sheafified tensor with the tensor of module
+stalks, naturally in the variable right factor.
 
 ## Implementation notes
 
