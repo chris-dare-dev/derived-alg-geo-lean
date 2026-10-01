@@ -261,7 +261,7 @@ theorem preservesColimitsOfShape_map₂HomologicalComplex_flip_obj
   exact preservesColimitsOfShape_of_natIso (totalIso_right F c₁ c₂ c₁₂ K)
 
 /-- The cochain specialization of
-`preservesColimitsOfShape_map₂HomologicalComplex_obj`. Countable coproducts
+`CategoryTheory.Functor.preservesColimitsOfShape_map₂HomologicalComplex_obj`. Countable coproducts
 supply every integer-diagonal total. -/
 theorem preservesColimitsOfShape_map₂CochainComplex_obj
     {C₁ : Type u₁} [Category.{v₁} C₁] [HasZeroMorphisms C₁]
