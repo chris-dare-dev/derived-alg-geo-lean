@@ -28,8 +28,8 @@ specialization retains the scalar presentation used by scheme stalks.
 
 ## Main results
 
-`PresheafOfModules.stalkLinearEquiv` identifies the two stalk presentations as modules over
-the commutative-ring stalk, with no sheaf or scheme hypothesis.
+`PresheafOfModules.stalkLinearEquiv` identifies the bundled module stalk with the usual
+germ stalk as modules over an arbitrary ring stalk, with no sheaf or scheme hypothesis.
 
 ## Implementation notes
 
@@ -77,6 +77,18 @@ def stalkRingComparisonIso :
       (forget₂ CommRingCat RingCat).obj (R.stalk x) :=
   (colimit.isColimit ((OpenNhds.inclusion x).op ⋙ R ⋙
     forget₂ CommRingCat RingCat)).coconePointUniqueUpToIso (stalkRingIsColimit X R x)
+
+/-- The scalar-ring comparison sends a general-ring germ to the same germ in the
+commutative-ring stalk. -/
+theorem stalkRingComparisonIso_hom_germ (U : Opens X) (hx : x ∈ U)
+    (r : R.obj (op U)) :
+    (stalkRingComparisonIso X R x).hom
+      ((show X.Presheaf RingCat.{u} from R ⋙ forget₂ CommRingCat RingCat).germ U x hx r) =
+    R.germ U x hx r := by
+  exact ConcreteCategory.congr_hom
+    (IsColimit.comp_coconePointUniqueUpToIso_hom
+      (colimit.isColimit ((OpenNhds.inclusion x).op ⋙ R ⋙ forget₂ CommRingCat RingCat))
+      (stalkRingIsColimit X R x) (op ⟨U, hx⟩)) r
 
 /-- Module colimit on neighborhoods of a point over an arbitrary ring presheaf. -/
 def neighborhoodStalkFunctor (X : TopCat.{u}) (S : X.Presheaf RingCat.{u}) (x : X) :
@@ -159,6 +171,34 @@ def commStalkAddEquiv
   (commStalkLinearEquiv X R x M).toAddEquiv.trans
     (stalkLinearEquiv X
       (show X.Presheaf RingCat.{u} from R ⋙ forget₂ CommRingCat RingCat) x M).toAddEquiv.symm
+
+/-- The additive comparison respects scalar multiplication through the
+canonical ring-stalk isomorphism. -/
+theorem commStalkAddEquiv_symm_smul
+    (M : PresheafOfModules.{u} (R ⋙ forget₂ CommRingCat RingCat))
+    (r : (show X.Presheaf RingCat.{u} from R ⋙ forget₂ CommRingCat RingCat).stalk x)
+    (m : (stalkFunctor X
+      (show X.Presheaf RingCat.{u} from R ⋙ forget₂ CommRingCat RingCat) x).obj M) :
+    (commStalkAddEquiv X R x M).symm (r • m) =
+      (stalkRingComparisonIso X R x).hom r •
+        (commStalkAddEquiv X R x M).symm m := by
+  let S : X.Presheaf RingCat.{u} := R ⋙ forget₂ CommRingCat RingCat
+  obtain ⟨U, hxU, r, rfl⟩ := TopCat.Presheaf.exists_germ_eq S r
+  obtain ⟨V, hVU, hxV, n, hn⟩ := TopCat.Presheaf.exists_le_germ_eq M.presheaf m hxU
+  subst m
+  rw [← TopCat.Presheaf.germ_res_apply S (homOfLE hVU) x hxV r]
+  rw [stalkRingComparisonIso_hom_germ]
+  have hg := (stalkLinearEquiv X S x M).map_smul
+    (S.germ V x hxV (S.map (homOfLE hVU).op r))
+    (TopCat.Presheaf.germ M.presheaf V x hxV n)
+  have hc := (commStalkLinearEquiv X R x M).map_smul
+    (R.germ V x hxV (R.map (homOfLE hVU).op r))
+    (TopCat.Presheaf.germ M.presheaf V x hxV n)
+  simp only [stalkLinearEquiv, commStalkLinearEquiv,
+    LinearEquiv.coe_mk, LinearMap.coe_mk, AddHom.coe_mk] at hg hc
+  rw [← PresheafOfModules.germ_ringCat_smul] at hg
+  rw [← PresheafOfModules.germ_smul] at hc
+  exact hg.trans hc.symm
 
 end
 
