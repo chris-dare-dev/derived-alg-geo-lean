@@ -26,6 +26,7 @@ and future upstream work; matching directories is not required to import Mathlib
 | Coproducts indexed by a family with finite nonzero support | `CategoryTheory/Limits/Shapes/FiniteProducts.lean` | `CategoryTheory/Limits/Shapes/FiniteProducts.lean` |
 | `Sigma.π` finite-support projection identity for a supplied coproduct | `CategoryTheory/Limits/Shapes/ZeroMorphisms.lean` | `CategoryTheory/Limits/Shapes/ZeroMorphisms.lean` |
 | `HomologicalComplex₂.totalFunctor` and direct-sum totalization | `Algebra/Homology/TotalComplex.lean` | `Algebra/Homology/TotalComplex.lean` |
+| `HomologicalComplex.mapBifunctorMap` and its finite-support quasi-isomorphism criteria | `Algebra/Homology/Bifunctor.lean` | `Algebra/Homology/Bifunctor.lean` |
 | `SheafOfModules` and `PresheafOfModules` | `Algebra/Category/ModuleCat/{Sheaf,Presheaf}/` | `Algebra/Category/ModuleCat/{Sheaf,Presheaf}/` |
 | `ModuleCat`, `Grp` | `Algebra/Category/{ModuleCat,Grp}/` | `Algebra/Category/{ModuleCat,Grp}/` |
 | `ObjectProperty`, the full subcategory it cuts out, and functor lifts into it | `CategoryTheory/ObjectProperty/` | `CategoryTheory/ObjectProperty/` |

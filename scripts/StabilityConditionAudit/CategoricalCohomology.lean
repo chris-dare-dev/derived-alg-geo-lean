@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.Algebra.Homology.Bifunctor
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence
 import DerivedAlgGeo.Algebra.Homology.HomologySequenceLemmas
 import DerivedAlgGeo.Algebra.Homology.HomologicalBicomplex
@@ -69,6 +70,8 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex₂.ι_totalColumnConeIso_hom_source
 #print axioms HomologicalComplex₂.ι_totalColumnConeIso_hom_target
 #print axioms HomologicalComplex₂.quasiIso_totalMap_of_four_diagonal_bounds_of_column_quasiIso
+#print axioms HomologicalComplex.quasiIso_mapBifunctorMap_id_left_of_finite_support_of_column_quasiIso
+#print axioms HomologicalComplex.quasiIso_mapBifunctorMap_id_right_of_finite_support_of_column_quasiIso
 #print axioms HomologicalComplex.singleCompExtendIso
 #print axioms HomologicalComplex.singleCompExtendAtImageIso
 #print axioms CategoryTheory.Triangulated.SpectralObject.mapHomologicalFunctor
