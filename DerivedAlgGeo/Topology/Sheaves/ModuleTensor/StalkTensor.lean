@@ -23,7 +23,12 @@ the statement that taking stalks commutes with the tensor product of presheaves 
   cocone whose legs send `m ⊗ p` to `germ m ⊗ germ p`;
 * `PresheafOfModules.stalkTensorEquiv` — the two assembled into an `Rₓ`-linear equivalence;
 * `PresheafOfModules.stalkMap` — the stalk map of a morphism of presheaves of modules, as an
-  `Rₓ`-linear map;
+  `Rₓ`-linear map.
+
+## Main results
+
+* `PresheafOfModules.stalkTensorEquiv_naturality` — naturality of the tensor-stalk
+  equivalence in both module-presheaf inputs;
 * `PresheafOfModules.isIso_stalkMapAdd_whiskerLeft` — **whiskering preserves stalkwise
   isomorphisms**, for an arbitrary whiskering factor. Tensoring is only right exact, but
   tensoring with an isomorphism is an isomorphism, and `stalkTensorEquiv` is what makes that
@@ -646,6 +651,36 @@ lemma stalkMap_germ (U : Opens X) (hxU : x ∈ U) (m : M.obj (op U)) :
   stalkMapAdd_germ g x U hxU m
 
 end StalkMap
+
+/-- The tensor-stalk equivalence is natural in both module-presheaf inputs.
+The proof computes on pure tensors of germs and then uses additivity. -/
+theorem stalkTensorEquiv_naturality
+    {M M' P P' : PresheafOfModules.{u} (R ⋙ forget₂ CommRingCat RingCat)}
+    (f : M ⟶ M') (g : P ⟶ P') (x : X) (t : StalkTensor M P x) :
+    stalkMapAdd (f ⊗ₘ g) x (stalkTensorEquiv M P x t) =
+      stalkTensorEquiv M' P' x
+        (TensorProduct.map (stalkMap f x) (stalkMap g x) t) := by
+  refine TensorProduct.induction_on t ?_ ?_ ?_
+  · simp
+  · intro ξ η
+    obtain ⟨U, hxU, m, rfl⟩ := TopCat.Presheaf.exists_germ_eq M.presheaf ξ
+    obtain ⟨V, hxV, p, rfl⟩ := TopCat.Presheaf.exists_germ_eq P.presheaf η
+    rw [TensorProduct.map_tmul, stalkMap_germ, stalkMap_germ,
+      stalkTensorEquiv_germ_tmul_germ, stalkTensorEquiv_germ_tmul_germ]
+    show stalkMapAdd (f ⊗ₘ g) x (TopCat.Presheaf.germ
+        (MonoidalCategory.tensorObj (C := PresheafOfModules.{u} _) M P).presheaf
+        (U ⊓ V) x ⟨hxU, hxV⟩
+        (M.map (homOfLE inf_le_left).op m ⊗ₜ P.map (homOfLE inf_le_right).op p)) = _
+    rw [stalkMapAdd_germ]
+    show TopCat.Presheaf.germ
+        (MonoidalCategory.tensorObj (C := PresheafOfModules.{u} _) M' P').presheaf
+        (U ⊓ V) x ⟨hxU, hxV⟩
+        (f.app (op (U ⊓ V)) (M.map (homOfLE inf_le_left).op m) ⊗ₜ
+          g.app (op (U ⊓ V)) (P.map (homOfLE inf_le_right).op p)) = _
+    rw [naturality_apply, naturality_apply]
+    rfl
+  · intro a b ha hb
+    simp only [map_add, ha, hb]
 
 section Whisker
 
