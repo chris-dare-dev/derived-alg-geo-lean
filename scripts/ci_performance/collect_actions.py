@@ -45,6 +45,10 @@ def collect_attempt(
         raise ValueError("provider returned another run ID")
     if before.get("status") != "completed":
         raise ValueError("run is not completed; job and step pages may still change")
+    if not isinstance(before.get("path"), str) or not before["path"]:
+        raise ValueError("run workflow path is unavailable")
+    if not isinstance(before.get("event"), str) or not before["event"]:
+        raise ValueError("run event is unavailable")
     current_attempt = _positive(before.get("run_attempt"), "provider run attempt")
     selected = current_attempt if attempt is None else _positive(attempt, "selected attempt")
     if selected > current_attempt:
@@ -55,6 +59,8 @@ def collect_attempt(
         attempt_run.get("id") != run_id
         or attempt_run.get("run_attempt") != selected
         or attempt_run.get("head_sha") != before.get("head_sha")
+        or attempt_run.get("event") != before.get("event")
+        or attempt_run.get("path") != before.get("path")
         or attempt_run.get("status") != "completed"
     ):
         raise ValueError("attempt identity differs from the parent run")
