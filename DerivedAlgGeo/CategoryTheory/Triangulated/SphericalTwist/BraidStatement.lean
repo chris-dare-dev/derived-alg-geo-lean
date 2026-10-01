@@ -13,26 +13,24 @@ For an `A₂`-configuration `(A, B)` the Seidel--Thomas theorem is the isomorphi
 `BraidStatement dA dB` carries that isomorphism as its single field, and nothing constructs an
 inhabitant.
 
-An inhabitant is a claim about the supplied `dA`, `dB`, and Seidel--Thomas supports it only when
-those are the genuine twists: `SphericalTwistData` records no more than a cone-like functor with the
-right `K₀` shadow, so for padded or otherwise non-genuine data the isomorphism can fail even for a
-genuine `A₂`-configuration. The dg realizations of `ObjectTwistData.lean` are the genuine ones.
-
-## References
-
-Seidel--Thomas, [arXiv:math/0001043v2](https://arxiv.org/abs/math/0001043v2). Definition 1.1(b): an
-`A_m`-configuration is a family of `m` spherical objects with `dim Hom^•(E_i, E_j) = 1` for
-`|i - j| = 1` and `0` for `|i - j| ≥ 2`, the dimension being total over all degrees. Theorem 1.2
-(second part) gives `T_{E_i} T_{E_{i+1}} T_{E_i} ≅ T_{E_{i+1}} T_{E_i} T_{E_{i+1}}` for such a
-family, up to graded natural isomorphism, and Theorem 2.17 is the abstract form. Proposition 2.13
-proves the displayed isomorphism for two `n`-spherical objects with `n > 0` and total
-`dim Hom^•(E_2, E_1) = 1`.
-
 ## Main definitions and results
 
 * `BraidStatement` — the supplied isomorphism `T_A T_B T_A ≅ T_B T_A T_B`.
 * `map_braid_of_sphericalPairData` — the `K₀` braid identity for the Euler-form data.
 * `BraidStatement.map_braid`, `BraidStatement.twistK₀_braid` — what a supplied isomorphism forces.
+
+## What an inhabitant claims
+
+An inhabitant is a claim about the supplied `dA`, `dB`, and Seidel--Thomas supports it only when
+those are the genuine twists: `SphericalTwistData` records no more than a cone-like functor with the
+right `K₀` shadow, so for padded or otherwise non-genuine data the isomorphism can fail even for a
+genuine `A₂`-configuration. The dg realizations of `ObjectTwistData.lean` are the genuine ones.
+
+`SphericalPairData` is the Euler-form shadow of an `A₂`-configuration, not the configuration
+itself: it does not record that `Hom^•(A, B)` is one-dimensional. The structure here records no
+hypothesis at all, so an inhabitant is a claim about a specific pair and must be supplied only for a
+genuine `A₂`-configuration. The isomorphism is of underlying functors; the graded natural
+isomorphism of Seidel--Thomas also respects the shift isomorphisms, which is not recorded.
 
 ## What is proved: only the `K₀` shadow, and only in one direction
 
@@ -51,13 +49,15 @@ statement, because `K₀` sees an object only through its class.
 Nothing projects the other way: the equality of two maps on `K₀` gives no isomorphism of
 functors.
 
-## What the statement is not
+## References
 
-`SphericalPairData` is the Euler-form shadow of an `A₂`-configuration, not the configuration
-itself: it does not record that `Hom^•(A, B)` is one-dimensional. The structure here records no
-hypothesis at all, so an inhabitant is a claim about a specific pair and must be supplied only for a
-genuine `A₂`-configuration. The isomorphism is of underlying functors; the graded natural
-isomorphism of Seidel--Thomas also respects the shift isomorphisms, which is not recorded.
+Seidel--Thomas, [arXiv:math/0001043v2](https://arxiv.org/abs/math/0001043v2). Definition 1.1(b): an
+`A_m`-configuration is a family of `m` spherical objects with `dim Hom^•(E_i, E_j) = 1` for
+`|i - j| = 1` and `0` for `|i - j| ≥ 2`, the dimension being total over all degrees. Theorem 1.2
+(second part) gives `T_{E_i} T_{E_{i+1}} T_{E_i} ≅ T_{E_{i+1}} T_{E_i} T_{E_{i+1}}` for such a
+family, up to graded natural isomorphism, and Theorem 2.17 is the abstract form. Proposition 2.13
+proves the displayed isomorphism for two `n`-spherical objects with `n > 0` and total
+`dim Hom^•(E_2, E_1) = 1`.
 -/
 
 universe w v u

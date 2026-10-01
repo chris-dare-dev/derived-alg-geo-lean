@@ -22,16 +22,6 @@ asserted**.
   on stability conditions by the Mukai reflection `ρ_{v(E)}`. The `K₀` action of `Φ` is `twistK₀`
   because `Φ ≅ T` and `K₀.map T = twistK₀` is `SphericalTwistData.map_eq_twistK₀`, proved.
 
-## References
-
-Seidel--Thomas, [arXiv:math/0001043v2](https://arxiv.org/abs/math/0001043v2): Theorem 1.2 (first
-part) says `T_E` is an exact self-equivalence of `Dᵇ(X)` for a spherical `E` on a smooth complex
-projective `X`; Proposition 2.10 is the abstract form, for an `n`-spherical `E` in the sense of
-their Definition 2.14. That definition has a fourth clause, a nondegenerate pairing
-`Hom^i(F,E) × Hom^{n-i}(E,F) → Hom^n(E,E)`, which Lemma 3.1 identifies on a smooth projective `X`
-with `E ⊗ ω_X ≅ E`. Huybrechts, *Fourier--Mukai transforms in algebraic geometry*, Proposition 8.6,
-is the same statement.
-
 ## Main definitions and results
 
 * `AutoequivalenceStatement` — the supplied conclusion, for a given `d` and `h`.
@@ -43,19 +33,20 @@ is the same statement.
 `SphericalTwistData` records no more than a cone-like triangulated functor with the right `K₀`
 shadow: nothing ties its `copower` and `ev` to `Hom^•(E,-) ⊗ E` and the evaluation map. So
 Seidel--Thomas supports an inhabitant only when `d` is the genuine twist datum, as the dg
-realizations of `ObjectTwistData.lean` are. For padded data, for instance a genuine twist plus a
-direct sum of contractible triangles, the class `[copower F]` is unchanged and `T` acquires extra
-summands, so no autoequivalence statement can hold. An inhabitant is a claim about the specific `d`.
+realizations of `ObjectTwistData.lean` are. Padding a genuine datum by the triangle
+`P F ⟶ 0 ⟶ (P F)⟦1⟧` with `P = 𝟭 ⊞ ⟦1⟧`, so that `[P F] = 0`, preserves every field, including the
+class of the copower, but adds the summands `F⟦1⟧ ⊕ F⟦2⟧` to `T F`, which an autoequivalence cannot
+have. An inhabitant is a claim about the specific `d`.
 
 ## What the hypothesis is, and is not
 
 The hypothesis `h` is `IsSphericalObject k 2 E` of `Basic.lean`: the Ext profile alone, with no
-Serre-functor clause and none of Definition 2.14's finiteness clauses. This is the clause the `K₀`
-consequences need (`χ(E,E) = 2`), and on a K3, where `ω_X ≅ O_X` makes the second clause of
-Definition 1.1(a) automatic, it is sphericity. It is **not** sufficient for the theorem in general:
-`AlgebraicGeometry/Surface/Spherical.lean` records a surface with the same Ext profile on which
-`T_E` is not an autoequivalence. So the statement must be supplied only where the full hypothesis of
-Seidel--Thomas holds, and its inhabitant is a claim about that case.
+Serre-functor clause and none of the finiteness clauses of Seidel--Thomas' Definition 2.9. This is
+the clause the `K₀` consequences need (`χ(E,E) = 2`), and on a K3, where `ω_X ≅ O_X` makes the
+second clause of Definition 1.1(a) automatic, it is sphericity. It is **not** sufficient for the
+theorem in general: `AlgebraicGeometry/Surface/Spherical.lean` records a surface with the same Ext
+profile on which `T_E` is not an autoequivalence. So the statement must be supplied only where the
+full hypothesis of Seidel--Thomas holds, and its inhabitant is a claim about that case.
 
 ## What the isomorphism does not record
 
@@ -67,6 +58,16 @@ consumed: `K₀.map_congr` needs only the natural isomorphism.
 
 The order-two statement of `StabilityAction.lean` remains about the lattice and not the functor:
 `T_E` has infinite order.
+
+## References
+
+Seidel--Thomas, [arXiv:math/0001043v2](https://arxiv.org/abs/math/0001043v2): Theorem 1.2 (first
+part) says `T_E` is an exact self-equivalence of `Dᵇ(X)` for a spherical `E` on a smooth complex
+projective `X`. Proposition 2.10 is the abstract form, for an `n`-spherical `E` in the sense of
+their Definition 2.9 (a bounded complex of injectives with finite-dimensional Homs, the Ext profile
+and a nondegenerate pairing); Definition 2.14 transfers that notion to `Dᵇ(S')`, and Lemma 3.1
+identifies it on a smooth projective `X` with `E ⊗ ω_X ≅ E`. Huybrechts, *Fourier--Mukai
+transforms in algebraic geometry*, Proposition 8.6, is the same statement.
 -/
 
 universe w v u
@@ -81,11 +82,14 @@ variable {k : Type w} [Field k] {C : Type u} [Category.{v} C] [Preadditive C]
   [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C] [IsTriangulated C]
   [HomFiniteBounded k C] [∀ n : ℤ, (shiftFunctor C n).Linear k]
 
-/-- **The Seidel--Thomas autoequivalence theorem for `T_E`, as a supplied statement.**
+/-- **The Seidel--Thomas autoequivalence theorem for `T_E` (their Proposition 2.10), as a supplied
+statement**: `d.T` is naturally isomorphic to the functor of a triangulated autoequivalence, whose
+inverse and instances `TriEquiv` carries. Never inhabited here.
 
-Under `h : IsSphericalObject k 2 E`, `T` is isomorphic to a triangulated autoequivalence, whose
-inverse and instances `TriEquiv` carries. Supplied, not proved; see the module docstring for the
-hypothesis and for what an inhabitant claims. -/
+The parameter `h` is the Ext profile only and is not sufficient for the theorem
+(`AlgebraicGeometry/Surface/Spherical.lean` records a counterexample), so an inhabitant may be
+supplied only where `E` is spherical in Seidel--Thomas' full sense and `d` is the genuine twist.
+`h` is consumed only by `toTwistShaped`, for `χ(E,E) = 2`. -/
 structure AutoequivalenceStatement {E : C} (d : SphericalTwistData k C E)
     (h : IsSphericalObject k (2 : ℤ) E) where
   /-- The autoequivalence, with its inverse and the instances of both. -/

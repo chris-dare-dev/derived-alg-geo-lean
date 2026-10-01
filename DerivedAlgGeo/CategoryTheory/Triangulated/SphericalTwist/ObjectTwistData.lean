@@ -4,7 +4,6 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.LinearObjectTwist
 import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.ObjectTwist
-import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.LinearEvaluationK0
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.LinearEvaluationK0
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.ObjectTwistK0
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.Definition
@@ -15,6 +14,14 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.Definition
 `SphericalTwistData` (in `Definition.lean`) is an interface that constructs nothing. This file
 shows that **route (b) of its encoding note, the dg enhancement, discharges every field**, so that
 the three instance fields of `T` are not an unsatisfiable demand.
+
+## Main definitions
+
+* `LinearEvaluationData.TwistConeData.toSphericalTwistData` and
+  `EvaluationData.TwistConeData.toSphericalTwistData` — the scalar-linear and the additive
+  realization, each given the Euler copower formula.
+
+## Implementation notes
 
 For a pretriangulated dg category `C` and an object `E`, the object twist
 `T_E = Cone(Hom(E,-) ⊗ E ⟶ id)` is a dg functor, and
@@ -28,24 +35,14 @@ For a pretriangulated dg category `C` and an object `E`, the object twist
 The one input beyond the dg construction is the copower's class, the field `copower_class`: the
 rank-one formula `[Hom(E,X) ⊗ E] = χ(E,X)·[E]`, which is `IsEulerCopower` of
 `DGEnhancement/H0/ObjectTwistK0.lean` and `DGEnhancement/H0/LinearEvaluationK0.lean` and the
-field's type on the nose. Both constructions take it as a hypothesis `hV`. For the scalar-linear
-package that is no extra assumption once all scalar-linear copowers exist:
-`LinearEvaluationData.IsEulerCopower.ofHomFiniteBounded` proves it, so
-`toSphericalTwistDataOfHasLinearCopowers` is a `SphericalTwistData` with no supplied field. The
-additive package has no such proof.
+field's type on the nose. Both constructions take it as a hypothesis `hV`; neither depends on how,
+or whether, the repository proves it for a particular package.
 
 Two constructions, one per evaluation package, and neither derived from the other: the additive
 `EvaluationData` (copowers by additive cochains over `ℤ`) and the scalar-linear
-`LinearEvaluationData` (copowers by `k`-linear cochains). The repository has no adapter between them
-and this file adds none. They are the two producers of `SphericalTwistData` that the
-single-instantiation gate asks for.
-
-## Main definitions
-
-* `LinearEvaluationData.TwistConeData.toSphericalTwistData`,
-  `EvaluationData.TwistConeData.toSphericalTwistData` — the two realizations.
-* `LinearEvaluationData.TwistConeData.toSphericalTwistDataOfHasLinearCopowers` — the scalar-linear
-  one with the Euler copower formula proved.
+`LinearEvaluationData` (copowers by `k`-linear cochains). The repository has no adapter between
+them and this file adds none. Two independent producers witness that the interface is not tailored
+to one construction.
 
 ## What this does not say
 
@@ -71,10 +68,10 @@ variable (k : Type w) [Field k]
   {E : C} {V : LinearEvaluationData k E} (K : V.TwistConeData k)
 
 omit [HomFiniteBounded k (H0 C)] in
-/-- Unlike `twistTriangleFunctor_map_hom₁` and `_hom₃` this is not `rfl`: the middle vertex is
-`(DGFunctor.id C).h0`, which agrees with `𝟭 (H0 C)` only through `DGFunctor.h0IdIso`. It is what
-makes `ev` and `π` natural transformations out of and into `𝟭`. A request to the dg `H⁰` lane to
-state it beside its siblings; private here so as not to claim their namespace. -/
+/-- Unlike `LinearEvaluationData.TwistConeData.twistTriangleFunctor_map_hom₁` and `_map_hom₃` this
+is not `rfl`: the middle vertex is `(DGFunctor.id C).h0`, which agrees with `𝟭 (H0 C)` only
+through `DGFunctor.h0IdIso`. It is what makes `ev` and `π` natural transformations out of and into
+`𝟭`. -/
 private theorem twistTriangleFunctor_map_hom₂ {X Y : H0 C} (f : X ⟶ Y) :
     ((twistTriangleFunctor K).map f).hom₂ = f := by
   change (DGFunctor.id C).h0.map f = f
@@ -126,24 +123,6 @@ theorem toSphericalTwistData_T (hV : V.IsEulerCopower k) :
 theorem toSphericalTwistData_copower (hV : V.IsEulerCopower k) :
     (K.toSphericalTwistData k hV).copower = V.functor.h0 :=
   rfl
-
-end LinearEvaluationData.TwistConeData
-
-namespace LinearEvaluationData.TwistConeData
-
-variable (k : Type v) [Field k]
-  {C : Type u} [DGCategory.{v} C] [IsPretriangulated C]
-  [∀ (X Y : C) (p : ℤ), Module k ((dgHom X Y).X p)]
-  [DGLinear k C] [HomFiniteBounded k (H0 C)] [HasLinearCopowers k C]
-  {E : C} {V : LinearEvaluationData k E} (K : V.TwistConeData k)
-
-/-- **The scalar-linear dg object twist is `SphericalTwistData` with nothing supplied** once all
-scalar-linear copowers exist: the copower's class is the theorem
-`LinearEvaluationData.IsEulerCopower.ofHomFiniteBounded`, a splitting by a finite cohomology
-presentation. Only the universe restriction `k : Type v` of that theorem is new. -/
-noncomputable def toSphericalTwistDataOfHasLinearCopowers :
-    SphericalTwistData k (H0 C) (show H0 C from E) :=
-  K.toSphericalTwistData k (LinearEvaluationData.IsEulerCopower.ofHomFiniteBounded k V)
 
 end LinearEvaluationData.TwistConeData
 

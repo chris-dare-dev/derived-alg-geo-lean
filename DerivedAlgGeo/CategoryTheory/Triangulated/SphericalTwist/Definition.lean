@@ -21,7 +21,14 @@ The one theorem it buys is `SphericalTwistData.map_eq_twistK₀`: the induced ma
 `twistK₀ k C E` of `SphericalTwist/GrothendieckGroup.lean`. The lattice half of the lane is
 therefore a consequence of this geometry and not a parallel story.
 
-## Encoding decision (settled before any construction)
+## Main definitions and results
+
+* `SphericalTwistData` — the supplied functor `T_E` with its instances, triangle and copower class.
+* `SphericalTwistData.class_T` — `[T F] = [F] - [Hom^•(E,F) ⊗ E]`, from `K₀.of_triangle`.
+* `SphericalTwistData.map_eq_twistK₀` — `K₀.map T = twistK₀ k C E`.
+* `map_comp_comp_eq_twistK₀` — the `K₀` map of a three-fold composite of supplied twists.
+
+## Encoding decision
 
 `Hom^•(E,-) ⊗_k E` is an object copowered by a complex of `k`-modules. It is neither the
 Fourier--Mukai kernel twist `C.tensor.obj K` of `FourierMukai/Basic.lean` nor the geometric
@@ -42,15 +49,14 @@ construct it for a concrete category.
 
 **Route (b) discharges `T.Additive`, `T.CommShift ℤ` and `T.IsTriangulated` for a concrete `T`**,
 and `ObjectTwistData.lean` checks it: both dg object twists, additive and scalar-linear, are
-`SphericalTwistData` given the Euler copower formula, which for the scalar-linear package is proved
-(see below). The cost of (b) is that its category is
-`H⁰` of a dg category, so a geometric `Dᵇ(Coh X)` is reached only through an `Enhancement`.
-Route (a) is not taken and would not replace (b): it gives the tensor, not the cone.
+`SphericalTwistData` given the Euler copower formula as a hypothesis. The cost of (b) is that its
+category is `H⁰` of a dg category, so a geometric `Dᵇ(Coh X)` is reached only through an
+`Enhancement`. Route (a) is not taken and would not replace (b): it gives the tensor, not the cone.
 
 This file takes neither route: it is the interface, in an arbitrary pretriangulated `C`, so that its
 consequences are stated once and every realization inherits them. It defines no tensor product and
-builds no cone, and must not: if it ever does, the shared-foundation split has been violated and
-the work belongs to lane 9.
+builds no cone, and must not: a tensor product defined here would duplicate the derived-tensor
+foundation and split it.
 
 ## Why the functoriality and the instances are fields
 
@@ -74,10 +80,8 @@ They are registered with `attribute [instance]`, in the shape `GroupAction.TriEq
   `K₀.IsRankOne` and the fixed-source Euler character `chiRight` (`copower_class_chiK₀` spells it
   with `chiK₀`). Splitting a copower of `E` by a bounded complex of finite-dimensional `k`-modules
   into its cohomology is a Postnikov or splitting argument; triangle additivity relates the three
-  objects of one triangle, and no triangle presents the copower. For the scalar-linear dg package
-  that argument is proved, as `CochainComplex.FiniteCohomologyPresentation.linearCopowerK₀Of`, and
-  `LinearEvaluationData.IsEulerCopower.ofHomFiniteBounded` discharges the field when all
-  scalar-linear copowers exist. The additive package has no such proof and takes it as a hypothesis.
+  objects of one triangle, and no triangle presents the copower. This is the second supplied input,
+  after the functor itself. The dg realizations take it as the hypothesis `IsEulerCopower`.
 * `map_eq_twistK₀`: **proved, not a field**, from the two halves above.
 
 ## What is not claimed
@@ -85,13 +89,6 @@ They are registered with `attribute [instance]`, in the shape `GroupAction.TriEq
 No spherical object is exhibited, `T_E` is not constructed on `Dᵇ(Coh X)`, and nothing says `T`
 is an autoequivalence: that is the separate supplied `SphericalTwist.AutoequivalenceStatement`.
 The identity on `K₀` is far weaker than any functorial statement about `T`.
-
-## Main definitions and results
-
-* `SphericalTwistData` — the supplied functor `T_E` with its instances, triangle and copower class.
-* `SphericalTwistData.class_T` — `[T F] = [F] - [Hom^•(E,F) ⊗ E]`, from `K₀.of_triangle`.
-* `SphericalTwistData.map_eq_twistK₀` — `K₀.map T = twistK₀ k C E`.
-* `map_comp_comp_eq_twistK₀` — the `K₀` map of a three-fold composite of supplied twists.
 
 ## References
 
@@ -121,8 +118,9 @@ product is defined here, and no field says `E` is spherical. -/
 structure SphericalTwistData (E : C) where
   /-- The endofunctor `T_E`. -/
   T : C ⥤ C
-  /-- `T_E` is additive. Mathlib derives this from `isTriangulated`; the field is kept because the
-  issue requires all three instances, and for the shape of `TriEquiv.fAdd`. -/
+  /-- `T_E` is additive. Mathlib derives this from `isTriangulated`; the field is kept, as in
+  `TriEquiv.fAdd`, so that all three instances `K₀.map` consumes are registered directly. It is a
+  `Prop`, so the redundancy creates no diamond. -/
   additive : T.Additive
   /-- `T_E` commutes with the shift. -/
   commShift : T.CommShift ℤ
