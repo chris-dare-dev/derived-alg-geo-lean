@@ -18,6 +18,32 @@ canonical functorial resolution for every scheme. Proving that derived tensor
 preserves quasicoherent cohomology and then restricting it to `Dqc X` remain
 geometric steps.
 
+## Main definitions
+
+* `AlgebraicGeometry.DerivedCategory.SchemeKFlatResolution` specializes the
+  generic resolution interface to the literal scheme-module total tensor.
+* `AlgebraicGeometry.DerivedCategory.SchemeKFlatResolution.derivedTensor`
+  supplies the unbounded bifunctor from a resolution.
+
+## Main results
+
+* `AlgebraicGeometry.DerivedCategory.SchemeKFlatResolution.derivedTensorFactors`
+  identifies the localized bifunctor with the resolved total tensor.
+
+## Implementation notes
+
+The canonical free-Yoneda inhabitant is defined downstream, so this generic
+scheme specialization does not import its construction.
+
+## References
+
+The underlying localization construction is
+`CategoryTheory.KFlatResolution.derivedTensor`.
+
+## Tags
+
+scheme, derived tensor, K-flat resolution, localization
+
 ## Which tensor product this is
 
 This is the **unbounded** tier of the `Tensor/` owner, and it is the only tier that
