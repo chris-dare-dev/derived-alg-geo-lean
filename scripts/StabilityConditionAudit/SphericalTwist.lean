@@ -303,7 +303,7 @@ docstrings of `SphericalTwist/Definition.lean`, `Autoequivalence.lean` and `Brai
 #print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.triangleFunctor
 #print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.triangleFunctor_obj_mem_distTriang
 #print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.class_T
-#print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.class_T_eq
+#print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.class_T_eq_sub_chiRight_smul
 #print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.copower_class_chiK₀
 #print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.map_eq_twistK₀
 
@@ -320,8 +320,8 @@ docstrings of `SphericalTwist/Definition.lean`, `Autoequivalence.lean` and `Brai
 #print axioms CategoryTheory.Triangulated.SphericalTwist.BraidStatement.iso
 #print axioms CategoryTheory.Triangulated.SphericalTwist.BraidStatement.mk.inj
 #print axioms CategoryTheory.Triangulated.SphericalTwist.BraidStatement.mk.sizeOf_spec
-#print axioms CategoryTheory.Triangulated.SphericalTwist.map_braid_left
-#print axioms CategoryTheory.Triangulated.SphericalTwist.map_braid_of_pair
+#print axioms CategoryTheory.Triangulated.SphericalTwist.map_comp_comp_eq_twistK₀
+#print axioms CategoryTheory.Triangulated.SphericalTwist.map_braid_of_sphericalPairData
 #print axioms CategoryTheory.Triangulated.SphericalTwist.BraidStatement.map_braid
 #print axioms CategoryTheory.Triangulated.SphericalTwist.BraidStatement.twistK₀_braid
 
@@ -329,11 +329,10 @@ docstrings of `SphericalTwist/Definition.lean`, `Autoequivalence.lean` and `Brai
 -- the Euler copower formula. The instances of `T` are the proved `h0CommShift` and
 -- `h0IsTriangulated`; the copower's class stays a hypothesis, as in `ObjectTwistK0` and
 -- `LinearObjectTwistK0`. The two constructions are not compared.
-#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.twistTriangleFunctor_map_hom₂
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.toSphericalTwistData
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.toSphericalTwistData_T
 #print axioms CategoryTheory.LinearEvaluationData.TwistConeData.toSphericalTwistData_copower
-#print axioms CategoryTheory.EvaluationData.TwistConeData.twistTriangleFunctor_map_hom₂
+#print axioms CategoryTheory.LinearEvaluationData.TwistConeData.toSphericalTwistDataOfHasLinearCopowers
 #print axioms CategoryTheory.EvaluationData.TwistConeData.toSphericalTwistData
 #print axioms CategoryTheory.EvaluationData.TwistConeData.toSphericalTwistData_T
 #print axioms CategoryTheory.EvaluationData.TwistConeData.toSphericalTwistData_copower

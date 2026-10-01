@@ -28,18 +28,22 @@ Fourier--Mukai kernel twist `C.tensor.obj K` of `FourierMukai/Basic.lean` nor th
 `HasDerivedTensor` of `AlgebraicGeometry/DerivedCategory/Tensor/BoundedCoherent.lean`. Two routes
 construct it for a concrete category.
 
-* **(a) The derived-tensor foundation of lane 9 (`dt-1`).** It would own the Hom-complex tensor.
-  It supplies neither a functorial cone nor the three instances on `T`.
+* **(a) A derived tensor on an ordinary triangulated category.** `Hom^•(E,-) ⊗_k E` would be a
+  tensor of that kind. No repository module provides one: #892 delivered the monoidal structure of
+  `Dᵇ(Coh X)`, which is a different tensor. Even then it would supply neither a functorial cone nor
+  the three instances on `T`.
 * **(b) The dg enhancement.** `Algebra/Homology/DGCategory/Basic.lean` gives the Hom-complexes and
-  `DGCategory/Pretriangulated/` the cones with their projections. `ObjectTwistK0.lean` and
-  `LinearObjectTwistK0.lean` already build `Cone(Hom(E,-) ⊗ E ⟶ id)` as a `DGFunctor` on a
-  pretriangulated dg category `C`. Its `H⁰` is a triangulated functor on `H⁰ C`, with `CommShift`
-  and `IsTriangulated` *proved* (`DGFunctor.h0CommShift`, `DGFunctor.h0IsTriangulated`), and its
-  evaluation triangle is the distinguished `twistTriangleFunctor`.
+  `DGCategory/Pretriangulated/` the cones with their projections. `DGCategory/Pretriangulated/
+  {ObjectTwist,LinearObjectTwist}.lean` already build `Cone(Hom(E,-) ⊗ E ⟶ id)` as a `DGFunctor`
+  on a pretriangulated dg category `C`. Its `H⁰` is a triangulated functor on `H⁰ C`, with
+  `CommShift` and `IsTriangulated` *proved* (`DGFunctor.h0CommShift`,
+  `DGFunctor.h0IsTriangulated`), and its evaluation triangle is the distinguished
+  `twistTriangleFunctor`.
 
 **Route (b) discharges `T.Additive`, `T.CommShift ℤ` and `T.IsTriangulated` for a concrete `T`**,
 and `ObjectTwistData.lean` checks it: both dg object twists, additive and scalar-linear, are
-`SphericalTwistData` given the Euler copower formula. The cost of (b) is that its category is
+`SphericalTwistData` given the Euler copower formula, which for the scalar-linear package is proved
+(see below). The cost of (b) is that its category is
 `H⁰` of a dg category, so a geometric `Dᵇ(Coh X)` is reached only through an `Enhancement`.
 Route (a) is not taken and would not replace (b): it gives the tensor, not the cone.
 
@@ -65,13 +69,15 @@ They are registered with `attribute [instance]`, in the shape `GroupAction.TriEq
 * `T F` has class `[F] - [Hom^•(E,F) ⊗ E]`: **a theorem**, `class_T`, from `K₀.of_triangle` applied
   to the supplied triangle. No shift appears, because the relation is read on the first three
   vertices.
-* `[Hom^•(E,F) ⊗ E] = χ(E,F)·[E]`: **not a theorem and not free**, the field `copower_class`, stated
-  with the existing predicate `K₀.IsRankOne` and the fixed-source Euler character `chiRight`
-  (`copower_class_chiK₀` spells it with `chiK₀`). Splitting a copower of `E` by a bounded complex of
-  finite-dimensional `k`-modules into its cohomology is a Postnikov or splitting argument, and
-  triangle additivity is not that: it relates the three objects of one triangle, and no triangle
-  presents the copower. This is the second supplied input, after the functor itself. Lane 9's `dt-1`
-  is where a proof of it would land.
+* `[Hom^•(E,F) ⊗ E] = χ(E,F)·[E]`: **not a corollary of triangle additivity**, so for an arbitrary
+  supplied `copower` it is the field `copower_class`, stated with the existing predicate
+  `K₀.IsRankOne` and the fixed-source Euler character `chiRight` (`copower_class_chiK₀` spells it
+  with `chiK₀`). Splitting a copower of `E` by a bounded complex of finite-dimensional `k`-modules
+  into its cohomology is a Postnikov or splitting argument; triangle additivity relates the three
+  objects of one triangle, and no triangle presents the copower. For the scalar-linear dg package
+  that argument is proved, as `CochainComplex.FiniteCohomologyPresentation.linearCopowerK₀Of`, and
+  `LinearEvaluationData.IsEulerCopower.ofHomFiniteBounded` discharges the field when all
+  scalar-linear copowers exist. The additive package has no such proof and takes it as a hypothesis.
 * `map_eq_twistK₀`: **proved, not a field**, from the two halves above.
 
 ## What is not claimed
@@ -80,7 +86,14 @@ No spherical object is exhibited, `T_E` is not constructed on `Dᵇ(Coh X)`, and
 is an autoequivalence: that is the separate supplied `SphericalTwist.AutoequivalenceStatement`.
 The identity on `K₀` is far weaker than any functorial statement about `T`.
 
-## Sources
+## Main definitions and results
+
+* `SphericalTwistData` — the supplied functor `T_E` with its instances, triangle and copower class.
+* `SphericalTwistData.class_T` — `[T F] = [F] - [Hom^•(E,F) ⊗ E]`, from `K₀.of_triangle`.
+* `SphericalTwistData.map_eq_twistK₀` — `K₀.map T = twistK₀ k C E`.
+* `map_comp_comp_eq_twistK₀` — the `K₀` map of a three-fold composite of supplied twists.
+
+## References
 
 Seidel--Thomas, *Braid group actions on derived categories of coherent sheaves*,
 [arXiv:math/0001043v2](https://arxiv.org/abs/math/0001043v2). The triangle
@@ -100,12 +113,16 @@ variable (k : Type w) [DivisionRing k] (C : Type u) [Category.{v} C] [Preadditiv
 
 /-- **The data of the Seidel--Thomas twist `T_E`**, supplied rather than constructed.
 
-`copower` is the functor `F ↦ Hom^•(E,F) ⊗_k E`; this structure does not build it, and no
-tensor product is defined here. -/
+`copower` is meant to be `F ↦ Hom^•(E,F) ⊗_k E` and `ev` the evaluation, but nothing ties either to
+`E` except the `K₀` equation `copower_class`. So `d.T` is the Seidel--Thomas twist only when the
+supplied copower and evaluation are the genuine ones, as in `ObjectTwistData.lean`; the structure
+records no more than a triangulated cone-like functor with the right `K₀` shadow. No tensor
+product is defined here, and no field says `E` is spherical. -/
 structure SphericalTwistData (E : C) where
   /-- The endofunctor `T_E`. -/
   T : C ⥤ C
-  /-- `T_E` is additive. -/
+  /-- `T_E` is additive. Mathlib derives this from `isTriangulated`; the field is kept because the
+  issue requires all three instances, and for the shape of `TriEquiv.fAdd`. -/
   additive : T.Additive
   /-- `T_E` commutes with the shift. -/
   commShift : T.CommShift ℤ
@@ -137,7 +154,8 @@ variable {k C} {E : C} (d : SphericalTwistData k C E)
 def triangleFunctor : C ⥤ Triangle C :=
   Triangle.functorMk d.ev d.π d.δ
 
-/-- Every value of `triangleFunctor` is distinguished. -/
+/-- The field `distinguished`, restated for `triangleFunctor` so that Mathlib's triangle-functor
+API applies. -/
 theorem triangleFunctor_obj_mem_distTriang (F : C) :
     d.triangleFunctor.obj F ∈ distTriang C :=
   d.distinguished F
@@ -154,8 +172,10 @@ theorem class_T (F : C) :
   rw [h]
   abel
 
-/-- `[T F] = [F] - χ(E,F)·[E]`: the class formula with the copower class substituted. -/
-theorem class_T_eq (F : C) :
+/-- `class_T` with `copower_class` substituted: `[T F] = [F] - χ(E,F)·[E]`. Stated with `chiRight`,
+which needs no linearity of the shifts; `chiK₀`, and so `twistK₀`, does, which makes this the
+strongest form available before `map_eq_twistK₀`. -/
+theorem class_T_eq_sub_chiRight_smul (F : C) :
     K₀.of C (d.T.obj F) = K₀.of C F - chiRight k C E (K₀.of C F) • K₀.of C E := by
   rw [d.class_T, d.copower_class F]
 
@@ -163,7 +183,8 @@ section Twist
 
 variable [∀ n : ℤ, (shiftFunctor C n).Linear k]
 
-/-- The copower class with the Euler form written as `chiK₀`, the form `twistK₀` uses. -/
+/-- `copower_class` read through `chiK₀_of`. It needs the shifts to be `k`-linear, which the field
+deliberately does not, and it is the form `twistK₀` consumes. -/
 theorem copower_class_chiK₀ (F : C) :
     K₀.of C (d.copower.obj F) = chiK₀ k C (K₀.of C E) (K₀.of C F) • K₀.of C E := by
   rw [d.copower_class F, chiK₀_of]
@@ -175,10 +196,27 @@ A theorem, not a field. It needs the two halves of the module docstring and noth
 theorem map_eq_twistK₀ : K₀.map d.T = twistK₀ k C E := by
   apply K₀.hom_ext
   intro F
-  rw [K₀.map_of, twistK₀_apply, d.class_T_eq, chiK₀_of]
+  rw [K₀.map_of, twistK₀_apply, d.class_T_eq_sub_chiRight_smul, chiK₀_of]
 
 end Twist
 
 end SphericalTwistData
+
+section Compose
+
+variable {k C} [∀ n : ℤ, (shiftFunctor C n).Linear k] {E₁ E₂ E₃ : C}
+  (d₁ : SphericalTwistData k C E₁) (d₂ : SphericalTwistData k C E₂)
+  (d₃ : SphericalTwistData k C E₃)
+
+/-- `K₀.map` of a three-fold composite of supplied twists, by `K₀.map_comp` and
+`SphericalTwistData.map_eq_twistK₀`. Applied to `(dA, dB, dA)` and to `(dB, dA, dB)` it gives the
+two sides of the braid relation. -/
+theorem map_comp_comp_eq_twistK₀ :
+    K₀.map (d₁.T ⋙ d₂.T ⋙ d₃.T) =
+      (twistK₀ k C E₃).comp ((twistK₀ k C E₂).comp (twistK₀ k C E₁)) := by
+  rw [K₀.map_comp, K₀.map_comp, d₁.map_eq_twistK₀, d₂.map_eq_twistK₀, d₃.map_eq_twistK₀]
+  rfl
+
+end Compose
 
 end CategoryTheory.Triangulated.SphericalTwist

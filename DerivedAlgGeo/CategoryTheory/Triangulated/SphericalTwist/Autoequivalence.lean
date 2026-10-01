@@ -13,15 +13,16 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.StabilityAction
 autoequivalence is the Seidel--Thomas theorem, and **it is stated here, never proved and never
 asserted**.
 
-* `AutoequivalenceStatement d` carries its conclusion as a field: for a `2`-spherical `E`, a
-  triangulated autoequivalence `Φ`, with its inverse and the instances of both (`TriEquiv`), and a
-  natural isomorphism `Φ ≅ T`. Nothing constructs an inhabitant, and no axiom stands in for one.
+* `AutoequivalenceStatement d h` carries its conclusion as fields, under the hypothesis
+  `h : IsSphericalObject k 2 E`: a triangulated autoequivalence `Φ`, with its inverse and the
+  instances of both (`TriEquiv`), and a natural isomorphism `Φ ≅ T`. Nothing constructs an
+  inhabitant, and no axiom stands in for one.
 * `AutoequivalenceStatement.toTwistShaped` closes the circle of the lane: a supplied statement turns
   a `SphericalTwistData` into a `TwistShaped` of `StabilityAction.lean`, so the supplied twist acts
   on stability conditions by the Mukai reflection `ρ_{v(E)}`. The `K₀` action of `Φ` is `twistK₀`
   because `Φ ≅ T` and `K₀.map T = twistK₀` is `SphericalTwistData.map_eq_twistK₀`, proved.
 
-## Sources
+## References
 
 Seidel--Thomas, [arXiv:math/0001043v2](https://arxiv.org/abs/math/0001043v2): Theorem 1.2 (first
 part) says `T_E` is an exact self-equivalence of `Dᵇ(X)` for a spherical `E` on a smooth complex
@@ -31,9 +32,24 @@ their Definition 2.14. That definition has a fourth clause, a nondegenerate pair
 with `E ⊗ ω_X ≅ E`. Huybrechts, *Fourier--Mukai transforms in algebraic geometry*, Proposition 8.6,
 is the same statement.
 
+## Main definitions and results
+
+* `AutoequivalenceStatement` — the supplied conclusion, for a given `d` and `h`.
+* `AutoequivalenceStatement.toTwistShaped` — the supplied twist is twist-shaped.
+* `AutoequivalenceStatement.act_Z` — it acts on stability conditions through `ρ_{v(E)}`.
+
+## What an inhabitant claims
+
+`SphericalTwistData` records no more than a cone-like triangulated functor with the right `K₀`
+shadow: nothing ties its `copower` and `ev` to `Hom^•(E,-) ⊗ E` and the evaluation map. So
+Seidel--Thomas supports an inhabitant only when `d` is the genuine twist datum, as the dg
+realizations of `ObjectTwistData.lean` are. For padded data, for instance a genuine twist plus a
+direct sum of contractible triangles, the class `[copower F]` is unchanged and `T` acquires extra
+summands, so no autoequivalence statement can hold. An inhabitant is a claim about the specific `d`.
+
 ## What the hypothesis is, and is not
 
-The field's hypothesis is `IsSphericalObject k 2 E` of `Basic.lean`: the Ext profile alone, with no
+The hypothesis `h` is `IsSphericalObject k 2 E` of `Basic.lean`: the Ext profile alone, with no
 Serre-functor clause and none of Definition 2.14's finiteness clauses. This is the clause the `K₀`
 consequences need (`χ(E,E) = 2`), and on a K3, where `ω_X ≅ O_X` makes the second clause of
 Definition 1.1(a) automatic, it is sphericity. It is **not** sufficient for the theorem in general:
@@ -67,41 +83,41 @@ variable {k : Type w} [Field k] {C : Type u} [Category.{v} C] [Preadditive C]
 
 /-- **The Seidel--Thomas autoequivalence theorem for `T_E`, as a supplied statement.**
 
-For a `2`-spherical `E`, `T` is isomorphic to a triangulated autoequivalence, whose inverse and
-instances `TriEquiv` carries. Supplied, not proved; see the module docstring for the hypothesis. -/
-structure AutoequivalenceStatement {E : C} (d : SphericalTwistData k C E) where
+Under `h : IsSphericalObject k 2 E`, `T` is isomorphic to a triangulated autoequivalence, whose
+inverse and instances `TriEquiv` carries. Supplied, not proved; see the module docstring for the
+hypothesis and for what an inhabitant claims. -/
+structure AutoequivalenceStatement {E : C} (d : SphericalTwistData k C E)
+    (h : IsSphericalObject k (2 : ℤ) E) where
   /-- The autoequivalence, with its inverse and the instances of both. -/
-  equiv : IsSphericalObject k (2 : ℤ) E → TriEquiv C
+  equiv : TriEquiv C
   /-- Its underlying functor is `T`, up to natural isomorphism. -/
-  iso : ∀ h : IsSphericalObject k (2 : ℤ) E, Nonempty ((equiv h).e.functor ≅ d.T)
+  iso : equiv.e.functor ≅ d.T
 
 namespace AutoequivalenceStatement
 
-variable {E : C} {d : SphericalTwistData k C E} (S : AutoequivalenceStatement d)
-  {N : Type*} [AddCommGroup N] {b : N →ₗ[ℤ] N →ₗ[ℤ] ℤ}
+variable {E : C} {d : SphericalTwistData k C E} {h : IsSphericalObject k (2 : ℤ) E}
+  (S : AutoequivalenceStatement d h) {N : Type*} [AddCommGroup N] {b : N →ₗ[ℤ] N →ₗ[ℤ] ℤ}
 
 /-- **The supplied twist is twist-shaped.** `Φ ≅ T` and `K₀.map T = twistK₀` give
 `K₀.map Φ = twistK₀`, and `χ(E,E) = 2` is `chiK₀_of_self_eq_two`. -/
-noncomputable def toTwistShaped (R : MukaiRealization k C b) (h : IsSphericalObject k (2 : ℤ) E) :
-    TwistShaped R E where
-  Φ := S.equiv h
-  map_eq := (K₀.map_congr (S.iso h).some).trans d.map_eq_twistK₀
+noncomputable def toTwistShaped (R : MukaiRealization k C b) : TwistShaped R E where
+  Φ := S.equiv
+  map_eq := (K₀.map_congr S.iso).trans d.map_eq_twistK₀
   chi_self := chiK₀_of_self_eq_two h
 
 omit [IsTriangulated C] in
+/-- The autoequivalence of the constructed `TwistShaped` is the supplied one. -/
 @[simp]
-theorem toTwistShaped_Φ (R : MukaiRealization k C b) (h : IsSphericalObject k (2 : ℤ) E) :
-    (S.toTwistShaped R h).Φ = S.equiv h :=
+theorem toTwistShaped_Φ (R : MukaiRealization k C b) : (S.toTwistShaped R).Φ = S.equiv :=
   rfl
 
 /-- **The supplied twist acts on stability conditions through the reflection.** The charge of
 `T_E • σ` is the charge of `σ` precomposed with the Mukai reflection `ρ_{v(E)}`; this is
 `TwistShaped.act_Z` at the twist-shaped pair that `toTwistShaped` produces. -/
-theorem act_Z (R : MukaiRealization k C b) (h : IsSphericalObject k (2 : ℤ) E)
-    (σ : StabilityCondition.WithClassMap C R.v) (x : Mukai.MukaiLattice N) :
-    (AutPairQuot.mk (S.toTwistShaped R h).toAutPair • σ).Z x =
-      σ.Z ((S.toTwistShaped R h).lam x) :=
-  (S.toTwistShaped R h).act_Z σ x
+theorem act_Z (R : MukaiRealization k C b) (σ : StabilityCondition.WithClassMap C R.v)
+    (x : Mukai.MukaiLattice N) :
+    (AutPairQuot.mk (S.toTwistShaped R).toAutPair • σ).Z x = σ.Z ((S.toTwistShaped R).lam x) :=
+  (S.toTwistShaped R).act_Z σ x
 
 end AutoequivalenceStatement
 

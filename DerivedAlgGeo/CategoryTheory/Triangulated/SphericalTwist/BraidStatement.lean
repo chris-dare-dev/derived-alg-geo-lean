@@ -13,7 +13,12 @@ For an `A₂`-configuration `(A, B)` the Seidel--Thomas theorem is the isomorphi
 `BraidStatement dA dB` carries that isomorphism as its single field, and nothing constructs an
 inhabitant.
 
-## Sources
+An inhabitant is a claim about the supplied `dA`, `dB`, and Seidel--Thomas supports it only when
+those are the genuine twists: `SphericalTwistData` records no more than a cone-like functor with the
+right `K₀` shadow, so for padded or otherwise non-genuine data the isomorphism can fail even for a
+genuine `A₂`-configuration. The dg realizations of `ObjectTwistData.lean` are the genuine ones.
+
+## References
 
 Seidel--Thomas, [arXiv:math/0001043v2](https://arxiv.org/abs/math/0001043v2). Definition 1.1(b): an
 `A_m`-configuration is a family of `m` spherical objects with `dim Hom^•(E_i, E_j) = 1` for
@@ -23,15 +28,21 @@ family, up to graded natural isomorphism, and Theorem 2.17 is the abstract form.
 proves the displayed isomorphism for two `n`-spherical objects with `n > 0` and total
 `dim Hom^•(E_2, E_1) = 1`.
 
+## Main definitions and results
+
+* `BraidStatement` — the supplied isomorphism `T_A T_B T_A ≅ T_B T_A T_B`.
+* `map_braid_of_sphericalPairData` — the `K₀` braid identity for the Euler-form data.
+* `BraidStatement.map_braid`, `BraidStatement.twistK₀_braid` — what a supplied isomorphism forces.
+
 ## What is proved: only the `K₀` shadow, and only in one direction
 
 The two `K₀` facts below are the entire content, and both are far weaker than the functorial
 statement, because `K₀` sees an object only through its class.
 
-* `map_braid_of_pair`: for the Euler-form data `SphericalPairData` of `Braid.lean`, the induced
-  maps `K₀.map (T_A T_B T_A)` and `K₀.map (T_B T_A T_B)` agree. This is `twistK₀_braid` read
-  through `SphericalTwistData.map_eq_twistK₀`: the lattice identity is a consequence of the
-  geometry's `K₀` action, not a parallel story.
+* `map_braid_of_sphericalPairData`: for the Euler-form data `SphericalPairData` of `Braid.lean`,
+  the induced maps `K₀.map (T_A T_B T_A)` and `K₀.map (T_B T_A T_B)` agree. This is
+  `twistK₀_braid` read through `SphericalTwistData.map_eq_twistK₀`: the lattice identity is a
+  consequence of the geometry's `K₀` action, not a parallel story.
 * `BraidStatement.map_braid`: a `BraidStatement` **implies** the same equality, from `K₀.map_congr`
   alone, with no use of `SphericalPairData`. It is a consistency check that the supplied
   isomorphism cannot contradict what is proved: for a pair whose `K₀` twists do not braid there is
@@ -72,17 +83,12 @@ section Twist
 
 variable [∀ n : ℤ, (shiftFunctor C n).Linear k]
 
-/-- The `K₀` map of the three-fold composite `T_A T_B T_A` is the composite of the three twists. -/
-theorem map_braid_left :
-    K₀.map (dA.T ⋙ dB.T ⋙ dA.T) =
-      (twistK₀ k C A).comp ((twistK₀ k C B).comp (twistK₀ k C A)) := by
-  rw [K₀.map_comp, K₀.map_comp, dA.map_eq_twistK₀, dB.map_eq_twistK₀]
-  rfl
-
-/-- **The `K₀` shadow of the braid relation, from the Euler-form data.** -/
-theorem map_braid_of_pair (h : SphericalPairData k C A B) :
+/-- **The `K₀` shadow of the braid relation, from the Euler-form data.** `twistK₀_braid`
+transported through `SphericalTwistData.map_eq_twistK₀`. The hypothesis is the product condition
+`χ(A,B)·χ(B,A) = 1` of `SphericalPairData`, not `χ(A,B) = 1`. -/
+theorem map_braid_of_sphericalPairData (h : SphericalPairData k C A B) :
     K₀.map (dA.T ⋙ dB.T ⋙ dA.T) = K₀.map (dB.T ⋙ dA.T ⋙ dB.T) := by
-  rw [map_braid_left, map_braid_left, twistK₀_braid h]
+  rw [map_comp_comp_eq_twistK₀, map_comp_comp_eq_twistK₀, twistK₀_braid h]
 
 end Twist
 
@@ -103,7 +109,7 @@ variable [∀ n : ℤ, (shiftFunctor C n).Linear k]
 theorem twistK₀_braid :
     (twistK₀ k C A).comp ((twistK₀ k C B).comp (twistK₀ k C A)) =
       (twistK₀ k C B).comp ((twistK₀ k C A).comp (twistK₀ k C B)) := by
-  rw [← map_braid_left dA dB, ← map_braid_left dB dA, S.map_braid]
+  rw [← map_comp_comp_eq_twistK₀ dA dB dA, ← map_comp_comp_eq_twistK₀ dB dA dB, S.map_braid]
 
 end BraidStatement
 
