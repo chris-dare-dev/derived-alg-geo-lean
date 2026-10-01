@@ -23,6 +23,7 @@ and future upstream work; matching directories is not required to import Mathlib
 | `HomologicalComplex.stupidTrunc` inclusions between integer degree-at-least truncations | `Algebra/Homology/Embedding/StupidTrunc.lean` | `Algebra/Homology/Embedding/StupidTruncGE.lean` |
 | `HomologicalComplex.stupidTruncXIso` normalized retained-component comparison and its bicomplex specialization | `Algebra/Homology/Embedding/StupidTrunc.lean` | `Algebra/Homology/Embedding/StupidTruncGE.lean` |
 | Spectral sequences | `Algebra/Homology/SpectralSequence/` | `Algebra/Homology/SpectralSequence/` |
+| Coproducts indexed by a family with finite nonzero support | `CategoryTheory/Limits/Shapes/FiniteProducts.lean` | `CategoryTheory/Limits/Shapes/FiniteProducts.lean` |
 | `Sigma.π` finite-support projection identity for a supplied coproduct | `CategoryTheory/Limits/Shapes/ZeroMorphisms.lean` | `CategoryTheory/Limits/Shapes/ZeroMorphisms.lean` |
 | `HomologicalComplex₂.totalFunctor` and direct-sum totalization | `Algebra/Homology/TotalComplex.lean` | `Algebra/Homology/TotalComplex.lean` |
 | `HomologicalComplex.mapBifunctorMap` and its finite-support quasi-isomorphism criteria | `Algebra/Homology/Bifunctor.lean` | `Algebra/Homology/Bifunctor.lean` |
@@ -53,6 +54,17 @@ and future upstream work; matching directories is not required to import Mathlib
 
 If two rows seem to apply, identify the API actually being extended, rather
 than choosing the weakest type appearing in the statement.
+Within the spectral-sequence row, `FilteredTotalComplexAdjacentCore.lean` owns the
+generic adjacent-column short exact sequence, its natural map, and the
+single-column total-map quasi-isomorphism criterion.
+`FiniteStripTotal.lean` consumes that core to prove the finite horizontal-strip
+comparison for the actual `HomologicalComplex₂.total.map`. The spectral-page
+and first-page files consume the core downstream; they do not define a second
+adjacent sequence. The retained truncation-component iso, inclusion naturality,
+and criterion that the inclusion is an isomorphism when discarded components
+vanish are owned separately by `Embedding/StupidTruncGE.lean`. The
+finite-support coproduct lemma used to construct total objects is owned by
+`CategoryTheory/Limits/Shapes/FiniteProducts.lean`; it has no bicomplex premise.
 `PrimeSpectrum.basicOpen_prod_eq_pi` is stated
 in the lattice of opens of a prime spectrum, but `PrimeSpectrum.basicOpen` is defined in
 `RingTheory/Spectrum/Prime/Topology.lean`, so it lives there and not in
