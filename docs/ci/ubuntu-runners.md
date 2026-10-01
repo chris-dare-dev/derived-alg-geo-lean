@@ -1,9 +1,13 @@
-# Ubuntu workstation runners
+# Ubuntu workstation runners (historical topology)
 
 The owner retired the Windows workstation setup on 2026-09-21 and authorized
 four runners on the personal Ubuntu PC. Windows is no longer a required
 platform for this repository. This operator-directed replacement is distinct
-from the hosted-Linux benchmarking and broader CI1 rollout in #1436.
+from the hosted-Linux benchmarking and broader CI1 rollout in #1436. The
+[hosted-only cutover](hosted-cutover.md) supersedes this scheduling topology
+after the four repository registrations are removed and the reviewed workflow
+change merges. The table and operational measurements below document the
+pre-cutover host; they are not instructions to re-register these runners.
 
 | Runner | Custom scheduling label | Work |
 | --- | --- | --- |
@@ -127,6 +131,6 @@ pkg-config, libgmp-dev, unzip, zstd and the runner's ICU/OpenSSL runtime
 libraries. Lean setup follows the committed toolchain through lean-action.
 
 If routing must be rolled back, use hosted Ubuntu through a reviewed change;
-do not recreate the Windows registrations or assign their labels to Linux.
+do not recreate the repository's Ubuntu or former Windows registrations.
 This migration does not claim completion of CI1 host-admission tooling,
 trusted-cache consolidation, cold/warm parity or the week-long rollout study.

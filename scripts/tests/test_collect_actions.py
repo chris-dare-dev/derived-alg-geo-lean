@@ -69,6 +69,18 @@ class CollectActionsTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "not completed"):
             collect_attempt(FakeClient(before=pending), 17)
 
+    def test_attempt_event_and_workflow_path_match_parent(self):
+        for field, value in (("event", "push"), ("path", ".github/workflows/other.yml")):
+            with self.subTest(field=field):
+                attempt = copy.deepcopy(RUN)
+                attempt[field] = value
+                with self.assertRaisesRegex(ValueError, "attempt identity differs"):
+                    collect_attempt(FakeClient(attempt=attempt), 17)
+        parent = copy.deepcopy(RUN)
+        parent.pop("path")
+        with self.assertRaisesRegex(ValueError, "workflow path is unavailable"):
+            collect_attempt(FakeClient(before=parent), 17)
+
     def test_selected_previous_attempt_and_immutable_output(self):
         previous = copy.deepcopy(RUN)
         previous["run_attempt"] = 1
