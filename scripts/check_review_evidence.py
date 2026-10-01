@@ -20,6 +20,7 @@ from _output import force_utf8_output
 from check_mathlib_style import code_only
 
 RAW_STRING = re.compile(r'r(#+)"')
+CHAR_LITERAL = re.compile(r"'(?:\\[^\n]|[^'\\\n])'")
 
 
 def prose_only(text: str) -> str:
@@ -61,6 +62,8 @@ def docs(text: str) -> list[tuple[int, str, bool]]:
         if raw:
             end = text.find('"' + raw[1], i + len(raw[0]))
             i = len(text) if end < 0 else end + 1 + len(raw[1])
+        elif char := CHAR_LITERAL.match(text, i):
+            i = char.end()
         elif text[i] == '"':
             i += 1
             while i < len(text):

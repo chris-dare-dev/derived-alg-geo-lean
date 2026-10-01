@@ -61,6 +61,13 @@ class DocumentationTests(unittest.TestCase):
         self.assertTrue(evidence.doc_errors([("sample", 1, "```markdown\n" + COMPLETE + "\n```", True)]))
         self.assertEqual(evidence.classifications("```\n## Reference classifications\n| X | code | example |\n```"), {})
 
+    def test_quote_character_cannot_hide_later_declaration_docstrings(self):
+        sample = "/-! # Primary -/\ndef quote : Char := '\"'\n/-- Check `StaleName`. -/\n"
+        extracted = evidence.docs(sample)
+        self.assertEqual(len(extracted), 2)
+        self.assertIn("StaleName", evidence.references([("sample", line, body, module)
+                                                      for line, body, module in extracted]))
+
     def test_classifications_need_a_reason_and_cannot_conflict(self):
         draft = "## Reference classifications\n| `M.fromTildeΓ` | parameter | M is a local binder |\n"
         self.assertEqual(evidence.classifications(draft), {"M.fromTildeΓ": "parameter"})
