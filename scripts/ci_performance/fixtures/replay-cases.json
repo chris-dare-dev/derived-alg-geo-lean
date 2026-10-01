@@ -1,31 +1,48 @@
 [
   {
     "name": "direct-change-with-complete-graph",
-    "identity": {
-      "toolchain": "lean-toolchain@1",
-      "manifest": "manifest-sha",
-      "target": "DerivedAlgGeo.Foo",
-      "options": "options-sha",
-      "pins": "pins-sha",
-      "emitter": "emitter-sha",
-      "dependency_graph_complete": true,
-      "changed_files": ["DerivedAlgGeo/Foo.lean"],
-      "direct_changes": ["DerivedAlgGeo/Foo.lean"],
-      "transitive_changes": []
-    }
+    "base_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "candidate_commit": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "base_identity": {
+      "toolchain": "toolchain-sha", "manifest": "manifest-sha",
+      "target": "DerivedAlgGeo.Foo", "options": "options-sha",
+      "pins": "pins-sha", "emitter": "emitter-sha",
+      "instances": "instances-sha", "exported_axioms": "axioms-sha"
+    },
+    "candidate_identity": {
+      "toolchain": "toolchain-sha", "manifest": "manifest-sha",
+      "target": "DerivedAlgGeo.Foo", "options": "options-sha",
+      "pins": "pins-sha", "emitter": "emitter-sha",
+      "instances": "instances-sha", "exported_axioms": "axioms-sha"
+    },
+    "dependency_graph_complete": true,
+    "change_inventory_complete": true,
+    "changed_files": ["DerivedAlgGeo/Foo.lean"],
+    "direct_changes": ["DerivedAlgGeo/Foo.lean"],
+    "transitive_changes": [],
+    "renames": [], "deletions": [], "unknown_inputs": []
   },
   {
     "name": "rename-requires-cold-reference",
-    "identity": {
-      "toolchain": "lean-toolchain@1",
-      "manifest": "manifest-sha",
-      "target": "DerivedAlgGeo.Foo",
-      "options": "options-sha",
-      "pins": "pins-sha",
-      "emitter": "emitter-sha",
-      "dependency_graph_complete": true,
-      "changed_files": ["DerivedAlgGeo/Old.lean"],
-      "renames": ["Old.lean -> New.lean"]
-    }
+    "base_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "candidate_commit": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "base_identity": {
+      "toolchain": "toolchain-sha", "manifest": "manifest-sha",
+      "target": "DerivedAlgGeo.Foo", "options": "options-sha",
+      "pins": "pins-sha", "emitter": "emitter-sha",
+      "instances": "instances-sha", "exported_axioms": "axioms-sha"
+    },
+    "candidate_identity": {
+      "toolchain": "toolchain-sha", "manifest": "manifest-sha",
+      "target": "DerivedAlgGeo.Foo", "options": "options-sha",
+      "pins": "pins-sha", "emitter": "emitter-sha",
+      "instances": "instances-sha", "exported_axioms": "axioms-sha"
+    },
+    "dependency_graph_complete": true,
+    "change_inventory_complete": true,
+    "changed_files": ["DerivedAlgGeo/Old.lean"],
+    "direct_changes": ["DerivedAlgGeo/Old.lean"],
+    "transitive_changes": [],
+    "renames": ["Old.lean -> New.lean"], "deletions": [], "unknown_inputs": []
   }
 ]

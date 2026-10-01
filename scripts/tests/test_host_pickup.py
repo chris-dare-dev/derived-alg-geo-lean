@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+from contextlib import redirect_stdout
 from pathlib import Path
 import subprocess
 import tarfile
@@ -41,6 +42,66 @@ def capacity(base: Path) -> dict[str, dict[str, int]]:
 
 
 class HostPickupTests(unittest.TestCase):
+    def test_capacity_report_shows_both_deficits_without_admitting(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            def show(unit: str, *properties: str) -> dict[str, str]:
+                if unit == "dag-runner@main.service":
+                    return {"ActiveState": "active", "UnitFileState": "enabled",
+                            "CPUQuotaPerSecUSec": "3s", "MemoryMax": str(12 * host_pickup.GIB)}
+                return {"ActiveState": "inactive", "UnitFileState": "disabled"}
+            with patch.object(host_pickup, "_systemctl_show", side_effect=show), \
+                 patch.object(host_pickup.os, "sched_getaffinity", return_value=set(range(16))), \
+                 patch.object(host_pickup, "_mem_available", return_value=28 * host_pickup.GIB), \
+                 patch.object(host_pickup.shutil, "disk_usage", return_value=Mock(free=20 * host_pickup.GIB)), \
+                 patch.object(host_pickup, "_host_id", return_value="fixture-host"), \
+                 patch.object(host_pickup.runner_state, "acquire_lease") as lease, \
+                 patch.object(host_pickup, "_prepare") as prepare, \
+                 patch.object(host_pickup, "_registration_token") as token, \
+                 patch.object(host_pickup, "_run_scope") as scope:
+                before = list(base.iterdir())
+                output = io.StringIO()
+                with redirect_stdout(output):
+                    self.assertEqual(host_pickup.main([
+                        "capacity-report", "--base", str(base), "--profile", "build",
+                    ]), 0)
+                build = json.loads(output.getvalue())
+                self.assertEqual(build["measured"]["memory_bytes"], 28 * host_pickup.GIB)
+                self.assertEqual(build["measured"]["disk_bytes"], 20 * host_pickup.GIB)
+                self.assertEqual(build["legacy_reservations"]["disk_bytes"], 16 * host_pickup.GIB)
+                self.assertEqual(build["deficit"], {
+                    "cpu_threads": 0, "memory_bytes": 4 * host_pickup.GIB,
+                    "disk_bytes": 28 * host_pickup.GIB,
+                })
+                self.assertFalse(build["profile_fits_snapshot"])
+                self.assertTrue(build["legacy_units"][0]["reserved"])
+                self.assertFalse(build["legacy_units"][1]["reserved"])
+                probe = host_pickup.capacity_report(base, "probe")
+                self.assertEqual(probe["deficit"]["disk_bytes"], 6 * host_pickup.GIB)
+                self.assertFalse(probe["profile_fits_snapshot"])
+                self.assertEqual(list(base.iterdir()), before)
+                lease.assert_not_called()
+                prepare.assert_not_called()
+                token.assert_not_called()
+                scope.assert_not_called()
+
+    def test_capacity_report_refuses_unknown_legacy_state(self) -> None:
+        for active, unit_file in (("activating", "enabled"), ("active", None),
+                                  ("inactive", "unknown")):
+            with self.subTest(active=active, unit_file=unit_file), \
+                 tempfile.TemporaryDirectory() as directory:
+                base = Path(directory)
+                data = {"ActiveState": active, "CPUQuotaPerSecUSec": "3s",
+                        "MemoryMax": str(12 * host_pickup.GIB)}
+                if unit_file is not None:
+                    data["UnitFileState"] = unit_file
+                with patch.object(host_pickup, "_systemctl_show", return_value=data), \
+                     patch.object(host_pickup.runner_state, "acquire_lease") as lease:
+                    with self.assertRaisesRegex(ValueError, "unknown state"):
+                        host_pickup.capacity_report(base, "build")
+                    self.assertEqual(list(base.iterdir()), [])
+                    lease.assert_not_called()
+
     def test_ephemeral_runner_lease_precedes_first_runner_write_and_archives_logs(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             base, _, _ = fixture(Path(directory))

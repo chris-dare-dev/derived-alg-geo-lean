@@ -3,5 +3,6 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Limits.Shapes.FiniteProducts
+import DerivedAlgGeo.CategoryTheory.Limits.Shapes.ZeroMorphisms
 
-/-! # Limits and colimits of particular shapes -/
+/-! # Limit and colimit shape extensions -/
