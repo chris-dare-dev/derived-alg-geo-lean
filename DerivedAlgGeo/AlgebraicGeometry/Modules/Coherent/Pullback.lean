@@ -10,8 +10,8 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Presentation
 
 Pullback of module sheaves along any morphism of schemes preserves finite presentation, hence
 coherence.  This file proves it and packages the result as the functor
-`Coh.pullback f : Coh Y ⥤ Coh X`, with its exactness: right exact always, left exact when
-module-sheaf pullback is, which flatness supplies.
+`Coh.pullback f : Coh Y ⥤ Coh X`. When `Y` is locally Noetherian, this functor is right exact;
+it is also left exact when module-sheaf pullback is, which flatness supplies.
 
 ## Main definitions
 
@@ -28,10 +28,11 @@ module-sheaf pullback is, which flatness supplies.
   pullback preserves finite presentation and coherence, along every morphism;
   `AlgebraicGeometry.Scheme.Modules.isFinite_pullbackPresentationOver` is the chart-level
   statement.
-* `AlgebraicGeometry.Coh.pullback_preservesFiniteColimits`,
-  `AlgebraicGeometry.Coh.pullback_preservesFiniteLimits`, and
-  `AlgebraicGeometry.Coh.pullback_additive`: the functor is right exact, left exact when
-  module-sheaf pullback is, and additive.
+* `AlgebraicGeometry.Coh.pullback_preservesFiniteColimits`: finite colimits are preserved
+  when `Y` is locally Noetherian.
+* `AlgebraicGeometry.Coh.pullback_preservesFiniteLimits`: finite limits are preserved when
+  `Y` is locally Noetherian and module-sheaf pullback preserves finite limits.
+* `AlgebraicGeometry.Coh.pullback_additive`: additivity holds for every scheme morphism.
 
 ## The argument
 
@@ -139,7 +140,8 @@ noncomputable def pullback : Coh Y ⥤ Coh X :=
 /-- Forgetting coherence after coherent pullback is module-sheaf pullback after forgetting
 coherence. Definitional, since `CategoryTheory.ObjectProperty.liftCompιIso` is
 `CategoryTheory.Iso.refl`; recorded because the
-contract `HasCoherentPullback` asks for the comparison as data. -/
+contract `AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.HasCoherentPullback`
+asks for the comparison as data. -/
 noncomputable def pullbackCompι : pullback f ⋙ ι X ≅ ι Y ⋙ Scheme.Modules.pullback f :=
   (Scheme.coherent X).liftCompιIso _ _
 
@@ -187,8 +189,9 @@ noncomputable def pullbackEquivalence {Z : Scheme.{u}} (e : Y ≅ Z) :
     exact h ≪≫ pullbackId Y
   exact CategoryTheory.Equivalence.mk (pullback e.hom) (pullback e.inv) η.symm ε
 
-/-- Coherent pullback preserves finite colimits, for every morphism: module-sheaf pullback is a
-left adjoint, `Coh.ι Y` is right exact on a locally Noetherian scheme, and the fully faithful
+/-- When `Y` is locally Noetherian, coherent pullback preserves finite colimits for every
+morphism `f`: module-sheaf pullback is a left adjoint, `Coh.ι Y` is right exact, and the
+fully faithful
 `Coh.ι X` reflects. The composite instance is
 `CategoryTheory.Limits.comp_preservesFiniteColimits`, a lemma rather
 than an instance, hence supplied by name. -/

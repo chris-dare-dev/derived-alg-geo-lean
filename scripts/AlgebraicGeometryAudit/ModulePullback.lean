@@ -56,7 +56,8 @@ variable {X Y : Scheme.{u}} (f : X ⟶ Y) (M : Y.Modules)
 
 /-! ## Coherence is preserved by pullback
 
-`Coh.pullback` with its exactness: right exact always, left exact when module-sheaf pullback is.
+`Coh.pullback` is additive for every morphism. When the target scheme is locally Noetherian,
+it preserves finite colimits and also finite limits when module-sheaf pullback does.
 -/
 
 #print axioms AlgebraicGeometry.Scheme.Modules.isFinite_pullbackPresentationOver
