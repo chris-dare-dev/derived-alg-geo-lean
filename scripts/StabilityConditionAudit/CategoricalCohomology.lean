@@ -25,6 +25,7 @@ import DerivedAlgGeo.Algebra.Homology.Localization
 import DerivedAlgGeo.Algebra.Homology.ShortComplex.Limits
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.InjectiveResolutionNaturality
 import DerivedAlgGeo.CategoryTheory.Limits.Preserves.Shapes.Products
+import DerivedAlgGeo.CategoryTheory.Limits.Shapes.FiniteProducts
 import DerivedAlgGeo.CategoryTheory.Localization.Coproducts
 import DerivedAlgGeo.CategoryTheory.MorphismProperty.Limits
 import DerivedAlgGeo.Algebra.Homology.Subcomplex
@@ -126,6 +127,7 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms CategoryTheory.ShortComplex.homologyFunctor_preservesColimitsOfShape
 #print axioms CategoryTheory.Limits.preservesCoproductsOfShape_of_essSurj
 #print axioms CategoryTheory.Limits.isIso_map_sigma_map
+#print axioms CategoryTheory.Limits.hasCoproduct_of_finite_support
 #print axioms HomotopyCategory.filteredComplexSpectralObject
 #print axioms CategoryTheory.Abelian.SpectralObject.coreE₂CohomologicalInt
 #print axioms CategoryTheory.Abelian.SpectralObject.coreE₂CohomologicalInt_deg
@@ -154,6 +156,9 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex.stupidTruncGETowerCocone
 #print axioms HomologicalComplex.isColimitStupidTruncGETowerCocone
 #print axioms HomologicalComplex.stupidTruncGEι
+#print axioms HomologicalComplex.stupidTruncMap_comp_stupidTruncGEι
+#print axioms HomologicalComplex.stupidTruncMap_comp_stupidTruncGEι_assoc
+#print axioms HomologicalComplex.stupidTruncGEι_isIso_of_isZero
 #print axioms HomologicalComplex.stupidTruncGEι_f_mono
 #print axioms HomologicalComplex.stupidTruncGEι_mono
 #print axioms HomologicalComplex.stupidTrunc_d_eq
@@ -177,6 +182,7 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex₂.adjacentColumnTotalRetraction
 #print axioms HomologicalComplex₂.adjacentColumnTotalSection
 #print axioms HomologicalComplex₂.adjacentColumnTotalShortComplex
+#print axioms HomologicalComplex₂.adjacentColumnTotalShortComplexMap
 #print axioms HomologicalComplex₂.adjacentColumnTotalShortExact
 #print axioms HomologicalComplex₂.columnFilteredAdjacentLayerComplex
 #print axioms HomologicalComplex₂.columnFilteredAdjacentLayerComplex_eq
@@ -207,11 +213,18 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex₂.complexIso_inv_hom_f
 #print axioms HomologicalComplex₂.complexIso_inv_hom_f_assoc
 #print axioms HomologicalComplex₂.filteredComplexPrecompTriangleIso
+#print axioms HomologicalComplex₂.totalMap_quasiIso_of_finiteStrip
 #print axioms HomologicalComplex₂.homologyMap_descShortComplex_comp_delta
 #print axioms HomologicalComplex₂.homologyMap_descShortComplex_comp_delta_assoc
 #print axioms HomologicalComplex₂.singleColumnBicomplex
+#print axioms HomologicalComplex₂.singleColumnBicomplexMap
+#print axioms HomologicalComplex₂.singleColumnHasTotal
 #print axioms HomologicalComplex₂.singleColumnShiftIso
+#print axioms HomologicalComplex₂.singleColumnShiftIso_naturality
+#print axioms HomologicalComplex₂.singleColumnShiftIso_naturality_assoc
 #print axioms HomologicalComplex₂.singleColumnTotalIso
+#print axioms HomologicalComplex₂.singleColumnTotalIso_naturality
+#print axioms HomologicalComplex₂.singleColumnTotalIso_naturality_assoc
 #print axioms HomologicalComplex₂.singleColumnXIso
 #print axioms HomologicalComplex₂.singleColumnXIso_hom_inv_f
 #print axioms HomologicalComplex₂.singleColumnXIso_hom_inv_f_assoc
@@ -237,6 +250,7 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex₂.stupidTruncXIso_eq_stupidTruncGEXIso
 #print axioms HomologicalComplex₂.totalFunctor_additive
 #print axioms HomologicalComplex₂.truncatedBicomplex
+#print axioms HomologicalComplex₂.truncatedBicomplexMap
 #print axioms HomologicalComplex₂.adjacentColumnConnecting_representative
 #print axioms HomologicalComplex₂.columnFilteredInitialPage_d_eq_connecting
 #print axioms HomologicalComplex₂.columnFilteredInitialPage_d_eq_horizontalHomologyMap
