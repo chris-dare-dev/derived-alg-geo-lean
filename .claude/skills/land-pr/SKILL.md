@@ -125,7 +125,9 @@ Two things to check before working in someone else's worktree:
 - **Its `.lake/packages` may be a symlink to another writable worktree**, or
   a dangling link if that donor was removed. Check with `ls -la .lake`. Do not
   repoint the link or run Lean through shared writable packages. Preserve this
-  checkout and cache, then create a fresh worktree at the intended commit.
+  checkout and cache, then create a fresh worktree at the intended commit,
+  under `python3 scripts/loop_worktrees.py root` and only once
+  `python3 scripts/loop_worktrees.py check` passes.
   Invoke `python3 <updated-checkout>/scripts/private_package_cache.py
   --target <fresh-worktree> --dry-run`, then the same command without
   `--dry-run`; `<updated-checkout>` must contain the private-cache helper from
@@ -279,7 +281,9 @@ A queued or failed run is not a green run. Leave the PR in draft and say why.
 
 Return to a detached-free clean state on `origin/main`. If the iteration ran in
 another worktree, leave that worktree on its own branch and clean — do not
-switch it to `main`, since a human may be using it. Report three lines: the
+switch it to `main`, since a human may be using it. A fresh worktree you
+created for the iteration is yours: once its branch is pushed, remove it with
+`python3 scripts/loop_worktrees.py retire <fresh-worktree>`. Report three lines: the
 PR touched, its new state, and the one thing a human must decide.
 
 **Do not merge. Do not start the next PR.** The next iteration re-reads the

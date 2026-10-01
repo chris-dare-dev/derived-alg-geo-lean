@@ -3,6 +3,9 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.Algebra.Homology.TotalComplex
+import Mathlib.Algebra.Homology.TotalComplexShift
+import Mathlib.Algebra.Homology.HomotopyCategory.MappingCone
+import Mathlib.Algebra.Homology.HomotopyCategory.Acyclic
 import Mathlib.Algebra.Homology.Refinements
 import Mathlib.Data.Int.Interval
 import DerivedAlgGeo.CategoryTheory.Limits.Shapes.ZeroMorphisms
@@ -42,12 +45,22 @@ assume the literal total already exists.
   differential at one direct-sum coordinate.
 * `HomologicalComplex₂.exists_totalCycleRefinement_zero_le` clears one
   coordinate of a generalized total cycle by an epi refinement.
-* `HomologicalComplex₂.total_exactAt_of_diagonal_bounds_of_column_exactAt`
+* `HomologicalComplex₂.exactAt_total_of_diagonal_bounds_of_column_exactAt`
   proves exactness from finite support and exactness on one total-degree diagonal.
-* `HomologicalComplex₂.total_acyclic_of_diagonal_bounds_of_column_exactAt`
+* `HomologicalComplex₂.acyclic_total_of_diagonal_bounds_of_column_exactAt`
   allows a separate finite support interval in every degree;
-  `HomologicalComplex₂.total_acyclic_of_upper_bounds_of_column_exactAt`
+  `HomologicalComplex₂.acyclic_total_of_upper_bounds_of_column_exactAt`
   derives the uniform-rectangle case.
+* `HomologicalComplex₂.columnCone` is the vertical pointwise cone of a
+  bicomplex map; `HomologicalComplex₂.hasTotal_columnCone` constructs its
+  literal total from source/target totals and the required biproducts.
+* `HomologicalComplex₂.totalColumnConeIso` compares that literal total with
+  the mapping cone of the literal total map, using a horizontal-degree sign
+  on the source branch.
+* `HomologicalComplex₂.quasiIso_totalMap_of_four_diagonal_bounds_of_column_quasiIso` upgrades a
+  columnwise quasi-isomorphism to a quasi-isomorphism of literal totals when
+  source and target each have lower and upper finite-support bounds in every
+  total degree.
 
 ## Implementation notes
 
@@ -532,7 +545,7 @@ set_option backward.isDefEq.respectTransparency false in
 /-- Refine a total cycle through the finitely supported diagonal, then use
 the finite projection identity to make its residual zero. The abelian
 exactness criterion then makes the literal total exact at `n`. -/
-theorem total_exactAt_of_diagonal_bounds_of_column_exactAt (n a b : ℤ)
+theorem exactAt_total_of_diagonal_bounds_of_column_exactAt (n a b : ℤ)
     (hLower : ∀ p q : ℤ, p + q = n → p < a → IsZero ((K.X p).X q))
     (hUpper : ∀ p q : ℤ, p + q = n → b < p → IsZero ((K.X p).X q))
     (hExact : ∀ p : ℤ, a ≤ p → p ≤ b → (K.X p).ExactAt (n-p)) :
@@ -571,7 +584,7 @@ theorem total_exactAt_of_diagonal_bounds_of_column_exactAt (n a b : ℤ)
 
 /-- Apply degree-local exactness to each diagonal, allowing the support
 interval and required column exactness to vary with total degree. -/
-theorem total_acyclic_of_diagonal_bounds_of_column_exactAt
+theorem acyclic_total_of_diagonal_bounds_of_column_exactAt
     (hData : ∀ n : ℤ, ∃ a b : ℤ,
       (∀ p q : ℤ, p + q = n → p < a → IsZero ((K.X p).X q)) ∧
       (∀ p q : ℤ, p + q = n → b < p → IsZero ((K.X p).X q)) ∧
@@ -579,17 +592,17 @@ theorem total_acyclic_of_diagonal_bounds_of_column_exactAt
     (K.total (ComplexShape.up ℤ)).Acyclic := by
   intro n
   obtain ⟨a, b, hLower, hUpper, hExact⟩ := hData n
-  exact total_exactAt_of_diagonal_bounds_of_column_exactAt K n a b hLower hUpper hExact
+  exact exactAt_total_of_diagonal_bounds_of_column_exactAt K n a b hLower hUpper hExact
 
 /-- A uniform upper rectangle gives finite support on every diagonal. Only
 columns and degrees inside that rectangle need the exactness premise. -/
-theorem total_acyclic_of_upper_bounds_of_column_exactAt (b c : ℤ)
+theorem acyclic_total_of_upper_bounds_of_column_exactAt (b c : ℤ)
     (hp : ∀ p q : ℤ, b < p → IsZero ((K.X p).X q))
     (hq : ∀ p q : ℤ, c < q → IsZero ((K.X p).X q))
     (hExact : ∀ p q : ℤ, p ≤ b → q ≤ c → (K.X p).ExactAt q) :
     (K.total (ComplexShape.up ℤ)).Acyclic := by
   intro n
-  apply total_exactAt_of_diagonal_bounds_of_column_exactAt K n (n-c) b
+  apply exactAt_total_of_diagonal_bounds_of_column_exactAt K n (n-c) b
   · intro p q hpq hpl
     exact hq p q (by omega)
   · intro p q hpq hpu
@@ -598,4 +611,954 @@ theorem total_acyclic_of_upper_bounds_of_column_exactAt (b c : ℤ)
     exact hExact p (n-p) hpu (by omega)
 
 end FiniteRefinement
+end HomologicalComplex₂
+open CategoryTheory CategoryTheory.Limits
+
+variable {C : Type u} [Category.{v} C] [HasZeroMorphisms C] {I : Type w}
+  (A B : I → C) [HasCoproduct A] [HasCoproduct B]
+  [HasBinaryBiproduct (∐ A) (∐ B)]
+  [∀ i, HasBinaryBiproduct (A i) (B i)]
+
+set_option backward.isDefEq.respectTransparency false in
+private theorem hasCoproduct_pointwise_biprod :
+    HasCoproduct (fun i => A i ⊞ B i) where
+  exists_colimit := Nonempty.intro
+    { cocone := Cofan.mk ((∐ A) ⊞ (∐ B))
+        (fun i => biprod.desc (Sigma.ι A i ≫ biprod.inl) (Sigma.ι B i ≫ biprod.inr))
+      isColimit := by
+        refine Cofan.IsColimit.mk _ (fun t => biprod.desc
+          (Sigma.desc (fun i => biprod.inl ≫ t.inj i))
+          (Sigma.desc (fun i => biprod.inr ≫ t.inj i))) ?_ ?_
+        · intro t i
+          apply biprod.hom_ext'
+          · simp only [cofan_mk_inj]
+            rw [← Category.assoc, biprod.inl_desc, Category.assoc, biprod.inl_desc, Sigma.ι_desc]
+          · simp only [cofan_mk_inj]
+            rw [← Category.assoc, biprod.inr_desc, Category.assoc, biprod.inr_desc, Sigma.ι_desc]
+        · intro t m hm
+          apply biprod.hom_ext'
+          · apply Sigma.hom_ext
+            intro i
+            have hi := hm i
+            have h := congrArg (fun k => biprod.inl ≫ k) hi
+            simpa [cofan_mk_inj, ← Category.assoc] using h
+          · apply Sigma.hom_ext
+            intro i
+            have hi := hm i
+            have h := congrArg (fun k => biprod.inr ≫ k) hi
+            simpa [cofan_mk_inj, ← Category.assoc] using h
+    }
+
+open ComplexShape
+namespace HomologicalComplex₂
+variable {C : Type*} [Category* C] [Preadditive C]
+  {K L : HomologicalComplex₂ C (up ℤ) (up ℤ)} (f : K ⟶ L)
+  [∀ p q : ℤ, HasBinaryBiproduct ((K.X p).X (q + 1)) ((L.X p).X q)]
+
+private theorem hasHomotopyCofiber_flip_map : HomologicalComplex.HasHomotopyCofiber
+    ((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).map f) := by
+  letI : ∀ q : ℤ, HasBinaryBiproduct
+      (((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).obj K).X (q + 1))
+      (((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).obj L).X q) := by
+    intro q
+    letI : ∀ p : ℤ, HasBinaryBiproduct
+      ((((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).obj K).X (q + 1)).X p)
+      ((((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).obj L).X q).X p) := by
+      intro p
+      change HasBinaryBiproduct ((K.X p).X (q + 1)) ((L.X p).X q)
+      infer_instance
+    exact HomologicalComplex.instHasBinaryBiproduct _ _
+  infer_instance
+
+/-- Take the pointwise cone vertically, leaving the horizontal bicomplex
+direction in place. -/
+noncomputable def columnCone : HomologicalComplex₂ C (up ℤ) (up ℤ) := by
+  letI := hasHomotopyCofiber_flip_map f
+  exact HomologicalComplex₂.flip (CochainComplex.mappingCone
+    ((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).map f))
+
+private def diagEquiv (n : ℤ) :
+    ((π (up ℤ) (up ℤ) (up ℤ)) ⁻¹' {n}) ≃ ℤ where
+  toFun i := i.1.1
+  invFun p := ⟨(p, n-p), by change p + (n-p) = n; omega⟩
+  left_inv := by
+    rintro ⟨⟨p,q⟩,h⟩
+    have hq : q = n - p := by
+      change p + q = n at h
+      omega
+    subst q
+    rfl
+  right_inv := by intro p; rfl
+
+private noncomputable def componentIso (p q : ℤ) :
+    ((columnCone f).X p).X q ≅ ((K.X p).X (q + 1)) ⊞ ((L.X p).X q) := by
+  letI := hasHomotopyCofiber_flip_map f
+  letI : HasBinaryBiproduct
+      (((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).obj K).X (q + 1))
+      (((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).obj L).X q) :=
+    HomologicalComplex.HasHomotopyCofiber.hasBinaryBiproduct
+      ((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).map f) q (q+1) (by simp)
+  letI : ∀ i : ℤ, HasBinaryBiproduct
+      ((((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).obj K).X (q + 1)).X i)
+      ((((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).obj L).X q).X i) := by
+    intro i
+    change HasBinaryBiproduct ((K.X i).X (q+1)) ((L.X i).X q)
+    infer_instance
+  dsimp [columnCone]
+  exact (HomologicalComplex.eval C (up ℤ) p).mapIso
+    (HomologicalComplex.homotopyCofiber.XIsoBiprod
+      ((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).map f) q (q + 1) (by simp)) ≪≫
+    HomologicalComplex.biprodXIso _ _ p
+
+variable [K.HasTotal (up ℤ)] [L.HasTotal (up ℤ)]
+  [∀ n : ℤ, HasBinaryBiproduct ((K.total (up ℤ)).X (n+1)) ((L.total (up ℤ)).X n)]
+
+/-- Construct a literal total of the vertical column cone from the two given
+totals. Only the pointwise and total-degree biproducts are needed. -/
+theorem hasTotal_columnCone : (columnCone f).HasTotal (up ℤ) := by
+  intro n
+  let A : ℤ → C := fun p => (K.X p).X (n + 1 - p)
+  let B : ℤ → C := fun p => (L.X p).X (n - p)
+  haveI hA : HasCoproduct A := by
+    apply hasCoproduct_of_equiv_of_iso
+      (K.toGradedObject.mapObjFun (π (up ℤ) (up ℤ) (up ℤ)) (n + 1)) A
+      (diagEquiv (n + 1)).symm
+    intro p
+    exact Iso.refl _
+  haveI hB : HasCoproduct B := by
+    apply hasCoproduct_of_equiv_of_iso
+      (L.toGradedObject.mapObjFun (π (up ℤ) (up ℤ) (up ℤ)) n) B
+      (diagEquiv n).symm
+    intro p
+    exact Iso.refl _
+  have eA : ∐ A ≅ (K.total (up ℤ)).X (n+1) := by
+    change ∐ A ≅ ∐ (K.toGradedObject.mapObjFun (π (up ℤ) (up ℤ) (up ℤ)) (n+1))
+    letI : HasCoproduct (K.toGradedObject.mapObjFun (π (up ℤ) (up ℤ) (up ℤ)) (n+1) ∘
+      (diagEquiv (n+1)).symm) := hA
+    change ∐ (K.toGradedObject.mapObjFun (π (up ℤ) (up ℤ) (up ℤ)) (n+1) ∘
+      (diagEquiv (n+1)).symm) ≅ ∐ (K.toGradedObject.mapObjFun (π (up ℤ) (up ℤ) (up ℤ)) (n+1))
+    exact Sigma.reindex (diagEquiv (n+1)).symm _
+  have eB : ∐ B ≅ (L.total (up ℤ)).X n := by
+    change ∐ B ≅ ∐ (L.toGradedObject.mapObjFun (π (up ℤ) (up ℤ) (up ℤ)) n)
+    letI : HasCoproduct (L.toGradedObject.mapObjFun (π (up ℤ) (up ℤ) (up ℤ)) n ∘
+      (diagEquiv n).symm) := hB
+    change ∐ (L.toGradedObject.mapObjFun (π (up ℤ) (up ℤ) (up ℤ)) n ∘
+      (diagEquiv n).symm) ≅ ∐ (L.toGradedObject.mapObjFun (π (up ℤ) (up ℤ) (up ℤ)) n)
+    exact Sigma.reindex (diagEquiv n).symm _
+  letI : HasBinaryBiproduct (∐ A) (∐ B) :=
+    hasBinaryBiproduct_of_iso eA.symm eB.symm
+  letI : ∀ p : ℤ, HasBinaryBiproduct (A p) (B p) := by
+    intro p
+    change HasBinaryBiproduct ((K.X p).X (n+1-p)) ((L.X p).X (n-p))
+    have hdeg : n-p+1 = n+1-p := by omega
+    simpa only [hdeg] using
+      (inferInstance : HasBinaryBiproduct ((K.X p).X ((n-p)+1)) ((L.X p).X (n-p)))
+  haveI hAB : HasCoproduct (fun p => A p ⊞ B p) :=
+    hasCoproduct_pointwise_biprod A B
+  apply hasCoproduct_of_equiv_of_iso (fun p => A p ⊞ B p)
+    ((columnCone f).toGradedObject.mapObjFun (π (up ℤ) (up ℤ) (up ℤ)) n)
+    (diagEquiv n)
+  rintro ⟨⟨p,q⟩,h⟩
+  have hq : q = n - p := by
+    change p + q = n at h
+    omega
+  subst q
+  change ((columnCone f).X p).X (n-p) ≅
+    ((K.X p).X (n+1-p)) ⊞ ((L.X p).X (n-p))
+  have hdeg : n-p+1 = n+1-p := by omega
+  simpa only [hdeg] using componentIso f p (n-p)
+omit [∀ p q : ℤ, HasBinaryBiproduct ((K.X p).X (q + 1)) ((L.X p).X q)] in
+private theorem hasHomotopyCofiber_total_map : HomologicalComplex.HasHomotopyCofiber
+    (HomologicalComplex₂.total.map f (up ℤ)) := by
+  letI : ∀ n : ℤ, HasBinaryBiproduct ((K.total (up ℤ)).X (n+1)) ((L.total (up ℤ)).X n) :=
+    fun n => inferInstance
+  infer_instance
+
+end HomologicalComplex₂
+
+namespace HomologicalComplex₂
+open ComplexShape
+variable {C : Type*} [Category* C] [Preadditive C]
+  {K L : HomologicalComplex₂ C (up ℤ) (up ℤ)} (f : K ⟶ L)
+  [∀ p q : ℤ, HasBinaryBiproduct ((K.X p).X (q + 1)) ((L.X p).X q)]
+  [K.HasTotal (up ℤ)] [L.HasTotal (up ℤ)]
+  [∀ n : ℤ, HasBinaryBiproduct ((K.total (up ℤ)).X (n+1)) ((L.total (up ℤ)).X n)]
+
+private noncomputable def componentMap (p q n : ℤ) (h : p + q = n) :
+    ((columnCone f).X p).X q ⟶
+      (CochainComplex.mappingCone (HomologicalComplex₂.total.map f (up ℤ))).X n := by
+  letI := hasHomotopyCofiber_total_map f
+  letI := hasHomotopyCofiber_flip_map f
+  letI : HasBinaryBiproduct ((K.X p).X (q + 1)) ((L.X p).X q) := inferInstance
+  let e := componentIso f p q
+  let s : ((K.X p).X (q + 1)) ⟶
+      (CochainComplex.mappingCone (HomologicalComplex₂.total.map f (up ℤ))).X n :=
+    (p.negOnePow • K.ιTotal (up ℤ) p (q + 1) (n + 1)
+      (by change p + (q + 1) = n + 1; omega)) ≫
+      (CochainComplex.mappingCone.inl
+        (HomologicalComplex₂.total.map f (up ℤ))).v (n + 1) n (by omega)
+  let t : ((L.X p).X q) ⟶
+      (CochainComplex.mappingCone (HomologicalComplex₂.total.map f (up ℤ))).X n :=
+    L.ιTotal (up ℤ) p q n (by change p + q = n; exact h) ≫
+      (CochainComplex.mappingCone.inr
+        (HomologicalComplex₂.total.map f (up ℤ))).f n
+  exact e.hom ≫ biprod.desc s t
+
+private noncomputable def comparisonMap [(columnCone f).HasTotal (up ℤ)] (n : ℤ) :
+    ((columnCone f).total (up ℤ)).X n ⟶
+      (CochainComplex.mappingCone (HomologicalComplex₂.total.map f (up ℤ))).X n := by
+  letI := hasHomotopyCofiber_total_map f
+  exact (columnCone f).totalDesc (fun p q h =>
+    componentMap f p q n (by change p + q = n at h; exact h))
+
+end HomologicalComplex₂
+
+namespace HomologicalComplex₂
+open ComplexShape
+variable {C : Type*} [Category* C] [Preadditive C]
+  {K L : HomologicalComplex₂ C (up ℤ) (up ℤ)} (f : K ⟶ L)
+  [∀ p q : ℤ, HasBinaryBiproduct ((K.X p).X (q + 1)) ((L.X p).X q)]
+  [K.HasTotal (up ℤ)] [L.HasTotal (up ℤ)]
+  [∀ n : ℤ, HasBinaryBiproduct ((K.total (up ℤ)).X (n+1)) ((L.total (up ℤ)).X n)]
+
+omit [∀ p q : ℤ, HasBinaryBiproduct ((K.X p).X (q + 1)) ((L.X p).X q)] in
+private theorem target_branch_d (p q n : ℤ) (h : p + q = n) :
+    (L.ιTotal (up ℤ) p q n (by change p + q = n; exact h)) ≫
+      (CochainComplex.mappingCone.inr (HomologicalComplex₂.total.map f (up ℤ))).f n ≫
+      (CochainComplex.mappingCone (HomologicalComplex₂.total.map f (up ℤ))).d n (n+1) =
+    (L.ιTotal (up ℤ) p q n (by change p + q = n; exact h)) ≫
+      (L.total (up ℤ)).d n (n+1) ≫
+      (CochainComplex.mappingCone.inr (HomologicalComplex₂.total.map f (up ℤ))).f (n+1) := by
+  letI := hasHomotopyCofiber_total_map f
+  simp only [CochainComplex.mappingCone.inr_f_d]
+
+omit [∀ p q : ℤ, HasBinaryBiproduct ((K.X p).X (q + 1)) ((L.X p).X q)] in
+private theorem source_branch_d (p q n : ℤ) (h : p + q = n) :
+    (p.negOnePow • K.ιTotal (up ℤ) p (q+1) (n+1)
+      (by change p + (q+1) = n+1; omega)) ≫
+      (CochainComplex.mappingCone.inl
+        (HomologicalComplex₂.total.map f (up ℤ))).v (n+1) n (by omega) ≫
+      (CochainComplex.mappingCone (HomologicalComplex₂.total.map f (up ℤ))).d n (n+1) =
+    ((p.negOnePow • (f.f p).f (q+1)) ≫
+      L.ιTotal (up ℤ) p (q+1) (n+1)
+        (by change p + (q+1) = n+1; omega)) ≫
+      (CochainComplex.mappingCone.inr
+        (HomologicalComplex₂.total.map f (up ℤ))).f (n+1) -
+    (p.negOnePow • K.ιTotal (up ℤ) p (q+1) (n+1)
+      (by change p + (q+1) = n+1; omega)) ≫
+      (K.total (up ℤ)).d (n+1) (n+1+1) ≫
+      (CochainComplex.mappingCone.inl
+        (HomologicalComplex₂.total.map f (up ℤ))).v (n+1+1) (n+1) (by omega) := by
+  letI := hasHomotopyCofiber_total_map f
+  rw [CochainComplex.mappingCone.inl_v_d
+    (HomologicalComplex₂.total.map f (up ℤ)) (n+1) n (n+1+1) (by omega) (by omega)]
+  simp only [Preadditive.comp_sub, Category.assoc]
+  congr 1
+  rw [← Category.assoc, Linear.units_smul_comp, HomologicalComplex₂.ιTotal_map]
+  simp only [Linear.units_smul_comp, Category.assoc]
+
+end HomologicalComplex₂
+
+namespace HomologicalComplex₂
+open ComplexShape
+variable {C : Type*} [Category* C] [Preadditive C]
+  {K L : HomologicalComplex₂ C (up ℤ) (up ℤ)} (f : K ⟶ L)
+  [∀ p q : ℤ, HasBinaryBiproduct ((K.X p).X (q + 1)) ((L.X p).X q)]
+  [K.HasTotal (up ℤ)] [L.HasTotal (up ℤ)]
+  [∀ n : ℤ, HasBinaryBiproduct ((K.total (up ℤ)).X (n+1)) ((L.total (up ℤ)).X n)]
+
+private theorem componentMap_source (p q n : ℤ) (h : p + q = n) :
+    biprod.inl ≫ (componentIso f p q).inv ≫ componentMap f p q n h =
+      (p.negOnePow • K.ιTotal (up ℤ) p (q+1) (n+1)
+        (by change p + (q+1) = n+1; omega)) ≫
+      (CochainComplex.mappingCone.inl
+        (HomologicalComplex₂.total.map f (up ℤ))).v (n+1) n (by omega) := by
+  letI := hasHomotopyCofiber_total_map f
+  letI := hasHomotopyCofiber_flip_map f
+  dsimp [componentMap]
+  simp
+
+private theorem componentMap_target (p q n : ℤ) (h : p + q = n) :
+    biprod.inr ≫ (componentIso f p q).inv ≫ componentMap f p q n h =
+      L.ιTotal (up ℤ) p q n (by change p + q = n; exact h) ≫
+      (CochainComplex.mappingCone.inr
+        (HomologicalComplex₂.total.map f (up ℤ))).f n := by
+  letI := hasHomotopyCofiber_total_map f
+  letI := hasHomotopyCofiber_flip_map f
+  dsimp [componentMap]
+  simp
+
+end HomologicalComplex₂
+
+
+namespace HomologicalComplex₂
+set_option backward.isDefEq.respectTransparency false
+open ComplexShape
+variable {C : Type*} [Category* C] [Preadditive C]
+  {K L : HomologicalComplex₂ C (up ℤ) (up ℤ)} (f : K ⟶ L)
+  [∀ p q : ℤ, HasBinaryBiproduct ((K.X p).X (q + 1)) ((L.X p).X q)]
+  [K.HasTotal (up ℤ)] [L.HasTotal (up ℤ)]
+  [∀ n : ℤ, HasBinaryBiproduct ((K.total (up ℤ)).X (n+1)) ((L.total (up ℤ)).X n)]
+
+private noncomputable def colInl (p q : ℤ) :
+    ((K.X p).X (q+1)) ⟶ ((columnCone f).X p).X q := by
+  letI := hasHomotopyCofiber_flip_map f
+  exact biprod.inl ≫ (componentIso f p q).inv
+
+private noncomputable def colInr (p q : ℤ) :
+    ((L.X p).X q) ⟶ ((columnCone f).X p).X q := by
+  letI := hasHomotopyCofiber_flip_map f
+  exact biprod.inr ≫ (componentIso f p q).inv
+
+omit [K.HasTotal (up ℤ)] [L.HasTotal (up ℤ)]
+  [∀ (n : ℤ), HasBinaryBiproduct ((K.total (up ℤ)).X (n + 1)) ((L.total (up ℤ)).X n)] in
+private theorem colInl_eq (p q : ℤ)
+    [HomologicalComplex.HasHomotopyCofiber
+      ((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).map f)] :
+    colInl f p q =
+      ((CochainComplex.mappingCone.inl
+        ((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).map f)).v
+          (q+1) q (by omega)).f p := by
+  letI := hasHomotopyCofiber_flip_map f
+  dsimp only [colInl, componentIso]
+  simp only [id_eq, Iso.trans_inv, HomologicalComplex.biprodXIso, Functor.mapBiprod_inv]
+  rw [← Category.assoc, biprod.inl_desc]
+  simp only [Functor.mapIso_inv, ← Functor.map_comp,
+    HomologicalComplex.homotopyCofiber.inl_XIsoBiprod_inv]
+  rfl
+
+omit [K.HasTotal (up ℤ)] [L.HasTotal (up ℤ)]
+  [∀ (n : ℤ), HasBinaryBiproduct ((K.total (up ℤ)).X (n + 1)) ((L.total (up ℤ)).X n)] in
+private theorem colInr_eq (p q : ℤ)
+    [HomologicalComplex.HasHomotopyCofiber
+      ((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).map f)] :
+    colInr f p q =
+      ((CochainComplex.mappingCone.inr
+        ((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).map f)).f q).f p := by
+  letI := hasHomotopyCofiber_flip_map f
+  dsimp only [colInr, componentIso]
+  simp only [id_eq, Iso.trans_inv, HomologicalComplex.biprodXIso, Functor.mapBiprod_inv]
+  rw [← Category.assoc, biprod.inr_desc]
+  simp only [Functor.mapIso_inv, ← Functor.map_comp,
+    HomologicalComplex.homotopyCofiber.inr_XIsoBiprod_inv]
+  rfl
+
+end HomologicalComplex₂
+
+namespace HomologicalComplex₂
+open ComplexShape
+variable {C : Type*} [Category* C] [Preadditive C]
+  {K L : HomologicalComplex₂ C (up ℤ) (up ℤ)} (f : K ⟶ L)
+  [∀ p q : ℤ, HasBinaryBiproduct ((K.X p).X (q + 1)) ((L.X p).X q)]
+  [K.HasTotal (up ℤ)] [L.HasTotal (up ℤ)]
+  [∀ n : ℤ, HasBinaryBiproduct ((K.total (up ℤ)).X (n+1)) ((L.total (up ℤ)).X n)]
+
+omit [K.HasTotal (up ℤ)] [L.HasTotal (up ℤ)]
+  [∀ (n : ℤ), HasBinaryBiproduct ((K.total (up ℤ)).X (n + 1)) ((L.total (up ℤ)).X n)] in
+private theorem colInl_vertical (p q : ℤ) :
+    colInl f p q ≫ ((columnCone f).X p).d q (q+1) =
+      (f.f p).f (q+1) ≫ colInr f p (q+1) -
+      (K.X p).d (q+1) (q+1+1) ≫ colInl f p (q+1) := by
+  letI := hasHomotopyCofiber_flip_map f
+  rw [colInl_eq f p q, colInl_eq f p (q+1), colInr_eq f p (q+1)]
+  have hc := congrArg (fun g => g.f p)
+    (CochainComplex.mappingCone.inl_v_d
+      ((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).map f)
+      (q+1) q (q+1+1) (by omega) (by omega))
+  simp only [HomologicalComplex.comp_f, HomologicalComplex.sub_f_apply] at hc
+  convert hc using 1 <;> rfl
+
+omit [K.HasTotal (up ℤ)] [L.HasTotal (up ℤ)]
+  [∀ (n : ℤ), HasBinaryBiproduct ((K.total (up ℤ)).X (n + 1)) ((L.total (up ℤ)).X n)] in
+private theorem colInr_vertical (p q : ℤ) :
+    colInr f p q ≫ ((columnCone f).X p).d q (q+1) =
+      (L.X p).d q (q+1) ≫ colInr f p (q+1) := by
+  letI := hasHomotopyCofiber_flip_map f
+  rw [colInr_eq f p q, colInr_eq f p (q+1)]
+  have hc := congrArg (fun g => g.f p)
+    (CochainComplex.mappingCone.inr_f_d
+      ((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).map f) q (q+1))
+  simp only [HomologicalComplex.comp_f] at hc
+  convert hc using 1 <;> rfl
+
+end HomologicalComplex₂
+
+namespace HomologicalComplex₂
+open ComplexShape
+variable {C : Type*} [Category* C] [Preadditive C]
+  {K L : HomologicalComplex₂ C (up ℤ) (up ℤ)} (f : K ⟶ L)
+  [∀ p q : ℤ, HasBinaryBiproduct ((K.X p).X (q + 1)) ((L.X p).X q)]
+  [K.HasTotal (up ℤ)] [L.HasTotal (up ℤ)]
+  [∀ n : ℤ, HasBinaryBiproduct ((K.total (up ℤ)).X (n+1)) ((L.total (up ℤ)).X n)]
+
+omit [K.HasTotal (up ℤ)] [L.HasTotal (up ℤ)]
+  [∀ (n : ℤ), HasBinaryBiproduct ((K.total (up ℤ)).X (n + 1)) ((L.total (up ℤ)).X n)] in
+private theorem colInl_horizontal (p q : ℤ) :
+    colInl f p q ≫ ((columnCone f).d p (p+1)).f q =
+      (K.d p (p+1)).f (q+1) ≫ colInl f (p+1) q := by
+  letI := hasHomotopyCofiber_flip_map f
+  rw [colInl_eq f p q, colInl_eq f (p+1) q]
+  have hc := (CochainComplex.mappingCone.inl
+      ((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).map f)).v
+        (q+1) q (by omega) |>.comm p (p+1)
+  convert hc using 1 <;> rfl
+
+omit [K.HasTotal (up ℤ)] [L.HasTotal (up ℤ)]
+  [∀ (n : ℤ), HasBinaryBiproduct ((K.total (up ℤ)).X (n + 1)) ((L.total (up ℤ)).X n)] in
+private theorem colInr_horizontal (p q : ℤ) :
+    colInr f p q ≫ ((columnCone f).d p (p+1)).f q =
+      (L.d p (p+1)).f q ≫ colInr f (p+1) q := by
+  letI := hasHomotopyCofiber_flip_map f
+  rw [colInr_eq f p q, colInr_eq f (p+1) q]
+  have hc := ((CochainComplex.mappingCone.inr
+      ((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).map f)).f q).comm p (p+1)
+  convert hc using 1 <;> rfl
+
+end HomologicalComplex₂
+
+namespace HomologicalComplex₂
+open ComplexShape
+set_option backward.isDefEq.respectTransparency false
+variable {C : Type*} [Category* C] [Preadditive C]
+
+private theorem ι_total_d (T : HomologicalComplex₂ C (up ℤ) (up ℤ))
+    [T.HasTotal (up ℤ)] (p q n : ℤ) (h : p+q=n) :
+    T.ιTotal (up ℤ) p q n (by change p+q=n; exact h) ≫
+      (T.total (up ℤ)).d n (n+1) =
+    (T.d p (p+1)).f q ≫ T.ιTotal (up ℤ) (p+1) q (n+1)
+      (by change p+1+q=n+1; omega) +
+    p.negOnePow • ((T.X p).d q (q+1) ≫
+      T.ιTotal (up ℤ) p (q+1) (n+1)
+        (by change p+(q+1)=n+1; omega)) := by
+  have hhor : ComplexShape.π (up ℤ) (up ℤ) (up ℤ) (p+1,q) = n+1 := by
+    change p+1+q=n+1; omega
+  have hver : ComplexShape.π (up ℤ) (up ℤ) (up ℤ) (p,q+1) = n+1 := by
+    change p+(q+1)=n+1; omega
+  change T.ιTotal (up ℤ) p q n (by change p+q=n; exact h) ≫
+    (T.D₁ (up ℤ) n (n+1) + T.D₂ (up ℤ) n (n+1)) = _
+  rw [Preadditive.comp_add, T.ι_D₁, T.ι_D₂]
+  rw [T.d₁_eq (up ℤ) (by simp : (up ℤ).Rel p (p+1)) q (n+1) hhor]
+  rw [T.d₂_eq (up ℤ) p (by simp : (up ℤ).Rel q (q+1)) (n+1) hver]
+  simp only [show ComplexShape.ε₁ (up ℤ) (up ℤ) (up ℤ) (p,q) = 1 from rfl,
+    show ComplexShape.ε₂ (up ℤ) (up ℤ) (up ℤ) (p,q) = p.negOnePow from rfl,
+    one_smul]
+
+end HomologicalComplex₂
+
+namespace HomologicalComplex₂
+open ComplexShape
+set_option backward.isDefEq.respectTransparency false
+variable {C : Type*} [Category* C] [Preadditive C]
+  {K L : HomologicalComplex₂ C (up ℤ) (up ℤ)} (f : K ⟶ L)
+  [∀ p q : ℤ, HasBinaryBiproduct ((K.X p).X (q + 1)) ((L.X p).X q)]
+  [K.HasTotal (up ℤ)] [L.HasTotal (up ℤ)]
+  [∀ n : ℤ, HasBinaryBiproduct ((K.total (up ℤ)).X (n+1)) ((L.total (up ℤ)).X n)]
+  [(columnCone f).HasTotal (up ℤ)]
+
+omit [(columnCone f).HasTotal (up ℤ)] in
+private theorem colInr_componentMap (p q n : ℤ) (h : p+q=n) :
+    colInr f p q ≫ componentMap f p q n h =
+      L.ιTotal (up ℤ) p q n (by change p+q=n; exact h) ≫
+        (CochainComplex.mappingCone.inr
+          (HomologicalComplex₂.total.map f (up ℤ))).f n := by
+  letI := hasHomotopyCofiber_total_map f
+  letI := hasHomotopyCofiber_flip_map f
+  simpa only [colInr, Category.assoc] using componentMap_target f p q n h
+
+omit [(columnCone f).HasTotal (up ℤ)] in
+private theorem colInl_componentMap (p q n : ℤ) (h : p+q=n) :
+    colInl f p q ≫ componentMap f p q n h =
+      (p.negOnePow • K.ιTotal (up ℤ) p (q+1) (n+1)
+        (by change p+(q+1)=n+1; omega)) ≫
+        (CochainComplex.mappingCone.inl
+          (HomologicalComplex₂.total.map f (up ℤ))).v (n+1) n (by omega) := by
+  letI := hasHomotopyCofiber_total_map f
+  letI := hasHomotopyCofiber_flip_map f
+  simpa only [colInl, Category.assoc] using componentMap_source f p q n h
+
+private theorem comparison_d (n : ℤ) :
+    comparisonMap f n ≫
+      (CochainComplex.mappingCone (HomologicalComplex₂.total.map f (up ℤ))).d n (n+1) =
+    ((columnCone f).total (up ℤ)).d n (n+1) ≫ comparisonMap f (n+1) := by
+  letI := hasHomotopyCofiber_total_map f
+  apply HomologicalComplex₂.total.hom_ext
+  intro p q h
+  dsimp only [comparisonMap]
+  rw [← Category.assoc, HomologicalComplex₂.ι_totalDesc]
+  rw [show ((columnCone f).total (up ℤ)).d n (n+1) =
+      (columnCone f).D₁ (up ℤ) n (n+1) +
+        (columnCone f).D₂ (up ℤ) n (n+1) from rfl]
+  simp only [Preadditive.comp_add, Preadditive.add_comp]
+  rw [← Category.assoc, HomologicalComplex₂.ι_D₁]
+  rw [← Category.assoc, HomologicalComplex₂.ι_D₂]
+  have hpq : p + q = n := by change p + q = n at h; exact h
+  have hhor : ComplexShape.π (up ℤ) (up ℤ) (up ℤ) (p+1,q) = n+1 := by
+    change p+1+q=n+1; omega
+  have hver : ComplexShape.π (up ℤ) (up ℤ) (up ℤ) (p,q+1) = n+1 := by
+    change p+(q+1)=n+1; omega
+  rw [(columnCone f).d₁_eq (up ℤ) (by simp : (up ℤ).Rel p (p+1)) q (n+1) hhor]
+  rw [(columnCone f).d₂_eq (up ℤ) p (by simp : (up ℤ).Rel q (q+1)) (n+1) hver]
+  rw [show ComplexShape.ε₁ (up ℤ) (up ℤ) (up ℤ) (p,q) = 1 from rfl, one_smul]
+  rw [show ComplexShape.ε₂ (up ℤ) (up ℤ) (up ℤ) (p,q) = p.negOnePow from rfl]
+  simp only [Category.assoc, HomologicalComplex₂.ι_totalDesc,
+    Linear.units_smul_comp]
+  letI := hasHomotopyCofiber_flip_map f
+  rw [← cancel_epi (componentIso f p q).inv]
+  apply biprod.hom_ext'
+  · simp only [Preadditive.comp_add, ← Category.assoc]
+    rw [show (biprod.inl ≫ (componentIso f p q).inv) ≫ componentMap f p q n hpq =
+      (p.negOnePow • K.ιTotal (up ℤ) p (q+1) (n+1)
+        (by change p+(q+1)=n+1; omega)) ≫
+        (CochainComplex.mappingCone.inl
+          (HomologicalComplex₂.total.map f (up ℤ))).v (n+1) n (by omega) from
+      colInl_componentMap f p q n hpq]
+    rw [Category.assoc, source_branch_d f p q n hpq]
+    have hh := colInl_horizontal f p q
+    have hv := colInl_vertical f p q
+    simp only [colInl, colInr] at hh hv
+    rw [hh]
+    simp only [Linear.comp_units_smul, ← Category.assoc]
+    rw [hv]
+    simp only [Preadditive.sub_comp, smul_sub, Linear.units_smul_comp, Category.assoc]
+    rw [componentMap_source f (p+1) q (n+1) (by omega),
+      componentMap_target f p (q+1) (n+1) (by omega),
+      componentMap_source f p (q+1) (n+1) (by omega)]
+    have hk : p+(q+1)=n+1 := by omega
+    have hK := ι_total_d K p (q+1) (n+1) hk
+    simp only [Linear.units_smul_comp, ← Category.assoc]
+    rw [hK]
+    simp only [Int.negOnePow_succ, smul_add, Linear.units_smul_comp,
+      Linear.comp_units_smul, smul_smul, Int.units_mul_self, one_smul,
+      Units.neg_smul, Preadditive.add_comp, Category.assoc]
+    simp only [Preadditive.comp_neg, Linear.comp_units_smul]
+    abel
+  · simp only [Preadditive.comp_add, ← Category.assoc]
+    rw [show (biprod.inr ≫ (componentIso f p q).inv) ≫ componentMap f p q n hpq =
+      L.ιTotal (up ℤ) p q n (by change p+q=n; exact hpq) ≫
+        (CochainComplex.mappingCone.inr (HomologicalComplex₂.total.map f (up ℤ))).f n from
+      colInr_componentMap f p q n hpq]
+    rw [Category.assoc, target_branch_d f p q n hpq]
+    have hh := colInr_horizontal f p q
+    have hv := colInr_vertical f p q
+    simp only [colInr] at hh hv
+    rw [hh]
+    simp only [Linear.comp_units_smul, ← Category.assoc]
+    rw [hv]
+    simp only [Category.assoc]
+    rw [componentMap_target f (p+1) q (n+1) (by omega),
+      componentMap_target f p (q+1) (n+1) (by omega)]
+    rw [← Category.assoc, ι_total_d L p q n hpq]
+    simp only [Preadditive.add_comp, Linear.units_smul_comp, Category.assoc]
+
+end HomologicalComplex₂
+
+namespace HomologicalComplex₂
+open ComplexShape
+variable {C : Type*} [Category* C] [Preadditive C]
+  {K L : HomologicalComplex₂ C (up ℤ) (up ℤ)} (f : K ⟶ L)
+  [∀ p q : ℤ, HasBinaryBiproduct ((K.X p).X (q + 1)) ((L.X p).X q)]
+  [K.HasTotal (up ℤ)] [L.HasTotal (up ℤ)]
+  [∀ n : ℤ, HasBinaryBiproduct ((K.total (up ℤ)).X (n+1)) ((L.total (up ℤ)).X n)]
+  [(columnCone f).HasTotal (up ℤ)]
+
+private noncomputable def sourceToColumnTotal (n : ℤ) :
+    (K.total (up ℤ)).X (n+1) ⟶ ((columnCone f).total (up ℤ)).X n := by
+  letI := hasTotal_columnCone f
+  exact K.totalDesc (fun p r h => by
+    let q : ℤ := r-1
+    have hq : q+1 = r := by dsimp [q]; omega
+    have hn : p+q = n := by
+      change p+r=n+1 at h
+      dsimp [q]
+      omega
+    let j : ((K.X p).X (q+1)) ⟶ ((columnCone f).total (up ℤ)).X n :=
+      (p.negOnePow • biprod.inl) ≫ (componentIso f p q).inv ≫
+        (columnCone f).ιTotal (up ℤ) p q n
+          (by change p+q=n; exact hn)
+    exact hq ▸ j)
+
+private noncomputable def targetToColumnTotal (n : ℤ) :
+    (L.total (up ℤ)).X n ⟶ ((columnCone f).total (up ℤ)).X n := by
+  letI := hasTotal_columnCone f
+  exact L.totalDesc (fun p q h =>
+    biprod.inr ≫ (componentIso f p q).inv ≫
+      (columnCone f).ιTotal (up ℤ) p q n
+        (by change p+q=n at h; exact h))
+
+private noncomputable def inverseMap (n : ℤ) :
+    (CochainComplex.mappingCone (HomologicalComplex₂.total.map f (up ℤ))).X n ⟶
+      ((columnCone f).total (up ℤ)).X n := by
+  letI := hasTotal_columnCone f
+  letI := hasHomotopyCofiber_total_map f
+  exact (HomologicalComplex.homotopyCofiber.XIsoBiprod
+      (HomologicalComplex₂.total.map f (up ℤ)) n (n+1) (by simp)).hom ≫
+    biprod.desc (sourceToColumnTotal f n) (targetToColumnTotal f n)
+
+private theorem inverseMap_source (n : ℤ) :
+    (CochainComplex.mappingCone.inl (HomologicalComplex₂.total.map f (up ℤ))).v
+      (n+1) n (by omega) ≫ inverseMap f n = sourceToColumnTotal f n := by
+  letI := hasHomotopyCofiber_total_map f
+  dsimp [inverseMap]
+  change HomologicalComplex.homotopyCofiber.inlX
+      (HomologicalComplex₂.total.map f (up ℤ)) (n+1) n (by simp) ≫
+      (HomologicalComplex.homotopyCofiber.XIsoBiprod
+        (HomologicalComplex₂.total.map f (up ℤ)) n (n+1) (by simp)).hom ≫
+      biprod.desc (sourceToColumnTotal f n) (targetToColumnTotal f n) = _
+  rw [← Category.assoc,
+    HomologicalComplex.homotopyCofiber.inlX_XIsoBiprod_hom]
+  simp
+
+private theorem inverseMap_target (n : ℤ) :
+    (CochainComplex.mappingCone.inr (HomologicalComplex₂.total.map f (up ℤ))).f n ≫
+      inverseMap f n = targetToColumnTotal f n := by
+  letI := hasHomotopyCofiber_total_map f
+  dsimp [inverseMap]
+  change HomologicalComplex.homotopyCofiber.inrX
+      (HomologicalComplex₂.total.map f (up ℤ)) n ≫
+      (HomologicalComplex.homotopyCofiber.XIsoBiprod
+        (HomologicalComplex₂.total.map f (up ℤ)) n (n+1) (by simp)).hom ≫
+      biprod.desc (sourceToColumnTotal f n) (targetToColumnTotal f n) = _
+  rw [← Category.assoc,
+    HomologicalComplex.homotopyCofiber.inrX_XIsoBiprod_hom]
+  simp
+
+set_option backward.isDefEq.respectTransparency false in
+omit [K.HasTotal (up ℤ)] [L.HasTotal (up ℤ)]
+  [∀ n : ℤ, HasBinaryBiproduct ((K.total (up ℤ)).X (n+1)) ((L.total (up ℤ)).X n)] in
+private theorem source_transport (p q₀ q n : ℤ) (e : q₀=q)
+    (he : q₀+1=q+1) (h₀ : p+q₀=n) (h : p+q=n) :
+    he ▸ ((p.negOnePow • biprod.inl) ≫ (componentIso f p q₀).inv ≫
+      (columnCone f).ιTotal (up ℤ) p q₀ n
+        (by change p+q₀=n; exact h₀)) =
+    p.negOnePow • (biprod.inl ≫ (componentIso f p q).inv ≫
+      (columnCone f).ιTotal (up ℤ) p q n
+        (by change p+q=n; exact h)) := by
+  subst q₀
+  simp only [Linear.units_smul_comp]
+
+private theorem ι_sourceToColumnTotal (p q n : ℤ) (h : p+q=n) :
+    K.ιTotal (up ℤ) p (q+1) (n+1)
+      (by change p+(q+1)=n+1; omega) ≫ sourceToColumnTotal f n =
+    p.negOnePow • (biprod.inl ≫ (componentIso f p q).inv ≫
+      (columnCone f).ιTotal (up ℤ) p q n
+        (by change p+q=n; exact h)) := by
+  dsimp [sourceToColumnTotal]
+  rw [K.ι_totalDesc]
+  exact source_transport f p (q+1-1) q n (by omega) (by omega) (by omega) h
+
+private theorem ι_targetToColumnTotal (p q n : ℤ) (h : p+q=n) :
+    L.ιTotal (up ℤ) p q n
+      (by change p+q=n; exact h) ≫ targetToColumnTotal f n =
+    biprod.inr ≫ (componentIso f p q).inv ≫
+      (columnCone f).ιTotal (up ℤ) p q n
+        (by change p+q=n; exact h) := by
+  dsimp [targetToColumnTotal]
+  rw [L.ι_totalDesc]
+
+private theorem componentMap_inverse_source (p q n : ℤ) (h : p+q=n) :
+    biprod.inl ≫ (componentIso f p q).inv ≫ componentMap f p q n h ≫
+      inverseMap f n =
+    biprod.inl ≫ (componentIso f p q).inv ≫
+      (columnCone f).ιTotal (up ℤ) p q n
+        (by change p+q=n; exact h) := by
+  calc
+    _ = (biprod.inl ≫ (componentIso f p q).inv ≫ componentMap f p q n h) ≫
+        inverseMap f n := by simp only [Category.assoc]
+    _ = _ := by
+      rw [componentMap_source]
+      rw [Category.assoc, inverseMap_source]
+      rw [Linear.units_smul_comp]
+      rw [← Category.assoc, ι_sourceToColumnTotal f p q n h]
+      simp [smul_smul]
+
+private theorem componentMap_inverse_target (p q n : ℤ) (h : p+q=n) :
+    biprod.inr ≫ (componentIso f p q).inv ≫ componentMap f p q n h ≫
+      inverseMap f n =
+    biprod.inr ≫ (componentIso f p q).inv ≫
+      (columnCone f).ιTotal (up ℤ) p q n
+        (by change p+q=n; exact h) := by
+  calc
+    _ = (biprod.inr ≫ (componentIso f p q).inv ≫ componentMap f p q n h) ≫
+        inverseMap f n := by simp only [Category.assoc]
+    _ = _ := by
+      rw [componentMap_target]
+      rw [Category.assoc, inverseMap_target]
+      exact ι_targetToColumnTotal f p q n h
+
+private theorem componentMap_inverse (p q n : ℤ) (h : p+q=n) :
+    componentMap f p q n h ≫ inverseMap f n =
+      (columnCone f).ιTotal (up ℤ) p q n
+        (by change p+q=n; exact h) := by
+  rw [← cancel_epi (componentIso f p q).inv]
+  apply biprod.hom_ext'
+  · simpa only [Category.assoc] using componentMap_inverse_source f p q n h
+  · simpa only [Category.assoc] using componentMap_inverse_target f p q n h
+
+private theorem comparisonMap_inverse (n : ℤ) :
+    comparisonMap f n ≫ inverseMap f n = 𝟙 _ := by
+  apply HomologicalComplex₂.total.hom_ext
+  intro p q h
+  rw [← Category.assoc]
+  dsimp [comparisonMap]
+  rw [HomologicalComplex₂.ι_totalDesc]
+  change p+q=n at h
+  rw [componentMap_inverse f p q n h]
+  simp
+
+private theorem targetToColumnTotal_comparisonMap (n : ℤ) :
+    targetToColumnTotal f n ≫ comparisonMap f n =
+      (CochainComplex.mappingCone.inr (HomologicalComplex₂.total.map f (up ℤ))).f n := by
+  apply HomologicalComplex₂.total.hom_ext
+  intro p q h
+  rw [← Category.assoc]
+  dsimp [targetToColumnTotal]
+  rw [L.ι_totalDesc]
+  dsimp [comparisonMap]
+  simp only [Category.assoc]
+  rw [HomologicalComplex₂.ι_totalDesc]
+  change p+q=n at h
+  exact componentMap_target f p q n h
+
+private theorem sourceToColumnTotal_comparisonMap (n : ℤ) :
+    sourceToColumnTotal f n ≫ comparisonMap f n =
+      (CochainComplex.mappingCone.inl (HomologicalComplex₂.total.map f (up ℤ))).v
+        (n+1) n (by omega) := by
+  apply HomologicalComplex₂.total.hom_ext
+  intro p r h
+  generalize hq : r-1=q
+  have hr : r=q+1 := by omega
+  subst r
+  have hn : p+q=n := by
+    change p+(q+1)=n+1 at h
+    omega
+  rw [← Category.assoc, ι_sourceToColumnTotal f p q n hn]
+  rw [Linear.units_smul_comp]
+  dsimp [comparisonMap]
+  simp only [Category.assoc]
+  rw [HomologicalComplex₂.ι_totalDesc]
+  rw [componentMap_source]
+  simp [smul_smul]
+
+private theorem inverseMap_comparisonMap (n : ℤ) :
+    inverseMap f n ≫ comparisonMap f n = 𝟙 _ := by
+  letI := hasHomotopyCofiber_total_map f
+  apply CochainComplex.mappingCone.ext_from
+    (HomologicalComplex₂.total.map f (up ℤ)) (n+1) n (by omega)
+  · rw [← Category.assoc, inverseMap_source]
+    rw [sourceToColumnTotal_comparisonMap]
+    simp
+  · rw [← Category.assoc, inverseMap_target]
+    rw [targetToColumnTotal_comparisonMap]
+    simp
+
+end HomologicalComplex₂
+
+
+namespace HomologicalComplex₂
+open ComplexShape
+attribute [local instance] hasTotal_columnCone hasHomotopyCofiber_total_map
+variable {C : Type*} [Category* C] [Preadditive C]
+  {K L : HomologicalComplex₂ C (up ℤ) (up ℤ)} (f : K ⟶ L)
+  [∀ p q : ℤ, HasBinaryBiproduct ((K.X p).X (q + 1)) ((L.X p).X q)]
+  [K.HasTotal (up ℤ)] [L.HasTotal (up ℤ)]
+  [∀ n : ℤ, HasBinaryBiproduct ((K.total (up ℤ)).X (n+1)) ((L.total (up ℤ)).X n)]
+
+/-- The literal total of the vertical column cone is the mapping cone of the
+literal total map. The source branch at horizontal degree `p` acquires the
+sign `(-1)^p`; the target branch is unchanged. -/
+noncomputable def totalColumnConeIso :
+    (columnCone f).total (up ℤ) ≅
+      CochainComplex.mappingCone (HomologicalComplex₂.total.map f (up ℤ)) := by
+  refine HomologicalComplex.Hom.isoOfComponents (fun n =>
+    { hom := comparisonMap f n
+      inv := inverseMap f n
+      hom_inv_id := comparisonMap_inverse f n
+      inv_hom_id := inverseMap_comparisonMap f n }) ?_
+  intro n n' h
+  have hn : n+1=n' := by change n+1=n' at h; exact h
+  subst n'
+  exact comparison_d f n
+
+end HomologicalComplex₂
+
+namespace HomologicalComplex₂
+open ComplexShape
+attribute [local instance] hasHomotopyCofiber_flip_map hasTotal_columnCone
+  hasHomotopyCofiber_total_map
+variable {C : Type*} [Category* C] [Preadditive C]
+  {K L : HomologicalComplex₂ C (up ℤ) (up ℤ)} (f : K ⟶ L)
+  [∀ p q : ℤ, HasBinaryBiproduct ((K.X p).X (q + 1)) ((L.X p).X q)]
+  [K.HasTotal (up ℤ)] [L.HasTotal (up ℤ)]
+  [∀ n : ℤ, HasBinaryBiproduct ((K.total (up ℤ)).X (n+1)) ((L.total (up ℤ)).X n)]
+
+/-- This source-branch rewrite rule exposes the sign needed to reconcile
+totalization with the negated differential on the shifted cone source. -/
+theorem ι_totalColumnConeIso_hom_source (p q n : ℤ) (h : p+q=n) :
+    ((CochainComplex.mappingCone.inl
+      ((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).map f)).v
+        (q+1) q (by omega)).f p ≫
+      (columnCone f).ιTotal (up ℤ) p q n
+        (by change p+q=n; exact h) ≫
+      (totalColumnConeIso f).hom.f n =
+    (p.negOnePow • K.ιTotal (up ℤ) p (q+1) (n+1)
+      (by change p+(q+1)=n+1; omega)) ≫
+      (CochainComplex.mappingCone.inl
+        (HomologicalComplex₂.total.map f (up ℤ))).v (n+1) n (by omega) := by
+  rw [← colInl_eq f p q]
+  change colInl f p q ≫
+    (columnCone f).ιTotal (up ℤ) p q n (by change p+q=n; exact h) ≫
+    comparisonMap f n = _
+  dsimp [comparisonMap]
+  rw [HomologicalComplex₂.ι_totalDesc]
+  exact colInl_componentMap f p q n h
+
+/-- Use this rule to transport the target-cone inclusion through the
+comparison without unfolding the coproduct descent maps. -/
+theorem ι_totalColumnConeIso_hom_target (p q n : ℤ) (h : p+q=n) :
+    ((CochainComplex.mappingCone.inr
+      ((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).map f)).f q).f p ≫
+      (columnCone f).ιTotal (up ℤ) p q n
+        (by change p+q=n; exact h) ≫
+      (totalColumnConeIso f).hom.f n =
+    L.ιTotal (up ℤ) p q n (by change p+q=n; exact h) ≫
+      (CochainComplex.mappingCone.inr
+        (HomologicalComplex₂.total.map f (up ℤ))).f n := by
+  rw [← colInr_eq f p q]
+  change colInr f p q ≫
+    (columnCone f).ιTotal (up ℤ) p q n (by change p+q=n; exact h) ≫
+    comparisonMap f n = _
+  dsimp [comparisonMap]
+  rw [HomologicalComplex₂.ι_totalDesc]
+  exact colInr_componentMap f p q n h
+
+end HomologicalComplex₂
+
+open ComplexShape
+
+namespace HomologicalComplex₂
+section Support
+variable {C : Type*} [Category* C] [Preadditive C]
+  {K L : HomologicalComplex₂ C (up ℤ) (up ℤ)} (f : K ⟶ L)
+  [∀ p q : ℤ, HasBinaryBiproduct ((K.X p).X (q + 1)) ((L.X p).X q)]
+
+private noncomputable def columnConeColumnIso (p : ℤ) :
+    (HomologicalComplex₂.columnCone f).X p ≅
+      CochainComplex.mappingCone (f.f p) := by
+  let H := HomologicalComplex.eval C (up ℤ) p
+  letI : H.Additive := ⟨by intro X Y g h; rfl⟩
+  letI : HomologicalComplex.HasHomotopyCofiber
+      ((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).map f) :=
+    hasHomotopyCofiber_flip_map f
+  letI : HomologicalComplex.HasHomotopyCofiber (f.f p) := inferInstance
+  letI : HomologicalComplex.HasHomotopyCofiber
+      ((H.mapHomologicalComplex (up ℤ)).map
+        ((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).map f)) := by
+    change HomologicalComplex.HasHomotopyCofiber (f.f p)
+    infer_instance
+  change ((H.mapHomologicalComplex (up ℤ)).obj
+    (CochainComplex.mappingCone ((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).map f))) ≅
+      CochainComplex.mappingCone ((H.mapHomologicalComplex (up ℤ)).map
+        ((HomologicalComplex₂.flipFunctor C (up ℤ) (up ℤ)).map f))
+  exact CochainComplex.mappingCone.mapHomologicalComplexIso _ H
+
+
+private lemma cone_lower_support
+    (aK aL : ℤ → ℤ)
+    (hK : ∀ n p q : ℤ, p + q = n → p < aK n → IsZero ((K.X p).X q))
+    (hL : ∀ n p q : ℤ, p + q = n → p < aL n → IsZero ((L.X p).X q))
+    (n p q : ℤ) (hn : p + q = n)
+    (hp : p < min (aK (n+1)) (aL n)) :
+    IsZero (((HomologicalComplex₂.columnCone f).X p).X q) := by
+  have hk : IsZero ((K.X p).X (q+1)) :=
+    hK (n+1) p (q+1) (by omega) ((Int.lt_min.mp hp).1)
+  have hl : IsZero ((L.X p).X q) :=
+    hL n p q hn ((Int.lt_min.mp hp).2)
+  have hc : IsZero ((CochainComplex.mappingCone (f.f p)).X q) :=
+    (CochainComplex.mappingCone.isZero_X_iff (f.f p) q).2 ⟨hk, hl⟩
+  exact hc.of_iso ((HomologicalComplex.eval C (up ℤ) q).mapIso (columnConeColumnIso f p))
+
+private lemma cone_upper_support
+    (bK bL : ℤ → ℤ)
+    (hK : ∀ n p q : ℤ, p + q = n → bK n < p → IsZero ((K.X p).X q))
+    (hL : ∀ n p q : ℤ, p + q = n → bL n < p → IsZero ((L.X p).X q))
+    (n p q : ℤ) (hn : p + q = n)
+    (hp : max (bK (n+1)) (bL n) < p) :
+    IsZero (((HomologicalComplex₂.columnCone f).X p).X q) := by
+  have hk : IsZero ((K.X p).X (q+1)) :=
+    hK (n+1) p (q+1) (by omega) ((Int.max_lt.mp hp).1)
+  have hl : IsZero ((L.X p).X q) :=
+    hL n p q hn ((Int.max_lt.mp hp).2)
+  have hc : IsZero ((CochainComplex.mappingCone (f.f p)).X q) :=
+    (CochainComplex.mappingCone.isZero_X_iff (f.f p) q).2 ⟨hk, hl⟩
+  exact hc.of_iso ((HomologicalComplex.eval C (up ℤ) q).mapIso (columnConeColumnIso f p))
+
+
+end Support
+
+section QuasiIso
+variable {C : Type*} [Category* C] [Abelian C]
+  {K L : HomologicalComplex₂ C (up ℤ) (up ℤ)} (f : K ⟶ L)
+
+private lemma quasiIso_iff_acyclic_mappingCone {A : Type*} [Category* A] [Abelian A]
+    {M N : CochainComplex A ℤ} (g : M ⟶ N) :
+    QuasiIso g ↔ (CochainComplex.mappingCone g).Acyclic := by
+  rw [← HomologicalComplex.mem_quasiIso_iff,
+    ← HomotopyCategory.quotient_map_mem_quasiIso_iff,
+    HomotopyCategory.quasiIso_eq_trW_subcategoryAcyclic]
+  exact ((HomotopyCategory.subcategoryAcyclic A).trW_iff_of_distinguished
+    (CochainComplex.mappingCone.triangleh g)
+    (HomotopyCategory.mappingCone_triangleh_distinguished g)).trans
+      (HomotopyCategory.quotient_obj_mem_subcategoryAcyclic_iff_acyclic _)
+
+private lemma exactAt_columnCone (hcol : ∀ p : ℤ, QuasiIso (f.f p))
+    (p q : ℤ) : ((HomologicalComplex₂.columnCone f).X p).ExactAt q := by
+  have hA : (CochainComplex.mappingCone (f.f p)).Acyclic :=
+    (quasiIso_iff_acyclic_mappingCone (f.f p)).1 (hcol p)
+  exact (hA q).of_iso (columnConeColumnIso f p).symm
+
+
+variable [K.HasTotal (up ℤ)] [L.HasTotal (up ℤ)]
+
+/-- A columnwise quasi-isomorphism induces a quasi-isomorphism of literal totals
+under finite diagonal support. The proof applies total acyclicity to the column
+cone: its degree `n` support combines source bounds at `n + 1` with target bounds
+at `n`, then uses `HomologicalComplex₂.totalColumnConeIso`. These are bounds on
+the terms themselves; bounds on cohomology alone do not provide this support. -/
+theorem quasiIso_totalMap_of_four_diagonal_bounds_of_column_quasiIso
+    (aK bK aL bL : ℤ → ℤ)
+    (hKLower : ∀ n p q : ℤ, p + q = n → p < aK n → IsZero ((K.X p).X q))
+    (hKUpper : ∀ n p q : ℤ, p + q = n → bK n < p → IsZero ((K.X p).X q))
+    (hLLower : ∀ n p q : ℤ, p + q = n → p < aL n → IsZero ((L.X p).X q))
+    (hLUpper : ∀ n p q : ℤ, p + q = n → bL n < p → IsZero ((L.X p).X q))
+    (hcol : ∀ p : ℤ, QuasiIso (f.f p)) :
+    QuasiIso (HomologicalComplex₂.total.map f (up ℤ)) := by
+  letI : (HomologicalComplex₂.columnCone f).HasTotal (up ℤ) :=
+    HomologicalComplex₂.hasTotal_columnCone f
+  have hData : ∀ n : ℤ, ∃ a b : ℤ,
+      (∀ p q : ℤ, p + q = n → p < a →
+        IsZero (((HomologicalComplex₂.columnCone f).X p).X q)) ∧
+      (∀ p q : ℤ, p + q = n → b < p →
+        IsZero (((HomologicalComplex₂.columnCone f).X p).X q)) ∧
+      (∀ p : ℤ, a ≤ p → p ≤ b →
+        ((HomologicalComplex₂.columnCone f).X p).ExactAt (n-p)) := by
+    intro n
+    refine ⟨min (aK (n+1)) (aL n), max (bK (n+1)) (bL n), ?_, ?_, ?_⟩
+    · intro p q hpq hp
+      exact cone_lower_support f aK aL hKLower hLLower n p q hpq hp
+    · intro p q hpq hp
+      exact cone_upper_support f bK bL hKUpper hLUpper n p q hpq hp
+    · intro p _ _
+      exact exactAt_columnCone f hcol p (n-p)
+  have hA : ((HomologicalComplex₂.columnCone f).total (up ℤ)).Acyclic :=
+    HomologicalComplex₂.acyclic_total_of_diagonal_bounds_of_column_exactAt
+      (HomologicalComplex₂.columnCone f) hData
+  have hCone : (CochainComplex.mappingCone
+      (HomologicalComplex₂.total.map f (up ℤ))).Acyclic := by
+    intro n
+    exact (hA n).of_iso (HomologicalComplex₂.totalColumnConeIso f)
+  exact (quasiIso_iff_acyclic_mappingCone
+    (HomologicalComplex₂.total.map f (up ℤ))).2 hCone
+
+end QuasiIso
+
 end HomologicalComplex₂
