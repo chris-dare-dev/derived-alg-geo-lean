@@ -277,3 +277,47 @@ twist then identifies the inverse's action. -/
 #print axioms CategoryTheory.Triangulated.SphericalTwist.TwistShaped.act_slicing
 #print axioms CategoryTheory.Triangulated.SphericalTwist.TwistShaped.act_Z
 #print axioms CategoryTheory.Triangulated.SphericalTwist.TwistShaped.lam_lam
+
+/-! ## The functor `T_E`: `SphericalTwistData` and the supplied statements (#893)
+
+`SphericalTwistData` SUPPLIES the functor `T_E`, its three instances, the copower functor
+`Hom^•(E,-) ⊗ E`, the evaluation triangle and the copower's `K₀` class; it constructs nothing.
+`class_T` and `map_eq_twistK₀` are proved from `K₀.of_triangle` and the field `copower_class`.
+`AutoequivalenceStatement` and `BraidStatement` are supplied, unproved statements of the
+Seidel--Thomas autoequivalence and braid theorems; nothing here asserts either. See the module
+docstrings of `SphericalTwist/Definition.lean`, `Autoequivalence.lean` and `BraidStatement.lean`. -/
+
+#print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData
+#print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.T
+#print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.additive
+#print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.commShift
+#print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.isTriangulated
+#print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.copower
+#print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.ev
+#print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.π
+#print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.δ
+#print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.distinguished
+#print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.copower_class
+#print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.mk.inj
+#print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.class_T
+#print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.class_T_eq
+#print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.map_eq_twistK₀
+
+#print axioms CategoryTheory.Triangulated.SphericalTwist.AutoequivalenceStatement
+#print axioms CategoryTheory.Triangulated.SphericalTwist.AutoequivalenceStatement.equiv
+#print axioms CategoryTheory.Triangulated.SphericalTwist.AutoequivalenceStatement.iso
+#print axioms CategoryTheory.Triangulated.SphericalTwist.AutoequivalenceStatement.mk.inj
+#print axioms CategoryTheory.Triangulated.SphericalTwist.AutoequivalenceStatement.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.SphericalTwist.AutoequivalenceStatement.toTwistShaped
+#print axioms CategoryTheory.Triangulated.SphericalTwist.AutoequivalenceStatement.toTwistShaped_Φ
+#print axioms CategoryTheory.Triangulated.SphericalTwist.AutoequivalenceStatement.act_Z
+
+#print axioms CategoryTheory.Triangulated.SphericalTwist.BraidStatement
+#print axioms CategoryTheory.Triangulated.SphericalTwist.BraidStatement.iso
+#print axioms CategoryTheory.Triangulated.SphericalTwist.BraidStatement.mk.inj
+#print axioms CategoryTheory.Triangulated.SphericalTwist.BraidStatement.mk.sizeOf_spec
+#print axioms CategoryTheory.Triangulated.SphericalTwist.map_braid_left
+#print axioms CategoryTheory.Triangulated.SphericalTwist.map_braid_of_pair
+#print axioms CategoryTheory.Triangulated.SphericalTwist.BraidStatement.map_braid
+#print axioms CategoryTheory.Triangulated.SphericalTwist.BraidStatement.twistK₀_braid
