@@ -52,3 +52,10 @@ open AlgebraicGeometry
 #print axioms AlgebraicGeometry.representableEtaleDescentAlong
 #print axioms AlgebraicGeometry.representableFppfFullyFaithfulToCechDescent
 #print axioms AlgebraicGeometry.representableFppfEssSurjToCechDescent
+
+#print axioms AlgebraicGeometry.Scheme.precoverage_eq_propQCPrecoverage_of_isOpenMap
+#print axioms AlgebraicGeometry.Scheme.grothendieckTopology_eq_propQCTopology_of_isOpenMap
+#print axioms AlgebraicGeometry.Scheme.fppfPrecoverage_eq_propQCPrecoverage
+#print axioms AlgebraicGeometry.Scheme.fppfTopology_eq_propQCTopology
+#print axioms AlgebraicGeometry.Scheme.etalePrecoverage_eq_propQCPrecoverage
+#print axioms AlgebraicGeometry.Scheme.etaleTopology_eq_propQCTopology
