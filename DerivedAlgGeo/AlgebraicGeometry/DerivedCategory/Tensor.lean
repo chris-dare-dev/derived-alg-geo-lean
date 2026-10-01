@@ -16,6 +16,13 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Tensor.Relative
 The geometry-level owner of derived tensor: one localization-facing interface and three
 deliberately separate derived-tensor tiers.
 
+## Main definitions
+
+This umbrella introduces no definitions. It exports the scheme-derived tensor
+interfaces and their existing constructions.
+
+## Main results
+
 | Interface | Module | What it supplies |
 | --- | --- | --- |
 | Localization-facing | `Tensor/LeftDerivedTensor.lean` | the bifunctor and fixed-argument universal properties on the unbounded derived category |
@@ -29,6 +36,11 @@ deliberately separate derived-tensor tiers.
 `Tensor/Relative.lean` is the compatibility layer for the bounded coherent tiers, not a fourth
 derived-tensor construction: it supplies `HasMonoidalDerivedPullback` for derived pullback along
 a morphism.
+
+`Tensor/FiniteKFlat.lean` proves that a finite supported complex with flat
+scheme-module terms is K-flat for the existing total tensor.
+
+## Implementation notes
 
 The tiers are separate because they are not each other's restrictions.  The unbounded
 bifunctor does **not** restrict to `Dᵇ(Coh Z)`: that category is not closed under
@@ -48,4 +60,8 @@ namespace on every declaration in the subtree.
 ## References
 
 * `docs/architecture/cutover-ledger.md`, row 10 (#1321).
+
+## Tags
+
+derived tensor, scheme-module sheaves, K-flat complexes, bounded coherent derived category
 -/
