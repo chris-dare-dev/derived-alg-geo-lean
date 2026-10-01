@@ -90,15 +90,18 @@ premerge reruns or make audit/emitter work disappear. The sampled maximum was
 three simultaneous build jobs (one push, two PR); the 4–6-producer cases are
 explicit scenarios, not measured arrivals.
 
-## Next experiment and limits
+## Bounded experiment and limits
 
-Choose one bounded, offline audit-traversal prototype only after profiling
-the per-file loop on matched revisions and confirming whether the repeated
-elaboration can be shared without losing any `#print axioms` output. Compare
-its results with independent cold/full verification, including direct and
-transitive imports, instances and exported axioms. The replay harness fails
-closed on changed or missing identity, renames, deletions and unknown inputs;
-it is not a replacement for that parity test. Record a go/no-go decision and
-exact cost/benefit before any production workflow change. Rerun this baseline
-after #1436 and #1438, which are still open. This progress slice does not
-close #1440.
+The [bounded audit batching probe](audit-batch-probe-2026-09-27.md) measured
+import-only and full elaboration on ten matched slices. Its initial ten-file
+timeout was an output-pipe deadlock in the probe. With output redirected
+during execution, that group completed in 2.7–3.0 seconds, reproduced all
+470 records and the parser verdict, and reached about 5.6 GB process-tree
+RSS. Two-file groups also reproduced their output and parser verdict with
+lower elapsed time in a prebuilt-cache sample. Both sizes remain experiment
+candidates, not production optimizations. They need independent cold/full
+verification, including direct and transitive imports, instances and exported
+axioms, and a concurrent memory budget before any required gate can change.
+The replay harness is likewise offline and cannot replace that parity test.
+Rerun this baseline after #1436 and #1438, which are still open. This progress
+slice does not close #1440.
