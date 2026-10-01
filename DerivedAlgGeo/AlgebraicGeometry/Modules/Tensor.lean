@@ -8,5 +8,6 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Complex
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Invertible
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Linear
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Sections
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Stalk
 
 /-! # Tensor products of module sheaves -/
