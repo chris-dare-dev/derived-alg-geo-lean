@@ -36,11 +36,11 @@ to `X` under the second projection.
 ## Implementation notes
 
 This formulation is intentionally an independent consumer of
-`AlgebraicGeometry.IsAlmostDisconnected`; graph
-sheaves and stability conditions do not enter the morphism root.  The two support isomorphisms
-canonically recover the relative automorphisms appearing in Definition 3.19.
+`AlgebraicGeometry.IsAlmostDisconnected`; graph sheaves and stability conditions do not enter the
+morphism root.  The two support isomorphisms canonically recover the relative automorphisms
+appearing in Definition 3.19.
 
-Lemma B.5 (flat-base-change stability) follows from Lemma B.2 plus the standard comparison
+Lemma B.5 (flat-base-change stability) is informally Lemma B.2 plus the standard comparison
 between base change of the relative self-product and the self-product after base change.  It is
 not asserted until Lemma B.2 and the cartesian comparison described in
 `AlmostDisconnected.lean` exist.
@@ -164,7 +164,9 @@ and the automorphism is the identity
 theorem of_mono {X Y : Scheme.{u}} (f : X ⟶ Y) [Mono f] : HasFiltrationProperty f :=
   ⟨FiltrationProperty.monoWitness f⟩
 
-/-- Monomorphisms have the filtration property, as an inequality of morphism properties. -/
+/-- The lattice form of `AlgebraicGeometry.HasFiltrationProperty.of_mono`, for combining with other
+morphism properties by `le_trans`.  There is no `CategoryTheory.MorphismProperty.RespectsIso`
+instance for this property, so it is proved directly. -/
 theorem monomorphisms_le : MorphismProperty.monomorphisms Scheme ≤ HasFiltrationProperty :=
   fun _ _ f (_ : Mono f) => of_mono f
 

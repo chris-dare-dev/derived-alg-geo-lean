@@ -39,16 +39,15 @@ to `Y`.
 
 The definition deliberately contains no stability-condition, moduli, or quotient-presentation
 data.  It is a `CategoryTheory.MorphismProperty`, so generic behavior belongs at this root and
-downstream
-stability adapters can consume it without owning it.  Equalities in Definition B.1 are replaced by
-chosen isomorphisms.
+downstream stability adapters can consume it without owning it.  Equalities in Definition B.1 are
+replaced by chosen isomorphisms.
 
 The closure of the property under flat base change and composition (Lemma B.2) is not asserted
 here.  Composition needs line-bundle pullback and the tensor--pushforward projection formula;
 base change needs the cartesian comparison `g^* i_* L ≅ i'_* g'^* L` for a closed immersion `i`,
 and exactness of flat pullback.  The statement of exactness of flat pullback is in
-`DerivedCategory/Families/FlatPullback.lean`, but its proof uses only the stalkwise API in
-`Modules/Pullback/Stalk.lean`, which this root may import.
+`DerivedCategory/Families/FlatPullback.lean`, but its proof uses only Mathlib's flat-module
+lemmas and the stalkwise API in `Modules/Pullback/Stalk.lean`, which this root may import.
 
 ## References
 
@@ -330,7 +329,8 @@ noncomputable def isoWitness (p : X ⟶ Y) [IsIso p] : Witness p where
         exact ((Scheme.Modules.pushforwardId X).app (structureSheaf X)).symm }
 
 /-- Explicit almost-disconnected data for the identity morphism; an abbreviation for
-`isoWitness (𝟙 X)`. -/
+`isoWitness (𝟙 X)`, so that facts about `AlgebraicGeometry.AlmostDisconnected.isoWitness` apply to
+it unchanged. -/
 noncomputable abbrev identityWitness (X : Scheme.{u}) : Witness (𝟙 X) :=
   isoWitness (𝟙 X)
 
@@ -350,7 +350,10 @@ hypothesis `[IsIso p]` is what this one-step witness needs: with `ι = 𝟙 X`, 
 theorem of_isIso {X Y : Scheme.{u}} (p : X ⟶ Y) [IsIso p] : IsAlmostDisconnected p :=
   ⟨AlmostDisconnected.isoWitness p⟩
 
-/-- Isomorphisms are almost disconnected, as an inequality of morphism properties. -/
+/-- The lattice form of `AlgebraicGeometry.IsAlmostDisconnected.of_isIso`, for combining with other
+morphism properties by `le_trans`.  Mathlib's
+`CategoryTheory.MorphismProperty.isomorphisms_le_of_containsIdentities` does not apply: it needs
+`CategoryTheory.MorphismProperty.RespectsIso`, which waits on composition closure (Lemma B.2). -/
 theorem isomorphisms_le : MorphismProperty.isomorphisms Scheme ≤ IsAlmostDisconnected :=
   fun _ _ p (_ : IsIso p) => of_isIso p
 
