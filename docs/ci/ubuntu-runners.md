@@ -1,9 +1,13 @@
-# Ubuntu workstation runners
+# Ubuntu workstation runners (historical topology)
 
 The owner retired the Windows workstation setup on 2026-09-21 and authorized
 four runners on the personal Ubuntu PC. Windows is no longer a required
 platform for this repository. This operator-directed replacement is distinct
-from the hosted-Linux benchmarking and broader CI1 rollout in #1436.
+from the hosted-Linux benchmarking and broader CI1 rollout in #1436. The
+[hosted-only cutover](hosted-cutover.md) supersedes this scheduling topology
+after the four repository registrations are removed and the reviewed workflow
+change merges. The table and operational measurements below document the
+pre-cutover host; they are not instructions to re-register these runners.
 
 | Runner | Custom scheduling label | Work |
 | --- | --- | --- |
@@ -63,6 +67,42 @@ the pin/toolchain inputs, run the focused build, then switch the pickup path.
 Keep the old checkout and cache until the new one is verified. No active
 service, checkout or cache was changed for this inventory.
 
+A read-only rescan on 2026-09-28 found 246 registered worktrees, 223 existing
+paths, and 107 `.lake/packages` links resolving to four shared targets. These
+are existing user worktrees; neither the runner installation nor the new
+worktree seeder deletes or rewrites them. On an idle migration, preserve the
+old worktree, create a new worktree at its commit, and invoke the private-cache
+helper from an updated checkout containing this change, with the new worktree
+as its explicit `--target`:
+
+```bash
+SAFE_ROOT=/absolute/path/to/updated/derived-alg-geo-lean
+NEW=/absolute/path/to/new-worktree
+python3 "$SAFE_ROOT/scripts/private_package_cache.py" --target "$NEW" --dry-run
+python3 "$SAFE_ROOT/scripts/private_package_cache.py" --target "$NEW"
+```
+
+Do not run the seeder script *inside* a worktree at an older commit: that
+commit may still contain the link-producing implementation. The current helper
+requires private package/build caches and verifies their receipt. Compare the
+new source and Git index with the old worktree, carry any uncommitted and
+untracked work deliberately, and move the pickup path only after verification.
+An old linked `.lake` refuses seeding in place, including with `--force`.
+Each migrated worktree needs its own disk space; the current seeder checks
+headroom and refuses before publication when it is insufficient.
+
+The updated helper reads pinned package source through the tracked minimal
+`scripts/private-reader.git` and rechecks source bytes independently of Git's
+index flags. It scans the whole private `.lake` for hardlinks, mount aliases
+and symlinks other than the exact tracked package-source links before
+publication and on reuse. A build may change its
+private Git indexes and build output, but a tracked source edit refuses reuse.
+The supported post-build check is the targeted Mathlib build; tracked
+ProofWidgets/npm outputs retain their pinned bytes. This is a quiescent pickup
+check among cooperating processes, not a barrier against later same-account
+mutation. It refuses ambiguous bind-mounted worktree ancestry rather than
+repointing or repairing it.
+
 The user services invoke the runner's `runsvc.sh` entrypoint and restart after
 failures. User lingering makes them start at boot and survive logout. Inspect:
 
@@ -91,6 +131,6 @@ pkg-config, libgmp-dev, unzip, zstd and the runner's ICU/OpenSSL runtime
 libraries. Lean setup follows the committed toolchain through lean-action.
 
 If routing must be rolled back, use hosted Ubuntu through a reviewed change;
-do not recreate the Windows registrations or assign their labels to Linux.
+do not recreate the repository's Ubuntu or former Windows registrations.
 This migration does not claim completion of CI1 host-admission tooling,
 trusted-cache consolidation, cold/warm parity or the week-long rollout study.

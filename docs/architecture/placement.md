@@ -18,9 +18,13 @@ and future upstream work; matching directories is not required to import Mathlib
 | --- | --- | --- |
 | `DerivedCategory C`, `Ext`, K-projectives, its t-structure, `Bounded` | `Algebra/Homology/DerivedCategory/` | `Algebra/Homology/DerivedCategory/` |
 | `HomotopyCategory`, `HomComplex`, bounded and plus variants | `Algebra/Homology/HomotopyCategory/` | `Algebra/Homology/HomotopyCategory/` |
+| `HomologicalComplex.HomologySequence` short-exact comparison lemmas | `Algebra/Homology/HomologySequenceLemmas.lean` | `Algebra/Homology/HomologySequenceLemmas.lean` |
+| `CochainComplex.truncLE`, `ιTruncLE`, and `truncLEMap`: the canonical increasing good-truncation tower and its colimit | `Algebra/Homology/Embedding/CochainComplex.lean` | `Algebra/Homology/Embedding/CochainComplex.lean` |
 | `HomologicalComplex.stupidTrunc` inclusions between integer degree-at-least truncations | `Algebra/Homology/Embedding/StupidTrunc.lean` | `Algebra/Homology/Embedding/StupidTruncGE.lean` |
 | `HomologicalComplex.stupidTruncXIso` normalized retained-component comparison and its bicomplex specialization | `Algebra/Homology/Embedding/StupidTrunc.lean` | `Algebra/Homology/Embedding/StupidTruncGE.lean` |
-| Spectral sequences and total complexes | `Algebra/Homology/SpectralSequence/` | `Algebra/Homology/SpectralSequence/` |
+| Spectral sequences | `Algebra/Homology/SpectralSequence/` | `Algebra/Homology/SpectralSequence/` |
+| `Sigma.π` finite-support projection identity for a supplied coproduct | `CategoryTheory/Limits/Shapes/ZeroMorphisms.lean` | `CategoryTheory/Limits/Shapes/ZeroMorphisms.lean` |
+| `HomologicalComplex₂.totalFunctor` and direct-sum totalization | `Algebra/Homology/TotalComplex.lean` | `Algebra/Homology/TotalComplex.lean` |
 | `SheafOfModules` and `PresheafOfModules` | `Algebra/Category/ModuleCat/{Sheaf,Presheaf}/` | `Algebra/Category/ModuleCat/{Sheaf,Presheaf}/` |
 | `ModuleCat`, `Grp` | `Algebra/Category/{ModuleCat,Grp}/` | `Algebra/Category/{ModuleCat,Grp}/` |
 | `ObjectProperty`, the full subcategory it cuts out, and functor lifts into it | `CategoryTheory/ObjectProperty/` | `CategoryTheory/ObjectProperty/` |
