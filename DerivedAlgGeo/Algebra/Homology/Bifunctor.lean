@@ -12,6 +12,11 @@ Mathlib's `HomologicalComplex.mapBifunctorMap` is a map between direct-sum total
 When the fixed input complex has finitely supported terms, a columnwise
 quasi-isomorphism criterion for literal bicomplex totals applies to this map.
 
+## Main definitions
+
+This module introduces no new definitions; it studies Mathlib's existing
+`HomologicalComplex.mapBifunctorMap`.
+
 ## Main results
 
 * `HomologicalComplex.quasiIso_mapBifunctorMap_id_left_of_finite_support_of_column_quasiIso` passes
