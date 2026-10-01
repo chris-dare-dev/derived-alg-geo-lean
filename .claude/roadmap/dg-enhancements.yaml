@@ -102,6 +102,7 @@ generations:
   - { rev: 11, at: "2026-08-18", note: "e6 closed. H⁰ of a pretriangulated dg category is pretriangulated, with axioms [propext, Classical.choice, Quot.sound] and no sorry. The finding worth carrying forward is about the axiom system rather than about dg categories: Pretriangulated states TR2 as an iff, only the forward half is ever proved by a construction, and the reverse half follows from the other four axioms. It is proved once, generically, over Set (Triangle D), which also keeps it clear of the H0 C := C transparency hazard that shaped every proof in this track -- the proof never meets H0 C. Pretriangulated.Axioms and Axioms.pretriangulated are the reusable form: five obligations in, the class out. Also recorded against e6 acceptance criterion 4: Localization.pretriangulated is inapplicable here rather than merely expensive, because it transports from a category that already carries the structure. e7 is unblocked." }
   - { rev: 12, at: "2026-08-28", note: "DG2 is complete: #378 closed through #771 and main contains Model/Agreement.lean. Milestone #21 is closed. DG3 is now materialized as #853 (the reusable K-injective model), #854 (the derived seam), and #855 (linear/exact H0 functors); #853 and #855 are independent ready lanes." }
   - { rev: 13, at: "2026-08-28", note: "Implementation started on #855 in a fresh worktree. #853 remains the other independent ready lane; #854 stays blocked on the derived model rather than being represented by an empty seam structure." }
+  - { rev: 14, at: "2026-09-30", note: "e10 (#855) closed out. An audit against main found all four scope items already landed across #861, #1239, #1276, #1367 and 21b8db6c while the issue and this entry still read in_progress; the one acceptance row with no named theorem, that the induced equivalence agrees with DGFunctor.h0, is now h0Equivalence_functor, and isTriangulated_h0Equivalence (Mathlib's Equivalence.IsTriangulated) joins the two halves. Three stale docstrings that still said exactness was unpackaged, or that no theorem related a quasi-equivalence to H⁰, are corrected." }
 retired: []
 
 # GitHub milestones are roadmap phases. Epic issues live inside them, and
@@ -306,8 +307,8 @@ items:
     kind: epic
     parent: dg-enhancements-m3
     title: "Dg functors induce exact functors, and quasi-equivalences induce equivalences"
-    status: in_progress
-    summary: "The functor half of the passage. This is where the programme's naturality claim first becomes testable: an induced functor should arrive with its compatibilities rather than acquire them by separate argument."
+    status: done
+    summary: "The functor half of the passage. This is where the programme's naturality claim first becomes testable: an induced functor should arrive with its compatibilities rather than acquire them by separate argument. Landed in four slices: #861 (Linear k (H0 C) and F.h0 linear), #1239/#1276/#1367 (every dg functor preserves shifts and chosen cones, and h0IsTriangulated derives the CommShift and IsTriangulated structure from them), 21b8db6c (a quasi-equivalence induces an equivalence on H⁰), and the close-out PR (the induced equivalence has functor H⁰ F, and is a triangulated equivalence between pretriangulated dg categories)."
     priority: must
     size: L
     tags: [lean, functors, naturality]

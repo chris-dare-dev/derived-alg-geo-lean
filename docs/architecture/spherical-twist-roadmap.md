@@ -251,6 +251,28 @@ equivalence of an `Enhancement` carries a geometric kernel category such as
 `Dᵇ(Coh(Y × Y))` to the dg side, and the shift and exactness compatibility of
 that comparison are instance hypotheses to be discharged by the realization.
 
+## The ordinary-category interface
+
+`SphericalTwistData k C E` (`SphericalTwist/Definition.lean`) is the functor `T_E` on an arbitrary
+`k`-linear pretriangulated `C`, stated once and supplied rather than constructed:
+
+```text
+SphericalTwistData k C E
+├─ T with T.Additive, T.CommShift ℤ, T.IsTriangulated as instance fields
+├─ copower : C ⥤ C           (F ↦ Hom^•(E,F) ⊗ E, supplied; no tensor is defined here)
+├─ ev : copower ⟶ 𝟭, π : 𝟭 ⟶ T, δ : T ⟶ copower ⋙ ⟦1⟧, and the distinguished triangle at each F
+├─ copower_class : K₀.IsRankOne copower (chiRight k C E) [E]      (second supplied input)
+├─ class_T       [T F] = [F] - [copower F]       proved from K₀.of_triangle
+└─ map_eq_twistK₀  K₀.map T = twistK₀ k C E     proved, not a field
+```
+
+The two dg object twists above realize it (`SphericalTwist/ObjectTwistData.lean`): additive and
+scalar-linear, given the Euler copower formula, with `T`'s three instances proved by
+`DGFunctor.h0CommShift` and `DGFunctor.h0IsTriangulated`. The Seidel--Thomas autoequivalence and
+braid theorems are supplied statements, `AutoequivalenceStatement` and `BraidStatement`, nowhere
+asserted; the first projects to `TwistShaped` and so to the action on `Stab`, the second only to the
+`K₀` braid identity, which is far weaker.
+
 ## Deliberately open seams
 
 1. `IsPretriangulated (DGFunctor C D)` is registered whenever `D` is
