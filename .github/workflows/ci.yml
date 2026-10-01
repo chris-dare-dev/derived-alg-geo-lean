@@ -27,8 +27,8 @@ on:
   # request open now gets no CI at all. That is the price of the change, not an
   # oversight. Open the PR first, or run `lean-gates full` locally.
   #
-  # The owner retired Windows on 2026-09-21. Main now has one dedicated
-  # Ubuntu runner; three other Ubuntu runners accept manual branch builds.
+  # The owner retired Windows on 2026-09-21. The later CI1.07 cutover routes
+  # main and manual jobs to hosted Ubuntu as well as PR and merge-group jobs.
   push:
     branches: [main]
   pull_request:
@@ -99,17 +99,11 @@ concurrency:
 
 jobs:
   build:
-    # Trusted push/manual builds use the owner's Ubuntu workstation.
-    # Main has an exclusive label so manual branch builds cannot starve it.
-    # PR and merge-group jobs stay on hosted Ubuntu. Do not add a fork-based
-    # self-hosted route or restore the retired employer-issued Mac lane.
-    # Each local service owns its HOME, .elan, cache, temp and _work roots.
-    # See docs/ci/ubuntu-runners.md for the host resource and startup policy.
-    runs-on: >-
-      ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-      && ((github.ref == 'refs/heads/main' && fromJSON('["self-hosted", "Linux", "X64", "owner-linux-main"]'))
-      || fromJSON('["self-hosted", "Linux", "X64", "owner-linux"]'))
-      || 'ubuntu-latest' }}
+    # All public-repository events use hosted Ubuntu. This workflow expression
+    # alone is not the trust boundary: PRs can edit their own workflow version.
+    # The four repository runner registrations must be removed separately.
+    # See docs/ci/hosted-cutover.md for the coordinated rollout and rollback.
+    runs-on: ubuntu-latest
     timeout-minutes: 90
 
     defaults:
@@ -1259,9 +1253,8 @@ jobs:
   # ---------------------------------------------------------------------------
   # The roadmap-vs-tracker gate (#620), in its own job since #1392.
   #
-  # ubuntu-latest UNCONDITIONALLY, unlike `build`. That job's routing invariant
-  # permits self-hosted only on `push`/`workflow_dispatch`; this one has no
-  # reason to want a warm `.lake`, so it never goes near the question.
+  # ubuntu-latest UNCONDITIONALLY, like `build` after the hosted cutover. This
+  # job has no reason to want a warm `.lake` or a persistent runner.
   roadmap:
     runs-on: ubuntu-latest
     # Seconds of work. The cap is here so a hung `gh` call cannot hold the
