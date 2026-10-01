@@ -9,6 +9,7 @@ an evidence score reflects the adjudicator's check, not merely a cited filename.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -84,11 +85,18 @@ def main(argv: list[str] | None = None) -> int:
             if not path.is_file():
                 print(f"case unavailable: missing source {path}", file=sys.stderr)
                 return 1
+            expected = case.get("source_sha256", {}).get(source)
+            if not expected:
+                print(f"case unavailable: missing source fingerprint: {source}", file=sys.stderr)
+                return 1
+            if hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+                print(f"case unavailable: source changed: {path}; re-adjudicate the case before refreshing its fingerprint", file=sys.stderr)
+                return 1
         print(f"Role: {case['role']}.\nEvaluation case: {case['id']}\nWorktree: {args.worktree.resolve()}\n"
               f"Read .claude/agents/{case['role']}.md in this worktree.\n"
               f"Check this claim against the pinned sources; use your role's severity rules.\n\n{case['claim']}\n\n"
               f"Expected Mathlib pin: {fixture['pin']}. If it differs, report the case as unavailable.\n"
-              "Sources:\n" + "\n".join(case["sources"]) +
+              "Sources (content fingerprints verified):\n" + "\n".join(case["sources"]) +
               "\nDo not read the evaluation fixture or its expected answers. Report findings and evidence; do not edit files.")
     return 0
 

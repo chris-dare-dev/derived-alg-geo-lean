@@ -24,6 +24,12 @@ Run by `.github/workflows/ci.yml` and by `CLAUDE.md`'s pre-push list.
 | the three subsystem audits and `check_audit.py` | `sorryAx` and unexpected axioms reaching the audit surface |
 | `scripts/check_source_independence.py` | retired or external source roots re-entering the library |
 | `scripts/check_mathlib_style.py` (edit hook, `gates.sh`, `--check-baseline` in CI) | unresolved merge-conflict markers left by a rebase — the structural gates all parse `import` lines only, so a conflicted file passed every one of them until #1359 — plus the copyright header, the module docstring's position, lines over 100 characters (except the three unbreakable shapes: an `import`, a line whose 101st character is inside a string literal, and a Markdown table row in a docstring), `λ` for `fun`, `$` for `<|`, space before `;`, `sorry`, unscoped `maxHeartbeats`, and missing docstrings on `def`/`abbrev`/`structure`/`class`/`inductive` |
+| `scripts/check_review_evidence.py docs` (precheck and CI) | absent primary documentation on new modules with commands; missing or misordered required sections in revised primary module docstrings; existing untouched documentation debt is preserved |
+
+Before a loop review, its `inventory` and compiled `probe` modes also cover
+reference occurrences in changed docstrings, changed Markdown sections and the
+complete PR draft. Existence and type checks do not certify the meaning of prose,
+source attribution, novelty or an equivalence; reviewers still establish those.
 
 `lake exe runLinter DerivedAlgGeo` covers the complete stable library. The
 development probes remain covered by the emitter and style checks.
@@ -135,8 +141,9 @@ as though it were about a variety or a derived category.
 
 ## 4. Documentation — insight, not restatement
 
-This is the section that matters most for the paper-facing work, and the one no
-linter will ever check.
+This is the section that matters most for the paper-facing work. Mechanical
+section checks establish the template; reviewers establish mathematical insight
+and correctness.
 
 **Module docstring** (`/-! ... -/`, delimiters on their own lines, immediately
 after the imports), in this order:

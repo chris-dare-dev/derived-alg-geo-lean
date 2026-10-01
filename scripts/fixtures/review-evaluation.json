@@ -12,6 +12,10 @@
       "expected": {
         "scheme-owner": "should-fix",
         "prime-owner": "should-fix"
+      },
+      "source_sha256": {
+        "Mathlib/AlgebraicGeometry/Scheme.lean": "211a5708e913082a004d34fe447aff1e13bd5ac50844d1bede3d5904c07d444a",
+        "Mathlib/RingTheory/Spectrum/Prime/Defs.lean": "5bc1b88d94819cc57afe52b710a377ae2f6c315911c8dcb5ee891a7c3cc298b6"
       }
     },
     {
@@ -24,6 +28,10 @@
       ],
       "expected": {
         "upstream-equivalence": "should-fix"
+      },
+      "source_sha256": {
+        "Mathlib/AlgebraicGeometry/Modules/Tilde.lean": "fbed17a5eca8fe9ab8d6e3bf10284fd036fc0de3b1b2bcd8c8c7eb45634b672c",
+        "DerivedAlgGeo/AlgebraicGeometry/Modules/Affine/Comparison.lean": "dc1307abe6a68fa2ba1861ffff368c6d6e4dd5b75336ef0c294ff8f8937be243"
       }
     },
     {
@@ -35,6 +43,9 @@
       ],
       "expected": {
         "direction": "should-fix"
+      },
+      "source_sha256": {
+        "Mathlib/AlgebraicGeometry/Modules/Tilde.lean": "fbed17a5eca8fe9ab8d6e3bf10284fd036fc0de3b1b2bcd8c8c7eb45634b672c"
       }
     },
     {
@@ -46,6 +57,9 @@
       ],
       "expected": {
         "one-way": "should-fix"
+      },
+      "source_sha256": {
+        "DerivedAlgGeo/AlgebraicGeometry/Modules/Affine/Comparison.lean": "dc1307abe6a68fa2ba1861ffff368c6d6e4dd5b75336ef0c294ff8f8937be243"
       }
     },
     {
@@ -57,6 +71,9 @@
       ],
       "expected": {
         "attribution-scope": "should-fix"
+      },
+      "source_sha256": {
+        "Mathlib/AlgebraicGeometry/Modules/Tilde.lean": "fbed17a5eca8fe9ab8d6e3bf10284fd036fc0de3b1b2bcd8c8c7eb45634b672c"
       }
     },
     {
@@ -69,6 +86,10 @@
       ],
       "expected": {
         "emitter-filter": "blocker"
+      },
+      "source_sha256": {
+        "exe/Emit.lean": "948af3251aa23a879faa02724a94cdb995a9a858cad5d05cbc5f0f15e590fc23",
+        "scripts/check_emission_coverage.py": "de0f0fdf34365313713d2959ad958cc0420fc5a9d2d3cb646329a29f39862530"
       }
     },
     {
@@ -81,6 +102,10 @@
       ],
       "expected": {
         "doc-completeness": "should-fix"
+      },
+      "source_sha256": {
+        ".claude/references/mathlib-style.md": "2922a6d12feb1960e52a9ed0b8dfa16e91e525962edbb1044abcd040a0df43e9",
+        "scripts/check_mathlib_style.py": "909729a9db3fc508d5b21a75c0d50b5b435d1c1d0462755be1584d7675fd0df6"
       }
     },
     {
@@ -92,6 +117,9 @@
       ],
       "expected": {
         "reference-coverage": "should-fix"
+      },
+      "source_sha256": {
+        "DerivedAlgGeo/Topology/Category/TopCat/Opens/CoversTop.lean": "4d1a289a6ba8f04695cbe3289d266835d1a8feb1e8c60b88ef44facf4b261db0"
       }
     },
     {
@@ -103,6 +131,9 @@
       ],
       "expected": {
         "positive-degree": "should-fix"
+      },
+      "source_sha256": {
+        "Mathlib/AlgebraicGeometry/ProjectiveSpectrum/Basic.lean": "482679c638fc474fa50b011d709adb8dcdc790257773e34a00e39190b4d36d68"
       }
     },
     {
@@ -114,7 +145,10 @@
       "sources": [
         "Mathlib/AlgebraicGeometry/Modules/Tilde.lean"
       ],
-      "expected": {}
+      "expected": {},
+      "source_sha256": {
+        "Mathlib/AlgebraicGeometry/Modules/Tilde.lean": "fbed17a5eca8fe9ab8d6e3bf10284fd036fc0de3b1b2bcd8c8c7eb45634b672c"
+      }
     },
     {
       "id": "correct-comparison",
@@ -123,7 +157,10 @@
       "sources": [
         "DerivedAlgGeo/Development/AffineProjectiveFoundations.lean"
       ],
-      "expected": {}
+      "expected": {},
+      "source_sha256": {
+        "DerivedAlgGeo/Development/AffineProjectiveFoundations.lean": "9a88359ee102c7fae7859e69269f1c7f589b81bdb482251f4dd145fd2222afe8"
+      }
     }
   ]
 }

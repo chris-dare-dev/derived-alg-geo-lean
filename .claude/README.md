@@ -104,8 +104,10 @@ archive can recognize reviewer dispatches. The digest reports requested settings
 and effort; unavailable fields remain unavailable.
 
 `scripts/review_evaluation.py prompt <case> --worktree <path>` emits a synthetic
-challenge without answers. A separate reviewer adjudicates each report into a
-local JSON list with `case` and `findings`; each finding has `id`, `severity`,
+challenge without answers. Prompts require the pinned Mathlib and each source's content
+fingerprint; a changed source makes the case unavailable until re-adjudication.
+A separate reviewer adjudicates each report into a local JSON list with `case`
+and `findings`; each finding has `id`, `severity`,
 `evidence`, `evidence_supported` (boolean), and an `adjudication` reason. `score
 <assessments.json>` reports recall, unsupported findings, severity errors,
 recurrence on repaired controls and evidence support. Unassessed cases and

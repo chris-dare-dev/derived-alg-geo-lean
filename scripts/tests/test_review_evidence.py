@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import contextlib
+import hashlib
 import io
 import json
 import os
@@ -214,6 +215,25 @@ class DispatchTests(unittest.TestCase):
 
 
 class EvaluationTests(unittest.TestCase):
+    def test_prompt_refuses_a_changed_source_or_missing_fingerprint(self):
+        with tempfile.TemporaryDirectory() as directory:
+            wt = Path(directory)
+            source = wt / "Source.lean"
+            source.write_text("def original := 1\n")
+            (wt / "lake-manifest.json").write_text(json.dumps({"packages": [{"name": "mathlib", "rev": SHA}]}))
+            fixture = {"pin": SHA, "cases": [{"id": "test", "role": "mathematics-adversary", "claim": "A claim.",
+                       "sources": [source.name], "source_sha256": {source.name: hashlib.sha256(source.read_bytes()).hexdigest()}}]}
+            path = wt / "fixture.json"
+            path.write_text(json.dumps(fixture))
+            with patch.object(evaluation, "FIXTURE", path), contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                args = ["prompt", "test", "--worktree", str(wt)]
+                self.assertEqual(evaluation.main(args), 0)
+                source.write_text("def changed := 2\n")
+                self.assertEqual(evaluation.main(args), 1)
+                del fixture["cases"][0]["source_sha256"]
+                path.write_text(json.dumps(fixture))
+                self.assertEqual(evaluation.main(args), 1)
+
     def test_misses_unsupported_severity_and_repaired_controls(self):
         cases = json.loads(evaluation.FIXTURE.read_text())["cases"]
         finding = {"id": "direction", "severity": "nit", "evidence": "criterion .mpr", "evidence_supported": True, "adjudication": "direction is reversed"}
