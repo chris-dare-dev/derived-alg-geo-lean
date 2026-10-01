@@ -10,9 +10,14 @@ import DerivedAlgGeo.Topology.Sheaves.ModuleStalk
 
 #print axioms PresheafOfModules.stalkRingCocone
 #print axioms PresheafOfModules.stalkRingIsColimit
+#print axioms PresheafOfModules.stalkRingComparisonIso
 #print axioms PresheafOfModules.neighborhoodStalkFunctor
 #print axioms PresheafOfModules.stalkFunctor
 #print axioms PresheafOfModules.stalkLinearEquiv
+#print axioms PresheafOfModules.commNeighborhoodStalkFunctor
+#print axioms PresheafOfModules.commStalkFunctor
+#print axioms PresheafOfModules.commStalkLinearEquiv
+#print axioms PresheafOfModules.commStalkAddEquiv
 
 /-! ## The stalk of a tensor product of presheaves of modules (#833)
 

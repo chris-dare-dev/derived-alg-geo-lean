@@ -80,23 +80,25 @@ abbrev moduleStalkRingCocone (X : Scheme.{u}) (x : X) :
       forget₂ CommRingCat RingCat) :=
   _root_.PresheafOfModules.stalkRingCocone X X.presheaf x
 
-/-- The underlying-ring stalk cocone is colimiting. -/
+/-- Definitional specialization of `PresheafOfModules.stalkRingIsColimit` to
+the scheme's structure presheaf. -/
 abbrev moduleStalkRingIsColimit (X : Scheme.{u}) (x : X) :
     IsColimit (moduleStalkRingCocone X x) :=
   _root_.PresheafOfModules.stalkRingIsColimit X X.presheaf x
 
-/-- The colimit over neighborhoods of modules, bundled over the local ring. -/
+/-- Definitional specialization of `PresheafOfModules.commNeighborhoodStalkFunctor`,
+using the scheme's local ring as its scalar ring. -/
 abbrev neighborhoodModuleStalkFunctor (X : Scheme.{u}) (x : X) :
     _root_.PresheafOfModules.{u}
         ((OpenNhds.inclusion x).op ⋙ X.ringCatSheaf.obj) ⥤
       ModuleCat.{u} (X.presheaf.stalk x) :=
-  _root_.PresheafOfModules.neighborhoodStalkFunctor X X.presheaf x
+  _root_.PresheafOfModules.commNeighborhoodStalkFunctor X X.presheaf x
 
 /-- The stalk of a presheaf of modules, bundled over the local ring. -/
 abbrev presheafModuleStalkFunctor (X : Scheme.{u}) (x : X) :
     _root_.PresheafOfModules.{u} X.ringCatSheaf.obj ⥤
       ModuleCat.{u} (X.presheaf.stalk x) :=
-  _root_.PresheafOfModules.stalkFunctor X X.presheaf x
+  _root_.PresheafOfModules.commStalkFunctor X X.presheaf x
 
 /-- The stalk of a sheaf of modules, bundled as a module over the local ring.
 
