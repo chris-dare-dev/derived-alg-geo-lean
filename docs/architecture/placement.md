@@ -18,6 +18,7 @@ and future upstream work; matching directories is not required to import Mathlib
 | --- | --- | --- |
 | `DerivedCategory C`, `Ext`, K-projectives, its t-structure, `Bounded` | `Algebra/Homology/DerivedCategory/` | `Algebra/Homology/DerivedCategory/` |
 | `HomotopyCategory`, `HomComplex`, bounded and plus variants | `Algebra/Homology/HomotopyCategory/` | `Algebra/Homology/HomotopyCategory/` |
+| `HomologicalComplex.HomologySequence` short-exact comparison lemmas | `Algebra/Homology/HomologySequenceLemmas.lean` | `Algebra/Homology/HomologySequenceLemmas.lean` |
 | `CochainComplex.truncLE`, `ιTruncLE`, and `truncLEMap`: the canonical increasing good-truncation tower and its colimit | `Algebra/Homology/Embedding/CochainComplex.lean` | `Algebra/Homology/Embedding/CochainComplex.lean` |
 | `HomologicalComplex.stupidTrunc` inclusions between integer degree-at-least truncations | `Algebra/Homology/Embedding/StupidTrunc.lean` | `Algebra/Homology/Embedding/StupidTruncGE.lean` |
 | `HomologicalComplex.stupidTruncXIso` normalized retained-component comparison and its bicomplex specialization | `Algebra/Homology/Embedding/StupidTrunc.lean` | `Algebra/Homology/Embedding/StupidTruncGE.lean` |
