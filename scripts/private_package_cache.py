@@ -5,6 +5,11 @@ A checked snapshot contains Git-object checkouts of every manifest package and
 all eleven required build trees.  A fresh target receives the whole `.lake`
 generation with one no-replace rename.  Existing `.lake` trees are never
 changed; migration needs a separate quiescent protocol.
+
+`--evict-snapshots` removes snapshots whose pins no `--keep-ref` commits
+(default `origin/main`). Snapshots are never evicted otherwise, and each one
+holds a full private copy of the build trees, so a pin change strands the old
+one until eviction runs.
 """
 
 from __future__ import annotations
@@ -102,8 +107,11 @@ def digest_file(path: Path) -> str:
 
 
 def pins(root: Path) -> tuple[str, dict[str, str]]:
-    toolchain = (root / "lean-toolchain").read_bytes()
-    manifest = (root / "lake-manifest.json").read_bytes()
+    return pins_from_bytes((root / "lean-toolchain").read_bytes(),
+                           (root / "lake-manifest.json").read_bytes())
+
+
+def pins_from_bytes(toolchain: bytes, manifest: bytes) -> tuple[str, dict[str, str]]:
     parsed = json.loads(manifest)
     revisions = {p["name"]: p["rev"] for p in parsed["packages"]}
     if len(revisions) != len(parsed["packages"]) or "mathlib" not in revisions:
@@ -123,12 +131,24 @@ def package_urls(root: Path, revisions: dict[str, str]) -> dict[str, str]:
     return urls
 
 
-def git(*args: str) -> str:
+def _git_environment() -> dict[str, str]:
     environment = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
     environment.update(GIT_CONFIG_NOSYSTEM="1", GIT_CONFIG_GLOBAL=os.devnull)
+    return environment
+
+
+def git(*args: str) -> str:
     result = subprocess.run(["git", *args], check=True, capture_output=True,
-                            text=True, env=environment)
+                            text=True, env=_git_environment())
     return result.stdout.strip()
+
+
+def pins_at(repo: Path, ref: str) -> str:
+    """Snapshot key of the pins committed at `ref`, read from Git objects, not files."""
+    blobs = [subprocess.run(["git", "-C", str(repo), "cat-file", "blob", f"{ref}:{name}"],
+                            check=True, capture_output=True, env=_git_environment()).stdout
+             for name in ("lean-toolchain", "lake-manifest.json")]
+    return pins_from_bytes(*blobs)[0]
 
 
 def validate_packages(root: Path, revisions: dict[str, str]) -> None:
@@ -235,12 +255,16 @@ def dry_run_headroom(path: Path, required: int) -> None:
         os.close(fd)
 
 
-def snapshot_dir(key: str) -> Path:
+def snapshot_store() -> Path:
     base = os.environ.get("DAG_PRIVATE_PACKAGE_SNAPSHOT_DIR")
     if not base:
         base = str(Path.home() / ".cache/derived-alg-geo-lean/package-snapshots")
     # Keep the spelling until each component has been opened with NOFOLLOW.
-    return Path(base).expanduser().absolute() / key
+    return Path(base).expanduser().absolute()
+
+
+def snapshot_dir(key: str) -> Path:
+    return snapshot_store() / key
 
 
 def open_created_directory(path: Path) -> int:
@@ -255,6 +279,26 @@ def open_created_directory(path: Path) -> int:
             except FileExistsError:
                 pass
             child = os.open(part, DIR_FLAGS, dir_fd=fd)
+            os.close(fd)
+            fd = child
+        return fd
+    except BaseException:
+        os.close(fd)
+        raise
+
+
+def open_existing_directory(path: Path) -> int | None:
+    """Open an absolute directory component by component without following links."""
+    if not path.is_absolute() or ".." in path.parts:
+        fail("snapshot store path must be absolute and normalized")
+    fd = os.open("/", DIR_FLAGS)
+    try:
+        for part in path.parts[1:]:
+            try:
+                child = os.open(part, DIR_FLAGS, dir_fd=fd)
+            except FileNotFoundError:
+                os.close(fd)
+                return None
             os.close(fd)
             fd = child
         return fd
@@ -651,20 +695,87 @@ def seed(target: Path, donor: Path | None, *, verify: bool, dry_run: bool,
     print(f"private package and build caches ready in {target}")
 
 
+def _tree_bytes(path: Path) -> int:
+    total = 0
+    for parent, _, files in os.walk(path, followlinks=False):
+        for name in files:
+            with contextlib.suppress(OSError):
+                total += (Path(parent) / name).lstat().st_blocks * 512
+    return total
+
+
+def evict_snapshots(repo: Path, keep_refs: list[str], *, dry_run: bool) -> None:
+    """Remove snapshots whose pins no kept ref commits, skipping any a seed holds."""
+    if fcntl is None:
+        fail("snapshot eviction requires Linux flock")
+    keep = {pins_at(repo, ref) for ref in keep_refs}
+    store = snapshot_store()
+    store_fd = open_existing_directory(store)
+    if store_fd is None:
+        print(f"no snapshot store at {store}")
+        return
+    try:
+        for entry in sorted(os.scandir(store_fd), key=lambda e: e.name):
+            name = entry.name
+            is_key = len(name) == 64 and set(name) <= set("0123456789abcdef")
+            # `.removing-*` at this level can only be an interrupted eviction.
+            if (not (is_key or name.startswith(".removing-")) or
+                    not entry.is_dir(follow_symlinks=False)):
+                continue
+            if name in keep:
+                print(f"keep {name[:12]}: pinned by {', '.join(keep_refs)}")
+                continue
+            size = f"{_tree_bytes(store / name) / 1024**3:.1f} GiB"
+            if dry_run:
+                print(f"would evict {name[:12]} ({size})")
+                continue
+            key_fd = os.open(name, DIR_FLAGS, dir_fd=store_fd)
+            try:
+                lock_fd = os.open(".lock", os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600,
+                                  dir_fd=key_fd)
+                try:
+                    try:
+                        fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    except BlockingIOError:
+                        print(f"skip {name[:12]}: a seed holds its lock")
+                        continue
+                    info = os.fstat(key_fd)
+                    remove_owned_tree(store_fd, name, (info.st_dev, info.st_ino))
+                    print(f"evicted {name[:12]} ({size})")
+                finally:
+                    os.close(lock_fd)
+            finally:
+                os.close(key_fd)
+    finally:
+        os.close(store_fd)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--target", type=Path, required=True)
+    parser.add_argument("--target", type=Path,
+                        help="worktree to seed; with --evict-snapshots, any checkout (default: .)")
     parser.add_argument("--donor", type=Path)
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--verify", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--evict-snapshots", action="store_true",
+                        help="remove snapshots whose pins no --keep-ref commits")
+    parser.add_argument("--keep-ref", action="append", metavar="REF",
+                        help="ref whose pinned snapshot stays (repeatable; default origin/main)")
     args = parser.parse_args()
+    if not args.evict_snapshots and args.target is None:
+        parser.error("--target is required")
+    action = "snapshot eviction" if args.evict_snapshots else "private cache seed"
     try:
-        seed(args.target, args.donor, verify=args.verify, dry_run=args.dry_run,
-             force=args.force)
+        if args.evict_snapshots:
+            evict_snapshots((args.target or Path.cwd()).resolve(strict=True),
+                            args.keep_ref or ["origin/main"], dry_run=args.dry_run)
+        else:
+            seed(args.target, args.donor, verify=args.verify, dry_run=args.dry_run,
+                 force=args.force)
     except (ValueError, OSError, subprocess.CalledProcessError, tarfile.TarError,
             KeyError) as error:
-        print(f"private cache seed refused: {error}", file=sys.stderr)
+        print(f"{action} refused: {error}", file=sys.stderr)
         return 1
     return 0
 

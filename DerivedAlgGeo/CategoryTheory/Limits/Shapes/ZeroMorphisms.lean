@@ -17,19 +17,27 @@ ambient finite-coproduct assumption or replacement coproduct is introduced.
 
 ## Main results
 
-* `CategoryTheory.Limits.Sigma.sum_π_ι_eq_id_of_isZero` gives the finite
-  projection-inclusion identity, and
-  `CategoryTheory.Limits.Sigma.isZero_of_sum_π_ι_eq_id_of_not_mem` gives its converse.
+* `CategoryTheory.Limits.Sigma.sum_π_ι_eq_id_of_isZero_all` gives the finite
+  projection-inclusion identity for every chosen equality instance;
+  `CategoryTheory.Limits.Sigma.isZero_of_sum_π_ι_eq_id_of_not_mem_all`
+  and `CategoryTheory.Limits.Sigma.sum_π_ι_eq_id_iff_isZero_all` give its
+  universal converse and characterization;
+  `CategoryTheory.Limits.Sigma.sum_π_ι_eq_id_of_isZero` selects one without
+  requiring a caller instance, and
+  `CategoryTheory.Limits.Sigma.isZero_of_sum_π_ι_eq_id_of_not_mem` gives its
+  converse, and `CategoryTheory.Limits.Sigma.sum_π_ι_eq_id_iff_isZero` gives
+  the selected characterization.
 * `CategoryTheory.Limits.Sigma.hom_ext_of_finite_support` compares incoming maps
-  on the finite nonzero support.
+  on a finite set containing every nonzero summand.
 * `CategoryTheory.Limits.Sigma.hom_eq_zero_of_finite_support` detects a zero
   incoming map.
 
 ## Implementation notes
 
-The identity and its converse choose decidable equality locally. The two
-incoming-map lemmas use the caller's equality instance, since it determines
-the particular `Sigma.π` in their statements.
+The universal identity, converse, and iff preserve the caller's equality
+instance, which determines the literal `CategoryTheory.Limits.Sigma.π`. Incoming-map extensionality
+uses that identity. The three caller-free statements choose classical equality
+as specializations of the universal results.
 
 ## References
 
@@ -52,10 +60,12 @@ namespace CategoryTheory.Limits.Sigma
 variable {C : Type u} [Category.{v} C] [Preadditive C]
 variable {I : Type w} (f : I → C) [HasCoproduct f]
 
-section ChosenDecidableEq
-variable [DecidableEq I]
+/-! The universal results quantify over the equality instance so callers may
+instantiate them with precisely the projections appearing in their statement. -/
 
-private lemma sum_π_ι_eq_id_of_isZero_chosen (s : Finset I)
+/-- The identity holds for every equality decision procedure defining the
+literal `CategoryTheory.Limits.Sigma.π`; finite support is the only restriction on summands. -/
+lemma sum_π_ι_eq_id_of_isZero_all [DecidableEq I] (s : Finset I)
     (hz : ∀ i, i ∉ s → IsZero (f i)) :
     ∑ i ∈ s, Sigma.π f i ≫ Sigma.ι f i = 𝟙 (∐ f) := by
   apply Sigma.hom_ext
@@ -70,7 +80,10 @@ private lemma sum_π_ι_eq_id_of_isZero_chosen (s : Finset I)
   · have hjzero := (hz j hj).eq_zero_of_src (Sigma.ι f j)
     simp [hjzero]
 
-private lemma isZero_of_sum_π_ι_eq_id_of_not_mem_chosen (s : Finset I)
+/-- Compose the claimed identity with the inclusion of an omitted summand.
+Every cross term vanishes by orthogonality, forcing that summand's identity
+morphism to vanish. -/
+lemma isZero_of_sum_π_ι_eq_id_of_not_mem_all [DecidableEq I] (s : Finset I)
     (hid : ∑ i ∈ s, Sigma.π f i ≫ Sigma.ι f i = 𝟙 (∐ f))
     (j : I) (hj : j ∉ s) : IsZero (f j) := by
   have hι : Sigma.ι f j = 0 := by
@@ -84,6 +97,18 @@ private lemma isZero_of_sum_π_ι_eq_id_of_not_mem_chosen (s : Finset I)
         rw [← assoc, Sigma.ι_π_of_ne _ (by aesop), zero_comp]
   rw [IsZero.iff_id_eq_zero, ← Sigma.ι_π_eq_id f j, hι, zero_comp]
 
+/-- Combine the inclusion test for the forward identity with the omitted
+summand obstruction for the converse, retaining the caller's projection
+convention in both directions. -/
+lemma sum_π_ι_eq_id_iff_isZero_all [DecidableEq I] (s : Finset I) :
+    (∑ i ∈ s, Sigma.π f i ≫ Sigma.ι f i = 𝟙 (∐ f)) ↔
+      ∀ i, i ∉ s → IsZero (f i) := by
+  exact ⟨fun hid i hi => isZero_of_sum_π_ι_eq_id_of_not_mem_all f s hid i hi,
+    fun hz => sum_π_ι_eq_id_of_isZero_all f s hz⟩
+
+section ChosenDecidableEq
+variable [DecidableEq I]
+
 /-- Compose with the finite projection-inclusion identity for the given
 projection convention to compare incoming maps on their nonzero support. -/
 lemma hom_ext_of_finite_support (s : Finset I)
@@ -91,16 +116,17 @@ lemma hom_ext_of_finite_support (s : Finset I)
     (h : ∀ i ∈ s, x ≫ Sigma.π f i = y ≫ Sigma.π f i) : x = y := by
   calc
     x = x ≫ ∑ i ∈ s, Sigma.π f i ≫ Sigma.ι f i := by
-      rw [sum_π_ι_eq_id_of_isZero_chosen f s hz, comp_id]
+      rw [sum_π_ι_eq_id_of_isZero_all f s hz, comp_id]
     _ = y ≫ ∑ i ∈ s, Sigma.π f i ≫ Sigma.ι f i := by
       rw [Preadditive.comp_sum, Preadditive.comp_sum]
       apply Finset.sum_congr rfl
       intro i hi
       rw [← assoc, h i hi, assoc]
-    _ = y := by rw [sum_π_ι_eq_id_of_isZero_chosen f s hz, comp_id]
+    _ = y := by rw [sum_π_ι_eq_id_of_isZero_all f s hz, comp_id]
 
-/-- An incoming map is zero once its projections to the finite nonzero
-support vanish. The projection convention remains the caller's. -/
+/-- Specialize `CategoryTheory.Limits.Sigma.hom_ext_of_finite_support` to
+comparison with the zero map.
+The projection convention remains the caller's. -/
 lemma hom_eq_zero_of_finite_support (s : Finset I)
     (hz : ∀ i, i ∉ s → IsZero (f i)) {A : C} (x : A ⟶ ∐ f)
     (h : ∀ i ∈ s, x ≫ Sigma.π f i = 0) : x = 0 := by
@@ -111,31 +137,32 @@ lemma hom_eq_zero_of_finite_support (s : Finset I)
 end ChosenDecidableEq
 
 section ClassicalProjection
-/-- Choose classical equality only in the generic projection-law statements. -/
-noncomputable local instance finiteSupportDecidableEq : DecidableEq I := Classical.decEq I
+open scoped Classical
 
-/-- Check the finite projection-inclusion sum after every coproduct inclusion.
-An omitted summand has zero inclusion; orthogonality leaves only the matching
-projection on the finite support. No caller decidability instance is needed. -/
+/-- Specialize `CategoryTheory.Limits.Sigma.sum_π_ι_eq_id_of_isZero_all` using
+classical equality so callers need not supply a decidability instance; the
+universal theorem supplies the coproduct-inclusion argument. -/
 lemma sum_π_ι_eq_id_of_isZero (s : Finset I)
     (hz : ∀ i, i ∉ s → IsZero (f i)) :
     ∑ i ∈ s, Sigma.π f i ≫ Sigma.ι f i = 𝟙 (∐ f) :=
-  sum_π_ι_eq_id_of_isZero_chosen f s hz
+  sum_π_ι_eq_id_of_isZero_all f s hz
 
-/-- Conversely, the finite identity forces an omitted summand to be zero:
-its inclusion is zero and its projection is a left inverse. -/
+/-- Specialize
+`CategoryTheory.Limits.Sigma.isZero_of_sum_π_ι_eq_id_of_not_mem_all` using
+classical equality. The universal converse supplies the omitted-summand
+argument. -/
 lemma isZero_of_sum_π_ι_eq_id_of_not_mem (s : Finset I)
     (hid : ∑ i ∈ s, Sigma.π f i ≫ Sigma.ι f i = 𝟙 (∐ f))
     (j : I) (hj : j ∉ s) : IsZero (f j) :=
-  isZero_of_sum_π_ι_eq_id_of_not_mem_chosen f s hid j hj
+  isZero_of_sum_π_ι_eq_id_of_not_mem_all f s hid j hj
 
-/-- An omitted nonzero summand obstructs the identity: composing with its
-inclusion and projection would force its identity morphism to vanish. -/
+/-- Specialize `CategoryTheory.Limits.Sigma.sum_π_ι_eq_id_iff_isZero_all` using
+classical equality; the universal characterization contains the
+omitted-summand obstruction. -/
 lemma sum_π_ι_eq_id_iff_isZero (s : Finset I) :
     (∑ i ∈ s, Sigma.π f i ≫ Sigma.ι f i = 𝟙 (∐ f)) ↔
       ∀ i, i ∉ s → IsZero (f i) :=
-  ⟨fun hid i hi => isZero_of_sum_π_ι_eq_id_of_not_mem f s hid i hi,
-    sum_π_ι_eq_id_of_isZero f s⟩
+  sum_π_ι_eq_id_iff_isZero_all f s
 
 end ClassicalProjection
 end CategoryTheory.Limits.Sigma
