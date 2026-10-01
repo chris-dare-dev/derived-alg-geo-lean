@@ -38,11 +38,11 @@ first-quadrant total complexes of abelian groups.
 The composition result uses the octahedral mapping-cone triangle in the
 derived category. The total result compares finite-column cones through
 adjacent-column maps, then identifies the connective tail with the full
-total, using the canonical adjacent-column maps from
-`FilteredTotalComplexAdjacentCore`. The middle-term short-exact comparison
-lives at the separate generic homology-sequence owner. The downstream
-finite-strip comparison in `FiniteStripTotal` uses derived short-exact
-triangles directly.
+total. The generic adjacent-column maps and their cone quasi-isomorphism are
+in `FilteredTotalComplexAdjacentCore`. The middle-term short-exact comparison
+lives at the separate generic homology-sequence owner.
+The downstream finite-strip comparison in `FiniteStripTotal` uses derived
+short-exact triangles directly.
 
 ## References
 
@@ -211,38 +211,6 @@ def IsHorizontallyConnective
       (ComplexShape.up ℤ) (ComplexShape.up ℤ)) : Prop :=
   ∀ p q : ℤ, p < 0 → IsZero ((K.X p).X q)
 
-/-- The morphism between the mapping cones of two adjacent-column inclusions induced by a
-bicomplex morphism. -/
-private noncomputable def adjacentColumnConeMap (f : K ⟶ L) (p : ℤ) :
-    CochainComplex.mappingCone (adjacentColumnTotalShortComplex K p).f ⟶
-      CochainComplex.mappingCone (adjacentColumnTotalShortComplex L p).f :=
-  CochainComplex.mappingCone.map _ _
-    (adjacentColumnTotalShortComplexMap f p).τ₁
-    (adjacentColumnTotalShortComplexMap f p).τ₂
-    (adjacentColumnTotalShortComplexMap f p).comm₁₂.symm
-
-/-- A quasi-isomorphism on one vertical column induces a quasi-isomorphism on the mapping cone
-of the corresponding adjacent-column inclusion. -/
-private lemma adjacentColumnConeMap_quasiIso (f : K ⟶ L) (p : ℤ)
-    (h : QuasiIso (f.f p)) : QuasiIso (adjacentColumnConeMap f p) := by
-  have h₃ : QuasiIso (adjacentColumnTotalShortComplexMap f p).τ₃ := by
-    exact totalMap_quasiIso_of_singleColumn f p h
-  letI : QuasiIso (adjacentColumnTotalShortComplexMap f p).τ₃ := h₃
-  letI : QuasiIso (CochainComplex.mappingCone.descShortComplex
-      (adjacentColumnTotalShortComplex L p)) :=
-    CochainComplex.mappingCone.quasiIso_descShortComplex
-      (adjacentColumnTotalShortExact L p)
-  letI : QuasiIso (CochainComplex.mappingCone.descShortComplex
-      (adjacentColumnTotalShortComplex K p)) :=
-    CochainComplex.mappingCone.quasiIso_descShortComplex
-      (adjacentColumnTotalShortExact K p)
-  rw [← quasiIso_iff_comp_right _
-    (CochainComplex.mappingCone.descShortComplex
-      (adjacentColumnTotalShortComplex L p))]
-  dsimp [adjacentColumnConeMap]
-  rw [CochainComplex.mappingCone.map_descShortComplex]
-  infer_instance
-
 /-- The inclusion of the tail beginning in column `n + 1` into the tail beginning in column
 zero.  Its cone is the finite quotient containing columns `0, …, n`. -/
 private noncomputable def tailToZero
@@ -287,31 +255,8 @@ private lemma truncatedBicomplexMap_naturality_inclusion (f : K ⟶ L)
   dsimp [truncatedTotalMap]
   rw [← total.map_comp, ← total.map_comp]
   congr 1
-  apply HomologicalComplex.Hom.ext
-  funext i
-  by_cases hi : q ≤ i
-  · dsimp [HomologicalComplex.stupidTruncGEMap]
-    rw [dif_pos hi, dif_pos hi]
-    let eK₀ := stupidTruncGEXIso K q i hi
-    let eK₁ := stupidTruncGEXIso K p i (hpq.trans hi)
-    let eL₀ := stupidTruncGEXIso L q i hi
-    let eL₁ := stupidTruncGEXIso L p i (hpq.trans hi)
-    change (truncatedBicomplexMap f q).f i ≫ eL₀.hom ≫ eL₁.inv =
-      eK₀.hom ≫ eK₁.inv ≫ (truncatedBicomplexMap f p).f i
-    dsimp [truncatedBicomplexMap, truncatedBicomplex]
-    rw [← cancel_mono eL₁.hom]
-    simp only [Category.assoc, eL₁.inv_hom_id, Category.comp_id]
-    rw [← Category.assoc, ← Category.assoc]
-    dsimp [eK₀, eK₁, eL₀, eL₁, stupidTruncGEXIso,
-      HomologicalComplex.stupidTruncGEXIso]
-    rw [HomologicalComplex.stupidTruncMap_stupidTruncXIso_hom]
-    simp only [Category.assoc]
-    rw [HomologicalComplex.stupidTruncMap_stupidTruncXIso_hom]
-    simp
-  · apply IsZero.eq_of_src
-    apply HomologicalComplex.isZero_stupidTrunc_X
-    rw [ComplexShape.notMem_range_embeddingUpIntGE_iff]
-    omega
+  simpa only [truncatedBicomplexMap] using
+    (HomologicalComplex.stupidTruncGEMap_naturality f p q hpq)
 
 /-- The direct inclusion of a column tail is natural in the bicomplex. -/
 private lemma tailToZero_naturality (f : K ⟶ L) (n : ℕ) :

@@ -3,40 +3,35 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence.FilteredTotalComplex
+import DerivedAlgGeo.Algebra.Homology.Embedding.StupidTruncGE
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence.FilteredTotalComplexAdjacentCore
 import Mathlib.Algebra.Category.Grp.Abelian
-import Mathlib.Algebra.Homology.HomotopyCategory.ShortExact
-import Mathlib.Algebra.Homology.TotalComplexShift
 
 /-!
-# Mapping cones and the first page of the column filtration
+# Spectral pages of a column-filtered total complex
 
-The generic adjacent-column short exact sequence lives in
-`FilteredTotalComplexAdjacentCore`. This file compares its mapping cone with the newly added
-column for bicomplexes of abelian groups, then identifies the initial page of the column-filtration
-spectral sequence with vertical column homology.
+The generic adjacent-column construction is in `FilteredTotalComplexAdjacentCore`.
+Here it is specialized to `AddCommGrpCat` and compared with the filtered
+spectral object's adjacent layers and connecting maps.
 
 ## Main definitions and results
 
-* `HomologicalComplex₂.adjacentColumnConeToShift` compares the adjacent-tail mapping cone with the
-  shifted vertical column.
-* `HomologicalComplex₂.columnFilteredAdjacentLayerConeToShift` makes that comparison for the
-  filtration's actual adjacent layer.
-* `HomologicalComplex₂.columnFilteredInitialPageColumnHomologyIso` identifies the initial page
-  with vertical column homology.
-* `HomologicalComplex₂.columnFilteredFirstPage_d_eq` identifies the first-page differential under
-  those isomorphisms.
+* `HomologicalComplex₂.columnFilteredInitialPageColumnHomologyIso` identifies
+  the initial-page object with vertical column homology.
+* `HomologicalComplex₂.columnFilteredFirstPage_d_eq` computes the initial
+  differential from the horizontal bicomplex differential.
 
 ## Implementation notes
 
-The adjacent short complex, its degreewise splitting, exactness, and natural map
-are defined in `FilteredTotalComplexAdjacentCore`. This file uses those maps
-to compare the mapping-cone and spectral-page presentations in abelian groups.
+The comparison transports the generic adjacent cone through filtration-stage
+isos, then tracks the signed total convention through connecting morphisms.
+The spectral-page statements here specialize to abelian groups.
 
 ## References
 
-This comparison uses Mathlib's mapping-cone and spectral-object APIs for
-homological complexes.
+The proof uses Mathlib's filtered
+`CategoryTheory.Triangulated.SpectralObject`, mapping-cone triangles,
+and homology connecting maps, together with the generic adjacent-column core.
 -/
 
 namespace HomologicalComplex₂
@@ -60,39 +55,6 @@ noncomputable instance totalFunctor_additive :
       HomologicalComplex.add_f_apply, Preadditive.add_comp,
       ← ιTotal_map X Y f, ← ιTotal_map X Y g]
     exact (Preadditive.comp_add _ _ _ _ _ _).symm
-
-
-@[reassoc (attr := simp)]
-lemma complexIso_inv_hom_f {A B : CochainComplex AddCommGrpCat.{w} ℤ}
-    (e : A ≅ B) (j : ℤ) : e.inv.f j ≫ e.hom.f j = 𝟙 _ := by
-  rw [← HomologicalComplex.comp_f, e.inv_hom_id, HomologicalComplex.id_f]
-
-@[reassoc (attr := simp)]
-lemma complexIso_hom_inv_f {A B : CochainComplex AddCommGrpCat.{w} ℤ}
-    (e : A ≅ B) (j : ℤ) : e.hom.f j ≫ e.inv.f j = 𝟙 _ := by
-  rw [← HomologicalComplex.comp_f, e.hom_inv_id, HomologicalComplex.id_f]
-
-
-noncomputable def adjacentColumnConeToShift
-    (K : HomologicalComplex₂ AddCommGrpCat.{w}
-      (ComplexShape.up ℤ) (ComplexShape.up ℤ)) (p : ℤ) :
-    CochainComplex.mappingCone (adjacentColumnTotalShortComplex K p).f ⟶
-      (K.X p)⟦-p⟧ :=
-  CochainComplex.mappingCone.descShortComplex
-      (adjacentColumnTotalShortComplex K p) ≫
-    (singleColumnTotalIso K p).hom
-
-noncomputable instance adjacentColumnConeToShift_quasiIso
-    (K : HomologicalComplex₂ AddCommGrpCat.{w}
-      (ComplexShape.up ℤ) (ComplexShape.up ℤ)) (p : ℤ) :
-    QuasiIso (adjacentColumnConeToShift K p) := by
-  letI : QuasiIso
-      (CochainComplex.mappingCone.descShortComplex
-        (adjacentColumnTotalShortComplex K p)) :=
-    CochainComplex.mappingCone.quasiIso_descShortComplex
-      (adjacentColumnTotalShortExact K p)
-  dsimp [adjacentColumnConeToShift]
-  infer_instance
 
 /-- The adjacent filtration layer that contributes column `p`: the mapping cone of the map from
 filtration stage `-p - 1` to stage `-p`. -/
@@ -138,6 +100,9 @@ private lemma totalStupidTruncGEMap_eqToHom
   subst b₁
   rfl
 
+/-- Reindexing filtration stage `-p` gives precisely the tail beginning at
+`p`; the comparison commutes with the adjacent-stage inclusion by the
+naturality of nested stupid-truncation maps. -/
 @[reassoc]
 lemma columnFilteredStageIso_comm
     (K : HomologicalComplex₂ AddCommGrpCat.{w}
@@ -163,6 +128,8 @@ lemma columnFilteredStageIso_comm
         (by simp [columnFiltrationIndex])
         (by simp [columnFiltrationIndex]) (by simp [columnFiltrationIndex])
 
+/-- Invert the preceding adjacent-stage square. Cancellation by the stage
+isomorphism turns its commutative square into this inverse orientation. -/
 @[reassoc]
 lemma columnFilteredStageIso_inv_comm
     (K : HomologicalComplex₂ AddCommGrpCat.{w}
@@ -274,8 +241,7 @@ lemma columnFilteredAdjacentLayerComplex_eq
       CochainComplex.mappingCone (adjacentColumnTotalShortComplex K p).f := by
   simp [columnFilteredAdjacentLayerComplex,
     columnFilteredTotalComplex, columnFiltrationBicomplex,
-    adjacentColumnTotalShortComplex,
-    adjacentColumnInclusion, truncatedBicomplex]
+    adjacentColumnTotalShortComplex, adjacentColumnInclusion, truncatedBicomplex]
   exact mappingConeTotalStupidTruncGEMap_eq_of_eq K
     (-columnFiltrationIndex p) (-columnFiltrationIndex (p + 1)) p
       (by simp [columnFiltrationIndex])
@@ -528,8 +494,7 @@ lemma columnFilteredConnecting_comp_homologyFactor
       (CochainComplex.mappingConeCompTriangle (F.map f) (F.map g))
       (p + q) (p + 1 + q) (by omega)]
     simp only [CochainComplex.mappingConeCompTriangle_obj₁,
-      CochainComplex.mappingConeCompTriangle_obj₃,
-      Iso.inv_hom_id_app]
+      CochainComplex.mappingConeCompTriangle_obj₃, Iso.inv_hom_id_app]
     congr 1
   have hδ : H.homologySequenceδ ((X.precomp F).triangle f g)
         (p + q) (p + 1 + q) (by omega) ≫
@@ -643,8 +608,9 @@ lemma homologyMap_descShortComplex_comp_delta
   have h₁'' := h₁'.trans (Category.assoc _ _ w).symm
   exact ((cancel_mono w).mp h₁'').symm
 
-/-- Naturality of the raw mapping-cone connecting map under the canonical filtration-stage
-comparison. -/
+/-- Apply the homology functor to the cone-triangle isomorphism induced by
+the filtration-stage square. Its third morphism gives the connecting-map
+square after the shift-map comparison. -/
 @[reassoc]
 lemma columnFilteredRawConnecting_comp_stageIso
     (K : HomologicalComplex₂ AddCommGrpCat.{w}
@@ -740,8 +706,9 @@ lemma columnFilteredHomologyMap_inr_comp_coneToShift
       simp only [HomologicalComplex.homologyMap_comp]
       rfl
 
-/-- Cancelling the final single-column isomorphism leaves the short-complex mapping-cone
-comparison. -/
+/-- The adjacent-layer cone comparison factors through the short-complex
+cone projection and the single-column total isomorphism. Cancel that final
+isomorphism after applying homology to expose the short-complex map. -/
 @[reassoc]
 lemma columnFilteredHomologyMap_coneToShift_comp_singleColumnTotalIso_inv
     (K : HomologicalComplex₂ AddCommGrpCat.{w}

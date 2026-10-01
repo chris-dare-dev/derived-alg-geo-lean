@@ -1926,7 +1926,7 @@ SF8_ADJACENT_DECLARATIONS = {
     "singleColumnShiftIso",
     "singleColumnHasTotal",
     "singleColumnTotalIso",
-    "totalMap_quasiIso_of_singleColumn",
+    "singleColumnTotalMap_quasiIso",
     "adjacentColumnTotalShortComplex",
     "adjacentColumnTotalRetraction",
     "adjacentColumnTotalSection",

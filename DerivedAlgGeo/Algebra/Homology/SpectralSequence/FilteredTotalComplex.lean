@@ -4,8 +4,6 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.SpectralSequence.FilteredComplexSpectralObject
 import DerivedAlgGeo.Algebra.Homology.Embedding.StupidTruncGE
-import Mathlib.Algebra.Homology.Embedding.CochainComplex
-import Mathlib.Algebra.Homology.Embedding.StupidTrunc
 import Mathlib.Algebra.Homology.SpectralObject.FirstPage
 import Mathlib.Algebra.Homology.TotalComplex
 

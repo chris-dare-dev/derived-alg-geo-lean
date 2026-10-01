@@ -116,7 +116,7 @@ private lemma finiteTailMap_quasiIso (f : K ⟶ L) (b : ℤ)
       (DerivedCategory.isIso_Q_map_iff_quasiIso C φ.τ₁).2 hprev
     have hq₃ : IsIso (DerivedCategory.Q.map φ.τ₃) :=
       (DerivedCategory.isIso_Q_map_iff_quasiIso C φ.τ₃).2
-        (totalMap_quasiIso_of_singleColumn f p (hcol p (by omega)))
+        (singleColumnTotalMap_quasiIso f p (hcol p (by omega)))
     have hq₂ : IsIso (DerivedCategory.Q.map φ.τ₂) := by
       let ψ := DerivedCategory.triangleOfSES.map hS₁ hS₂ φ
       exact Pretriangulated.isIso₂_of_isIso₁₃ ψ
