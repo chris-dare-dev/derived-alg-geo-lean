@@ -19,9 +19,17 @@ interfaces.  The source inverse shift comparison is derived from the supplied
 forward comparison by `Equivalence.commShiftInverse`; no duplicate transport
 or exactness structure is introduced.
 
-The equivalence constructor assumes only that `F.h0` is an equivalence.  It
-does not infer a dg quasi-equivalence, and the exactness declarations require
-the ordinary comparison equivalences to be supplied as triangulated.
+The transport constructor assumes only that `F.h0` is an equivalence.  It does
+not infer one from a dg quasi-equivalence, and its exactness declarations
+require the endpoint equivalences to be supplied as triangulated.
+
+Without endpoint equivalences, `DGFunctor.isTriangulated_h0_asEquivalence` says
+that `H⁰ F` is a triangulated equivalence whenever it is an equivalence, and
+`DGFunctor.isTriangulated_h0Equivalence` specializes it to the equivalence
+`DGFunctor.h0Equivalence` that a dg quasi-equivalence induces (which is why this
+file imports `QuasiEquivalence.lean`).  Both reduce, through Mathlib's
+`Equivalence.IsTriangulated.mk'`, to exactness of the forward functor,
+`DGFunctor.h0IsTriangulated`.
 -/
 
 set_option autoImplicit false
@@ -135,16 +143,14 @@ equivalence.**  `Functor.asEquivalence` of `H⁰ F` is a triangulated equivalenc
 in Mathlib's sense `Equivalence.IsTriangulated`: the forward shift comparison is
 the explicit `h0CommShift`, and the inverse comparison and the triangulated
 inverse are Mathlib's canonical mates (`Equivalence.commShiftInverse`,
-`Equivalence.IsTriangulated.mk'`).  It is the `eC = eD = refl` case of
-`transportedH0EquivalenceIsTriangulated`, stated without the endpoint
-equivalences. -/
-theorem isTriangulated_h0AsEquivalence (F : DGFunctor C D)
+`Equivalence.IsTriangulated.mk'`), so the only input is exactness of the
+forward functor, `h0IsTriangulated`.  It is the analogue, without endpoint
+equivalences, of `transportedH0EquivalenceIsTriangulated`. -/
+theorem isTriangulated_h0_asEquivalence (F : DGFunctor C D)
     [F.h0.IsEquivalence] :
     letI : F.h0.asEquivalence.functor.CommShift ℤ := F.h0CommShift
     letI : F.h0.asEquivalence.inverse.CommShift ℤ :=
       F.h0.asEquivalence.commShiftInverse ℤ
-    letI : F.h0.asEquivalence.CommShift ℤ :=
-      F.h0.asEquivalence.commShift_of_functor ℤ
     F.h0.asEquivalence.IsTriangulated := by
   letI : F.h0.asEquivalence.functor.CommShift ℤ := F.h0CommShift
   letI : F.h0.asEquivalence.inverse.CommShift ℤ :=
@@ -159,23 +165,17 @@ triangulated equivalence on `H⁰`**, in the sense of Mathlib's
 `Equivalence.IsTriangulated`.
 
 `hF` only builds the equivalence `h0Equivalence`, whose functor is `H⁰ F`
-(`h0Equivalence_functor`); exactness of that functor is `h0IsTriangulated`, and
-the inverse is Mathlib's canonical mate.  The shift on `H⁰ F` is the explicit
-`h0CommShift`, not an instance, so callers must `letI` the same structure. -/
+(`h0Equivalence_functor`); this is `isTriangulated_h0_asEquivalence` for it.  The
+shift on `H⁰ F` is the explicit `h0CommShift`, not an instance, so callers must
+`letI` the same structure. -/
 theorem isTriangulated_h0Equivalence (F : DGFunctor C D)
     (hF : F.IsQuasiEquivalence) :
     letI : (F.h0Equivalence hF).functor.CommShift ℤ := F.h0CommShift
     letI : (F.h0Equivalence hF).inverse.CommShift ℤ :=
       (F.h0Equivalence hF).commShiftInverse ℤ
-    letI : (F.h0Equivalence hF).CommShift ℤ :=
-      (F.h0Equivalence hF).commShift_of_functor ℤ
-    (F.h0Equivalence hF).IsTriangulated := by
-  letI : (F.h0Equivalence hF).functor.CommShift ℤ := F.h0CommShift
-  letI : (F.h0Equivalence hF).inverse.CommShift ℤ :=
-    (F.h0Equivalence hF).commShiftInverse ℤ
-  letI : (F.h0Equivalence hF).CommShift ℤ :=
-    (F.h0Equivalence hF).commShift_of_functor ℤ
-  exact Equivalence.IsTriangulated.mk' _ F.h0IsTriangulated
+    (F.h0Equivalence hF).IsTriangulated :=
+  haveI := F.isEquivalence_h0 hF
+  F.isTriangulated_h0_asEquivalence
 
 end QuasiEquivalence
 

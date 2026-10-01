@@ -46,7 +46,7 @@ that class is exactly the three conditions.
 Nothing about the converse, and nothing about dg functors that are only
 quasi-equivalences up to homotopy.  It also says nothing about triangulated
 structure: the equivalence produced here is an equivalence of ordinary
-categories, and `h0Equivalence_functor` says its functor is `H⁰ F`.  Exactness
+categories, and `DGFunctor.h0Equivalence_functor` says its functor is `H⁰ F`.  Exactness
 of `H⁰ F` is proved separately, for every dg functor between pretriangulated
 dg categories, as `DGFunctor.h0IsTriangulated`; the two meet in
 `DGFunctor.isTriangulated_h0Equivalence`, the induced equivalence being
