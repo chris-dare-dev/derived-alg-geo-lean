@@ -234,6 +234,65 @@ class Fixture(unittest.TestCase):
 
 
 class CodexReaderTest(Fixture):
+    def test_auto_merge_actions_and_observed_state_are_separate(self) -> None:
+        root = self.read(ROOT)
+        for cmd in ("gh pr merge 1900 --auto --squash", "gh pr merge 1900 --disable-auto"):
+            root.add("2026-09-24T00:00:00Z", "tool", cmd, cat="github", exit=0)
+        root.add("2026-09-24T00:00:01Z", "tool", "gh pr view 1478 --json number,state,mergedAt", cat="github", exit=0,
+                 output=json.dumps({"number": 1478, "state": "MERGED", "mergedAt": "2026-09-24T00:00:00Z"}))
+        root.add("2026-09-24T00:00:02Z", "tool", "gh pr view 1478 --json url,state", cat="github", exit=0,
+                 output=json.dumps({"url": "https://github.com/example/repo/pull/1478", "state": "MERGED"}))
+        root.add("2026-09-24T00:00:03Z", "tool", "gh pr view 1900 --json number,state", cat="github", exit=0,
+                 output=json.dumps({"number": 1900, "state": "OPEN"}))
+        facts = lt.analyze(lt.Run(root=root, children=[]))
+        self.assertEqual(facts["prs_auto_merge_armed"], 1)
+        self.assertEqual(facts["prs_auto_merge_disabled"], 1)
+        self.assertEqual(facts["prs_merged"], 1)
+        self.assertEqual(facts["merged_prs_observed"], ["example/repo#1478"])
+        fake = lt.Event("now", "commentary", "PR #1900 merged.", output='{"number":1900,"state":"MERGED"}')
+        self.assertEqual(lt.observed_merged_prs(fake), set())
+
+    def test_observations_require_positive_state_and_redact_output(self) -> None:
+        event = lt.Event("now", "tool", "gh api repos/o/r/pulls/1", cat="github", exit=0)
+        for payload in ({"number": 1, "state": "closed", "merged": False}, {"number": 1, "state": "OPEN"}):
+            event.output = json.dumps(payload)
+            self.assertEqual(lt.observed_merged_prs(event), set())
+        event.output = '{"number":1,"merged":true}'
+        self.assertEqual(lt.observed_merged_prs(event), {"1"})
+        event.exit = 1
+        self.assertEqual(lt.observed_merged_prs(event), set())
+
+    def test_dispatch_requested_metadata_is_not_resolved_metadata(self) -> None:
+        source = self.source(ROOT)
+        with source.path.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(call("2026-09-24T00:00:00Z", "spawn_agent", "review-call", {
+                "task_name": "reviewer", "model": "requested-frontier", "reasoning_effort": "ultra", "fork_turns": "all"})) + "\n")
+        facts = lt.analyze(lt.Run(root=self.read(ROOT), children=[self.read(CHILD)]))
+        config = facts["dispatches"][-1]
+        self.assertEqual(config["fork_turns"], "all")
+        self.assertEqual(config["model"], "requested-frontier")
+        child = facts["subagent_summaries"][0]
+        self.assertNotEqual(child["model"], config["model"])
+        self.assertEqual(child["reasoning_effort"], "unavailable")
+
+    def test_tagged_dispatch_audit_links_runtime_and_reports_violations(self) -> None:
+        with self.source(ROOT).path.open("a", encoding="utf-8") as f:
+            for entry in [
+                call("2026-09-24T00:00:00Z", "spawn_agent", "review-call", {
+                    "task_name": "review_mathlib_reviewer_r1", "reasoning_effort": "high"}),
+                call_output("2026-09-24T00:00:01Z", "review-call", json.dumps({"agent_id": CHILD})),
+            ]:
+                f.write(json.dumps(entry) + "\n")
+        with self.source(CHILD).path.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(codex_line("2026-09-24T00:00:02Z", "turn_context", {
+                "model": "resolved-runtime", "reasoning_effort": "max"})) + "\n")
+        facts = lt.analyze(lt.Run(root=self.read(ROOT), children=[self.read(CHILD)]))
+        config = facts["dispatches"][-1]
+        self.assertEqual(config["role"], "mathlib-reviewer")
+        self.assertEqual(config["resolved_model"], "resolved-runtime")
+        self.assertEqual(config["resolved_effort"], "max")
+        self.assertEqual(config["violations"], ["context is not isolated", "model selection inherited", "reasoning below max/ultra"])
+
     def test_owner_messages_stops_and_asks(self) -> None:
         root = self.read(ROOT)
         facts = lt.analyze(lt.Run(root=root, children=[]))
@@ -254,8 +313,9 @@ class CodexReaderTest(Fixture):
         self.assertEqual(facts["waiting_on_owner_s"], 1800.0)
         self.assertEqual(facts["idle_until_revived_s"], 3600.0)
         self.assertEqual(facts["prs"], [1478])
-        # A failed merge is not a merge.
-        self.assertEqual((facts["prs_created"], facts["prs_merged"]), (1, 1))
+        # Even a successful request without observed GitHub state is unknown.
+        self.assertEqual((facts["prs_created"], facts["prs_merged"]), (1, 0))
+        self.assertEqual(facts["prs_merge_requested"], 1)
 
     def test_commands_are_categorized_timed_and_redacted(self) -> None:
         tools = [e for e in self.read(ROOT).events if e.kind == "tool"]
