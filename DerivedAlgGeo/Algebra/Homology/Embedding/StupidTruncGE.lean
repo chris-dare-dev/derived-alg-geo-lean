@@ -32,6 +32,9 @@ in any category with zero morphisms and a zero object.
 * `HomologicalComplex.isColimitStupidTruncGETowerCocone` proves that the tower
   recovers the original complex as a colimit.
 * `HomologicalComplex.stupidTrunc_d_eq` describes the retained differential.
+* `HomologicalComplex.stupidTruncMap_comp_stupidTruncGEι` proves naturality
+  of the tail inclusion, and `HomologicalComplex.stupidTruncGEι_isIso_of_isZero`
+  detects an isomorphism when the discarded components vanish.
 * `HomologicalComplex.stupidTruncGEMap_naturality` commutes tail inclusion
   with a cochain map.
 
@@ -127,6 +130,41 @@ noncomputable def stupidTruncGEι (K : HomologicalComplex C (ComplexShape.up ℤ
       apply isZero_stupidTrunc_X
       rw [ComplexShape.notMem_range_embeddingUpIntGE_iff]
       omega
+
+/-- On retained degrees, the naturality square commutes by Mathlib's canonical
+truncation isomorphisms; below the cutoff its source is zero. -/
+@[reassoc]
+lemma stupidTruncMap_comp_stupidTruncGEι
+    {K L : HomologicalComplex C (ComplexShape.up ℤ)} (f : K ⟶ L) (p : ℤ) :
+    stupidTruncMap f (ComplexShape.embeddingUpIntGE p) ≫ stupidTruncGEι L p =
+      stupidTruncGEι K p ≫ f := by
+  ext i
+  by_cases hi : p ≤ i
+  · dsimp [stupidTruncGEι]
+    rw [dif_pos hi, dif_pos hi]
+    exact stupidTruncMap_stupidTruncXIso_hom f
+      (ComplexShape.embeddingUpIntGE p) (geIndex_spec p i hi)
+  · apply IsZero.eq_of_src
+    apply isZero_stupidTrunc_X
+    rw [ComplexShape.notMem_range_embeddingUpIntGE_iff]
+    omega
+
+/-- The inclusion is the canonical component isomorphism above the cutoff and
+the unique map between zero objects below it. -/
+lemma stupidTruncGEι_isIso_of_isZero
+    (K : HomologicalComplex C (ComplexShape.up ℤ)) (p : ℤ)
+    (hK : ∀ i : ℤ, i < p → IsZero (K.X i)) :
+    IsIso (stupidTruncGEι K p) := by
+  letI componentIso (i : ℤ) : IsIso ((stupidTruncGEι K p).f i) := by
+    dsimp [stupidTruncGEι]
+    split_ifs with hi
+    · infer_instance
+    · apply IsZero.isIso
+      · apply isZero_stupidTrunc_X
+        rw [ComplexShape.notMem_range_embeddingUpIntGE_iff]
+        omega
+      · exact hK i (by omega)
+  exact Hom.isIso_of_components _
 
 noncomputable instance stupidTruncGEι_f_mono
     (K : HomologicalComplex C (ComplexShape.up ℤ)) (p i : ℤ) :
