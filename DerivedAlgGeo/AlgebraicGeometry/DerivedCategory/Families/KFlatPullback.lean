@@ -7,6 +7,7 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeCatego
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.FlatPullback
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.OpenImmersionPullback
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.PullbackAcyclicResolution
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.KFlatQuasiIso
 
 /-!
 # Derived pullback from K-flat resolutions
@@ -81,6 +82,27 @@ theorem kFlatPullbackAcyclic_ofExact (R : SchemeKFlatResolution U.left) (f : T �
 theorem kFlatPullbackAcyclic_ofFlat (R : SchemeKFlatResolution U.left) (f : T ⟶ U)
     [Flat f.left] : KFlatPullbackAcyclic R f :=
   kFlatPullbackAcyclic_ofExact R f
+
+/-- Every K-flat resolution is acyclic for pullback along an arbitrary scheme
+morphism. K-flatness of the resolved endpoints and the comparison map is
+enough; no exactness or flatness of the morphism is needed. -/
+theorem kFlatPullbackAcyclic_ofKFlat (R : SchemeKFlatResolution U.left) (f : T ⟶ U) :
+    KFlatPullbackAcyclic R f where
+  pullback_inverts := by
+    intro K L g hg
+    change IsIso ((SchemeDerivedCategory.Q T.left).map
+      ((complexPullback f).map (R.resolution.map g)))
+    apply Localization.inverts (SchemeDerivedCategory.Q T.left)
+      (HomologicalComplex.quasiIso T.left.Modules (ComplexShape.up ℤ))
+    exact Scheme.Modules.quasiIso_pullback_of_kflat f.left (R.resolution.map g)
+      (R.map_quasiIso g hg) (R.isKFlat K) (R.isKFlat L)
+  resolved_comparison_isIso K := by
+    apply Localization.inverts (SchemeDerivedCategory.Q T.left)
+      (HomologicalComplex.quasiIso T.left.Modules (ComplexShape.up ℤ))
+    exact Scheme.Modules.quasiIso_pullback_of_kflat f.left
+      (R.comparison.app (R.resolution.obj K))
+      (R.comparison_quasiIso (R.resolution.obj K))
+      (R.isKFlat (R.resolution.obj K)) (R.isKFlat K)
 
 /-- A K-flat resolution satisfying the pullback-acyclicity conditions constructs the existing
 functorial pullback-acyclic resolution interface. -/
