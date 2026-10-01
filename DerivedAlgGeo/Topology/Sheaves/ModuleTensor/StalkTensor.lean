@@ -44,6 +44,14 @@ The backward map is the harder direction: a section of `M ⊗ P` near `x` is a s
 whose two factors live over *different* neighbourhoods, so the map is built in two colimit stages
 (`germTmulRight`, then `germTmulBiadd`), additively first and upgraded to `Rₓ`-bilinear afterwards.
 The key input is `PresheafOfModules.germ_smul`, which makes germs `Rₓ`-linear.
+
+## References
+
+The comparison extends Mathlib's module-presheaf stalk and monoidal APIs.
+
+## Tags
+
+module presheaf, stalk, tensor product, naturality
 -/
 
 universe u
