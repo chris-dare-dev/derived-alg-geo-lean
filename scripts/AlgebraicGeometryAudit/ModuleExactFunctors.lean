@@ -10,6 +10,8 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorLeftFunctor_preservesFiniteColimits
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorLeftFunctor_additive
 #print axioms AlgebraicGeometry.Scheme.Modules.tensorLeftFunctor_preservesFiniteLimits
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorLeftFunctorStalkNatIso
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorLeftFunctor_preservesFiniteLimits_of_isFlatOverId
 #print axioms AlgebraicGeometry.Scheme.Modules.isFinitePresentation_tensorObj_left_of_isInvertible
 #print axioms AlgebraicGeometry.Scheme.Modules.pushforward_faithful_of_isInducing
 #print axioms AlgebraicGeometry.Scheme.Modules.pushforward_faithful_of_isClosedImmersion

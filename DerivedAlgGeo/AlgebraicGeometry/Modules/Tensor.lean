@@ -4,6 +4,8 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.LineBundle
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.LineBundleLinear
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Monoidal
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Colimits
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Stalk
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Flat
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Complex
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Invertible
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Linear
