@@ -16,6 +16,12 @@ and its termwise action preserves quasi-isomorphisms of complexes of any shape.
 These results treat a flat sheaf fixed in degree zero; K-flatness of a complex
 of flat sheaves and arbitrary derived pullback remain separate.
 
+## Main definitions
+
+This module introduces no new public definitions. Private stalk comparison and
+tensor-commutativity adapters support the results below, which extend existing
+partial tensor functors on scheme-module sheaves.
+
 ## Main results
 
 * `AlgebraicGeometry.Scheme.Modules.tensorLeftFunctor_preservesHomology_of_isFlatOverId`
@@ -42,6 +48,10 @@ gives the arbitrary-shape quasi-isomorphism corollaries.
   monomorphisms and cokernels.
 * Mathlib/Algebra/Homology/QuasiIso.lean: mapped quasi-isomorphisms under a
   homology-preserving functor.
+
+## Tags
+
+flat module sheaf, tensor product, homology, quasi-isomorphism
 -/
 
 open CategoryTheory CategoryTheory.Limits MonoidalCategory Opposite TopologicalSpace
