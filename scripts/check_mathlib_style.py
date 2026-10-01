@@ -757,15 +757,21 @@ def main(argv: list[str]) -> int:
         paths = [Path(a) for a in argv if not a.startswith("-")]
 
     if not paths:
-        print(__doc__, file=sys.stderr)
-        return 0
+        print("error: no files supplied; use explicit paths or --check-baseline", file=sys.stderr)
+        return 1
 
     bad = 0
     total_warns = 0
     total_covered = 0
+    checked = 0
     for p in paths:
-        if not in_scope(p) or not p.exists():
+        if not p.exists():
+            print(f"error: input file does not exist: {p}", file=sys.stderr)
+            bad |= 1
             continue
+        if not in_scope(p):
+            continue
+        checked += 1
         text = p.read_text(encoding="utf-8")
         findings = check_text(text, p)
         # Before the diff filter, so a branch that merely moves a recorded line
@@ -785,6 +791,10 @@ def main(argv: list[str]) -> int:
         total_warns += sum(1 for f in findings if f.severity == "WARN")
         bad |= report(p, findings)
 
+    if not checked and not hook_mode:
+        print("error: no in-scope Lean files were checked", file=sys.stderr)
+        bad |= 1
+    print(f"mathlib-style: {checked} in-scope file(s) checked")
     if bad:
         print(
             "\nMathlib-convention ERRORs above must be fixed before continuing. "
