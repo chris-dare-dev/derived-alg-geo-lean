@@ -70,7 +70,7 @@ AUDITS = {
 # one: a change that leaves more declarations unaudited than it found is the
 # thing this gate exists to stop.
 CEILINGS = {
-    "AlgebraicGeometry": 748,
+    "AlgebraicGeometry": 746,
     # CI measured this backlog at 287 on 2026-09-20; keep the ratchet at the
     # observed value rather than carrying the old ceiling forward.
     "StabilityCondition": 287,

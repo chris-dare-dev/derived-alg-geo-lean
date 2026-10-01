@@ -163,6 +163,17 @@ def absent_security_scan(setting_state: str = "disabled") -> dict:
     }
 
 
+def without_dynamic_gate(candidate: dict) -> None:
+    candidate["gates"] = [
+        gate for gate in candidate["gates"] if gate["id"] != "github-advanced-security"
+    ]
+    candidate["artifacts"] = [
+        artifact for artifact in candidate["artifacts"]
+        if artifact["subject"] != "github-advanced-security"
+    ]
+    candidate["security_scan"] = absent_security_scan()
+
+
 class ContractTests(unittest.TestCase):
     def evaluate(self, candidate: dict, inventory: dict = INVENTORY) -> dict:
         direct_ref_event = isinstance(candidate.get("event"), str) and candidate["event"] in {
@@ -314,10 +325,39 @@ class ContractTests(unittest.TestCase):
 
     def test_revision_bound_evidence_passes(self) -> None:
         candidate = evidence()
+        without_dynamic_gate(candidate)
         bind_provider_proof(candidate)
         result = self.evaluate(candidate)
         self.assertTrue(result["valid"], result)
-        self.assertTrue(any("optional gate github-advanced-security is unknown" in warning for warning in result["warnings"]))
+        self.assertTrue(any("optional gate github-advanced-security is disabled_by_setting" in warning for warning in result["warnings"]))
+
+    def test_dynamic_gate_requires_scan_even_when_check_is_present(self) -> None:
+        candidate = evidence()
+        bind_provider_proof(candidate)
+        self.assert_invalid(candidate, "security_scan is required")
+
+    def test_failed_dynamic_run_cannot_be_hidden_as_disabled_absence(self) -> None:
+        candidate = evidence()
+        without_dynamic_gate(candidate)
+        scan = candidate["security_scan"]
+        scan["head_workflow_runs"].append({
+            "id": 77777, "workflow_id": 360047049, "run_attempt": 1,
+            "check_suite_id": 333, "name": "Code scanning AI findings on PR #1",
+            "event": "dynamic", "path": "dynamic/agents/github-advanced-security",
+            "head_sha": SHA_B, "status": "completed", "conclusion": "failure",
+            "actor": {"id": 62310815, "login": "github-advanced-security[bot]"},
+        })
+        scan["run_query"]["total_observed"] = len(scan["head_workflow_runs"])
+        bind_provider_proof(candidate)
+        self.assert_invalid(candidate, "matching runs differ from the retained provider query")
+
+    def test_dynamic_setting_malformed_raw_state_fails_without_crashing(self) -> None:
+        candidate = evidence()
+        without_dynamic_gate(candidate)
+        candidate["security_scan"]["setting"]["response"]["pr_scan"] = []
+        candidate["security_scan"]["setting"]["state"] = []
+        bind_provider_proof(candidate)
+        self.assert_invalid(candidate, "setting has an unknown state")
 
     def test_missing_candidate_identity_is_rejected(self) -> None:
         candidate = evidence()
@@ -432,6 +472,7 @@ class ContractTests(unittest.TestCase):
         del status_artifact["run_attempt"]
         candidate["artifacts"].append(status_artifact)
         candidate["policy_binding"]["inventory_sha256"] = ci_contract._canonical_sha256(inventory)
+        without_dynamic_gate(candidate)
         bind_provider_proof(candidate)
         self.assertEqual(ci_contract.validate_inventory(inventory), [])
         self.assertTrue(self.evaluate(candidate, inventory)["valid"])

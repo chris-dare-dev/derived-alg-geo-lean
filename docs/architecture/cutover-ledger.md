@@ -2366,12 +2366,20 @@ or exactness was strengthened by relocation.
   `PrimeSpectrum.basicOpen_prod_eq_pi`, while
   `AlgebraicGeometry/Cohomology/Cech/Affine.lean` imports it and retains only
   the private localization machinery and public affine Čech exactness
-  theorems. The declaration name and full signature are preserved without a
-  compatibility shim. The earlier queue classified this under `Algebra/` from
+  theorems. The earlier queue classified this under `Algebra/` from
   its ring input alone; the complete signature instead contains
   `Opens (PrimeSpectrum R)` and a categorical finite product supplied by
   `Topology/Category/TopCat/Opens/Limits`, so `RingTheory/Spectrum/Prime/` is the first valid
   owner without a forbidden `Algebra -> Topology` edge.
+- Basic-open covers on prime spectra:
+  `RingTheory/Spectrum/Prime/CoversTop.lean` owns
+  `PrimeSpectrum.coversTop_basicOpen_of_span_eq_top` for arbitrary
+  commutative semirings, bridging a unit-ideal generating family to a cover
+  of the open-set site. Its proof composes the prime-spectrum supremum
+  criterion with `TopCat.Opens.grothendieckTopology_coversTop`. The former
+  `AlgebraicGeometry/Spec/` leaf and umbrella are retired; they held no
+  scheme-level construction. The new root reaches no geometry, including
+  transitively.
 - Generating sections from free epimorphisms:
   `Algebra/Category/ModuleCat/Sheaf/GeneratingSections.lean` owns
   `SheafOfModules.GeneratingSections.ofFreeEpi`, its finite-index instance,
@@ -2531,6 +2539,26 @@ or exactness was strengthened by relocation.
   above. The Euler form `chiHom` is now `GradedObject.eulerChar` of the shifted
   Hom family by `rfl`, and its additivity on distinguished triangles applies
   `GradedObject.eulerChar_eq_add_of_exact` directly.
+- The SF8 #554 integer-tail cutover moved the existing
+  `HomologicalComplex.stupidTruncGEι` and
+  `HomologicalComplex.stupidTruncGEMap` API, including its mono instances and
+  map laws, from the filtered-total consumer to
+  `Algebra/Homology/Embedding/StupidTruncGE.lean`. The names and hypotheses
+  are unchanged; `FilteredTotalComplex.lean` imports that owner. The separate
+  normalized component cutover moves `HomologicalComplex₂.stupidTruncGEXIso`
+  and its companion lemmas from
+  `SpectralSequence/FilteredTotalComplexAdjacent.lean` into the same embedding
+  owner. The canonical `HomologicalComplex.stupidTruncGEXIso` normalizes
+  Mathlib's `HomologicalComplex.stupidTruncXIso` at the retained integer degree;
+  the bicomplex presentation is its definitional specialization, with its
+  existing fully qualified names and simp/reassociation behavior preserved.
+  The owner imports no spectral or geometric consumer, and the adjacent
+  construction imports the owner directly. This is a direct Mathlib API
+  extension (Tier 1); the import graph and the specialization map are separate
+  facts. The neutral adjacent short exact construction, finite-strip total
+  quasi-isomorphism, unbounded total comparison, K-flatness and arbitrary
+  derived pullback remain SF8 proof obligations, not consequences of these
+  source moves.
 
 ## Confirmed next lanes
 

@@ -122,20 +122,21 @@ Two things to check before working in someone else's worktree:
 
 - **It must be clean.** A dirty worktree is unfinished human work — halt and
   report, exactly as in step 0. Never stash it.
-- **Its `.lake/packages` is often a symlink to a sibling worktree**, and those
-  siblings get deleted. A dangling symlink shows up as a baffling
-  `mkdir: .lake/packages: No such file or directory` from `lake build` even
-  though `.lake` plainly exists. Check with `ls -la .lake`, and repoint it at
-  the main checkout's packages when it dangles:
-
-  For a fresh worktree, use `scripts/seed_worktree_cache.sh --dry-run` to
-  inspect a suitable donor. For an existing cache, resolve the actual shared
-  package location before repairing the symlink. Never reuse a hard-coded
-  path from another machine.
-
-  Only do this once `lean-toolchain` and `lakefile.toml` are identical to
-  `origin/main`, which after step 2's rebase they are. Sharing a package set
-  across differing pins would be silent corruption, not a repair.
+- **Its `.lake/packages` may be a symlink to another writable worktree**, or
+  a dangling link if that donor was removed. Check with `ls -la .lake`. Do not
+  repoint the link or run Lean through shared writable packages. Preserve this
+  checkout and cache, then create a fresh worktree at the intended commit,
+  under `python3 scripts/loop_worktrees.py root` and only once
+  `python3 scripts/loop_worktrees.py check` passes.
+  Invoke `python3 <updated-checkout>/scripts/private_package_cache.py
+  --target <fresh-worktree> --dry-run`, then the same command without
+  `--dry-run`; `<updated-checkout>` must contain the private-cache helper from
+  this change or later. Do not run a seeder script from the old commit: it may
+  still create shared package links. The current helper verifies pins,
+  installs private packages/build output, and refuses an existing unreceipted
+  `.lake`. Carry any source, index and untracked work deliberately before
+  switching to the new path. This procedure does not delete or rewrite the
+  older checkout.
 
 A conflict needs a declaration-level review. Preserve the selected PR's intended
 work and current main; do not resolve by a blanket preference for either side.
@@ -280,7 +281,9 @@ A queued or failed run is not a green run. Leave the PR in draft and say why.
 
 Return to a detached-free clean state on `origin/main`. If the iteration ran in
 another worktree, leave that worktree on its own branch and clean — do not
-switch it to `main`, since a human may be using it. Report three lines: the
+switch it to `main`, since a human may be using it. A fresh worktree you
+created for the iteration is yours: once its branch is pushed, remove it with
+`python3 scripts/loop_worktrees.py retire <fresh-worktree>`. Report three lines: the
 PR touched, its new state, and the one thing a human must decide.
 
 **Do not merge. Do not start the next PR.** The next iteration re-reads the

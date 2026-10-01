@@ -27,9 +27,11 @@ from urllib.parse import urlencode, urlsplit
 if __package__:
     from . import ci_contract
     from . import ci_publication
+    from . import ci_security_scan
 else:  # Imported by the standalone loop_engine.py entry point.
     import ci_contract
     import ci_publication
+    import ci_security_scan
 
 
 API_ROOT = "https://api.github.com"
@@ -142,9 +144,19 @@ class GitHubClient:
 
     def get_all(self, path: str, *, key: str | None = None) -> list[dict[str, Any]]:
         """Follow every Link page and check the advertised total when present."""
+        pages = self.get_pages(path, key=key)
+        return [
+            item
+            for page in pages
+            for item in (page["response"] if key is None else page["response"][key])
+        ]
+
+    def get_pages(self, path: str, *, key: str | None = None) -> list[dict[str, Any]]:
+        """Return validated page envelopes, including request and Link evidence."""
         url: str | None = self._url(path, per_page=100)
         seen_urls: set[str] = set()
         items: list[dict[str, Any]] = []
+        pages: list[dict[str, Any]] = []
         total: int | None = None
         while url is not None:
             if url in seen_urls or len(seen_urls) >= self.max_pages:
@@ -190,10 +202,16 @@ class GitHubClient:
                 raise EvidenceError(
                     f"GitHub API full page has no completeness proof: {path}"
                 )
+            pages.append({
+                "request_url": url,
+                "response_headers": headers,
+                "pagination_links": links,
+                "response": value,
+            })
             url = next_url
         if total is not None and len(items) != total:
             raise EvidenceError(f"GitHub API page count is inconsistent: {path}")
-        return items
+        return pages
 
 
 def _sha(value: Any, label: str) -> str:
@@ -551,34 +569,87 @@ def _observations(
     }
 
 
-AI_SCAN_WORKFLOW_ID = 360047049
-AI_SCAN_BOT_ID = 62310815
-AI_SCAN_PATH = "dynamic/agents/github-advanced-security"
+AI_SCAN_WORKFLOW_ID = ci_security_scan.WORKFLOW_ID
+AI_SCAN_BOT_ID = ci_security_scan.BOT_ID
+AI_SCAN_PATH = ci_security_scan.PATH
 
 
 def _matching_ai_scan_checks(checks: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    return [
-        check for check in checks
-        if check.get("name") == "github-advanced-security"
-        and isinstance(check.get("app"), dict)
-        and check["app"].get("slug") == "github-actions"
-    ]
+    return ci_security_scan.matching_checks(checks)
 
 
 def _matching_ai_scan_runs(
     runs: list[dict[str, Any]], pr_number: int, head: str
 ) -> list[dict[str, Any]]:
-    return [
-        run for run in runs
-        if run.get("workflow_id") == AI_SCAN_WORKFLOW_ID
-        and run.get("path") == AI_SCAN_PATH
-        and run.get("event") == "dynamic"
-        and run.get("head_sha") == head
-        and run.get("name") == f"Code scanning AI findings on PR #{pr_number}"
-        and isinstance(run.get("actor"), dict)
-        and run["actor"].get("id") == AI_SCAN_BOT_ID
-        and run["actor"].get("login") == "github-advanced-security[bot]"
-    ]
+    return ci_security_scan.matching_runs(runs, pr_number, head)
+
+
+def _head_run_projection(run: dict[str, Any]) -> tuple[Any, ...]:
+    """Provider fields that bind a workflow run's identity and outcome."""
+    actor = run.get("actor")
+    actor_identity = (
+        (actor.get("id"), actor.get("login")) if isinstance(actor, dict) else None
+    )
+    return (
+        run.get("id"), run.get("workflow_id"), run.get("path"),
+        run.get("event"), run.get("head_sha"), run.get("name"),
+        actor_identity, run.get("run_attempt"), run.get("status"),
+        run.get("conclusion"), run.get("check_suite_id"),
+    )
+
+
+def _same_head_run_snapshot(
+    retained: Any, live: list[dict[str, Any]], primary_run_id: int,
+    pr_number: int, base: str, head: str,
+    *, allow_cleared_primary_association: bool,
+) -> bool:
+    """Compare stable run facts and one checked post-merge association loss."""
+    if not isinstance(retained, list) or len(retained) != len(live):
+        return False
+    if any(
+        not isinstance(run, dict)
+        or isinstance(run.get("id"), bool)
+        or not isinstance(run.get("id"), int)
+        or run["id"] <= 0
+        for run in [*retained, *live]
+    ):
+        return False
+    retained_by_id = {
+        run.get("id"): run for run in retained if isinstance(run, dict)
+    }
+    live_by_id = {run.get("id"): run for run in live if isinstance(run, dict)}
+    if (
+        len(retained_by_id) != len(retained)
+        or len(live_by_id) != len(live)
+        or retained_by_id.keys() != live_by_id.keys()
+    ):
+        return False
+    for identity, old in retained_by_id.items():
+        current = live_by_id[identity]
+        if _head_run_projection(old) != _head_run_projection(current):
+            return False
+        if old.get("pull_requests") == current.get("pull_requests"):
+            continue
+        if not (
+            allow_cleared_primary_association
+            and identity == primary_run_id
+            and isinstance(old.get("pull_requests"), list)
+            and bool(old["pull_requests"])
+            and current.get("pull_requests") == []
+        ):
+            return False
+        if len(old["pull_requests"]) != 1 or not isinstance(old["pull_requests"][0], dict):
+            return False
+        association = old["pull_requests"][0]
+        if (
+            association.get("number") != pr_number
+            or not isinstance(association.get("base"), dict)
+            or association["base"].get("sha") != base
+            or not isinstance(association.get("head"), dict)
+            or association["head"].get("sha") != head
+        ):
+            return False
+    return True
 
 
 def _observed_at() -> str:
@@ -618,9 +689,20 @@ def _validate_ai_scan_setting(setting: dict[str, Any]) -> None:
     if not isinstance(response, dict) or error is not None:
         raise EvidenceError("AI Scan setting response and error disagree")
     raw = response.get("pr_scan")
-    expected = raw if raw in {"enabled", "disabled"} else "unknown"
+    expected = raw if isinstance(raw, str) and raw in {"enabled", "disabled"} else "unknown"
     if state != expected:
         raise EvidenceError("AI Scan setting state contradicts its raw provider response")
+
+
+def _require_security_reconciliation(
+    scan: dict[str, Any], runs: list[dict[str, Any]], head: str,
+    pr_number: int, gate: dict[str, Any] | None,
+) -> None:
+    _, errors = ci_security_scan.reconcile(
+        {**scan, "head_workflow_runs": runs}, head, pr_number, gate
+    )
+    if errors:
+        raise EvidenceError("AI Scan provider observations disagree: " + "; ".join(errors))
 
 
 def _dynamic_security_gate(
@@ -660,6 +742,7 @@ def _dynamic_security_gate(
         scan["state"] = {
             "enabled": "missing", "disabled": "disabled_by_setting"
         }.get(setting["state"], "provider_state_unknown")
+        _require_security_reconciliation(scan, runs, head, pr_number, None)
         return None, None, None, scan
     if not checks and len(matches) == 1:
         pending_run = matches[0]
@@ -675,6 +758,7 @@ def _dynamic_security_gate(
                 ),
                 "run_status": pending_run["status"],
             })
+            _require_security_reconciliation(scan, runs, head, pr_number, None)
             return None, None, None, scan
     if len(checks) != 1 or len(matches) != 1:
         raise EvidenceError("dynamic security check/run is missing or ambiguous")
@@ -751,6 +835,7 @@ def _dynamic_security_gate(
         "prerequisites": definition["prerequisites"],
         "artifact_refs": [artifact_id],
     }
+    _require_security_reconciliation(scan, runs, head, pr_number, gate)
     return gate, artifact, payload, scan
 
 
@@ -1603,6 +1688,7 @@ def verify_premerge_provider_evidence(
         raise EvidenceError("receipt does not enumerate the complete live check-run set")
 
     security_definition = definitions.get("github-advanced-security")
+    retained_security_setting: dict[str, Any] | None = None
     if (
         isinstance(security_definition, dict)
         and security_definition.get("run_binding") == "dynamic"
@@ -1614,6 +1700,7 @@ def verify_premerge_provider_evidence(
         retained_setting = _required_object(
             security_scan.get("setting"), "receipt AI Scan setting"
         )
+        retained_security_setting = retained_setting
         _validate_ai_scan_setting(retained_setting)
         current_setting = _ai_scan_setting(client, head)
         if any(
@@ -1623,7 +1710,10 @@ def verify_premerge_provider_evidence(
             raise EvidenceError("receipt AI Scan setting differs from the current provider response")
         retained_runs = security_scan.get("head_workflow_runs")
         live_runs = client.get_all(f"/actions/runs?head_sha={head}", key="workflow_runs")
-        if retained_runs != live_runs:
+        if not _same_head_run_snapshot(
+            retained_runs, live_runs, run_id, pr_number, base, head,
+            allow_cleared_primary_association=not bool(live_associations),
+        ):
             raise EvidenceError("receipt AI Scan head-run query differs from GitHub")
         matching_runs = _matching_ai_scan_runs(live_runs, pr_number, head)
         matching_checks = _matching_ai_scan_checks(list(live_checks.values()))
@@ -1874,6 +1964,8 @@ def verify_premerge_provider_evidence(
             ):
                 raise EvidenceError("retained dynamic artifact setting or scan state is inconsistent")
             _validate_ai_scan_setting(setting)
+            if retained_security_setting is None or setting != retained_security_setting:
+                raise EvidenceError("retained dynamic artifact setting differs from the verified scan setting")
             snapshot_run = payload_value.get("workflow_run")
             run_fields = (
                 "id", "workflow_id", "name", "path", "event", "head_sha",

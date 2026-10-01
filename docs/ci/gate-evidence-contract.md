@@ -16,7 +16,7 @@ protected branch metadata; a SHA supplied by the PR is not a trust anchor.
 Missing or mismatched base, head or policy anchors deny admission.
 
 Evidence uses the exact schema version of the protected-base inventory. Version
-4 remains readable while the current protected base still contains version 4; its
+4 remains readable for historical protected-base evidence; its
 `github-advanced-security` entry retains the legacy independent-workflow
 binding and may be reported missing, so it cannot make auxiliary health true.
 Version 5 added `run_binding=check` for a runless check-app observation on the
@@ -173,6 +173,15 @@ optional warning, and the publication verifier refetches the setting, complete
 head-run list and check list before accepting the retained classification. If
 provider state has changed since collection, historical absence is no longer
 independently verifiable from a current response; verification fails closed.
+The schema derives the **exact** matching dynamic-run IDs from the retained
+head-run query using the trusted workflow ID, path, event, bot and PR head;
+declared IDs must agree. A pending run records its actual attempt and status,
+even before it has a check. The contract requires `security_scan` for this
+dynamic gate whether or not a check exists. The publication receipt compares
+the dynamic artifact's setting bytes with that same verified scan setting.
+After a merge, GitHub may clear the primary CI run's `pull_requests` array;
+receipt revalidation permits only that already checked association change and
+still requires every run ID, attempt, head, outcome and AI Scan match to agree.
 Cache warm and Docs have separate event selectors
 and cannot borrow either the primary or dynamic run.
 
@@ -180,7 +189,7 @@ Separate workflow runs on one head cannot silently supersede an older red
 required check: the collector denies a current claim if more than one CI run
 exists for that head. It also rechecks the run and attempt after collection.
 Failed-jobs-only reruns may reuse a successful job and candidate artifact from
-an earlier attempt; neither schema version can represent required gates spanning
+an earlier attempt; no supported schema version can represent required gates spanning
 attempts, so this collector currently denies that case conservatively.
 
 The local bundle contains `evidence.json`, `validation.json`, canonical
