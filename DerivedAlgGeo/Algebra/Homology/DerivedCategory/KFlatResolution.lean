@@ -207,6 +207,46 @@ lemma map_quasiIso (R : KFlatResolution C tensor) {K L : CochainComplex C ℤ}
     (f : K ⟶ L) (hf : W f) : W (R.resolution.map f) :=
   CochainComplex.quasiIso_map_of_comparison R.comparison R.comparison_quasiIso f hf
 
+/-- A quasi-isomorphism between K-flat complexes stays a quasi-isomorphism after tensoring
+on the right with any complex. The resolution of the other factor supplies the intermediate
+K-flat tensor, while the two K-flat endpoints invert its comparison map. -/
+theorem tensorRight_map_between_kflat (R : KFlatResolution C tensor)
+    {K L : CochainComplex C ℤ}
+    (hK : CochainComplex.IsKFlat tensor K)
+    (hL : CochainComplex.IsKFlat tensor L)
+    (g : K ⟶ L) (hg : W g) (M : CochainComplex C ℤ) :
+    IsIso (DerivedCategory.Q.map ((tensor.map g).app M)) := by
+  let a := (tensor.obj K).map (R.comparison.app M)
+  let b := (tensor.obj L).map (R.comparison.app M)
+  haveI ha : IsIso (DerivedCategory.Q.map a) :=
+    hK.tensorLeft_inverts (R.comparison.app M) (R.comparison_quasiIso M)
+  haveI hb : IsIso (DerivedCategory.Q.map b) :=
+    hL.tensorLeft_inverts (R.comparison.app M) (R.comparison_quasiIso M)
+  haveI ht : IsIso (DerivedCategory.Q.map ((tensor.map g).app (R.resolution.obj M))) :=
+    (R.isKFlat M).tensorRight_inverts g hg
+  have heq : DerivedCategory.Q.map a ≫ DerivedCategory.Q.map ((tensor.map g).app M) =
+      DerivedCategory.Q.map ((tensor.map g).app (R.resolution.obj M)) ≫
+        DerivedCategory.Q.map b := by
+    simp only [← Functor.map_comp]
+    exact congrArg (fun t => DerivedCategory.Q.map t)
+      ((tensor.map g).naturality (R.comparison.app M))
+  haveI hc : IsIso (DerivedCategory.Q.map a ≫ DerivedCategory.Q.map ((tensor.map g).app M)) := by
+    rw [heq]
+    exact IsIso.comp_isIso' ht hb
+  exact (isIso_comp_left_iff (DerivedCategory.Q.map a) _).mp hc
+
+/-- A quasi-isomorphism between K-flat complexes stays a quasi-isomorphism after tensoring
+on the left with any complex. This is the right-variable result for the flipped bifunctor. -/
+theorem tensorLeft_map_between_kflat (R : KFlatResolution C tensor)
+    {K L : CochainComplex C ℤ}
+    (hK : CochainComplex.IsKFlat tensor K)
+    (hL : CochainComplex.IsKFlat tensor L)
+    (g : K ⟶ L) (hg : W g) (M : CochainComplex C ℤ) :
+    IsIso (DerivedCategory.Q.map ((tensor.obj M).map g)) := by
+  let R' : KFlatResolution C tensor.flip :=
+    { R with isKFlat K := ⟨(R.isKFlat K).2, (R.isKFlat K).1⟩ }
+  exact tensorRight_map_between_kflat R' ⟨hK.2, hK.1⟩ ⟨hL.2, hL.1⟩ g hg M
+
 /-- Apply `tensor` after K-flat replacement in both inputs and then localize. -/
 def resolvedTensor (R : KFlatResolution C tensor) :
     CochainComplex C ℤ ⥤ CochainComplex C ℤ ⥤ DerivedCategory C :=
