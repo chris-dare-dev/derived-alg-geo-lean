@@ -123,8 +123,9 @@ private theorem stalkTensorLinearEquiv_natural {M N : X.Modules} (f : M ⟶ N) :
   · intro a b ha hb
     simp only [map_add, ha, hb]
 
-/-- For a fixed scheme-module sheaf, the stalk of its tensor with another sheaf
-is the tensor of the stalks. The comparison is natural in the other sheaf. -/
+/-- Compose the presheaf tensor/stalk equivalence with the stalk comparison
+for module sheafification. Both comparisons concern ordinary tensor products,
+so the fixed factor needs no flatness or local-freeness hypothesis. -/
 noncomputable def fixedLeftTensorStalkIso :
     moduleStalkFunctor X x ⋙
         tensorLeft (C := ModuleCat.{u} (X.presheaf.stalk x))
