@@ -20,7 +20,9 @@ the canonical good-truncation diagram and inclusion cocone.
 
 ## Main results
 
-`CochainComplex.isColimitTruncLETowerCocone` proves its colimit property.
+`CochainComplex.isColimitTruncLETowerCocone` proves its colimit property;
+`CochainComplex.isColimitMapTruncLETowerCocone` proves the colimit property
+after a zero-morphism-preserving functor is applied termwise.
 
 ## Implementation notes
 
