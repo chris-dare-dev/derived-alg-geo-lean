@@ -36,8 +36,8 @@ interfaces and their existing constructions.
 
 `Tensor/Relative.lean` is the compatibility layer for the bounded coherent tiers, not a fourth
 derived-tensor construction: it supplies
-`AlgebraicGeometry.DerivedCategory.FourierMukai.HasMonoidalDerivedPullback` for derived pullback along
-a morphism.
+`AlgebraicGeometry.DerivedCategory.FourierMukai.HasMonoidalDerivedPullback`
+for derived pullback along a morphism.
 
 `Tensor/FiniteKFlat.lean` proves that a finite supported complex with flat
 scheme-module terms is K-flat for the existing total tensor.
