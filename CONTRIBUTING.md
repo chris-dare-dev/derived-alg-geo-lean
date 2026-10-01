@@ -361,6 +361,23 @@ lake env lean scripts/StabilityConditionAudit.lean \
 python3 scripts/check_audit.py /tmp/stability-condition-audit.txt
 ```
 
+## Review evidence
+
+Local precheck and CI run `review-docs` (primary docstrings on new modules with
+commands and required sections in added or revised module docstrings) and
+`emission-sources` (tracked obligations, sweep imports,
+and emitter eligibility using pinned Lean's header parser). The latter is a
+source check; the emitted artifact and axiom verdict still require CI.
+
+Loop PR drafts carry a Claim evidence table distinguishing definition owners,
+re-exports, hypotheses, versioned source statements, and executable witnesses.
+Run `scripts/check_review_evidence.py inventory` over the changed documentation
+and draft before review, classify non-declaration spans with reasons, and
+compile the generated `probe` in ignored scratch. Keep permanent probes in
+Development with its verification export route. A reference check establishes
+existence and type, not novelty, an equivalence, or a literature attribution.
+The run-loop skill and `.claude/README.md` document the complete commands.
+
 ## Documentation
 
 Module docstrings should explain the mathematical statement, assumptions,

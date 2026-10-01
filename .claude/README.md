@@ -75,6 +75,52 @@ back after the runtimes have deleted the originals. The archive holds raw
 transcripts, so it never belongs in this repository. Loop runs do not need it;
 it exists to find out why they stop.
 
+## Review evidence and evaluation
+
+`scripts/check_review_evidence.py docs --base <SHA>` checks required sections
+only in new or changed primary module docstrings, preserving existing debt;
+new modules with commands also need a primary docstring. Import-only umbrellas
+and mid-file section notes do not need the full module template. `inventory`
+with `--draft scratch/pr-N.md` reports every inline reference occurrence in
+all docstrings in changed Lean modules, changed Markdown sections and the complete draft; `probe`
+with `--output scratch/ReferenceChecks.lean --run` checks all declaration tokens
+at root scope. Put justified non-declaration classifications in the draft's
+`## Reference classifications` table (`Token | Kind | Reason`). Paths are
+classified automatically; reviewers still inspect their meaning. Generated
+probes stay untracked; durable probes use Development and its sweep route.
+
+`scripts/check_emission_coverage.py --source-only` uses the pinned Lean header
+parser to check every tracked obligation against both sweep reachability and
+emitter root filters, without certifying axioms or replacing CI emission.
+
+`scripts/review_dispatch.py prepare` emits Codex tool arguments for a fresh,
+explicitly selected frontier reviewer on an immutable diff. `verdict` validates
+the trailer, commit, and mathematics evidence shape; it does not certify the
+mathematics. Claude's Agent/Task pre-tool hook enforces fresh reviewers and
+explicit model selection. Codex has no repository hook for collaboration:
+submit generated arguments unchanged and examine the archived actual dispatch
+metadata. Generated task names start `review_<role with underscores>_` so the
+archive can recognize reviewer dispatches. The digest reports requested settings separately from resolved model
+and effort; unavailable fields remain unavailable.
+
+`scripts/review_evaluation.py prompt <case> --worktree <path>` emits a synthetic
+challenge without answers. Prompts require the pinned Mathlib and each source's content
+fingerprint; a changed source makes the case unavailable until re-adjudication.
+Dispatch the emitted plaintext, which uses opaque labels; keep descriptive case
+ids and the command used to select the case outside the reviewer's context.
+A separate reviewer adjudicates each report into a local JSON list with `case`
+and `findings`; each finding has `id`, `severity`,
+`evidence`, `evidence_supported` (boolean), and an `adjudication` reason. `score
+<assessments.json>` reports recall, unsupported findings, severity errors,
+recurrence on repaired controls and evidence support. Unassessed cases and
+undefined rates are explicit. Keep reports and assessments in ignored scratch
+or the owner-only archive; never commit actual archived transcripts. The
+fixture's expected ids are for adjudicators, not the reviewer taking the test.
+
+Transcript merge counts require observed GitHub state (`number`, `url`, `state`,
+`mergedAt`), not successful auto-merge arming or disarming. Existing archives are
+reparsed on the next `sync`; absent output evidence is unknown, not a merge.
+
 ## The artifacts in `notes/`
 
 Produced 2026-08-04 by two multi-agent workflows (34 agents, ~4.2M tokens).
