@@ -24,8 +24,9 @@ literal `AlgebraicGeometry.Scheme.Modules.totalTensor` on cochain complexes.
 ## Main results
 
 `Tensor/Colimits.lean` proves ordinary sheaf tensor preserves colimits in
-either slot. `Tensor/ComplexColimits.lean` transfers sequential-colimit
-preservation to either fixed-input slot of the literal complex total.
+either slot. `Tensor/ComplexColimits.lean` transfers site-universe and
+small-shape colimit preservation to either fixed-input slot of the literal
+complex total; sequential diagrams are a specialization.
 `Tensor/Flat.lean` gives the termwise homology-preservation input for flat
 module sheaves.
 
