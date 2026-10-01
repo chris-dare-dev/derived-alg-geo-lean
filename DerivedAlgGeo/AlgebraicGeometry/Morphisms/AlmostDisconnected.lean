@@ -15,17 +15,49 @@ consists of a finite filtration of `𝒪_X`; each graded piece is the pushforwar
 an invertible sheaf from a closed subscheme `Xᵢ ↪ X` whose composite with `p` is an isomorphism
 to `Y`.
 
-The definition deliberately contains no stability-condition, moduli, or quotient-presentation
-data.  It is a `MorphismProperty`, so generic behavior belongs at this root and downstream
-stability adapters can consume it without owning it.
+## Main definitions
 
-The paper also proves flat-base-change and composition closure (Lemma B.2).  The geometric part
-of composition is implemented here at the common `SupportData` root.  The full closure theorems
-are not yet asserted: composition still needs line-bundle pullback and the tensor--pushforward
-projection formula, while base change needs the arbitrary cartesian comparison
-`g^* i_* L ≅ i'_* g'^* L` and an exact scheme-module pullback API.  In particular, the
-repository's current exact flat-pullback theorem lives below
-`DerivedCategory/Families`, which this root must not import.
+* `AlgebraicGeometry.AlmostDisconnected.SupportData`: a closed support identified with the base.
+* `AlgebraicGeometry.AlmostDisconnected.GradedPieceData`: a support with a line bundle and the
+  identification of a graded quotient with the pushforward of its inverse.
+* `AlgebraicGeometry.AlmostDisconnected.Witness`: a finite filtration of `𝒪_X` with such data for
+  every graded piece.
+* `AlgebraicGeometry.IsAlmostDisconnected`: the morphism property of admitting a witness.
+
+## Main results
+
+* `AlgebraicGeometry.AlmostDisconnected.SupportData.comp`: composition of support data, the
+  geometric part of the composition argument of Lemma B.2.
+* `AlgebraicGeometry.AlmostDisconnected.isoWitness` and
+  `AlgebraicGeometry.IsAlmostDisconnected.of_isIso`: an isomorphism is almost disconnected with one
+  step (`m = 1`, `X₁ = X`, `L₁ = 𝒪_X`).
+* `AlgebraicGeometry.IsAlmostDisconnected.isomorphisms_le` and
+  `AlgebraicGeometry.IsAlmostDisconnected.id`: the same facts as an inequality of morphism
+  properties and for the identity.
+
+## Implementation notes
+
+The definition deliberately contains no stability-condition, moduli, or quotient-presentation
+data.  It is a `CategoryTheory.MorphismProperty`, so generic behavior belongs at this root and
+downstream
+stability adapters can consume it without owning it.  Equalities in Definition B.1 are replaced by
+chosen isomorphisms.
+
+The closure of the property under flat base change and composition (Lemma B.2) is not asserted
+here.  Composition needs line-bundle pullback and the tensor--pushforward projection formula;
+base change needs the cartesian comparison `g^* i_* L ≅ i'_* g'^* L` for a closed immersion `i`,
+and exactness of flat pullback.  The statement of exactness of flat pullback is in
+`DerivedCategory/Families/FlatPullback.lean`, but its proof uses only the stalkwise API in
+`Modules/Pullback/Stalk.lean`, which this root may import.
+
+## References
+
+* [arXiv:2607.28411v1](https://arxiv.org/abs/2607.28411v1), Appendix B, Definition B.1 and
+  Lemma B.2.
+
+## Tags
+
+almost disconnected morphism, filtration, closed subscheme, line bundle
 -/
 
 open CategoryTheory Limits
@@ -47,7 +79,8 @@ noncomputable abbrev structureSheaf (X : Scheme.{u}) : X.Modules :=
 
 This is the common root of the graded-piece hierarchy: it owns only the closed subscheme and
 its identification with the base.  Line bundles and quotient comparisons are attached by
-`GradedPieceData`, so composition of supports does not depend on any module-theoretic choices. -/
+`AlgebraicGeometry.AlmostDisconnected.GradedPieceData`, so composition of supports does not depend
+on any module-theoretic choices. -/
 structure SupportData (p : X ⟶ Y) where
   /-- The closed support of the graded piece. -/
   support : Scheme.{u}
@@ -68,13 +101,44 @@ variable {p : X ⟶ Y}
 instance (D : SupportData p) : IsClosedImmersion D.inclusion :=
   D.inclusion_isClosedImmersion
 
-/-- The tautological support datum for an identity morphism. -/
-def identity (X : Scheme.{u}) : SupportData (𝟙 X) where
+/-- The tautological support datum for an isomorphism: the whole source, identified with the
+target by the morphism itself.
+
+The identification `baseIso := asIso p` is forced: the compatibility field then reads
+`p = 𝟙 X ≫ p`.  Taking `p = 𝟙 X` recovers
+`AlgebraicGeometry.AlmostDisconnected.SupportData.identity`. -/
+noncomputable def ofIsIso (p : X ⟶ Y) [IsIso p] : SupportData p where
   support := X
   inclusion := 𝟙 X
   inclusion_isClosedImmersion := inferInstance
-  baseIso := Iso.refl X
+  baseIso := asIso p
   baseIso_hom := by simp
+
+@[simp]
+theorem ofIsIso_support (p : X ⟶ Y) [IsIso p] : (ofIsIso p).support = X :=
+  rfl
+
+@[simp]
+theorem ofIsIso_inclusion (p : X ⟶ Y) [IsIso p] : (ofIsIso p).inclusion = 𝟙 X :=
+  rfl
+
+@[simp]
+theorem ofIsIso_baseIso (p : X ⟶ Y) [IsIso p] : (ofIsIso p).baseIso = asIso p :=
+  rfl
+
+/-- The tautological support datum for an identity morphism; an abbreviation for `ofIsIso (𝟙 X)`,
+so that it unfolds to the general isomorphism case. -/
+noncomputable abbrev identity (X : Scheme.{u}) : SupportData (𝟙 X) :=
+  ofIsIso (𝟙 X)
+
+/-- `identity X` unfolds to `ofIsIso (𝟙 X)`, whose
+`AlgebraicGeometry.AlmostDisconnected.SupportData.baseIso` is `asIso (𝟙 X)` and not syntactically
+`Iso.refl X`.  This lemma lets callers rewrite it to `Iso.refl X`; it holds by
+`CategoryTheory.Iso.ext`, since
+`AlgebraicGeometry.AlmostDisconnected.SupportData.baseIso_hom` fixes the forward map. -/
+theorem identity_baseIso (X : Scheme.{u}) : (identity X).baseIso = Iso.refl X := by
+  ext
+  simp [identity]
 
 /-- Compose two support data.
 
@@ -118,7 +182,8 @@ end SupportData
 
 /-- One graded piece of an almost-disconnected witness.
 
-The geometric support extends `SupportData`; the module-theoretic child adds the line bundle and
+The geometric support extends `AlgebraicGeometry.AlmostDisconnected.SupportData`; the
+module-theoretic child adds the line bundle and
 the comparison with the relevant quotient.  Keeping this inheritance explicit prevents future
 consumers from growing parallel support records with subtly different composition laws. -/
 structure GradedPieceData (p : X ⟶ Y) (Q : X.Modules) extends SupportData p where
@@ -131,7 +196,8 @@ structure GradedPieceData (p : X ⟶ Y) (Q : X.Modules) extends SupportData p wh
 /-- Explicit data witnessing that a scheme morphism is almost disconnected.
 
 This is Definition B.1 of arXiv:2607.28411v1, with equalities replaced by chosen isomorphisms.
-The line bundle stores both `Lᵢ` and its tensor inverse, so `gradedIso` can name `Lᵢ⁻¹`
+The line bundle stores both `Lᵢ` and its tensor inverse, so
+`AlgebraicGeometry.AlmostDisconnected.GradedPieceData.gradedIso` can name `Lᵢ⁻¹`
 without making a noncanonical choice. -/
 structure Witness (p : X ⟶ Y) where
   /-- The filtration `0 = F₀ ⊂ ⋯ ⊂ Fₘ = 𝒪_X`. -/
@@ -205,7 +271,8 @@ theorem compositionSupportData_support {q : Y ⟶ Z} (W : Witness p) (V : Witnes
     (compositionSupportData W V ij).support = V.support ij.2 :=
   rfl
 
-/-- The composite pair's inclusion is the root `SupportData.comp` inclusion. -/
+/-- The composite pair's inclusion is the root
+`AlgebraicGeometry.AlmostDisconnected.SupportData.comp` inclusion. -/
 @[simp]
 theorem compositionSupportData_inclusion {q : Y ⟶ Z} (W : Witness p) (V : Witness q)
     (ij : CompositionIndex W V) :
@@ -249,16 +316,23 @@ private noncomputable def identityFiltration (X : Scheme.{u}) :
     exact isZero_zero _
   terminalIso := Iso.refl _
 
-/-- Explicit almost-disconnected data for the identity morphism. -/
-noncomputable def identityWitness (X : Scheme.{u}) : Witness (𝟙 X) where
+/-- Explicit almost-disconnected data for an isomorphism: the one-step filtration `0 ⊂ 𝒪_X`
+whose only support is the whole source, with line bundle `𝒪_X`
+(`AlgebraicGeometry.Scheme.Modules.LineBundleData.unit`). -/
+noncomputable def isoWitness (p : X ⟶ Y) [IsIso p] : Witness p where
   filtration := identityFiltration X
   piece := fun _ =>
-    { toSupportData := SupportData.identity X
+    { toSupportData := SupportData.ofIsIso p
       lineBundle := Scheme.Modules.LineBundleData.unit X
       gradedIso := by
         change structureSheaf X ≅
           (Scheme.Modules.pushforward (𝟙 X)).obj (structureSheaf X)
         exact ((Scheme.Modules.pushforwardId X).app (structureSheaf X)).symm }
+
+/-- Explicit almost-disconnected data for the identity morphism; an abbreviation for
+`isoWitness (𝟙 X)`. -/
+noncomputable abbrev identityWitness (X : Scheme.{u}) : Witness (𝟙 X) :=
+  isoWitness (𝟙 X)
 
 end AlmostDisconnected
 
@@ -269,9 +343,20 @@ def IsAlmostDisconnected : MorphismProperty Scheme :=
 
 namespace IsAlmostDisconnected
 
+/-- An isomorphism is almost disconnected: Definition B.1 with `m = 1`, `X₁ = X` and
+`L₁ = 𝒪_X`, so the filtration is `0 ⊂ 𝒪_X` and `p ∘ ι₁ = p` is the required isomorphism.  The
+hypothesis `[IsIso p]` is what this one-step witness needs: with `ι = 𝟙 X`, the condition that
+`p ∘ ι₁` be an isomorphism is exactly `IsIso p`. -/
+theorem of_isIso {X Y : Scheme.{u}} (p : X ⟶ Y) [IsIso p] : IsAlmostDisconnected p :=
+  ⟨AlmostDisconnected.isoWitness p⟩
+
+/-- Isomorphisms are almost disconnected, as an inequality of morphism properties. -/
+theorem isomorphisms_le : MorphismProperty.isomorphisms Scheme ≤ IsAlmostDisconnected :=
+  fun _ _ p (_ : IsIso p) => of_isIso p
+
 /-- The identity morphism is almost disconnected. -/
 theorem id (X : Scheme.{u}) : IsAlmostDisconnected (𝟙 X) :=
-  ⟨AlmostDisconnected.identityWitness X⟩
+  of_isIso (𝟙 X)
 
 instance : IsAlmostDisconnected.ContainsIdentities where
   id_mem := id

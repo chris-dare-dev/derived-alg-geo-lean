@@ -14,14 +14,45 @@ geometric characterization used here: for separated `f : X ⟶ Y`, the first pro
 almost disconnected and every closed support occurring in its witness also maps isomorphically
 to `X` under the second projection.
 
-This formulation is intentionally an independent consumer of `IsAlmostDisconnected`; graph
+## Main definitions
+
+* `AlgebraicGeometry.FiltrationProperty.Witness`: the data of Lemma B.4 for a morphism `f`.
+* `AlgebraicGeometry.FiltrationProperty.Witness.automorphism`: the automorphism of `X` over `Y`
+  recovered from the two support isomorphisms of a graded piece.
+* `AlgebraicGeometry.HasFiltrationProperty`: the morphism property of admitting such a witness.
+
+## Main results
+
+* `AlgebraicGeometry.FiltrationProperty.monoWitness`,
+  `AlgebraicGeometry.HasFiltrationProperty.of_mono` and
+  `AlgebraicGeometry.HasFiltrationProperty.of_isIso`: monomorphisms, in particular isomorphisms,
+  have the filtration property.  For an isomorphism this is the trivial-Galois-group case of
+  Example 3.20(1); the mono case is not in the paper.
+* `AlgebraicGeometry.FiltrationProperty.monoWitness_automorphism_eq_refl`: the recovered
+  automorphism of this witness is the identity.
+* `AlgebraicGeometry.HasFiltrationProperty.monomorphisms_le`: the same as an inequality of
+  morphism properties.
+
+## Implementation notes
+
+This formulation is intentionally an independent consumer of
+`AlgebraicGeometry.IsAlmostDisconnected`; graph
 sheaves and stability conditions do not enter the morphism root.  The two support isomorphisms
 canonically recover the relative automorphisms appearing in Definition 3.19.
 
-Lemma B.5 (flat-base-change stability) will follow from Lemma B.2 plus the standard comparison
+Lemma B.5 (flat-base-change stability) follows from Lemma B.2 plus the standard comparison
 between base change of the relative self-product and the self-product after base change.  It is
-not asserted until the missing neutral flat-pullback/pushforward comparison documented in
-`AlmostDisconnected.lean` exists.
+not asserted until Lemma B.2 and the cartesian comparison described in
+`AlmostDisconnected.lean` exist.
+
+## References
+
+* [arXiv:2607.28411v1](https://arxiv.org/abs/2607.28411v1), Definition 3.19, Example 3.20(1) and
+  Appendix B, Lemma B.4.
+
+## Tags
+
+filtration property, almost disconnected morphism, kernel pair, Galois cover
 -/
 
 open CategoryTheory Limits
@@ -92,11 +123,56 @@ noncomputable def overAutomorphism (i : Fin W.kernel.filtration.length) :
 
 end Witness
 
+/-- The filtration property of a monomorphism, with the single support `X ×_Y X ≅ X`.
+
+For a monomorphism `f` both projections of `X ×_Y X` are isomorphisms and agree
+(`CategoryTheory.Limits.fst_eq_snd_of_mono_eq`).  So
+`AlgebraicGeometry.AlmostDisconnected.isoWitness` for the first
+projection is a one-step kernel witness, and Lemma B.4 requires `p₂ ∘ ι₁` to be an isomorphism as
+well, which holds because `p₂ = p₁`.  Separatedness is Mathlib's
+`AlgebraicGeometry.IsSeparated.isSeparated_of_mono`. -/
+noncomputable def monoWitness (f : X ⟶ Y) [Mono f] : Witness f where
+  isSeparated := inferInstance
+  kernel := AlmostDisconnected.isoWitness (pullback.fst f f)
+  secondProjectionIso := fun _ => (asIso (pullback.snd f f) : pullback f f ≅ X)
+  secondProjectionIso_hom := fun _ => by
+    change (asIso (pullback.snd f f)).hom = 𝟙 _ ≫ pullback.snd f f
+    simp
+
+/-- For a monomorphism `f`, the automorphism `p₂ ∘ ι₁ ∘ (p₁ ∘ ι₁)⁻¹` that the witness
+`monoWitness f` recovers in Lemma B.4 is the identity, because `p₁ = p₂`
+(`CategoryTheory.Limits.fst_eq_snd_of_mono_eq`). -/
+theorem monoWitness_automorphism_eq_refl (f : X ⟶ Y) [Mono f]
+    (i : Fin (monoWitness f).kernel.filtration.length) :
+    (monoWitness f).automorphism i = Iso.refl X := by
+  ext
+  change (asIso (pullback.fst f f)).inv ≫ (asIso (pullback.snd f f)).hom = 𝟙 _
+  simp [fst_eq_snd_of_mono_eq f]
+
 end FiltrationProperty
 
 /-- The filtration property of Definition 3.19, represented by the equivalent scheme-theoretic
 criterion of Lemma B.4 of arXiv:2607.28411v1. -/
 def HasFiltrationProperty : MorphismProperty Scheme :=
   fun _ _ f => Nonempty (FiltrationProperty.Witness f)
+
+namespace HasFiltrationProperty
+
+/-- A monomorphism has the filtration property: `X ×_Y X ≅ X`, the single graph is the diagonal
+and the automorphism is the identity
+(`AlgebraicGeometry.FiltrationProperty.monoWitness_automorphism_eq_refl`). -/
+theorem of_mono {X Y : Scheme.{u}} (f : X ⟶ Y) [Mono f] : HasFiltrationProperty f :=
+  ⟨FiltrationProperty.monoWitness f⟩
+
+/-- Monomorphisms have the filtration property, as an inequality of morphism properties. -/
+theorem monomorphisms_le : MorphismProperty.monomorphisms Scheme ≤ HasFiltrationProperty :=
+  fun _ _ f (_ : Mono f) => of_mono f
+
+/-- An isomorphism has the filtration property.  This is the trivial-Galois-group case of
+Example 3.20(1) of arXiv:2607.28411v1, in the Lemma B.4 formulation. -/
+theorem of_isIso {X Y : Scheme.{u}} (f : X ⟶ Y) [IsIso f] : HasFiltrationProperty f :=
+  of_mono f
+
+end HasFiltrationProperty
 
 end AlgebraicGeometry
