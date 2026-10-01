@@ -3,6 +3,9 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.Basic
+import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.Definition
+import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.Autoequivalence
+import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.BraidStatement
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.GrothendieckGroup
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.Mukai
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.StabilityAction
@@ -13,6 +16,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.EnhancedFunctorH
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.EnhancedFunctorK0
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.ObjectTwistK0
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.LinearObjectTwistK0
+import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.ObjectTwistData
 
 /-! # The spherical twist
 
@@ -40,4 +44,10 @@ but the Morita/higher-cone theorem of Anno--Logvinenko is not a repository
 primitive.  The object-specific
 evaluation functor `RHom(E,-) ⊗ E` and its identification with a
 Fourier--Mukai kernel remain geometric realization obligations.
+
+`Definition.lean` states the functor `T_E` on an arbitrary `k`-linear pretriangulated category as
+supplied data, `SphericalTwistData`, and proves that its map on `K₀` is `twistK₀`.
+`ObjectTwistData.lean` realizes it by both dg object twists. `Autoequivalence.lean` and
+`BraidStatement.lean` state the Seidel--Thomas autoequivalence and braid theorems as supplied,
+unasserted structures, and derive their `TwistShaped` and `K₀` consequences.
 -/

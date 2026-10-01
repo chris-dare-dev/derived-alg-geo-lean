@@ -1,0 +1,166 @@
+{
+  "pin": "520045ab14e26149ee970e2e617ca04b09bde5d6",
+  "cases": [
+    {
+      "id": "definition-owner",
+      "role": "repository-boundary-adversary",
+      "claim": "Scheme Spec and Scheme.Spec are defined in Mathlib/AlgebraicGeometry/Spec.lean. PrimeSpectrum is defined in RingTheory/Spectrum/Prime/Topology.lean.",
+      "sources": [
+        "Mathlib/AlgebraicGeometry/Scheme.lean",
+        "Mathlib/RingTheory/Spectrum/Prime/Defs.lean"
+      ],
+      "expected": {
+        "scheme-owner": "should-fix",
+        "prime-owner": "should-fix"
+      },
+      "source_sha256": {
+        "Mathlib/AlgebraicGeometry/Scheme.lean": "211a5708e913082a004d34fe447aff1e13bd5ac50844d1bede3d5904c07d444a",
+        "Mathlib/RingTheory/Spectrum/Prime/Defs.lean": "5bc1b88d94819cc57afe52b710a377ae2f6c315911c8dcb5ee891a7c3cc298b6"
+      }
+    },
+    {
+      "id": "upstream-novelty",
+      "role": "abstraction-adversary",
+      "claim": "Mathlib only proves the quasi-coherent case. The local isIso_fromTilde\u0393_iff_isLocalizedModule supplies a new criterion for arbitrary affine module sheaves.",
+      "sources": [
+        "Mathlib/AlgebraicGeometry/Modules/Tilde.lean",
+        "DerivedAlgGeo/AlgebraicGeometry/Modules/Affine/Comparison.lean"
+      ],
+      "expected": {
+        "upstream-equivalence": "should-fix"
+      },
+      "source_sha256": {
+        "Mathlib/AlgebraicGeometry/Modules/Tilde.lean": "fbed17a5eca8fe9ab8d6e3bf10284fd036fc0de3b1b2bcd8c8c7eb45634b672c",
+        "DerivedAlgGeo/AlgebraicGeometry/Modules/Affine/Comparison.lean": "dc1307abe6a68fa2ba1861ffff368c6d6e4dd5b75336ef0c294ff8f8937be243"
+      }
+    },
+    {
+      "id": "iff-direction",
+      "role": "mathematics-adversary",
+      "claim": "For IsIso M.fromTilde\u0393 \u2194 IsLocalizing (...), localization implies invertibility by the forward direction.",
+      "sources": [
+        "Mathlib/AlgebraicGeometry/Modules/Tilde.lean"
+      ],
+      "expected": {
+        "direction": "should-fix"
+      },
+      "source_sha256": {
+        "Mathlib/AlgebraicGeometry/Modules/Tilde.lean": "fbed17a5eca8fe9ab8d6e3bf10284fd036fc0de3b1b2bcd8c8c7eb45634b672c"
+      }
+    },
+    {
+      "id": "one-way-overclaim",
+      "role": "mathematics-adversary",
+      "claim": "The local theorem isIso_fromTilde\u0393_app_basicOpen proves that a component is invertible exactly when the basic-open restriction is a localization.",
+      "sources": [
+        "DerivedAlgGeo/AlgebraicGeometry/Modules/Affine/Comparison.lean"
+      ],
+      "expected": {
+        "one-way": "should-fix"
+      },
+      "source_sha256": {
+        "DerivedAlgGeo/AlgebraicGeometry/Modules/Affine/Comparison.lean": "dc1307abe6a68fa2ba1861ffff368c6d6e4dd5b75336ef0c294ff8f8937be243"
+      }
+    },
+    {
+      "id": "source-attribution",
+      "role": "mathematics-adversary",
+      "claim": "The supplied source states only that the sheaf associated to a module has the expected basic-open sections and stalks. The draft attributes to that same statement recovery of every quasi-coherent affine sheaf from global sections.",
+      "sources": [
+        "Mathlib/AlgebraicGeometry/Modules/Tilde.lean"
+      ],
+      "expected": {
+        "attribution-scope": "should-fix"
+      },
+      "source_sha256": {
+        "Mathlib/AlgebraicGeometry/Modules/Tilde.lean": "fbed17a5eca8fe9ab8d6e3bf10284fd036fc0de3b1b2bcd8c8c7eb45634b672c"
+      }
+    },
+    {
+      "id": "tracked-scratch",
+      "role": "repository-boundary-adversary",
+      "claim": "A new tracked scratch/Checks.lean imports the affine modules and compiles. Adding an import of scratch.Checks to DerivedAlgGeoSweep makes it eligible for the emitter.",
+      "sources": [
+        "exe/Emit.lean",
+        "scripts/check_emission_coverage.py"
+      ],
+      "expected": {
+        "emitter-filter": "blocker"
+      },
+      "source_sha256": {
+        "exe/Emit.lean": "948af3251aa23a879faa02724a94cdb995a9a858cad5d05cbc5f0f15e590fc23",
+        "scripts/check_emission_coverage.py": "de0f0fdf34365313713d2959ad958cc0420fc5a9d2d3cb646329a29f39862530"
+      }
+    },
+    {
+      "id": "module-doc-sections",
+      "role": "mathlib-reviewer",
+      "claim": "A newly added verification module has a title and a useful opening summary, but omits Main definitions, Main results, Implementation notes, References and Tags. Its author says a passing text style check establishes documentation completeness.",
+      "sources": [
+        ".claude/references/mathlib-style.md",
+        "scripts/check_mathlib_style.py"
+      ],
+      "expected": {
+        "doc-completeness": "should-fix"
+      },
+      "source_sha256": {
+        ".claude/references/mathlib-style.md": "283949c6dba3d3d81fd69e09a63776cb9b58363b1a6ae17e72a5fa8b6bdf8989",
+        "scripts/check_mathlib_style.py": "909729a9db3fc508d5b21a75c0d50b5b435d1c1d0462755be1584d7675fd0df6"
+      }
+    },
+    {
+      "id": "omitted-occurrence",
+      "role": "mathlib-reviewer",
+      "claim": "The new leaf docstring now uses CategoryTheory.GrothendieckTopology.CoversTop. The changed companion module and PR draft still say GrothendieckTopology.CoversTop at root scope. Only the new leaf was checked.",
+      "sources": [
+        "DerivedAlgGeo/Topology/Category/TopCat/Opens/CoversTop.lean"
+      ],
+      "expected": {
+        "reference-coverage": "should-fix"
+      },
+      "source_sha256": {
+        "DerivedAlgGeo/Topology/Category/TopCat/Opens/CoversTop.lean": "4d1a289a6ba8f04695cbe3289d266835d1a8feb1e8c60b88ef44facf4b261db0"
+      }
+    },
+    {
+      "id": "proj-hypothesis",
+      "role": "mathematics-adversary",
+      "claim": "Proj.basicOpenIsoSpec identifies D(f) with the spectrum of HomogeneousLocalization.Away for every homogeneous element, including degree zero.",
+      "sources": [
+        "Mathlib/AlgebraicGeometry/ProjectiveSpectrum/Basic.lean"
+      ],
+      "expected": {
+        "positive-degree": "should-fix"
+      },
+      "source_sha256": {
+        "Mathlib/AlgebraicGeometry/ProjectiveSpectrum/Basic.lean": "482679c638fc474fa50b011d709adb8dcdc790257773e34a00e39190b4d36d68"
+      }
+    },
+    {
+      "id": "repaired-direction",
+      "family": "iff-direction",
+      "after_repair": true,
+      "role": "mathematics-adversary",
+      "claim": "For IsIso M.fromTilde\u0393 \u2194 IsLocalizing (...), localization implies invertibility by the right-to-left direction (.mpr).",
+      "sources": [
+        "Mathlib/AlgebraicGeometry/Modules/Tilde.lean"
+      ],
+      "expected": {},
+      "source_sha256": {
+        "Mathlib/AlgebraicGeometry/Modules/Tilde.lean": "fbed17a5eca8fe9ab8d6e3bf10284fd036fc0de3b1b2bcd8c8c7eb45634b672c"
+      }
+    },
+    {
+      "id": "correct-comparison",
+      "role": "abstraction-adversary",
+      "claim": "The local whole-counit criterion is a retained restatement of Mathlib's IsLocalizing criterion. The predicates agree definitionally, witnessed by Iff.rfl. Proj charts retain homogeneity and positive-degree hypotheses.",
+      "sources": [
+        "DerivedAlgGeo/Development/AffineProjectiveFoundations.lean"
+      ],
+      "expected": {},
+      "source_sha256": {
+        "DerivedAlgGeo/Development/AffineProjectiveFoundations.lean": "9a88359ee102c7fae7859e69269f1c7f589b81bdb482251f4dd145fd2222afe8"
+      }
+    }
+  ]
+}

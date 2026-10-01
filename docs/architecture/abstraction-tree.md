@@ -401,9 +401,9 @@ LinearAlgebra
 │     ├─ stability wall adapter          CentralCharge/Quadratic.lean
 │     ├─ kernel negativity               one half of quadratic support
 │     └─ Mukai.expCharge                 existing exponential presentation
-├─ conditional lattice root (#1230)      not landed: second consumer unresolved
-│  └─ Lattice.pairCharge                 retain existing functional/bridges meanwhile
-├─ conditional graded pairing (#1230)    separate two-consumer decision
+├─ lattice root (#1230)                  WITHDRAWN 2026-09-30, never landed
+│  └─ Lattice.pairCharge                 expCharge already specialises centralCharge
+├─ graded pairing (#1230)                WITHDRAWN: no consumer; odd form refuted
 │  └─ n = 2 must compare to realPairing  never a second definition
 └─ Mukai.pairing / selfPairing           Lattice/Mukai/Basic.lean:56,143
    ARITY IS FIXED AT THREE               generalise over the coefficient ring only
@@ -636,6 +636,16 @@ unification that looks right in the literature and is false here.
   their `B`-twisted top coordinates are respectively `0` and `1`.
   `ChernCharacter.twist_rankOne_eq_exp` compares the valid `B=βH` slice;
   `ChargeCoordinates.twistByScalar_eq_exp` includes the weight `H²` on rank.
+- **A nonsymmetric lattice charge root is not worth a name (#1230, withdrawn).**
+  `Mukai.expCharge` is by definition `PeriodDomain.centralCharge (realForm b)` at
+  the exponential pair, so the two charges were already one root. Neither leaf's
+  API uses symmetry of `b`, which means dropping it generalizes nothing they
+  need, and for nonsymmetric `b` the identity `expCharge = pairCharge
+  (realPairing b)` is false: `polar (realForm b)` is the symmetrization. Under
+  clause 2a the remaining content was a thin Lift (add, smul, zero, kernel) with
+  no consumer asking for it. The one hand-rolled copy of the form, `cPair`, is
+  symmetric and may be re-expressible through `centralCharge` (#1810). Recorded
+  in [the generalization backlog](generalization-backlog.md).
 - **The graded pairing needs no second root at `n = 2`.** Its comparison
   with `Mukai.realPairing` must exhibit the actual coordinate identification
   and normalization. A function space and a product carrier are not thereby
@@ -751,7 +761,7 @@ The policy is partly mechanical and partly a review obligation:
 - `scripts/check_umbrella_coverage.py` keeps every specialization in the public
   tree;
 - `scripts/check_single_instantiation.py` checks its configured paths for
-  thin abstractions; the two-consumer obligation still applies outside its scan;
+  thin abstractions; the clause 2 adoption obligation for carriers still applies outside its scan;
 - `scripts/check_roadmap.py` keeps materialized lanes synchronized with their
   tracker issues;
 - the pull-request template and the ownership decision record capture the

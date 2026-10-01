@@ -27,6 +27,16 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "Agent|Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/review_dispatch.py\" hook",
+            "timeout": 10
+          }
+        ]
       }
     ]
   }
