@@ -19,7 +19,8 @@ have covering families the Zariski topology does not.
 
 This file raises the descent level for representable stacks:
 
-* `representableFppfStack` and `representableEtaleStack`, whose stack
+* the `representableFppfStack` and `representableEtaleStack` abbreviations
+  imported from `Stacks/Representable.lean`, whose stack
   condition is Mathlib's fpqc descent theorem for representable presheaves,
   restricted along `Scheme.fppfTopology ≤ Scheme.fpqcTopology` and
   `Scheme.etaleTopology ≤ Scheme.fppfTopology`;
@@ -104,24 +105,6 @@ abbrev zariskiCoverToEtale {S : Scheme.{u}}
 
 /-! ## Representable stacks at the fppf and étale levels -/
 
-/-- The big-fppf stack represented by a scheme `X`.
-
-The descent condition is genuinely stronger than the one carried by
-`representableZariskiStack`: it is Mathlib's fpqc descent theorem for
-representable presheaves, restricted to fppf coverings. -/
-def representableFppfStack (X : Scheme.{u}) :
-    StackInGroupoids Scheme.{u} Scheme.fppfTopology :=
-  stackInGroupoidsOfSheaf Scheme.fppfTopology (yoneda.obj X)
-    (GrothendieckTopology.Subcanonical.isSheaf_of_isRepresentable
-      (J := Scheme.fppfTopology.{u}) (yoneda.obj X))
-
-/-- The big-étale stack represented by a scheme `X`. -/
-def representableEtaleStack (X : Scheme.{u}) :
-    StackInGroupoids Scheme.{u} Scheme.etaleTopology :=
-  stackInGroupoidsOfSheaf Scheme.etaleTopology (yoneda.obj X)
-    (GrothendieckTopology.Subcanonical.isSheaf_of_isRepresentable
-      (J := Scheme.etaleTopology.{u}) (yoneda.obj X))
-
 @[simp]
 theorem representableFppfStack_presheaf (X : Scheme.{u}) :
     (representableFppfStack X).presheaf = (representableZariskiStack X).presheaf :=
@@ -137,7 +120,7 @@ theorem representableEtaleStack_presheaf (X : Scheme.{u}) :
 theorem representableEtaleStack_eq_ofLE (X : Scheme.{u}) :
     representableEtaleStack X =
       (representableFppfStack X).ofLE Scheme.etaleTopology_le_fppfTopology :=
-  rfl
+  (StackInGroupoids.representable_ofLE Scheme.etaleTopology_le_fppfTopology X).symm
 
 /-- The existing big-Zariski layer is the restriction of the fppf level.
 
@@ -147,7 +130,7 @@ fppf level had to be proved rather than derived from the Zariski layer. -/
 theorem representableZariskiStack_eq_ofLE (X : Scheme.{u}) :
     representableZariskiStack X =
       (representableFppfStack X).ofLE Scheme.zariskiTopology_le_fppfTopology :=
-  rfl
+  (StackInGroupoids.representable_ofLE Scheme.zariskiTopology_le_fppfTopology X).symm
 
 /-- A morphism `T ⟶ X`, as an object of the fppf stack represented by `X`.
 The fiber categories are literally those of the Zariski layer. -/

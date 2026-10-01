@@ -1239,3 +1239,200 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   wrapper, but some compatibility evidence cannot be dropped from the
   transported-triangulation proof.
 - state:              FALSIFIED (literal compatibility-evidence deletion fails)
+
+### 2026-09-30 — `discretePseudofunctorMap` (issue #1635)
+- chunk:              1635-representable-stacks
+- reviewing commit:   a30793798c7faecef2a83895df639b53934eb3f8
+- found by:           altitude-scout
+- proposed ancestor:  a natural-transformation adapter for
+  `Functor.toPseudofunctor'`, owned by
+  `CategoryTheory/Bicategory/Functor/LocallyDiscrete.lean`; a discrete map
+  specializes it using `Functor.whiskerRight φ typeToCat`
+- weaker hypotheses:  `{I B : Type*} [Category* I] [Bicategory B] [Strict B]
+  and `{F G : I ⥤ B} (φ : F ⟶ G)`; no presheaf variance, discrete fibers,
+  sheaf condition, Grothendieck topology, groupoid condition, or scheme
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Bicategory/Functor/LocallyDiscrete.lean:146`
+- source note:        At the pin `Functor.toPseudofunctor'` already promotes an
+  ordinary functor into any strict bicategory. The precise NatTrans adapter
+  is not declared there; it is a new adapter on that existing root, with
+  `app T := φ.app T.as` and `naturality f := eqToIso (φ.naturality f.as)`.
+  The three coherence proofs reduce using `LocallyDiscrete.eq_of_hom`,
+  `Strict.leftUnitor_eqToIso`, `Strict.rightUnitor_eqToIso`, and
+  `Strict.associator_eqToIso`. Its proposed implementation is typechecked
+  in `scratch/altitude-probe-1635.lean:29`.
+  `Functor.whiskerRight` is at
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Whiskering.lean:61`, with
+  component `typeToCat.map (φ.app T)`. `typeToCat` is at
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Category/Cat.lean:408`,
+  and its map is literally `Discrete.functor (Discrete.mk ∘ f)` (:410).
+  Scratch examples at :42 and :47 confirm by `rfl` both
+  `Discrete.mk (φ.app T x)` and `Discrete.mk (g ≫ f)` for `yoneda.map f`.
+  This is a possible foundation for later consolidation, not a request to
+  introduce another pseudofunctor or stack carrier.
+- state:              UNVERIFIED
+
+### 2026-09-30 — `StackInGroupoids.representable` (issue #1635)
+- chunk:              1635-representable-stacks
+- reviewing commit:   a30793798c7faecef2a83895df639b53934eb3f8
+- found by:           altitude-scout
+- proposed ancestor:  the existing `stackInGroupoidsOfSheaf` constructor,
+  specialized with `GrothendieckTopology.Subcanonical.isSheaf_of_isRepresentable`;
+  the upstream represented-sheaf API is `CategoryTheory/Sites/Canonical.lean`
+- weaker hypotheses:  arbitrary `C`, arbitrary subcanonical `J`, and any
+  `{P : Cᵒᵖ ⥤ Type w} [P.IsRepresentable]`; the underlying discrete-stack
+  constructor already works for any `P` supplied with a `J`-sheaf proof
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Sites/Canonical.lean:151`
+- source note:        The pinned theorem is universe-general in `P` and is
+  stronger than a theorem restricted to literal `yoneda.obj X`. The same
+  file packages the entire sheaf-valued Yoneda functor as
+  `GrothendieckTopology.yoneda` (:168) and its raised-universe variant
+  `uliftYoneda` (:176). For relative sites the existing instance
+  `.lake/packages/mathlib/Mathlib/CategoryTheory/Sites/SubcanonicalOver.lean:25`
+  proves `(J.over X).Subcanonical` without geometry. The repository root
+  `DerivedAlgGeo/CategoryTheory/Sites/Descent/StackInGroupoids/Discrete.lean:131`
+  already supplies the stack constructor and :28 supplies its pseudofunctor;
+  a new representable carrier, independently assumed descent, or a relative
+  representable carrier is unnecessary. The issue's `yoneda.obj X`
+  specialization can keep the existing `StackInGroupoids` owner.
+- state:              UNVERIFIED
+
+### 2026-09-30 — `fppfTopology_eq_propQCTopology` and `etaleTopology_eq_propQCTopology` (issue #1635)
+- chunk:              1635-representable-stacks
+- reviewing commit:   a30793798c7faecef2a83895df639b53934eb3f8
+- found by:           altitude-scout
+- proposed ancestor:  `AlgebraicGeometry/Sites/QuasiCompact.lean`, with
+  `precoverage P = propQCPrecoverage P` and
+  `grothendieckTopology P = propQCTopology P` for every open-map property `P`
+- weaker hypotheses:  `{P : MorphismProperty Scheme.{u}}`
+  `(hP : P ≤ fun _ _ f ↦ IsOpenMap f.base)` only; no multiplicativity,
+  base-change stability, flatness, local finite presentation, or étaleness
+  is needed for the generic equality
+- pin status:         PIN-CONFIRMED
+  `.lake/packages/mathlib/Mathlib/AlgebraicGeometry/Sites/QuasiCompact.lean:87`
+- source note:        The pinned source already proves
+  `precoverage P ≤ qcPrecoverage` from exactly `hP`.
+  `propQCPrecoverage P` is `qcPrecoverage ⊓ precoverage P` (:112), so
+  `le_antisymm (le_inf (precoverage_le_qcPrecoverage_of_isOpenMap hP) le_rfl)
+  inf_le_right` proves the equality. `congrArg Precoverage.toGrothendieck`
+  proves the corresponding topology equality. Both typechecked as scratch
+  examples (:10 and :18) without extra hypotheses. Exact equality names are
+  absent at the pin; this is a pin-supported generic derivation, not a claim
+  that the requested fppf/étale equalities are already named. The fppf
+  specialization repeats Mathlib's own use of the open-map inequality in
+  `.lake/packages/mathlib/Mathlib/AlgebraicGeometry/Sites/Fpqc.lean:66`.
+  The generic equality is an extension of scheme-site machinery, not neutral
+  category theory: quasi-compact covers and underlying open maps keep its
+  owner under `AlgebraicGeometry/Sites/`.
+- state:              UNVERIFIED
+
+
+### 2026-09-30 — individual representables need only objectwise sheafhood
+
+- chunk: `stk2-1-1635-representable-stacks`
+- reviewing commit: a30793798c7faecef2a83895df639b53934eb3f8
+- found by: `hypothesis-elimination-scout`
+- proposed ancestor: existing `stackInGroupoidsOfSheaf` and planned
+  `StackInGroupoids.discreteMap`, in `CategoryTheory/Sites/Descent/StackInGroupoids/`
+- weaker hypotheses: arbitrary category `C`; `Presieve.IsSheaf J (yoneda.obj X)`
+  for one constructor, and the two objectwise sheaf proofs for a map;
+  omit `[J.Subcanonical]` from this proof-witness formulation.
+- pin status: `PIN-CONFIRMED`
+- source note: private scratch file compiled with the exact bounded command
+  above. `PUnit` at the top topology verifies that this is strictly weaker than
+  requiring all representables to be sheaves. No new public root is required.
+- state: UNVERIFIED
+- proof classification: L (proof-witness verified; compiled candidate, not merged)
+
+### 2026-09-30 — restriction needs no explicit lower subcanonical class
+
+- chunk: `stk2-1-1635-representable-stacks`
+- reviewing commit: a30793798c7faecef2a83895df639b53934eb3f8
+- found by: `hypothesis-elimination-scout`
+- proposed ancestor: planned `StackInGroupoids.representable_ofLE`, with the
+  arbitrary-sheaf restriction equality in `Discrete.lean`
+- weaker hypotheses: retain `[J₂.Subcanonical]`, `h : J₁ ≤ J₂`, and `X : C`;
+  omit `[J₁.Subcanonical]` and derive it with Mathlib's
+  `GrothendieckTopology.Subcanonical.of_le h`. More generally retain only a
+  sheaf proof for arbitrary `P` at `J₂`, and transport it by
+  `Presieve.isSheaf_of_le _ h hP`.
+- pin status: `PIN-CONFIRMED`
+- source note: both resulting equalities compile by `rfl` in the private
+  scratch file with the exact bounded command above.
+- state: UNVERIFIED
+- proof classification: L (proof-witness verified; compiled candidate, not merged)
+
+### 2026-09-30 — QC comparison consumes ordinary openness only
+
+- chunk: `stk2-1-1635-representable-stacks`
+- reviewing commit: a30793798c7faecef2a83895df639b53934eb3f8
+- found by: `hypothesis-elimination-scout`
+- proposed ancestor: `AlgebraicGeometry.Scheme.precoverage_eq_propQCPrecoverage_of_isOpenMap`
+  and induced topology equality, beside Mathlib's `Sites/QuasiCompact.lean`
+- weaker hypotheses: any `P : MorphismProperty Scheme.{u}` and
+  `P ≤ fun _ _ f ↦ IsOpenMap f.base`; omit flatness, local finite presentation,
+  étaleness, stability, multiplicativity, locality, or finiteness assumptions.
+- pin status: `PIN-CONFIRMED`
+- source note: `le_antisymm (le_inf
+  (precoverage_le_qcPrecoverage_of_isOpenMap hP) le_rfl) inf_le_right`
+  compiles, and `congrArg Precoverage.toGrothendieck` gives the topology
+  equality. The parent plans these generic results in
+  `DerivedAlgGeo/AlgebraicGeometry/Sites/QuasiCompact.lean`.
+- state: UNVERIFIED
+- proof classification: L (proof-witness verified; compiled candidate, not merged)
+
+### 2026-09-30 — delete subcanonicity without an objectwise sheaf replacement
+
+- chunk: `stk2-1-1635-representable-stacks`
+- reviewing commit: a30793798c7faecef2a83895df639b53934eb3f8
+- found by: `hypothesis-elimination-scout`
+- attempted weaker hypotheses: arbitrary category `C`, topology `J`, object `X`,
+  with no `[J.Subcanonical]` and no `IsSheaf J (yoneda.obj X)` proof.
+- pin status: `PIN-CONFIRMED`
+- source note: compiled `bool_yoneda_not_sheaf_top` and
+  `bool_discrete_not_stack_top` for `C = Type`, `J = ⊤`, `X = Bool`.
+  The empty cover of `PUnit` makes the false and true maps have indistinguishable
+  descent data. Full faithfulness would produce a morphism between their
+  discrete fibre objects, forcing `false = true`.
+- state: `FALSIFIED (compiled counterexample)`
+
+### 2026-09-30 — a morphism and one sheaf endpoint imply the other endpoint is a sheaf
+
+- chunk: `stk2-1-1635-representable-stacks`
+- reviewing commit: a30793798c7faecef2a83895df639b53934eb3f8
+- found by: `hypothesis-elimination-scout`
+- attempted weaker hypotheses: only the source sheaf proof or only the target
+  sheaf proof in `discreteMap`, retaining the natural transformation.
+- pin status: `PIN-CONFIRMED`
+- source note: compiled examples give arrows `PUnit ⟶ Bool` and `Bool ⟶ PUnit`,
+  while `yoneda.obj PUnit` is a sheaf at `⊤` and `yoneda.obj Bool` is not.
+  Thus neither endpoint's proof can generally be reconstructed from the other.
+- state: `FALSIFIED (compiled counterexample)`
+
+### 2026-09-30 — reverse topology restriction
+
+- chunk: `stk2-1-1635-representable-stacks`
+- reviewing commit: a30793798c7faecef2a83895df639b53934eb3f8
+- found by: `hypothesis-elimination-scout`
+- attempted weaker hypotheses: use descent for a coarser topology to obtain
+  descent for a finer topology without further proof.
+- pin status: `PIN-CONFIRMED`
+- source note: compiled conjunction proves `yoneda.obj Bool` is a sheaf for
+  `⊥` by `Presieve.isSheaf_bot` and is not a sheaf for `⊤` by the empty-cover
+  counterexample. The associated discrete pseudofunctor fails the `⊤` stack
+  condition by the compiled direct descent proof.
+- state: `FALSIFIED (compiled counterexample)`
+
+### 2026-09-30 — dropping the open-map premise from QC comparison (issue #1635)
+- chunk: 1635-representable-stacks
+- reviewing commit: 068871899ba704007712939699dbbe7dc5c00d8f
+- found by: mathematics-adversary
+- proposed ancestor: `AlgebraicGeometry/Sites/QuasiCompact.lean`
+- weaker hypotheses: arbitrary scheme morphism property, without the open-map premise
+- source note: The review's compiled point-family counterexample takes an infinite affine
+  scheme and its residue-field points. The family is jointly surjective, hence a cover for
+  the unrestricted property, but cannot satisfy the quasi-compact covering condition:
+  finitely many source point opens cover only finitely many target points. The empty-cover
+  and point-family proof witnesses are kept in the private transcript supplement for #1635.
+- state: FALSIFIED (infinite affine residue-field point family)
