@@ -87,6 +87,18 @@ An old linked `.lake` refuses seeding in place, including with `--force`.
 Each migrated worktree needs its own disk space; the current seeder checks
 headroom and refuses before publication when it is insufficient.
 
+The updated helper reads pinned package source through the tracked minimal
+`scripts/private-reader.git` and rechecks source bytes independently of Git's
+index flags. It scans the whole private `.lake` for hardlinks, mount aliases
+and symlinks other than the exact tracked package-source links before
+publication and on reuse. A build may change its
+private Git indexes and build output, but a tracked source edit refuses reuse.
+The supported post-build check is the targeted Mathlib build; tracked
+ProofWidgets/npm outputs retain their pinned bytes. This is a quiescent pickup
+check among cooperating processes, not a barrier against later same-account
+mutation. It refuses ambiguous bind-mounted worktree ancestry rather than
+repointing or repairing it.
+
 The user services invoke the runner's `runsvc.sh` entrypoint and restart after
 failures. User lingering makes them start at boot and survive logout. Inspect:
 

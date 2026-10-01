@@ -5,6 +5,11 @@ A checked snapshot contains Git-object checkouts of every manifest package and
 all eleven required build trees.  A fresh target receives the whole `.lake`
 generation with one no-replace rename.  Existing `.lake` trees are never
 changed; migration needs a separate quiescent protocol.
+
+`--evict-snapshots` removes snapshots whose pins no `--keep-ref` commits
+(default `origin/main`). Snapshots are never evicted otherwise, and each one
+holds a full private copy of the build trees, so a pin change strands the old
+one until eviction runs.
 """
 
 from __future__ import annotations
@@ -31,6 +36,8 @@ except ImportError:
     fcntl = None
 
 from private_archive_io import DIR_FLAGS, extract_checked_archive, remove_owned_tree
+from private_alias_scan import scan_owned_child, scan_private_lake
+from private_source_contract import verify_source_packages
 
 MIN_FREE_BYTES = 2 * 1024**3
 QUIET_SECONDS = 90
@@ -38,10 +45,57 @@ READY = "private-cache-ready.json"
 STAGE_OWNER = ".private-stage-owner.json"
 FORMAT = 4
 RENAME_NOREPLACE = 1
+MAX_RECORD_BYTES = 256 * 1024
+SOURCE_READER = Path(__file__).resolve().parent / "private-reader.git"
 
 
 def fail(message: str) -> None:
     raise ValueError(message)
+
+
+def _unique_pairs(pairs: list[tuple[str, object]]) -> dict:
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            fail(f"duplicate private-cache record key: {key}")
+        result[key] = value
+    return result
+
+
+def _read_record(path: Path) -> dict:
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+    try:
+        info = os.fstat(fd)
+        if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1 or info.st_size > MAX_RECORD_BYTES:
+            fail("private-cache record is not one bounded private file")
+        raw = os.read(fd, MAX_RECORD_BYTES + 1)
+        if len(raw) > MAX_RECORD_BYTES:
+            fail("private-cache record is too large")
+        record = json.loads(raw, object_pairs_hook=_unique_pairs)
+        if not isinstance(record, dict):
+            fail("private-cache record must be an object")
+        return record
+    finally:
+        os.close(fd)
+
+
+def _validate_record(record: dict, key: str, revisions: dict[str, str],
+                     urls: dict[str, str], label: str) -> None:
+    expected = {"format", "key", "revisions", "urls", "cache_digests",
+                "packages_sha256", "build_sha256", "source_bytes", "archive_sha256"}
+    if (set(record) != expected or type(record.get("format")) is not int or
+            record["format"] != FORMAT or record.get("key") != key or
+            record.get("revisions") != revisions or record.get("urls") != urls):
+        fail(f"private-cache {label} pins or schema differ from target")
+    digests = record.get("cache_digests")
+    if (not isinstance(digests, dict) or set(digests) != set(revisions) | {"project"} or
+            type(record.get("source_bytes")) is not int or record["source_bytes"] <= 0):
+        fail("private-cache record inventory is incomplete")
+    for value in (record["archive_sha256"], record["packages_sha256"],
+                  record["build_sha256"], *digests.values()):
+        if (not isinstance(value, str) or len(value) != 64 or
+                any(ch not in "0123456789abcdef" for ch in value)):
+            fail("private-cache record has an invalid content digest")
 
 
 def digest_file(path: Path) -> str:
@@ -53,8 +107,11 @@ def digest_file(path: Path) -> str:
 
 
 def pins(root: Path) -> tuple[str, dict[str, str]]:
-    toolchain = (root / "lean-toolchain").read_bytes()
-    manifest = (root / "lake-manifest.json").read_bytes()
+    return pins_from_bytes((root / "lean-toolchain").read_bytes(),
+                           (root / "lake-manifest.json").read_bytes())
+
+
+def pins_from_bytes(toolchain: bytes, manifest: bytes) -> tuple[str, dict[str, str]]:
     parsed = json.loads(manifest)
     revisions = {p["name"]: p["rev"] for p in parsed["packages"]}
     if len(revisions) != len(parsed["packages"]) or "mathlib" not in revisions:
@@ -74,12 +131,24 @@ def package_urls(root: Path, revisions: dict[str, str]) -> dict[str, str]:
     return urls
 
 
-def git(*args: str) -> str:
+def _git_environment() -> dict[str, str]:
     environment = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
     environment.update(GIT_CONFIG_NOSYSTEM="1", GIT_CONFIG_GLOBAL=os.devnull)
+    return environment
+
+
+def git(*args: str) -> str:
     result = subprocess.run(["git", *args], check=True, capture_output=True,
-                            text=True, env=environment)
+                            text=True, env=_git_environment())
     return result.stdout.strip()
+
+
+def pins_at(repo: Path, ref: str) -> str:
+    """Snapshot key of the pins committed at `ref`, read from Git objects, not files."""
+    blobs = [subprocess.run(["git", "-C", str(repo), "cat-file", "blob", f"{ref}:{name}"],
+                            check=True, capture_output=True, env=_git_environment()).stdout
+             for name in ("lean-toolchain", "lake-manifest.json")]
+    return pins_from_bytes(*blobs)[0]
 
 
 def validate_packages(root: Path, revisions: dict[str, str]) -> None:
@@ -186,12 +255,16 @@ def dry_run_headroom(path: Path, required: int) -> None:
         os.close(fd)
 
 
-def snapshot_dir(key: str) -> Path:
+def snapshot_store() -> Path:
     base = os.environ.get("DAG_PRIVATE_PACKAGE_SNAPSHOT_DIR")
     if not base:
         base = str(Path.home() / ".cache/derived-alg-geo-lean/package-snapshots")
     # Keep the spelling until each component has been opened with NOFOLLOW.
-    return Path(base).expanduser().absolute() / key
+    return Path(base).expanduser().absolute()
+
+
+def snapshot_dir(key: str) -> Path:
+    return snapshot_store() / key
 
 
 def open_created_directory(path: Path) -> int:
@@ -206,6 +279,26 @@ def open_created_directory(path: Path) -> int:
             except FileExistsError:
                 pass
             child = os.open(part, DIR_FLAGS, dir_fd=fd)
+            os.close(fd)
+            fd = child
+        return fd
+    except BaseException:
+        os.close(fd)
+        raise
+
+
+def open_existing_directory(path: Path) -> int | None:
+    """Open an absolute directory component by component without following links."""
+    if not path.is_absolute() or ".." in path.parts:
+        fail("snapshot store path must be absolute and normalized")
+    fd = os.open("/", DIR_FLAGS)
+    try:
+        for part in path.parts[1:]:
+            try:
+                child = os.open(part, DIR_FLAGS, dir_fd=fd)
+            except FileNotFoundError:
+                os.close(fd)
+                return None
             os.close(fd)
             fd = child
         return fd
@@ -281,21 +374,8 @@ def checked_snapshot(directory: Path, key: str, revisions: dict[str, str],
         fail("snapshot files are linked or incomplete")
     if archive.stat().st_mode & 0o222 or metadata.stat().st_mode & 0o222:
         fail("snapshot files are writable")
-    record = json.loads(metadata.read_text())
-    if (record.get("format") != FORMAT or record.get("key") != key or
-            record.get("revisions") != revisions or record.get("urls") != urls):
-        fail("snapshot pins differ from target")
-    expected_caches = set(revisions) | {"project"}
-    digests = record.get("cache_digests")
-    if (not isinstance(digests, dict) or set(digests) != expected_caches or
-            not isinstance(record.get("source_bytes"), int) or
-            record["source_bytes"] <= 0):
-        fail("snapshot cache inventory is incomplete")
-    for value in (record.get("archive_sha256"), record.get("packages_sha256"),
-                  record.get("build_sha256"), *digests.values()):
-        if (not isinstance(value, str) or len(value) != 64 or
-                any(ch not in "0123456789abcdef" for ch in value)):
-            fail("snapshot has an invalid content digest")
+    record = _read_record(metadata)
+    _validate_record(record, key, revisions, urls, "snapshot")
     if record.get("archive_sha256") != digest_file(archive):
         fail("snapshot archive checksum failed")
     return record
@@ -457,7 +537,7 @@ def _read_receipt(lake: Path) -> dict:
     receipt = lake / READY
     if receipt.is_symlink() or not receipt.is_file():
         fail("target has no private-cache receipt")
-    return json.loads(receipt.read_text())
+    return _read_record(receipt)
 
 
 def verify_ready(target: Path) -> None:
@@ -466,17 +546,17 @@ def verify_ready(target: Path) -> None:
     urls = package_urls(target, revisions)
     lake = target / ".lake"
     record = _read_receipt(lake)
-    if (record.get("format") != FORMAT or record.get("key") != key or
-            record.get("revisions") != revisions or record.get("urls") != urls):
-        fail("private-cache receipt pins differ from target")
+    _validate_record(record, key, revisions, urls, "receipt")
     validate_packages(lake / "packages", revisions)
+    verified_links = verify_source_packages(lake / "packages", revisions,
+                                            reader_git_dir=SOURCE_READER)
+    scan_private_lake(target, verified_links)
     for name, url in urls.items():
         if git("-C", str(lake / "packages" / name), "remote", "get-url", "origin") != url:
             fail(f"private package remote differs from manifest: {name}")
     caches = {name: lake / "packages" / name / ".lake/build" for name in revisions}
     caches["project"] = lake / "build"
-    digests = record.get("cache_digests")
-    if not isinstance(digests, dict) or set(digests) != set(caches):
+    if set(record["cache_digests"]) != set(caches):
         fail("private-cache receipt inventory is incomplete")
     for name, path in caches.items():
         if not path.is_dir() or path.is_symlink():
@@ -543,7 +623,7 @@ def seed(target: Path, donor: Path | None, *, verify: bool, dry_run: bool,
             print(f"would create Git-object snapshot from {donor}")
         else:
             source_bytes = record["source_bytes"]
-            print(f"verified package snapshot {directory}")
+            print(f"verified snapshot checksum {directory}; candidate source checks deferred")
         disk_headroom(target, source_bytes)
         print(f"would privately seed fresh {target} from {directory}")
         return
@@ -589,6 +669,8 @@ def seed(target: Path, donor: Path | None, *, verify: bool, dry_run: bool,
                 for name, path in caches.items():
                     if tree_digest(path)[0] != record["cache_digests"][name]:
                         fail(f"extracted build cache differs from snapshot: {name}")
+                verified_links = verify_source_packages(stage / "packages", revisions,
+                                                        reader_git_dir=SOURCE_READER)
                 receipt_fd = os.open(READY, os.O_CREAT | os.O_EXCL | os.O_WRONLY |
                                      os.O_NOFOLLOW, 0o600, dir_fd=stage_fd)
                 try:
@@ -599,6 +681,7 @@ def seed(target: Path, donor: Path | None, *, verify: bool, dry_run: bool,
                     os.close(receipt_fd)
                 os.fsync(stage_fd)
                 verify_target_inode(target, target_fd)
+                scan_owned_child(target, stage_name, verified_links)
                 no_replace_rename(target_fd, stage_name, target_fd, ".lake", identity)
                 published = True
             finally:
@@ -612,20 +695,87 @@ def seed(target: Path, donor: Path | None, *, verify: bool, dry_run: bool,
     print(f"private package and build caches ready in {target}")
 
 
+def _tree_bytes(path: Path) -> int:
+    total = 0
+    for parent, _, files in os.walk(path, followlinks=False):
+        for name in files:
+            with contextlib.suppress(OSError):
+                total += (Path(parent) / name).lstat().st_blocks * 512
+    return total
+
+
+def evict_snapshots(repo: Path, keep_refs: list[str], *, dry_run: bool) -> None:
+    """Remove snapshots whose pins no kept ref commits, skipping any a seed holds."""
+    if fcntl is None:
+        fail("snapshot eviction requires Linux flock")
+    keep = {pins_at(repo, ref) for ref in keep_refs}
+    store = snapshot_store()
+    store_fd = open_existing_directory(store)
+    if store_fd is None:
+        print(f"no snapshot store at {store}")
+        return
+    try:
+        for entry in sorted(os.scandir(store_fd), key=lambda e: e.name):
+            name = entry.name
+            is_key = len(name) == 64 and set(name) <= set("0123456789abcdef")
+            # `.removing-*` at this level can only be an interrupted eviction.
+            if (not (is_key or name.startswith(".removing-")) or
+                    not entry.is_dir(follow_symlinks=False)):
+                continue
+            if name in keep:
+                print(f"keep {name[:12]}: pinned by {', '.join(keep_refs)}")
+                continue
+            size = f"{_tree_bytes(store / name) / 1024**3:.1f} GiB"
+            if dry_run:
+                print(f"would evict {name[:12]} ({size})")
+                continue
+            key_fd = os.open(name, DIR_FLAGS, dir_fd=store_fd)
+            try:
+                lock_fd = os.open(".lock", os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600,
+                                  dir_fd=key_fd)
+                try:
+                    try:
+                        fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    except BlockingIOError:
+                        print(f"skip {name[:12]}: a seed holds its lock")
+                        continue
+                    info = os.fstat(key_fd)
+                    remove_owned_tree(store_fd, name, (info.st_dev, info.st_ino))
+                    print(f"evicted {name[:12]} ({size})")
+                finally:
+                    os.close(lock_fd)
+            finally:
+                os.close(key_fd)
+    finally:
+        os.close(store_fd)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--target", type=Path, required=True)
+    parser.add_argument("--target", type=Path,
+                        help="worktree to seed; with --evict-snapshots, any checkout (default: .)")
     parser.add_argument("--donor", type=Path)
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--verify", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--evict-snapshots", action="store_true",
+                        help="remove snapshots whose pins no --keep-ref commits")
+    parser.add_argument("--keep-ref", action="append", metavar="REF",
+                        help="ref whose pinned snapshot stays (repeatable; default origin/main)")
     args = parser.parse_args()
+    if not args.evict_snapshots and args.target is None:
+        parser.error("--target is required")
+    action = "snapshot eviction" if args.evict_snapshots else "private cache seed"
     try:
-        seed(args.target, args.donor, verify=args.verify, dry_run=args.dry_run,
-             force=args.force)
+        if args.evict_snapshots:
+            evict_snapshots((args.target or Path.cwd()).resolve(strict=True),
+                            args.keep_ref or ["origin/main"], dry_run=args.dry_run)
+        else:
+            seed(args.target, args.donor, verify=args.verify, dry_run=args.dry_run,
+                 force=args.force)
     except (ValueError, OSError, subprocess.CalledProcessError, tarfile.TarError,
             KeyError) as error:
-        print(f"private cache seed refused: {error}", file=sys.stderr)
+        print(f"{action} refused: {error}", file=sys.stderr)
         return 1
     return 0
 

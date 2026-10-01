@@ -2539,22 +2539,28 @@ or exactness was strengthened by relocation.
   above. The Euler form `chiHom` is now `GradedObject.eulerChar` of the shifted
   Hom family by `rfl`, and its additivity on distinguished triangles applies
   `GradedObject.eulerChar_eq_add_of_exact` directly.
+- The SF8 #554 integer-tail cutover moved the existing
+  `HomologicalComplex.stupidTruncGEι` and
+  `HomologicalComplex.stupidTruncGEMap` API, including its mono instances and
+  map laws, from the filtered-total consumer to
+  `Algebra/Homology/Embedding/StupidTruncGE.lean`. The names and hypotheses
+  are unchanged; `FilteredTotalComplex.lean` imports that owner. The separate
+  normalized component cutover moves `HomologicalComplex₂.stupidTruncGEXIso`
+  and its companion lemmas from
+  `SpectralSequence/FilteredTotalComplexAdjacent.lean` into the same embedding
+  owner. The canonical `HomologicalComplex.stupidTruncGEXIso` normalizes
+  Mathlib's `HomologicalComplex.stupidTruncXIso` at the retained integer degree;
+  the bicomplex presentation is its definitional specialization, with its
+  existing fully qualified names and simp/reassociation behavior preserved.
+  The owner imports no spectral or geometric consumer, and the adjacent
+  construction imports the owner directly. This is a direct Mathlib API
+  extension (Tier 1); the import graph and the specialization map are separate
+  facts. The neutral adjacent short exact construction, finite-strip total
+  quasi-isomorphism, unbounded total comparison, K-flatness and arbitrary
+  derived pullback remain SF8 proof obligations, not consequences of these
+  source moves.
 
 ## Confirmed next lanes
-
-The SF8 #554 integer-tail cutover moves the existing
-`HomologicalComplex.stupidTruncGEι` and
-`HomologicalComplex.stupidTruncGEMap` API, including its
-mono instances and map laws, from the filtered-total consumer to
-`Algebra/Homology/Embedding/StupidTruncGE.lean`. The names and hypotheses are
-unchanged; `FilteredTotalComplex.lean` imports that owner. This source move
-does not complete the distinct normalized component comparison:
-`HomologicalComplex₂.stupidTruncGEXIso` and its companion lemmas still live in
-`SpectralSequence/FilteredTotalComplexAdjacent.lean`. Their target is the
-embedding owner, after a separate declaration-level generalization review.
-The neutral adjacent short exact construction and finite-strip total
-quasi-isomorphism are further SF8 proof obligations, not consequences of the
-tail owner move.
 
 Every path lane confirmed by the 2026-09-01 audit has landed, and so have
 both lanes recorded after it: the `ObjectProperty` lift block (2026-09-02)
