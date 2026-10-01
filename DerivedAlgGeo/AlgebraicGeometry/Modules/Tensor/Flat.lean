@@ -12,9 +12,20 @@ import Mathlib.Algebra.Homology.QuasiIso
 
 A module sheaf flat over the identity makes ordinary tensoring exact in either
 slot. The results here show that each partial tensor functor preserves homology
-and its termwise action preserves quasi-isomorphisms of integer cochain complexes.
-They do not assert K-flatness of an arbitrary complex of flat sheaves or an
-arbitrary derived pullback.
+and its termwise action preserves quasi-isomorphisms of complexes of any shape.
+These results treat a flat sheaf fixed in degree zero; K-flatness of a complex
+of flat sheaves and arbitrary derived pullback remain separate.
+
+## Proof ingredients
+
+`PresheafOfModules.stalkTensorEquiv` and
+`PresheafOfModules.stalkMapAdd_whiskerLeft` transfer
+`Module.Flat.lTensor_preserves_injective_linearMap` to sheaf stalks. Joint
+stalk reflection then gives mono preservation. Tensor colimits supply
+cokernels, so `Functor.preservesHomology_of_preservesMonos_and_cokernels`
+gives homology preservation. A private natural tensor-commutativity isomorphism
+handles the right slot. `HomologicalComplex.quasiIso_map_of_preservesHomology`
+gives the arbitrary-shape quasi-isomorphism corollaries.
 
 ## Main results
 
@@ -26,7 +37,7 @@ arbitrary derived pullback.
 
 open CategoryTheory CategoryTheory.Limits MonoidalCategory Opposite TopologicalSpace
 open AlgebraicGeometry
-universe u
+universe u v
 noncomputable section
 
 namespace AlgebraicGeometry.Scheme.Modules
@@ -107,7 +118,8 @@ private lemma mono_tensorLeft_of_isFlatOverId (X : Scheme.{u}) (L : X.Modules)
     infer_instance
   exact (moduleStalkFunctors_jointlyReflectIsomorphisms X).jointlyReflectMonomorphisms.mono _
 
-/-- Tensoring on the left by a sheaf flat over the identity preserves homology. -/
+/-- Stalkwise flatness preserves injectivity through the tensor-stalk comparison.
+Joint stalk reflection gives mono preservation; tensor colimits supply cokernels. -/
 theorem tensorLeftFunctor_preservesHomology_of_isFlatOverId (X : Scheme.{u}) (L : X.Modules)
     (hL : IsFlatOver (𝟙 X) L) : (tensorLeftFunctor L).PreservesHomology := by
   letI : (tensorLeftFunctor L).PreservesMonomorphisms :=
@@ -132,7 +144,8 @@ local instance tensorRightAdditive (X : Scheme.{u}) (L : X.Modules) :
   letI := preservesBinaryBiproducts_of_preservesBinaryCoproducts (tensorRight L)
   exact Functor.additive_of_preservesBinaryBiproducts _
 
-/-- Tensoring on the right by a sheaf flat over the identity preserves homology. -/
+/-- Tensor symmetry transports the left-slot mono result to the right slot;
+colimit preservation supplies the cokernel condition. -/
 theorem tensorRight_preservesHomology_of_isFlatOverId (X : Scheme.{u}) (L : X.Modules)
     (hL : IsFlatOver (𝟙 X) L) : (tensorRight L).PreservesHomology := by
   letI : (tensorLeftFunctor L).PreservesMonomorphisms :=
@@ -145,19 +158,23 @@ theorem tensorRight_preservesHomology_of_isFlatOverId (X : Scheme.{u}) (L : X.Mo
   letI : (tensorRight L).Additive := Functor.additive_of_preservesBinaryBiproducts _
   exact Functor.preservesHomology_of_preservesMonos_and_cokernels (tensorRight L)
 
-/-- Termwise left tensor by an identity-flat sheaf preserves quasi-isomorphisms. -/
+/-- Homology preservation of left tensor gives the termwise complex result for any
+shape. The fixed flat sheaf is a degree-zero factor, not a K-flat complex. -/
 theorem quasiIso_map_tensorLeftFunctor_of_isFlatOverId (X : Scheme.{u}) (L : X.Modules)
     (hL : IsFlatOver (𝟙 X) L)
-    {K K' : CochainComplex X.Modules ℤ} (f : K ⟶ K') [QuasiIso f] :
-    QuasiIso (((tensorLeftFunctor L).mapHomologicalComplex (ComplexShape.up ℤ)).map f) := by
+    {ι : Type v} {c : ComplexShape ι} {K K' : HomologicalComplex X.Modules c}
+    (f : K ⟶ K') [QuasiIso f] :
+    QuasiIso (((tensorLeftFunctor L).mapHomologicalComplex c).map f) := by
   letI := tensorLeftFunctor_preservesHomology_of_isFlatOverId X L hL
   exact HomologicalComplex.quasiIso_map_of_preservesHomology f (tensorLeftFunctor L)
 
-/-- Termwise right tensor by an identity-flat sheaf preserves quasi-isomorphisms. -/
+/-- Tensor symmetry supplies the right-slot homology preservation used termwise
+on any complex shape, with the flat sheaf fixed as a degree-zero factor. -/
 theorem quasiIso_map_tensorRight_of_isFlatOverId (X : Scheme.{u}) (L : X.Modules)
     (hL : IsFlatOver (𝟙 X) L)
-    {K K' : CochainComplex X.Modules ℤ} (f : K ⟶ K') [QuasiIso f] :
-    QuasiIso (((tensorRight L).mapHomologicalComplex (ComplexShape.up ℤ)).map f) := by
+    {ι : Type v} {c : ComplexShape ι} {K K' : HomologicalComplex X.Modules c}
+    (f : K ⟶ K') [QuasiIso f] :
+    QuasiIso (((tensorRight L).mapHomologicalComplex c).map f) := by
   letI : PreservesFiniteColimits (tensorRight L) :=
     preservesFiniteColimits_of_natIso (flatTensorLeftRightIso X L)
   letI := preservesBinaryBiproducts_of_preservesBinaryCoproducts (tensorRight L)
