@@ -44,10 +44,4 @@ but the Morita/higher-cone theorem of Anno--Logvinenko is not a repository
 primitive.  The object-specific
 evaluation functor `RHom(E,-) ⊗ E` and its identification with a
 Fourier--Mukai kernel remain geometric realization obligations.
-
-`Definition.lean` states the functor `T_E` on an arbitrary `k`-linear pretriangulated category as
-supplied data, `SphericalTwistData`, and proves that its map on `K₀` is `twistK₀`.
-`ObjectTwistData.lean` realizes it by both dg object twists. `Autoequivalence.lean` and
-`BraidStatement.lean` state the Seidel--Thomas autoequivalence and braid theorems as supplied,
-unasserted structures, and derive their `TwistShaped` and `K₀` consequences.
 -/

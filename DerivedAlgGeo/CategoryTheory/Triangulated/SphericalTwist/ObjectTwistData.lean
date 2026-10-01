@@ -9,45 +9,47 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.ObjectTwistK0
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.Definition
 
 /-!
-# Route (b): the dg object twists are `SphericalTwistData`
+# The dg object twists are supplied twist data
 
-`SphericalTwistData` (in `Definition.lean`) is an interface that constructs nothing. This file
-shows that **route (b) of its encoding note, the dg enhancement, discharges every field**, so that
-the three instance fields of `T` are not an unsatisfiable demand.
+For a pretriangulated dg category `C` and an object `E`, both dg object twists
+`T_E = Cone(Hom(E,-) ⊗ E ⟶ id)` on `H⁰ C`, the additive one and the scalar-linear one, are supplied
+twist data, given the Euler copower formula as a hypothesis. This is route (b) of
+`SphericalTwist/Definition.lean`, checked by construction.
 
 ## Main definitions
 
-* `LinearEvaluationData.TwistConeData.toSphericalTwistData` and
-  `EvaluationData.TwistConeData.toSphericalTwistData` — the scalar-linear and the additive
-  realization, each given the Euler copower formula.
+* `CategoryTheory.LinearEvaluationData.TwistConeData.toSphericalTwistData`:
+  the scalar-linear realization.
+* `CategoryTheory.EvaluationData.TwistConeData.toSphericalTwistData`:
+  the additive realization.
+
+## Main results
+
+* `CategoryTheory.LinearEvaluationData.TwistConeData.toSphericalTwistData_T` and
+  `CategoryTheory.EvaluationData.TwistConeData.toSphericalTwistData_T`:
+  the constructed functor is the dg twist on `H⁰`, by `rfl`. With the formula for the induced map
+  on `K₀` of the root structure, they give `SphericalTwist/ObjectTwistK0.lean` and
+  `SphericalTwist/LinearObjectTwistK0.lean` their `K₀` theorems.
 
 ## Implementation notes
 
-For a pretriangulated dg category `C` and an object `E`, the object twist
-`T_E = Cone(Hom(E,-) ⊗ E ⟶ id)` is a dg functor, and
+The shift commutation and triangulatedness of the twist on `H⁰ C` are proved for every dg functor
+by `CategoryTheory.DGFunctor.h0CommShift` and `CategoryTheory.DGFunctor.h0IsTriangulated`, and the
+structure maps and the distinguished triangle are the projections of the object-twist triangle
+functor. The one input beyond the dg construction is the class of the copower, which is the Euler
+copower formula of `DGEnhancement/H0/ObjectTwistK0.lean` and
+`DGEnhancement/H0/LinearEvaluationK0.lean` on the nose and is taken as the hypothesis `hV`. The two
+packages are not compared: the repository has no adapter between additive and scalar-linear
+copowers, and this file adds none.
 
-* `T.Additive`, `T.CommShift ℤ` and `T.IsTriangulated` on `H⁰ C` are **proved**:
-  `DGFunctor.h0CommShift` and `DGFunctor.h0IsTriangulated` hold for every dg functor;
-* the evaluation triangle is the existing functor `twistTriangleFunctor : H⁰ C ⥤ Triangle (H⁰ C)`,
-  every value of which is distinguished; the three structure maps and their naturality are its
-  three projections.
+## References
 
-The one input beyond the dg construction is the copower's class, the field `copower_class`: the
-rank-one formula `[Hom(E,X) ⊗ E] = χ(E,X)·[E]`, which is `IsEulerCopower` of
-`DGEnhancement/H0/ObjectTwistK0.lean` and `DGEnhancement/H0/LinearEvaluationK0.lean` and the
-field's type on the nose. Both constructions take it as a hypothesis `hV`; neither depends on how,
-or whether, the repository proves it for a particular package.
+Seidel--Thomas, [arXiv:math/0001043v2](https://arxiv.org/abs/math/0001043v2), Definition 2.5: `T_E`
+on complexes of injectives, the model of route (b).
 
-Two constructions, one per evaluation package, and neither derived from the other: the additive
-`EvaluationData` (copowers by additive cochains over `ℤ`) and the scalar-linear
-`LinearEvaluationData` (copowers by `k`-linear cochains). The repository has no adapter between
-them and this file adds none. Two independent producers witness that the interface is not tailored
-to one construction.
+## Tags
 
-## What this does not say
-
-Nothing here says `T` is an autoequivalence, that `E` is spherical, or constructs a copower: the
-copower object assignment is the one the evaluation data already chose.
+spherical twist, dg category, object twist, copower
 -/
 
 set_option autoImplicit false
@@ -59,6 +61,15 @@ namespace CategoryTheory
 
 open DGCategoryStruct DGCategory Pretriangulated Triangulated Triangulated.SphericalTwist
 
+/-- `H⁰` of the identity dg functor is the identity on morphisms: it agrees with the identity
+functor of `H⁰ C` only through the comparison isomorphism, and this is what makes the evaluation and
+the first map natural transformations out of and into the identity functor. -/
+private theorem h0_id_map {C : Type u} [DGCategory.{v} C] {X Y : H0 C} (f : X ⟶ Y) :
+    (DGFunctor.id C).h0.map f = f := by
+  have h := (DGFunctor.h0IdIso (C := C)).hom.naturality f
+  simp only [DGFunctor.h0IdIso_hom_app, Functor.id_map] at h
+  exact (Category.comp_id _).symm.trans (h.trans (Category.id_comp _))
+
 namespace LinearEvaluationData.TwistConeData
 
 variable (k : Type w) [Field k]
@@ -67,44 +78,26 @@ variable (k : Type w) [Field k]
   [DGLinear k C] [HomFiniteBounded k (H0 C)]
   {E : C} {V : LinearEvaluationData k E} (K : V.TwistConeData k)
 
-omit [HomFiniteBounded k (H0 C)] in
-/-- Unlike `LinearEvaluationData.TwistConeData.twistTriangleFunctor_map_hom₁` and `_map_hom₃` this
-is not `rfl`: the middle vertex is `(DGFunctor.id C).h0`, which agrees with `𝟭 (H0 C)` only
-through `DGFunctor.h0IdIso`. It is what makes `ev` and `π` natural transformations out of and into
-`𝟭`. -/
-private theorem twistTriangleFunctor_map_hom₂ {X Y : H0 C} (f : X ⟶ Y) :
-    ((twistTriangleFunctor K).map f).hom₂ = f := by
-  change (DGFunctor.id C).h0.map f = f
-  have h := (DGFunctor.h0IdIso (C := C)).hom.naturality f
-  simp only [DGFunctor.h0IdIso_hom_app, Functor.id_map] at h
-  exact (Category.comp_id _).symm.trans (h.trans (Category.id_comp _))
-
-/-- **The scalar-linear dg object twist is `SphericalTwistData`**, given the Euler copower formula.
-
-Every field but `copower_class` is the existing dg construction on `H⁰ C`: the instances of `T` are
-the proved `h0CommShift` and `h0IsTriangulated`, and `ev`, `π`, `δ` and `distinguished` are the
-three maps and the distinguished values of `twistTriangleFunctor`. -/
+/-- **The scalar-linear dg object twist is twist data**, given the Euler copower formula `hV`. The
+instances of `T` are the proved ones of the dg functor on `H⁰`; `ev`, `π`, `δ` and `distinguished`
+are the three maps and the distinguished values of the object-twist triangle functor. -/
 noncomputable def toSphericalTwistData (hV : V.IsEulerCopower k) :
     SphericalTwistData k (H0 C) (show H0 C from E) where
   T := K.twist.h0
   commShift := DGFunctor.h0CommShift K.twist
   isTriangulated := DGFunctor.h0IsTriangulated K.twist
-  additive := by
-    letI : K.twist.h0.CommShift ℤ := DGFunctor.h0CommShift K.twist
-    letI : K.twist.h0.IsTriangulated := DGFunctor.h0IsTriangulated K.twist
-    infer_instance
   copower := V.functor.h0
   ev :=
     { app := fun X => ((twistTriangleFunctor K).obj X).mor₁
       naturality := fun X Y f => by
         have h := ((twistTriangleFunctor K).map f).comm₁.symm
-        simp only [twistTriangleFunctor_map_hom₁, twistTriangleFunctor_map_hom₂ k K] at h
+        rw [show ((twistTriangleFunctor K).map f).hom₂ = f from h0_id_map f] at h
         exact h }
   π :=
     { app := fun X => ((twistTriangleFunctor K).obj X).mor₂
       naturality := fun X Y f => by
         have h := ((twistTriangleFunctor K).map f).comm₂.symm
-        simp only [twistTriangleFunctor_map_hom₃, twistTriangleFunctor_map_hom₂ k K] at h
+        rw [show ((twistTriangleFunctor K).map f).hom₂ = f from h0_id_map f] at h
         exact h }
   δ :=
     { app := fun X => ((twistTriangleFunctor K).obj X).mor₃
@@ -133,39 +126,25 @@ variable (k : Type w) [DivisionRing k]
   [Linear k (H0 C)] [HomFiniteBounded k (H0 C)]
   {E : C} {V : EvaluationData E} (K : V.TwistConeData)
 
-omit [Linear k (H0 C)] [HomFiniteBounded k (H0 C)] in
-/-- The additive twin of the private lemma of the same name in the scalar-linear namespace. -/
-private theorem twistTriangleFunctor_map_hom₂ {X Y : H0 C} (f : X ⟶ Y) :
-    ((twistTriangleFunctor K).map f).hom₂ = f := by
-  change (DGFunctor.id C).h0.map f = f
-  have h := (DGFunctor.h0IdIso (C := C)).hom.naturality f
-  simp only [DGFunctor.h0IdIso_hom_app, Functor.id_map] at h
-  exact (Category.comp_id _).symm.trans (h.trans (Category.id_comp _))
-
-/-- **The additive dg object twist is `SphericalTwistData`**, given the Euler copower formula.
-The construction of `LinearEvaluationData.TwistConeData.toSphericalTwistData` for the additive
-evaluation package; the two are not compared. -/
+/-- **The additive dg object twist is twist data**, given the Euler copower formula `hV`: the
+scalar-linear construction for the additive evaluation package. -/
 noncomputable def toSphericalTwistData (hV : V.IsEulerCopower k) :
     SphericalTwistData k (H0 C) (show H0 C from E) where
   T := K.twist.h0
   commShift := K.twistH0CommShift
   isTriangulated := K.twistH0IsTriangulated
-  additive := by
-    letI : K.twist.h0.CommShift ℤ := K.twistH0CommShift
-    letI : K.twist.h0.IsTriangulated := K.twistH0IsTriangulated
-    infer_instance
   copower := V.functor.h0
   ev :=
     { app := fun X => ((twistTriangleFunctor K).obj X).mor₁
       naturality := fun X Y f => by
         have h := ((twistTriangleFunctor K).map f).comm₁.symm
-        simp only [twistTriangleFunctor_map_hom₁, twistTriangleFunctor_map_hom₂ K] at h
+        rw [show ((twistTriangleFunctor K).map f).hom₂ = f from h0_id_map f] at h
         exact h }
   π :=
     { app := fun X => ((twistTriangleFunctor K).obj X).mor₂
       naturality := fun X Y f => by
         have h := ((twistTriangleFunctor K).map f).comm₂.symm
-        simp only [twistTriangleFunctor_map_hom₃, twistTriangleFunctor_map_hom₂ K] at h
+        rw [show ((twistTriangleFunctor K).map f).hom₂ = f from h0_id_map f] at h
         exact h }
   δ :=
     { app := fun X => ((twistTriangleFunctor K).obj X).mor₃

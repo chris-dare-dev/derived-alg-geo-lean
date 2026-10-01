@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.LinearEvaluationK0
 import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.H0.LinearObjectTwistK0
 import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.GrothendieckGroup
+import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.ObjectTwistData
 
 /-!
 # Numerical action of the scalar-linear object twist
@@ -43,25 +44,20 @@ theorem twistK₀Of_eq_twistK₀ (hV : V.IsEulerCopower k) (X : H0 C) :
     K₀.of (H0 C) (K.twist.h0.obj X) =
       SphericalTwist.twistK₀ k (H0 C) (show H0 C from E)
         (K₀.of (H0 C) X) := by
-  rw [SphericalTwist.twistK₀_of, K.twistK₀Of, hV X, chiRight_of]
+  rw [SphericalTwist.twistK₀_apply, chiK₀_of]
+  exact (K.toSphericalTwistData k hV).class_T_eq_sub_chiRight_smul X
 
-set_option backward.isDefEq.respectTransparency false in
 /-- If scalar-linear evaluation realizes the Euler copower formula, its cone
-induces the numerical twist endomorphism on `K₀`. -/
+induces the numerical twist endomorphism on `K₀`. It is the induced-map theorem of the twist data
+built by `CategoryTheory.LinearEvaluationData.TwistConeData.toSphericalTwistData`. -/
 theorem twistK₀Map_eq_twistK₀
     (hV : V.IsEulerCopower k) :
     letI : K.twist.h0.CommShift ℤ :=
       DGFunctor.h0CommShift K.twist
     letI : K.twist.h0.IsTriangulated := DGFunctor.h0IsTriangulated K.twist
     K₀.map K.twist.h0 =
-      SphericalTwist.twistK₀ k (H0 C) (show H0 C from E) := by
-  letI : K.twist.h0.CommShift ℤ :=
-    DGFunctor.h0CommShift K.twist
-  letI : K.twist.h0.IsTriangulated := DGFunctor.h0IsTriangulated K.twist
-  apply K₀.hom_ext
-  intro X
-  rw [K₀.map_of]
-  exact K.twistK₀Of_eq_twistK₀ k hV X
+      SphericalTwist.twistK₀ k (H0 C) (show H0 C from E) :=
+  (K.toSphericalTwistData k hV).map_eq_twistK₀
 
 end LinearEvaluationData.TwistConeData
 

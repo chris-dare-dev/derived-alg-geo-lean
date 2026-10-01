@@ -253,8 +253,9 @@ that comparison are instance hypotheses to be discharged by the realization.
 
 ## The ordinary-category interface
 
-`SphericalTwistData k C E` (`SphericalTwist/Definition.lean`) is the functor `T_E` on an arbitrary
-`k`-linear pretriangulated `C`, stated once and supplied rather than constructed:
+The twist `T_E` on an arbitrary `k`-linear pretriangulated category is stated once, supplied and not
+constructed, as `CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData`
+(`SphericalTwist/Definition.lean`):
 
 ```text
 SphericalTwistData k C E
@@ -267,11 +268,16 @@ SphericalTwistData k C E
 ```
 
 The two dg object twists above realize it (`SphericalTwist/ObjectTwistData.lean`): additive and
-scalar-linear, given the Euler copower formula, with `T`'s three instances proved by
-`DGFunctor.h0CommShift` and `DGFunctor.h0IsTriangulated`. The Seidel--Thomas autoequivalence and
-braid theorems are supplied statements, `AutoequivalenceStatement` and `BraidStatement`, nowhere
-asserted; the first projects to `TwistShaped` and so to the action on `Stab`, the second only to the
-`K₀` braid identity, which is far weaker.
+scalar-linear, given the Euler copower formula, with the three instances on the twist proved for
+every dg functor by `CategoryTheory.DGFunctor.h0CommShift` and
+`CategoryTheory.DGFunctor.h0IsTriangulated`. The numerical-twist theorems of
+`SphericalTwist/ObjectTwistK0.lean` and `SphericalTwist/LinearObjectTwistK0.lean` are the
+induced-map theorem `CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.map_eq_twistK₀`
+for these realizations. The Seidel--Thomas autoequivalence and braid theorems are the supplied
+statements `CategoryTheory.Triangulated.SphericalTwist.AutoequivalenceStatement` and
+`CategoryTheory.Triangulated.SphericalTwist.BraidStatement`, nowhere asserted. The first projects
+to a twist-shaped autoequivalence and so to the action on stability conditions; the second only to
+the braid identity on `K₀`, which is far weaker.
 
 ## Deliberately open seams
 

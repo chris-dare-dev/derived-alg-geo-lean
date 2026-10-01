@@ -301,12 +301,13 @@ docstrings of `SphericalTwist/Definition.lean`, `Autoequivalence.lean` and `Brai
 #print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.mk.inj
 #print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.mk.sizeOf_spec
 #print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.triangleFunctor
-#print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.triangleFunctor_obj_mem_distTriang
+#print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.triangleFunctor_obj_distinguished
 #print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.class_T
 #print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.class_T_eq_sub_chiRight_smul
 #print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.copower_class_chiK₀
 #print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.map_eq_twistK₀
 
+#print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.toTwistShaped
 #print axioms CategoryTheory.Triangulated.SphericalTwist.AutoequivalenceStatement
 #print axioms CategoryTheory.Triangulated.SphericalTwist.AutoequivalenceStatement.equiv
 #print axioms CategoryTheory.Triangulated.SphericalTwist.AutoequivalenceStatement.iso
@@ -320,7 +321,7 @@ docstrings of `SphericalTwist/Definition.lean`, `Autoequivalence.lean` and `Brai
 #print axioms CategoryTheory.Triangulated.SphericalTwist.BraidStatement.iso
 #print axioms CategoryTheory.Triangulated.SphericalTwist.BraidStatement.mk.inj
 #print axioms CategoryTheory.Triangulated.SphericalTwist.BraidStatement.mk.sizeOf_spec
-#print axioms CategoryTheory.Triangulated.SphericalTwist.map_comp_comp_eq_twistK₀
+#print axioms CategoryTheory.Triangulated.SphericalTwist.SphericalTwistData.map_comp_comp_eq_twistK₀
 #print axioms CategoryTheory.Triangulated.SphericalTwist.map_braid_of_sphericalPairData
 #print axioms CategoryTheory.Triangulated.SphericalTwist.BraidStatement.map_braid
 #print axioms CategoryTheory.Triangulated.SphericalTwist.BraidStatement.twistK₀_braid
