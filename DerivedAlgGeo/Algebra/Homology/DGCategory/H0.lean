@@ -349,9 +349,11 @@ def mapComplex (F : DGFunctor C D) (X Y : C) :
 /-- A quasi-equivalence of dg categories: the action on every Hom-complex is a
 quasi-isomorphism, and `H⁰` of it is essentially surjective.
 
-This is a definition and nothing more. No theorem in this repository relates it
-to anything — in particular there is no claim here that a quasi-equivalence
-induces an equivalence on `H⁰`, which is `dg-enhancements-e10`. -/
+That a quasi-equivalence induces an equivalence `H⁰ C ≌ H⁰ D` is
+`DGFunctor.isEquivalence_h0` and `DGFunctor.h0Equivalence`
+(`DGCategory/QuasiEquivalence.lean`), and that this equivalence is triangulated
+between pretriangulated dg categories is `DGFunctor.isTriangulated_h0Equivalence`
+(`DGCategory/Pretriangulated/H0/FunctorTransport.lean`). -/
 structure IsQuasiEquivalence (F : DGFunctor C D) : Prop where
   /-- Every Hom-complex map is a quasi-isomorphism. -/
   quasiIso : ∀ X Y : C, QuasiIso (F.mapComplex X Y)
