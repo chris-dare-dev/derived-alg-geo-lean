@@ -14,7 +14,7 @@ a base -- and says of it, in its own words, that it is not an algebraic stack:
 the standard notion asks for fppf descent, and that file only ever asks for
 Zariski descent.
 
-`Stacks/Descent.lean` supplies the missing half, `representableFppfStack`,
+`Stacks/Representable.lean` supplies `representableFppfStack`,
 whose stack condition is Mathlib's fpqc descent theorem for representable
 presheaves restricted along `Scheme.fppfTopology ≤ Scheme.fpqcTopology`.
 
@@ -71,7 +71,7 @@ This is the big-Zariski morphism unchanged: the two stacks have the same
 presheaf, and a `StackMorphism` is data about presheaves. -/
 def representableFppfStackMap {X Y : Scheme.{u}} (f : X ⟶ Y) :
     StackMorphism (representableFppfStack X) (representableFppfStack Y) :=
-  representableZariskiStackMap f
+  StackInGroupoids.representableMap Scheme.fppfTopology f
 
 /-- The fppf and Zariski representable stack maps of a scheme morphism are the
 same data. Stated, rather than left implicit, because every transport below

@@ -64,3 +64,12 @@ The module, declarations, and audit ownership are neutral category theory.
 #print axioms CategoryTheory.StackInGroupoids.Cover.ofLE_index
 #print axioms CategoryTheory.StackInGroupoids.Cover.ofLE_obj
 #print axioms CategoryTheory.StackInGroupoids.Cover.ofLE_hom
+
+#print axioms CategoryTheory.discretePseudofunctorMap
+#print axioms CategoryTheory.StackInGroupoids.discreteMap
+#print axioms CategoryTheory.StackInGroupoids.representable
+#print axioms CategoryTheory.StackInGroupoids.representableMap
+#print axioms CategoryTheory.StackInGroupoids.representableMap_app_obj
+#print axioms CategoryTheory.StackInGroupoids.representable_ofLE
+#print axioms CategoryTheory.stackInGroupoidsOfSheaf_ofLE
+#print axioms CategoryTheory.StackInGroupoids.discreteMap_app_obj
