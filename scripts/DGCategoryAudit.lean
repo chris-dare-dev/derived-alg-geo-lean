@@ -923,6 +923,8 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement
 #print axioms CategoryTheory.DGFunctor.full_h0
 #print axioms CategoryTheory.DGFunctor.isEquivalence_h0
 #print axioms CategoryTheory.DGFunctor.h0Equivalence
+#print axioms CategoryTheory.DGFunctor.h0Equivalence_functor
+#print axioms CategoryTheory.DGFunctor.h0Equivalence_isTriangulated
 
 -- Shifting twice agrees with shifting once, and shifting by zero changes
 -- nothing -- both up to a canonical comparison that is closed and invertible,

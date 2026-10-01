@@ -46,8 +46,10 @@ that class is exactly the three conditions.
 Nothing about the converse, and nothing about dg functors that are only
 quasi-equivalences up to homotopy.  It also says nothing about triangulated
 structure: the equivalence produced here is an equivalence of ordinary
-categories, and exactness of `H⁰ F` is a separate capability
-(`DGFunctor.PreservesShifts` and `PreservesChosenCones`).
+categories, and `h0Equivalence_functor` says its functor is `H⁰ F`.  Exactness
+of `H⁰ F` is proved separately, for every dg functor between pretriangulated
+dg categories, as `DGFunctor.h0IsTriangulated`; the two meet in
+`DGFunctor.h0Equivalence_isTriangulated`.
 -/
 
 set_option autoImplicit false
@@ -214,6 +216,14 @@ noncomputable def h0Equivalence (F : DGFunctor C D) (hF : F.IsQuasiEquivalence) 
     H0 C ≌ H0 D :=
   have := F.isEquivalence_h0 hF
   F.h0.asEquivalence
+
+/-- The forward functor of the induced equivalence is `H⁰ F` itself, so the
+equivalence adds no second construction: everything proved of `F.h0` (its
+linearity, its shift and triangulated structure) is a statement about it. -/
+@[simp]
+theorem h0Equivalence_functor (F : DGFunctor C D) (hF : F.IsQuasiEquivalence) :
+    (F.h0Equivalence hF).functor = F.h0 :=
+  rfl
 
 end DGFunctor
 
