@@ -7,6 +7,7 @@ import Mathlib.Algebra.Category.ModuleCat.Abelian
 import Mathlib.Algebra.Homology.DerivedCategory.Basic
 import Mathlib.Algebra.Homology.HomologicalComplexAbelian
 import Mathlib.Algebra.Homology.QuasiIso
+import Mathlib.CategoryTheory.Functor.ReflectsIso.Exact
 
 /-!
 # Quasi-isomorphisms detected by module stalks
@@ -47,9 +48,10 @@ noncomputable section
 
 namespace AlgebraicGeometry.Scheme.Modules
 
-universe u
+universe u v
 
-/-- The local-ring module stalk functor is additive. -/
+/-- Additivity follows from finite-product preservation, without computing
+with stalk representatives. -/
 theorem moduleStalkFunctor_additive (X : Scheme.{u}) (x : X) :
     (moduleStalkFunctor X x).Additive := by
   letI := moduleStalkFunctor_preservesFiniteLimits X x
@@ -57,35 +59,16 @@ theorem moduleStalkFunctor_additive (X : Scheme.{u}) (x : X) :
 
 attribute [local instance] moduleStalkFunctor_additive
 
-/-- Module stalks preserve parallel-pair colimits. -/
+/-- Coequalizer preservation is a specialization of the small-colimit theorem
+for the existing module-stalk functor. -/
 theorem moduleStalkFunctor_preservesParallelPairColimits
     (X : Scheme.{u}) (x : X) :
     PreservesColimitsOfShape WalkingParallelPair (moduleStalkFunctor X x) := by
-  let forgetModule := forget₂ (ModuleCat.{u} (X.presheaf.stalk x)) AddCommGrpCat.{u}
-  let α := 𝟙 X.ringCatSheaf.obj
-  letI : PreservesColimitsOfShape WalkingParallelPair
-      (PresheafOfModules.sheafification α ⋙ SheafOfModules.toSheaf X.ringCatSheaf) := by
-    exact inferInstanceAs (PreservesColimitsOfShape WalkingParallelPair
-      (PresheafOfModules.toPresheaf X.ringCatSheaf.obj ⋙
-        presheafToSheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}))
-  have hF : PreservesColimitsOfShape WalkingParallelPair
-      (SheafOfModules.toSheaf X.ringCatSheaf) :=
-    (PresheafOfModules.sheafificationAdjunction α).preservesColimitsOfShape_of_comp_left
-      (K := WalkingParallelPair) (SheafOfModules.toSheaf X.ringCatSheaf)
-  let G := TopCat.Sheaf.forget AddCommGrpCat.{u} X ⋙
-    TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} x
-  have hG : PreservesColimitsOfShape WalkingParallelPair G := inferInstance
-  have hFG : PreservesColimitsOfShape WalkingParallelPair
-      (SheafOfModules.toSheaf X.ringCatSheaf ⋙ G) :=
-    @comp_preservesColimitsOfShape _ _ _ _ _ _ _ _
-      (SheafOfModules.toSheaf X.ringCatSheaf) G hF hG
-  letI : PreservesColimitsOfShape WalkingParallelPair
-      (moduleStalkFunctor X x ⋙ forgetModule) :=
-    (preservesColimitsOfShape_iff_of_natIso (moduleStalkForgetIso X x)).mpr hFG
-  exact preservesColimitsOfShape_of_reflects_of_preserves
-    (moduleStalkFunctor X x) forgetModule
+  letI := moduleStalkFunctor_preservesFiniteColimits X x
+  infer_instance
 
-/-- Taking a local-ring module stalk preserves homology. -/
+/-- Finite limits supply kernels and coequalizers supply cokernels, giving
+preservation of homology by module stalks. -/
 theorem moduleStalkFunctor_preservesHomology (X : Scheme.{u}) (x : X) :
     (moduleStalkFunctor X x).PreservesHomology := by
   letI := moduleStalkFunctor_additive X x
@@ -97,31 +80,16 @@ theorem moduleStalkFunctor_preservesHomology (X : Scheme.{u}) (x : X) :
 attribute [local instance] moduleStalkFunctor_preservesHomology
   HasDerivedCategory.standard
 
-/-- Quasi-isomorphisms of complexes of scheme-module sheaves are detected at
-all local-ring module stalks. -/
+/-- Apply the pinned jointly-reflecting exact-functor criterion to all module
+stalks. This detects quasi-isomorphisms for every complex shape. -/
 theorem quasiIso_iff_stalkwise (X : Scheme.{u})
-    {K L : CochainComplex X.Modules ℤ} (g : K ⟶ L) :
+    {ι : Type v} {c : ComplexShape ι} {K L : HomologicalComplex X.Modules c}
+    (g : K ⟶ L) :
     QuasiIso g ↔ ∀ x : X, QuasiIso
-      (((moduleStalkFunctor X x).mapHomologicalComplex
-        (ComplexShape.up ℤ)).map g) := by
-  constructor
-  · intro h x
-    letI := h
-    infer_instance
-  · intro h
-    rw [quasiIso_iff]
-    intro n
-    rw [quasiIsoAt_iff_isIso_homologyMap]
-    letI : ∀ x : X, IsIso ((moduleStalkFunctor X x).map
-        (HomologicalComplex.homologyMap g n)) := by
-      intro x
-      let F := moduleStalkFunctor X x
-      let φ := (HomologicalComplex.shortComplexFunctor X.Modules (ComplexShape.up ℤ) n).map g
-      letI := h x
-      have hi : IsIso ((F.mapShortComplex ⋙ ShortComplex.homologyFunctor _).map φ) := by
-        exact (quasiIsoAt_iff_isIso_homologyMap
-          ((F.mapHomologicalComplex (ComplexShape.up ℤ)).map g) n).mp inferInstance
-      exact (NatIso.isIso_map_iff (ShortComplex.homologyFunctorIso F) φ).mp hi
-    exact (moduleStalkFunctors_jointlyReflectIsomorphisms X).isIso _
+      (((moduleStalkFunctor X x).mapHomologicalComplex c).map g) := by
+  letI (x : X) := moduleStalkFunctor_preservesFiniteLimits X x
+  letI (x : X) :=
+    (moduleStalkFunctor X x).preservesFiniteColimits_of_preservesHomology
+  exact (moduleStalkFunctors_jointlyReflectIsomorphisms X).quasiIso_iff g
 
 end AlgebraicGeometry.Scheme.Modules

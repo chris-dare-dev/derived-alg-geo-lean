@@ -23,6 +23,8 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.StalkQuasiIso
 #print axioms AlgebraicGeometry.Scheme.Modules.presheafModulePullbackStalkIso
 #print axioms AlgebraicGeometry.Scheme.Modules.pullbackStalkIso
 #print axioms AlgebraicGeometry.Scheme.Modules.exists_sheaf_with_stalk
+#print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor_preservesSmallColimits
+#print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor_preservesFiniteColimits
 #print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor_additive
 #print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor_preservesParallelPairColimits
 #print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor_preservesHomology

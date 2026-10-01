@@ -8,6 +8,7 @@ import Mathlib.Algebra.Category.ModuleCat.Presheaf.ColimitFunctor
 import Mathlib.Algebra.Module.TransferInstance
 import Mathlib.AlgebraicGeometry.Modules.Sheaf
 import Mathlib.CategoryTheory.Functor.ReflectsIso.Limits
+import Mathlib.CategoryTheory.Limits.Preserves.Finite
 import Mathlib.Topology.Sheaves.Abelian
 import Mathlib.Topology.Sheaves.Sheafify
 import Mathlib.Topology.Sheaves.Skyscraper
@@ -32,8 +33,9 @@ an arbitrary scheme morphism is exact.
 
 ## Main results
 
-* `AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor_preservesColimitsOfShape`
-  preserves indexed coproducts.
+* `AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor_preservesSmallColimits`
+  preserves arbitrary small colimits; the existing coproduct theorem is its
+  discrete-diagram specialization.
 * `AlgebraicGeometry.Scheme.Modules.preservesFiniteLimits_of_stalkwise`
   reduces finite-limit preservation to
   module stalks.
@@ -68,7 +70,7 @@ open AlgebraicGeometry
 
 noncomputable section
 
-universe u
+universe u v
 
 /-- The cocone of underlying rings whose point is the local ring of `X` at
 `x`.  It is the image of the standard commutative-ring stalk cocone. -/
@@ -178,45 +180,51 @@ def moduleStalkForgetIso (X : Scheme.{u}) (x : X) :
           TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} x) :=
   CategoryTheory.Functor.associator _ _ _
 
-/-- Indexed sheaf coproducts are preserved by the underlying additive sheaf stalk;
-the forgetful module functor reflects and preserves these colimits. -/
-theorem moduleStalkFunctor_preservesColimitsOfShape
-    (X : Scheme.{u}) (x : X) (I : Type u) :
-    PreservesColimitsOfShape (Discrete I) (moduleStalkFunctor X x) := by
+/-- Arbitrary small colimits of module sheaves are preserved by the underlying
+additive sheaf stalk. The forgetful module functor reflects and preserves the
+corresponding module colimits. -/
+theorem moduleStalkFunctor_preservesSmallColimits
+    (X : Scheme.{u}) (x : X) (J : Type u) [Category.{u} J] :
+    PreservesColimitsOfShape J (moduleStalkFunctor X x) := by
   let forgetModule := forget₂ (ModuleCat.{u} (X.presheaf.stalk x)) AddCommGrpCat.{u}
+  let α := 𝟙 X.ringCatSheaf.obj
+  letI : PreservesColimitsOfShape J
+      (PresheafOfModules.sheafification α ⋙ SheafOfModules.toSheaf X.ringCatSheaf) := by
+    exact inferInstanceAs (PreservesColimitsOfShape J
+      (PresheafOfModules.toPresheaf X.ringCatSheaf.obj ⋙
+        presheafToSheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}))
+  have hF : PreservesColimitsOfShape J
+      (SheafOfModules.toSheaf X.ringCatSheaf) :=
+    (PresheafOfModules.sheafificationAdjunction α).preservesColimitsOfShape_of_comp_left
+      (K := J) (SheafOfModules.toSheaf X.ringCatSheaf)
   let G := TopCat.Sheaf.forget AddCommGrpCat.{u} X ⋙
     TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} x
-  have hF : PreservesColimitsOfShape (Discrete I)
-      (SheafOfModules.toSheaf X.ringCatSheaf) := by
-    let α := 𝟙 X.ringCatSheaf.obj
-    haveI : PreservesColimitsOfShape (Discrete I)
-        (PresheafOfModules.sheafification α ⋙ SheafOfModules.toSheaf X.ringCatSheaf) := by
-      exact inferInstanceAs (PreservesColimitsOfShape (Discrete I)
-        (PresheafOfModules.toPresheaf X.ringCatSheaf.obj ⋙
-          presheafToSheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}))
-    exact (PresheafOfModules.sheafificationAdjunction α).preservesColimitsOfShape_of_comp_left
-      (K := Discrete I) (SheafOfModules.toSheaf X.ringCatSheaf)
-  have hG : PreservesColimitsOfShape (Discrete I)
-      (TopCat.Sheaf.forget AddCommGrpCat.{u} X ⋙
-        TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} x) := inferInstance
-  have hFG : PreservesColimitsOfShape (Discrete I)
+  have hG : PreservesColimitsOfShape J G := inferInstance
+  have hFG : PreservesColimitsOfShape J
       (SheafOfModules.toSheaf X.ringCatSheaf ⋙ G) := by
     exact @comp_preservesColimitsOfShape _ _ _ _ _ _ _ _
       (SheafOfModules.toSheaf X.ringCatSheaf) G hF hG
-  have hFGi : PreservesColimitsOfShape (Discrete I)
-      (SheafOfModules.toSheaf X.ringCatSheaf ⋙
-        (TopCat.Sheaf.forget AddCommGrpCat.{u} X ⋙
-          TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} x)) := by
-    change PreservesColimitsOfShape (Discrete I)
-      (SheafOfModules.toSheaf X.ringCatSheaf ⋙ G)
-    exact hFG
-  have hComposite : PreservesColimitsOfShape (Discrete I)
-      (moduleStalkFunctor X x ⋙ forgetModule) := by
-    exact (preservesColimitsOfShape_iff_of_natIso
-      (moduleStalkForgetIso X x)).mp hFGi
-  letI := hComposite
+  letI : PreservesColimitsOfShape J
+      (moduleStalkFunctor X x ⋙ forgetModule) :=
+    (preservesColimitsOfShape_iff_of_natIso (moduleStalkForgetIso X x)).mpr hFG
   exact preservesColimitsOfShape_of_reflects_of_preserves
     (moduleStalkFunctor X x) forgetModule
+
+/-- The established indexed-coproduct API is the discrete-diagram case of
+general small-colimit preservation. -/
+theorem moduleStalkFunctor_preservesColimitsOfShape
+    (X : Scheme.{u}) (x : X) (I : Type u) :
+    PreservesColimitsOfShape (Discrete I) (moduleStalkFunctor X x) :=
+  moduleStalkFunctor_preservesSmallColimits X x (Discrete I)
+
+/-- Finite colimits follow from the general small-colimit theorem after
+transporting a finite indexing category to the scheme's universe. -/
+theorem moduleStalkFunctor_preservesFiniteColimits
+    (X : Scheme.{u}) (x : X) :
+    PreservesFiniteColimits (moduleStalkFunctor X x) := by
+  apply preservesFiniteColimits_of_preservesFiniteColimitsOfSize
+  intro J _ _
+  exact moduleStalkFunctor_preservesSmallColimits X x J
 
 /-- Taking the stalk of a sheaf of modules preserves finite limits. -/
 theorem moduleStalkFunctor_preservesFiniteLimits
