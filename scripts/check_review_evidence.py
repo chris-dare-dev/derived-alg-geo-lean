@@ -9,6 +9,7 @@ durable Lean evidence belongs in Development with sweep/emitter coverage.
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 import hashlib
 import os
 import re
@@ -114,7 +115,7 @@ def corpus(paths: list[Path], base: str) -> list[tuple[str, int, str, bool]]:
                 primary = next((line for line, _, module in blocks if module), None)
                 # Mid-file /-! section notes need no duplicate module header.
                 return [(line, body, module and line == primary) for line, body, module in blocks]
-            previous = {(body, primary) for _, body, primary in primary_blocks(old.stdout)} if old.returncode == 0 else set()
+            previous = Counter((body, primary) for _, body, primary in primary_blocks(old.stdout)) if old.returncode == 0 else Counter()
             current = primary_blocks(text)
             code = "\n".join(code_only(text.splitlines()))
             non_import = any(s.strip() and not re.match(r"^\s*(?:(?:public|meta)\s+)?import\b", s)
@@ -123,8 +124,12 @@ def corpus(paths: list[Path], base: str) -> list[tuple[str, int, str, bool]]:
                 (old.returncode != 0 and non_import) or any(primary for _, primary in previous)
             ):
                 result.append((str(path), 1, "", True))
-            result.extend((str(path), line, body, primary) for line, body, primary in current
-                          if (body, primary) not in previous)
+            for line, body, primary in current:
+                key = (body, primary)
+                if previous[key]:
+                    previous[key] -= 1
+                else:
+                    result.append((str(path), line, body, primary))
         elif path.suffix == ".md" and path.parts[0] not in (".claude", "openspec"):
             diff = git("diff", "--unified=0", merge_base, "--", str(path))
             touched = set()
