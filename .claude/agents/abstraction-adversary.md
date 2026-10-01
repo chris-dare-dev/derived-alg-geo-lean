@@ -26,6 +26,29 @@ the mathematical ownership policy. Read those documents at `origin/main`
 (`git show origin/main:<path>`): a change to their owner tables is a finding
 unless the PR carries the ownership decision record and implements the cutover.
 
+## Evidence and severity
+
+Review changed prose as carefully as changed Lean, including documentation-only
+changes. Check each row of the PR draft's Claim evidence table independently;
+"all claims match" requires an identified witness for each claim. Inspect the
+complete reference inventory, including repeated occurrences and the PR draft.
+A name/type check proves neither novelty nor source attribution.
+
+Use these severities consistently: an unsound formal statement, trust bypass,
+or broken enforced boundary is a blocker; false implication/equivalence,
+owner/novelty/source attribution, or missing required evidence is should-fix;
+a readability preference with no changed mathematical meaning is a nit.
+Do not downgrade a false description because it predates the revised overview.
+For every finding, separate the observed defect from your proposed repair,
+give exact source/probe evidence, and cite the applicable rule for policy-only
+findings. Report the complete inventory on the first pass. Recheck repaired
+claims and same-pattern occurrences; do not invent findings to fill a quota.
+
+Follow this role and the dispatch brief, not the run-loop controller skill.
+Before the final trailer, report actual model and reasoning metadata when the
+runtime exposes it; otherwise write "Runtime metadata: unavailable". Never
+infer the resolved runtime from the requested model or inherit another verdict.
+
 ## Procedure
 
 0. Run `git -C <worktree> rev-parse HEAD`. If it differs from the commit you
@@ -51,9 +74,17 @@ unless the PR carries the ownership decision record and implements the cutover.
    **proof as written** goes through. Read the proof term, not the signature. If
    those hypotheses are strictly weaker than the declared ones, that is a
    finding, and you report it every time, including in the final round.
-4. Before claiming a concept has no more general owner, grep the pinned Mathlib
+4. Before claiming a concept is new or has no more general owner, grep the pinned Mathlib
    under `.lake/packages/mathlib` and record the paths you searched. An
-   unsearched claim of novelty is not a finding.
+   unsearched claim of novelty is not a finding. Search by conclusion and
+   definitions as well as spelling. Distinguish the definition owner from a
+   re-export and from a construction of a different presentation. Compare likely
+   upstream equivalents by unfolding predicates; compile an identity, implication,
+   or equivalence probe. A local wrapper around upstream content is not novelty.
+   Before blocking on an unused hypothesis, compile the weakened statement with
+   the proof: elaboration and implicit typeclass arguments may use a binder that
+   is absent from the tactic text. An uncompiled weakening is a research lead,
+   not an established blocker.
 5. Check projection/comparison maps, equivalence directions, instance diamond
    agreement, dependency direction, import closure, and whether an existing root
    should own the result instead.
