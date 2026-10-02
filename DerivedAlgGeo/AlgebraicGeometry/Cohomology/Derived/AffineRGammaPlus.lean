@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.Algebra.Homology.DerivedCategory.RightDerivedFunctorPlus
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.RightDerivedFunctorPlus
 import DerivedAlgGeo.AlgebraicGeometry.Modules.AB
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.Extensions
 
@@ -14,6 +15,8 @@ has a right derived functor on Mathlib's bounded-below derived category. Its
 unit carries Mathlib's right-derived universal property. The construction
 uses injective resolutions of all module sheaves, with no quasicoherence
 assumption on their terms or on the input.
+Finite-limit preservation of affine sections specializes the generic H⁰
+unit theorem to all affine module sheaves, without a quasicoherence premise.
 
 ## Main definitions
 
@@ -25,14 +28,21 @@ for the existing affine global-sections functor is local to this construction.
 * `AlgebraicGeometry.Cohomology.affineRGammaPlus` is the bounded-below right
   derived global-sections functor.
 * `AlgebraicGeometry.Cohomology.affineRGammaPlusUnit` is its derived unit.
+* `AlgebraicGeometry.Cohomology.affineRGammaPlusHomologyZeroSingleIso` is the
+  pointwise comparison on degree-zero single objects.
 * `AlgebraicGeometry.Cohomology.affineRGammaPlus_isRightDerivedFunctor` records
   the right-derived universal property.
+* `AlgebraicGeometry.Cohomology.isIso_homologyZero_map_affineRGammaPlusUnit_of_isStrictlyGE_zero`
+  gives the H⁰ unit isomorphism on strictly nonnegative complexes.
 
 ## Implementation notes
 
 Finite-product preservation makes the affine sections functor additive. Mathlib's
 `CategoryTheory.Functor.rightDerivedFunctorPlus` constructs the functor and its unit from
 that fact and enough injectives in the category of module sheaves.
+Finite-limit preservation discharges both outgoing-kernel premises of the
+generic H⁰ theorem. These comparisons are pointwise; no natural H⁰
+identification on arbitrary bounded-below Dqc objects follows.
 
 ## References
 
@@ -60,8 +70,8 @@ private theorem affineGamma_additive (R : CommRingCat.{u}) :
 attribute [local instance] affineGamma_additive
 
 /-- Right-derived global sections of module sheaves on an affine scheme,
-restricted to Mathlib's bounded-below derived categories. This definition
-makes no H⁰ comparison or unbounded Dqc identification. -/
+restricted to Mathlib's bounded-below derived categories. The definition
+itself uses no H⁰ comparison or unbounded Dqc identification. -/
 noncomputable def affineRGammaPlus (R : CommRingCat.{u}) :
     DerivedCategory.Plus (Spec R).Modules ⥤ DerivedCategory.Plus (ModuleCat R) :=
   (AlgebraicGeometry.affineΓ R).rightDerivedFunctorPlus
@@ -80,5 +90,33 @@ instance affineRGammaPlus_isRightDerivedFunctor (R : CommRingCat.{u}) :
       (HomotopyCategory.Plus.quasiIso (Spec R).Modules) := by
   dsimp only [affineRGammaPlus, affineRGammaPlusUnit]
   infer_instance
+
+/-- Affine sections preserve finite limits, so they preserve both the input's
+degree-zero outgoing kernel and those in its nonnegative injective resolutions.
+The generic right-derived unit theorem then gives an H⁰ isomorphism. -/
+theorem isIso_homologyZero_map_affineRGammaPlusUnit_of_isStrictlyGE_zero
+    (R : CommRingCat.{u}) (K : CochainComplex.Plus (Spec R).Modules)
+    [K.obj.IsStrictlyGE 0] :
+    IsIso ((DerivedCategory.Plus.homologyFunctor (ModuleCat R) 0).map
+      ((affineRGammaPlusUnit R).app
+        ((HomotopyCategory.Plus.quotient (Spec R).Modules).obj K))) := by
+  have h := (AlgebraicGeometry.affineΓ R)
+    |>.isIso_homologyZero_map_rightDerivedFunctorPlusUnit_of_isStrictlyGE_zero
+      K inferInstance (fun _ _ _ => inferInstance)
+  exact h
+
+/-- On an arbitrary affine module sheaf, invert H⁰ of the derived unit on
+its degree-zero single and normalize the source to ordinary affine sections.
+The result is pointwise in the sheaf; naturality remains separate. -/
+noncomputable def affineRGammaPlusHomologyZeroSingleIso
+    (R : CommRingCat.{u}) (M : (Spec R).Modules) :
+    (DerivedCategory.Plus.homologyFunctor (ModuleCat R) 0).obj
+      ((affineRGammaPlus R).obj
+        ((DerivedCategory.Plus.singleFunctor (Spec R).Modules 0).obj M)) ≅
+      (AlgebraicGeometry.affineΓ R).obj M := by
+  haveI : CategoryTheory.Limits.PreservesFiniteLimits (AlgebraicGeometry.affineΓ R) :=
+    inferInstance
+  exact (AlgebraicGeometry.affineΓ R)
+    |>.rightDerivedFunctorPlusHomologyZeroSingleIsoOfPreservesFiniteLimits M
 
 end AlgebraicGeometry.Cohomology
