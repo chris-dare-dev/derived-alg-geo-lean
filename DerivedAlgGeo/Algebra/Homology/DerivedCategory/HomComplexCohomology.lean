@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import Mathlib.Algebra.Homology.DerivedCategory.KProjective
 import Mathlib.Algebra.Homology.DerivedCategory.KInjective
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyHomotopy
 
 /-!
 # Degree-zero Hom-complex classes and derived-category morphisms
@@ -27,9 +28,9 @@ ordinary derived-category morphisms.
 
 ## Implementation notes
 
-The homotopy-category additive equivalence is followed by the zero-shift
-isomorphism and Mathlib's bijectivity of localization maps under the relevant
-K-projective or K-injective hypothesis.
+The neutral `CochainComplex.HomComplex.cohomologyClassHomotopyAddEquiv`
+owns zero-shift normalization. Mathlib's bijectivity of localization maps
+then uses the relevant K-projective or K-injective hypothesis.
 
 ## References
 
@@ -58,21 +59,11 @@ noncomputable def derivedCategoryHomAddEquiv
         (DerivedCategory.Qh).obj ((HomotopyCategory.quotient C (.up ℤ)).obj L)) := by
   let Kₕ := (HomotopyCategory.quotient C (.up ℤ)).obj K
   let Lₕ := (HomotopyCategory.quotient C (.up ℤ)).obj L
-  let L₀ := (HomotopyCategory.quotient C (.up ℤ)).obj (L⟦(0 : ℤ)⟧)
-  let e : L₀ ≅ Lₕ :=
-    (HomotopyCategory.quotient C (.up ℤ)).mapIso
-      ((shiftFunctorZero (CochainComplex C ℤ) ℤ).app L)
-  let e₁ : (Kₕ ⟶ L₀) ≃+ (Kₕ ⟶ Lₕ) :=
-    { toFun := fun f => f ≫ e.hom
-      invFun := fun g => g ≫ e.inv
-      left_inv := by intro f; simp
-      right_inv := by intro g; simp
-      map_add' := by intro f g; simp [Preadditive.add_comp] }
   let e₂ : (Kₕ ⟶ Lₕ) ≃+
       ((DerivedCategory.Qh).obj Kₕ ⟶ (DerivedCategory.Qh).obj Lₕ) :=
     AddEquiv.ofBijective (Functor.mapAddHom DerivedCategory.Qh)
       (CochainComplex.IsKProjective.Qh_map_bijective K Lₕ)
-  exact CohomologyClass.homAddEquiv.trans (e₁.trans e₂)
+  exact (CochainComplex.HomComplex.cohomologyClassHomotopyAddEquiv K L).trans e₂
 
 /-- Degree-zero Hom-complex classes are derived-category morphisms when the
 target complex is K-injective. This is the target-side counterpart of
@@ -86,20 +77,10 @@ noncomputable def derivedCategoryHomAddEquivOfKInjective
         (DerivedCategory.Qh).obj ((HomotopyCategory.quotient C (.up ℤ)).obj L)) := by
   let Kₕ := (HomotopyCategory.quotient C (.up ℤ)).obj K
   let Lₕ := (HomotopyCategory.quotient C (.up ℤ)).obj L
-  let L₀ := (HomotopyCategory.quotient C (.up ℤ)).obj (L⟦(0 : ℤ)⟧)
-  let e : L₀ ≅ Lₕ :=
-    (HomotopyCategory.quotient C (.up ℤ)).mapIso
-      ((shiftFunctorZero (CochainComplex C ℤ) ℤ).app L)
-  let e₁ : (Kₕ ⟶ L₀) ≃+ (Kₕ ⟶ Lₕ) :=
-    { toFun := fun f => f ≫ e.hom
-      invFun := fun g => g ≫ e.inv
-      left_inv := by intro f; simp
-      right_inv := by intro g; simp
-      map_add' := by intro f g; simp [Preadditive.add_comp] }
   let e₂ : (Kₕ ⟶ Lₕ) ≃+
       ((DerivedCategory.Qh).obj Kₕ ⟶ (DerivedCategory.Qh).obj Lₕ) :=
     AddEquiv.ofBijective (Functor.mapAddHom DerivedCategory.Qh)
       (CochainComplex.IsKInjective.Qh_map_bijective Kₕ L)
-  exact CohomologyClass.homAddEquiv.trans (e₁.trans e₂)
+  exact (CochainComplex.HomComplex.cohomologyClassHomotopyAddEquiv K L).trans e₂
 
 end CochainComplex.HomComplex.CohomologyClass
