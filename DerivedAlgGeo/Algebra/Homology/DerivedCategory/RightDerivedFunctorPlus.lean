@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import Mathlib.Algebra.Homology.DerivedCategory.RightDerivedFunctorPlus
 import Mathlib.Algebra.Homology.DerivedCategory.FullyFaithful
+import DerivedAlgGeo.Algebra.Homology.HomologicalComplexLeftExact
 
 /-!
 # Degree-zero homology of the bounded-below right-derived functor
@@ -15,6 +16,9 @@ H⁰ of a strictly nonnegative complex when the functor preserves the input's
 outgoing degree-zero kernel and those of nonnegative injective resolutions
 equipped with a quasi-isomorphism from that input. The degree-zero single
 case needs only its resolution-kernel condition.
+Composing the inverse H⁰ unit with the ordinary zero-incoming complex
+comparison identifies derived H⁰ with the functor applied to input H⁰ for
+strictly nonnegative representatives, under those same local kernels.
 
 The derived unit also gives a natural H⁰ comparison on degree-zero singles.
 Its components agree with the pointwise comparisons below, as proved by the
@@ -35,6 +39,8 @@ two component-agreement theorems. Geometric identifications are separate.
 
 * `CategoryTheory.Functor.isIso_homologyZero_map_rightDerivedFunctorPlusUnit_of_isStrictlyGE_zero`:
   the H⁰ unit is invertible on a nonnegative complex under local kernels.
+* `CategoryTheory.Functor.rightDerivedFunctorPlusHomologyZeroOfIsStrictlyGEZero`:
+  under the same local kernels, derived H⁰ is the functor applied to input H⁰.
 * `CategoryTheory.Functor.isIso_homologyZero_map_rightDerivedFunctorPlusUnit_single`:
   the degree-zero single specialization.
 * `CategoryTheory.Functor.rightDerivedFunctorPlusHomologyZeroSingleNatIso_app`:
@@ -46,6 +52,9 @@ two component-agreement theorems. Geometric identifications are separate.
 The resolution is strictly nonnegative and termwise injective. Zero incoming
 differentials reduce H⁰ preservation to outgoing-kernel preservation. Unit
 naturality transfers invertibility from the injective resolution.
+The resulting objectwise comparison reuses the generic integer-complex
+zero-incoming normalization; it does not require global finite-limit
+preservation.
 
 ## References
 
@@ -224,6 +233,35 @@ theorem isIso_homologyZero_map_rightDerivedFunctorPlusUnit_of_isStrictlyGE_zero
       (DerivedCategory.Plus.Q.map (F.mapCochainComplexPlus.map i)))
     exact hplus
   exact isIso_homologyZero_unit_of_resolution F _ _ w hw
+
+/-- The H⁰ isomorphism of the derived unit, followed by the ordinary
+zero-incoming comparison, identifies H⁰ of a bounded-below right-derived
+functor with the functor applied to input H⁰. The kernel assumptions are local
+to the input and the nonnegative injective resolutions used by the unit. -/
+noncomputable def rightDerivedFunctorPlusHomologyZeroOfIsStrictlyGEZero
+    (K : CochainComplex.Plus C) [K.obj.IsStrictlyGE 0]
+    (hK : PreservesLimit (parallelPair (K.obj.sc 0).g 0) F)
+    (hResKernel : ∀ (L : CochainComplex.Plus (InjectiveObject C)) [L.obj.IsStrictlyGE 0],
+      (i : K ⟶ (InjectiveObject.ι C).mapCochainComplexPlus.obj L) →
+      CochainComplex.Plus.quasiIso C i → PreservesLimit (parallelPair
+        (((InjectiveObject.ι C).mapCochainComplexPlus.obj L).obj.sc 0).g 0) F) :
+    (DerivedCategory.Plus.homologyFunctor D 0).obj
+      (F.rightDerivedFunctorPlus.obj (DerivedCategory.Plus.Q.obj K)) ≅
+      F.obj (K.obj.homology 0) := by
+  let H := DerivedCategory.Plus.homologyFunctor D 0
+  let a := F.rightDerivedFunctorPlusUnit.app
+    ((HomotopyCategory.Plus.quotient C).obj K)
+  haveI : IsIso (H.map a) :=
+    F.isIso_homologyZero_map_rightDerivedFunctorPlusUnit_of_isStrictlyGE_zero K hK hResKernel
+  refine (asIso (H.map a)).symm ≪≫ ?_
+  change (DerivedCategory.homologyFunctor D 0).obj
+    (DerivedCategory.Q.obj
+      ((F.mapHomologicalComplex (ComplexShape.up ℤ)).obj K.obj)) ≅ _
+  refine (DerivedCategory.homologyFunctorFactors D 0).app _ ≪≫ ?_
+  letI := hK
+  apply F.mapCochainComplexHomologyZeroIsoOfZeroIncoming K.obj
+  change K.obj.d ((ComplexShape.up ℤ).prev 0) 0 = 0
+  exact (K.obj.isZero_of_isStrictlyGE 0 _ (by simp)).eq_of_src _ _
 
 /-- For a degree-zero single, the source outgoing differential is zero and
 its kernel is automatically preserved. Only kernels in resolutions receiving
