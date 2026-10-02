@@ -41,6 +41,7 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms HomologicalComplex.extendCyclesIso_naturality
 #print axioms CategoryTheory.Functor.mapCochainComplexHomologyZeroIso
 #print axioms CategoryTheory.Functor.mapCochainComplexHomologyZeroIso_naturality
+#print axioms CategoryTheory.Functor.mapCochainComplexHomologyZeroIso_naturality_assoc
 #print axioms HomologicalComplex.extendCyclesIso_naturality_assoc
 #print axioms HomologicalComplex.extendHomologyIso_naturality
 #print axioms HomologicalComplex.extendHomologyIso_naturality_assoc
