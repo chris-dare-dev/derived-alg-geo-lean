@@ -72,8 +72,9 @@ private theorem homology_isQuasicoherent_of_termwise
     (Scheme.Modules.isQuasicoherent_cokernel (K.toCycles (n - 1) n)
       (hK (n - 1)) (cycles_isQuasicoherent_of_termwise X K hK n))
 
-/-- A complex of quasi-coherent module sheaves represents an object of `Dqc(X)`.
-The statement holds for unbounded complexes on any scheme. -/
+/-- Kernel closure gives quasi-coherent cycles, and cokernel closure gives
+quasi-coherent homology. Transport along
+`DerivedCategory.homologyFunctorFactors` gives derived-category membership. -/
 theorem quasicoherentCohomology_of_termwiseQuasicoherent
     (X : Scheme.{u}) (K : CochainComplex X.Modules ℤ)
     (hK : ∀ n : ℤ, (K.X n).IsQuasicoherent) :
