@@ -315,6 +315,7 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms CochainComplex.HomComplex.CohomologyClass.postcompAddMonoidHom_comp_i
 #print axioms CochainComplex.HomComplex.singleCoyonedaIso
 #print axioms CochainComplex.HomComplex.singleRepresentedIso
+#print axioms CochainComplex.HomComplex.singleRepresentedHomologyAddEquiv
 #print axioms CochainComplex.HomComplex.singleRepresentedHomologyZeroAddEquiv
 #print axioms CochainComplex.HomComplex.CohomologyClass.postcompCocycleAddMonoidHom
 #print axioms CochainComplex.HomComplex.CohomologyClass.postcompCocycleAddMonoidHom_apply

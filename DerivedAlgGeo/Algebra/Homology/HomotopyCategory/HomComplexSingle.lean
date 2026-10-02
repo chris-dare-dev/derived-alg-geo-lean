@@ -22,12 +22,14 @@ or injectivity hypothesis is used.
 
 * `CochainComplex.HomComplex.singleCoyonedaIso`
 * `CochainComplex.HomComplex.singleRepresentedIso`
+* `CochainComplex.HomComplex.singleRepresentedHomologyAddEquiv`
 * `CochainComplex.HomComplex.singleRepresentedHomologyZeroAddEquiv`
 
 ## Main results
 
 The isomorphism identifies the full Hom complex, and the additive equivalence
-identifies its degree-zero cohomology with represented degreewise homology.
+identifies cohomology in every integer degree with represented degreewise
+homology. The degree-zero result is a specialization.
 
 ## Implementation notes
 
@@ -76,26 +78,35 @@ noncomputable def singleCoyonedaIso (X : C) (K : CochainComplex C ℤ) :
         Cochain.δ_fromSingleMk f (zero_add i) j j (zero_add j),
         Cochain.fromSingleEquiv_fromSingleMk])
 
-/-- Specialize `singleCoyonedaIso` along a supplied representation of an
-additive functor. The representation is a natural isomorphism of functors;
-the resulting complex comparison itself imposes no exactness hypothesis. -/
+/-- Specialize `singleCoyonedaIso` along a supplied representation of a
+zero-morphism-preserving functor. The representation is a natural isomorphism
+of functors; the complex comparison does not require a separate additivity or
+exactness hypothesis. -/
 noncomputable def singleRepresentedIso
-    (X : C) (F : C ⥤ AddCommGrpCat.{v}) [F.Additive]
+    (X : C) (F : C ⥤ AddCommGrpCat.{v}) [F.PreservesZeroMorphisms]
     (e : preadditiveCoyoneda.obj (op X) ≅ F) (K : CochainComplex C ℤ) :
     HomComplex ((CochainComplex.singleFunctor C 0).obj X) K ≅
       (F.mapHomologicalComplex (.up ℤ)).obj K :=
   singleCoyonedaIso X K ≪≫ (NatIso.mapHomologicalComplex e (.up ℤ)).app K
 
-/-- Degree-zero classes in the Hom complex are the degree-zero homology of
-any represented additive functor applied degreewise. All integer degrees,
-including boundaries from degree minus one, remain in the quotient. -/
+/-- Degree-`n` classes in the Hom complex are degree-`n` homology of any
+represented zero-morphism-preserving functor applied degreewise. In
+particular, the quotient retains boundaries from degree `n - 1`. -/
+noncomputable def singleRepresentedHomologyAddEquiv
+    (X : C) (F : C ⥤ AddCommGrpCat.{v}) [F.PreservesZeroMorphisms]
+    (e : preadditiveCoyoneda.obj (op X) ≅ F) (K : CochainComplex C ℤ) (n : ℤ) :
+    CohomologyClass ((CochainComplex.singleFunctor C 0).obj X) K n ≃+
+      ((F.mapHomologicalComplex (.up ℤ)).obj K).homology n :=
+  (homologyAddEquiv _ K n).symm.trans
+    (HomologicalComplex.homologyMapIso
+      (singleRepresentedIso X F e K) n).addCommGroupIsoToAddEquiv
+
+/-- Degree-zero specialization of `singleRepresentedHomologyAddEquiv`. -/
 noncomputable def singleRepresentedHomologyZeroAddEquiv
-    (X : C) (F : C ⥤ AddCommGrpCat.{v}) [F.Additive]
+    (X : C) (F : C ⥤ AddCommGrpCat.{v}) [F.PreservesZeroMorphisms]
     (e : preadditiveCoyoneda.obj (op X) ≅ F) (K : CochainComplex C ℤ) :
     CohomologyClass ((CochainComplex.singleFunctor C 0).obj X) K 0 ≃+
       ((F.mapHomologicalComplex (.up ℤ)).obj K).homology 0 :=
-  (homologyAddEquiv _ K 0).symm.trans
-    (HomologicalComplex.homologyMapIso
-      (singleRepresentedIso X F e K) 0).addCommGroupIsoToAddEquiv
+  singleRepresentedHomologyAddEquiv X F e K 0
 
 end CochainComplex.HomComplex
