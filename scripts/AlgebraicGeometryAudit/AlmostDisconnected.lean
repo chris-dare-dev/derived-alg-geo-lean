@@ -15,7 +15,12 @@ import DerivedAlgGeo.AlgebraicGeometry.Morphisms
 #print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.mk.inj
 #print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.mk.sizeOf_spec
 #print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.instIsClosedImmersionInclusion
+#print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.ofIso
+#print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.ofIso_support
+#print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.ofIso_inclusion
+#print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.ofIso_baseIso
 #print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.identity
+#print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.identity_baseIso
 #print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.comp
 #print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.comp_support
 #print axioms AlgebraicGeometry.AlmostDisconnected.SupportData.comp_inclusion
@@ -44,8 +49,10 @@ import DerivedAlgGeo.AlgebraicGeometry.Morphisms
 #print axioms AlgebraicGeometry.AlmostDisconnected.Witness.compositionSupportData
 #print axioms AlgebraicGeometry.AlmostDisconnected.Witness.compositionSupportData_support
 #print axioms AlgebraicGeometry.AlmostDisconnected.Witness.compositionSupportData_inclusion
+#print axioms AlgebraicGeometry.AlmostDisconnected.isoWitness
 #print axioms AlgebraicGeometry.AlmostDisconnected.identityWitness
 #print axioms AlgebraicGeometry.IsAlmostDisconnected
+#print axioms AlgebraicGeometry.IsAlmostDisconnected.of_isIso
 #print axioms AlgebraicGeometry.IsAlmostDisconnected.id
 #print axioms AlgebraicGeometry.IsAlmostDisconnected.instContainsIdentitiesScheme
 
@@ -60,4 +67,8 @@ import DerivedAlgGeo.AlgebraicGeometry.Morphisms
 #print axioms AlgebraicGeometry.FiltrationProperty.Witness.automorphism_hom_over
 #print axioms AlgebraicGeometry.FiltrationProperty.Witness.automorphism_inv_over
 #print axioms AlgebraicGeometry.FiltrationProperty.Witness.overAutomorphism
+#print axioms AlgebraicGeometry.FiltrationProperty.ofMono
+#print axioms AlgebraicGeometry.FiltrationProperty.ofMono_automorphism_eq_refl
 #print axioms AlgebraicGeometry.HasFiltrationProperty
+#print axioms AlgebraicGeometry.HasFiltrationProperty.of_mono
+#print axioms AlgebraicGeometry.HasFiltrationProperty.of_isIso
