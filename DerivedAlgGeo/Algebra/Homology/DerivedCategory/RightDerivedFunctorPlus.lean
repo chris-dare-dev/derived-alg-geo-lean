@@ -17,9 +17,8 @@ equipped with a quasi-isomorphism from that input. The degree-zero single
 case needs only its resolution-kernel condition.
 
 The derived unit also gives a natural H⁰ comparison on degree-zero singles.
-Its components are constructed from the unit; agreement with the separately
-defined pointwise isomorphism below is not asserted. Geometric identifications
-are separate.
+Its components agree with the pointwise comparisons below, as proved by the
+two component-agreement theorems. Geometric identifications are separate.
 
 ## Main definitions
 
@@ -38,6 +37,9 @@ are separate.
   the H⁰ unit is invertible on a nonnegative complex under local kernels.
 * `CategoryTheory.Functor.isIso_homologyZero_map_rightDerivedFunctorPlusUnit_single`:
   the degree-zero single specialization.
+* `CategoryTheory.Functor.rightDerivedFunctorPlusHomologyZeroSingleNatIso_app`:
+  agreement with the pointwise comparison; the finite-limit specialization
+  has the analogous result.
 
 ## Implementation notes
 
@@ -348,8 +350,8 @@ noncomputable def rightDerivedFunctorPlusHomologyZeroSingleNatIso
   letI : IsIso (homologyZeroSingleUnit F) := hη
   exact (asIso (homologyZeroSingleUnit F)).symm ≪≫ homologyZeroSingleSourceNatIso F
 
-/-- The natural comparison has the previously defined pointwise comparison as
-each component, with the same resolution-kernel hypothesis. -/
+/-- Both constructions invert the same component of the derived unit and use
+the same source normalization, without choosing compatible resolutions. -/
 theorem rightDerivedFunctorPlusHomologyZeroSingleNatIso_app
     (hResKernel : ∀ (X : C)
       (L : CochainComplex.Plus (InjectiveObject C)) [L.obj.IsStrictlyGE 0],
@@ -374,7 +376,8 @@ noncomputable def rightDerivedFunctorPlusHomologyZeroSingleNatIsoOfPreservesFini
       DerivedCategory.Plus.homologyFunctor D 0 ≅ F :=
   F.rightDerivedFunctorPlusHomologyZeroSingleNatIso (fun _ _ _ _ => inferInstance)
 
-/-- Component agreement for the finite-limit specialization. -/
+/-- Specializing uniform-kernel agreement recovers the existing finite-limit
+pointwise comparison without unfolding either construction. -/
 theorem rightDerivedFunctorPlusHomologyZeroSingleNatIsoOfPreservesFiniteLimits_app
     [PreservesFiniteLimits F] (X : C) :
     F.rightDerivedFunctorPlusHomologyZeroSingleNatIsoOfPreservesFiniteLimits.app X =
