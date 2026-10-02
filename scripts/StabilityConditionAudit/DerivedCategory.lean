@@ -102,6 +102,7 @@ end FiniteProjectiveResolutionClient
 /-! ## Degree-zero Hom-complex classes and derived morphisms -/
 
 #print axioms CochainComplex.HomComplex.CohomologyClass.derivedCategoryHomAddEquiv
+#print axioms CochainComplex.HomComplex.CohomologyClass.derivedCategoryHomAddEquivOfKInjective
 #print axioms CochainComplex.HomComplex.CohomologyClass.derivedCategoryHomAddEquiv_apply_eq
 #print axioms CochainComplex.HomComplex.CohomologyClass.derivedCategoryHomLinearEquiv
 #print axioms CochainComplex.HomComplex.CohomologyClass.derivedCategoryHomIntLinearEquiv
