@@ -20,9 +20,9 @@ This file introduces no new carrier, class, or instance.
 
 ## Main results
 
-* `AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.affineDerivedPullbackObjIsoOfKFlat`
-  compares nonflat affine derived pullback with termwise scalar extension on a
-  supplied ambient K-flat model.
+* The right-tensor comparison identifies derived pullback with termwise
+  scalar extension under the precise inversion premise.
+* Its K-flat specialization uses a supplied ambient K-flat model.
 
 ## Implementation notes
 
@@ -33,7 +33,7 @@ module-side derived tensor identification is used here.
 
 ## References
 
-The comparison uses the repository's `derivedPullbackObjIsoOfKFlat` and
+The comparison uses the repository's generic right-tensor comparison and
 `AlgebraicGeometry.Scheme.Modules.pullbackSpecMapTildeMapHomologicalComplexIso`.
 
 ## Tags
@@ -53,7 +53,29 @@ namespace AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 
 /-- For any ring map, including a nonflat one, derived pullback of a sheafified
 module complex agrees objectwise with sheafified termwise scalar extension if
-the sheafified complex is ambient K-flat. This does not infer ambient K-flatness
+right tensor with the sheafified input inverts quasi-isomorphisms. -/
+def affineDerivedPullbackObjIsoOfTensorRightInverts
+    {R A : CommRingCat.{u}} (f : R ⟶ A)
+    (P : CochainComplex (ModuleCat R) ℤ)
+    (hP : (HomologicalComplex.quasiIso (Spec R).Modules (ComplexShape.up ℤ)).IsInvertedBy
+      ((Scheme.Modules.totalTensor (Spec R)).flip.obj
+        (((tilde.functor R).mapHomologicalComplex (ComplexShape.up ℤ)).obj P) ⋙
+          DerivedCategory.Q)) :
+    (arbitraryLeftDerivedPullback
+      (toIdentityBaseChange (Over.mk (Spec.map f)))).functor.obj
+      ((SchemeDerivedCategory.Q (Spec R)).obj
+        (((tilde.functor R).mapHomologicalComplex (ComplexShape.up ℤ)).obj P)) ≅
+      (SchemeDerivedCategory.Q (Spec A)).obj
+        (((tilde.functor A).mapHomologicalComplex (ComplexShape.up ℤ)).obj
+          (((ModuleCat.extendScalars f.hom).mapHomologicalComplex
+            (ComplexShape.up ℤ)).obj P)) := by
+  let e := Scheme.Modules.pullbackSpecMapTildeMapHomologicalComplexIso f
+  exact (derivedPullbackObjIsoOfTensorRightInverts
+      (toIdentityBaseChange (Over.mk (Spec.map f))) _ hP) ≪≫
+    (SchemeDerivedCategory.Q (Spec A)).mapIso (e.app P)
+
+/-- Ambient K-flatness supplies the right-tensor inversion premise for the
+nonflat affine objectwise comparison. This does not infer ambient K-flatness
 from a property of the module complex. -/
 def affineDerivedPullbackObjIsoOfKFlat
     {R A : CommRingCat.{u}} (f : R ⟶ A)
@@ -67,10 +89,7 @@ def affineDerivedPullbackObjIsoOfKFlat
       (SchemeDerivedCategory.Q (Spec A)).obj
         (((tilde.functor A).mapHomologicalComplex (ComplexShape.up ℤ)).obj
           (((ModuleCat.extendScalars f.hom).mapHomologicalComplex
-            (ComplexShape.up ℤ)).obj P)) := by
-  let e := Scheme.Modules.pullbackSpecMapTildeMapHomologicalComplexIso f
-  exact (derivedPullbackObjIsoOfKFlat
-      (toIdentityBaseChange (Over.mk (Spec.map f))) _ hP) ≪≫
-    (SchemeDerivedCategory.Q (Spec A)).mapIso (e.app P)
+            (ComplexShape.up ℤ)).obj P)) :=
+  affineDerivedPullbackObjIsoOfTensorRightInverts f P hP.2
 
 end AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange

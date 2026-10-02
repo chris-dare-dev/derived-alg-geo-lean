@@ -34,9 +34,9 @@ all categorical structure descends from one K-flat replacement and explicit geom
 
 * `AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.kFlatPullbackAcyclic`
   proves both fields for any K-flat resolution and morphism.
-* `derivedPullbackObjIsoOfTensorRightInverts`
-  compares canonical derived pullback with ordinary pullback on a supplied
-  right-tensor-acyclic complex; `derivedPullbackObjIsoOfKFlat` specializes it.
+* The right-tensor comparison identifies canonical derived pullback with
+  ordinary pullback on a supplied tensor-acyclic complex. Its K-flat
+  specialization supplies the inversion premise.
 
 ## Implementation notes
 
