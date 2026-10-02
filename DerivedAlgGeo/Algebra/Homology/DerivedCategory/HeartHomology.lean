@@ -25,8 +25,9 @@ This file introduces no carrier, class, or instance.
 ## Implementation notes
 
 The heart equivalence first identifies the truncation with a single object.
-The long exact homology sequence makes both degree-zero truncation maps into
-isomorphisms, identifying that object with Mathlib's homology object.
+The long exact homology sequence shows that both truncation maps induce
+isomorphisms on degree-zero homology, identifying that object with Mathlib's
+homology object.
 
 ## References
 
@@ -61,7 +62,7 @@ private noncomputable def h0HeartTruncIso (M : DerivedCategory C) :
   let e := heartEquivalence C
   exact t.heart.ι.mapIso (e.counitIso.app H)
 
-private theorem h0TruncLTIsIso (M : DerivedCategory C) :
+private theorem isIso_h0_map_truncLTι (M : DerivedCategory C) :
     IsIso ((homologyFunctor C 0).map ((TStructure.t.truncLTι 1).app M)) := by
   let t := TStructure.t (C := C)
   let T := (t.triangleLTGE 1).obj M
@@ -80,7 +81,7 @@ private theorem h0TruncLTIsIso (M : DerivedCategory C) :
   letI := hepi
   exact isIso_of_mono_of_epi _
 
-private theorem h0TruncGEIsIso (L : DerivedCategory C) :
+private theorem isIso_h0_map_truncGEπ (L : DerivedCategory C) :
     IsIso ((homologyFunctor C 0).map ((TStructure.t.truncGEπ 0).app L)) := by
   let t := TStructure.t (C := C)
   let T := (t.triangleLTGE 0).obj L
@@ -105,11 +106,11 @@ private noncomputable def h0HeartObjectIsoHomology (M : DerivedCategory C) :
   let F := h0HeartObject C M
   let L := (TStructure.t.truncLT 1).obj M
   haveI : IsIso ((homologyFunctor C 0).map ((TStructure.t.truncLTι 1).app M)) :=
-    h0TruncLTIsIso C M
+    isIso_h0_map_truncLTι C M
   haveI : IsIso ((homologyFunctor C 0).map ((TStructure.t.truncGEπ 0).app L)) :=
-    h0TruncGEIsIso C L
+    isIso_h0_map_truncGEπ C L
   let eLT : (homologyFunctor C 0).obj L ≅ (homologyFunctor C 0).obj M :=
-    @asIso _ _ _ _ _ (h0TruncLTIsIso C M)
+    @asIso _ _ _ _ _ (isIso_h0_map_truncLTι C M)
   exact ((singleFunctorCompHomologyFunctorIso C 0).app F).symm ≪≫
     (homologyFunctor C 0).mapIso (h0HeartTruncIso C M) ≪≫
     (asIso ((homologyFunctor C 0).map ((TStructure.t.truncGEπ 0).app L))).symm ≪≫
