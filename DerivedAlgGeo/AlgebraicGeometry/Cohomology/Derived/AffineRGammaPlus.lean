@@ -30,6 +30,8 @@ for the existing affine global-sections functor is local to this construction.
 * `AlgebraicGeometry.Cohomology.affineRGammaPlusUnit` is its derived unit.
 * `AlgebraicGeometry.Cohomology.affineRGammaPlusHomologyZeroSingleIso` is the
   pointwise comparison on degree-zero single objects.
+* `AlgebraicGeometry.Cohomology.affineRGammaPlusHomologyZeroSingleNatIso`
+  is the natural comparison on degree-zero single objects.
 * `AlgebraicGeometry.Cohomology.affineRGammaPlus_isRightDerivedFunctor` records
   the right-derived universal property.
 * `AlgebraicGeometry.Cohomology.isIso_homologyZero_map_affineRGammaPlusUnit_of_isStrictlyGE_zero`
@@ -41,8 +43,9 @@ Finite-product preservation makes the affine sections functor additive. Mathlib'
 `CategoryTheory.Functor.rightDerivedFunctorPlus` constructs the functor and its unit from
 that fact and enough injectives in the category of module sheaves.
 Finite-limit preservation discharges both outgoing-kernel premises of the
-generic H⁰ theorem. These comparisons are pointwise; no natural H⁰
-identification on arbitrary bounded-below Dqc objects follows.
+generic H⁰ theorem. The degree-zero single comparison is natural and agrees
+with its pointwise predecessor. No natural H⁰ identification on arbitrary
+bounded-below Dqc objects follows.
 
 ## References
 
@@ -107,7 +110,7 @@ theorem isIso_homologyZero_map_affineRGammaPlusUnit_of_isStrictlyGE_zero
 
 /-- On an arbitrary affine module sheaf, invert H⁰ of the derived unit on
 its degree-zero single and normalize the source to ordinary affine sections.
-The result is pointwise in the sheaf; naturality remains separate. -/
+Its agreement with the natural comparison below is proved separately. -/
 noncomputable def affineRGammaPlusHomologyZeroSingleIso
     (R : CommRingCat.{u}) (M : (Spec R).Modules) :
     (DerivedCategory.Plus.homologyFunctor (ModuleCat R) 0).obj
@@ -118,5 +121,28 @@ noncomputable def affineRGammaPlusHomologyZeroSingleIso
     inferInstance
   exact (AlgebraicGeometry.affineΓ R)
     |>.rightDerivedFunctorPlusHomologyZeroSingleIsoOfPreservesFiniteLimits M
+
+/-- Affine sections preserve finite limits, so the generic natural H⁰
+comparison specializes to all module sheaves on an affine scheme. -/
+noncomputable def affineRGammaPlusHomologyZeroSingleNatIso
+    (R : CommRingCat.{u}) :
+    (DerivedCategory.Plus.singleFunctor (Spec R).Modules 0 ⋙ affineRGammaPlus R) ⋙
+      DerivedCategory.Plus.homologyFunctor (ModuleCat R) 0 ≅
+    AlgebraicGeometry.affineΓ R := by
+  haveI : CategoryTheory.Limits.PreservesFiniteLimits (AlgebraicGeometry.affineΓ R) :=
+    inferInstance
+  exact (AlgebraicGeometry.affineΓ R)
+    |>.rightDerivedFunctorPlusHomologyZeroSingleNatIsoOfPreservesFiniteLimits
+
+/-- The natural affine comparison recovers the earlier pointwise comparison
+at every module sheaf by the generic component-agreement theorem. -/
+theorem affineRGammaPlusHomologyZeroSingleNatIso_app
+    (R : CommRingCat.{u}) (M : (Spec R).Modules) :
+    (affineRGammaPlusHomologyZeroSingleNatIso R).app M =
+      affineRGammaPlusHomologyZeroSingleIso R M := by
+  haveI : CategoryTheory.Limits.PreservesFiniteLimits (AlgebraicGeometry.affineΓ R) :=
+    inferInstance
+  exact (AlgebraicGeometry.affineΓ R)
+    |>.rightDerivedFunctorPlusHomologyZeroSingleNatIsoOfPreservesFiniteLimits_app M
 
 end AlgebraicGeometry.Cohomology
