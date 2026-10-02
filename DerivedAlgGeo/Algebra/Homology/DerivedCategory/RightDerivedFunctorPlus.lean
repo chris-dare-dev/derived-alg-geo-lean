@@ -385,4 +385,35 @@ theorem rightDerivedFunctorPlusHomologyZeroSingleNatIsoOfPreservesFiniteLimits_a
   exact F.rightDerivedFunctorPlusHomologyZeroSingleNatIso_app
     (fun _ _ _ _ => inferInstance) X
 
+/-- The bounded-below right-derived functor of an additive functor is additive.
+The bounded injective homotopy model is full and essentially surjective in
+the derived category, and the right-derived unit is invertible on that model.
+No finite-limit preservation or nonnegative bound is required. -/
+theorem rightDerivedFunctorPlus_additive : F.rightDerivedFunctorPlus.Additive := by
+  let J := (InjectiveObject.ι C).mapHomotopyCategoryPlus
+  let L := J ⋙ DerivedCategory.Plus.Qh
+  have hJ (K : HomotopyCategory.Plus (InjectiveObject C)) :
+      CochainComplex.IsKInjective (J.obj K).obj.as := by
+    obtain ⟨K, rfl⟩ := HomotopyCategory.Plus.quotient_obj_surjective K
+    change CochainComplex.IsKInjective
+      (((InjectiveObject.ι C).mapHomologicalComplex (.up ℤ)).obj K.obj)
+    infer_instance
+  haveI : L.Full := ⟨by
+    intro K N
+    exact (DerivedCategory.Plus.Qh_map_bijective_of_isKInjective
+      (J.obj K) (J.obj N) (hJ N)).surjective.comp (J.map_surjective)⟩
+  haveI : L.EssSurj := inferInstanceAs
+    (((InjectiveObject.ι C).mapHomotopyCategoryPlus ⋙ DerivedCategory.Plus.Qh).EssSurj)
+  haveI hunit (K : HomotopyCategory.Plus (InjectiveObject C)) :
+      IsIso (F.rightDerivedFunctorPlusUnit.app (J.obj K)) := by
+    dsimp only [J]
+    infer_instance
+  let e : J ⋙ (F.mapHomotopyCategoryPlus ⋙ DerivedCategory.Plus.Qh) ≅
+      L ⋙ F.rightDerivedFunctorPlus :=
+    NatIso.ofComponents
+      (fun K => @asIso _ _ _ _ (F.rightDerivedFunctorPlusUnit.app (J.obj K)) (hunit K))
+      (fun f => F.rightDerivedFunctorPlusUnit.naturality (J.map f))
+  haveI : (L ⋙ F.rightDerivedFunctorPlus).Additive := Functor.additive_of_iso e
+  exact Functor.additive_of_full_essSurj_comp L F.rightDerivedFunctorPlus
+
 end CategoryTheory.Functor

@@ -17,6 +17,7 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyIntLo
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyLinear
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyLocalization
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyNaturality
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexSingle
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexLocalization
 import DerivedAlgGeo.Algebra.Homology.Homotopy.HomologyModel
 import DerivedAlgGeo.Algebra.Homology.Homotopy.ModuleCatFormality
@@ -312,6 +313,10 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms CochainComplex.HomComplex.CohomologyClass.homologyIso_hom_naturality
 #print axioms CochainComplex.HomComplex.CohomologyClass.postcomp
 #print axioms CochainComplex.HomComplex.CohomologyClass.postcompAddMonoidHom_comp_i
+#print axioms CochainComplex.HomComplex.singleCoyonedaIso
+#print axioms CochainComplex.HomComplex.singleRepresentedIso
+#print axioms CochainComplex.HomComplex.singleRepresentedHomologyAddEquiv
+#print axioms CochainComplex.HomComplex.singleRepresentedHomologyZeroAddEquiv
 #print axioms CochainComplex.HomComplex.CohomologyClass.postcompCocycleAddMonoidHom
 #print axioms CochainComplex.HomComplex.CohomologyClass.postcompCocycleAddMonoidHom_apply
 #print axioms CochainComplex.HomComplex.CohomologyClass.postcompSc
