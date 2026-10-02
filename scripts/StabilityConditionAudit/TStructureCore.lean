@@ -10,6 +10,7 @@ import DerivedAlgGeo.CategoryTheory.ObjectProperty.Bifunctor
 import DerivedAlgGeo.CategoryTheory.ObjectProperty.Lift
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Thick
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.Local
+import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.HomComparison
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.IndFilteredColimits
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.Projection
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.Bounded
@@ -20,6 +21,9 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.LinearCoyoneda
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.EulerForm
 import DerivedAlgGeo.LinearAlgebra
 open CategoryTheory.Triangulated
+
+#print axioms CategoryTheory.Triangulated.TStructure.homTruncLTAddEquiv
+#print axioms CategoryTheory.Triangulated.TStructure.homToDegreeZeroTruncAddEquiv
 
 /-! ## Full triangulated subcategory triangle lifts -/
 

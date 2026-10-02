@@ -13,6 +13,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.HeartBridge
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.ImageFactorisation
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.Local
 import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.Retracts
+import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.HomComparison
 
 /-!
 # Abstract t-structure theory
