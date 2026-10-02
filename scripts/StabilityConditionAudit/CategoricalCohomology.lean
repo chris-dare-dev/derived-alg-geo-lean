@@ -31,6 +31,7 @@ import DerivedAlgGeo.CategoryTheory.Localization.Coproducts
 import DerivedAlgGeo.CategoryTheory.MorphismProperty.Limits
 import DerivedAlgGeo.Algebra.Homology.Subcomplex
 import DerivedAlgGeo.Algebra.Homology.HomologicalComplexFiniteDescent
+import DerivedAlgGeo.Algebra.Homology.HomologicalComplexLeftExact
 
 /-!
 Audit records for generic cohomological infrastructure on arbitrary categories.
@@ -38,6 +39,9 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 -/
 
 #print axioms HomologicalComplex.extendCyclesIso_naturality
+#print axioms CategoryTheory.Functor.mapCochainComplexHomologyZeroIso
+#print axioms CategoryTheory.Functor.mapCochainComplexHomologyZeroIso_naturality
+#print axioms CategoryTheory.Functor.mapCochainComplexHomologyZeroIso_naturality_assoc
 #print axioms HomologicalComplex.extendCyclesIso_naturality_assoc
 #print axioms HomologicalComplex.extendHomologyIso_naturality
 #print axioms HomologicalComplex.extendHomologyIso_naturality_assoc
