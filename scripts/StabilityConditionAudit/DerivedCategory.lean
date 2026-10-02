@@ -58,6 +58,7 @@ categories. Scheme and affine consumers are audited by AlgebraicGeometryAudit.
 #print axioms CategoryTheory.Functor.rightDerivedFunctorPlusHomologyZeroSingleNatIso_app
 #print axioms CategoryTheory.Functor.rightDerivedFunctorPlusHomologyZeroSingleNatIsoOfPreservesFiniteLimits
 #print axioms CategoryTheory.Functor.rightDerivedFunctorPlusHomologyZeroSingleNatIsoOfPreservesFiniteLimits_app
+#print axioms CategoryTheory.Functor.rightDerivedFunctorPlus_additive
 #print axioms CategoryTheory.mapHomologicalComplex_isStrictlyGE
 #print axioms CategoryTheory.Adjunction.mapHomologicalComplex
 #print axioms CategoryTheory.Adjunction.mapDerivedCategory
