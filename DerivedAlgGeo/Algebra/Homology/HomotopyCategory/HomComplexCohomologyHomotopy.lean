@@ -8,14 +8,38 @@ import Mathlib.Algebra.Homology.HomotopyCategory.HomComplexCohomology
 # Degree-zero Hom-complex classes in the homotopy category
 
 Mathlib identifies `CohomologyClass K L 0` with morphisms from `K` to `L⟦0⟧`
-in the homotopy category. Composing with the canonical `shiftFunctorZero`
+in the homotopy category. Composing with the canonical `CategoryTheory.shiftFunctorZero`
 isomorphism gives an additive equivalence with morphisms from `K` to `L`.
 On representatives it sends a cocycle `z` to the homotopy class of
 `Cocycle.homOf z`.
 
 This neutral comparison uses no module localization or derived-category API.
-The earlier `CohomologyClass.derivedCategoryHomAddEquiv` independently spells
-out this same pre-`Qh` factor; it can reuse this equivalence in a later refactor.
+The downstream K-projective and K-injective derived comparisons reuse this
+equivalence before applying localization.
+
+## Main definitions
+
+* `CochainComplex.HomComplex.cohomologyClassHomotopyAddEquiv` is the neutral
+  additive comparison with homotopy-category morphisms.
+
+## Main results
+
+* `CochainComplex.HomComplex.cohomologyClassHomotopyAddEquiv_mk` identifies the
+  image of a cocycle class with the homotopy class of its chain map.
+
+## Implementation notes
+
+The zero-shift isomorphism normalizes Mathlib's shifted Hom-complex
+cohomology comparison before any derived localization is applied.
+
+## References
+
+Mathlib's `HomComplexCohomology.lean` and `HomComplexShift.lean` at pin
+`520045ab14e26149ee970e2e617ca04b09bde5d6`.
+
+## Tags
+
+Hom complex, homotopy category, cohomology class, zero shift
 -/
 
 set_option autoImplicit false
