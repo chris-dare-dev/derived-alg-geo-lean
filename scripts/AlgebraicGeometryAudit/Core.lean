@@ -1489,6 +1489,8 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms AlgebraicGeometry.Cohomology.affineRGammaPlus
 #print axioms AlgebraicGeometry.Cohomology.affineRGammaPlusUnit
 #print axioms AlgebraicGeometry.Cohomology.affineRGammaPlus_isRightDerivedFunctor
+#print axioms AlgebraicGeometry.Cohomology.isIso_homologyZero_map_affineRGammaPlusUnit_of_isStrictlyGE_zero
+#print axioms AlgebraicGeometry.Cohomology.affineRGammaPlusHomologyZeroSingleIso
 
 -- Topological prime-spectrum infrastructure consumed by the affine Cech argument.
 #print axioms PrimeSpectrum.basicOpen_prod_eq_pi
