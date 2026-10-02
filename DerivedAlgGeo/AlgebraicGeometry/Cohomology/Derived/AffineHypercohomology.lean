@@ -6,6 +6,8 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.HomComparison
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty.Bounded
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Derived.AffineHomVanishing
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.Extensions
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HeartHomology
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.LineBundleLinear
 
 /-!
 # Bounded-below affine Hom comparison
@@ -22,12 +24,16 @@ This file introduces no carrier, class, or instance.
 
 * `AlgebraicGeometry.Cohomology.affineHomToDegreeZeroTruncAddEquiv` gives the
   additive Hom comparison under an explicit lower cohomological bound.
+* `AlgebraicGeometry.Cohomology.affineHomH0SectionsAddEquiv` identifies those
+  maps with top sections of Mathlib's degree-zero homology object.
 
 ## Implementation notes
 
 The generic t-structure comparison requires two negative Hom groups to vanish.
 Both vanish by the existing bounded affine theorem, applied to the negative
 truncation and its shift. The Dqc property is preserved by truncation and shift.
+The sections comparison uses the generic heart-to-homology isomorphism, the
+fully faithful single functor, and the unit-to-top-sections equivalence.
 
 ## References
 
@@ -96,5 +102,47 @@ noncomputable def affineHomToDegreeZeroTruncAddEquiv
     intro f
     exact hom_unit_eq_zero_of_isGE_of_isLE_neg hNs (a - 1) f
   exact t.homToDegreeZeroTruncAddEquiv h₁ h₄
+
+private noncomputable def truncHomH0SectionsAddEquiv
+    (M : SchemeDerivedCategory (Spec R)) :
+    ((DerivedCategory.singleFunctor (Spec R).Modules 0).obj (Scheme.Modules.unit (Spec R)) ⟶
+      (DerivedCategory.TStructure.t.truncGE 0).obj
+        ((DerivedCategory.TStructure.t.truncLT 1).obj M)) ≃+
+    Γ((DerivedCategory.homologyFunctor (Spec R).Modules 0).obj M,
+      (⊤ : (Spec R).Opens)) := by
+  let C := (Spec R).Modules
+  let F := DerivedCategory.singleFunctor C 0
+  let H := (DerivedCategory.homologyFunctor C 0).obj M
+  let U := Scheme.Modules.unit (Spec R)
+  let T := (DerivedCategory.TStructure.t.truncGE 0).obj
+    ((DerivedCategory.TStructure.t.truncLT 1).obj M)
+  let e : F.obj H ≅ T := DerivedCategory.singleH0TruncIso C M
+  let postHom : (F.obj U ⟶ T) →+ (F.obj U ⟶ F.obj H) :=
+    { toFun := fun f => f ≫ e.inv
+      map_zero' := by simp
+      map_add' := by intros; simp [Preadditive.add_comp] }
+  let post : (F.obj U ⟶ T) ≃+ (F.obj U ⟶ F.obj H) :=
+    AddEquiv.ofBijective postHom (Iso.homToEquiv e.symm).bijective
+  let mapHom : (U ⟶ H) →+ (F.obj U ⟶ F.obj H) :=
+    { toFun := F.map
+      map_zero' := by simp
+      map_add' := by intros; simp [Functor.map_add] }
+  let map : (U ⟶ H) ≃+ (F.obj U ⟶ F.obj H) :=
+    AddEquiv.ofBijective mapHom
+      ((Functor.FullyFaithful.ofFullyFaithful F).map_bijective U H)
+  exact post.trans map.symm |>.trans (Scheme.Modules.unitHomTopLinearEquiv H).toAddEquiv
+
+/-- For a bounded-below Dqc object on an affine scheme, maps from the
+structure sheaf are additive-equivalent to top sections of its degree-zero
+homology sheaf. This is a pointwise comparison, without a derived-global-
+sections or naturality assertion. -/
+noncomputable def affineHomH0SectionsAddEquiv
+    {M : SchemeDerivedCategory (Spec R)}
+    (hM : Dqc.schemeQuasicoherentCohomology (Spec R) M)
+    (a : ℤ) [DerivedCategory.TStructure.t.IsGE M a] :
+    ((DerivedCategory.singleFunctor (Spec R).Modules 0).obj (Scheme.Modules.unit (Spec R)) ⟶ M) ≃+
+    Γ((DerivedCategory.homologyFunctor (Spec R).Modules 0).obj M,
+      (⊤ : (Spec R).Opens)) :=
+  (affineHomToDegreeZeroTruncAddEquiv hM a).trans (truncHomH0SectionsAddEquiv M)
 
 end AlgebraicGeometry.Cohomology
