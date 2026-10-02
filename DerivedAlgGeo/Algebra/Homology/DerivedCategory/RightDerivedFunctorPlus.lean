@@ -249,19 +249,40 @@ theorem isIso_homologyZero_map_rightDerivedFunctorPlusUnit_single (X : C)
         ((HomotopyCategory.Plus.singleFunctor C 0).obj X))) at h
   exact h
 
-/-- Normalize the source of the derived unit by composing the localization–
-homology, mapped-single, and single-object homology comparisons. -/
+/-- The source of the degree-zero derived unit on singles is naturally the
+underived functor. This uses Mathlib's mapped-single and single-homology
+natural isomorphisms. -/
+private noncomputable def homologyZeroSingleSourceNatIso
+    {C' : Type u} {D' : Type v} [Category C'] [Category D']
+    [Preadditive C'] [HasZeroObject C'] [Abelian D'] [HasDerivedCategory D']
+    (G : C' ⥤ D') [G.Additive] :
+    ((HomotopyCategory.Plus.singleFunctor C' 0 ⋙
+      (G.mapHomotopyCategoryPlus ⋙ DerivedCategory.Plus.Qh)) ⋙
+      DerivedCategory.Plus.homologyFunctor D' 0) ≅ G := by
+  change ((CochainComplex.singleFunctor C' 0 ⋙
+      G.mapHomologicalComplex (ComplexShape.up ℤ) ⋙ DerivedCategory.Q) ⋙
+      DerivedCategory.homologyFunctor D' 0) ≅ G
+  let S := CochainComplex.singleFunctor C' 0
+  let T := CochainComplex.singleFunctor D' 0
+  let M := G.mapHomologicalComplex (ComplexShape.up ℤ)
+  let Q := DerivedCategory.Q (C := D')
+  let H := DerivedCategory.homologyFunctor D' 0
+  let HC := HomologicalComplex.homologyFunctor D' (ComplexShape.up ℤ) 0
+  exact (Functor.associator (S ⋙ M) Q H) ≪≫
+    Functor.isoWhiskerLeft (S ⋙ M) (DerivedCategory.homologyFunctorFactors D' 0) ≪≫
+    Functor.isoWhiskerRight (G.mapCochainComplexSingleFunctor 0) HC ≪≫
+    Functor.associator G T HC ≪≫
+    Functor.isoWhiskerLeft G
+      (HomologicalComplex.homologyFunctorSingleIso D' (ComplexShape.up ℤ) 0) ≪≫
+    G.rightUnitor
+
+/-- Normalize the source of the derived unit by the component of the
+localization–homology, mapped-single, and single-object homology comparisons. -/
 private noncomputable def sourceH0SingleIso (X : C) :
     (DerivedCategory.Plus.homologyFunctor D 0).obj
       ((F.mapHomotopyCategoryPlus ⋙ DerivedCategory.Plus.Qh).obj
-        ((HomotopyCategory.Plus.singleFunctor C 0).obj X)) ≅ F.obj X := by
-  let M := (F.mapHomologicalComplex (ComplexShape.up ℤ)).obj
-    ((CochainComplex.singleFunctor C 0).obj X)
-  let t := (DerivedCategory.homologyFunctorFactors D 0).app M
-  let m := (HomologicalComplex.homologyFunctor D (ComplexShape.up ℤ) 0).mapIso
-    ((F.mapCochainComplexSingleFunctor 0).app X)
-  let s := HomologicalComplex.singleObjHomologySelfIso (ComplexShape.up ℤ) 0 (F.obj X)
-  exact t ≪≫ m ≪≫ s
+        ((HomotopyCategory.Plus.singleFunctor C 0).obj X)) ≅ F.obj X :=
+  (homologyZeroSingleSourceNatIso F).app X
 
 /-- Invert H⁰ of the derived unit on this single, then compose with the
 canonical source comparison to `F.obj X`. This packages a pointwise
@@ -304,18 +325,6 @@ private noncomputable def homologyZeroSingleUnit :
   whiskerRight (whiskerLeft (HomotopyCategory.Plus.singleFunctor C 0)
     F.rightDerivedFunctorPlusUnit) (DerivedCategory.Plus.homologyFunctor D 0)
 
-/-- The source of the degree-zero derived unit on singles is naturally the
-underived functor. This uses Mathlib's mapped-single and single-homology
-natural isomorphisms. -/
-private noncomputable def homologyZeroSingleSourceNatIso :
-    ((HomotopyCategory.Plus.singleFunctor C 0 ⋙
-      (F.mapHomotopyCategoryPlus ⋙ DerivedCategory.Plus.Qh)) ⋙
-      DerivedCategory.Plus.homologyFunctor D 0) ≅ F :=
-  (isoWhiskerRight (F.mapCochainComplexSingleFunctor 0)
-    (DerivedCategory.Q ⋙ DerivedCategory.homologyFunctor D 0)) ≪≫
-  (isoWhiskerLeft F (DerivedCategory.singleFunctorCompHomologyFunctorIso D 0)) ≪≫
-  rightUnitor F
-
 /-- A uniform family of outgoing-kernel conditions on injective resolutions
 makes the H⁰ comparison of the bounded-below right-derived functor natural in
 the degree-zero input. No choice of resolutions needs to be natural: the
@@ -339,6 +348,24 @@ noncomputable def rightDerivedFunctorPlusHomologyZeroSingleNatIso
   letI : IsIso (homologyZeroSingleUnit F) := hη
   exact (asIso (homologyZeroSingleUnit F)).symm ≪≫ homologyZeroSingleSourceNatIso F
 
+/-- The natural comparison has the previously defined pointwise comparison as
+each component, with the same resolution-kernel hypothesis. -/
+theorem rightDerivedFunctorPlusHomologyZeroSingleNatIso_app
+    (hResKernel : ∀ (X : C)
+      (L : CochainComplex.Plus (InjectiveObject C)) [L.obj.IsStrictlyGE 0],
+      (i : (⟨(CochainComplex.singleFunctor C 0).obj X, ⟨0, inferInstance⟩⟩ :
+        CochainComplex.Plus C) ⟶ (InjectiveObject.ι C).mapCochainComplexPlus.obj L) →
+      CochainComplex.Plus.quasiIso C i → PreservesLimit (parallelPair
+        (((InjectiveObject.ι C).mapCochainComplexPlus.obj L).obj.sc 0).g 0) F)
+    (X : C) :
+    (F.rightDerivedFunctorPlusHomologyZeroSingleNatIso hResKernel).app X =
+      F.rightDerivedFunctorPlusHomologyZeroSingleIso X (hResKernel X) := by
+  apply Iso.ext
+  simp [rightDerivedFunctorPlusHomologyZeroSingleNatIso,
+    rightDerivedFunctorPlusHomologyZeroSingleIso, sourceH0SingleIso,
+    homologyZeroSingleUnit]
+  rfl
+
 /-- Finite-limit preservation supplies the resolution-kernel conditions for
 the natural H⁰ comparison of degree-zero singles. -/
 noncomputable def rightDerivedFunctorPlusHomologyZeroSingleNatIsoOfPreservesFiniteLimits
@@ -346,5 +373,13 @@ noncomputable def rightDerivedFunctorPlusHomologyZeroSingleNatIsoOfPreservesFini
     (DerivedCategory.Plus.singleFunctor C 0 ⋙ F.rightDerivedFunctorPlus) ⋙
       DerivedCategory.Plus.homologyFunctor D 0 ≅ F :=
   F.rightDerivedFunctorPlusHomologyZeroSingleNatIso (fun _ _ _ _ => inferInstance)
+
+/-- Component agreement for the finite-limit specialization. -/
+theorem rightDerivedFunctorPlusHomologyZeroSingleNatIsoOfPreservesFiniteLimits_app
+    [PreservesFiniteLimits F] (X : C) :
+    F.rightDerivedFunctorPlusHomologyZeroSingleNatIsoOfPreservesFiniteLimits.app X =
+      F.rightDerivedFunctorPlusHomologyZeroSingleIsoOfPreservesFiniteLimits X := by
+  exact F.rightDerivedFunctorPlusHomologyZeroSingleNatIso_app
+    (fun _ _ _ _ => inferInstance) X
 
 end CategoryTheory.Functor
