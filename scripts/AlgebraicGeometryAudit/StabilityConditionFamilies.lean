@@ -643,6 +643,7 @@ general-scheme equivalence and compact/perfect theorem still needed by A.14.
 -/
 
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.schemeQuasicoherentCohomology
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.quasicoherentCohomology_of_termwiseQuasicoherent
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.instIsClosedUnderIsomorphismsSchemeDerivedCategorySchemeQuasicoherentCohomology
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.SchemeQuasicoherentDerivedCategory
 #print axioms AlgebraicGeometry.DerivedCategory.Dqc.SchemeQuasicoherentDerivedCategory.ι
@@ -1374,6 +1375,8 @@ carrying known noise.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.kFlatPullbackAcyclic_ofFlat
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.kFlatPullbackAcyclic
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.arbitraryLeftDerivedPullback
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.quasicoherentCohomology_arbitraryLeftDerivedPullback_of_tensorRightInverts_of_termwiseQC
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.quasicoherentCohomology_arbitraryLeftDerivedPullback_of_isKFlat_of_termwiseQuasicoherent
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.kFlatPullbackAcyclic_of_isKProjective
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.kFlatQuasicoherentBaseChangeComponent
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.kFlatResolvedPullback
