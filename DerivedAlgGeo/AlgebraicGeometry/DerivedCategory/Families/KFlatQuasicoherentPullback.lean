@@ -20,8 +20,8 @@ This file introduces no new carrier, class, or instance.
 
 ## Main results
 
-* `SchemeBaseChange.quasicoherentCohomology_arbitraryLeftDerivedPullback_of_kFlatTermwise`
-  proves conditional quasi-coherent cohomology preservation for any morphism.
+* The theorem on arbitrary left-derived pullback proves conditional
+  quasi-coherent cohomology preservation for any morphism.
 
 ## Implementation notes
 
@@ -31,8 +31,10 @@ given representative. Ordinary pullback preserves quasi-coherent terms.
 
 ## References
 
-The proof uses the repository's `Scheme.Modules.quasiIso_pullback_of_isKFlat`,
-`Scheme.Modules.isQuasicoherent_pullback`, and canonical K-flat resolution.
+The proof uses the repository's
+`AlgebraicGeometry.Scheme.Modules.quasiIso_pullback_of_isKFlat`,
+`AlgebraicGeometry.Scheme.Modules.isQuasicoherent_pullback`, and canonical
+K-flat resolution.
 
 ## Tags
 

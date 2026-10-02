@@ -18,8 +18,9 @@ This file introduces no new carrier, class, or instance.
 
 ## Main results
 
-* `Dqc.quasicoherentCohomology_of_termwiseQuasicoherent` supplies the `Dqc`
-  membership proof for an unbounded termwise quasi-coherent complex.
+* `AlgebraicGeometry.DerivedCategory.Dqc.quasicoherentCohomology_of_termwiseQuasicoherent`
+  supplies the `Dqc` membership proof for an unbounded termwise
+  quasi-coherent complex.
 
 ## Implementation notes
 
