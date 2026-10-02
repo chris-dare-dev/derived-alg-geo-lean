@@ -50,6 +50,10 @@ categories. Scheme and affine consumers are audited by AlgebraicGeometryAudit.
 #print axioms CategoryTheory.instIsStableUnderRetractsPlus_derivedAlgGeo
 #print axioms CategoryTheory.instIsStableUnderRetractsBounded_derivedAlgGeo
 #print axioms CategoryTheory.mapHomologicalComplex_isStrictlyLE
+#print axioms CategoryTheory.Functor.rightDerivedFunctorPlusUnit_homologyZero_isIso_of_strictlyGE_zero
+#print axioms CategoryTheory.Functor.rightDerivedFunctorPlusUnit_homologyZero_single_isIso
+#print axioms CategoryTheory.Functor.rightDerivedFunctorPlusHomologyZeroSingleIso
+#print axioms CategoryTheory.Functor.rightDerivedFunctorPlusHomologyZeroSingleIsoOfPreservesFiniteLimits
 #print axioms CategoryTheory.mapHomologicalComplex_isStrictlyGE
 #print axioms CategoryTheory.Adjunction.mapHomologicalComplex
 #print axioms CategoryTheory.Adjunction.mapDerivedCategory
