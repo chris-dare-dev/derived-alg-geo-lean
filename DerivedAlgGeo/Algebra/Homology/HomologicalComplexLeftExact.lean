@@ -17,16 +17,25 @@ complex when the corresponding kernel is preserved at each endpoint.
 This is a statement about ordinary complexes. It does not identify degree-zero
 homology of a right-derived functor with its underived functor; that requires
 an injective-resolution comparison.
+For an integer-indexed complex, the same local comparison holds whenever its
+incoming degree-zero differential is zero. This weaker condition is useful
+for strictly nonnegative representatives and is natural in maps between them.
 
 ## Main definitions
 
 * `CategoryTheory.Functor.mapCochainComplexHomologyZeroIso`: the canonical
   degree-zero homology comparison under preservation of one outgoing kernel.
+* `CategoryTheory.Functor.mapCochainComplexHomologyZeroIsoOfZeroIncoming`:
+  the corresponding comparison for an integer-indexed complex whose incoming
+  degree-zero differential vanishes.
 
 ## Main results
 
 * `CategoryTheory.Functor.mapCochainComplexHomologyZeroIso_naturality`: the
   comparison commutes with every cochain map.
+* `CategoryTheory.Functor.mapCochainComplexHomologyZeroIsoOfZeroIncoming_naturality`:
+  the integer-indexed comparison commutes with cochain maps whose endpoints
+  both have zero incoming degree-zero differential.
 
 ## Implementation notes
 
@@ -34,6 +43,8 @@ The incoming differential at zero vanishes. Mathlib's canonical isomorphism
 from cycles to homology and its preserved-cycles isomorphism give the result.
 An additive left-exact functor between abelian categories supplies the local
 homology and preservation instances in this statement.
+For the integer-indexed form, Mathlib's short-complex homology comparison
+replaces the natural-number-specific cycles normalization.
 
 ## References
 
@@ -70,6 +81,58 @@ noncomputable def mapCochainComplexHomologyZeroIso
     F.preservesLeftHomology_of_zero_f (K.sc 0) hzero
   exact (CochainComplex.isoHomologyπ₀ _).symm ≪≫
     (K.sc 0).mapCyclesIso F ≪≫ F.mapIso (CochainComplex.isoHomologyπ₀ K)
+
+/-- For an integer-indexed cochain complex with zero incoming differential,
+preservation of its outgoing degree-zero kernel suffices for the mapped
+complex's degree-zero homology to agree with the image of input homology. -/
+noncomputable def mapCochainComplexHomologyZeroIsoOfZeroIncoming
+    {C : Type u} {D : Type v} [Category C] [Category D]
+    [HasZeroMorphisms C] [HasZeroMorphisms D]
+    (F : C ⥤ D) [F.PreservesZeroMorphisms]
+    (K : CochainComplex C ℤ) [K.HasHomology 0]
+    [((F.mapHomologicalComplex (ComplexShape.up ℤ)).obj K).HasHomology 0]
+    (hzero : (K.sc 0).f = 0)
+    [PreservesLimit (parallelPair (K.sc 0).g 0) F] :
+    ((F.mapHomologicalComplex (ComplexShape.up ℤ)).obj K).homology 0 ≅
+      F.obj (K.homology 0) := by
+  haveI : F.PreservesLeftHomologyOf (K.sc 0) :=
+    F.preservesLeftHomology_of_zero_f (K.sc 0) hzero
+  haveI : ((K.sc 0).map F).HasHomology := by
+    change (((F.mapHomologicalComplex (ComplexShape.up ℤ)).obj K).sc 0).HasHomology
+    infer_instance
+  exact (K.sc 0).mapHomologyIso F
+
+/-- The zero-incoming degree-zero comparison respects a cochain map whenever
+the required outgoing kernels are preserved at both endpoints. -/
+@[reassoc]
+theorem mapCochainComplexHomologyZeroIsoOfZeroIncoming_naturality
+    {C : Type u} {D : Type v} [Category C] [Category D]
+    [HasZeroMorphisms C] [HasZeroMorphisms D]
+    (F : C ⥤ D) [F.PreservesZeroMorphisms]
+    {K L : CochainComplex C ℤ} (φ : K ⟶ L)
+    [K.HasHomology 0] [L.HasHomology 0]
+    [((F.mapHomologicalComplex (ComplexShape.up ℤ)).obj K).HasHomology 0]
+    [((F.mapHomologicalComplex (ComplexShape.up ℤ)).obj L).HasHomology 0]
+    (hK : (K.sc 0).f = 0) (hL : (L.sc 0).f = 0)
+    [PreservesLimit (parallelPair (K.sc 0).g 0) F]
+    [PreservesLimit (parallelPair (L.sc 0).g 0) F] :
+    HomologicalComplex.homologyMap
+        ((F.mapHomologicalComplex (ComplexShape.up ℤ)).map φ) 0 ≫
+      (mapCochainComplexHomologyZeroIsoOfZeroIncoming F L hL).hom =
+      (mapCochainComplexHomologyZeroIsoOfZeroIncoming F K hK).hom ≫
+        F.map (HomologicalComplex.homologyMap φ 0) := by
+  haveI : F.PreservesLeftHomologyOf (K.sc 0) :=
+    F.preservesLeftHomology_of_zero_f (K.sc 0) hK
+  haveI : F.PreservesLeftHomologyOf (L.sc 0) :=
+    F.preservesLeftHomology_of_zero_f (L.sc 0) hL
+  haveI : ((K.sc 0).map F).HasHomology := by
+    change (((F.mapHomologicalComplex (ComplexShape.up ℤ)).obj K).sc 0).HasHomology
+    infer_instance
+  haveI : ((L.sc 0).map F).HasHomology := by
+    change (((F.mapHomologicalComplex (ComplexShape.up ℤ)).obj L).sc 0).HasHomology
+    infer_instance
+  exact ShortComplex.mapHomologyIso_hom_naturality
+    ((HomologicalComplex.shortComplexFunctor C (ComplexShape.up ℤ) 0).map φ) F
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The degree-zero homology comparison respects cochain maps through
