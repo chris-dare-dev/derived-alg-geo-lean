@@ -270,6 +270,7 @@ numerical data written on `C` onto the heart. -/
 #print axioms DerivedCategory.toHeart_obj_obj
 #print axioms DerivedCategory.heartEquivalence
 #print axioms DerivedCategory.heartEquivalence_functor
+#print axioms DerivedCategory.singleH0TruncIso
 
 /-! ## The standard heart of the bounded derived category (#1121) -/
 

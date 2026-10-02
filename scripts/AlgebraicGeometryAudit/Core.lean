@@ -1484,6 +1484,8 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms AlgebraicGeometry.Cohomology.subsingleton_ext_unit_of_isQuasicoherent
 #print axioms AlgebraicGeometry.Cohomology.hom_unit_eq_zero_of_isGE_of_isLE_neg
 #print axioms AlgebraicGeometry.Cohomology.affineHomToDegreeZeroTruncAddEquiv
+#print axioms AlgebraicGeometry.Cohomology.homTruncH0SectionsAddEquiv
+#print axioms AlgebraicGeometry.Cohomology.affineHomH0SectionsAddEquiv
 
 -- Topological prime-spectrum infrastructure consumed by the affine Cech argument.
 #print axioms PrimeSpectrum.basicOpen_prod_eq_pi

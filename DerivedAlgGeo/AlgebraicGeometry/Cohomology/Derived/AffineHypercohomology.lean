@@ -6,6 +6,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.HomComparison
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty.Bounded
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Derived.AffineHomVanishing
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.Extensions
+import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Derived.H0Sections
 
 /-!
 # Bounded-below affine Hom comparison
@@ -22,12 +23,16 @@ This file introduces no carrier, class, or instance.
 
 * `AlgebraicGeometry.Cohomology.affineHomToDegreeZeroTruncAddEquiv` gives the
   additive Hom comparison under an explicit lower cohomological bound.
+* `AlgebraicGeometry.Cohomology.affineHomH0SectionsAddEquiv` identifies those
+  maps with top sections of Mathlib's degree-zero homology object.
 
 ## Implementation notes
 
 The generic t-structure comparison requires two negative Hom groups to vanish.
 Both vanish by the existing bounded affine theorem, applied to the negative
 truncation and its shift. The Dqc property is preserved by truncation and shift.
+The arbitrary-scheme sections comparison supplies the final step through the
+generic heart-to-homology isomorphism and unit-to-top-sections equivalence.
 
 ## References
 
@@ -96,5 +101,18 @@ noncomputable def affineHomToDegreeZeroTruncAddEquiv
     intro f
     exact hom_unit_eq_zero_of_isGE_of_isLE_neg hNs (a - 1) f
   exact t.homToDegreeZeroTruncAddEquiv h₁ h₄
+
+/-- For a bounded-below Dqc object on an affine scheme, maps from the
+structure sheaf are additive-equivalent to top sections of its degree-zero
+homology sheaf. This is a pointwise comparison, without a derived-global-
+sections or naturality assertion. -/
+noncomputable def affineHomH0SectionsAddEquiv
+    {M : SchemeDerivedCategory (Spec R)}
+    (hM : Dqc.schemeQuasicoherentCohomology (Spec R) M)
+    (a : ℤ) [DerivedCategory.TStructure.t.IsGE M a] :
+    ((DerivedCategory.singleFunctor (Spec R).Modules 0).obj (Scheme.Modules.unit (Spec R)) ⟶ M) ≃+
+    Γ((DerivedCategory.homologyFunctor (Spec R).Modules 0).obj M,
+      (⊤ : (Spec R).Opens)) :=
+  (affineHomToDegreeZeroTruncAddEquiv hM a).trans (homTruncH0SectionsAddEquiv (Spec R) M)
 
 end AlgebraicGeometry.Cohomology
