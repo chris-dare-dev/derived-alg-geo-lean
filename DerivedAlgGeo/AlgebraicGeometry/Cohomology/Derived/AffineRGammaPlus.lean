@@ -3,7 +3,6 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.Algebra.Homology.DerivedCategory.RightDerivedFunctorPlus
-import Mathlib.Algebra.Homology.ShortComplex.PreservesHomology
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.RightDerivedFunctorPlus
 import DerivedAlgGeo.AlgebraicGeometry.Modules.AB
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.Extensions
@@ -112,23 +111,6 @@ theorem isIso_homologyZero_map_affineRGammaPlusUnit_of_isStrictlyGE_zero
       K inferInstance (fun _ _ _ => inferInstance)
   exact h
 
-/-- For a strictly nonnegative complex, the incoming map to degree zero
-vanishes. Affine sections therefore preserve its degree-zero homology by
-preserving the remaining kernel. -/
-private noncomputable def affineGammaHomologyZeroOfIsStrictlyGEZero
-    (R : CommRingCat.{u}) (K : CochainComplex.Plus (Spec R).Modules)
-    [K.obj.IsStrictlyGE 0] :
-    (((AlgebraicGeometry.affineΓ R).mapHomologicalComplex (ComplexShape.up ℤ)).obj
-      K.obj).homology 0 ≅
-      (AlgebraicGeometry.affineΓ R).obj (K.obj.homology 0) := by
-  let F := AlgebraicGeometry.affineΓ R
-  have hzero : (K.obj.sc 0).f = 0 := by
-    change K.obj.d ((ComplexShape.up ℤ).prev 0) 0 = 0
-    exact (K.obj.isZero_of_isStrictlyGE 0 _ (by simp)).eq_of_src _ _
-  haveI : F.PreservesLeftHomologyOf (K.obj.sc 0) :=
-    F.preservesLeftHomology_of_zero_f (K.obj.sc 0) hzero
-  exact (K.obj.sc 0).mapHomologyIso F
-
 /-- On a strictly nonnegative complex of affine module sheaves, degree-zero
 homology of bounded-below derived global sections is ordinary affine sections
 of the input's degree-zero homology sheaf. No quasicoherence assumption is
@@ -140,18 +122,12 @@ noncomputable def affineRGammaPlusHomologyZeroOfIsStrictlyGEZero
     (DerivedCategory.Plus.homologyFunctor (ModuleCat R) 0).obj
       ((affineRGammaPlus R).obj ((DerivedCategory.Plus.Q).obj K)) ≅
       (AlgebraicGeometry.affineΓ R).obj (K.obj.homology 0) := by
-  let H := DerivedCategory.Plus.homologyFunctor (ModuleCat R) 0
-  let a := (affineRGammaPlusUnit R).app
-    ((HomotopyCategory.Plus.quotient (Spec R).Modules).obj K)
-  haveI : IsIso (H.map a) :=
-    isIso_homologyZero_map_affineRGammaPlusUnit_of_isStrictlyGE_zero R K
-  refine (asIso (H.map a)).symm ≪≫ ?_
-  change (DerivedCategory.homologyFunctor (ModuleCat R) 0).obj
-    ((DerivedCategory.Q).obj
-      (((AlgebraicGeometry.affineΓ R).mapHomologicalComplex (ComplexShape.up ℤ)).obj
-        K.obj)) ≅ _
-  exact (DerivedCategory.homologyFunctorFactors (ModuleCat R) 0).app _ ≪≫
-    affineGammaHomologyZeroOfIsStrictlyGEZero R K
+  have hK : CategoryTheory.Limits.PreservesLimit
+      (CategoryTheory.Limits.parallelPair (K.obj.sc 0).g 0)
+      (AlgebraicGeometry.affineΓ R) := inferInstance
+  exact (AlgebraicGeometry.affineΓ R)
+    |>.rightDerivedFunctorPlusHomologyZeroOfIsStrictlyGEZero K hK
+      (fun _ _ _ => inferInstance)
 
 /-- On an arbitrary affine module sheaf, invert H⁰ of the derived unit on
 its degree-zero single and normalize the source to ordinary affine sections.
