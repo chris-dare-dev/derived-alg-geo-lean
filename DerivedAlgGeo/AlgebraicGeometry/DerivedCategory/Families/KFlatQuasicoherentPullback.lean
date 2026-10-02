@@ -25,9 +25,9 @@ This file introduces no new carrier, class, or instance.
 
 ## Implementation notes
 
-The canonical resolution has the right-tensor inversion property; combining
-it with the supplied representative's property makes its comparison invertible
-after pullback. Ordinary pullback preserves quasi-coherent terms.
+The generic objectwise comparison from `KFlatPullback.lean` identifies
+canonical derived pullback with ordinary pullback on the supplied acyclic
+representative. Ordinary pullback preserves quasi-coherent terms.
 
 ## References
 
@@ -67,23 +67,8 @@ theorem quasicoherentCohomology_arbitraryLeftDerivedPullback_of_tensorRightInver
     schemeQuasicoherentCohomology T.left
       ((arbitraryLeftDerivedPullback f).functor.obj
         ((SchemeDerivedCategory.Q U.left).obj K)) := by
-  let R := freeYonedaSchemeKFlatResolution U.left
-  let hR := kFlatPullbackAcyclic R f
-  have hcomp : IsIso ((SchemeDerivedCategory.Q T.left).map
-      ((complexPullback f).map (R.comparison.app K))) := by
-    apply Localization.inverts (SchemeDerivedCategory.Q T.left)
-      (HomologicalComplex.quasiIso T.left.Modules (ComplexShape.up ℤ))
-    exact Scheme.Modules.quasiIso_pullback_of_tensorRight_inverts f.left
-      (R.comparison.app K) (R.comparison_quasiIso K) (R.isKFlat K).2 hRight
-  letI : IsIso ((SchemeDerivedCategory.Q T.left).map
-      ((complexPullback f).map (R.comparison.app K))) := hcomp
-  let e : (arbitraryLeftDerivedPullback f).functor.obj
-      ((SchemeDerivedCategory.Q U.left).obj K) ≅
-        (SchemeDerivedCategory.Q T.left).obj ((complexPullback f).obj K) :=
-    (kFlatPullbackAcyclicResolution R f hR).derivedFactors.app K ≪≫
-      @asIso _ _ _ _ ((SchemeDerivedCategory.Q T.left).map
-        ((complexPullback f).map (R.comparison.app K))) hcomp
-  apply (schemeQuasicoherentCohomology T.left).prop_of_iso e.symm
+  apply (schemeQuasicoherentCohomology T.left).prop_of_iso
+    (derivedPullbackObjIsoOfTensorRightInverts f K hRight).symm
   apply quasicoherentCohomology_of_termwiseQuasicoherent
   intro n
   exact Scheme.Modules.isQuasicoherent_pullback f.left (K.X n) (hK n)

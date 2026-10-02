@@ -34,6 +34,9 @@ all categorical structure descends from one K-flat replacement and explicit geom
 
 * `AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.kFlatPullbackAcyclic`
   proves both fields for any K-flat resolution and morphism.
+* The right-tensor comparison identifies canonical derived pullback with
+  ordinary pullback on a supplied tensor-acyclic complex. Its K-flat
+  specialization supplies the inversion premise.
 
 ## Implementation notes
 
@@ -155,6 +158,40 @@ No preservation assertion or resolution is supplied by the caller. -/
 def arbitraryLeftDerivedPullback (f : T ⟶ U) : LeftDerivedPullback f :=
   kFlatLeftDerivedPullback (freeYonedaSchemeKFlatResolution U.left) f
     (kFlatPullbackAcyclic _ f)
+
+/-- On an input whose right tensor functor inverts quasi-isomorphisms, ordinary
+pullback computes the canonical arbitrary left-derived pullback. The comparison
+uses the canonical free-Yoneda resolution but does not require its terms to be
+quasi-coherent. -/
+def derivedPullbackObjIsoOfTensorRightInverts (f : T ⟶ U)
+    (K : CochainComplex U.left.Modules ℤ)
+    (hRight :
+      (HomologicalComplex.quasiIso U.left.Modules (ComplexShape.up ℤ)).IsInvertedBy
+        ((Scheme.Modules.totalTensor U.left).flip.obj K ⋙ DerivedCategory.Q)) :
+    (arbitraryLeftDerivedPullback f).functor.obj
+      ((SchemeDerivedCategory.Q U.left).obj K) ≅
+      (SchemeDerivedCategory.Q T.left).obj ((complexPullback f).obj K) := by
+  let R := freeYonedaSchemeKFlatResolution U.left
+  let hR := kFlatPullbackAcyclic R f
+  have hcomp : IsIso ((SchemeDerivedCategory.Q T.left).map
+      ((complexPullback f).map (R.comparison.app K))) := by
+    apply Localization.inverts (SchemeDerivedCategory.Q T.left)
+      (HomologicalComplex.quasiIso T.left.Modules (ComplexShape.up ℤ))
+    exact Scheme.Modules.quasiIso_pullback_of_tensorRight_inverts f.left
+      (R.comparison.app K) (R.comparison_quasiIso K) (R.isKFlat K).2 hRight
+  exact (kFlatPullbackAcyclicResolution R f hR).derivedFactors.app K ≪≫
+    @asIso _ _ _ _ ((SchemeDerivedCategory.Q T.left).map
+      ((complexPullback f).map (R.comparison.app K))) hcomp
+
+/-- Ambient K-flatness supplies the right-tensor inversion premise for the
+objectwise comparison with ordinary pullback. -/
+def derivedPullbackObjIsoOfKFlat (f : T ⟶ U)
+    (K : CochainComplex U.left.Modules ℤ)
+    (hK : CochainComplex.IsKFlat (Scheme.Modules.totalTensor U.left) K) :
+    (arbitraryLeftDerivedPullback f).functor.obj
+      ((SchemeDerivedCategory.Q U.left).obj K) ≅
+      (SchemeDerivedCategory.Q T.left).obj ((complexPullback f).obj K) :=
+  derivedPullbackObjIsoOfTensorRightInverts f K hK.2
 
 /-- For exact pullback, the K-flat construction agrees canonically with the existing exact
 derived pullback. -/
