@@ -18,6 +18,7 @@ import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor.Bounded
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.FGModuleCatInclusion
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor.Coproducts
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Heart
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HeartHomology
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.BoundedHeart
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.GrothendieckGroup
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.GrothendieckGroup.Comparison
