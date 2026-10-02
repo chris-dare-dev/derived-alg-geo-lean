@@ -53,9 +53,11 @@ universe u
 
 namespace AlgebraicGeometry.Cohomology
 
-private noncomputable instance affineGamma_additive (R : CommRingCat.{u}) :
+private theorem affineGamma_additive (R : CommRingCat.{u}) :
     (AlgebraicGeometry.affineΓ R).Additive :=
   Functor.additive_of_preserves_binary_products _
+
+attribute [local instance] affineGamma_additive
 
 /-- Right-derived global sections of module sheaves on an affine scheme,
 restricted to Mathlib's bounded-below derived categories. This definition
@@ -64,15 +66,15 @@ noncomputable def affineRGammaPlus (R : CommRingCat.{u}) :
     DerivedCategory.Plus (Spec R).Modules ⥤ DerivedCategory.Plus (ModuleCat R) :=
   (AlgebraicGeometry.affineΓ R).rightDerivedFunctorPlus
 
-/-- The canonical comparison from homotopy-level affine sections to the
-bounded-below right derived functor. -/
+/-- Mathlib's injective-resolution construction supplies this comparison from
+homotopy-level affine sections to the bounded-below derived functor. -/
 noncomputable def affineRGammaPlusUnit (R : CommRingCat.{u}) :
     (AlgebraicGeometry.affineΓ R).mapHomotopyCategoryPlus ⋙ DerivedCategory.Plus.Qh ⟶
       DerivedCategory.Plus.Qh ⋙ affineRGammaPlus R :=
   (AlgebraicGeometry.affineΓ R).rightDerivedFunctorPlusUnit
 
-/-- The bounded-below affine global-sections construction satisfies Mathlib's
-right-derived universal property for quasi-isomorphisms of homotopy complexes. -/
+/-- This universal property is inherited by unfolding the specialization to
+Mathlib's right-derived functor; no affine acyclicity theorem is needed here. -/
 instance affineRGammaPlus_isRightDerivedFunctor (R : CommRingCat.{u}) :
     (affineRGammaPlus R).IsRightDerivedFunctor (affineRGammaPlusUnit R)
       (HomotopyCategory.Plus.quasiIso (Spec R).Modules) := by
