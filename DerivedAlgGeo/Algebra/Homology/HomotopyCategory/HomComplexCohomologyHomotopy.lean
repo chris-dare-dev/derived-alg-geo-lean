@@ -8,7 +8,7 @@ import Mathlib.Algebra.Homology.HomotopyCategory.HomComplexCohomology
 # Degree-zero Hom-complex classes in the homotopy category
 
 Mathlib identifies `CohomologyClass K L 0` with morphisms from `K` to `L⟦0⟧`
-in the homotopy category. Composing with the canonical `shiftFunctorZero`
+in the homotopy category. Composing with the canonical `CategoryTheory.shiftFunctorZero`
 isomorphism gives an additive equivalence with morphisms from `K` to `L`.
 On representatives it sends a cocycle `z` to the homotopy class of
 `Cocycle.homOf z`.
