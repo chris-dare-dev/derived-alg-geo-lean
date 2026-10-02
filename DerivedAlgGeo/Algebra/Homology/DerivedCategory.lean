@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty.Termwise
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty.Bounded
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomFinite
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty.HomVanishing

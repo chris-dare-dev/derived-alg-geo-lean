@@ -4,6 +4,7 @@ concurrent branches append to different files (#480). See the umbrella file for 
 contract and reading guide.
 -/
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty.Termwise
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty.Bounded
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty.HomVanishing
 import DerivedAlgGeo.CategoryTheory.Abelian.SerreClass.FullSubcategory
@@ -31,6 +32,7 @@ needed.
 
 #print axioms DerivedCategory.cohomologyIn
 #print axioms DerivedCategory.mem_cohomologyIn_iff
+#print axioms DerivedCategory.cohomologyIn_Q_obj_of_termwise
 #print axioms DerivedCategory.instIsClosedUnderIsomorphismsCohomologyIn
 #print axioms DerivedCategory.instContainsZeroCohomologyInOfIsClosedUnderIsomorphisms
 #print axioms DerivedCategory.instIsStableUnderShiftCohomologyInIntOfIsClosedUnderIsomorphisms
