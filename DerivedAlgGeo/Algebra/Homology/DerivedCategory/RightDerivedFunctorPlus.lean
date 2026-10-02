@@ -12,8 +12,9 @@ For an additive functor between abelian categories with enough injectives,
 Mathlib constructs a bounded-below right-derived functor and its universal
 unit. An injective resolution shows that the unit induces an isomorphism on
 H⁰ of a strictly nonnegative complex when the functor preserves the input's
-outgoing degree-zero kernel and those of nonnegative injective resolutions.
-The degree-zero single case needs only the resolution-kernel condition.
+outgoing degree-zero kernel and those of nonnegative injective resolutions
+equipped with a quasi-isomorphism from that input. The degree-zero single
+case needs only its resolution-kernel condition.
 
 This is a pointwise comparison. Naturality of the resulting objectwise
 isomorphism and geometric identifications are separate.
@@ -27,9 +28,9 @@ isomorphism and geometric identifications are separate.
 
 ## Main results
 
-* `CategoryTheory.Functor.rightDerivedFunctorPlusUnit_homologyZero_isIso_of_strictlyGE_zero`:
+* `CategoryTheory.Functor.isIso_homologyZero_map_rightDerivedFunctorPlusUnit_of_isStrictlyGE_zero`:
   the H⁰ unit is invertible on a nonnegative complex under local kernels.
-* `CategoryTheory.Functor.rightDerivedFunctorPlusUnit_homologyZero_single_isIso`:
+* `CategoryTheory.Functor.isIso_homologyZero_map_rightDerivedFunctorPlusUnit_single`:
   the degree-zero single specialization.
 
 ## Implementation notes
@@ -61,7 +62,7 @@ variable {C : Type u} {D : Type v}
   (F : C ⥤ D) [F.Additive] [EnoughInjectives C]
 
 /-- Unit naturality transports H⁰ invertibility across an injective resolution. -/
-private theorem unit_h0_of_resolution
+private theorem isIso_homologyZero_unit_of_resolution
     (K J : HomotopyCategory.Plus C) (w : K ⟶ J)
     (hw : (HomotopyCategory.Plus.quasiIso C) w)
     [∀ n : ℤ, Injective (J.obj.as.X n)]
@@ -94,23 +95,22 @@ private theorem unit_h0_of_resolution
   simpa only [H, α] using hunit
 
 
-omit [HasDerivedCategory C] [HasDerivedCategory D] [EnoughInjectives C] in
-/-- Preserved degree-zero outgoing kernels let an additive functor preserve the H⁰
-map of a quasi-isomorphism between nonnegative complexes. -/
-private lemma map_h0_of_strictlyGE_zero
+omit [Abelian C] [Abelian D] [HasDerivedCategory C] [HasDerivedCategory D]
+  [EnoughInjectives C] [F.Additive] in
+/-- Zero incoming differentials identify degree-zero left homology with
+outgoing kernels. Their preservation carries a local quasi-isomorphism to H⁰. -/
+private lemma isIso_homologyMap_of_zero_incoming
+    [HasZeroMorphisms C] [HasZeroMorphisms D] [F.PreservesZeroMorphisms]
     (K L : CochainComplex C ℤ) (φ : K ⟶ L)
-    [K.IsStrictlyGE 0] [L.IsStrictlyGE 0]
-    [QuasiIso φ]
+    (hK : (K.sc 0).f = 0) (hL : (L.sc 0).f = 0)
+    [K.HasHomology 0] [L.HasHomology 0]
+    [((F.mapHomologicalComplex (ComplexShape.up ℤ)).obj K).HasHomology 0]
+    [((F.mapHomologicalComplex (ComplexShape.up ℤ)).obj L).HasHomology 0]
+    [QuasiIsoAt φ 0]
     [PreservesLimit (parallelPair (K.sc 0).g 0) F]
     [PreservesLimit (parallelPair (L.sc 0).g 0) F] :
     IsIso (HomologicalComplex.homologyMap
       ((F.mapHomologicalComplex (ComplexShape.up ℤ)).map φ) 0) := by
-  have hK : (K.sc 0).f = 0 := by
-    change K.d ((ComplexShape.up ℤ).prev 0) 0 = 0
-    exact (K.isZero_of_isStrictlyGE 0 _ (by simp)).eq_of_src _ _
-  have hL : (L.sc 0).f = 0 := by
-    change L.d ((ComplexShape.up ℤ).prev 0) 0 = 0
-    exact (L.isZero_of_isStrictlyGE 0 _ (by simp)).eq_of_src _ _
   haveI : F.PreservesLeftHomologyOf (K.sc 0) :=
     F.preservesLeftHomology_of_zero_f (K.sc 0) hK
   haveI : F.PreservesLeftHomologyOf (L.sc 0) :=
@@ -118,6 +118,14 @@ private lemma map_h0_of_strictlyGE_zero
   haveI : ShortComplex.QuasiIso
       ((HomologicalComplex.shortComplexFunctor C (ComplexShape.up ℤ) 0).map φ) := by
     exact (inferInstance : QuasiIsoAt φ 0).quasiIso
+  haveI : (F.mapShortComplex.obj
+      ((HomologicalComplex.shortComplexFunctor C (ComplexShape.up ℤ) 0).obj K)).HasHomology := by
+    change (((F.mapHomologicalComplex (ComplexShape.up ℤ)).obj K).sc 0).HasHomology
+    infer_instance
+  haveI : (F.mapShortComplex.obj
+      ((HomologicalComplex.shortComplexFunctor C (ComplexShape.up ℤ) 0).obj L)).HasHomology := by
+    change (((F.mapHomologicalComplex (ComplexShape.up ℤ)).obj L).sc 0).HasHomology
+    infer_instance
   haveI hmap : ShortComplex.QuasiIso
       (F.mapShortComplex.map
         ((HomologicalComplex.shortComplexFunctor C (ComplexShape.up ℤ) 0).map φ)) :=
@@ -136,8 +144,9 @@ private lemma map_h0_of_strictlyGE_zero
   exact hmap.isIso
 
 
-/-- The plus derived-category H⁰ map is the ordinary H⁰ map on displayed complexes. -/
-private lemma h0_plusQ_map_of_homologyMap
+/-- The localization–homology comparison identifies the plus derived-category
+H⁰ map with ordinary homology of a displayed complex morphism. -/
+private lemma isIso_homologyZero_plusQ_map_of_homologyMap
     {K L : CochainComplex.Plus D} (ψ : K ⟶ L)
     [IsIso (HomologicalComplex.homologyMap ψ.hom 0)] :
     IsIso ((DerivedCategory.Plus.homologyFunctor D 0).map
@@ -149,14 +158,16 @@ private lemma h0_plusQ_map_of_homologyMap
   change IsIso (HomologicalComplex.homologyMap ψ.hom 0)
   infer_instance
 
-/-- On a strictly nonnegative bounded-below complex, the H⁰ map of the
-right-derived unit is invertible when the outgoing kernels of the complex
-and of nonnegative injective resolutions are preserved. -/
-theorem rightDerivedFunctorPlusUnit_homologyZero_isIso_of_strictlyGE_zero
+/-- Resolve the input by a strictly nonnegative complex of injectives.
+Preservation of the input's outgoing kernel and the kernels in its chosen
+resolution makes the mapped resolution an H⁰ isomorphism; unit naturality
+then transfers invertibility to the input. -/
+theorem isIso_homologyZero_map_rightDerivedFunctorPlusUnit_of_isStrictlyGE_zero
     (K : CochainComplex.Plus C) [K.obj.IsStrictlyGE 0]
     (hK : PreservesLimit (parallelPair (K.obj.sc 0).g 0) F)
     (hResKernel : ∀ (L : CochainComplex.Plus (InjectiveObject C)) [L.obj.IsStrictlyGE 0],
-      PreservesLimit (parallelPair
+      (i : K ⟶ (InjectiveObject.ι C).mapCochainComplexPlus.obj L) →
+      CochainComplex.Plus.quasiIso C i → PreservesLimit (parallelPair
         (((InjectiveObject.ι C).mapCochainComplexPlus.obj L).obj.sc 0).g 0) F) :
     IsIso ((DerivedCategory.Plus.homologyFunctor D 0).map
       (F.rightDerivedFunctorPlusUnit.app
@@ -180,10 +191,16 @@ theorem rightDerivedFunctorPlusUnit_homologyZero_isIso_of_strictlyGE_zero
     exact hi
   letI : PreservesLimit (parallelPair (K.obj.sc 0).g 0) F := hK
   letI : L.obj.IsStrictlyGE 0 := hL
-  letI : PreservesLimit (parallelPair (J.obj.sc 0).g 0) F := hResKernel L
+  letI : PreservesLimit (parallelPair (J.obj.sc 0).g 0) F := hResKernel L i hi
+  have hzK : (K.obj.sc 0).f = 0 := by
+    change K.obj.d ((ComplexShape.up ℤ).prev 0) 0 = 0
+    exact (K.obj.isZero_of_isStrictlyGE 0 _ (by simp)).eq_of_src _ _
+  have hzJ : (J.obj.sc 0).f = 0 := by
+    change J.obj.d ((ComplexShape.up ℤ).prev 0) 0 = 0
+    exact (J.obj.isZero_of_isStrictlyGE 0 _ (by simp)).eq_of_src _ _
   haveI hmap : IsIso (HomologicalComplex.homologyMap
       ((F.mapHomologicalComplex (ComplexShape.up ℤ)).map i.hom) 0) :=
-    map_h0_of_strictlyGE_zero F K.obj J.obj i.hom
+    isIso_homologyMap_of_zero_incoming F K.obj J.obj i.hom hzK hzJ
   have hmapPlus : IsIso (HomologicalComplex.homologyMap
       (F.mapCochainComplexPlus.map i).hom 0) := by
     change IsIso (HomologicalComplex.homologyMap
@@ -192,19 +209,22 @@ theorem rightDerivedFunctorPlusUnit_homologyZero_isIso_of_strictlyGE_zero
   have hplus : IsIso ((DerivedCategory.Plus.homologyFunctor D 0).map
       (DerivedCategory.Plus.Q.map (F.mapCochainComplexPlus.map i))) := by
     letI := hmapPlus
-    exact h0_plusQ_map_of_homologyMap _
+    exact isIso_homologyZero_plusQ_map_of_homologyMap _
   have hsource : IsIso ((DerivedCategory.Plus.homologyFunctor D 0).map
       ((F.mapHomotopyCategoryPlus ⋙ DerivedCategory.Plus.Qh).map w)) := by
     change IsIso ((DerivedCategory.Plus.homologyFunctor D 0).map
       (DerivedCategory.Plus.Q.map (F.mapCochainComplexPlus.map i)))
     exact hplus
-  exact unit_h0_of_resolution F _ _ w hw
+  exact isIso_homologyZero_unit_of_resolution F _ _ w hw
 
-/-- On a degree-zero single object, only outgoing kernels of nonnegative
-injective resolutions must be preserved: the source outgoing map is zero. -/
-theorem rightDerivedFunctorPlusUnit_homologyZero_single_isIso (X : C)
+/-- For a degree-zero single, the source outgoing differential is zero and
+its kernel is automatically preserved. Only kernels in resolutions receiving
+a quasi-isomorphism from this single remain as premises. -/
+theorem isIso_homologyZero_map_rightDerivedFunctorPlusUnit_single (X : C)
     (hResKernel : ∀ (L : CochainComplex.Plus (InjectiveObject C)) [L.obj.IsStrictlyGE 0],
-      PreservesLimit (parallelPair
+      (i : (⟨(CochainComplex.singleFunctor C 0).obj X, ⟨0, inferInstance⟩⟩ :
+        CochainComplex.Plus C) ⟶ (InjectiveObject.ι C).mapCochainComplexPlus.obj L) →
+      CochainComplex.Plus.quasiIso C i → PreservesLimit (parallelPair
         (((InjectiveObject.ι C).mapCochainComplexPlus.obj L).obj.sc 0).g 0) F) :
     IsIso ((DerivedCategory.Plus.homologyFunctor D 0).map
       (F.rightDerivedFunctorPlusUnit.app
@@ -216,13 +236,15 @@ theorem rightDerivedFunctorPlusUnit_homologyZero_single_isIso (X : C)
     apply Limits.preservesKernel_zero'
     simp [K]
     rfl
-  have h := rightDerivedFunctorPlusUnit_homologyZero_isIso_of_strictlyGE_zero F K hK hResKernel
+  have h :=
+    isIso_homologyZero_map_rightDerivedFunctorPlusUnit_of_isStrictlyGE_zero F K hK hResKernel
   change IsIso ((DerivedCategory.Plus.homologyFunctor D 0).map
       (F.rightDerivedFunctorPlusUnit.app
         ((HomotopyCategory.Plus.singleFunctor C 0).obj X))) at h
   exact h
 
-/-- Before applying the derived unit, H⁰ of a mapped degree-zero single is F(X). -/
+/-- Normalize the source of the derived unit by composing the localization–
+homology, mapped-single, and single-object homology comparisons. -/
 private noncomputable def sourceH0SingleIso (X : C) :
     (DerivedCategory.Plus.homologyFunctor D 0).obj
       ((F.mapHomotopyCategoryPlus ⋙ DerivedCategory.Plus.Qh).obj
@@ -235,12 +257,14 @@ private noncomputable def sourceH0SingleIso (X : C) :
   let s := HomologicalComplex.singleObjHomologySelfIso (ComplexShape.up ℤ) 0 (F.obj X)
   exact t ≪≫ m ≪≫ s
 
-/-- The degree-zero homology of the bounded-below right-derived functor
-on a degree-zero single object agrees pointwise with the underived functor,
-provided outgoing kernels of nonnegative injective resolutions are preserved. -/
+/-- Invert H⁰ of the derived unit on this single, then compose with the
+canonical source comparison to `F.obj X`. This packages a pointwise
+isomorphism; naturality in `X` remains separate. -/
 noncomputable def rightDerivedFunctorPlusHomologyZeroSingleIso (X : C)
     (hResKernel : ∀ (L : CochainComplex.Plus (InjectiveObject C)) [L.obj.IsStrictlyGE 0],
-      PreservesLimit (parallelPair
+      (i : (⟨(CochainComplex.singleFunctor C 0).obj X, ⟨0, inferInstance⟩⟩ :
+        CochainComplex.Plus C) ⟶ (InjectiveObject.ι C).mapCochainComplexPlus.obj L) →
+      CochainComplex.Plus.quasiIso C i → PreservesLimit (parallelPair
         (((InjectiveObject.ι C).mapCochainComplexPlus.obj L).obj.sc 0).g 0) F) :
     (DerivedCategory.Plus.homologyFunctor D 0).obj
       (F.rightDerivedFunctorPlus.obj ((DerivedCategory.Plus.singleFunctor C 0).obj X)) ≅
@@ -249,19 +273,18 @@ noncomputable def rightDerivedFunctorPlusHomologyZeroSingleIso (X : C)
   let H := DerivedCategory.Plus.homologyFunctor D 0
   let α := F.rightDerivedFunctorPlusUnit
   haveI : IsIso (H.map (α.app K)) :=
-    rightDerivedFunctorPlusUnit_homologyZero_single_isIso F X hResKernel
+    isIso_homologyZero_map_rightDerivedFunctorPlusUnit_single F X hResKernel
   let e := (asIso (H.map (α.app K))).symm
   exact e ≪≫ sourceH0SingleIso F X
 
 
-/-- A finite-limit-preserving additive functor satisfies the resolution-kernel
-condition, so its bounded-below right-derived functor has the expected
-pointwise degree-zero homology on single objects. -/
+/-- Finite-limit preservation supplies every outgoing kernel condition
+required by the pointwise single-object comparison. -/
 noncomputable def rightDerivedFunctorPlusHomologyZeroSingleIsoOfPreservesFiniteLimits
     (X : C) [PreservesFiniteLimits F] :
     (DerivedCategory.Plus.homologyFunctor D 0).obj
       (F.rightDerivedFunctorPlus.obj ((DerivedCategory.Plus.singleFunctor C 0).obj X)) ≅
       F.obj X :=
-  F.rightDerivedFunctorPlusHomologyZeroSingleIso X (fun _ => inferInstance)
+  F.rightDerivedFunctorPlusHomologyZeroSingleIso X (fun _ _ _ => inferInstance)
 
 end CategoryTheory.Functor
