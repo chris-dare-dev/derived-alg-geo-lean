@@ -107,8 +107,9 @@ variable {C : Type u} [Category.{v} C] [Preadditive C] [HasZeroObject C]
   [HasShift C ℤ] [∀ (n : ℤ), (shiftFunctor C n).Additive] [Pretriangulated C]
   (t : TStructure C)
 
-/-- Under the stated outer-Hom vanishing, maps into `M` identify additively
-with maps into its degree-zero t-structure truncation. -/
+/-- First lift through the nonpositive truncation using the source's aisle
+bound, then postcompose with its nonnegative truncation projection. The two
+outer-Hom vanishings give injectivity and surjectivity of the second step. -/
 noncomputable def homToDegreeZeroTruncAddEquiv {X M : C} [t.IsLE X 0]
     (h₁ : ∀ f : X ⟶ (t.truncLT 0).obj ((t.truncLT 1).obj M), f = 0)
     (h₄ : ∀ f : X ⟶ ((t.truncLT 0).obj ((t.truncLT 1).obj M))⟦(1 : ℤ)⟧, f = 0) :
