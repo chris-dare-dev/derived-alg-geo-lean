@@ -18,10 +18,11 @@ This file introduces no carrier, class, or instance.
 
 ## Main results
 
-* `CategoryTheory.Triangulated.TStructure.homTruncLTAddEquiv` identifies maps into a target with maps into
-  its upper truncation from a source in the appropriate aisle.
-* `CategoryTheory.Triangulated.TStructure.homToDegreeZeroTruncAddEquiv` identifies maps into a target with
-  maps into its degree-zero truncation under explicit outer-Hom vanishing.
+* `CategoryTheory.Triangulated.TStructure.homTruncLTAddEquiv` identifies maps
+  into an upper truncation from a source in the appropriate aisle.
+* `CategoryTheory.Triangulated.TStructure.homToDegreeZeroTruncAddEquiv`
+  identifies maps into a target with maps into its degree-zero truncation under
+  explicit outer-Hom vanishing.
 
 ## Implementation notes
 
@@ -31,7 +32,8 @@ vanishing is inferred from the generic statement's explicit hypotheses.
 
 ## References
 
-Mathlib's `CategoryTheory.Triangulated.TStructure.liftTruncLT_ι`, `CategoryTheory.Triangulated.TStructure.to_truncLT_obj_ext`, and
+Mathlib's `CategoryTheory.Triangulated.TStructure.liftTruncLT_ι`,
+`CategoryTheory.Triangulated.TStructure.to_truncLT_obj_ext`, and
 `CategoryTheory.Pretriangulated.Triangle.coyoneda_exact₂` and
 `CategoryTheory.Pretriangulated.Triangle.coyoneda_exact₃` at the pinned revision.
 
