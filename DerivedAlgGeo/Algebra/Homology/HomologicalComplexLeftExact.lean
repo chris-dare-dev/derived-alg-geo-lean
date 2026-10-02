@@ -66,7 +66,7 @@ noncomputable def mapCochainComplexHomologyZeroIso
     (K.sc 0).mapCyclesIso F ≪≫ F.mapIso (CochainComplex.isoHomologyπ₀ K)
 
 set_option backward.isDefEq.respectTransparency false in
-/-- Naturality of `Functor.mapCochainComplexHomologyZeroIso` in a cochain map. -/
+/-- Naturality of `CategoryTheory.Functor.mapCochainComplexHomologyZeroIso` in a cochain map. -/
 @[reassoc]
 theorem mapCochainComplexHomologyZeroIso_naturality
     {C : Type u} {D : Type v} [Category C] [Category D]
