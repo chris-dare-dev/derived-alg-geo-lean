@@ -61,7 +61,8 @@ noncomputable section
 namespace AffineRGammaPlusHomProof
 
 variable (R : CommRingCat.{u})
-local instance : (affineΓ R).Additive := Functor.additive_of_preserves_binary_products _
+private local instance : (affineΓ R).Additive :=
+  Functor.additive_of_preserves_binary_products _
 
 private abbrev U := Scheme.Modules.unit (Spec R)
 private abbrev S : CochainComplex.Plus (Spec R).Modules :=
