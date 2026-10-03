@@ -53,18 +53,19 @@ namespace CochainComplex.HomComplex
 variable {C : Type u} [Category.{v} C] [Preadditive C] [HasZeroObject C]
 variable (X : C) (F : C ⥤ AddCommGrpCat.{v}) [F.PreservesZeroMorphisms]
 variable (e : preadditiveCoyoneda.obj (op X) ≅ F)
-private abbrev S := (CochainComplex.singleFunctor C 0).obj X
+private abbrev S : CochainComplex C ℤ := (CochainComplex.singleFunctor C 0).obj X
 
-/-- Hom-complex classes out of a single are the homology of the represented
-additive-group-valued functor in every integer degree. -/
+/-- Internal comparison while zero preservation is in scope; it delegates to
+`CochainComplex.HomComplex.singleRepresentedHomologyAddEquiv`. -/
 private def representedAddCommGrpEquiv_ofPZM (K : CochainComplex C ℤ) (n : ℤ) :
     CohomologyClass (S X) K n ≃+
       ((F.mapHomologicalComplex (.up ℤ)).obj K).homology n :=
   singleRepresentedHomologyAddEquiv X F e K n
 
-/-- The complex obtained by applying the represented additive-group functor
-degreewise. -/
-abbrev addCommGrpSectionsComplex (K : CochainComplex C ℤ) :=
+/-- Degreewise mapping supplies the target of the represented Hom-complex
+comparison; zero preservation suffices to map its differential. -/
+abbrev addCommGrpSectionsComplex (K : CochainComplex C ℤ) :
+    CochainComplex AddCommGrpCat.{v} ℤ :=
   (F.mapHomologicalComplex (.up ℤ)).obj K
 
 private def representedCycle (K : CochainComplex C ℤ)
@@ -110,15 +111,16 @@ private lemma representedCycle_i (K : CochainComplex C ℤ)
   rfl
 
 
-/-- Homology of the represented image of the degree-zero single is its value
-on the source object. -/
+/-- Apply homology to the mapped-single comparison and then use single-complex
+homology; no representation is needed for this identification. -/
 def ordinaryAddCommGrpSourceIso : (addCommGrpSectionsComplex F (S X)).homology 0 ≅
     F.obj X :=
   HomologicalComplex.homologyMapIso
       ((HomologicalComplex.singleMapHomologicalComplex F (.up ℤ) 0).app X) 0 ≪≫
     (HomologicalComplex.homologyFunctorSingleIso (AddCommGrpCat) (.up ℤ) 0).app _
 
-/-- The cycle corresponding to the represented identity on the source. -/
+/-- Lift the represented identity through the single's cycles isomorphism so
+evaluation can pass through the canonical homology quotient. -/
 def addCommGrpSourceCycle : (addCommGrpSectionsComplex F (S X)).cycles 0 :=
   (HomologicalComplex.cyclesMap
     ((HomologicalComplex.singleMapHomologicalComplex F (.up ℤ) 0).app X).inv 0).hom
@@ -126,8 +128,8 @@ def addCommGrpSourceCycle : (addCommGrpSectionsComplex F (S X)).cycles 0 :=
         (F.obj X)).inv.hom
         ((e.hom.app X) (𝟙 X)))
 
-/-- The source identity cycle maps to the inverse image of the represented
-identity under the canonical source homology iso. -/
+/-- Naturality of the homology quotient transports the identity cycle through
+the mapped-single comparison. -/
 lemma addCommGrpSourceCycle_π :
     ((addCommGrpSectionsComplex F (S X)).homologyπ 0).hom (addCommGrpSourceCycle X F e) =
       (ordinaryAddCommGrpSourceIso X F).inv.hom
@@ -141,7 +143,8 @@ lemma addCommGrpSourceCycle_π :
     HomologicalComplex.singleObjCyclesSelfIso_inv_homologyπ_assoc]
   rfl
 
-/-- The source identity cycle agrees with its degree-zero component. -/
+/-- Compute the included source cycle from the degree-zero component of the
+mapped-single comparison. -/
 lemma addCommGrpSourceCycle_i :
     ((addCommGrpSectionsComplex F (S X)).iCycles 0).hom (addCommGrpSourceCycle X F e) =
       (F.map
@@ -194,8 +197,8 @@ private lemma representedCycle_ofHom (K : CochainComplex C ℤ)
   exact h
 
 
-/-- A chain map out of the degree-zero single evaluates the represented
-identity to its full Hom-complex homology class. -/
+/-- Apply naturality of the homology quotient to the cycle-level evaluation
+identity for a chain map out of the degree-zero single. -/
 private theorem representedAddCommGrpNormalization_ofPZM (K : CochainComplex C ℤ)
     (f : S X ⟶ K) :
     (HomologicalComplex.homologyMap
@@ -236,8 +239,9 @@ theorem singleRepresentedAddCommGrpHomologyAddEquiv_ofHom (K : CochainComplex C 
   letI := Functor.preservesZeroMorphisms_of_iso e
   exact representedAddCommGrpNormalization_ofPZM X F e K f
 
-/-- A degree-`n - 1` cochain maps to the incoming differential under the
-represented Hom-complex comparison. -/
+/-- The single has zero differential, so the Hom-complex differential reduces
+to postcomposition with the target differential; representation naturality
+transports that formula to the image. -/
 theorem singleRepresentedAddCommGrp_incoming_boundary (K : CochainComplex C ℤ) (n : ℤ)
     (b : X ⟶ K.X (n - 1)) :
     (singleRepresentedIso X _ e K).hom.f n
@@ -251,14 +255,16 @@ theorem singleRepresentedAddCommGrp_incoming_boundary (K : CochainComplex C ℤ)
   rw [Cochain.fromSingleEquiv_fromSingleMk]
   exact ConcreteCategory.congr_hom (e.hom.naturality (K.d (n - 1) n)) b
 
-/-- The canonical incoming boundary, regarded as a degree-`n` cocycle. -/
+/-- The square-zero law supplies the cocycle proof for this explicit incoming
+boundary representative used by quotient compatibility. -/
 def singleRepresentedAddCommGrpBoundaryCycle (K : CochainComplex C ℤ) (n : ℤ)
     (b : X ⟶ K.X (n - 1)) : Cocycle (S X) K n :=
   Cocycle.mk (δ (n - 1) n (Cochain.fromSingleMk b (zero_add (n - 1)))) (n + 1) rfl
     (δ_δ _ _ _ _)
 
 omit [F.PreservesZeroMorphisms] in
-/-- The full homology quotient kills every incoming degree-`n - 1` boundary. -/
+/-- Exhibit the incoming differential as a coboundary before passing through
+the full homology quotient; the outgoing kernel alone would not kill it. -/
 theorem singleRepresentedAddCommGrp_boundary_killed (K : CochainComplex C ℤ) (n : ℤ)
     (b : X ⟶ K.X (n - 1)) :
     singleRepresentedAddCommGrpHomologyAddEquiv X F e K n

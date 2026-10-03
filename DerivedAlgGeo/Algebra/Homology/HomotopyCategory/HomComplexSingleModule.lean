@@ -59,10 +59,10 @@ private theorem representedModulePreservesZero : F.PreservesZeroMorphisms := by
     (forget₂ (ModuleCat R) AddCommGrpCat)
   infer_instance
 
-private abbrev S := (CochainComplex.singleFunctor C 0).obj X
+private abbrev S : CochainComplex C ℤ := (CochainComplex.singleFunctor C 0).obj X
 
-/-- The represented additive equivalence for a module-valued functor, in every
-integer degree. -/
+/-- Compose the represented additive-group equivalence with the forgetful
+homology comparison to use the module category's canonical homology object. -/
 private def representedModuleEquiv_ofPZM (K : CochainComplex C ℤ) (n : ℤ) :
     CohomologyClass (S X) K n ≃+
       ((F.mapHomologicalComplex (.up ℤ)).obj K).homology n :=
@@ -70,10 +70,12 @@ private def representedModuleEquiv_ofPZM (K : CochainComplex C ℤ) (n : ℤ) :
     ((((F.mapHomologicalComplex (.up ℤ)).obj K).sc n).mapHomologyIso
       (forget₂ (ModuleCat R) AddCommGrpCat)).addCommGroupIsoToAddEquiv
 
-private abbrev sectionsComplex (K : CochainComplex C ℤ) :=
+private abbrev sectionsComplex (K : CochainComplex C ℤ) :
+    CochainComplex (ModuleCat.{v} R) ℤ :=
   (F.mapHomologicalComplex (.up ℤ)).obj K
 
-/-- The source homology iso in the module category. -/
+/-- Apply homology to the mapped-single comparison and then use single-complex
+homology; no representation is needed for this source identification. -/
 def ordinarySourceIso : (sectionsComplex F (S X)).homology 0 ≅
     F.obj X :=
   HomologicalComplex.homologyMapIso

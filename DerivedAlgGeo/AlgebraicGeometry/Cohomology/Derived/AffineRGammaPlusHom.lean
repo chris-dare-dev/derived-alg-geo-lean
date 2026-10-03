@@ -65,11 +65,14 @@ variable (R : CommRingCat.{u})
 private local instance : (affineΓ R).Additive :=
   Functor.additive_of_preserves_binary_products _
 
-private abbrev U := Scheme.Modules.unit (Spec R)
+private abbrev U : (Spec R).Modules := Scheme.Modules.unit (Spec R)
 private abbrev S : CochainComplex.Plus (Spec R).Modules :=
   ⟨(CochainComplex.singleFunctor (Spec R).Modules 0).obj (U R), ⟨0, inferInstance⟩⟩
-private abbrev H := DerivedCategory.Plus.homologyFunctor (ModuleCat R) 0
-private abbrev G := (affineΓ R).mapHomotopyCategoryPlus ⋙ DerivedCategory.Plus.Qh
+private abbrev H : DerivedCategory.Plus (ModuleCat R) ⥤ ModuleCat R :=
+  DerivedCategory.Plus.homologyFunctor (ModuleCat R) 0
+private abbrev G : HomotopyCategory.Plus (Spec R).Modules ⥤
+    DerivedCategory.Plus (ModuleCat R) :=
+  (affineΓ R).mapHomotopyCategoryPlus ⋙ DerivedCategory.Plus.Qh
 
 -- The concrete source normalization: localized degreewise sections of a single,
 -- then homology of the mapped single, then the usual single homology comparison.
@@ -151,7 +154,8 @@ private def modelIso (L : CochainComplex.Plus (InjectiveObject (Spec R).Modules)
       (DerivedCategory.homologyFunctorFactors (ModuleCat R) 0).app _
 
 -- The source of the quotient includes every boundary of degree -1.
-private abbrev sectionsComplex (K : CochainComplex (Spec R).Modules ℤ) :=
+private abbrev sectionsComplex (K : CochainComplex (Spec R).Modules ℤ) :
+    CochainComplex (ModuleCat R) ℤ :=
   ((affineΓ R).mapHomologicalComplex (.up ℤ)).obj K
 
 -- The ordinary normalization compares the actual class map with derived

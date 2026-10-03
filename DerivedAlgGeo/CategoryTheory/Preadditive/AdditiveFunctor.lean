@@ -19,7 +19,7 @@ The data-based form uses Mathlib's chosen inverse.
 
 ## Main results
 
-Both equivalences have forward map `Functor.map`.
+Both equivalences have forward map `CategoryTheory.Functor.map`.
 
 ## Implementation notes
 
@@ -51,7 +51,8 @@ noncomputable def homAddEquiv (hF : F.FullyFaithful) (X Y : C) :
   { hF.homEquiv with map_add' := fun _ _ => F.map_add }
 
 variable [F.Full] [F.Faithful]
-/-- The map on hom groups of an additive fully faithful functor. -/
+/-- Class-based specialization of `CategoryTheory.Functor.homAddEquiv`, using
+the inverse chosen from the full and faithful instances. -/
 noncomputable def mapAddEquiv (X Y : C) :
     (X ⟶ Y) ≃+ (F.obj X ⟶ F.obj Y) :=
   F.homAddEquiv (Functor.FullyFaithful.ofFullyFaithful F) X Y
