@@ -8,11 +8,11 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexSingleModule
 # Import boundary for represented Hom-complex normalization
 
 This compile-only fixture checks the actual imported module closure of the
-neutral normalization root. It is exported only by `Development`.
+neutral normalization root. It is exported only by the Development umbrella.
 
 ## Main definitions
 
-No definition is exported; the `run_cmd` fixture checks imports.
+No definition is exported; the Lean `run_cmd` command checks imports.
 
 ## Main results
 

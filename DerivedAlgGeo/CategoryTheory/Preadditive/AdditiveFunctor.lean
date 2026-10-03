@@ -23,8 +23,9 @@ Both equivalences have forward map `Functor.map`.
 
 ## Implementation notes
 
-The data-based equivalence extends `FullyFaithful.homEquiv` and adds
-`Functor.map_add`. The class-based version specializes it.
+The data-based equivalence extends
+`CategoryTheory.Functor.FullyFaithful.homEquiv` and adds
+`CategoryTheory.Functor.map_add`. The class-based version specializes it.
 
 ## References
 
@@ -43,7 +44,8 @@ variable {C D : Type*} [Category* C] [Category* D]
 variable (F : C ⥤ D) [F.Additive]
 
 /-- An additive functor's fully faithful data induces an additive equivalence
-on hom groups, with the supplied inverse from `FullyFaithful.homEquiv`. -/
+on hom groups, with the supplied inverse from
+`CategoryTheory.Functor.FullyFaithful.homEquiv`. -/
 noncomputable def homAddEquiv (hF : F.FullyFaithful) (X Y : C) :
     (X ⟶ Y) ≃+ (F.obj X ⟶ F.obj Y) :=
   { hF.homEquiv with map_add' := fun _ _ => F.map_add }

@@ -12,7 +12,7 @@ functor preserving the chosen left homology data.
 
 ## Main definitions
 
-No new carrier is introduced; this module extends Mathlib's `ShortComplex`.
+No new carrier is introduced; this module extends Mathlib's `CategoryTheory.ShortComplex`.
 
 ## Main results
 
