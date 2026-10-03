@@ -45,13 +45,13 @@ noncomputable section
 variable {C D : Type*} [Category* C] [Category* D]
   [HasZeroMorphisms C] [HasZeroMorphisms D]
 variable (F : C ⥤ D) [F.PreservesZeroMorphisms]
-variable (T : ShortComplex C) [T.HasLeftHomology]
+variable (T : ShortComplex C)
   [F.PreservesLeftHomologyOf T]
 
 set_option backward.defeqAttrib.useBackward true in
 /-- The left-homology quotient commutes with a functor preserving this left
 homology, without requiring homology of either whole short complex. -/
-theorem leftHomologyπ_mapLeftHomologyIso_hom :
+theorem leftHomologyπ_mapLeftHomologyIso_hom [T.HasLeftHomology] :
     (T.map F).leftHomologyπ ≫ (T.mapLeftHomologyIso F).hom =
       (T.mapCyclesIso F).hom ≫ F.map T.leftHomologyπ := by
   rw [T.leftHomologyData.mapLeftHomologyIso_eq,

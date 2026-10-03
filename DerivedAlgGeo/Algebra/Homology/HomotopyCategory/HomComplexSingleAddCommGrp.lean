@@ -119,21 +119,28 @@ def ordinaryAddCommGrpSourceIso : (addCommGrpSectionsComplex F (S X)).homology 0
       ((HomologicalComplex.singleMapHomologicalComplex F (.up ℤ) 0).app X) 0 ≪≫
     (HomologicalComplex.homologyFunctorSingleIso (AddCommGrpCat) (.up ℤ) 0).app _
 
+omit [F.PreservesZeroMorphisms] in
 /-- Lift the represented identity through the single's cycles isomorphism so
 evaluation can pass through the canonical homology quotient. -/
-def addCommGrpSourceCycle : (addCommGrpSectionsComplex F (S X)).cycles 0 :=
-  (HomologicalComplex.cyclesMap
+def addCommGrpSourceCycle :
+    letI := Functor.preservesZeroMorphisms_of_iso e
+    (addCommGrpSectionsComplex F (S X)).cycles 0 := by
+  letI := Functor.preservesZeroMorphisms_of_iso e
+  exact (HomologicalComplex.cyclesMap
     ((HomologicalComplex.singleMapHomologicalComplex F (.up ℤ) 0).app X).inv 0).hom
       ((HomologicalComplex.singleObjCyclesSelfIso (.up ℤ) 0
         (F.obj X)).inv.hom
         ((e.hom.app X) (𝟙 X)))
 
+omit [F.PreservesZeroMorphisms] in
 /-- Naturality of the homology quotient transports the identity cycle through
 the mapped-single comparison. -/
 lemma addCommGrpSourceCycle_π :
+    letI := Functor.preservesZeroMorphisms_of_iso e
     ((addCommGrpSectionsComplex F (S X)).homologyπ 0).hom (addCommGrpSourceCycle X F e) =
       (ordinaryAddCommGrpSourceIso X F).inv.hom
         ((e.hom.app X) (𝟙 X)) := by
+  letI := Functor.preservesZeroMorphisms_of_iso e
   change ((HomologicalComplex.singleObjCyclesSelfIso (.up ℤ) 0
       (F.obj X)).inv ≫
     HomologicalComplex.cyclesMap
@@ -143,13 +150,16 @@ lemma addCommGrpSourceCycle_π :
     HomologicalComplex.singleObjCyclesSelfIso_inv_homologyπ_assoc]
   rfl
 
+omit [F.PreservesZeroMorphisms] in
 /-- Compute the included source cycle from the degree-zero component of the
 mapped-single comparison. -/
 lemma addCommGrpSourceCycle_i :
+    letI := Functor.preservesZeroMorphisms_of_iso e
     ((addCommGrpSectionsComplex F (S X)).iCycles 0).hom (addCommGrpSourceCycle X F e) =
       (F.map
         (HomologicalComplex.singleObjXSelf (.up ℤ) 0 X).inv).hom
           ((e.hom.app X) (𝟙 X)) := by
+  letI := Functor.preservesZeroMorphisms_of_iso e
   change ((HomologicalComplex.singleObjCyclesSelfIso (.up ℤ) 0
       (F.obj X)).inv ≫
     HomologicalComplex.cyclesMap
@@ -239,15 +249,18 @@ theorem singleRepresentedAddCommGrpHomologyAddEquiv_ofHom (K : CochainComplex C 
   letI := Functor.preservesZeroMorphisms_of_iso e
   exact representedAddCommGrpNormalization_ofPZM X F e K f
 
+omit [F.PreservesZeroMorphisms] in
 /-- The single has zero differential, so the Hom-complex differential reduces
 to postcomposition with the target differential; representation naturality
 transports that formula to the image. -/
 theorem singleRepresentedAddCommGrp_incoming_boundary (K : CochainComplex C ℤ) (n : ℤ)
     (b : X ⟶ K.X (n - 1)) :
+    letI := Functor.preservesZeroMorphisms_of_iso e
     (singleRepresentedIso X _ e K).hom.f n
         (δ (n - 1) n (Cochain.fromSingleMk b (zero_add (n - 1)))) =
       ((F).map (K.d (n - 1) n))
         ((e.hom.app (K.X (n - 1))) b) := by
+  letI := Functor.preservesZeroMorphisms_of_iso e
   rw [Cochain.δ_fromSingleMk b (zero_add (n - 1)) n n (zero_add n)]
   change (e.hom.app (K.X n))
     (Cochain.fromSingleEquiv (zero_add n)
