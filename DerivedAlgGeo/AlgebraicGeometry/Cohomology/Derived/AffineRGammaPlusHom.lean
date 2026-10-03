@@ -17,10 +17,12 @@ retains the incoming degree-minus-one boundaries in homology.
 
 ## Main definitions
 
-* `affineRGammaPlusEvalAddEquiv` packages the existing canonical evaluation
-  map as an additive equivalence on bounded-below derived objects.
-* `affineRGammaPlusDqcHomologyZeroSectionsAddEquiv` composes its inverse with
-  the existing pointwise Hom-to-H⁰ sections comparison for Dqc objects.
+* `AlgebraicGeometry.Cohomology.affineRGammaPlusEvalAddEquiv`
+  packages the existing canonical evaluation map as an additive equivalence
+  on bounded-below derived objects.
+* `AlgebraicGeometry.Cohomology.affineRGammaPlusDqcHomologyZeroSectionsAddEquiv`
+  composes its inverse with the existing pointwise Hom-to-H⁰ sections
+  comparison for Dqc objects.
 
 General arbitrary-pullback preservation remains separate.
 
@@ -376,7 +378,8 @@ private lemma normalization (K : CochainComplex.Plus (Spec R).Modules)
 
 -- The exact existing affine evaluation agrees with the full quotient map on
 -- every bounded-below injective model; the incoming boundary remains present.
-private lemma sameMap (L : CochainComplex.Plus (InjectiveObject (Spec R).Modules))
+private lemma modelIso_hom_eval_eq_classToSections
+    (L : CochainComplex.Plus (InjectiveObject (Spec R).Modules))
     (f : S R ⟶ J R L) :
     (modelIso R L).hom.hom
       (Cohomology.affineRGammaPlusEvalAddHom R
@@ -450,7 +453,7 @@ private lemma model_same_map_all
     classToSections R (J R L).obj (modelHomClassEquiv R L g) := by
   obtain ⟨f, rfl⟩ := model_chain_map_surjective R L g
   rw [modelHomClassEquiv_map]
-  exact sameMap R L f
+  exact modelIso_hom_eval_eq_classToSections R L f
 
 private lemma eval_bijective_on_injective_model
     (L : CochainComplex.Plus (InjectiveObject (Spec R).Modules)) :
@@ -513,7 +516,7 @@ namespace AlgebraicGeometry.Cohomology
 /-- The canonical evaluation map identifies maps out of the structure sheaf
 with degree-zero bounded-below derived affine sections. Its inverse is obtained
 from injective models at an arbitrary integer lower bound; the underlying map
-is exactly `affineRGammaPlusEvalAddHom`. -/
+is exactly `AlgebraicGeometry.Cohomology.affineRGammaPlusEvalAddHom`. -/
 noncomputable def affineRGammaPlusEvalAddEquiv (R : CommRingCat.{u})
     (M : DerivedCategory.Plus (Spec R).Modules) :
     (((DerivedCategory.Plus.singleFunctor (Spec R).Modules 0).obj
@@ -523,14 +526,16 @@ noncomputable def affineRGammaPlusEvalAddEquiv (R : CommRingCat.{u})
   AddEquiv.ofBijective (affineRGammaPlusEvalAddHom R M)
     (AffineRGammaPlusHomProof.eval_bijective R M)
 
-/-- The equivalence acts by the already defined canonical evaluation. -/
+/-- Injective models establish bijectivity, while simplifying the forward map
+requires no choice of resolution. -/
 @[simp] theorem affineRGammaPlusEvalAddEquiv_apply (R : CommRingCat.{u})
     (M : DerivedCategory.Plus (Spec R).Modules)
     (f : ((DerivedCategory.Plus.singleFunctor (Spec R).Modules 0).obj
       (Scheme.Modules.unit (Spec R))) ⟶ M) :
     affineRGammaPlusEvalAddEquiv R M f = affineRGammaPlusEval R M f := rfl
 
-/-- As an additive homomorphism, the equivalence is the original evaluation. -/
+/-- This identity reuses additive evaluation lemmas without unfolding the
+chosen inverse. -/
 theorem affineRGammaPlusEvalAddEquiv_toAddMonoidHom (R : CommRingCat.{u})
     (M : DerivedCategory.Plus (Spec R).Modules) :
     (affineRGammaPlusEvalAddEquiv R M).toAddMonoidHom =
@@ -564,8 +569,8 @@ noncomputable def affineRGammaPlusDqcHomologyZeroSectionsAddEquiv
     ((affinePlusHomToUnboundedAddEquiv R M).trans
       (affineHomH0SectionsAddEquiv hM a))
 
-/-- On a morphism out of the structure sheaf, the Dqc comparison sends its
-canonical evaluation to the existing pointwise Hom-to-sections comparison. -/
+/-- This computation avoids unfolding the inverse: the evaluation equivalence
+cancels before applying the existing Hom-to-sections comparison. -/
 theorem affineRGammaPlusDqcHomologyZeroSectionsAddEquiv_apply_eval
     (R : CommRingCat.{u}) (M : DerivedCategory.Plus (Spec R).Modules)
     (hM : DerivedCategory.Dqc.schemeQuasicoherentCohomology (Spec R)
