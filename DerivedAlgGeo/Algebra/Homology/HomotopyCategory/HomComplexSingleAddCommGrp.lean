@@ -9,21 +9,21 @@ import Mathlib.Algebra.Category.Grp.EpiMono
 /-!
 # Represented Hom-complex classes in additive groups
 
-For arbitrary integer-indexed cochain complexes, a represented zero-preserving
+For arbitrary integer-indexed cochain complexes, a represented
 additive-group-valued functor sends Hom-complex classes out of a degree-zero
 single to the full homology of its degreewise image. The chain-map formula
 uses the represented identity, and incoming boundaries are included.
 
 ## Main definitions
 
-* `CochainComplex.HomComplex.representedAddCommGrpEquiv_ofPZM`
+* `CochainComplex.HomComplex.singleRepresentedAddCommGrpHomologyAddEquiv`
   gives the all-degree additive equivalence.
 * `CochainComplex.HomComplex.ordinaryAddCommGrpSourceIso`
   identifies homology of the degreewise image of the single.
 
 ## Main results
 
-* `CochainComplex.HomComplex.representedAddCommGrpNormalization_ofPZM`
+* `CochainComplex.HomComplex.singleRepresentedAddCommGrpHomologyAddEquiv_ofHom`
   computes a chain-map class.
 * `CochainComplex.HomComplex.singleRepresentedAddCommGrp_boundary_killed`
   records the incoming-boundary quotient.

@@ -9,20 +9,20 @@ import Mathlib.Algebra.Homology.ShortComplex.ModuleCat
 /-!
 # Module-valued normalization of represented Hom-complex classes
 
-The additive-group theorem specializes to a zero-preserving module-valued
+The additive-group theorem specializes to a represented module-valued
 functor. The forgetful homology comparison transports the represented source
 identity to homology in the module category, retaining the incoming-boundary
 quotient from the neutral theorem.
 
 ## Main definitions
 
-* `CochainComplex.HomComplex.representedModuleEquiv_ofPZM`
+* `CochainComplex.HomComplex.singleRepresentedModuleHomologyAddEquiv`
   is the all-degree module-valued comparison.
 * `CochainComplex.HomComplex.ordinarySourceIso` identifies the mapped single.
 
 ## Main results
 
-* `CochainComplex.HomComplex.representedModuleNormalization_ofPZM`
+* `CochainComplex.HomComplex.singleRepresentedModuleHomologyAddEquiv_ofHom`
   computes the class of a chain map under the module-valued comparison.
 
 ## Implementation notes
