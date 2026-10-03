@@ -1,1 +1,2 @@
 import DerivedAlgGeo.CategoryTheory.Preadditive.CompactObject
+import DerivedAlgGeo.CategoryTheory.Preadditive.AdditiveFunctor
