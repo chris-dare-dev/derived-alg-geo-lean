@@ -44,6 +44,8 @@ for line in raw.splitlines():
         paths[commit].add(line)
 digest = sha256(''.join(sha + '\n' for sha in sorted(paths)).encode()).hexdigest()
 print('integrations', len(paths), 'digest', digest)
+assert len(paths) == 223
+assert digest == 'e4a76253d464254f4fee4dd259582ebeb2ef1d96f7024d8e42c5b9aabe7a2596'
 names = (
     'scripts/StabilityConditionAudit/CategoricalCohomology.lean',
     'scripts/StabilityConditionAudit/TStructureCore.lean',
@@ -55,8 +57,9 @@ names = (
     'scripts/AlgebraicGeometryAudit.lean',
 )
 counts = Counter(path for touched in paths.values() for path in touched)
-for path in names:
+for path, expected in zip(names, (28, 15, 11, 6, 4, 1, 1, 1)):
     print('touch', counts[path], path)
+    assert counts[path] == expected
 prs = json.loads(subprocess.check_output([
     'gh', 'pr', 'list', '--repo', 'chris-dare-dev/derived-alg-geo-lean',
     '--state', 'merged', '--base', 'main',
@@ -67,14 +70,21 @@ matched = {pr['mergeCommit']['oid']: pr for pr in prs
            if pr['mergeCommit'] and pr['mergeCommit']['oid'] in paths}
 print('PR query', len(prs), 'matched', len(matched),
       'direct', sorted(set(paths) - set(matched)))
+assert len(prs) == len(matched) == 222
+assert set(paths) - set(matched) == {'47db217d78f55a45f0899281649d643347159253'}
 def overlaps(a, b):
     return a['createdAt'] <= b['mergedAt'] and b['createdAt'] <= a['mergedAt']
-for path, excluded in ((names[0], 1619), (names[1], 1479), (names[4], None)):
+for path, excluded, expected in (
+    (names[0], 1619, (28, 30, 18)),
+    (names[1], 1479, (15, 8, 1)),
+    (names[4], None, (3, 0, 0)),
+):
     touched = [pr for sha, pr in matched.items() if path in paths[sha]]
     pairs = [(a, b) for a, b in combinations(touched, 2) if overlaps(a, b)]
     without = [(a, b) for a, b in pairs
                if excluded not in (a['number'], b['number'])]
     print('windows', len(touched), len(pairs), len(without), path)
+    assert (len(touched), len(pairs), len(without)) == expected
 PY
 ```
 
