@@ -3,46 +3,97 @@
 ## Measurement and the pilot boundary
 
 The baseline is main `ef2cfbb0060bf98dae0a45f3ad1eecff9ee46788`. Count a
-path once for each of the 273 main commits since 2026-09-20 that changed it.
-This measures touch frequency, not simultaneous-edit conflicts. The following
-query fixes the revision and date; its output is sorted by descending count:
+path once for each of the 223 first-parent integrations after
+`c7e4bfcf21823744661bc4acd20d100ebdbe5ac8` that changed it.
+The lower boundary is the exclusive first-parent predecessor selected by
+2026-09-20 00:00 UTC: it was committed at 2026-09-19 23:46:58 UTC, and
+the next first-parent commit at 2026-09-20 01:08:44 UTC. The upper boundary
+is the pinned 2026-10-02 main tree. `--first-parent` counts mainline
+integrations instead of side-branch ancestors; `--diff-merges=first-parent`
+compares merge commits with their first parent. `--no-renames` treats old and
+new paths separately. Switching that flag changes one unrelated path count
+but none of the named hotspots. Touches are a contention proxy, not observed
+Git conflicts.
+
+This single probe replays the path counts, integration digest, PR match and
+overlapping open-to-merge windows. It requires the pinned Git history and an
+authenticated `gh` CLI. The GitHub merge-date search is fixed at the upper
+boundary's date, so later PRs do not enter the sample.
 
 ```bash
 python3 - <<'PY'
 from collections import Counter
+from hashlib import sha256
+from itertools import combinations
+import json
 import subprocess
 
-raw = subprocess.check_output(
-    ['git', 'log', 'ef2cfbb0060bf98dae0a45f3ad1eecff9ee46788',
-     '--since=2026-09-20', '--format=@@@%H', '--name-only'], text=True)
-commits = []
-paths = None
+lo = 'c7e4bfcf21823744661bc4acd20d100ebdbe5ac8'
+hi = 'ef2cfbb0060bf98dae0a45f3ad1eecff9ee46788'
+raw = subprocess.check_output([
+    'git', 'log', '--first-parent', '--diff-merges=first-parent',
+    '--no-renames', '--format=@@@%H', '--name-only', f'{lo}..{hi}'
+], text=True)
+paths = {}
+commit = None
 for line in raw.splitlines():
     if line.startswith('@@@'):
-        if paths is not None:
-            commits.append(paths)
-        paths = set()
-    elif paths is not None and line:
-        paths.add(line)
-if paths is not None:
-    commits.append(paths)
-counts = Counter(path for paths in commits for path in paths)
-print('commits:', len(commits))
-for path, count in sorted(counts.items(), key=lambda item: (-item[1], item[0])):
-    if path.startswith('scripts/') and (
-        'Audit/' in path or path.endswith('Audit.lean') or 'baseline' in path
-    ):
-        print(count, path)
+        commit = line[3:]
+        paths[commit] = set()
+    elif line and commit:
+        paths[commit].add(line)
+digest = sha256(''.join(sha + '\n' for sha in sorted(paths)).encode()).hexdigest()
+print('integrations', len(paths), 'digest', digest)
+names = (
+    'scripts/StabilityConditionAudit/CategoricalCohomology.lean',
+    'scripts/StabilityConditionAudit/TStructureCore.lean',
+    'scripts/AlgebraicGeometryAudit/Core.lean',
+    'scripts/AlgebraicGeometryAudit/ModuleFlatGenerators.lean',
+    'scripts/single_instantiation_baseline.txt',
+    'scripts/audit_missing_baseline.txt',
+    'scripts/StabilityConditionAudit.lean',
+    'scripts/AlgebraicGeometryAudit.lean',
+)
+counts = Counter(path for touched in paths.values() for path in touched)
+for path in names:
+    print('touch', counts[path], path)
+prs = json.loads(subprocess.check_output([
+    'gh', 'pr', 'list', '--repo', 'chris-dare-dev/derived-alg-geo-lean',
+    '--state', 'merged', '--base', 'main',
+    '--search', 'merged:2026-09-20..2026-10-02', '--limit', '500',
+    '--json', 'number,createdAt,mergedAt,mergeCommit'
+], text=True))
+matched = {pr['mergeCommit']['oid']: pr for pr in prs
+           if pr['mergeCommit'] and pr['mergeCommit']['oid'] in paths}
+print('PR query', len(prs), 'matched', len(matched),
+      'direct', sorted(set(paths) - set(matched)))
+def overlaps(a, b):
+    return a['createdAt'] <= b['mergedAt'] and b['createdAt'] <= a['mergedAt']
+for path, excluded in ((names[0], 1619), (names[1], 1479), (names[4], None)):
+    touched = [pr for sha, pr in matched.items() if path in paths[sha]]
+    pairs = [(a, b) for a, b in combinations(touched, 2) if overlaps(a, b)]
+    without = [(a, b) for a, b in pairs
+               if excluded not in (a['number'], b['number'])]
+    print('windows', len(touched), len(pairs), len(without), path)
 PY
 ```
 
-| Path | Commits | Interpretation |
+At the pinned range the probe reports 223 integrations, with the SHA-256 of
+the sorted newline-terminated integration SHAs
+`e4a76253d464254f4fee4dd259582ebeb2ef1d96f7024d8e42c5b9aabe7a2596`.
+The GitHub query returns 222 PRs and matches all 222 `mergeCommit.oid`
+values. The one unmatched integration is direct main commit
+`47db217d78f55a45f0899281649d643347159253`. These are PR integration
+commits, not 222 Git merge commits; most were squashed.
+
+| Path | Integrations touching it | Interpretation |
 | --- | ---: | --- |
 | `scripts/StabilityConditionAudit/CategoricalCohomology.lean` | 28 | Mostly serial #554/SF11 work in one broad slice; independent subowners need declaration-level evidence before another split. |
-| `scripts/StabilityConditionAudit/TStructureCore.lean` | 13 | Shared area, retained for a later source-owner review. |
-| `scripts/AlgebraicGeometryAudit/{Core,ModuleFlatGenerators}.lean` | 11 each | Residual broad area slices. |
-| `scripts/single_instantiation_baseline.txt` | 5 | One shared exception append point; the bounded pilot below gives new records subject-owned paths. |
-| `scripts/audit_missing_baseline.txt` | 1 | Keep the global identity ratchet; a new unaudited name must not be added by hand. |
+| `scripts/StabilityConditionAudit/TStructureCore.lean` | 15 | Shared area, retained for later source-owner review. |
+| `scripts/AlgebraicGeometryAudit/Core.lean` | 11 | Residual broad area slice. |
+| `scripts/AlgebraicGeometryAudit/ModuleFlatGenerators.lean` | 6 | Residual broad area slice. |
+| `scripts/single_instantiation_baseline.txt` | 4 | Shared exception append point; the pilot gives new records subject-owned paths. |
+| `scripts/audit_missing_baseline.txt` | 1 | Keep the global identity ratchet. |
 | `scripts/{StabilityCondition,AlgebraicGeometry}Audit.lean` | 1 each | Contract prose, not routine record append points. |
 
 Issue #480, implemented by PR #546, already split the former large audit
@@ -50,28 +101,15 @@ files into per-area leaves. This pilot does not repeat that migration. The
 mode-only CI1.02 prerequisite is present: `scripts/check_audit_complete.py`
 has mode 100755 at the baseline revision.
 
-The merged-PR windows give a second, closer contention proxy. Match each
-commit's touched paths to the `mergeCommit.oid` of PRs merged from 2026-09-20
-through the pinned main commit's date, 2026-10-02:
-
-```bash
-gh pr list --repo chris-dare-dev/derived-alg-geo-lean --state merged \
-  --base main --search 'merged:2026-09-20..2026-10-02' --limit 500 \
-  --json number,createdAt,mergedAt,mergeCommit
-```
-
-The query returns 222 PRs. For each path, count a pair when both PRs
-changed it and their open-to-merge time intervals overlapped. The
-CategoricalCohomology leaf has 30 such pairs (18 after excluding long-lived
-PR #1619); TStructureCore has eight (one after excluding long-lived PR #1479).
-The single-instantiation baseline has no overlapping pair among the three
-matched PRs that touched it. These are opportunities for a shared-file
-conflict, not evidence that Git actually reported one; direct main commits do
-not contribute to this count. The high-touch
-audit leaves, especially CategoricalCohomology, are the better candidates for
-the follow-up audit cut after source-owner boundaries are checked. The
-exception pilot below proves the record pattern on a smaller, safer surface;
-it does not claim to eliminate those audit overlaps.
+The probe reports 28 matched PRs and 30 overlapping open-to-merge pairs for
+CategoricalCohomology (18 pairs excluding long-lived #1619), 15 PRs and eight
+pairs for TStructureCore (one excluding long-lived #1479), and three PRs
+with zero pairs for the exception baseline. A pair means that both PRs
+touched the path and their `createdAt`–`mergedAt` intervals overlapped.
+This does not show that Git reported a conflict. Direct main commits are
+excluded from pair counts. The audit leaves are follow-up candidates after
+their source-owner boundaries are checked; the bounded exception pilot does
+not claim to remove those overlaps.
 
 ## Independently owned exception records
 
