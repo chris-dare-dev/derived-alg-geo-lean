@@ -50,6 +50,29 @@ files into per-area leaves. This pilot does not repeat that migration. The
 mode-only CI1.02 prerequisite is present: `scripts/check_audit_complete.py`
 has mode 100755 at the baseline revision.
 
+The merged-PR windows give a second, closer contention proxy. Match each
+commit's touched paths to the `mergeCommit.oid` of PRs merged from 2026-09-20
+through the pinned main commit's date, 2026-10-02:
+
+```bash
+gh pr list --repo chris-dare-dev/derived-alg-geo-lean --state merged \
+  --base main --search 'merged:2026-09-20..2026-10-02' --limit 500 \
+  --json number,createdAt,mergedAt,mergeCommit
+```
+
+The query returns 222 PRs. For each path, count a pair when both PRs
+changed it and their open-to-merge time intervals overlapped. The
+CategoricalCohomology leaf has 30 such pairs (18 after excluding long-lived
+PR #1619); TStructureCore has eight (one after excluding long-lived PR #1479).
+The single-instantiation baseline has no overlapping pair among the three
+matched PRs that touched it. These are opportunities for a shared-file
+conflict, not evidence that Git actually reported one; direct main commits do
+not contribute to this count. The high-touch
+audit leaves, especially CategoricalCohomology, are the better candidates for
+the follow-up audit cut after source-owner boundaries are checked. The
+exception pilot below proves the record pattern on a smaller, safer surface;
+it does not claim to eliminate those audit overlaps.
+
 ## Independently owned exception records
 
 The first column of each single-instantiation exception is the **source module
