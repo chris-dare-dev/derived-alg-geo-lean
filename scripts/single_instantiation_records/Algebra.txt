@@ -1,0 +1,1 @@
+Algebra	CategoryTheory.CopowerData	bundled object plus universal property; `copowerData` is the sole choice selector from `HasCopower`, the HasLimit/LimitCone shape, so a second producer would be a second unrelated choice

@@ -1,0 +1,1 @@
+CategoryTheory	CategoryTheory.Enhancement.Exact	supplied data: constructing one means building a `CommShift` structure and proving `Functor.IsTriangulated`, and nothing in the repository produces one for a general `E`, as its docstring states
