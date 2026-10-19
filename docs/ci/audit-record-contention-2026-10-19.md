@@ -18,7 +18,8 @@ Git conflicts.
 This single probe replays the path counts, integration digest, PR match and
 overlapping open-to-merge windows. It requires the pinned Git history and an
 authenticated `gh` CLI. The GitHub merge-date search is fixed at the upper
-boundary's date, so later PRs do not enter the sample.
+boundary's calendar date; the SHA-match assertions reject PRs outside the
+pinned range, including any later same-day merge.
 
 ```bash
 python3 - <<'PY'
