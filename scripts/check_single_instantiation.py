@@ -24,14 +24,17 @@ failing on all of them fires on 45% of the tree and stops being read.
 So this follows `audit_missing_baseline.txt`: the known ones are named, and only
 a NEW name fails. That converts the failure mode from invisible drift into a
 deliberate, reviewable act -- the author either instantiates it twice in the same
-change, or adds the name and says why in the third column of the baseline.
+change, or adds the name and says why in the third column of its owner record.
+The historical records stay in `single_instantiation_baseline.txt`; new ones
+go to `single_instantiation_records/<source-module-subject>.txt`. A strict
+reader checks the union for duplicate names and conflicting owners.
 
 The reason used to live in the pull request instead, and that did not hold. A
-pull request is not readable from the tree, and `--relax` rewrites the file from
-scratch, so a regenerated baseline was indistinguishable from a reviewed one.
+pull request is not readable from the tree, and `--relax` used to rewrite the
+file from scratch, so a regenerated baseline was indistinguishable from a reviewed one.
 Between 2026-09-08 and 2026-09-14, 29 names drifted in that way -- against 80
 recorded -- while this gate ran only in `scripts/gates.sh` and never in CI. The
-reason now lives in the file, `--relax` preserves the reasons already there and
+reason now lives in each record, `--relax` preserves the reasons already there and
 returns nonzero for any name it had to write a `TODO` for, and a `TODO` that
 reaches a commit fails the gate. `--relax` can record a name; it cannot bless
 one. The 80 entries that predate the column carry a visible legacy marker rather
@@ -52,11 +55,13 @@ from __future__ import annotations
 import collections
 import pathlib
 import sys
+from typing import NamedTuple
 
 from _output import force_utf8_output
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 BASELINE = ROOT / "scripts" / "single_instantiation_baseline.txt"
+RECORDS = ROOT / "scripts" / "single_instantiation_records"
 
 # Subjects that exist in order to be instantiated. `AlgebraicGeometry` is not
 # one: a structure there describes a particular geometric situation, and having
@@ -85,20 +90,88 @@ def subject_of(module: str) -> str:
 TODO = "TODO: say why one inhabitant is right"
 
 
-def read_baseline() -> tuple[set[str], dict[str, str]]:
-    """Parse the baseline into its names and their recorded reasons."""
-    names: set[str] = set()
-    reasons: dict[str, str] = {}
-    if not BASELINE.exists():
-        return names, reasons
-    for line in BASELINE.read_text(encoding="utf-8").splitlines():
-        parts = line.split("\t")
-        if len(parts) < 2:
-            continue
-        names.add(parts[1])
-        if len(parts) > 2 and parts[2].strip():
-            reasons[parts[1]] = parts[2].strip()
-    return names, reasons
+class BaselineError(ValueError):
+    """A record cannot be assigned to one unambiguous subject owner."""
+
+
+class BaselineRecord(NamedTuple):
+    subject: str
+    name: str
+    reason: str
+    path: pathlib.Path
+    line: int
+
+
+def read_baseline(
+    legacy: pathlib.Path = BASELINE, shards: pathlib.Path = RECORDS
+) -> dict[str, BaselineRecord]:
+    """Read the historical records and owner shards without lossy set union."""
+    if not legacy.is_file():
+        raise BaselineError(f"{legacy} is missing; the exception gate cannot pass")
+    paths = [legacy]
+    if shards.exists():
+        if not shards.is_dir():
+            raise BaselineError(f"{shards} is not a directory")
+        for path in sorted(shards.iterdir()):
+            if path.is_symlink() or not path.is_file() or path.suffix != ".txt":
+                raise BaselineError(f"{path}: expected an ordinary .txt owner shard")
+            if path.stem not in GENERIC_SUBJECTS:
+                raise BaselineError(f"{path}: unknown subject owner {path.stem}")
+            paths.append(path)
+
+    records: dict[str, BaselineRecord] = {}
+    for path in paths:
+        for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            parts = line.split("\t")
+            if len(parts) != 3 or any(not part.strip() for part in parts):
+                raise BaselineError(f"{path}:{line_number}: expected subject, name and reason")
+            subject, name, reason = parts
+            if subject not in GENERIC_SUBJECTS:
+                raise BaselineError(f"{path}:{line_number}: unknown subject owner {subject}")
+            if path != legacy and subject != path.stem:
+                raise BaselineError(
+                    f"{path}:{line_number}: record owner {subject} conflicts with shard {path.stem}"
+                )
+            if name in records:
+                earlier = records[name]
+                raise BaselineError(
+                    f"{path}:{line_number}: duplicate {name}; first at "
+                    f"{earlier.path}:{earlier.line} (owner {earlier.subject})"
+                )
+            records[name] = BaselineRecord(subject, name, reason, path, line_number)
+    return records
+
+
+def write_baseline(
+    thin: list[str], modules: dict[str, str], records: dict[str, BaselineRecord],
+    legacy: pathlib.Path = BASELINE, shards: pathlib.Path = RECORDS,
+) -> list[pathlib.Path]:
+    """Preserve old record locations and place each new exception with its owner."""
+    by_path: dict[pathlib.Path, list[tuple[str, str]]] = {}
+    for name in thin:
+        subject = subject_of(modules[name])
+        previous = records.get(name)
+        if previous and previous.subject != subject:
+            raise BaselineError(
+                f"{previous.path}:{previous.line}: {name} belongs to module subject "
+                f"{subject}, not recorded owner {previous.subject}"
+            )
+        path = previous.path if previous else shards / f"{subject}.txt"
+        reason = previous.reason if previous else TODO
+        by_path.setdefault(path, []).append((name, f"{subject}\t{name}\t{reason}\n"))
+
+    touched: list[pathlib.Path] = []
+    paths = {legacy, *(record.path for record in records.values()), *by_path}
+    for path in sorted(paths):
+        content = "".join(row for _, row in sorted(by_path.get(path, [])))
+        if path != legacy and not content:
+            path.unlink()
+            touched.append(path)
+        elif not path.exists() or path.read_text(encoding="utf-8") != content:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(content, encoding="utf-8")
+            touched.append(path)
+    return touched
 
 
 def main() -> int:
@@ -127,17 +200,28 @@ def main() -> int:
         if subject_of(module) in GENERIC_SUBJECTS and counts[name] <= THRESHOLD
     )
 
+    try:
+        records = read_baseline(BASELINE, RECORDS)
+        for name in thin:
+            previous = records.get(name)
+            if previous and previous.subject != subject_of(modules[name]):
+                raise BaselineError(
+                    f"{previous.path}:{previous.line}: {name} belongs to module subject "
+                    f"{subject_of(modules[name])}, not recorded owner {previous.subject}"
+                )
+    except (BaselineError, OSError, UnicodeError) as error:
+        print(f"::error::single-instantiation records: {error}")
+        return 1
+
     if relax:
-        _, reasons = read_baseline()
-        missing = [n for n in thin if not reasons.get(n)]
-        BASELINE.write_text(
-            "".join(
-                f"{subject_of(modules[n])}\t{n}\t{reasons.get(n) or TODO}\n"
-                for n in thin
-            ),
-            encoding="utf-8",
-        )
-        print(f"wrote {BASELINE.relative_to(ROOT)} ({len(thin)} entries)")
+        missing = [n for n in thin if n not in records or records[n].reason == TODO]
+        touched = write_baseline(thin, modules, records, BASELINE, RECORDS)
+        for path in touched:
+            action = "wrote" if path.exists() else "removed"
+            shown = path.relative_to(ROOT) if path.is_relative_to(ROOT) else path
+            print(f"{action} {shown}")
+        if not touched:
+            print("single-instantiation records unchanged")
         if missing:
             print()
             print(f"{len(missing)} of them have no reason, written as `{TODO}`:")
@@ -156,12 +240,8 @@ def main() -> int:
             return 1
         return 0
 
-    if not BASELINE.exists():
-        print(f"::error::{BASELINE.relative_to(ROOT)} is missing; regenerate it with --relax")
-        return 1
-
-    baseline, reasons = read_baseline()
-    new = [n for n in thin if n not in baseline]
+    baseline = set(records)
+    new = [n for n in thin if n not in records]
 
     if new:
         print("single-instantiation gate failed:")
@@ -175,13 +255,13 @@ def main() -> int:
             "produced `GrothendieckPresentation` and `ClassDatum`: written for N "
             "cases, instantiated once, never adopted. Either instantiate it a "
             "second time in this change, or add it to "
-            f"{BASELINE.relative_to(ROOT)} with --relax and say in the pull "
-            "request why one is right."
+            "an owner shard with --relax and say in the pull request why one "
+            "is right."
         )
         return 1
 
     unexplained = sorted(
-        n for n in thin if n in baseline and reasons.get(n, TODO) == TODO
+        n for n in thin if n in records and records[n].reason == TODO
     )
     if unexplained:
         print("single-instantiation gate failed:")
