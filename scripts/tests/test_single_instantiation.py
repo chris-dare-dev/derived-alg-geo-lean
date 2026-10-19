@@ -154,6 +154,22 @@ class SingleInstantiationRecordTests(unittest.TestCase):
         self.assertEqual(status, 1)
         self.assertIn("belongs to module subject Algebra", output)
 
+    def test_absent_and_above_threshold_records_are_distinguished(self) -> None:
+        self.legacy.write_text(
+            "LinearAlgebra\tLinearAlgebra.Absent\thistorical reason\n",
+            encoding="utf-8",
+        )
+        rows = (
+            "structure\tDerivedAlgGeo.CategoryTheory.Existing\tCategoryTheory.Existing\n"
+            "structure\tDerivedAlgGeo.Algebra.Existing\tAlgebra.Existing\n"
+            "inhabitant\tCategoryTheory.Existing\tfirst\n"
+            "inhabitant\tCategoryTheory.Existing\tsecond\n"
+        )
+        status, output = self.run_gate(rows)
+        self.assertEqual(status, 0)
+        self.assertIn("1 baseline entry/entries now have more than 1", output)
+        self.assertIn("1 baseline entry/entries are absent from the emitted structure sweep", output)
+
     def test_padded_todo_fails_both_check_and_relax(self) -> None:
         rows = "structure\tDerivedAlgGeo.CategoryTheory.Existing\tCategoryTheory.Existing\n"
         path = self.shards / "CategoryTheory.txt"

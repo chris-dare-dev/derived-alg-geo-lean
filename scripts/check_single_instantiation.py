@@ -82,10 +82,10 @@ def subject_of(module: str) -> str:
     return parts[1] if len(parts) > 1 else ""
 
 
-# A third, optional tab-separated column carrying the reason one inhabitant
-# is right. Optional only in the parsing: `--relax` writes `TODO` for a name
-# that has none and returns nonzero, and the gate rejects a `TODO` that
-# reaches a commit. Before this column the reason lived only in the pull
+# The third tab-separated column carries the required reason one inhabitant
+# is right. `--relax` writes `TODO` for a new name and returns nonzero; the
+# gate rejects that placeholder for every current thin abstraction. Before
+# this column the reason lived only in the pull
 # request, so the next `--relax` erased every one of them and a regenerated
 # file could not be told from a reviewed one -- which is how 29 names drifted
 # in unnoticed while the gate itself ran only locally.
@@ -282,15 +282,22 @@ def main() -> int:
         )
         return 1
 
-    stale = sorted(baseline - set(thin))
+    above_threshold = sorted(n for n in baseline if n in modules and n not in thin)
+    absent = sorted(baseline - set(modules))
     print(
         f"ok: {len(thin)} generic abstraction(s) at or below {THRESHOLD} "
         f"inhabitant(s), all known"
     )
-    if stale:
+    if above_threshold:
         print(
-            f"note: {len(stale)} baseline entry/entries now have more than "
+            f"note: {len(above_threshold)} baseline entry/entries now have more than "
             f"{THRESHOLD}; review and remove them separately. "
+            "`--relax` does not prune records."
+        )
+    if absent:
+        print(
+            f"note: {len(absent)} baseline entry/entries are absent from the "
+            "emitted structure sweep; verify build coverage before triage. "
             "`--relax` does not prune records."
         )
     return 0
