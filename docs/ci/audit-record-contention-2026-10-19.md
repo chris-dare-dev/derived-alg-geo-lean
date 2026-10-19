@@ -89,7 +89,7 @@ row, unknown subject, unexpected shard file, row/shard owner mismatch,
 duplicate name (including a duplicate across the old file and a shard), or a
 live name whose recorded owner disagrees with its emitted module. It reports
 both locations for a duplicate rather than allowing a set union to discard
-one. `--relax` preserves all existing records, including three current
+one. `--relax` preserves all existing records, including five current
 above-threshold exceptions reserved for #1394, and writes a new reason as a failing TODO
 in the new subject shard. Adding one new exception therefore changes only its
 subject file. A reviewer must replace that TODO with a reason before the gate
@@ -97,19 +97,17 @@ passes.
 
 The seeded local cache initially omitted two current SphericalTwist structures
 from the root-only `EnumInhabitants` sweep. That partial sweep counted 98 thin
-names, three above threshold, and two absent from the emitted environment; it
-was not used as final evidence. A targeted build of the SphericalTwist subtree,
-followed by a scratch copy of the same enumerator with explicit imports of
-its Autoequivalence and BraidStatement modules, emitted both missing names.
-That supplemental sweep counts 100 thin names, three above threshold, and
-zero absent baseline names. A local root-target rebuild failed because the
-seeded cache imports older compiled versions of two unchanged defining modules:
-their current sources compile directly, but their cached imports omit
-declarations that those sources now export. This local root
-build is not a full audit verdict. The gate now reports absent names separately
-from above-threshold ones, so a stale import cannot masquerade as a resolved
-exception. Required PR CI rebuilds the source graph and remains the full
-audit verdict.
+names, three above threshold, and two absent from the emitted environment. A
+targeted SphericalTwist build and explicit-import scratch sweep found those two,
+but still used other stale imports. The first root-target rebuild then failed
+because two unchanged defining modules had old compiled imports. Compiling
+those modules from current source, rebuilding the five affected consumers, and
+rebuilding the root succeeded (6109 Lake jobs). The standard sweep from that
+rebuilt root counts 98 thin names, five above-threshold records, and zero
+absent baseline names. Two Serre-functor records moved from thin to above
+threshold when their producer imports refreshed. The gate now reports absent
+names separately from above-threshold ones, so stale imports cannot masquerade
+as resolved exceptions. Required PR CI remains the full audit verdict.
 
 The before/after `(name, reason)` set contains the same 103 records. Its
 sorted, newline-terminated TSV SHA-256 is
