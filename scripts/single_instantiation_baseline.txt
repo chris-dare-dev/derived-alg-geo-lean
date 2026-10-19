@@ -3,7 +3,6 @@ Algebra	CategoryTheory.DGAdjunction.H0Presentation	a parameter of nine downstrea
 Algebra	CategoryTheory.DGFunctor.HomogeneousNatTrans.ConeData	`chosenConeData` selects objectwise cones from `IsPretriangulated`; the choice is the only producer
 Algebra	CategoryTheory.DGFunctor.IsQuasiEquivalence	recorded before the reason column existed; reason not yet written
 Algebra	CategoryTheory.DGFunctor.PreservesConeTriangles	the weak exactness seam; `preservesConeTriangles_of_preservesChosenCones` derives it from the strong split-cone witness, as its docstring states
-Algebra	CategoryTheory.DGLinear	recorded before the reason column existed; reason not yet written
 Algebra	CategoryTheory.DerivedCategory.OppositeComparison	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Enhancement	recorded before the reason column existed; reason not yet written
 Algebra	CategoryTheory.HasCopowers	a Mathlib-style mere-existence capability (abstraction-tree.md:220), discharged by a consumer's dg category rather than instantiated here; the `AddCommGrp` tower it heads serves object twists, distinct from the `ModuleCat k` tower under `HasLinearCopowers`
@@ -21,13 +20,10 @@ CategoryTheory	CategoryTheory.SerreFunctor.EnriquesCategoryData	recorded before 
 CategoryTheory	CategoryTheory.SerreFunctor.HomFinite	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.SerreFunctor.MixedClassificationData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.SerreFunctor.PseudoprojectiveExtProfile	recorded before the reason column existed; reason not yet written
-CategoryTheory	CategoryTheory.SerreFunctor.SerreCategoryData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.SerreFunctor.SerreCompatibleEquivalence	recorded before the reason column existed; reason not yet written
-CategoryTheory	CategoryTheory.SerreFunctor.SerreFunctorData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.SerreFunctor.SphericalClassificationData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.SerreFunctor.SphericalExtProfile	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.StackEquivalence	recorded before the reason column existed; reason not yet written
-CategoryTheory	CategoryTheory.StackInGroupoids.Cover	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.AdjacentExtProfile	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.BidirectionalPrefixBlockEmbeddingData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.CofiltrationData	recorded before the reason column existed; reason not yet written
@@ -66,7 +62,6 @@ CategoryTheory	CategoryTheory.Triangulated.TStructure.ApproximationMap	recorded 
 CategoryTheory	CategoryTheory.Triangulated.TStructure.CompactGeneratorBrown.StepData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.TStructure.GeneratorApproximationMap	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.TStructure.IsNondegenerate	recorded before the reason column existed; reason not yet written
-CategoryTheory	CategoryTheory.Triangulated.TStructure.Restriction	one clause of S-locality at one functor; `SLocalData` holds the real per-open witnesses as fields, so the only named inhabitant is the trivial `Restriction.id` [adoption pending, tracked in the single-instantiation follow-up]
 CategoryTheory	CategoryTheory.Triangulated.WeakSlopeData.SameSlopeOrder	a relation between two slope data, proved so far only at the K3 tilt slope normalization [adoption pending, tracked in the single-instantiation follow-up]
 CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.DedekindHNProblem	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.OrdinaryDefinition20_5Conditions	recorded before the reason column existed; reason not yet written
