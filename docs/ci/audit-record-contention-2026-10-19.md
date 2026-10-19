@@ -89,10 +89,11 @@ row, unknown subject, unexpected shard file, row/shard owner mismatch,
 duplicate name (including a duplicate across the old file and a shard), or a
 live name whose recorded owner disagrees with its emitted module. It reports
 both locations for a duplicate rather than allowing a set union to discard
-one. `--relax` preserves existing reasons and locations, removes only stale
-records, and writes a new reason as a failing TODO in the new subject shard.
-Its usual new-record operation therefore changes one subject file. A reviewer
-must replace that TODO with a reason before the gate passes.
+one. `--relax` preserves all existing records, including the five presently
+stale exceptions reserved for #1394, and writes a new reason as a failing TODO
+in the new subject shard. Adding one new exception therefore changes only its
+subject file. A reviewer must replace that TODO with a reason before the gate
+passes.
 
 The before/after `(name, reason)` set contains the same 103 records. Its
 sorted, newline-terminated TSV SHA-256 is

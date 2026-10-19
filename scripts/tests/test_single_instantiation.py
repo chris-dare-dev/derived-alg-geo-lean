@@ -63,6 +63,13 @@ class SingleInstantiationRecordTests(unittest.TestCase):
         with self.assertRaisesRegex(gate.BaselineError, "duplicate CategoryTheory.Existing"):
             self.records()
 
+    def test_conflicting_duplicate_owner_is_rejected(self) -> None:
+        self.legacy.write_text(
+            "Algebra\tCategoryTheory.Existing\tconflicting owner\n", encoding="utf-8"
+        )
+        with self.assertRaisesRegex(gate.BaselineError, "duplicate CategoryTheory.Existing"):
+            self.records()
+
     def test_conflicting_owner_and_wrong_shard_are_rejected(self) -> None:
         (self.shards / "CategoryTheory.txt").write_text(ALG, encoding="utf-8")
         with self.assertRaisesRegex(gate.BaselineError, "conflicts with shard CategoryTheory"):
@@ -85,25 +92,34 @@ class SingleInstantiationRecordTests(unittest.TestCase):
                     path.write_text(original, encoding="utf-8")
 
     def test_new_category_record_changes_only_its_owner_shard(self) -> None:
+        self.legacy.write_text(
+            "LinearAlgebra\tLinearAlgebra.Stale\tformer thin abstraction\n",
+            encoding="utf-8",
+        )
         before_legacy = self.legacy.read_bytes()
         before_algebra = (self.shards / "Algebra.txt").read_bytes()
         records = self.records()
         changed = gate.write_baseline(
-            sorted([*records, "CategoryTheory.New"]), MODULES, records,
-            self.legacy, self.shards,
+            ["Algebra.Existing", "CategoryTheory.Existing", "CategoryTheory.New"],
+            MODULES, records,
+            self.shards,
         )
         self.assertEqual(changed, [self.shards / "CategoryTheory.txt"])
         self.assertEqual(self.legacy.read_bytes(), before_legacy)
         self.assertEqual((self.shards / "Algebra.txt").read_bytes(), before_algebra)
         self.assertEqual(self.records()["CategoryTheory.New"].reason, gate.TODO)
+        self.assertIn("LinearAlgebra.Stale", self.records())
 
-    def run_gate(self, rows: str) -> tuple[int, str]:
+    def run_gate(self, rows: str, *, relax: bool = False) -> tuple[int, str]:
         sweep = self.root / "enum-inhabitants.txt"
         sweep.write_text(rows, encoding="utf-8")
         output = io.StringIO()
         with mock.patch.object(gate, "BASELINE", self.legacy), \
              mock.patch.object(gate, "RECORDS", self.shards), \
-             mock.patch.object(sys, "argv", ["check_single_instantiation.py", str(sweep)]), \
+             mock.patch.object(sys, "argv", [
+                 "check_single_instantiation.py", str(sweep),
+                 *(["--relax"] if relax else []),
+             ]), \
              redirect_stdout(output):
             status = gate.main()
         return status, output.getvalue()
@@ -127,6 +143,49 @@ class SingleInstantiationRecordTests(unittest.TestCase):
         status, output = self.run_gate(rows)
         self.assertEqual(status, 1)
         self.assertIn("belongs to module subject Algebra", output)
+
+    def test_record_owner_check_includes_live_names_with_two_inhabitants(self) -> None:
+        rows = (
+            "structure\tDerivedAlgGeo.Algebra.Existing\tCategoryTheory.Existing\n"
+            "inhabitant\tCategoryTheory.Existing\tfirst\n"
+            "inhabitant\tCategoryTheory.Existing\tsecond\n"
+        )
+        status, output = self.run_gate(rows)
+        self.assertEqual(status, 1)
+        self.assertIn("belongs to module subject Algebra", output)
+
+    def test_padded_todo_fails_both_check_and_relax(self) -> None:
+        rows = "structure\tDerivedAlgGeo.CategoryTheory.Existing\tCategoryTheory.Existing\n"
+        path = self.shards / "CategoryTheory.txt"
+        for reason in (" " + gate.TODO, gate.TODO + " "):
+            with self.subTest(reason=reason):
+                content = f"CategoryTheory\tCategoryTheory.Existing\t{reason}\n"
+                path.write_text(content, encoding="utf-8")
+                for relax in (False, True):
+                    status, output = self.run_gate(rows, relax=relax)
+                    self.assertEqual(status, 1)
+                    self.assertIn("surrounding whitespace", output)
+                    self.assertEqual(path.read_text(encoding="utf-8"), content)
+
+    def test_relax_adds_only_owner_shard_with_stale_legacy_record(self) -> None:
+        self.legacy.write_text(
+            "LinearAlgebra\tLinearAlgebra.Stale\tformer thin abstraction\n",
+            encoding="utf-8",
+        )
+        before_legacy = self.legacy.read_bytes()
+        before_algebra = (self.shards / "Algebra.txt").read_bytes()
+        rows = (
+            "structure\tDerivedAlgGeo.CategoryTheory.Existing\tCategoryTheory.Existing\n"
+            "structure\tDerivedAlgGeo.Algebra.Existing\tAlgebra.Existing\n"
+            "structure\tDerivedAlgGeo.CategoryTheory.New\tCategoryTheory.New\n"
+        )
+        status, output = self.run_gate(rows, relax=True)
+        self.assertEqual(status, 1)  # New exceptions require a written reason.
+        self.assertIn("CategoryTheory.New", output)
+        self.assertEqual(self.legacy.read_bytes(), before_legacy)
+        self.assertEqual((self.shards / "Algebra.txt").read_bytes(), before_algebra)
+        self.assertEqual(self.records()["CategoryTheory.New"].reason, gate.TODO)
+        self.assertIn("LinearAlgebra.Stale", self.records())
 
     def test_two_independent_git_branches_merge_without_shared_append_point(self) -> None:
         repo = self.root / "git-fixture"
@@ -154,7 +213,7 @@ class SingleInstantiationRecordTests(unittest.TestCase):
             git("switch", "-qc", branch, base)
             records = gate.read_baseline(legacy, shards)
             changed = gate.write_baseline(
-                sorted([*records, added]), MODULES, records, legacy, shards
+                sorted([*records, added]), MODULES, records, shards
             )
             self.assertEqual(changed, [shards / f"{gate.subject_of(MODULES[added])}.txt"])
             git("add", ".")
