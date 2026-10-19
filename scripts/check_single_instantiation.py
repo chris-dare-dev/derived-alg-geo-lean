@@ -35,10 +35,12 @@ file from scratch, so a regenerated baseline was indistinguishable from a review
 Between 2026-09-08 and 2026-09-14, 29 names drifted in that way -- against 80
 recorded -- while this gate ran only in `scripts/gates.sh` and never in CI. The
 reason now lives in each record, `--relax` preserves the reasons already there and
-returns nonzero for any name it had to write a `TODO` for, and a `TODO` that
-reaches a commit fails the gate. `--relax` can record a name; it cannot bless
-one. The 80 entries that predate the column carry a visible legacy marker rather
-than a silent pass, so the back-fill stays countable.
+returns nonzero for any name it had to write a `TODO` for, and a `TODO` for a
+current thin abstraction fails the gate. `--relax` can record a name; it cannot
+bless one. The 80 entries that predate the column carry a visible legacy marker
+rather than a silent pass, so the back-fill stays countable.
+`--relax` adds records without pruning stale ones; stale-record triage is a
+separate review decision.
 
 ## What counts as an inhabitant
 
@@ -125,6 +127,8 @@ def read_baseline(
             parts = line.split("\t")
             if len(parts) != 3 or any(not part.strip() for part in parts):
                 raise BaselineError(f"{path}:{line_number}: expected subject, name and reason")
+            if any(part != part.strip() for part in parts):
+                raise BaselineError(f"{path}:{line_number}: surrounding whitespace in a record field")
             subject, name, reason = parts
             if subject not in GENERIC_SUBJECTS:
                 raise BaselineError(f"{path}:{line_number}: unknown subject owner {subject}")
@@ -144,10 +148,10 @@ def read_baseline(
 
 def write_baseline(
     thin: list[str], modules: dict[str, str], records: dict[str, BaselineRecord],
-    legacy: pathlib.Path = BASELINE, shards: pathlib.Path = RECORDS,
+    shards: pathlib.Path = RECORDS,
 ) -> list[pathlib.Path]:
-    """Preserve old record locations and place each new exception with its owner."""
-    by_path: dict[pathlib.Path, list[tuple[str, str]]] = {}
+    """Add new exceptions to owner shards without pruning any existing record."""
+    additions: dict[pathlib.Path, list[tuple[str, str]]] = {}
     for name in thin:
         subject = subject_of(modules[name])
         previous = records.get(name)
@@ -156,18 +160,20 @@ def write_baseline(
                 f"{previous.path}:{previous.line}: {name} belongs to module subject "
                 f"{subject}, not recorded owner {previous.subject}"
             )
-        path = previous.path if previous else shards / f"{subject}.txt"
-        reason = previous.reason if previous else TODO
-        by_path.setdefault(path, []).append((name, f"{subject}\t{name}\t{reason}\n"))
+        if previous:
+            continue
+        path = shards / f"{subject}.txt"
+        additions.setdefault(path, []).append((name, f"{subject}\t{name}\t{TODO}\n"))
 
     touched: list[pathlib.Path] = []
-    paths = {legacy, *(record.path for record in records.values()), *by_path}
-    for path in sorted(paths):
-        content = "".join(row for _, row in sorted(by_path.get(path, [])))
-        if path != legacy and not content:
-            path.unlink()
-            touched.append(path)
-        elif not path.exists() or path.read_text(encoding="utf-8") != content:
+    for path in sorted(additions):
+        rows = [
+            (record.name, f"{record.subject}\t{record.name}\t{record.reason}\n")
+            for record in records.values() if record.path == path
+        ]
+        rows.extend(additions[path])
+        content = "".join(row for _, row in sorted(rows))
+        if not path.exists() or path.read_text(encoding="utf-8") != content:
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(content, encoding="utf-8")
             touched.append(path)
@@ -202,12 +208,12 @@ def main() -> int:
 
     try:
         records = read_baseline(BASELINE, RECORDS)
-        for name in thin:
-            previous = records.get(name)
-            if previous and previous.subject != subject_of(modules[name]):
+        for name, previous in records.items():
+            module = modules.get(name)
+            if module and previous.subject != subject_of(module):
                 raise BaselineError(
                     f"{previous.path}:{previous.line}: {name} belongs to module subject "
-                    f"{subject_of(modules[name])}, not recorded owner {previous.subject}"
+                    f"{subject_of(module)}, not recorded owner {previous.subject}"
                 )
     except (BaselineError, OSError, UnicodeError) as error:
         print(f"::error::single-instantiation records: {error}")
@@ -215,7 +221,7 @@ def main() -> int:
 
     if relax:
         missing = [n for n in thin if n not in records or records[n].reason == TODO]
-        touched = write_baseline(thin, modules, records, BASELINE, RECORDS)
+        touched = write_baseline(thin, modules, records, RECORDS)
         for path in touched:
             action = "wrote" if path.exists() else "removed"
             shown = path.relative_to(ROOT) if path.is_relative_to(ROOT) else path
@@ -284,7 +290,8 @@ def main() -> int:
     if stale:
         print(
             f"note: {len(stale)} baseline entry/entries now have more than "
-            f"{THRESHOLD}; `--relax` to drop them and lower the figure."
+            f"{THRESHOLD}; review and remove them separately. "
+            "`--relax` does not prune records."
         )
     return 0
 
