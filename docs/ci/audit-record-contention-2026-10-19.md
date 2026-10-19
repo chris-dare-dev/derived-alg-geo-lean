@@ -187,6 +187,13 @@ misassign an owner or corrupt a row; the gate rejects each bad state. The
 required PR `ci` result, including all three full axiom audits and the
 completeness ratchet, is the final verification of this pilot.
 
+At 2026-10-19 18:34 UTC, frozen draft PR #1847's
+[CI run 39298977534](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/runs/39298977534)
+had a successful `roadmap` job and an in-progress `build` job; it had no full
+audit verdict. That run belongs to the frozen attempt. The successor branch
+had no PR or CI run at that observation. Its own required PR checks must pass
+before normal merge; the loop-state comment records subsequent observed state.
+
 ## Integration ownership and next decision
 
 The active milestone-54 loop coordinator is the **single integration owner**
