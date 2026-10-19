@@ -139,10 +139,10 @@ duplicate name (including a duplicate across the old file and a shard), or a
 live name whose recorded owner disagrees with its emitted module. It reports
 both locations for a duplicate rather than allowing a set union to discard
 one. `--relax` preserves all existing records, including five current
-above-threshold exceptions reserved for #1394, and writes a new reason as a failing TODO
-in the new subject shard. Adding one new exception therefore changes only its
-subject file. A reviewer must replace that TODO with a reason before the gate
-passes.
+above-threshold exceptions for separately scoped follow-up under #1439, and
+writes a new reason as a failing TODO in the new subject shard. Adding one
+new exception therefore changes only its subject file. A reviewer must replace
+that TODO with a reason before the gate passes.
 
 The seeded local cache initially omitted two current SphericalTwist structures
 from the root-only `EnumInhabitants` sweep. That partial sweep counted 98 thin
