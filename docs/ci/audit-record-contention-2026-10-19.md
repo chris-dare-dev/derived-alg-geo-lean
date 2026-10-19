@@ -105,7 +105,7 @@ That supplemental sweep counts 100 thin names, three above threshold, and
 zero absent baseline names. A local root-target rebuild failed because the
 seeded cache imports older compiled versions of two unchanged defining modules:
 their current sources compile directly, but their cached imports omit
-`FixedTargetArrowExtension` and `freeYonedaSheafCoproduct`. This local root
+declarations that those sources now export. This local root
 build is not a full audit verdict. The gate now reports absent names separately
 from above-threshold ones, so a stale import cannot masquerade as a resolved
 exception. Required PR CI rebuilds the source graph and remains the full
