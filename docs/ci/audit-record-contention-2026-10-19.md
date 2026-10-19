@@ -73,7 +73,7 @@ print('PR query', len(prs), 'matched', len(matched),
 assert len(prs) == len(matched) == 222
 assert set(paths) - set(matched) == {'47db217d78f55a45f0899281649d643347159253'}
 def overlaps(a, b):
-    return a['createdAt'] <= b['mergedAt'] and b['createdAt'] <= a['mergedAt']
+    return a['createdAt'] < b['mergedAt'] and b['createdAt'] < a['mergedAt']
 for path, excluded, expected in (
     (names[0], 1619, (28, 30, 18)),
     (names[1], 1479, (15, 8, 1)),
