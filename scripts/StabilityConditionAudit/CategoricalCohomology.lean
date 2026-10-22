@@ -18,6 +18,8 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyLinea
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyLocalization
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyNaturality
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexSingle
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexSingleAddCommGrp
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexSingleModule
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexLocalization
 import DerivedAlgGeo.Algebra.Homology.Homotopy.HomologyModel
 import DerivedAlgGeo.Algebra.Homology.Homotopy.ModuleCatFormality
@@ -25,6 +27,8 @@ import DerivedAlgGeo.Algebra.Homology.Homotopy.FiniteCohomologyPresentation
 import DerivedAlgGeo.Algebra.Homology.Homotopy.FiniteCohomologyPresentationOfSupport
 import DerivedAlgGeo.Algebra.Homology.Localization
 import DerivedAlgGeo.Algebra.Homology.ShortComplex.Limits
+import DerivedAlgGeo.Algebra.Homology.ShortComplex.PreservesHomology
+import DerivedAlgGeo.CategoryTheory.Preadditive.AdditiveFunctor
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext.InjectiveResolutionNaturality
 import DerivedAlgGeo.CategoryTheory.Limits.Preserves.Shapes.Products
 import DerivedAlgGeo.CategoryTheory.Limits.Shapes.FiniteProducts
@@ -317,6 +321,23 @@ Scheme-specific consumers remain in AlgebraicGeometryAudit.
 #print axioms CochainComplex.HomComplex.singleRepresentedIso
 #print axioms CochainComplex.HomComplex.singleRepresentedHomologyAddEquiv
 #print axioms CochainComplex.HomComplex.singleRepresentedHomologyZeroAddEquiv
+#print axioms CochainComplex.HomComplex.singleRepresentedAddCommGrpHomologyAddEquiv
+#print axioms CochainComplex.HomComplex.addCommGrpSectionsComplex
+#print axioms CochainComplex.HomComplex.ordinaryAddCommGrpSourceIso
+#print axioms CochainComplex.HomComplex.addCommGrpSourceCycle
+#print axioms CochainComplex.HomComplex.addCommGrpSourceCycle_π
+#print axioms CochainComplex.HomComplex.addCommGrpSourceCycle_i
+#print axioms CochainComplex.HomComplex.singleRepresentedAddCommGrpHomologyAddEquiv_ofHom
+#print axioms CochainComplex.HomComplex.singleRepresentedAddCommGrp_incoming_boundary
+#print axioms CochainComplex.HomComplex.singleRepresentedAddCommGrpBoundaryCycle
+#print axioms CochainComplex.HomComplex.singleRepresentedAddCommGrp_boundary_killed
+#print axioms CochainComplex.HomComplex.singleRepresentedModuleHomologyAddEquiv
+#print axioms CochainComplex.HomComplex.ordinarySourceIso
+#print axioms CochainComplex.HomComplex.singleRepresentedModuleHomologyAddEquiv_ofHom
+#print axioms CategoryTheory.ShortComplex.homologyπ_mapHomologyIso_hom
+#print axioms CategoryTheory.ShortComplex.leftHomologyπ_mapLeftHomologyIso_hom
+#print axioms CategoryTheory.Functor.homAddEquiv
+#print axioms CategoryTheory.Functor.mapAddEquiv
 #print axioms CochainComplex.HomComplex.CohomologyClass.postcompCocycleAddMonoidHom
 #print axioms CochainComplex.HomComplex.CohomologyClass.postcompCocycleAddMonoidHom_apply
 #print axioms CochainComplex.HomComplex.CohomologyClass.postcompSc

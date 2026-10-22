@@ -15,6 +15,8 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexCohomologyNatur
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexLocalization
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexPostcomp
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexSingle
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexSingleAddCommGrp
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.HomComplexSingleModule
 
 /-!
 # The homotopy category
