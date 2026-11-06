@@ -64,7 +64,7 @@ noncomputable def intTwistScalarHom (d : ℤ) (r : k) :
     intTwistPresheaf ι k d ⟶ intTwistPresheaf ι k d :=
   (sheafToPresheaf _ _).map ((_root_.AlgebraicGeometry.Scheme.Modules.toSheaf _).map
     (Cohomology.varietyScalarAction (Proj (polynomialGrading ι k))
-      (associatedSheaf (polynomialGrading ι k) (intShift (polynomialGrading ι k) d)) r))
+      (associatedSheaf (polynomialGrading ι k) (intShift (polynomialGrading ι k) d)) r).asHom)
 
 /-- The induced map on degree `n`, read at one Čech index.
 

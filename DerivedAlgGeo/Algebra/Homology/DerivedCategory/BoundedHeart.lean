@@ -30,14 +30,20 @@ noncomputable def boundedSingleFunctor : C ⥤ Bounded C :=
   (TStructure.t (C := C)).bounded.lift (singleFunctor C 0) fun _ =>
     ⟨⟨0, inferInstance⟩, ⟨0, inferInstance⟩⟩
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 instance boundedSingleFunctor_additive : (boundedSingleFunctor C).Additive := by
   dsimp [boundedSingleFunctor]
   infer_instance
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 instance boundedSingleFunctor_full : (boundedSingleFunctor C).Full := by
   dsimp [boundedSingleFunctor]
   infer_instance
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 instance boundedSingleFunctor_faithful : (boundedSingleFunctor C).Faithful := by
   dsimp [boundedSingleFunctor]
   infer_instance

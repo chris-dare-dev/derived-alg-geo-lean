@@ -51,6 +51,8 @@ lemma IsClosed.app_mem_cocycles {α : HomogeneousNatTrans F G 0}
   rw [← show (0 : ℤ) + 1 = 1 by omega]
   exact hα.app_d X
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **A closed degree-zero dg natural transformation descends to `H⁰`.**
 
 The components are the classes of the dg components; naturality is graded

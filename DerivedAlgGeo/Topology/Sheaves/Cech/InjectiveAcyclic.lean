@@ -36,7 +36,7 @@ namespace TopologicalSpace.Opens
 variable {X : Type*} [TopologicalSpace X]
 
 local instance iicHasTerminal' (V : Opens X) : HasTerminal (Set.Iic V) :=
-  (IsTerminal.ofUniqueHom (Y := (⟨V, by exact le_refl V⟩ : Set.Iic V))
+  (IsTerminal.ofUniqueHom (X := (⟨V, by exact le_refl V⟩ : Set.Iic V))
     (fun U ↦ homOfLE U.2) (fun _ _ ↦ Subsingleton.elim _ _)).hasTerminal
 
 local instance iicHasLimitPair' (V : Opens X) {U W : Set.Iic V} :
@@ -85,6 +85,8 @@ end CategoryTheory.Limits.FormalCoproduct
 namespace CategoryTheory.Sheaf
 
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private lemma freeAbelianYonedaPresheafHomAddEquiv_precomp'
     {C : Type u} [Category.{u} C] {X Y : C} (f : X ⟶ Y)
     (G : Cᵒᵖ ⥤ AddCommGrpCat.{u})
@@ -189,6 +191,8 @@ private structure FreeCechStalkData {X : TopCat.{u}} {I : Type u}
   exactAt_succ (n : ℕ) : Kloc.ExactAt (n + 1)
   isIso (n : ℕ) : IsIso (comparison.f n)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private noncomputable def freeCechStalkData {X : TopCat.{u}} {I : Type u}
     (U : I → Opens X) (j : I) (x : X) (hx : x ∈ U j) :
     FreeCechStalkData U j x hx := by
@@ -286,7 +290,7 @@ private noncomputable def freeCechStalkData {X : TopCat.{u}} {I : Type u}
         Limits.Sigma.map p
       apply Limits.Sigma.hom_ext
       intro q
-      exact (Limits.Sigma.ι_desc
+      exact (Limits.Sigma.ι_comp_desc
         (fun q ↦ p q ≫ Limits.Sigma.ι B q) q).trans
           (Limits.Sigma.ι_map p q).symm
     rw [heval]
@@ -428,7 +432,7 @@ private noncomputable def sigmaHomAddEquiv
       left_inv := fun f ↦ by
         apply Limits.Sigma.hom_ext
         intro q
-        rw [Limits.Sigma.ι_desc]
+        rw [Limits.Sigma.ι_comp_desc]
         apply (e q).injective
         rw [AddEquiv.apply_symm_apply]
         exact congrFun (eT.apply_symm_apply _) q
@@ -436,7 +440,7 @@ private noncomputable def sigmaHomAddEquiv
         apply eT.injective
         rw [eT.apply_symm_apply]
         funext q
-        rw [Limits.Sigma.ι_desc]
+        rw [Limits.Sigma.ι_comp_desc]
         exact AddEquiv.apply_symm_apply _ _
       map_add' := fun f g ↦ by
         apply eT.injective
@@ -492,7 +496,7 @@ private lemma eval_ι_map
   change Limits.Sigma.ι (fun i ↦ F.obj (V.obj i)) q ≫
       Limits.Sigma.desc (fun i ↦ F.map (m.φ i) ≫
         Limits.Sigma.ι (fun j ↦ F.obj (W.obj j)) (m.f i)) = _
-  rw [Limits.Sigma.ι_desc]
+  rw [Limits.Sigma.ι_comp_desc]
 
 private lemma evalOp_map_π
     {C D : Type*} [Category C] [Category D] [HasProducts D]
@@ -507,7 +511,7 @@ private lemma evalOp_map_π
       Limits.Pi.π (fun j ↦ F.obj (op (W.obj j))) (m.f i) ≫
         F.map (m.φ i).op) ≫
       Limits.Pi.π (fun q ↦ F.obj (op (V.obj q))) q = _
-  rw [Limits.Pi.lift_π]
+  rw [Limits.Pi.lift_comp_π]
 
 set_option backward.isDefEq.respectTransparency false in
 private noncomputable def freeAbelianCechChainHomAddEquiv

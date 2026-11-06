@@ -182,8 +182,8 @@ def affineCoherentLocalizationDerivedComparison
   haveI : PreservesFiniteColimits (FR ⋙ F) := inferInstance
   haveI : PreservesFiniteLimits (G ⋙ FA) := inferInstance
   haveI : PreservesFiniteColimits (G ⋙ FA) := inferInstance
-  exact Functor.mapDerivedCategoryCompIso (Iso.refl (FR ⋙ F)) ≪≫
+  exact Functor.mapDerivedCategoryCompIsoOfIso (Iso.refl (FR ⋙ F)) ≪≫
     NatIso.mapDerivedCategory (Coh.affineTildePullbackIso (R := R) (A := A)) ≪≫
-      (Functor.mapDerivedCategoryCompIso (Iso.refl (G ⋙ FA))).symm
+      (Functor.mapDerivedCategoryCompIsoOfIso (Iso.refl (G ⋙ FA))).symm
 
 end AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange

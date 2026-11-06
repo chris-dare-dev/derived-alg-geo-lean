@@ -27,6 +27,8 @@ open TopCat TopologicalSpace
 namespace CategoryTheory.Sheaf
 
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private lemma freeAbelianYonedaPresheafHomAddEquiv_precomp
     {C : Type u} [Category.{u} C] {X Y : C} (f : X ⟶ Y)
     (G : Cᵒᵖ ⥤ AddCommGrpCat.{u})
@@ -69,6 +71,8 @@ private lemma freeAbelianYonedaSheafHomAddEquiv_precomp
   rw [Adjunction.homEquiv_naturality_left]
   exact freeAbelianYonedaPresheafHomAddEquiv_precomp f G.obj _
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- An injective sheaf of abelian groups on a topological space is flasque. -/
 lemma isFlasque_of_injective {X : TopCat.{u}}
     (I : TopCat.Sheaf AddCommGrpCat.{u} X) [hI : Injective I] :

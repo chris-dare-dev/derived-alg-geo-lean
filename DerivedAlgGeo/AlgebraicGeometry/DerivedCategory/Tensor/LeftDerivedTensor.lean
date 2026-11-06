@@ -416,6 +416,8 @@ noncomputable def exactLeftCounit (X : Scheme.{u}) (L : X.Modules)
   (Scheme.Modules.tensorLeftFunctor L).mapDerivedCategoryFactors.hom ≫
     (Functor.isoWhiskerRight (singleLeftTensorIso X L).symm (SchemeDerivedCategory.Q X)).hom
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 noncomputable instance exactLeftCounit_isIso (X : Scheme.{u}) (L : X.Modules)
     [SheafOfModules.IsInvertible.{u, u, u}
       (show SheafOfModules X.ringCatSheaf from L)] :
@@ -551,6 +553,8 @@ def derivedTensor (R : TensorAcyclicResolution X) :
   Localization.lift₂ R.resolvedTensor R.tensor_inverts
     (SchemeDerivedCategory.Q X) (SchemeDerivedCategory.Q X)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Pulling the derived tensor back to complexes recovers the resolved tensor. -/
 def derivedTensorFactors (R : TensorAcyclicResolution X) :
     (((Functor.whiskeringLeft₂ (SchemeDerivedCategory X)).obj

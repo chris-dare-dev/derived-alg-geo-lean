@@ -107,6 +107,8 @@ theorem representableFppfStackMap_hasRepresentableProperty
              (RepresentableZariskiStackMap.fiberRepresentation f y).fiberEquivalence
            property := P.pullback_snd f y.as hf }⟩
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The identity atlas of a representable fppf stack is smooth and
 surjective on every representing scheme. -/
 theorem representableFppfStackMap_id_isSmoothSurjective (X : Scheme.{u}) :

@@ -175,7 +175,7 @@ private lemma iota_retraction_projection_smul_precomp {A B : AddCommGrpCat.{w}}
         adjacentColumnTotalRetraction K p n ≫
         (adjacentColumnTotalShortComplex K (p + 1)).g.f n = 0 := by
   simp only [Linear.units_smul_comp, Category.assoc,
-    iota_retraction_projection, dif_neg hi]
+    iota_retraction_projection, dite_eq_right hi]
   rw [← Linear.units_smul_comp, ← Category.assoc]
   exact comp_zero
 
@@ -225,7 +225,7 @@ lemma singleColumnTotalι_section_d_retraction_projection (p q : ℤ) :
   dsimp [singleColumnTotalι, adjacentColumnTotalSection]
   simp only [Category.assoc]
   rw [HomologicalComplex₂.ι_totalDesc_assoc]
-  simp only [dif_pos trivial]
+  simp only [dite_eq_left trivial]
   simp only [← Category.assoc]
   rw [singleColumnXIso_inv_hom_f]
   simp only [Category.id_comp]
@@ -279,7 +279,7 @@ lemma singleColumnTotalι_section_d_retraction_projection (p q : ℤ) :
         (((HomologicalComplex.stupidTrunc K
           (ComplexShape.embeddingUpIntGE p)).X p).d q (q + 1))
         p.negOnePow (by omega) (by omega)]
-      simp only [dif_pos (show p + 1 ≤ p + 1 by omega), add_zero]
+      simp only [dite_eq_left (show p + 1 ≤ p + 1 by omega), add_zero]
       erw [stupidTruncBoundary_assoc K p q]
       slice_lhs 2 4 =>
         erw [adjacentProjectionIota K (p + 1) q (p + 1 + q)]

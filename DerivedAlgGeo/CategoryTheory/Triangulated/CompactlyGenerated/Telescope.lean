@@ -50,7 +50,7 @@ omit [HasZeroObject C] [HasShift C ℤ] [Preadditive C]
 theorem ι_shiftMap (n : ℕ) :
     Sigma.ι X n ≫ shiftMap X f = f n ≫ Sigma.ι X (n + 1) := by
   simpa only [shiftMap] using
-    (Sigma.ι_desc (fun n ↦ f n ≫ Sigma.ι X (n + 1)) n)
+    (Sigma.ι_comp_desc (fun n ↦ f n ≫ Sigma.ι X (n + 1)) n)
 
 /-- The morphism whose cone defines the mapping telescope. -/
 noncomputable def map : (∐ X) ⟶ (∐ X) :=
@@ -78,7 +78,7 @@ theorem ι_projection (i n : ℕ) :
     Sigma.ι X i ≫ projection X n =
       if h : i = n then eqToHom (congrArg X h) else 0 := by
   simpa only [projection] using
-    (Sigma.ι_desc
+    (Sigma.ι_comp_desc
       (fun i => if h : i = n then eqToHom (congrArg X h) else 0) i)
 
 omit [HasZeroObject C] [HasShift C ℤ]
@@ -111,8 +111,8 @@ theorem shiftMap_projection_succ (n : ℕ) :
     rw [← Category.assoc, ι_projection_self, Category.id_comp]
     simp
   · have hs : i + 1 ≠ n + 1 := by omega
-    rw [dif_neg hs, comp_zero, ← Category.assoc, ι_projection,
-      dif_neg h, zero_comp]
+    rw [dite_eq_right hs, comp_zero, ← Category.assoc, ι_projection,
+      dite_eq_right h, zero_comp]
 
 omit [HasZeroObject C] [HasShift C ℤ]
   [∀ n : ℤ, (shiftFunctor C n).Additive]
@@ -168,7 +168,7 @@ theorem eq_zero_of_comp_map_eq_zero (a : K ⟶ ∐ X)
         symm
         refine (Finset.sum_eq_single i ?_ ?_).trans ?_
         · intro j hj hji
-          rw [dif_neg hji, comp_zero]
+          rw [dite_eq_right hji, comp_zero]
         · intro hnot
           exact (hnot hi).elim
         · simp
@@ -250,7 +250,7 @@ theorem exists_desc {Z : C} (g : ∀ n, X n ⟶ Z)
     apply Sigma.hom_ext
     intro n
     rw [← Category.assoc, ι_map]
-    simp only [Preadditive.sub_comp, Sigma.ι_desc,
+    simp only [Preadditive.sub_comp, Sigma.ι_comp_desc,
       Category.assoc, comp_zero]
     rw [hcompat n, sub_self]
   exact Triangle.yoneda_exact₂
@@ -264,7 +264,7 @@ theorem exists_desc_comp_ι {Z : C} (g : ∀ n, X n ⟶ Z)
     ∃ k : T.obj ⟶ Z, ∀ n, Sigma.ι X n ≫ T.hom ≫ k = g n := by
   obtain ⟨k, hk⟩ := T.exists_desc g hcompat
   refine ⟨k, fun n ↦ ?_⟩
-  rw [← hk, Sigma.ι_desc]
+  rw [← hk, Sigma.ι_comp_desc]
 
 /-- The canonical map from a stage into the mapping telescope. -/
 noncomputable def inclusion (n : ℕ) : X n ⟶ T.obj :=
@@ -373,7 +373,7 @@ theorem exists_transition_comp_eq_zero (n : ℕ) (b : K ⟶ X n)
         · subst n
           have h0 : q ≫ projection X 0 = b := by
             simpa [Category.assoc, map_projection_zero] using h.symm
-          rw [dif_pos le_rfl, h0, transition_self, Category.comp_id]
+          rw [dite_eq_left le_rfl, h0, transition_self, Category.comp_id]
         · have hnle : ¬ n ≤ 0 := by omega
           simpa [Category.assoc, map_projection_zero, hn, hnle] using h.symm
     | succ j ih =>
@@ -387,8 +387,8 @@ theorem exists_transition_comp_eq_zero (n : ℕ) (b : K ⟶ X n)
           have hnext : q ≫ projection X (j + 1) =
               (q ≫ projection X j) ≫ f j :=
             sub_eq_zero.mp hrel.symm
-          rw [dif_pos (hnj.trans (Nat.le_succ j)), hnext, ih,
-            dif_pos hnj, transition_succ, Category.assoc]
+          rw [dite_eq_left (hnj.trans (Nat.le_succ j)), hnext, ih,
+            dite_eq_left hnj, transition_succ, Category.assoc]
         · by_cases heq : n = j + 1
           · subst n
             have hrel : b = q ≫ projection X (j + 1) -
@@ -400,7 +400,7 @@ theorem exists_transition_comp_eq_zero (n : ℕ) (b : K ⟶ X n)
             have hnext : q ≫ projection X (j + 1) = b := by
               rw [hprev, zero_comp, sub_zero] at hrel
               exact hrel.symm
-            rw [dif_pos (by omega), hnext, transition_self, Category.comp_id]
+            rw [dite_eq_left (by omega), hnext, transition_self, Category.comp_id]
           · have hnle : ¬ n ≤ j + 1 := by omega
             have hrel : 0 = q ≫ projection X (j + 1) -
                 (q ≫ projection X j) ≫ f j := by
@@ -411,7 +411,7 @@ theorem exists_transition_comp_eq_zero (n : ℕ) (b : K ⟶ X n)
             have hnext : q ≫ projection X (j + 1) = 0 := by
               rw [hprev, zero_comp, sub_zero] at hrel
               exact hrel.symm
-            rw [dif_neg hnle, hnext]
+            rw [dite_eq_right hnle, hnext]
   obtain ⟨s, g, hqsum⟩ := hK.exists_finite_sum X q
   let m : ℕ := max n (s.sup id) + 1
   have hnm : n ≤ m := by omega
@@ -428,10 +428,10 @@ theorem exists_transition_comp_eq_zero (n : ℕ) (b : K ⟶ X n)
     have hne : i ≠ m := by
       intro him
       exact hmnot (him ▸ hi)
-    rw [dif_neg hne, comp_zero]
+    rw [dite_eq_right hne, comp_zero]
   refine ⟨m, hnm, ?_⟩
   have hm := hcoeff m
-  rw [dif_pos hnm, hqproj] at hm
+  rw [dite_eq_left hnm, hqproj] at hm
   exact hm.symm
 
 /-- Equality after mapping into the telescope is witnessed at a finite later

@@ -86,6 +86,8 @@ theorem shift (n : ℤ) : IsCompactObject.{w} (K⟦n⟧) := by
 
 end IsCompactObject
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private instance : (preadditiveYoneda (C := C)).flip.Additive where
   map_add {X Y} f g := by
     ext X x
@@ -226,7 +228,8 @@ theorem extension (T : Triangle C) (hT : T ∈ distTriang C)
       (preadditiveYoneda.flip.map T.mor₁.op) using 1; rfl
   have hc₄ : i₄ ≫ g₄ = f₄ ≫ i₅ := by
     convert colimitPost_naturality D
-      (preadditiveYoneda.flip.map T.invRotate.mor₁.op) using 1 <;> rfl
+      (preadditiveYoneda.flip.map T.invRotate.mor₁.op) using 1
+    rfl
   have hA₁ : IsCompactObject.{w} T.rotate.obj₃ := by
     change IsCompactObject.{w} (T.obj₁⟦(1 : ℤ)⟧)
     exact h₁.shift 1

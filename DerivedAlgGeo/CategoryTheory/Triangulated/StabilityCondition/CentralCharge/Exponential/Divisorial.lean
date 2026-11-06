@@ -77,8 +77,8 @@ theorem ChargeCoordinates.twistByScalar_eq_exp (D : ChargeCoordinates N) (β : �
       Exp.twist 2 β ![D.hyperplaneSquare * D.rank E, D.degree E, D.chTwo E] := by
   funext i
   fin_cases i <;>
-    norm_num [Exp.twist_apply, Fin.sum_univ_succ, Nat.factorial,
-      ChargeCoordinates.twistByScalar] <;> ring
+    simp [Exp.twist_apply, Fin.sum_univ_succ, ChargeCoordinates.twistByScalar,
+      Fin.succ] <;> ring
 
 /-- Along `B = βH`, twisting in the full divisor space commutes with compression.
 For an arbitrary `B`, the compressed degrees do not determine the twist. -/
@@ -198,13 +198,13 @@ theorem moments_rankOne (ch : ChernCharacter N D) (S : DivisorSpace D) (H : D)
   | 1 =>
     simp only [moments, tripleMoments, Exp.moments, cPair, StabilityParameters.rankOne,
       Exp.alphaBetaChart, DivisorSpace.pair, ChernCharacter.toRealExtension_apply,
-      map_smul, smul_eq_mul, LinearMap.smul_apply, dif_pos (by omega : (1:ℕ) ≤ 2), pow_one]
+      map_smul, smul_eq_mul, LinearMap.smul_apply, dite_eq_left (by omega : (1:ℕ) ≤ 2), pow_one]
     norm_num
     apply Complex.ext <;> simp
   | 2 =>
     simp only [moments, tripleMoments, Exp.moments, cSelf, StabilityParameters.rankOne,
       Exp.alphaBetaChart, DivisorSpace.pair, ChernCharacter.toRealExtension_apply,
-      map_smul, smul_eq_mul, LinearMap.smul_apply, dif_pos (by omega : (2:ℕ) ≤ 2)]
+      map_smul, smul_eq_mul, LinearMap.smul_apply, dite_eq_left (by omega : (2:ℕ) ≤ 2)]
     norm_num
     apply Complex.ext <;>
       simp [Complex.add_re, Complex.add_im, Complex.mul_re, Complex.mul_im,

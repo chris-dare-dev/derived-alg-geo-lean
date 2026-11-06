@@ -51,6 +51,8 @@ variable {A : Type u} {B : Type u'}
   (leftAdj : DGAdjunction L S) (rightAdj : DGAdjunction S R)
   (K : rightAdj.CounitConeData) [IsPretriangulated B]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **The twist adjunction comparison factors through inverse rotation.**
 
 The descended dg comparison is the first map of the inverse-rotated twist

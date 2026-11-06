@@ -68,7 +68,7 @@ def kFlatAffineExactSchemeModuleComparison
 private instance tilde_additive_of_commRing
     {R : Type u} [CommRing R] :
     (tilde.functor (CommRingCat.of R)).Additive :=
-  AlgebraicGeometry.instAdditiveModuleCatCarrierModulesSpecOfFunctor
+  AlgebraicGeometry.instAdditiveModuleCatCarrierModulesSpecFunctor
 
 private instance tilde_preservesFiniteLimits_of_commRing
     {R : Type u} [CommRing R] :

@@ -86,7 +86,7 @@ lemma homologyZeroIso_naturality {Y : A} (f : X ⟶ Y) :
         (Λ.chainComplexXZeroIso Y).inv) ≫
           ι.map (Λ.chainComplexXZeroIso Y).hom ≫ Λ.π.app Y =
         (ι.map (Λ.chainComplexXZeroIso X).hom ≫ Λ.π.app X) ≫ f
-      simp only [Functor.map_comp, Category.assoc, Iso.map_inv_hom_id_assoc,
+      simp only [Functor.map_comp, Category.assoc, Iso.inv_hom_id_map_assoc,
         Λ.π_naturality X Y f]
     _ = (KX.pOpcycles 0 ≫ KX.isoHomologyι₀.inv) ≫
         ((Λ.homologyZeroIso ι X).hom ≫ f) := by

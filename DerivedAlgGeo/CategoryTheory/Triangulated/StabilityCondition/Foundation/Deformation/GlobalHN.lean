@@ -278,7 +278,7 @@ theorem deformedHN_exists
             hε₀10 hWide hε hεε₀ hε2 hε8 hsin
             (by
               have hphase : F.φ last ≤ F.φ j :=
-                F.hφ.antitone (Fin.mk_le_mk.mpr (by change j.val ≤ F.n - 1; omega))
+                F.hφ.antitone (Fin.mk_le_mk.mpr (by omega))
               dsimp [bottom]
               linarith)
             (F.semistable j) hj)
@@ -293,7 +293,7 @@ theorem deformedHN_exists
               (by
                 have hphase : F.φ j ≤ F.φ first :=
                   F.hφ.antitone
-                    (Fin.mk_le_mk.mpr (by change 0 ≤ j.val; exact Nat.zero_le j.val))
+                    (Fin.mk_le_mk.mpr (by exact Nat.zero_le j.val))
                 dsimp [top]
                 linarith)
               (F.semistable j) hj))

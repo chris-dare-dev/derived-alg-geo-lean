@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/workflows/ci.yml)
 [![Documentation](https://github.com/chris-dare-dev/derived-alg-geo-lean/actions/workflows/docs.yml/badge.svg)](https://chris-dare-dev.github.io/derived-alg-geo-lean/)
-[![Lean](https://img.shields.io/badge/Lean-v4.32.1-blue.svg)](https://github.com/leanprover/lean4/releases/tag/v4.32.1)
+[![Lean](https://img.shields.io/badge/Lean-v4.35.0-blue.svg)](https://github.com/leanprover/lean4/releases/tag/v4.35.0)
 [![License](https://img.shields.io/badge/license-MIT%20%2F%20Apache--2.0-blue.svg)](LICENSE.md)
 
 `DerivedAlgGeo` is a Lean 4 library for derived algebraic geometry. Its current
@@ -34,7 +34,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition
 ```
 
-The repository is pinned to Lean and Mathlib v4.32.1. From a checkout, fetch the
+The repository is pinned to Lean and Mathlib v4.35.0. From a checkout, fetch the
 Mathlib cache and build the module you are working on:
 
 ```bash

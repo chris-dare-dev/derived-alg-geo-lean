@@ -48,7 +48,7 @@ variable (k : Type u) [Field k]
 local instance moduleCat_isArtinianObject (M : ModuleCat.{u} k)
     [IsArtinian k M] : IsArtinianObject M := by
   apply ObjectProperty.is_of_prop isArtinianObject
-  exact RelHomClass.isWellFounded
+  exact RelHomClass.wellFounded'
     (ModuleCat.subobjectModule M).toOrderEmbedding.ltEmbedding
 
 /-- A finitely generated vector space is Artinian as an object of

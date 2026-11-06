@@ -38,6 +38,8 @@ variable (k : Type v) [Field k]
   [DGLinear k C] [HomFiniteBounded k (H0 C)]
   {E : C}
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Supplied finite cohomology presentations compute every scalar-linear
 evaluation class by the Euler pairing. -/
 theorem IsEulerCopower.ofFiniteCohomologyPresentations

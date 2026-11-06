@@ -218,7 +218,7 @@ def intLatticeMap : IntLattice →+ Divisor :=
     (fun x => (((x 0 : ℤ) : ℝ), ((x 1 : ℤ) : ℝ), ((x 2 : ℤ) : ℝ)))
     (by
       intro x y
-      ext <;> simp <;> push_cast <;> ring)
+      ext <;> simp)
 
 @[simp]
 theorem intLatticeMap_apply (x : IntLattice) :
@@ -254,7 +254,7 @@ theorem intLatticeMap_antiCanonical :
     intLatticeMap ![3, -1, -1]
       = numericalRealization.realizePolarization antiCanonicalPolarization := by
   rw [antiCanonicalPolarization, numericalRealization_polarization]
-  ext <;> simp [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons] <;> norm_num
+  ext <;> simp [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
 
 /-! ### The anticanonical ray -/
 

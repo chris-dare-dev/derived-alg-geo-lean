@@ -166,9 +166,9 @@ def affineSchemeModuleExactDerivedPullbackComparison
   letI : PreservesFiniteLimits G := inferInstance
   letI : PreservesFiniteColimits F := inferInstance
   letI : PreservesFiniteColimits G := inferInstance
-  exact Functor.mapDerivedCategoryCompIso (Iso.refl F) ≪≫
+  exact Functor.mapDerivedCategoryCompIsoOfIso (Iso.refl F) ≪≫
     NatIso.mapDerivedCategory (Scheme.Modules.pullbackSpecMapTildeIso f) ≪≫
-      (Functor.mapDerivedCategoryCompIso (Iso.refl G)).symm
+      (Functor.mapDerivedCategoryCompIsoOfIso (Iso.refl G)).symm
 
 /-- On derived categories, affine global sections identify exact pullback
 with derived extension of scalars. -/
@@ -191,9 +191,9 @@ def affineQuasicoherentDerivedPullbackGammaIso
   letI : PreservesFiniteColimits H := by
     dsimp [H]
     exact comp_preservesFiniteColimits _ _
-  exact Functor.mapDerivedCategoryCompIso
+  exact Functor.mapDerivedCategoryCompIsoOfIso
       (affineQuasicoherentSheavesPullbackGammaIso f) ≪≫
-    (Functor.mapDerivedCategoryCompIso (Iso.refl H)).symm
+    (Functor.mapDerivedCategoryCompIsoOfIso (Iso.refl H)).symm
 
 /-- Exact affine derived pullback is extension of scalars transported
 through the affine derived equivalences. -/

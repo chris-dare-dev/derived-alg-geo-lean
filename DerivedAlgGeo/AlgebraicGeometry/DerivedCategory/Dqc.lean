@@ -224,6 +224,8 @@ noncomputable def coherentDerivedInclusion
       (Coh.ι_additive X) (Coh.ι_preservesFiniteLimits X)
       (Coh.ι_preservesFiniteColimits X)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The derived coherent-sheaf inclusion has quasi-coherent cohomology in
 every degree.  This is proved by exactness of `Coh.ι`, not postulated as a
 geometric realization. -/

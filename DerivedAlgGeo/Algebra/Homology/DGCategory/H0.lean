@@ -394,6 +394,8 @@ lemma h0_map_mk (F : DGFunctor C D) {X Y : H0 C} (f : cocycles (H0.of C X) (H0.o
     F.h0.map (QuotientAddGroup.mk f) =
       QuotientAddGroup.mk ⟨F.map 0 f.1, F.map_mem_cocycles f.2⟩ := rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- `H⁰` of the identity dg functor is the identity. -/
 def h0IdIso : (DGFunctor.id C).h0 ≅ 𝟭 (H0 C) :=
   NatIso.ofComponents (fun _ => Iso.refl _) (by
@@ -419,6 +421,8 @@ theorem h0IdIso_inv_app (X : H0 C) :
     (h0IdIso (C := C)).inv.app X = 𝟙 _ :=
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- `H⁰` takes composition of dg functors to composition of functors. -/
 def h0CompIso (F : DGFunctor C D) (G : DGFunctor D E) :
     (F.comp G).h0 ≅ F.h0 ⋙ G.h0 :=
@@ -444,6 +448,8 @@ theorem h0CompIso_inv_app (F : DGFunctor C D) (G : DGFunctor D E) (X : H0 C) :
     (h0CompIso F G).inv.app X = 𝟙 _ :=
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The `H⁰` composition comparison satisfies the pseudofunctor
 associativity law.  The ordinary functor associator is retained explicitly
 even though dg-functor composition is strict. -/
@@ -465,6 +471,8 @@ theorem h0CompIso_assoc {B : Type u'''} [DGCategory.{v} B]
   change 𝟙 _ ≫ 𝟙 _ ≫ 𝟙 _ = 𝟙 _ ≫ 𝟙 _
   simp
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The `H⁰` composition comparison is coherent with right composition by
 the identity dg functor and the ordinary right unitor. -/
 theorem h0CompIso_comp_id (F : DGFunctor C D) :
@@ -480,6 +488,8 @@ theorem h0CompIso_comp_id (F : DGFunctor C D) :
   change 𝟙 (F.h0.obj X) ≫ 𝟙 _ ≫ 𝟙 _ = 𝟙 _
   simp
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The `H⁰` composition comparison is coherent with left composition by
 the identity dg functor and the ordinary left unitor. -/
 theorem h0CompIso_id_comp (F : DGFunctor C D) :

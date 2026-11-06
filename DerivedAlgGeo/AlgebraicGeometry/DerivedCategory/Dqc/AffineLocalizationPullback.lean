@@ -189,7 +189,7 @@ def affineLocalizationDerivedCounitIso :
   letI := affineLocalizationExtendScalars_additive (R := R) (A := A)
   letI := affineLocalizationExtendScalars_preservesFiniteLimits
     (R := R) (A := A) M
-  exact Functor.mapDerivedCategoryCompIso
+  exact Functor.mapDerivedCategoryCompIsoOfIso
       (affineLocalizationExtendRestrictCounitIso M) ≪≫
     Functor.mapDerivedCategoryIdIso (ModuleCat.{u} A)
 

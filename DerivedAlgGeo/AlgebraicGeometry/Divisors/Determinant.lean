@@ -64,6 +64,8 @@ theorem isLocallyFree {E : X.Modules} {n : ℕ}
   letI : D.localGenerators.IsLocallyFreeData := D.isLocallyFreeData
   exact D.localGenerators.isLocallyFree
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Transport a fixed-rank locally free atlas across an isomorphism. -/
 noncomputable def ofIso {E F : X.Modules} {n : ℕ}
     (D : FiniteLocallyFreeData E n) (e : E ≅ F) :

@@ -78,9 +78,9 @@ theorem coherentHZeroSectionsAddEquiv_smul (Y : Scheme.{u})
       r • (show linearGlobalSectionsObj (k := k) Y ((Coh.ι Y).obj F) from
         coherentHZeroSectionsAddEquiv Y F x) := by
   change coherentHZeroSectionsAddEquiv Y F
-      ((coherentH Y 0).map (coherentScalarAction Y F r) x) =
+      ((coherentH Y 0).map (coherentScalarAction Y F r).asHom x) =
     baseFieldToGlobalSections Y r • coherentHZeroSectionsAddEquiv Y F x
-  rw [← coherentHZeroSectionsAddEquiv_naturality Y (coherentScalarAction Y F r) x]
+  rw [← coherentHZeroSectionsAddEquiv_naturality Y (coherentScalarAction Y F r).asHom x]
   change ((globalSectionSmul ((Coh.ι Y).obj F) (baseFieldToGlobalSections Y r)).val.app
       (op (⊤ : Y.Opens))).hom (coherentHZeroSectionsAddEquiv Y F x) = _
   rw [globalSectionSmul_app]

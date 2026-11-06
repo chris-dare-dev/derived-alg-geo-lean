@@ -19,8 +19,8 @@ sheaf, or other geometric input occurs here.
 
 ## Main definitions
 
-* `NatIso.mapDerivedCategory`, `Functor.mapDerivedCategoryIdIso`, and
-  `Functor.mapDerivedCategoryCompIso`: the pseudofunctoriality of
+* `NatIso.mapDerivedCategory` and `Functor.mapDerivedCategoryCompIsoOfIso`: with Mathlib's
+  `Functor.mapDerivedCategoryIdIso`, the pseudofunctoriality of
   `Functor.mapDerivedCategory`, each obtained from the corresponding
   isomorphism on complexes through the universal property of the
   localization (`Localization.liftNatIso`);
@@ -36,6 +36,22 @@ sheaf, or other geometric input occurs here.
 ## Main results
 
 * `mapDerivedCategory_bounded`: an exact functor preserves bounded objects.
+
+## Implementation notes
+
+Mathlib v4.35 added `Functor.mapDerivedCategoryIdIso` and a `Functor.mapDerivedCategoryCompIso`
+for the composite `F ⋙ G` itself. The identity isomorphism formerly defined here had the same
+statement and was removed in favour of Mathlib's; the composite isomorphism here takes an
+arbitrary factorization `F ⋙ G ≅ H` and is named `Functor.mapDerivedCategoryCompIsoOfIso`.
+
+## References
+
+* Mathlib `Algebra/Homology/DerivedCategory/ExactFunctor.lean`, which defines
+  `Functor.mapDerivedCategory` and its identity and composite isomorphisms.
+
+## Tags
+
+derived category, exact functor, t-structure, pseudofunctor
 -/
 
 attribute [local instance] HasDerivedCategory.standard
@@ -170,26 +186,17 @@ noncomputable def NatIso.mapDerivedCategory {F G : A ⥤ B} [F.Additive]
     (Functor.isoWhiskerRight (NatIso.mapHomologicalComplex e (ComplexShape.up ℤ))
       DerivedCategory.Q)
 
-variable (A) in
-/-- The derived functor of the identity is the identity, up to the natural
-isomorphism lifted from `Functor.mapHomologicalComplexIdIso`.  The category is
-explicit because nothing else determines it. -/
-noncomputable def Functor.mapDerivedCategoryIdIso :
-    (𝟭 A).mapDerivedCategory ≅ 𝟭 (DerivedCategory A) :=
-  Localization.liftNatIso DerivedCategory.Q
-    (HomologicalComplex.quasiIso A (ComplexShape.up ℤ))
-    ((𝟭 A).mapHomologicalComplex (ComplexShape.up ℤ) ⋙ DerivedCategory.Q)
-    DerivedCategory.Q
-    (𝟭 A).mapDerivedCategory (𝟭 (DerivedCategory A))
-    (Functor.isoWhiskerRight (Functor.mapHomologicalComplexIdIso A (ComplexShape.up ℤ))
-      DerivedCategory.Q ≪≫ Functor.leftUnitor _)
+-- `Functor.mapDerivedCategoryIdIso`, formerly defined here, is upstream in Mathlib since v4.35
+-- (`Mathlib/Algebra/Homology/DerivedCategory/ExactFunctor.lean`) with the same statement.
 
 /-- A factorization `F ⋙ G ≅ H` of exact functors induces the factorization of
 the derived functors, in the shape of `Functor.mapHomologicalComplexCompIso`:
 the composite is given as a third functor `H` so that a caller need not
 elaborate `(F ⋙ G).mapDerivedCategory`, whose exactness instances
-`comp_preservesFiniteLimits` does not supply by search. -/
-noncomputable def Functor.mapDerivedCategoryCompIso {F : A ⥤ B} {G : B ⥤ C} {H : A ⥤ C}
+`comp_preservesFiniteLimits` does not supply by search. Mathlib's
+`Functor.mapDerivedCategoryCompIso` (v4.35) is the special case `H = F ⋙ G`; this
+declaration carried that name until the toolchain bump. -/
+noncomputable def Functor.mapDerivedCategoryCompIsoOfIso {F : A ⥤ B} {G : B ⥤ C} {H : A ⥤ C}
     (e : F ⋙ G ≅ H)
     [F.Additive] [PreservesFiniteLimits F] [PreservesFiniteColimits F]
     [G.Additive] [PreservesFiniteLimits G] [PreservesFiniteColimits G]

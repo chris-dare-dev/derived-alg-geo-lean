@@ -45,6 +45,8 @@ private theorem mapFunctor_comp_general {C D E : Type u}
   induction P using Subobject.ind with
   | h f => simp only [Subobject.mapFunctor_mk, Functor.comp_map]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The actual coherent tilde inclusion for a chosen finite `N ≤ M`, pulled
 back from `Spec R` to the basic open `D(r)`. -/
 def basicOpenChosenTildeSubobject {R : CommRingCat.{u}} [IsNoetherianRing R]
@@ -60,6 +62,8 @@ def basicOpenChosenTildeSubobject {R : CommRingCat.{u}} [IsNoetherianRing R]
   letI : G.PreservesMonomorphisms := inferInstance
   exact Subobject.mapFunctor G (coherentTildeSubobject M E cR N hN)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Restrict a coherent subobject on `D(a)` along `D(x) ⊆ D(a)`, using the
 pullback-composition isomorphism to place it on the canonical `D(x)` pullback. -/
 def restrictBasicOpenSubobject {R : CommRingCat.{u}} [IsNoetherianRing R]
@@ -86,6 +90,8 @@ def restrictBasicOpenSubobject {R : CommRingCat.{u}} [IsNoetherianRing R]
     (Coh.pullbackComp i ja) ≪≫ eqToIso (congrArg Coh.pullback hi)
   exact (Subobject.map (η.app E).hom).obj (Subobject.mapFunctor F S)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private theorem restrictBasicOpenSubobject_chosen {R : CommRingCat.{u}}
     [IsNoetherianRing R] (a x : R)
     (h : PrimeSpectrum.basicOpen x ≤ PrimeSpectrum.basicOpen a)

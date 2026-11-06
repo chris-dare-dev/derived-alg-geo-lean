@@ -466,7 +466,7 @@ theorem heartFunctor_finiteExact
     (r : t.Restriction F) :
     PreservesFiniteLimits r.heartFunctor ∧
       PreservesFiniteColimits r.heartFunctor := by
-  exact ((Functor.exact_tfae r.heartFunctor).out 0 3).1
+  exact ((Functor.exact_tfae r.heartFunctor).out 1 4).1
     (heartFunctor_shortExact r)
 
 /-- The restricted heart functor preserves binary joins of subobjects.

@@ -97,7 +97,7 @@ a category this file does not own. Named rather than anonymous because the gener
 type carries an underscore, which the naming linter rejects. -/
 noncomputable local instance monoidalCategoryAssociatedPresheaf :
     MonoidalCategory (PresheafOfModules (𝒪.1 ⋙ forget₂ CommRingCat RingCat)) :=
-  PresheafOfModules.monoidalCategory (R := 𝒪.1)
+  PresheafOfModulesOfCommRing.monoidalCategory (R := 𝒪.1)
 
 /-- **Multiplication by a section of `A(d)`, landing in `M(d)`.**
 

@@ -126,6 +126,8 @@ theorem fracSection_pow_mul_comm {e : ℕ} {f g₁ g₂ : A} (hf : f ∈ 𝒜 e)
       (hU₂.trans (basicOpen_le_basicOpen_pow 𝒜 g₂ (e * k))))).symm
   exact fracSection_eq 𝒜 _ _ _ _ _ _ (by ring)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **The twist exponent can be taken as large as one likes.**
 
 `exists_globalSection_twistBy` with the existential over `N` replaced by "every `N` from some

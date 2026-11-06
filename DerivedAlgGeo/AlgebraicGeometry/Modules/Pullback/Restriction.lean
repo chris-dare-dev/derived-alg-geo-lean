@@ -95,6 +95,8 @@ def pullbackOverIso (f : X ⟶ Y) (M : Y.Modules) (U : Y.Opens) :
   exact (overEquiv V).fullyFaithfulFunctor.preimageIso
     (e ≪≫ ((overEquiv V).counitIso.app N).symm)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Pullback along `f ∣_ U` sends the structure sheaf to the structure sheaf; the inverse of
 Mathlib's `pullbackObjUnitToUnit`, an isomorphism because inverse image on opens is final
 (`TopologicalSpace.Opens.map_final`). -/

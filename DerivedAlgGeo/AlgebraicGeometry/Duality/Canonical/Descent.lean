@@ -291,6 +291,8 @@ private def chartBasicOpen {n : ℕ} {x : X}
     (C : SmoothChart k X n x) (f : Γ(X, C.source)) : Over C.source :=
   Over.mk (homOfLE (X.basicOpen_le f))
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 set_option maxHeartbeats 1600000 in
 private lemma chartBasisHom_app_basicOpen_isIso {n : ℕ} {x : X}
     (C : SmoothChart k X n x) (f : Γ(X, C.source)) :
@@ -399,11 +401,10 @@ private noncomputable def freeObjGeneratorSection
     (Eq.mpr (Functor.const_obj_obj C₀ᵒᵖ I Y) i)) (by
     intro Y Z f
     rw [PresheafOfModules.freeObj_map]
-    simpa using! (ModuleCat.freeDesc_apply
-      (f := ↾fun x ↦ ModuleCat.freeMk
-        (((Functor.const C₀ᵒᵖ).obj I).map f x))
-      (Eq.mpr (Functor.const_obj_obj C₀ᵒᵖ I Y) i)))
+    simp)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 set_option maxHeartbeats 1600000 in
 private noncomputable def freeSheafIsoAssociatedFree
     {U : X.Opens} (I : Type u) :

@@ -103,8 +103,7 @@ theorem exists_strictMDQ_with_quotient_bound
     obtain ⟨B, q, hq⟩ := h S0 hS0 hupper0 hQLo0
     exact ⟨B, e0.inv ≫ q, IsStrictMDQ.precomposeIso C hq e0.symm⟩
   intro S
-  induction S using IsWellFounded.induction
-      (· > · : StrictSubobject X → StrictSubobject X → Prop) with
+  induction S using WellFoundedGT.induction with
   | ind S ih =>
       intro hQS hQSupper hQLoS
       let QS : σ.slicing.IntervalCat C a b := cokernel S.1.arrow

@@ -147,6 +147,8 @@ lemma h0_map_eq_mapH0Hom (F : DGFunctor C D) (X Y : H0 C) :
   induction f using Quotient.ind with
   | _ f => rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The comparison between the two quotients: `abLeftHomologyData` divides by
 the range of `abToCycles`, and `H⁰` divides by the coboundaries. -/
 noncomputable def homologyQuotientEquiv (X Y : C) :
@@ -154,6 +156,8 @@ noncomputable def homologyQuotientEquiv (X Y : C) :
       (cocycles X Y ⧸ H0.coboundariesIn X Y) :=
   QuotientAddGroup.quotientAddEquivOfEq (range_abToCycles X Y)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 lemma mapH0Hom_comp_homologyQuotientEquiv (F : DGFunctor C D) (X Y : C)
     (z : (homSc X Y).abLeftHomologyData.H) :
     homologyQuotientEquiv (F.obj X) (F.obj Y) ((F.mapHomScData X Y).φH.hom z) =

@@ -479,7 +479,7 @@ noncomputable def componentTopologicalLinearLocalModel
             linarith
           exact lt_of_le_of_lt hbound hlt
         -- Injectivity (Lemma 6.4)
-        have hZinj : Function.Injective (U.restrict Zmap) := by
+        have hZinj : Function.Injective (U.domRestrict Zmap) := by
           intro ⟨⟨τ₁, hτ₁cc⟩, hτ₁U⟩ ⟨⟨τ₂, hτ₂cc⟩, hτ₂U⟩ hZeq
           have hZval : τ₁.Z = τ₂.Z := congrArg Subtype.val hZeq
           have hd : slicingDist C τ₁.slicing τ₂.slicing < ENNReal.ofReal 1 :=
@@ -502,14 +502,14 @@ noncomputable def componentTopologicalLinearLocalModel
         -- For τ ∈ T ⊂ U: Z(T) ⊃ {‖·-Z(τ)‖_τ < sin(πδ)} by Thm 7.1.
         -- {‖·‖_{σ₀} < r₀} ⊂ {‖·‖_τ < sin(πδ)} by reverse comparison.
         -- So Z(T) contains a σ₀-ball. Hence image is open in τ_V.
-        have hZopen : IsOpenMap (U.restrict Zmap) := by
+        have hZopen : IsOpenMap (U.domRestrict Zmap) := by
           rw [isOpenMap_iff_nhds_le]
           intro ⟨⟨σ_x, hσ_x_cc⟩, hσ_x_U⟩
-          -- Need: 𝓝 (Zmap ⟨σ_x, hσ_x_cc⟩) ≤ map (U.restrict Zmap) (𝓝 ⟨⟨σ_x, hσ_x_cc⟩, hσ_x_U⟩)
+          -- Need: 𝓝 (Zmap ⟨σ_x, hσ_x_cc⟩) ≤ map (U.domRestrict Zmap) (𝓝 ⟨⟨σ_x, hσ_x_cc⟩, hσ_x_U⟩)
           rw [Filter.le_def]
           intro S hS
           rw [Filter.mem_map] at hS
-          -- hS : (U.restrict Zmap)⁻¹' S ∈ 𝓝 ⟨⟨σ_x, hσ_x_cc⟩, hσ_x_U⟩
+          -- hS : (U.domRestrict Zmap)⁻¹' S ∈ 𝓝 ⟨⟨σ_x, hσ_x_cc⟩, hσ_x_U⟩
           -- Extract an open neighborhood from hS
           obtain ⟨T, hT_sub, hT_open, hx_T⟩ := mem_nhds_iff.mp hS
           -- Comparison: ‖U‖_{σ_x} ≤ K_rev * ‖U‖_{σ₀}
@@ -654,11 +654,11 @@ noncomputable def componentTopologicalLinearLocalModel
           let yU : U := ⟨yComp, hyU⟩
           have hyT : yU ∈ T := by
             rwa [← hT_eq]
-          have hyS : (U.restrict Zmap) yU ∈ S := hT_sub hyT
+          have hyS : (U.domRestrict Zmap) yU ∈ S := hT_sub hyT
           have hZeq : Zmap yComp = F := by
             apply Subtype.ext
             exact hρZ
-          simpa [yU, yComp, hZeq] using hyS
+          exact (show (U.domRestrict Zmap) yU = F from hZeq) ▸ hyS
         exact IsOpenEmbedding.of_continuous_injective_isOpenMap
           (hZcont.comp continuous_subtype_val) hZinj hZopen
     change @IsLocalHomeomorph comp V inferInstance inferInstance Zmap

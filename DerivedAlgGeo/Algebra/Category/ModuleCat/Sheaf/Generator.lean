@@ -92,7 +92,7 @@ private lemma freeYonedaSheafHomEquiv_comp (U : C)
     freeYonedaSheafHomEquiv R U N (e ≫ f) =
       f.val.app (Opposite.op U) (freeYonedaSheafHomEquiv R U M e) := by
   dsimp [freeYonedaSheafHomEquiv]
-  rw [(PresheafOfModules.sheafificationAdjunction (𝟙 R.obj)).homEquiv_naturality_right e f]
+  erw [(PresheafOfModules.sheafificationAdjunction (𝟙 R.obj)).homEquiv_naturality_right e f]
   rw [PresheafOfModules.freeYonedaEquiv_comp]
   have h := ModuleCat.restrictScalarsId'App_hom_naturality
     (RingHom.id (R.obj.obj (Opposite.op U))) rfl (f.val.app (Opposite.op U))
@@ -134,7 +134,7 @@ lemma ι_fromFreeYonedaSheafCoproduct (M : SheafOfModules.{u} R)
     (m : M.val.Elements) :
     M.ιFreeYonedaSheafCoproduct R m ≫ M.fromFreeYonedaSheafCoproduct R =
       Elements.fromFreeYonedaSheaf (R := R) m :=
-  by exact Sigma.ι_desc (fun n ↦ Elements.fromFreeYonedaSheaf (R := R) n) m
+  by exact Sigma.ι_comp_desc (fun n ↦ Elements.fromFreeYonedaSheaf (R := R) n) m
 
 /-- The element-indexed coproduct map is epi: every map from a free-Yoneda sheaf factors
 through the summand indexed by the image of its distinguished section. -/
@@ -182,6 +182,8 @@ lemma map_comp {P : SheafOfModules.{u} R} (f : M ⟶ N) (g : N ⟶ P)
   cases m
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private lemma fromFreeYonedaSheaf_comp (m : M.val.Elements) (f : M ⟶ N) :
     Elements.fromFreeYonedaSheaf (R := R) m ≫ f =
       Elements.fromFreeYonedaSheaf (R := R) (Elements.map (R := R) f m) := by
@@ -213,34 +215,34 @@ noncomputable def freeYonedaSheafCoproductFunctor :
   map := freeYonedaSheafCoproductMap R
   map_id M := by
     apply Sigma.hom_ext
-    rintro ⟨U, s⟩
+    rintro @⟨U, s⟩
     calc
-      Sigma.ι _ ⟨U, s⟩ ≫
+      Sigma.ι _ (.mk (obj := U) s) ≫
           Sigma.desc (fun n ↦ M.ιFreeYonedaSheafCoproduct R
             (Elements.map (R := R) (𝟙 M) n)) =
-        M.ιFreeYonedaSheafCoproduct R (Elements.map (R := R) (𝟙 M) ⟨U, s⟩) :=
-          Sigma.ι_desc _ _
+        M.ιFreeYonedaSheafCoproduct R (Elements.map (R := R) (𝟙 M) (.mk (obj := U) s)) :=
+          Sigma.ι_comp_desc _ _
       _ = M.ιFreeYonedaSheafCoproduct R (M.val.elementsMk U s) := by
         congr 1
   map_comp := by
     intro M N P f g
     apply Sigma.hom_ext
-    rintro ⟨U, s⟩
+    rintro @⟨U, s⟩
     calc
-      Sigma.ι _ ⟨U, s⟩ ≫
+      Sigma.ι _ (.mk (obj := U) s) ≫
           Sigma.desc (fun n ↦ P.ιFreeYonedaSheafCoproduct R
             (Elements.map (R := R) (f ≫ g) n)) =
         P.ιFreeYonedaSheafCoproduct R
-          (Elements.map (R := R) (f ≫ g) ⟨U, s⟩) := Sigma.ι_desc _ _
+          (Elements.map (R := R) (f ≫ g) (.mk (obj := U) s)) := Sigma.ι_comp_desc _ _
       _ = P.ιFreeYonedaSheafCoproduct R
-          (Elements.map (R := R) g (Elements.map (R := R) f ⟨U, s⟩)) := by
+          (Elements.map (R := R) g (Elements.map (R := R) f (.mk (obj := U) s))) := by
         congr 1
-      _ = (Sigma.ι _ ⟨U, s⟩ ≫
+      _ = (Sigma.ι _ (.mk (obj := U) s) ≫
           Sigma.desc (fun n ↦ N.ιFreeYonedaSheafCoproduct R
             (Elements.map (R := R) f n))) ≫
           Sigma.desc (fun n ↦ P.ιFreeYonedaSheafCoproduct R
             (Elements.map (R := R) g n)) := by
-        simp only [Sigma.ι_desc]
+        simp only [Sigma.ι_comp_desc]
 
 /-- The coproduct presentation commutes with every morphism of sheaves of modules. -/
 lemma fromFreeYonedaSheafCoproduct_natural {M N : SheafOfModules.{u} R} (f : M ⟶ N) :
@@ -252,7 +254,7 @@ lemma fromFreeYonedaSheafCoproduct_natural {M N : SheafOfModules.{u} R} (f : M �
         Sigma.desc (fun i ↦ N.ιFreeYonedaSheafCoproduct R
           (Elements.map (R := R) f i))) ≫ N.fromFreeYonedaSheafCoproduct R =
       (Sigma.ι _ m ≫ M.fromFreeYonedaSheafCoproduct R) ≫ f
-    simp only [Category.assoc, Sigma.ι_desc_assoc,
+    simp only [Category.assoc, Sigma.ι_comp_desc_assoc,
       N.ι_fromFreeYonedaSheafCoproduct, M.ι_fromFreeYonedaSheafCoproduct]
     exact (Elements.fromFreeYonedaSheaf_comp R m f).symm
 

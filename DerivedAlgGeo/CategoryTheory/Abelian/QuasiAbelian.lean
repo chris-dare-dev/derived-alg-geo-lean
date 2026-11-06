@@ -551,16 +551,16 @@ theorem isStrictArtinianObject_of_isArtinianObject {X : C}
     [IsArtinianObject X] : IsStrictArtinianObject X := by
   let f : StrictSubobject X → Subobject X := Subtype.val
   exact ObjectProperty.is_of_prop _
-    ⟨InvImage.wf f
-      (wellFounded_lt : WellFounded ((· < ·) : Subobject X → Subobject X → Prop))⟩
+    (InvImage.wf f
+      (wellFounded_lt : WellFounded ((· < ·) : Subobject X → Subobject X → Prop)))
 
 /-- A Noetherian object is strict-Noetherian. -/
 theorem isStrictNoetherianObject_of_isNoetherianObject {X : C}
     [IsNoetherianObject X] : IsStrictNoetherianObject X := by
   let f : StrictSubobject X → Subobject X := Subtype.val
   exact ObjectProperty.is_of_prop _
-    ⟨InvImage.wf f
-      (wellFounded_gt : WellFounded ((· > ·) : Subobject X → Subobject X → Prop))⟩
+    (InvImage.wf f
+      (wellFounded_gt : WellFounded ((· > ·) : Subobject X → Subobject X → Prop)))
 
 end
 
@@ -571,6 +571,8 @@ variable {D : Type u} [Category.{v} D] [Abelian D]
 
 variable {X : D}
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- A strict-Artinian object in an abelian category is Artinian. -/
 theorem isArtinianObject_of_isStrictArtinianObject [IsStrictArtinianObject X] :
     IsArtinianObject X := by

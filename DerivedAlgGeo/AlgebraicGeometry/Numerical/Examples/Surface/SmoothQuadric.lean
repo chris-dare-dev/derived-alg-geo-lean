@@ -48,6 +48,8 @@ def rulingTwoQ : Ring := ((0, 0), (1, 0))
 /-- The point class `f₁f₂`. -/
 def pointQ : Ring := ((0, 0), (0, 1))
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem rulingOneQ_mul_self : rulingOneQ * rulingOneQ = 0 := by
   ext <;> simp [rulingOneQ]
@@ -56,6 +58,8 @@ theorem rulingOneQ_mul_self : rulingOneQ * rulingOneQ = 0 := by
 theorem rulingOneQ_sq : rulingOneQ ^ 2 = 0 := by
   simpa only [pow_two] using rulingOneQ_mul_self
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem rulingTwoQ_mul_self : rulingTwoQ * rulingTwoQ = 0 := by
   ext <;> simp [rulingTwoQ]
@@ -64,30 +68,44 @@ theorem rulingTwoQ_mul_self : rulingTwoQ * rulingTwoQ = 0 := by
 theorem rulingTwoQ_sq : rulingTwoQ ^ 2 = 0 := by
   simpa only [pow_two] using rulingTwoQ_mul_self
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem rulingOneQ_mul_rulingTwoQ : rulingOneQ * rulingTwoQ = pointQ := by
   ext <;> simp [rulingOneQ, rulingTwoQ, pointQ]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem rulingTwoQ_mul_rulingOneQ : rulingTwoQ * rulingOneQ = pointQ := by
   ext <;> simp [rulingOneQ, rulingTwoQ, pointQ]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem rulingOneQ_mul_pointQ : rulingOneQ * pointQ = 0 := by
   ext <;> simp [rulingOneQ, pointQ]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem rulingTwoQ_mul_pointQ : rulingTwoQ * pointQ = 0 := by
   ext <;> simp [rulingTwoQ, pointQ]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem pointQ_mul_rulingOneQ : pointQ * rulingOneQ = 0 := by
   ext <;> simp [rulingOneQ, pointQ]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem pointQ_mul_rulingTwoQ : pointQ * rulingTwoQ = 0 := by
   ext <;> simp [rulingTwoQ, pointQ]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem pointQ_mul_self : pointQ * pointQ = 0 := by
   ext <;> simp [pointQ]
@@ -121,6 +139,8 @@ def basis : Module.Basis (Fin 4) ℚ Ring :=
 /-- Codimension weights on the product basis. -/
 def weight : Fin 4 → ℕ := ![0, 1, 1, 2]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem basis_zero : basis 0 = 1 := by
   change basis 0 = (((1, 0), (0, 0)) : Ring)
@@ -128,18 +148,24 @@ theorem basis_zero : basis 0 = 1 := by
   funext i
   fin_cases i <;> simp [basis, coordEquiv]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem basis_one : basis 1 = rulingOneQ := by
   apply coordEquiv.injective
   funext i
   fin_cases i <;> simp [basis, coordEquiv, rulingOneQ]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem basis_two : basis 2 = rulingTwoQ := by
   apply coordEquiv.injective
   funext i
   fin_cases i <;> simp [basis, coordEquiv, rulingTwoQ]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem basis_three : basis 3 = pointQ := by
   apply coordEquiv.injective
@@ -293,6 +319,8 @@ theorem chComp_add (E F : NumericalClass) (i : ℕ) :
       rw [add_smul]
   | _ + 3 => simp [chComp]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The total Chern character in the explicit four-coordinate carrier. -/
 theorem ch_sum (E : NumericalClass) :
     (∑ i ∈ Finset.range (2 + 1), chComp E i) =
@@ -316,6 +344,8 @@ theorem toddComp_mem (i : ℕ) : toddComp i ∈ numericalRing.piece i := by
   | 2 => exact pointQ_mem
   | _ + 3 => exact Submodule.zero_mem _
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The total Todd class in the explicit four-coordinate carrier. -/
 theorem todd_sum :
     (∑ i ∈ Finset.range (2 + 1), toddComp i) =
@@ -346,6 +376,8 @@ noncomputable def numericalVariety : NumericalVarietyData 2 Ring NumericalClass 
   toddComp_zero := rfl
   chi := chi
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The selected presentation satisfies Hirzebruch--Riemann--Roch. -/
 theorem numericalVariety_satisfiesHRR : numericalVariety.SatisfiesHRR := by
   refine ⟨fun E => ?_⟩
@@ -359,12 +391,16 @@ theorem numericalVariety_satisfiesHRR : numericalVariety.SatisfiesHRR := by
 /-- The Segre polarization `f₁+f₂` in the rational intersection ring. -/
 def segreQ : Ring := rulingOneQ + rulingTwoQ
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 theorem segreQ_eq : segreQ = (((0, 1), (1, 0)) : Ring) := by
   ext <;> norm_num [segreQ, rulingOneQ, rulingTwoQ]
 
 theorem segreQ_mem : segreQ ∈ numericalRing.piece 1 :=
   Submodule.add_mem _ rulingOneQ_mem rulingTwoQ_mem
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem degree_segreQ_sq : numericalRing.degree (segreQ ^ 2) = 2 := by
   change degree (segreQ ^ 2) = 2
@@ -382,6 +418,8 @@ theorem polarizationClass_mem (h₁ h₂ : ℚ) :
     (Submodule.smul_mem _ _ rulingOneQ_mem)
     (Submodule.smul_mem _ _ rulingTwoQ_mem)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem degree_polarizationClass_sq (h₁ h₂ : ℚ) :
     numericalRing.degree (polarizationClass h₁ h₂ ^ 2) =
@@ -491,6 +529,8 @@ theorem divisorClass_map_rat_smul (q : ℚ) (x : numericalRing.piece 1) :
     divisorClass (q • x) = (q : ℝ) • divisorClass x := by
   ext <;> simp [divisorClass]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Multiplication in the rational ring realizes to the ruling intersection
 form. -/
 theorem divisorClass_intersection (x y : numericalRing.piece 1) :
@@ -538,24 +578,32 @@ theorem chernCharacter_rank (E : NumericalClass) :
     chernCharacter.rank E = (E.1 : ℝ) := by
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem chernCharacter_chOne (E : NumericalClass) :
     chernCharacter.chOne E = ((E.2.1 : ℝ), (E.2.2.1 : ℝ)) := by
   change divisorClass ⟨chComp E 1, chComp_mem E 1⟩ = _
   ext <;> simp [divisorClass, chComp, rulingOneQ, rulingTwoQ]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem chernCharacter_chTwo (E : NumericalClass) :
     chernCharacter.chTwo E = (E.2.2.2 : ℝ) := by
   change ((degree (chComp E 2) : ℚ) : ℝ) = _
   simp [chComp, degree, pointQ]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem numericalRealization_segre :
     numericalRealization.realizePolarization segrePolarization = segre := by
   change divisorClass ⟨segreQ, segreQ_mem⟩ = segre
   ext <;> norm_num [divisorClass, segreQ, rulingOneQ, rulingTwoQ, segre]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem numericalRealization_polarization
     (h₁ h₂ : ℚ) (hh₁ : 0 < h₁) (hh₂ : 0 < h₂) :
@@ -566,6 +614,8 @@ theorem numericalRealization_polarization
     ⟨polarizationClass h₁ h₂, polarizationClass_mem h₁ h₂⟩ = _
   ext <;> simp [divisorClass, polarizationClass, rulingOneQ, rulingTwoQ]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem numericalRealization_bField (b₁ b₂ : ℚ) :
     numericalRealization.realizeBField (bField b₁ b₂) =

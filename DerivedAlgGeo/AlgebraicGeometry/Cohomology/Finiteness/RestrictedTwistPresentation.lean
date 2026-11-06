@@ -74,6 +74,8 @@ theorem restrictedTwist_isInvertible
 
 variable [IsVariety k X]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **A coherent sheaf is a quotient of finitely many restricted negative twists, provided the
 closed-immersion pullback/pushforward counit is epi at that sheaf.**
 

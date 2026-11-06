@@ -103,12 +103,13 @@ theorem rankOnePB_basis_apply (n : ℕ) (i : Fin (rankOnePB n).dim) :
     (rankOnePB n).basis i = rankOneH n ^ (i : ℕ) := by
   rw [(rankOnePB n).basis_eq_pow, rankOnePB_gen]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- `H^{n+1} = 0`: the relation, in the ring. -/
 theorem rankOneH_pow_succ_eq_zero (n : ℕ) : rankOneH n ^ (n + 1) = 0 := by
   change AdjoinRoot.root (rankOneRel n) ^ (n + 1) = 0
   rw [← AdjoinRoot.eval₂_root (rankOneRel n)]
   simp [rankOneRel]
-  rfl
 
 /-- Every power above the dimension vanishes, not only the first one. This is what lets the
 Chern and Todd components be defined uniformly in `i` — see the module docstring. -/
@@ -206,11 +207,11 @@ theorem rankOneDegree_pow (n : ℕ) (d : ℚ) (k : ℕ) :
       have hidx : rankOneIdx n hle = rankOneIdx n (le_refl n) := by
         simp only [rankOneIdx, Fin.mk.injEq]
         exact hk
-      rw [if_pos hk, hidx]
+      rw [ite_eq_left hk, hidx]
       exact rankOneDegree_basis_top n d
-    · rw [if_neg hk]
+    · rw [ite_eq_right hk]
       exact rankOneDegree_basis_of_ne n d _ hk
-  · rw [rankOneH_pow_eq_zero n (by omega), map_zero, if_neg (by omega)]
+  · rw [rankOneH_pow_eq_zero n (by omega), map_zero, ite_eq_right (by omega)]
 
 theorem rankOneDegree_algebraMap_mul_pow (n : ℕ) (d q : ℚ) (k : ℕ) :
     rankOneDegree n d (algebraMap ℚ (RankOneRing n) q * rankOneH n ^ k)
@@ -244,10 +245,10 @@ theorem rankOneDegree_sum_mul_sum (n : ℕ) (d : ℚ) (c t : ℕ → ℚ) :
   have hin : i ≤ n := Nat.lt_succ_iff.mp (Finset.mem_range.mp hi)
   rw [map_sum, Finset.sum_congr rfl fun j _ => hterm i j]
   rw [Finset.sum_eq_single (n - i)]
-  · rw [if_pos (show i + (n - i) = n by omega)]
+  · rw [ite_eq_left (show i + (n - i) = n by omega)]
     ring
   · intro b _ hb
-    rw [if_neg (show i + b ≠ n by omega), mul_zero]
+    rw [ite_eq_right (show i + b ≠ n by omega), mul_zero]
   · intro hmem
     exact absurd (Finset.mem_range.mpr (show n - i < n + 1 by omega)) hmem
 

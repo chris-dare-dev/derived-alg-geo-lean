@@ -102,7 +102,6 @@ theorem homogeneousPicardCoefficient_singleton
   rw [coeff_interpolate_range_three]
   · simp [scaledPicardCoefficient, picardCoefficient, picardMixedDifference,
       picardDifference]
-    rfl
   · simp [scaledPicardCoefficient, picardCoefficient, picardMixedDifference,
       picardDifference]
 

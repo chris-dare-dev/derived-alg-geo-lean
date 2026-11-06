@@ -120,8 +120,7 @@ noncomputable def truncGEShiftNatIso :
         rw [truncGEπ_comp_truncGEShiftIso_inv]
         exact (Linear.units_smul_comp _ _ _).trans (by
           dsimp [common]
-          rw [← Functor.map_comp]
-          rfl)
+          rw [← Functor.map_comp])
       exact hleft.trans hright.symm
     have hfinal : (truncGEShiftIso t a n X).inv ≫
         (shiftFunctor C n).map ((t.truncGE (a + n)).map f) ≫

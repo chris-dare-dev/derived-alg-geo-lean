@@ -73,6 +73,7 @@ noncomputable def affineGeometricBoundedAboveProjectiveCorePullbackCompIso
         affineGeometricBoundedAboveProjectiveCorePullback g :=
   (affineGeometricBoundedAboveProjectiveDerivedPullbackCompIso f g).symm.core
 
+set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
 /-- The genuine geometric affine bounded-above projective moduli groupoids
 and their arbitrary pullbacks, packaged as a Cat-valued pseudofunctor. -/

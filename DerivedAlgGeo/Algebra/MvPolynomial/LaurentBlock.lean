@@ -173,7 +173,7 @@ theorem coeff_laurentFilter_of_eq {γ : ι →₀ ℕ} {m : ℕ} {F : Finset ι}
     Finset.sum_congr rfl fun b _ => MvPolynomial.coeff_monomial β b (p.coeff b),
     Finset.sum_ite_eq' _ β fun b => p.coeff b]
   by_cases hs : β ∈ p.support
-  · rw [if_pos (Finset.mem_filter.mpr ⟨hs, h⟩)]
+  · rw [ite_eq_left (Finset.mem_filter.mpr ⟨hs, h⟩)]
   · rw [MvPolynomial.notMem_support_iff.mp hs, ite_self]
 
 theorem coeff_laurentFilter_of_ne {γ : ι →₀ ℕ} {m : ℕ} {F : Finset ι} {β : ι →₀ ℕ}
@@ -192,10 +192,10 @@ descends from. -/
 theorem laurentFilter_add (γ : ι →₀ ℕ) (m : ℕ) (F : Finset ι) (p q : MvPolynomial ι R) :
     laurentFilter γ m F (p + q) = laurentFilter γ m F p + laurentFilter γ m F q := by
   ext β
-  rw [MvPolynomial.coeff_add]
+  rw [AddMonoidAlgebra.coeff_add, Finsupp.add_apply]
   by_cases h : intNegSupport (laurentExponent γ m β) = F
   · rw [coeff_laurentFilter_of_eq h, coeff_laurentFilter_of_eq h, coeff_laurentFilter_of_eq h,
-      MvPolynomial.coeff_add]
+      AddMonoidAlgebra.coeff_add, Finsupp.add_apply]
   · rw [coeff_laurentFilter_of_ne h, coeff_laurentFilter_of_ne h, coeff_laurentFilter_of_ne h,
       add_zero]
 
@@ -209,7 +209,7 @@ theorem IsPolynomialTwist.laurentFilter_mem {σM : Type u} [SetLike σM (MvPolyn
     ext β
     by_cases h : intNegSupport (laurentExponent γ m β) = F
     · rw [coeff_laurentFilter_of_eq h]
-    · rw [coeff_laurentFilter_of_ne h, MvPolynomial.coeff_zero]
+    · rw [coeff_laurentFilter_of_ne h, AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply]
   refine (h𝓜 _ _).mpr (Or.inr ⟨e, he, ?_⟩)
   intro β hβ
   by_cases h : intNegSupport (laurentExponent γ m β) = F
@@ -257,7 +257,7 @@ theorem laurentFilter_laurentFilter_of_ne {F F' : Finset ι} (h : F ≠ F') (γ 
     (p : MvPolynomial ι R) :
     laurentFilter γ m F (laurentFilter γ m F' p) = 0 := by
   ext β
-  rw [MvPolynomial.coeff_zero]
+  rw [AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply]
   by_cases hN : intNegSupport (laurentExponent γ m β) = F
   · rw [coeff_laurentFilter_of_eq hN, coeff_laurentFilter_of_ne fun h' => h (hN ▸ h')]
   · rw [coeff_laurentFilter_of_ne hN]
@@ -267,7 +267,7 @@ theorem laurentFilter_eq_zero_of_not_subset {γ : ι →₀ ℕ} {F : Finset ι}
     (h : ¬ F ⊆ γ.support) (m : ℕ) (p : MvPolynomial ι R) :
     laurentFilter γ m F p = 0 := by
   ext β
-  rw [MvPolynomial.coeff_zero]
+  rw [AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply]
   exact coeff_laurentFilter_of_ne
     (fun hN => h (by rw [← hN]; exact intNegSupport_laurentExponent_subset γ m β)) p
 
@@ -287,13 +287,13 @@ theorem laurentFilter_monomial_mul {γ γ' σ : ι →₀ ℕ} {m m' : ℕ}
       laurentExponent_sub_of_add_eq hσ hle
     by_cases hN : intNegSupport (laurentExponent γ' m' β) = F
     · rw [coeff_laurentFilter_of_eq hN, MvPolynomial.coeff_monomial_mul',
-        MvPolynomial.coeff_monomial_mul', if_pos hle, if_pos hle, one_mul, one_mul,
+        MvPolynomial.coeff_monomial_mul', ite_eq_left hle, ite_eq_left hle, one_mul, one_mul,
         coeff_laurentFilter_of_eq (by rw [hα]; exact hN)]
-    · rw [coeff_laurentFilter_of_ne hN, MvPolynomial.coeff_monomial_mul', if_pos hle, one_mul,
+    · rw [coeff_laurentFilter_of_ne hN, MvPolynomial.coeff_monomial_mul', ite_eq_left hle, one_mul,
         coeff_laurentFilter_of_ne (by rw [hα]; exact hN)]
-  · rw [MvPolynomial.coeff_monomial_mul', if_neg hle]
+  · rw [MvPolynomial.coeff_monomial_mul', ite_eq_right hle]
     by_cases hN : intNegSupport (laurentExponent γ' m' β) = F
-    · rw [coeff_laurentFilter_of_eq hN, MvPolynomial.coeff_monomial_mul', if_neg hle]
+    · rw [coeff_laurentFilter_of_eq hN, MvPolynomial.coeff_monomial_mul', ite_eq_right hle]
     · rw [coeff_laurentFilter_of_ne hN]
 
 /-! ## The block projection on the localization

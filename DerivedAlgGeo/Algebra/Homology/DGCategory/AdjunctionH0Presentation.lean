@@ -86,7 +86,6 @@ theorem transportedH0_unit_app
   rw [transportedH0, Adjunction.comp_unit_app, Adjunction.comp_unit_app]
   rw [DGAdjunction.h0_unit]
   rw [Functor.comp_map]
-  rfl
 
 /-- Expand both `Adjunction.comp` steps in the transported counit, making the
 original `h0Counit` visible between the source- and target-equivalence
@@ -102,7 +101,6 @@ theorem transportedH0_counit_app
         eD.toAdjunction.counit.app Z := by
   rw [transportedH0, Adjunction.comp_counit_app, Adjunction.comp_counit_app]
   rw [DGAdjunction.h0_counit]
-  rfl
 
 /-- Data presenting two dg functors, after passage to `H⁰` and transport
 through category equivalences, by named ordinary functors.
@@ -162,7 +160,6 @@ theorem toAdjunction_unit_app (A : DGAdjunction L R) (Z : X) :
   rw [P.toAdjunction_unit A]
   simp only [NatTrans.comp_app, Functor.whiskerRight_app,
     Functor.whiskerLeft_app, Category.assoc]
-  rfl
 
 /-- Pointwise normal form of the presented counit. -/
 theorem toAdjunction_counit_app (A : DGAdjunction L R) (Z : Y) :

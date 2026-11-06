@@ -231,7 +231,7 @@ theorem exists_maximalDestabilizing (h : MuPositivityData P) (I : MuHNInput P h)
   obtain ⟨B₀, hB₀ne, hB₀max⟩ := exists_slopeMax h I hF
   haveI : IsNoetherianObject F := I.noetherian F
   have hwf : WellFounded ((· > ·) : Subobject F → Subobject F → Prop) :=
-    (inferInstance : WellFoundedGT (Subobject F)).wf
+    (inferInstance : WellFoundedGT (Subobject F))
   obtain ⟨Bmax, hBmem, hBmin⟩ := hwf.has_min
     {B' : Subobject F | ¬IsZero (B' : Coh X) ∧
       (P.weakSlopeData h).topSlope (B' : Coh X) =

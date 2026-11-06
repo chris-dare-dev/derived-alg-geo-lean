@@ -48,6 +48,8 @@ variable {C : Type u} [Category.{v} C] {D : Type u} [Category.{v} D]
   [HasGlobalSectionsFunctor J A] [HasGlobalSectionsFunctor K A]
   [∀ (F : Cᵒᵖ ⥤ A), G.op.HasLeftKanExtension F]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **Global sections do not see the pushforward.** `Γ` is sections over the terminal object and
 the pushforward evaluates at `G.obj ⊤`, so the two agree once `G.obj ⊤` is again terminal; the
 middle comparison is the identity because `(G_* F)` at `⊤` *is* `F` at `G.obj ⊤`. -/

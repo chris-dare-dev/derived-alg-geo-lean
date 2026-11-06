@@ -58,6 +58,8 @@ lemma opensRangeEquivalence_functor_coverPreserving :
       (Opens.grothendieckTopology Y) f.opensRange)
     (coverPreserving_opens_map f.base)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 lemma opensRangeEquivalence_inverse_coverPreserving :
     CoverPreserving (Opens.grothendieckTopology X)
       ((Opens.grothendieckTopology Y).over f.opensRange)
@@ -184,6 +186,8 @@ noncomputable def ringCatSheafOverToPushforwardOverOver (W : Over f.opensRange) 
         exact congr_arg (fun k => (forget₂ CommRingCat RingCat).map k)
           (f.appIso_inv_naturality ((Over.forget _).op.map g)) }
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The module equivalence induced on the slice over `W`. -/
 noncomputable def opensRangeOverModulesEquivalence (W : Over f.opensRange) :
     SheafOfModules.{u} (X.ringCatSheaf.over
@@ -309,9 +313,10 @@ noncomputable def ringCatSheafToPushforwardOver :
             (forget₂ CommRingCat RingCat).map (f.appIso U.unop).inv ≫
               (forget₂ CommRingCat RingCat).map
                 (Y.presheaf.map (f.opensFunctor.op.map g))
-        rw [← Functor.map_comp, ← Functor.map_comp, f.appIso_inv_naturality g]
-        rfl }
+        rw [← Functor.map_comp, ← Functor.map_comp, f.appIso_inv_naturality g] }
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The equivalence between modules on the source of an open immersion and modules on the
 slice site over its range. -/
 noncomputable def opensRangeModulesEquivalence :
@@ -376,6 +381,8 @@ noncomputable def opensRangeModulesEquivalenceInverseUnitIso :
     ext x
     exact congr($(h) x)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- A presentation on the range slice of an open immersion transports to a presentation of the
 scheme-level restriction on its source. -/
 noncomputable def restrictPresentation (M : Y.Modules)

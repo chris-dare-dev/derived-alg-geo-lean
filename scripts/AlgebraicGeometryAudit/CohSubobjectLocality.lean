@@ -37,6 +37,8 @@ example {R : CommRingCat.{u}} (r s : R) :
   rfl
 
 -- These are two restrictions of existing global subobjects, not a gluing claim.
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 example {R : CommRingCat.{u}} [IsNoetherianRing R] (r s : R)
     (E : Coh ((⨆ b : Bool, twoBasicOpenFamily r s b).toScheme))
     (P Q : Subobject E) :

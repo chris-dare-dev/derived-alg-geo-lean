@@ -46,7 +46,6 @@ private theorem fixedTargetArrowExtension_of_comp_equivalence
     rw [H.map_preimage]
     dsimp [βH]
     simp only [Iso.hom_inv_id_assoc]
-    rfl
   have h2 : c.hom ≫ H.map βF =
       c.hom ≫ H.map (d.hom ≫ F.map f) := by rw [hd]
   let p : Z ⟶ (F ⋙ H).obj Y := c.hom ≫ H.map d.hom
@@ -54,7 +53,6 @@ private theorem fixedTargetArrowExtension_of_comp_equivalence
       p ≫ (F ⋙ H).map f := by
     dsimp [p]
     simp only [Functor.map_comp, Category.assoc]
-    rfl
   have hα : (α.app Y).inv ≫ G.map f ≫ (α.app E).hom =
       (F ⋙ H).map f := by
     rw [hnat]
@@ -63,9 +61,7 @@ private theorem fixedTargetArrowExtension_of_comp_equivalence
       (z.hom ≫ G.map f) ≫ (α.app E).hom := by
     have hz : z.hom = p ≫ (α.app Y).inv := by
       dsimp [z, p]
-      simp only [Iso.trans_hom, Functor.mapIso_hom, Iso.symm_hom,
-        Category.assoc]
-      rfl
+      simp only [Category.assoc]
     calc
       p ≫ (F ⋙ H).map f =
           p ≫ ((α.app Y).inv ≫ G.map f ≫ (α.app E).hom) :=

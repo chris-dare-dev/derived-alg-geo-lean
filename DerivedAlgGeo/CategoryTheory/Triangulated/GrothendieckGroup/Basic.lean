@@ -119,7 +119,7 @@ private theorem K₀.of_shift_negative (X : C) (n : ℕ) :
     K₀.of C (X⟦(Int.negSucc n : ℤ)⟧) =
       ((-1 : ℤ) ^ (n + 1)) • K₀.of C X := by
   induction n with
-  | zero => simpa using K₀.of_shift_neg_one C X
+  | zero => simp
   | succ n ih =>
       calc
         K₀.of C (X⟦(Int.negSucc (n + 1) : ℤ)⟧) =

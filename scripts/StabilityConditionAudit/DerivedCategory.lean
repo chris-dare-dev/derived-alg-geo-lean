@@ -68,7 +68,7 @@ categories. Scheme and affine consumers are audited by AlgebraicGeometryAudit.
 #print axioms CategoryTheory.mapDerivedCategoryHomologyIso
 #print axioms CategoryTheory.NatIso.mapDerivedCategory
 #print axioms CategoryTheory.Functor.mapDerivedCategoryIdIso
-#print axioms CategoryTheory.Functor.mapDerivedCategoryCompIso
+#print axioms CategoryTheory.Functor.mapDerivedCategoryCompIsoOfIso
 #print axioms CategoryTheory.Functor.singleFunctorIsoOfFactors
 #print axioms DerivedCategory.isoOfFactors
 #print axioms DerivedCategory.idFactors

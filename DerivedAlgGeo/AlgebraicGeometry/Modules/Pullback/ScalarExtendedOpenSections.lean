@@ -42,17 +42,17 @@ private noncomputable def fixedBaseOpenSections_restrictScalars
       map_add' := by intros; rfl
       map_smul' := by
         intro r x
-        change (K.smul r).hom x = (T.smul (a.hom r)).hom x
+        change (K.smul r).asHom.hom x = (T.smul (a.hom r)).asHom.hom x
         have hK := modulesToFixedBaseSheaf_smul Z (φ ≫ f.appTop) N
           (f ⁻¹ᵁ U) r x
         have hT := modulesToFixedBaseSheaf_smul Z ψ N (f ⁻¹ᵁ U) (a.hom r) x
-        change (K.smul r).hom x = _ at hK
-        change (T.smul (a.hom r)).hom x = _ at hT
+        change (K.smul r).asHom.hom x = _ at hK
+        change (T.smul (a.hom r)).asHom.hom x = _ at hT
         rw [hK, hT]
         change (N.smul (Z.presheaf.map (f ⁻¹ᵁ U).leTop.op
-          ((φ ≫ f.appTop).hom r))).hom (show Γ(N, f ⁻¹ᵁ U) from x) =
+          ((φ ≫ f.appTop).hom r))).asHom.hom (show Γ(N, f ⁻¹ᵁ U) from x) =
           (N.smul (Z.presheaf.map (f ⁻¹ᵁ U).leTop.op
-            ((a ≫ ψ).hom r))).hom (show Γ(N, f ⁻¹ᵁ U) from x)
+            ((a ≫ ψ).hom r))).asHom.hom (show Γ(N, f ⁻¹ᵁ U) from x)
         rw [compat] }
 
 /-- The change-of-scalars comparison on the same section carrier commutes
@@ -96,7 +96,7 @@ theorem fixedBasePullbackOpenAfterExtension_one_tmul (U : Y.Opens)
   change (1 : A) • ((fixedBasePullbackOpen φ f M U ≫
     fixedBaseOpenSections_restrictScalars φ f a ψ U compat ((pullback f).obj M)).hom x) = _
   rw [one_smul]
-  simp only [ModuleCat.comp_apply, fixedBasePullbackOpen_apply]
+  simp only []
   rfl
 
 /-- The scalar-extended actual pullback unit commutes with restriction of
@@ -145,7 +145,8 @@ theorem fixedBasePullbackOpenAfterExtension_restrict
   simp only [adj, ModuleCat.extendRestrictScalarsAdj,
     Adjunction.mk'_homEquiv,
     ModuleCat.ExtendRestrictScalarsAdj.homEquiv_symm_apply] at hA
-  convert hA.symm using 1 <;> rfl
+  convert hA.symm using 1
+  rfl
 
 /-- At the top open, the arbitrary-open scalar-extended unit is the previously
 defined scalar-extended global-section unit. -/

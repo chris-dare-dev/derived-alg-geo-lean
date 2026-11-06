@@ -90,6 +90,8 @@ theorem rayVec_eq_of_onRay {φ ψ : ℝ} (h : OnRay (rayVec φ) (rayVec ψ)) :
 
 /-! ## The deck transformations -/
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The deck transformation `φ ↦ φ + 2n`, as a normalized shift.
 
 `2 * n`, not `n`: only an even shift of phase returns every ray to itself. See

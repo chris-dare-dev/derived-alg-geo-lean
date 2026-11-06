@@ -102,6 +102,8 @@ abbrev CoSerreFunctorData := SerreFunctorData k Cᵒᵖ
 
 variable {k C}
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private def homOpLinearEquiv (A B : C) :
     (A ⟶ B) ≃ₗ[k] (Opposite.op B ⟶ Opposite.op A) where
   toFun f := f.op

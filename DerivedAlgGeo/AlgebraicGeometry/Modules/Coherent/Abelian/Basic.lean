@@ -121,7 +121,7 @@ theorem shortExact_map_ι [IsLocallyNoetherian X] {S : ShortComplex (Coh X)}
     (hS : S.ShortExact) : (S.map (ι X)).ShortExact := by
   have hExact : ∀ (T : ShortComplex (Coh X)), T.ShortExact →
       (T.map (ι X)).ShortExact :=
-    ((@Functor.exact_tfae _ _ _ _ _ _ (ι X) (ι_additive X)).out 3 0).mp
+    ((@Functor.exact_tfae _ _ _ _ _ _ (ι X) (ι_additive X)).out 4 1).mp
       (show PreservesFiniteLimits (ι X) ∧ PreservesFiniteColimits (ι X) from
         ⟨inferInstance, inferInstance⟩)
   exact hExact S hS

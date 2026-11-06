@@ -172,6 +172,8 @@ noncomputable def chartModuleTwistSectionEquiv {f : A} (hf : f ∈ 𝒜 1) (d : 
   intShiftModuleSectionLinearEquivOn 𝒜 𝓜 hf d hU ≪≫ₗ
     sectionLinearEquivOfMemIff 𝒜 (intShift 𝓜 0) 𝓜 (mem_intShift_zero_iff 𝓜) U
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **Over a degree-one chart the twisted multiplication is the scalar action**, conjugated by
 the two chart trivializations. -/
 theorem chartModuleTwistSectionEquiv_sectionTwistMul {f : A} (hf : f ∈ 𝒜 1) (d : ℤ)
@@ -200,6 +202,8 @@ noncomputable def chartTensorEquiv {f : A} (hf : f ∈ 𝒜 1) (d : ℤ)
   TensorProduct.congr (LinearEquiv.refl _ _) (chartRingTwistSectionEquiv 𝒜 hf d hU) ≪≫ₗ
     TensorProduct.rid _ _ ≪≫ₗ (chartModuleTwistSectionEquiv 𝒜 𝓜 hf d hU).symm
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 theorem twistMultiplicationHom_app_eq {f : A} (hf : f ∈ 𝒜 1) (d : ℤ)
     {U : Opens X} (hU : U ≤ ProjectiveSpectrum.basicOpen 𝒜 f) :
     (twistMultiplicationHom 𝒜 𝓜 d).app (op U) =
@@ -212,6 +216,8 @@ theorem twistMultiplicationHom_app_eq {f : A} (hf : f ∈ 𝒜 1) (d : ℤ)
   rw [LinearEquiv.eq_symm_apply]
   exact chartModuleTwistSectionEquiv_sectionTwistMul 𝒜 𝓜 hf d hU m n
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Over a degree-one chart the twisted multiplication is already an isomorphism on sections. -/
 theorem isIso_twistMultiplicationHom_app {f : A} (hf : f ∈ 𝒜 1) (d : ℤ)
     {U : Opens X} (hU : U ≤ ProjectiveSpectrum.basicOpen 𝒜 f) :

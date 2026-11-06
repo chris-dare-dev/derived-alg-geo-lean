@@ -22,7 +22,7 @@ namespace PresheafOfModules
 
 variable {Y : TopCat.{u}} {R : Y.Presheaf CommRingCat.{u}}
 
-attribute [local instance] PresheafOfModules.monoidalCategory
+attribute [local instance] PresheafOfModulesOfCommRing.monoidalCategory
 
 /-- Sheafification inverts `M ◁ g` on a topological space whenever every stalk map of `g` is an
 isomorphism. -/

@@ -167,7 +167,7 @@ private lemma evalOp_map_π
       Limits.Pi.π (fun j ↦ F.obj (op (W.obj j))) (m.f i) ≫
         F.map (m.φ i).op) ≫
       Limits.Pi.π (fun q ↦ F.obj (op (V.obj q))) q = _
-  rw [Limits.Pi.lift_π]
+  rw [Limits.Pi.lift_comp_π]
 
 /-- Restriction of a section on `V` to the degree-zero Cech term of a family lying in `V`. -/
 private noncomputable def sectionsToCechZero
@@ -216,7 +216,7 @@ private lemma sectionsToCechZero_comp_d
         G.obj.map (homOfLE
           ((leOfHom (Limits.Pi.π (U ∘ r) 0)).trans (hUV (r 0)))).op := by
     dsimp [sectionsToCechZero, T₀]
-    rw [Limits.Pi.lift_π]
+    rw [Limits.Pi.lift_comp_π]
   rw [hd, Fin.sum_univ_two]
   rw [show (-1 : ℤ) ^ ((0 : Fin 2) : ℕ) = 1 by norm_num,
     show (-1 : ℤ) ^ ((1 : Fin 2) : ℕ) = -1 by norm_num]
@@ -347,7 +347,7 @@ private lemma cechZeroOfRestrictions_eq_sectionsToCechZero
   dsimp [cechZeroOfFamily, sectionsToCechZero]
   rw [Limits.Concrete.productEquiv_symm_apply_π]
   have hπ := CategoryTheory.congr_fun
-    (Limits.Pi.lift_π (fun q : Q ↦ G.obj.map (homOfLE
+    (Limits.Pi.lift_comp_π (fun q : Q ↦ G.obj.map (homOfLE
       ((leOfHom (Limits.Pi.π (U ∘ q) 0)).trans (hUV (q 0)))).op) q) s
   simp only [CategoryTheory.comp_apply] at hπ
   calc
@@ -467,7 +467,7 @@ private lemma cechZeroFamily_isCompatible
       Limits.Pi.π (U ∘ q) ((SimplexCategory.δ (1 : Fin 2)).toOrderHom k)))
     (by
       intro k
-      exact (heq_of_eq (Limits.Pi.lift_π (fun k : Fin 1 ↦
+      exact (heq_of_eq (Limits.Pi.lift_comp_π (fun k : Fin 1 ↦
         Limits.Pi.π (U ∘ q)
           ((SimplexCategory.δ (1 : Fin 2)).toOrderHom k)) k)).trans
         (projectionHEq (hδ₁ k)))
@@ -478,7 +478,7 @@ private lemma cechZeroFamily_isCompatible
       Limits.Pi.π (U ∘ q) ((SimplexCategory.δ (0 : Fin 2)).toOrderHom k)))
     (by
       intro k
-      exact (heq_of_eq (Limits.Pi.lift_π (fun k : Fin 1 ↦
+      exact (heq_of_eq (Limits.Pi.lift_comp_π (fun k : Fin 1 ↦
         Limits.Pi.π (U ∘ q)
           ((SimplexCategory.δ (0 : Fin 2)).toOrderHom k)) k)).trans
         (projectionHEq (hδ₀ k)))
@@ -501,11 +501,11 @@ private lemma cechZeroFamily_isCompatible
     simpa only [G.obj.map_comp, ConcreteCategory.comp_apply] using hpull
   have hl₀ : l ≫ Limits.Pi.π (U ∘ q) 0 = Opens.infLELeft (U i) (U j) := by
     dsimp [l]
-    rw [Limits.Pi.lift_π]
+    rw [Limits.Pi.lift_comp_π]
     rfl
   have hl₁ : l ≫ Limits.Pi.π (U ∘ q) 1 = Opens.infLERight (U i) (U j) := by
     dsimp [l]
-    rw [Limits.Pi.lift_π]
+    rw [Limits.Pi.lift_comp_π]
     rfl
   rw [← op_comp, ← op_comp, hl₀, hl₁] at hpull'
   exact hpull'
@@ -766,6 +766,17 @@ noncomputable abbrev derivedH
     {X : TopCat.{u}} (hExt : HasExt.{u + 1} (TopCat.Sheaf AddCommGrpCat.{u} X))
     (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) : Type (u + 1) :=
   @Sheaf.H (Opens X) _ (Opens.grothendieckTopology X) F inferInstance hExt n
+
+/-- The group structure of `derivedH`. On Lean 4.35 instance search no longer recovers `Ext`'s
+group from the explicit `TopCat.Sheaf` witness, so it is supplied here. -/
+private noncomputable abbrev derivedHAddCommGroup
+    {X : TopCat.{u}} (hExt : HasExt.{u + 1} (TopCat.Sheaf AddCommGrpCat.{u} X))
+    (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) : AddCommGroup (derivedH hExt F n) :=
+  letI : HasExt.{u + 1} (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}) := hExt
+  inferInstanceAs (AddCommGroup (@Sheaf.H (Opens X) _ (Opens.grothendieckTopology X) F
+    inferInstance hExt n))
+
+attribute [local instance] derivedHAddCommGroup
 
 set_option maxHeartbeats 4000000 in
 private noncomputable abbrev derivedH₀Equiv

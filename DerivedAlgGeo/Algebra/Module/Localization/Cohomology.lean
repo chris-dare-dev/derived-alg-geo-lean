@@ -100,6 +100,8 @@ def localizedBoundaryToCycles :
       simpa only [localizedDifferential, LinearMap.comp_apply, LinearMap.zero_apply,
         LinearMap.mem_ker] using h)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private theorem localizedBoundaryToCyclesViaMap_eq :
     localizedBoundaryToCyclesViaMap S f₀ f₁ f₂ d₀ d₁ hd =
       localizedBoundaryToCycles S f₀ f₁ f₂ d₀ d₁ hd := by
@@ -120,6 +122,8 @@ private theorem localizedBoundaryToCyclesViaMap_eq :
   change f₁ (d₀ x) = f₁ (d₀ x)
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The map on kernel modulo image induced by three degreewise localizations. -/
 def cohomologyMap :
     (d₁.ker ⧸ (boundaryToCycles d₀ d₁ hd).range) →ₗ[R]

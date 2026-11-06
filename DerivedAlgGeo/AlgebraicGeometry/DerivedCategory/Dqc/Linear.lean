@@ -93,7 +93,6 @@ theorem isIso_smul_id_of_isLocalization
   have huEnd : IsUnit ((affineBaseToGlobal (algebraMap R A) p) (s : R) •
       (1 : End E)) := by
     convert huΓ.map (algebraMap Γ(Y, (⊤ : Y.Opens)) (End E)) using 1
-    simp [Algebra.algebraMap_eq_smul_one]
   change IsIso (((affineBaseToGlobal (algebraMap R A) p) (s : R)) • 𝟙 E)
   exact (isUnit_iff_isIso _).mp huEnd
 

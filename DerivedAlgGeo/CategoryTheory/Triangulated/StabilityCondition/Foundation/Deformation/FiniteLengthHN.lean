@@ -322,6 +322,8 @@ variable {σ : StabilityCondition.WithClassMap C κ} {a b : ℝ}
 variable {F : SkewedStabilityFunction C κ σ.slicing a b}
 variable [Fact (a < b)] [Fact (b - a ≤ 1)]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Strict-Artinian recursion on kernel subobjects constructs an owner HN
 filtration.  The explicit lower quotient bound is the induction invariant
 propagated from a strict MDQ to its kernel. -/

@@ -447,15 +447,15 @@ private lemma rationalSectionsRes_rationalMul {U V : X.Opens} (h : V ≤ U)
   rfl
 
 noncomputable local instance : MonoidalCategory X.PresheafOfModules :=
-  PresheafOfModules.monoidalCategory (R := X.presheaf)
+  PresheafOfModulesOfCommRing.monoidalCategory (R := X.presheaf)
 
 noncomputable local instance (U : X.Opens) : MonoidalCategory
     (_root_.PresheafOfModules (X.ringCatSheaf.over U).obj) :=
-  PresheafOfModules.monoidalCategory (R := (X.sheaf.over U).obj)
+  PresheafOfModulesOfCommRing.monoidalCategory (R := (X.sheaf.over U).obj)
 
 noncomputable local instance (U : X.Opens) : SymmetricCategory
     (_root_.PresheafOfModules (X.ringCatSheaf.over U).obj) :=
-  PresheafOfModules.symmetricCategory (R := (X.sheaf.over U).obj)
+  PresheafOfModulesOfCommRing.symmetricCategory (R := (X.sheaf.over U).obj)
 
 /-- Multiplication of fractional sections. -/
 noncomputable def multiplicationHom (D E : CartierDivisor X) :
@@ -535,21 +535,15 @@ private lemma tensorEquationHom_eq_tensor (D E : CartierDivisor X) (U : X.Opens)
           (show (PresheafOfModules.unit
             (X.ringCatSheaf.over U).obj).obj V from
               (1 : (X.ringCatSheaf.over U).obj.obj V)))
-  erw [PresheafOfModules.leftUnitor_inv_app,
-    ModuleCat.MonoidalCategory.leftUnitor_inv_apply,
-    ModuleCat.MonoidalCategory.tensorHom_tmul]
+  change _ =
+    (equationHom D U f hf).app V
+        (show (PresheafOfModules.unit (X.ringCatSheaf.over U).obj).obj V from
+          (1 : (X.ringCatSheaf.over U).obj.obj V)) ⊗ₜ
+      (equationHom E U g hg).app V
+        (show (PresheafOfModules.unit (X.ringCatSheaf.over U).obj).obj V from
+          (1 : (X.ringCatSheaf.over U).obj.obj V))
   rw [equationHom_app_one D U f hf V,
     equationHom_app_one E U g hg V]
-  change
-    (show fractionalSections D V.unop.left from
-        ⟨inverseSection V.unop.left f,
-          Submodule.subset_span
-            ⟨f, hf.mono (leOfHom V.unop.hom), rfl⟩⟩) ⊗ₜ[Γ(X, V.unop.left)]
-      (show fractionalSections E V.unop.left from
-        ⟨inverseSection V.unop.left g,
-          Submodule.subset_span
-            ⟨g, hg.mono (leOfHom V.unop.hom), rfl⟩⟩) = _
-  rfl
 
 private lemma unitHomEquiv_symm_comp' (U : X.Opens)
     {M N : _root_.PresheafOfModules (X.ringCatSheaf.over U).obj}
@@ -602,12 +596,7 @@ private lemma tensorEquationHom_isLocallySurjective (D E : CartierDivisor X)
   letI : Presheaf.IsLocallySurjective K φE := equationHom_isLocallySurjective E U g hg
   constructor
   intro V z
-  induction z using TensorProduct.induction_on with
-  | zero =>
-      have hzero : Presheaf.imageSieve φT (φT.app (.op V) 0) ∈ K V := by
-        rw [Presheaf.imageSieve_app]
-        exact K.top_mem V
-      simpa only [map_zero] using hzero
+  induction z using TensorProduct.inductionOn with
   | add z₁ z₂ hz₁ hz₂ =>
       apply K.superset_covering
         (S := Presheaf.imageSieve φT z₁ ⊓ Presheaf.imageSieve φT z₂)
@@ -633,8 +622,9 @@ private lemma tensorEquationHom_isLocallySurjective (D E : CartierDivisor X)
         change (tensorEquationHom D E U f hf g hg).app (.op W) (a * b) =
           (fractionalPresheaf D ⊗ fractionalPresheaf E).map j.left.op (s ⊗ₜ t)
         change (tensorEquationHom D E U f hf g hg).app (.op W) (a * b) =
-          (fractionalPresheaf D).map j.left.op s ⊗ₜ
-            (fractionalPresheaf E).map j.left.op t
+          (show fractionalSections D W.left from
+              (fractionalPresheaf D).map j.left.op s) ⊗ₜ[Γ(X, W.left)]
+            (show fractionalSections E W.left from (fractionalPresheaf E).map j.left.op t)
         change (a * b) •
             ((show fractionalSections D W.left from
                 ⟨inverseSection W.left f, Submodule.subset_span
@@ -657,7 +647,6 @@ private lemma tensorEquationHom_isLocallySurjective (D E : CartierDivisor X)
         change (equationHom D U f hf).app (.op W) a ⊗ₜ
           (equationHom E U g hg).app (.op W) b = _
         rw [ha, hb]
-        rfl
       · exact K.intersection_covering
           (Presheaf.imageSieve_mem K φD s) (Presheaf.imageSieve_mem K φE t)
 

@@ -44,6 +44,8 @@ open DGCategoryStruct DGCategory Limits
 
 variable {C : Type u} [DGCategory.{v} C]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- An object with zero dg identity is a zero object of `H⁰`. The ascription is
 written `show H0 C from Z` rather than `(Z : H0 C)`: the latter reads the
 category off `Z`'s own type and looks for `Category C`, which does not exist. -/

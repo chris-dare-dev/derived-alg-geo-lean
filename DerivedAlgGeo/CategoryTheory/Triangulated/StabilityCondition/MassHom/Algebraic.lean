@@ -105,7 +105,7 @@ theorem exists_common_positive_functional
     · by_cases hrei : 0 < (z i).re
       · have hlt : δ < (z i).im / (z i).re := by
           have hbound := hdle i
-          simp only [slopeCap, if_pos hrei] at hbound
+          simp only [slopeCap, ite_eq_left hrei] at hbound
           dsimp [δ]
           linarith
         have hmul : δ * (z i).re < (z i).im :=

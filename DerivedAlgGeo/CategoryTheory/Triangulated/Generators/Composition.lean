@@ -126,8 +126,8 @@ private lemma extensionProduct_prop_prod (Q R : ObjectProperty C)
     (IsLimit.equivOfNatIsoOfIso α c d (Iso.refl d)).toFun hFan
   let e : U.obj₂ ≅ A ⨯ B :=
     IsLimit.conePointUniqueUpToIso hMid (Limits.limit.isLimit (Limits.pair A B))
-  have hA : A = X := by dsimp [A, F, T, T₁, T₂]; rfl
-  have hB : B = Y := by dsimp [B, F, T, T₁, T₂]; rfl
+  have hA : A = X := by dsimp [A, F, T, T₁, T₂]
+  have hB : B = Y := by dsimp [B, F, T, T₁, T₂]
   exact (extensionProduct Q R).prop_of_iso (e ≪≫ eqToIso (by rw [hA, hB])) hUmem
 
 private lemma extensionProduct_isClosedUnderBinaryProducts (Q R : ObjectProperty C)

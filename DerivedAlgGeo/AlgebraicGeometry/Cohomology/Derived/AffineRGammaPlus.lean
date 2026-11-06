@@ -54,7 +54,7 @@ bounded-below Dqc objects follows.
 ## References
 
 Mathlib's `CategoryTheory.Functor.rightDerivedFunctorPlus` and
-`CategoryTheory.Functor.rightDerivedFunctorPlusUnit` at the pinned revision;
+`CategoryTheory.Functor.rightDerivedFunctorPlusUnith` at the pinned revision;
 the affine source functor is `AlgebraicGeometry.affineΓ`.
 
 ## Tags
@@ -88,7 +88,7 @@ homotopy-level affine sections to the bounded-below derived functor. -/
 noncomputable def affineRGammaPlusUnit (R : CommRingCat.{u}) :
     (AlgebraicGeometry.affineΓ R).mapHomotopyCategoryPlus ⋙ DerivedCategory.Plus.Qh ⟶
       DerivedCategory.Plus.Qh ⋙ affineRGammaPlus R :=
-  (AlgebraicGeometry.affineΓ R).rightDerivedFunctorPlusUnit
+  (AlgebraicGeometry.affineΓ R).rightDerivedFunctorPlusUnith
 
 /-- This universal property is inherited by unfolding the specialization to
 Mathlib's right-derived functor; no affine acyclicity theorem is needed here. -/

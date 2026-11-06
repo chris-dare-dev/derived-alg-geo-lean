@@ -20,42 +20,22 @@ namespace PresheafOfModules
 
 noncomputable instance monoidalPreadditive {C : Type v} [Category C]
     (R : Cᵒᵖ ⥤ CommRingCat.{u}) :
-    MonoidalPreadditive (PresheafOfModules (R ⋙ forget₂ _ _)) where
+    MonoidalPreadditive (PresheafOfModulesOfCommRing R) where
   whiskerLeft_zero := by
     intro A B C
-    ext U x
-    change (MonoidalCategory.whiskerLeft
-      (C := ModuleCat ((R ⋙ forget₂ _ RingCat).obj U)) (A.obj U)
-        (0 : B.obj U ⟶ C.obj U)).hom x = 0
-    simp
+    ext1 U
+    exact MonoidalPreadditive.whiskerLeft_zero (C := ModuleCat (R.obj U))
   zero_whiskerRight := by
     intro A B C
-    ext U x
-    change (MonoidalCategory.whiskerRight
-      (C := ModuleCat ((R ⋙ forget₂ _ RingCat).obj U))
-        (0 : B.obj U ⟶ C.obj U) (A.obj U)).hom x = 0
-    simp
+    ext1 U
+    exact MonoidalPreadditive.zero_whiskerRight (C := ModuleCat (R.obj U))
   whiskerLeft_add := by
     intro A B C f g
-    ext U x
-    change (MonoidalCategory.whiskerLeft
-      (C := ModuleCat ((R ⋙ forget₂ _ RingCat).obj U)) (A.obj U)
-        (f.app U + g.app U)).hom x =
-      (MonoidalCategory.whiskerLeft
-        (C := ModuleCat ((R ⋙ forget₂ _ RingCat).obj U)) (A.obj U) (f.app U)).hom x +
-      (MonoidalCategory.whiskerLeft
-        (C := ModuleCat ((R ⋙ forget₂ _ RingCat).obj U)) (A.obj U) (g.app U)).hom x
-    simp
+    ext1 U
+    exact MonoidalPreadditive.whiskerLeft_add (C := ModuleCat (R.obj U)) (f.app U) (g.app U)
   add_whiskerRight := by
     intro A B C f g
-    ext U x
-    change (MonoidalCategory.whiskerRight
-      (C := ModuleCat ((R ⋙ forget₂ _ RingCat).obj U))
-        (f.app U + g.app U) (A.obj U)).hom x =
-      (MonoidalCategory.whiskerRight
-        (C := ModuleCat ((R ⋙ forget₂ _ RingCat).obj U)) (f.app U) (A.obj U)).hom x +
-      (MonoidalCategory.whiskerRight
-        (C := ModuleCat ((R ⋙ forget₂ _ RingCat).obj U)) (g.app U) (A.obj U)).hom x
-    simp
+    ext1 U
+    exact MonoidalPreadditive.add_whiskerRight (C := ModuleCat (R.obj U)) (f.app U) (g.app U)
 
 end PresheafOfModules

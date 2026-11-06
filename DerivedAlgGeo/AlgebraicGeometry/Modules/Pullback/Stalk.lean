@@ -352,6 +352,8 @@ def neighborhoodModulePullbackStalkIso {X Y : Scheme.{u}}
         (ModuleCat.extendRestrictScalarsAdj (f.stalkMap x).hom))
     (constNeighborhoodPushforwardIso f x)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- After taking a stalk, module-sheaf pullback reduces canonically to
 presheaf-module pullback.  The sheafification step disappears because it
 induces an isomorphism on every module stalk. -/
@@ -410,7 +412,7 @@ private def moduleSkyscraperPositiveEquiv (X : Scheme.{u}) (x : X)
     (hU : x ∈ U.unop) :
     ((moduleSkyscraperUnderlying X x N).obj U : Type u) ≃+ N := by
   classical
-  exact (eqToIso (if_pos hU)).addCommGroupIsoToAddEquiv
+  exact (eqToIso (ite_eq_left hU)).addCommGroupIsoToAddEquiv
 
 @[reducible] private def moduleSkyscraperModule (X : Scheme.{u}) (x : X)
     (N : ModuleCat.{u} (X.presheaf.stalk x)) (U : (Opens X)ᵒᵖ) :
@@ -426,7 +428,7 @@ private def moduleSkyscraperPositiveEquiv (X : Scheme.{u}) (x : X)
     letI : Module (X.ringCatSheaf.obj.obj U)
         (terminal AddCommGrpCat.{u}) :=
       subsingletonModule _ _
-    exact (eqToIso (if_neg hU)).addCommGroupIsoToAddEquiv.module _
+    exact (eqToIso (ite_eq_right hU)).addCommGroupIsoToAddEquiv.module _
 
 private def moduleSkyscraperPresheaf (X : Scheme.{u}) (x : X)
     (N : ModuleCat.{u} (X.presheaf.stalk x)) : X.PresheafOfModules := by
@@ -445,9 +447,9 @@ private def moduleSkyscraperPresheaf (X : Scheme.{u}) (x : X)
         Module.compHom N (X.presheaf.germ V.unop x hV).hom
       have map_compat (z : G.obj U) : eV (G.map i z) = eU z := by
         have hmap : G.map i ≫
-              (eqToIso (if_pos hV) : G.obj V ≅
+              (eqToIso (ite_eq_left hV) : G.obj V ≅
                 (forget₂ (ModuleCat (X.presheaf.stalk x)) AddCommGrpCat).obj N).hom =
-            (eqToIso (if_pos hU) : G.obj U ≅
+            (eqToIso (ite_eq_left hU) : G.obj U ≅
                 (forget₂ (ModuleCat (X.presheaf.stalk x)) AddCommGrpCat).obj N).hom := by
           simp [G, moduleSkyscraperUnderlying, skyscraperPresheaf, hU, hV]
         exact CategoryTheory.congr_fun hmap z
@@ -497,7 +499,7 @@ private def moduleSkyscraperPresheaf (X : Scheme.{u}) (x : X)
           simp [smulTransfer, Equiv.smul_def]
     · letI : Subsingleton (terminal AddCommGrpCat.{u}) :=
         terminalAddCommGrpSubsingleton
-      apply (eqToIso (if_neg hV) : G.obj V ≅
+      apply (eqToIso (ite_eq_right hV) : G.obj V ≅
         terminal AddCommGrpCat).addCommGroupIsoToAddEquiv.injective
       exact Subsingleton.elim _ _)
 
@@ -511,7 +513,7 @@ private def moduleSkyscraperPresheafAppIso (X : Scheme.{u}) (x : X)
   letI : Module (X.ringCatSheaf.obj.obj U) N :=
     Module.compHom N (X.presheaf.germ U.unop x hU).hom
   apply ModuleCat.isoMk
-    (eqToIso (if_pos hU))
+    (eqToIso (ite_eq_left hU))
   intro r
   ext m
   let smulActual (a : X.ringCatSheaf.obj.obj U)
@@ -539,7 +541,7 @@ private def moduleSkyscraperPresheafAppIso (X : Scheme.{u}) (x : X)
     (X : Scheme.{u}) (x : X)
     (N : ModuleCat.{u} (X.presheaf.stalk x)) (U : (Opens X)ᵒᵖ)
     (hU : x ∈ U.unop) (m : (moduleSkyscraperPresheaf X x N).obj U) :
-    (moduleSkyscraperPresheafAppIso X x N U hU).hom m =
+    (moduleSkyscraperPresheafAppIso X x N U hU).hom.hom m =
       moduleSkyscraperPositiveEquiv X x N U hU m := by
   rfl
 
@@ -549,7 +551,7 @@ private def moduleSkyscraperPresheafAppIso (X : Scheme.{u}) (x : X)
     (hU : x ∈ U.unop)
     (m : (ModuleCat.restrictScalars
       (X.presheaf.germ U.unop x hU).hom).obj N) :
-    (moduleSkyscraperPresheafAppIso X x N U hU).inv m =
+    (moduleSkyscraperPresheafAppIso X x N U hU).inv.hom m =
       (moduleSkyscraperPositiveEquiv X x N U hU).symm m := by
   rfl
 
@@ -563,10 +565,10 @@ private theorem moduleSkyscraperPositiveEquiv_map
       moduleSkyscraperPositiveEquiv X x N U (i.unop.le hV) m := by
   classical
   have hmap : (moduleSkyscraperUnderlying X x N).map i ≫
-        (eqToIso (if_pos hV) :
+        (eqToIso (ite_eq_left hV) :
           (moduleSkyscraperUnderlying X x N).obj V ≅
             (forget₂ (ModuleCat (X.presheaf.stalk x)) AddCommGrpCat).obj N).hom =
-      (eqToIso (if_pos (i.unop.le hV)) :
+      (eqToIso (ite_eq_left (i.unop.le hV)) :
           (moduleSkyscraperUnderlying X x N).obj U ≅
             (forget₂ (ModuleCat (X.presheaf.stalk x)) AddCommGrpCat).obj N).hom := by
     simp [moduleSkyscraperUnderlying, skyscraperPresheaf, hV, i.unop.le hV]
@@ -608,11 +610,13 @@ private theorem moduleSkyscraperMapApp_apply (X : Scheme.{u}) (x : X)
     rfl
   · letI : Subsingleton (terminal AddCommGrpCat.{u}) :=
       terminalAddCommGrpSubsingleton
-    apply (eqToIso (if_neg hU) :
+    apply (eqToIso (ite_eq_right hU) :
       (moduleSkyscraperUnderlying X x N).obj U ≅
         terminal AddCommGrpCat).addCommGroupIsoToAddEquiv.injective
     exact Subsingleton.elim _ _
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private def moduleSkyscraperMap (X : Scheme.{u}) (x : X)
     {M N : ModuleCat.{u} (X.presheaf.stalk x)} (g : M ⟶ N) :
     moduleSkyscraperPresheaf X x M ⟶
@@ -677,21 +681,19 @@ private def neighborhoodModuleSkyscraperIso (X : Scheme.{u}) (x : X)
     (fun {V W} i ↦ by
     ext m
     change (moduleSkyscraperPresheafAppIso X x N
-          ((OpenNhds.inclusion x).op.obj W) W.unop.2).hom
+          ((OpenNhds.inclusion x).op.obj W) W.unop.2).hom.hom
         ((moduleSkyscraperPresheaf X x N).map
           ((OpenNhds.inclusion x).op.map i) m) =
       ((_root_.PresheafOfModules.constFunctor
           (moduleStalkRingCocone X x)).obj N).map i
         ((moduleSkyscraperPresheafAppIso X x N
-          ((OpenNhds.inclusion x).op.obj V) V.unop.2).hom m)
-    rw [moduleSkyscraperPresheafAppIso_hom_apply,
-      moduleSkyscraperPresheafAppIso_hom_apply]
+          ((OpenNhds.inclusion x).op.obj V) V.unop.2).hom.hom m)
     change moduleSkyscraperPositiveEquiv X x N
           ((OpenNhds.inclusion x).op.obj W) W.unop.2
           ((moduleSkyscraperUnderlying X x N).map
             ((OpenNhds.inclusion x).op.map i) m) = _
-    rw [moduleSkyscraperPositiveEquiv_map]
-    rfl)
+    exact moduleSkyscraperPositiveEquiv_map X x N
+      ((OpenNhds.inclusion x).op.map i) W.unop.2 m)
 
 private def skyscraperHomToNeighborhoodHom (X : Scheme.{u}) (x : X)
     (M : X.PresheafOfModules) (N : ModuleCat.{u} (X.presheaf.stalk x))
@@ -703,6 +705,8 @@ private def skyscraperHomToNeighborhoodHom (X : Scheme.{u}) (x : X)
     X.ringCatSheaf.obj).map φ ≫
       (neighborhoodModuleSkyscraperIso X x N).hom
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private def neighborhoodHomToSkyscraperHom (X : Scheme.{u}) (x : X)
     (M : X.PresheafOfModules) (N : ModuleCat.{u} (X.presheaf.stalk x))
     (ψ : (_root_.PresheafOfModules.pushforward₀ (OpenNhds.inclusion x)
@@ -734,18 +738,20 @@ private def neighborhoodHomToSkyscraperHom (X : Scheme.{u}) (x : X)
           ((OpenNhds.inclusion x).op.map j)
           (θ.app (op (⟨U.unop, hU⟩ : OpenNhds x)) m) at hθ
       rw [hj] at hθ
-      simp only [dif_pos hU, dif_pos hV]
+      simp only [dite_eq_left hU, dite_eq_left hV]
       change θ.app (op (⟨V.unop, hV⟩ : OpenNhds x)) (M.map i m) =
         (moduleSkyscraperPresheaf X x N).map i
           (θ.app (op (⟨U.unop, hU⟩ : OpenNhds x)) m)
       exact hθ
     · letI : Subsingleton (terminal AddCommGrpCat.{u}) :=
         terminalAddCommGrpSubsingleton
-      apply (eqToIso (if_neg hV) :
+      apply (eqToIso (ite_eq_right hV) :
         (moduleSkyscraperUnderlying X x N).obj V ≅
           terminal AddCommGrpCat).addCommGroupIsoToAddEquiv.injective
       exact Subsingleton.elim _ _
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private def skyscraperNeighborhoodHomEquiv (X : Scheme.{u}) (x : X)
     (M : X.PresheafOfModules) (N : ModuleCat.{u} (X.presheaf.stalk x)) :
     (M ⟶ moduleSkyscraperPresheaf X x N) ≃
@@ -764,7 +770,7 @@ private def skyscraperNeighborhoodHomEquiv (X : Scheme.{u}) (x : X)
       rfl
     · letI : Subsingleton (terminal AddCommGrpCat.{u}) :=
         terminalAddCommGrpSubsingleton
-      apply (eqToIso (if_neg hU) :
+      apply (eqToIso (ite_eq_right hU) :
         (moduleSkyscraperUnderlying X x N).obj U ≅
           terminal AddCommGrpCat).addCommGroupIsoToAddEquiv.injective
       exact Subsingleton.elim _ _
@@ -778,7 +784,7 @@ private def skyscraperNeighborhoodHomEquiv (X : Scheme.{u}) (x : X)
     have happ : (neighborhoodHomToSkyscraperHom X x M N ψ).app (op V) =
         ψ.app Q ≫ (neighborhoodModuleSkyscraperIso X x N).inv.app Q := by
       dsimp only [neighborhoodHomToSkyscraperHom]
-      rw [dif_pos hV]
+      rw [dite_eq_left hV]
       rfl
     rw [happ]
     have hc : ψ.app Q ≫
@@ -805,14 +811,16 @@ private def neighborhoodModuleSkyscraperNatIso (X : Scheme.{u}) (x : X) :
     (fun {M N} g ↦ by
       ext V m
       obtain ⟨⟨V, hV⟩⟩ := V
-      change (moduleSkyscraperPresheafAppIso X x N (op V) hV).hom
+      change (moduleSkyscraperPresheafAppIso X x N (op V) hV).hom.hom
           (moduleSkyscraperMapApp X x g (op V) m) =
         ((ModuleCat.restrictScalars
           (X.presheaf.germ V x hV).hom).map g)
-          ((moduleSkyscraperPresheafAppIso X x M (op V) hV).hom m)
+          ((moduleSkyscraperPresheafAppIso X x M (op V) hV).hom.hom m)
       simp [moduleSkyscraperMapApp, hV]
-      rfl)
+      exact (moduleSkyscraperPositiveEquiv X x N (op V) hV).apply_symm_apply _)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private theorem skyscraperNeighborhoodHomEquiv_naturality_left
     (X : Scheme.{u}) (x : X)
     {M M' : X.PresheafOfModules} (f : M' ⟶ M)
@@ -825,6 +833,8 @@ private theorem skyscraperNeighborhoodHomEquiv_naturality_left
   simp [skyscraperNeighborhoodHomEquiv,
     skyscraperHomToNeighborhoodHom, CategoryTheory.Functor.map_comp, Category.assoc]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private theorem skyscraperNeighborhoodHomEquiv_naturality_right
     (X : Scheme.{u}) (x : X)
     {M : X.PresheafOfModules}
@@ -886,6 +896,8 @@ private def presheafModuleStalkSkyscraperHomEquiv (X : Scheme.{u}) (x : X)
         X.ringCatSheaf.obj).obj M) N).trans
     (skyscraperNeighborhoodHomEquiv X x M N).symm
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private def presheafModuleStalkSkyscraperAdjunction (X : Scheme.{u}) (x : X) :
     presheafModuleStalkFunctor X x ⊣
       moduleSkyscraperPresheafFunctor X x := by
@@ -967,12 +979,12 @@ private def moduleSkyscraperPushforwardIsoApp {X Y : Scheme.{u}}
     let R := (moduleSkyscraperPresheaf Y (f x)
       ((ModuleCat.restrictScalars (f.stalkMap x).hom).obj N)).obj V
     let eL : (L : Type u) ≃+ (terminal AddCommGrpCat.{u} : Type u) :=
-      (eqToIso (if_neg hV) :
+      (eqToIso (ite_eq_right hV) :
         (moduleSkyscraperUnderlying X x N).obj
             (op (f ⁻¹ᵁ V.unop)) ≅
           terminal AddCommGrpCat).addCommGroupIsoToAddEquiv
     let eR : (R : Type u) ≃+ (terminal AddCommGrpCat.{u} : Type u) :=
-      (eqToIso (if_neg hV) :
+      (eqToIso (ite_eq_right hV) :
         (moduleSkyscraperUnderlying Y (f x)
           ((ModuleCat.restrictScalars (f.stalkMap x).hom).obj N)).obj V ≅
             terminal AddCommGrpCat).addCommGroupIsoToAddEquiv
@@ -1013,7 +1025,7 @@ private theorem moduleSkyscraperPushforwardIsoApp_hom_apply {X Y : Scheme.{u}}
     simp [moduleSkyscraperPushforwardIsoApp, hV]]
   change eR
       ((moduleSkyscraperPresheafAppIso Y (f x)
-          ((ModuleCat.restrictScalars d).obj N) V hV).inv
+          ((ModuleCat.restrictScalars d).obj N) V hV).inv.hom
         ((ModuleCat.restrictScalarsComp' c d dc rfl).hom.app N
           ((ModuleCat.restrictScalarsCongr h).hom.app N
             ((ModuleCat.restrictScalarsComp' a b ba rfl).inv.app N
@@ -1071,7 +1083,7 @@ private def moduleSkyscraperPushforwardIsoObj {X Y : Scheme.{u}}
           f x N W hW _).trans (hsource.trans (hVapp.trans htarget))
       · letI : Subsingleton (terminal AddCommGrpCat.{u}) :=
           terminalAddCommGrpSubsingleton
-        apply (eqToIso (if_neg hW) :
+        apply (eqToIso (ite_eq_right hW) :
           (moduleSkyscraperUnderlying Y (f x)
             ((ModuleCat.restrictScalars (f.stalkMap x).hom).obj N)).obj W ≅
               terminal AddCommGrpCat).addCommGroupIsoToAddEquiv.injective
@@ -1093,10 +1105,8 @@ private theorem moduleSkyscraperPositiveEquiv_mapApp
         (moduleSkyscraperPresheafAppIso X x N U hU).inv by
     simp [moduleSkyscraperMapApp, hU]]
   change moduleSkyscraperPositiveEquiv X x N U hU
-      ((moduleSkyscraperPresheafAppIso X x N U hU).inv
-        (g ((moduleSkyscraperPresheafAppIso X x M U hU).hom m))) = _
-  rw [moduleSkyscraperPresheafAppIso_hom_apply,
-    moduleSkyscraperPresheafAppIso_inv_apply]
+      ((moduleSkyscraperPresheafAppIso X x N U hU).inv.hom
+        (g ((moduleSkyscraperPresheafAppIso X x M U hU).hom.hom m))) = _
   exact (moduleSkyscraperPositiveEquiv X x N U hU).apply_symm_apply _
 
 private def moduleSkyscraperPushforwardIso {X Y : Scheme.{u}}
@@ -1145,7 +1155,7 @@ private def moduleSkyscraperPushforwardIso {X Y : Scheme.{u}}
         exact hleft.trans hright.symm
       · letI : Subsingleton (terminal AddCommGrpCat.{u}) :=
           terminalAddCommGrpSubsingleton
-        apply (eqToIso (if_neg hV) :
+        apply (eqToIso (ite_eq_right hV) :
           (moduleSkyscraperUnderlying Y (f x)
             ((ModuleCat.restrictScalars (f.stalkMap x).hom).obj N)).obj V ≅
               terminal AddCommGrpCat).addCommGroupIsoToAddEquiv.injective
@@ -1153,6 +1163,8 @@ private def moduleSkyscraperPushforwardIso {X Y : Scheme.{u}}
 
 
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Pulling back a presheaf of modules and then taking its stalk agrees with
 first taking the stalk at the image point and extending scalars along the
 induced local-ring map. -/

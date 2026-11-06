@@ -84,9 +84,6 @@ private theorem cocycle_equivHomShift_symm_comp_shiftZero (z : Cocycle K L 0) :
   ext i
   simp [Cocycle.equivHomShift_symm_apply, Cocycle.homOf_f,
     Cochain.rightShift_v, CochainComplex.shiftFunctorZero_hom_app_f]
-  -- The remaining inverse/forward `XIsoOfEq` composite contains dependent casts.
-  -- Ordinary `rw` fails at instances transparency; `erw` closes it.
-  erw [Category.assoc, Iso.inv_hom_id, Category.comp_id]
 
 /-- The class of a degree-zero cocycle corresponds to the homotopy class of its
 associated chain map. -/
@@ -100,7 +97,6 @@ associated chain map. -/
   rw [CohomologyClass.homAddEquiv_apply, CohomologyClass.toHom_mk]
   rw [← Functor.map_comp]
   rw [cocycle_equivHomShift_symm_comp_shiftZero K L z]
-  rfl
 
 end
 

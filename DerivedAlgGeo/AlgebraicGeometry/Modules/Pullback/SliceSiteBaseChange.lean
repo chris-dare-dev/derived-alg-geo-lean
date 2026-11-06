@@ -52,10 +52,11 @@ theorem overEquiv_map_pushforwardOverIso_hom (f : X ⟶ Y) (M : X.Modules)
           ((pushforward (f ∣_ U)).obj
             ((overEquiv (f ⁻¹ᵁ U)).functor.obj (M.over (f ⁻¹ᵁ U)))) := by
   simp only [pushforwardOverIso, Functor.FullyFaithful.preimageIso_hom,
-    Functor.FullyFaithful.map_preimage, Iso.trans_hom,
-    Functor.mapIso_hom, Iso.symm_hom]
+    Functor.FullyFaithful.map_preimage]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The preexisting objectwise `pullbackOverIso` is the geometric pullback
 comparison after transport through the slice equivalence. -/
 theorem overEquiv_map_pullbackOverIso_hom (f : X ⟶ Y) (N : Y.Modules)

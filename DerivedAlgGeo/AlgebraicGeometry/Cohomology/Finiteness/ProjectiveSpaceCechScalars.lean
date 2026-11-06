@@ -71,10 +71,10 @@ theorem eqToIso_transport_varietyScalarAction (d : ℤ)
         ).addCommGroupIsoToAddEquiv
         (((Cohomology.varietyScalarAction (Proj (polynomialGrading ι k))
             (associatedSheaf (polynomialGrading ι k)
-              (intShift (polynomialGrading ι k) d)) r).val.app (op W)).hom s) =
+              (intShift (polynomialGrading ι k) d)) r).asHom.val.app (op W)).hom s) =
       ((Cohomology.varietyScalarAction (Proj (polynomialGrading ι k))
           (associatedSheaf (polynomialGrading ι k)
-            (intShift (polynomialGrading ι k) d)) r).val.app (op W')).hom
+            (intShift (polynomialGrading ι k) d)) r).asHom.val.app (op W')).hom
         ((eqToIso (congrArg (fun V => (intTwistPresheaf ι k d).obj (op V)) h)
           ).addCommGroupIsoToAddEquiv s) := by
   subst h; rfl
@@ -89,7 +89,7 @@ theorem intCechTermSectionAddEquiv_symm_varietyScalarAction (d : ℤ) {n : ℕ}
     (intCechTermSectionAddEquiv ι k d x).symm
         (((Cohomology.varietyScalarAction (Proj (polynomialGrading ι k))
             (associatedSheaf (polynomialGrading ι k)
-              (intShift (polynomialGrading ι k) d)) r).val.app _).hom w) =
+              (intShift (polynomialGrading ι k) d)) r).asHom.val.app _).hom w) =
       r • (intCechTermSectionAddEquiv ι k d x).symm w := by
   refine (congrArg (intCechTermSectionAddEquiv ι k d x).symm
     (varietyScalarAction_app_eq ι k (intShift (polynomialGrading ι k) d) r _ w)).trans ?_
@@ -103,7 +103,7 @@ theorem intCechIndexEquiv_smul (d : ℤ) {n : ℕ} (x : Fin (n + 1) → ι) (r :
     intCechIndexEquiv ι k d x
         (((Cohomology.varietyScalarAction (Proj (polynomialGrading ι k))
             (associatedSheaf (polynomialGrading ι k)
-              (intShift (polynomialGrading ι k) d)) r).val.app
+              (intShift (polynomialGrading ι k) d)) r).asHom.val.app
           (op (∏ᶜ (polynomialVariableChart ι k ∘ x)))).hom s) =
       r • intCechIndexEquiv ι k d x s := by
   refine Eq.trans (congrArg (intCechTermSectionAddEquiv ι k d x).symm

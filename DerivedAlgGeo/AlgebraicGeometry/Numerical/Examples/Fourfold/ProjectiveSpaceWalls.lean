@@ -116,7 +116,7 @@ theorem p4_hDegrees_eq_chCoeff (k : Fin 5) (E : FourfoldNum) :
       (Polarised.corrComp p4NumericalVariety (Polarised.unitCorr (RankOneRing 4)) E (k : ℕ)
         * p4Polarization.cls ^ (4 - (k : ℕ))) : ℚ) : ℝ) = _
   rw [Polarised.corrComp_unitCorr, p4Polarization_cls, p4_degree_chComp_mul,
-    if_pos (show (k : ℕ) + (4 - (k : ℕ)) = 4 by omega), mul_one]
+    ite_eq_left (show (k : ℕ) + (4 - (k : ℕ)) = 4 by omega), mul_one]
 
 /-! ### The charge family on the model -/
 
@@ -150,7 +150,7 @@ theorem p4_charge (w : ℂ) (E : FourfoldNum) :
   rw [p4WallChargeFamily_charge, Wall.Exp.charge_apply, Wall.Exp.ofMoments]
   rw [Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_succ,
     Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_zero, zero_add]
-  simp only [Wall.Exp.moments, Nat.zero_le, Nat.le_refl, dif_pos,
+  simp only [Wall.Exp.moments, Nat.zero_le, Nat.le_refl, dite_eq_left,
     p4_hDegrees_eq_chCoeff]
   norm_num [Wall.Exp.coeff, Nat.factorial]
   ring

@@ -23,6 +23,8 @@ universe u
 
 namespace AlgebraicGeometry.Coh
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Every coherent subobject of the restriction of `E` to the actual basic open
 `D(r)` lifts to a coherent subobject of `E`. In contrast to a
 `FixedTargetMonoExtension` witness, the upstairs arrow `m` is itself monic. -/

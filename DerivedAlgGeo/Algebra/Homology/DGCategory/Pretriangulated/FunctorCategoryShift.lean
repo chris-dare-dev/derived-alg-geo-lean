@@ -208,6 +208,8 @@ noncomputable def z0ShiftFunctorAddIso (n m : ℤ) :
       z0ShiftFunctor n ⋙ z0ShiftFunctor m :=
   z0ShiftFunctorAddIso' n m (n + m) rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The right unit law for the additive comparison, in free-degree form. -/
 lemma z0ShiftFunctorAddIso'_hom_app_zero_right (n nm : ℤ)
     (hnm : n + 0 = nm) (F : Z0 (DGFunctor C D)) :

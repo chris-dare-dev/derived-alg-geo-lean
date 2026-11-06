@@ -244,6 +244,10 @@ theorem polynomialVariableIntCechComplex_homology_zero_isZero [Nontrivial ι] (d
   intCechComplex_homology_zero_isZero_of_ker ι k d
     (fun s hs => intCechComplex_ker_zero_eq_zero_of_neg ι k d hd s hs)
 
+set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+set_option backward.isDefEq.respectTransparency.types false in
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **`H⁰(Pⁿ, O(d)) = 0` for `d < 0`.**
 
 The abelian-group statement of #665. `Nontrivial ι` is the only hypothesis on the variable set:

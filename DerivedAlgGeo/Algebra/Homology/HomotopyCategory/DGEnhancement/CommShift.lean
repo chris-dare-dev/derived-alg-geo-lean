@@ -61,6 +61,8 @@ open CochainComplex CochainComplex.HomComplex Limits DGCategoryStruct DGCategory
 namespace Cdg
 variable (A : Type u) [Category.{v} A] [Preadditive A]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Cochain complexes into `H⁰(C^dg A)`. -/
 def toH0 : CochainComplex A ℤ ⥤ H0 (Cdg A) where
   obj K := (show H0 (Cdg A) from (K : Cdg A))
@@ -139,6 +141,8 @@ lemma toH0ShiftIso_zero_hom (K : Cdg A) :
         (IsPretriangulated.shiftWitness (Cdg A) K 0)))
       (compare_isShiftBy_zero K))
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The `add` coherence, componentwise. -/
 lemma toH0ShiftIso_add_hom (K : Cdg A) (a b : ℤ) :
     (toH0ShiftIso K (a + b)).hom =

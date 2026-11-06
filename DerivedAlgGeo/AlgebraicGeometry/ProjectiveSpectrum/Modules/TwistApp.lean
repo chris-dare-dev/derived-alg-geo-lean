@@ -47,6 +47,8 @@ variable (𝒜 : ℕ → σA) [GradedRing 𝒜]
 
 local notation3 "X" => ProjectiveSpectrum.top 𝒜
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **What `twistBy` does to a section: it is the pure tensor with `a / 1`.**
 
 The section-level counterpart of `unitToTwist_app_one`, one tensor up. Without it `twistBy` is

@@ -115,6 +115,8 @@ theorem freeHomEquiv_symm_sectionsOfTop_ιFree_app_one (G : X.Modules) {I : Type
       (fun b => sectionsOfTop G (σ b))) a
   exact h1.symm.trans (congrArg (fun s => s.val (op W)) h2)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **A family every section is locally a combination of classifies an epimorphism.**
 
 The local preimage of `∑ cₐ • σₐ|_W` under `free I ⟶ G` is `∑ cₐ • ιFree a (1)`; the map is

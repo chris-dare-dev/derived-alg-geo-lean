@@ -110,7 +110,7 @@ theorem polygonLength_le_add_norm_charge_sub_of_mono
       have := F.nonempty
       omega
     unfold q
-    rw [dif_neg hne, dif_pos rfl]
+    rw [dite_eq_right hne, dite_eq_left rfl]
   have hq : Monotone q := by
     intro a b hab
     rcases hab.eq_or_lt with rfl | hab
@@ -134,7 +134,7 @@ theorem polygonLength_le_add_norm_charge_sub_of_mono
             lt_of_le_of_ne (Fin.le_last a) hal
           have hb_last : b < Fin.last F.n :=
             lt_of_le_of_ne (Fin.le_last b) hbl
-          simp only [q, dif_neg ha₀, dif_neg hal, dif_neg hb₀, dif_neg hbl,
+          simp only [q, dite_eq_right ha₀, dite_eq_right hal, dite_eq_right hb₀, dite_eq_right hbl,
             Fin.castSucc_le_castSucc_iff]
           exact ComplexPolygonalPath.crossMaxIndex_mono_of_angle_gt
             G.polygonVertex (fun i ↦ G.polygonEdge_mem_semiClosedUpperHalfPlane i)

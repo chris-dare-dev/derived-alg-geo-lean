@@ -41,11 +41,11 @@ noncomputable def fixedBasePullbackTop :
         map_add' := by intros; rfl
         map_smul' := by
           intro r x
-          change (X.smul r).hom x = (T.smul r).hom x
+          change (X.smul r).asHom.hom x = (T.smul r).asHom.hom x
           have hX := modulesToFixedBaseSheaf_smul Y φ ((pushforward f).obj N) ⊤ r x
-          change (X.smul r).hom x = _ at hX
+          change (X.smul r).asHom.hom x = _ at hX
           have hT := modulesToFixedBaseSheaf_smul Z (φ ≫ f.appTop) N ⊤ r x
-          change (T.smul r).hom x = _ at hT
+          change (T.smul r).asHom.hom x = _ at hT
           rw [hX, hT]
           have htopY : (⊤ : Y.Opens).leTop = 𝟙 _ := Subsingleton.elim _ _
           have htopZ : (⊤ : Z.Opens).leTop = 𝟙 _ := Subsingleton.elim _ _

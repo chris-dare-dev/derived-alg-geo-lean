@@ -107,6 +107,8 @@ theorem boundedFunctor_obj_obj (P : DqcRightDerivedPushforward f)
     ((P.boundedFunctor h).obj E).obj = P.functor.obj E.obj :=
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Fullness of right-derived pushforward on `Dqc` descends to its intrinsic
 bounded-coherent restriction. -/
 noncomputable instance boundedFunctor_full (P : DqcRightDerivedPushforward f)
@@ -115,6 +117,8 @@ noncomputable instance boundedFunctor_full (P : DqcRightDerivedPushforward f)
   dsimp [boundedFunctor]
   infer_instance
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Faithfulness of right-derived pushforward on `Dqc` descends to its
 intrinsic bounded-coherent restriction. -/
 instance boundedFunctor_faithful (P : DqcRightDerivedPushforward f)

@@ -110,6 +110,8 @@ noncomputable def homologyZeroLinearEquiv (X Y : C) :
     ((scHomologyLinearEquiv (k := k) X Y).trans
       (quotientToH0LinearEquiv (k := k) X Y))
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The degree-zero comparison sends the homology class represented by a
 closed dg morphism to its class in `H⁰`. -/
 lemma homologyZeroLinearEquiv_homologyπ_cyclesMk (X Y : C)

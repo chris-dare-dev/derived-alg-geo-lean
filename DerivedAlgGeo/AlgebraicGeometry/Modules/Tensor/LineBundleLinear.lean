@@ -37,11 +37,13 @@ variable {X : Scheme.{u}}
 
 noncomputable section
 
+set_option backward.isDefEq.respectTransparency false in
 private noncomputable instance unitHomModule (M : X.Modules) :
     Module Γ(X, (⊤ : X.Opens))
       ((SheafOfModules.unit X.ringCatSheaf : X.Modules) ⟶ M) :=
   Scheme.homModuleGlobal X _ _
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Maps from the tensor unit to `M` are linearly equivalent to the global sections of `M`. -/
 noncomputable def unitHomTopLinearEquiv (M : X.Modules) :
     ((SheafOfModules.unit X.ringCatSheaf : X.Modules) ⟶ M) ≃ₗ[Γ(X, (⊤ : X.Opens))]
@@ -67,11 +69,13 @@ noncomputable def unitHomTopLinearEquiv (M : X.Modules) :
         (show X.presheaf.obj (op (⊤ : X.Opens)) from 1)
     exact (f.val.app (op (⊤ : X.Opens))).hom.map_smul r _
 
+set_option backward.isDefEq.respectTransparency false in
 private noncomputable instance unitHomModuleOver {k : Type u} [Field k]
     (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] (M : Y.Modules) :
     Module k ((SheafOfModules.unit Y.ringCatSheaf : Y.Modules) ⟶ M) :=
   Variety.homModule Y _ _
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The tensor-unit Hom/sections comparison is linear over the base field. -/
 noncomputable def unitHomTopLinearEquivOver {k : Type u} [Field k]
     (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] (M : Y.Modules) :
@@ -121,6 +125,7 @@ noncomputable def tensorLeftHomLinearEquiv (R : Type w) [Semiring R]
       (M ⟶ tensorObj L.inverse N) :=
   L.tensorLeftEquivalence.toAdjunction.homLinearEquiv M N
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The line-bundle Hom/sections comparison is linear over global functions. -/
 noncomputable def lineHomTopLinearEquiv (L : LineBundleData X) (N : X.Modules) :
     (L.line ⟶ N) ≃ₗ[Γ(X, (⊤ : X.Opens))] Γ(tensorObj L.inverse N, (⊤ : X.Opens)) :=
@@ -130,6 +135,7 @@ noncomputable def lineHomTopLinearEquiv (L : LineBundleData X) (N : X.Modules) :
       (SheafOfModules.unit X.ringCatSheaf) N).trans
       (unitHomTopLinearEquiv (tensorObj L.inverse N)))
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The line-bundle Hom/sections comparison is linear over the base field. -/
 noncomputable def lineHomTopLinearEquivOver {k : Type u} [Field k]
     (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))]

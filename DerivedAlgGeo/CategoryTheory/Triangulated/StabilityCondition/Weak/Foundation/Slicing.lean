@@ -8,7 +8,7 @@ Portions adapted from mattrobball/BridgelandStability, revision 9e48f23
 import DerivedAlgGeo.CategoryTheory.Triangulated.PostnikovTower
 import Mathlib.CategoryTheory.ObjectProperty.ContainsZero
 import Mathlib.CategoryTheory.Triangulated.Triangulated
-import Mathlib.Data.Real.Basic
+import Mathlib.Basic.Real.Basic
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Ring
 

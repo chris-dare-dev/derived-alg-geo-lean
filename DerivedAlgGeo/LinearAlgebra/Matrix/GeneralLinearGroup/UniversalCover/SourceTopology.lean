@@ -85,6 +85,8 @@ noncomputable def rotationGLPos (θ : ℝ) : Matrix.GLPos (Fin 2) ℝ :=
 @[simp]
 theorem rotationGLPos_mat (θ : ℝ) : toMat (rotationGLPos θ) = rotationMatrix θ := rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Translation of the phase line through `θ`. -/
 def phaseTranslation (θ : ℝ) : NormalizedShift where
   toOrderIso := OrderIso.addRight θ

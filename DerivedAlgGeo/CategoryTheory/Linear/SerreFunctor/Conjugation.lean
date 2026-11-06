@@ -123,8 +123,8 @@ private theorem homEquivCounit_naturality_right (Φ : C ≌ C)
   calc
     (Φ.counitIso.app B').inv ≫ Φ.functor.map (Φ.inverse.map g ≫ h) =
         ((Φ.counitIso.app B').inv ≫ Φ.functor.map (Φ.inverse.map g)) ≫
-          Φ.functor.map h := by simp only [Functor.map_comp, Category.assoc]; rfl
-    _ = (g ≫ (Φ.counitIso.app B).inv) ≫ Φ.functor.map h := by rw [hnat]; rfl
+          Φ.functor.map h := by simp only [Functor.map_comp, Category.assoc]
+    _ = (g ≫ (Φ.counitIso.app B).inv) ≫ Φ.functor.map h := by rw [hnat]
     _ = g ≫ (Φ.counitIso.app B).inv ≫ Φ.functor.map h := Category.assoc _ _ _
 
 /-- Conjugation by a linear autoequivalence preserves Serre duality. -/
@@ -198,10 +198,6 @@ private theorem counit_inv_trans (Φ Ψ : C ≌ C) (B : C) :
   simp [Equivalence.trans, Functor.associator_inv_app, Functor.associator_hom_app,
     Functor.isoWhiskerLeft_inv, Functor.isoWhiskerRight_inv,
     Functor.rightUnitor_inv_app, Category.assoc]
-  erw [Ψ.functor.map_id, Category.id_comp]
-  erw [Ψ.functor.map_id, Category.comp_id]
-  erw [Category.comp_id]
-  rfl
 
 private theorem homEquivCounit_trans (Φ Ψ : C ≌ C)
     [Φ.functor.Additive] [Φ.functor.Linear k]
@@ -218,7 +214,6 @@ private theorem homEquivCounit_trans (Φ Ψ : C ≌ C)
   rw [counit_inv_trans Φ Ψ B]
   simp only [Functor.map_comp]
   erw [Category.assoc]
-  rfl
 
 /-- Inverse Hom preimages for a composite equivalence run in reverse order;
 its composite counit then identifies the two transported Serre duality maps. -/
@@ -242,7 +237,6 @@ theorem conj_eta_trans (D : SerreFunctorData k C) (Φ Ψ : C ≌ C)
           A B).symm.dualMap φ) := by
     ext h
     simp [LinearEquiv.dualMap_apply, homEquivOfFullyFaithful, preimage_inverse_trans]
-    rfl
   dsimp [conj, etaConj]
   change homEquivCounit (k := k) (Φ.trans Ψ) B (D.S.obj ((Φ.trans Ψ).inverse.obj A))
       (D.eta ((Φ.trans Ψ).inverse.obj A) ((Φ.trans Ψ).inverse.obj B)
@@ -273,6 +267,8 @@ theorem conj_trans_uniqueIso_hom_app_eq_id
   rw [← conj_eta_trans D Φ Ψ A ((D.conj (Φ.trans Ψ)).S.obj A)]
   exact LinearEquiv.apply_symm_apply _ _
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private theorem eta_conj_refl (D : SerreFunctorData k C) (A B : C)
     (φ : Module.Dual k (A ⟶ B)) :
     (letI : (Equivalence.refl : C ≌ C).functor.Additive := by
@@ -327,6 +323,8 @@ private theorem uniqueIso_conj_refl_hom_app (D : SerreFunctorData k C) (A : C) :
   rw [eta_conj_refl D A (D.S.obj A)]
   exact LinearEquiv.apply_symm_apply _ _
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Reflexive η compatibility and Serre uniqueness normalize transport by
 the identity equivalence to the functor unitors. This states no shift coherence. -/
 theorem transportIso_refl (D : SerreFunctorData k C) :
@@ -352,8 +350,6 @@ theorem transportIso_refl (D : SerreFunctorData k C) :
   erw [uniqueIso_hom_app]
   erw [h]
   simp [Equivalence.refl, Functor.associator_inv_app]
-  erw [D.S.map_id]
-  erw [Category.id_comp, Category.id_comp, Category.id_comp]
 
 section TransportFunctoriality
 

@@ -185,6 +185,8 @@ noncomputable def twistSequence (D : EffectiveCartierDivisor (X := X))
     simp only [Category.assoc, Iso.hom_inv_id_assoc]
     rw [(D.tensorTwistSequence E).zero, comp_zero])
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private noncomputable def tensorTwistSequenceIsoTwistSequence
     (D : EffectiveCartierDivisor (X := X)) (E : CartierDivisor X) :
     D.tensorTwistSequence E ≅ D.twistSequence E :=

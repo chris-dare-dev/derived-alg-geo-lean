@@ -173,6 +173,8 @@ structure RelativePerfectOpenZariskiPresentation (S : Scheme.{u})
 
 /-! ## The supported zero presentation -/
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private noncomputable instance identityFiberArrowUnique {S : Scheme.{u}}
     (T : SchemeBaseChange S) :
     Unique (Over.mk (𝟙 T.left) ⟶

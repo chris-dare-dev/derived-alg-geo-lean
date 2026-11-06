@@ -171,12 +171,14 @@ theorem phaseBase_add_phaseIndex (phi : ℝ) :
 theorem phaseBase_add_one (phi : ℝ) : phaseBase (phi + 1) = phaseBase phi := by
   change toIocMod zero_lt_one (0 : ℝ) (phi + 1) =
     toIocMod zero_lt_one (0 : ℝ) phi
-  convert toIocMod_add_intCast_mul zero_lt_one (0 : ℝ) phi 1 using 1 <;> ring
+  convert toIocMod_add_intCast_mul zero_lt_one (0 : ℝ) phi 1 using 1
+  ring
 
 theorem phaseIndex_add_one (phi : ℝ) : phaseIndex (phi + 1) = phaseIndex phi + 1 := by
   change toIocDiv zero_lt_one (0 : ℝ) (phi + 1) =
     toIocDiv zero_lt_one (0 : ℝ) phi + 1
-  convert toIocDiv_add_intCast_mul zero_lt_one (0 : ℝ) phi 1 using 1 <;> ring
+  convert toIocDiv_add_intCast_mul zero_lt_one (0 : ℝ) phi 1 using 1
+  ring
 
 theorem phaseBase_eq_of_mem_Ioc {phi : ℝ} (hphi : phi ∈ Set.Ioc (0 : ℝ) 1) :
     phaseBase phi = phi :=

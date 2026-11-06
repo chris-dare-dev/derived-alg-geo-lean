@@ -34,7 +34,7 @@ variable {Λ V : Type*} [AddCommGroup Λ]
 
 private local instance realModuleIsAddTorsionFree
     (M : Type*) [AddCommGroup M] [Module ℝ M] : IsAddTorsionFree M :=
-  IsAddTorsionFree.of_isTorsionFree ℝ M
+  ⟨fun _ hn _ _ _ h ↦ (HasUniqueDiv.of_isTorsionFree ℝ M).nsmul_right_injective hn h⟩
 
 /-- The map from the saturated integral quotient to the real quotient.
 
