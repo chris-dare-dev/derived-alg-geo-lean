@@ -107,6 +107,8 @@ theorem fracSection_mul {a b a' b' : A} {k k' : ℕ} (ha : a ∈ 𝒜 k) (hb : b
       = fracSection 𝒜 (SetLike.mul_mem_graded ha ha') (SetLike.mul_mem_graded hb hb') hUU :=
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **`a / b` and `b / a` are inverse to each other**, over an open inside both `D₊(a)` and
 `D₊(b)`.
 
@@ -126,6 +128,8 @@ theorem fracSection_mul_fracSection_symm {a b : A} {k : ℕ} (ha : a ∈ 𝒜 k)
   rw [← Localization.mk_one, Localization.mk_eq_mk_iff, Localization.r_iff_exists]
   exact ⟨1, by simp [mul_comm]⟩
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **Rescaling the section `b` of `O(k)` by `a / b` gives the section `a`**, at every point of an
 open inside `D₊(b)`.
 
@@ -149,6 +153,8 @@ theorem fracSection_smul_sectionOfMem {a b : A} {k : ℕ} (ha : a ∈ 𝒜 k) (h
   funext x
   exact frac_smul_sectionOfMem 𝒜 ha hb hU x
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **The overlap comparison for two homogeneous elements of the same degree.**
 
 Over an open inside `D₊(b)`, twisting a section by `a` is twisting it by `b` and scaling by

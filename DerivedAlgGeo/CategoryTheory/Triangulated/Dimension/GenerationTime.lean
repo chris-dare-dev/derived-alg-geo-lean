@@ -79,7 +79,7 @@ theorem generationTime_le_coe_iff (P Q : ObjectProperty C) (n : ℕ) :
     · exfalso
       rw [Set.not_nonempty_iff_eq_empty] at hne
       rw [generationTime, hne, Set.image_empty, sInf_empty, top_le_iff] at h
-      exact ENat.coe_ne_top n h
+      exact ENat.natCast_ne_top n h
   · intro h
     exact sInf_le ⟨n, h, rfl⟩
 
@@ -116,7 +116,7 @@ theorem generationTime_eq_top_iff (P Q : ObjectProperty C) :
   · intro h n hn
     have := (generationTime_le_coe_iff P Q n).2 hn
     rw [h, top_le_iff] at this
-    exact ENat.coe_ne_top n this
+    exact ENat.natCast_ne_top n this
   · intro h
     have hempty : {m | Q ≤ P.triangEnvelopeIter m} = (∅ : Set ℕ) :=
       Set.subset_empty_iff.1 fun m hm ↦ h m hm

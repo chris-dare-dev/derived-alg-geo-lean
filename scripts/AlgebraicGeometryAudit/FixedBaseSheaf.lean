@@ -47,7 +47,7 @@ example {R : CommRingCat.{u}} (Y : Scheme.{u}) (φ : R ⟶ Γ(Y, ⊤))
 example {R : CommRingCat.{u}} (Y : Scheme.{u}) (φ : R ⟶ Γ(Y, ⊤))
     (M : Y.Modules) (U : Y.Opens) (r : R)
     (x : ((modulesToFixedBaseSheaf Y φ).obj M).presheaf.obj (.op U)) :
-    r • x = (M.smul (Y.presheaf.map U.leTop.op (φ.hom r))).hom x :=
+    r • x = (M.smul (Y.presheaf.map U.leTop.op (φ.hom r))).asHom.hom x :=
   rfl
 
 -- The point and legs of the fixed-ring pullback cone are the original

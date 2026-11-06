@@ -86,6 +86,8 @@ def standardAway (i : StandardChartIndex 𝒜) :
       AlgebraicGeometry.Proj 𝒜 :=
   AlgebraicGeometry.Proj.awayι 𝒜 (i.2 : A) i.2.2 i.1.2
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 instance standardAway_isOpenImmersion (i : StandardChartIndex 𝒜) :
     AlgebraicGeometry.IsOpenImmersion (standardAway 𝒜 i) := by
   unfold standardAway
@@ -183,6 +185,8 @@ noncomputable def affineComparisonDataSelf : AffineComparisonData 𝒜 𝒜 wher
 
 namespace AffineComparisonData
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Quasi-coherent data on one range slice, transported from the affine `tilde` presentation. -/
 noncomputable def localQuasicoherentData (c : AffineComparisonData 𝒜 𝓜)
     (i : StandardChartIndex 𝒜) :
@@ -253,6 +257,8 @@ namespace AffineComparisonDataOn
 
 variable {𝒜 𝓜} {ι : Type u} {charts : ι → StandardChartIndex 𝒜}
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Quasi-coherent data on one chart of the family, transported from its `tilde` presentation.
 The same argument as `AffineComparisonData.localQuasicoherentData`, over one index. -/
 noncomputable def localQuasicoherentData (c : AffineComparisonDataOn 𝒜 𝓜 charts) (j : ι) :
@@ -473,6 +479,8 @@ structure LocalizedNoetherianFiniteData where
     Module.Finite
       (HomogeneousLocalization.Away 𝒜 (i.2 : A)) (localizedModule 𝒜 𝓜 i)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Finite presentation of all standard-chart localizations makes the associated sheaf coherent.
 
 The proof uses Mathlib's finite-presentation theorem for affine `tilde`, transports it across the

@@ -77,9 +77,9 @@ private theorem isIso_homologyZero_unit_of_resolution
     [IsIso ((DerivedCategory.Plus.homologyFunctor D 0).map
       ((F.mapHomotopyCategoryPlus ⋙ DerivedCategory.Plus.Qh).map w))] :
     IsIso ((DerivedCategory.Plus.homologyFunctor D 0).map
-      (F.rightDerivedFunctorPlusUnit.app K)) := by
+      (F.rightDerivedFunctorPlusUnith.app K)) := by
   let H := DerivedCategory.Plus.homologyFunctor D 0
-  let α := F.rightDerivedFunctorPlusUnit
+  let α := F.rightDerivedFunctorPlusUnith
   have hJ : IsIso (α.app J) := inferInstance
   have hwQ : IsIso (DerivedCategory.Plus.Qh.map w) :=
     Localization.inverts DerivedCategory.Plus.Qh _ _ hw
@@ -178,7 +178,7 @@ theorem isIso_homologyZero_map_rightDerivedFunctorPlusUnit_of_isStrictlyGE_zero
       CochainComplex.Plus.quasiIso C i → PreservesLimit (parallelPair
         (((InjectiveObject.ι C).mapCochainComplexPlus.obj L).obj.sc 0).g 0) F) :
     IsIso ((DerivedCategory.Plus.homologyFunctor D 0).map
-      (F.rightDerivedFunctorPlusUnit.app
+      (F.rightDerivedFunctorPlusUnith.app
         ((HomotopyCategory.Plus.quotient C).obj K))) := by
   obtain ⟨L, hL, i, hi⟩ :=
     CochainComplex.Plus.exists_quasiIso_injective K 0
@@ -225,6 +225,8 @@ theorem isIso_homologyZero_map_rightDerivedFunctorPlusUnit_of_isStrictlyGE_zero
     exact hplus
   exact isIso_homologyZero_unit_of_resolution F _ _ w hw
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- For a degree-zero single, the source outgoing differential is zero and
 its kernel is automatically preserved. Only kernels in resolutions receiving
 a quasi-isomorphism from this single remain as premises. -/
@@ -235,7 +237,7 @@ theorem isIso_homologyZero_map_rightDerivedFunctorPlusUnit_single (X : C)
       CochainComplex.Plus.quasiIso C i → PreservesLimit (parallelPair
         (((InjectiveObject.ι C).mapCochainComplexPlus.obj L).obj.sc 0).g 0) F) :
     IsIso ((DerivedCategory.Plus.homologyFunctor D 0).map
-      (F.rightDerivedFunctorPlusUnit.app
+      (F.rightDerivedFunctorPlusUnith.app
         ((HomotopyCategory.Plus.singleFunctor C 0).obj X))) := by
   let K : CochainComplex.Plus C :=
     ⟨(CochainComplex.singleFunctor C 0).obj X, ⟨0, inferInstance⟩⟩
@@ -243,11 +245,10 @@ theorem isIso_homologyZero_map_rightDerivedFunctorPlusUnit_single (X : C)
   have hK : PreservesLimit (parallelPair (K.obj.sc 0).g 0) F := by
     apply Limits.preservesKernel_zero'
     simp [K]
-    rfl
   have h :=
     isIso_homologyZero_map_rightDerivedFunctorPlusUnit_of_isStrictlyGE_zero F K hK hResKernel
   change IsIso ((DerivedCategory.Plus.homologyFunctor D 0).map
-      (F.rightDerivedFunctorPlusUnit.app
+      (F.rightDerivedFunctorPlusUnith.app
         ((HomotopyCategory.Plus.singleFunctor C 0).obj X))) at h
   exact h
 
@@ -300,7 +301,7 @@ noncomputable def rightDerivedFunctorPlusHomologyZeroSingleIso (X : C)
       F.obj X := by
   let K := (HomotopyCategory.Plus.singleFunctor C 0).obj X
   let H := DerivedCategory.Plus.homologyFunctor D 0
-  let α := F.rightDerivedFunctorPlusUnit
+  let α := F.rightDerivedFunctorPlusUnith
   haveI : IsIso (H.map (α.app K)) :=
     isIso_homologyZero_map_rightDerivedFunctorPlusUnit_single F X hResKernel
   let e := (asIso (H.map (α.app K))).symm
@@ -325,7 +326,7 @@ private noncomputable def homologyZeroSingleUnit :
       (DerivedCategory.Plus.Qh ⋙ F.rightDerivedFunctorPlus)) ⋙
       DerivedCategory.Plus.homologyFunctor D 0) :=
   whiskerRight (whiskerLeft (HomotopyCategory.Plus.singleFunctor C 0)
-    F.rightDerivedFunctorPlusUnit) (DerivedCategory.Plus.homologyFunctor D 0)
+    F.rightDerivedFunctorPlusUnith) (DerivedCategory.Plus.homologyFunctor D 0)
 
 /-- A uniform family of outgoing-kernel conditions on injective resolutions
 makes the H⁰ comparison of the bounded-below right-derived functor natural in
@@ -344,12 +345,14 @@ noncomputable def rightDerivedFunctorPlusHomologyZeroSingleNatIso
     rw [NatTrans.isIso_iff_isIso_app]
     intro X
     change IsIso ((DerivedCategory.Plus.homologyFunctor D 0).map
-      (F.rightDerivedFunctorPlusUnit.app
+      (F.rightDerivedFunctorPlusUnith.app
         ((HomotopyCategory.Plus.singleFunctor C 0).obj X)))
     exact F.isIso_homologyZero_map_rightDerivedFunctorPlusUnit_single X (hResKernel X)
   letI : IsIso (homologyZeroSingleUnit F) := hη
   exact (asIso (homologyZeroSingleUnit F)).symm ≪≫ homologyZeroSingleSourceNatIso F
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Both constructions invert the same component of the derived unit and use
 the same source normalization, without choosing compatible resolutions. -/
 theorem rightDerivedFunctorPlusHomologyZeroSingleNatIso_app
@@ -366,7 +369,6 @@ theorem rightDerivedFunctorPlusHomologyZeroSingleNatIso_app
   simp [rightDerivedFunctorPlusHomologyZeroSingleNatIso,
     rightDerivedFunctorPlusHomologyZeroSingleIso, sourceH0SingleIso,
     homologyZeroSingleUnit]
-  rfl
 
 /-- Finite-limit preservation supplies the resolution-kernel conditions for
 the natural H⁰ comparison of degree-zero singles. -/
@@ -405,14 +407,14 @@ theorem rightDerivedFunctorPlus_additive : F.rightDerivedFunctorPlus.Additive :=
   haveI : L.EssSurj := inferInstanceAs
     (((InjectiveObject.ι C).mapHomotopyCategoryPlus ⋙ DerivedCategory.Plus.Qh).EssSurj)
   haveI hunit (K : HomotopyCategory.Plus (InjectiveObject C)) :
-      IsIso (F.rightDerivedFunctorPlusUnit.app (J.obj K)) := by
+      IsIso (F.rightDerivedFunctorPlusUnith.app (J.obj K)) := by
     dsimp only [J]
     infer_instance
   let e : J ⋙ (F.mapHomotopyCategoryPlus ⋙ DerivedCategory.Plus.Qh) ≅
       L ⋙ F.rightDerivedFunctorPlus :=
     NatIso.ofComponents
-      (fun K => @asIso _ _ _ _ (F.rightDerivedFunctorPlusUnit.app (J.obj K)) (hunit K))
-      (fun f => F.rightDerivedFunctorPlusUnit.naturality (J.map f))
+      (fun K => @asIso _ _ _ _ (F.rightDerivedFunctorPlusUnith.app (J.obj K)) (hunit K))
+      (fun f => F.rightDerivedFunctorPlusUnith.naturality (J.map f))
   haveI : (L ⋙ F.rightDerivedFunctorPlus).Additive := Functor.additive_of_iso e
   exact Functor.additive_of_full_essSurj_comp L F.rightDerivedFunctorPlus
 

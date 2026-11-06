@@ -16,6 +16,10 @@ This file supplies that reading. `cechComplexFunctor_delta_π` computes one cofa
 and `cechComplexFunctor_d_π` assembles the alternating sum. Both are statements about Mathlib's
 construction, so they live in Mathlib's namespace.
 
+## Main definitions
+
+* None: the file states component formulas for Mathlib's `cechComplexFunctor`.
+
 ## Main statements
 
 * `cechComplexFunctor_delta_π` — the `j`-th coface, projected at `x`, is the projection at the
@@ -33,11 +37,19 @@ intersection.
 
 Both proofs finish with `exact` rather than `rw`. The two sides differ in the `HasProduct`
 instance argument that `Pi.π` carries, which `rw` will not see through but definitional
-unification will. Rewriting with `Pi.lift_π` fails here for that reason alone.
+unification will. Rewriting with `Pi.lift_comp_π` fails here for that reason alone.
 
 `Fin.succAbove` needs no reindexing lemma: `SimplexCategory.δ j` has
 `toOrderHom = Fin.succAbove j`, so this is the shape the Čech nerve already produces via
 `FormalCoproduct.mapPower`.
+
+## References
+
+* Mathlib `CategoryTheory/Sites/SheafCohomology/Cech.lean`, which defines the complex.
+
+## Tags
+
+Čech complex, differential, presheaf, cohomology
 -/
 
 universe w v' v u' u
@@ -75,7 +87,7 @@ theorem cechComplexFunctor_delta_π {n : ℕ} (j : Fin (n + 2))
       Pi.π (cechTermFamily U P n) (((cechNerve U).map (SimplexCategory.δ j).op).f x) ≫
         P.map (((cechNerve U).map (SimplexCategory.δ j).op).φ x).op := by
   rw [CosimplicialObject.δ, Limits.FormalCoproduct.cosimplicialObjectFunctor_obj_map]
-  exact Limits.Pi.lift_π _ _
+  exact Limits.Pi.lift_comp_π _ _
 
 /-- The map a morphism of presheaves induces on Čech cochains, projected at the index `x`, is the
 projection at `x` followed by the morphism on that intersection.
@@ -98,6 +110,8 @@ theorem cechComplexFunctor_map_f_π {F G : Cᵒᵖ ⥤ A} (φ : F ⟶ G) (n : �
   rw [h]
   exact Limits.Pi.map_π _ _
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The Čech differential, projected at the index `x`, is the alternating sum of the face
 restrictions. This is the formula a concrete computation of `Hⁱ` consumes. -/
 theorem cechComplexFunctor_d_π {n : ℕ} (x : ToType (SimplexCategory.mk (n + 1)) → ι) :

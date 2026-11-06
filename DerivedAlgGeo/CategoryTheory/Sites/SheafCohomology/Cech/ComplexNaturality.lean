@@ -127,7 +127,7 @@ noncomputable def sectionsToCechBicomplexMap
         change 0 + 1 = p' at hpp
         omega
       subst p'
-      simp only [dif_pos True.intro, dif_neg (by omega : ¬ (0 + 1 = (0 : ℤ))),
+      simp only [dite_eq_left True.intro, dite_eq_right (by omega : ¬ (0 + 1 = (0 : ℤ))),
         comp_zero]
       rw [Category.assoc]
       change (HomologicalComplex₂.singleZeroXIso A 0 rfl).hom.f q ≫
@@ -138,7 +138,7 @@ noncomputable def sectionsToCechBicomplexMap
   · intro p q q' hqq
     by_cases hp : p = 0
     · subst p
-      simp only [dif_pos True.intro]
+      simp only [dite_eq_left True.intro]
       exact (HomologicalComplex.Hom.comm
         ((HomologicalComplex₂.singleZeroXIso A 0 rfl).hom ≫ g) q q')
     · simp [hp]

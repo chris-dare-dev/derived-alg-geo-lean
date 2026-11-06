@@ -78,8 +78,7 @@ theorem exists_semistable_strictQuotient_le_phase
         phaseQ T.1 ≤ phaseQ S.1 := by
     intro S hQS
     revert hQS
-    induction S using IsWellFounded.induction
-        (· > · : StrictSubobject X → StrictSubobject X → Prop) with
+    induction S using WellFoundedGT.induction with
     | ind S ih =>
         intro hQS
         have hStop : S.1 ≠ ⊤ := by
@@ -512,8 +511,7 @@ theorem exists_strictMDQ
       exact cokernelZeroIsoTarget
     exact ⟨B, e.inv ≫ q, IsStrictMDQ.precomposeIso C hq e.symm⟩
   intro S
-  induction S using IsWellFounded.induction
-      (· > · : StrictSubobject X → StrictSubobject X → Prop) with
+  induction S using WellFoundedGT.induction with
   | ind S ih =>
       intro hQS
       let QS : σ.slicing.IntervalCat C a b := cokernel S.1.arrow

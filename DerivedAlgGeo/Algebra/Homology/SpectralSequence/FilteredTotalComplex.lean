@@ -142,6 +142,8 @@ noncomputable def columnFilteredTotalι
     inferInstanceAs (((columnFiltrationBicomplex K).obj p).HasTotal (ComplexShape.up ℤ))
   exact total.map (HomologicalComplex.stupidTruncGEι K (-p)) (ComplexShape.up ℤ)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The filtration-stage maps to the total complex are compatible with the filtration maps. -/
 @[reassoc]
 lemma columnFilteredTotal_map_comp_ι

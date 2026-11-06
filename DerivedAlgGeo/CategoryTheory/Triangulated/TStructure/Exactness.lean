@@ -350,15 +350,13 @@ theorem mapTruncLEIso_hom_naturality (n : ℤ) {X Y : C} (f : X ⟶ Y) :
           (mapTruncLEIso_hom_comp_ι F t t' n Y))
     _ = F.map ((t.truncLEι n).app X) ≫ F.map f := by
       rw [← F.map_comp, ← F.map_comp]
-      exact congrArg F.map (by simpa using (t.truncLEι n).naturality f)
+      exact congrArg F.map (by simp)
     _ = (mapTruncLEIso F t t' n X).hom ≫
         (t'.truncLEι n).app (F.obj X) ≫ F.map f := by
       rw [← mapTruncLEIso_hom_comp_ι F t t' n X]
       cat_disch
     _ = _ := by
-      simpa [Category.assoc] using
-        congrArg (fun g => (mapTruncLEIso F t t' n X).hom ≫ g)
-          ((t'.truncLEι n).naturality (F.map f)).symm
+      simp [Category.assoc]
 
 /-- The connective truncation comparison of a t-exact functor. -/
 noncomputable def mapTruncGEIso (n : ℤ) (X : C) :

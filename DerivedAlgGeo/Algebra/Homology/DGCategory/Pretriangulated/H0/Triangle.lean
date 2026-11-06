@@ -145,6 +145,8 @@ lemma distinguished_cocone_triangle {X Y : H0 C} (f : X ⟶ Y) :
       coneTriangle_mem (C := C) f hc⟩
 
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 omit [IsPretriangulated C] in
 /-- A cone on an identity is a zero object of `H⁰`: its identity is a
 coboundary, so it is zero in the quotient. `Enhancement.lean` proves the same
@@ -344,6 +346,8 @@ variable {X₁ Y₁ Z₁ X₂ Y₂ Z₂ : C} {f₁ : cocycles X₁ Y₁} {f₂ :
   (hc₁ : IsConeOf (f₁ : (dgHom X₁ Y₁).X 0) Z₁)
   (hc₂ : IsConeOf (f₂ : (dgHom X₂ Y₂).X 0) Z₂)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- A dg cone morphism descends to a morphism of the associated `H⁰` cone
 triangles. The retained degree-minus-one homotopy supplies the first square;
 the two strict cone squares supply the other two. -/

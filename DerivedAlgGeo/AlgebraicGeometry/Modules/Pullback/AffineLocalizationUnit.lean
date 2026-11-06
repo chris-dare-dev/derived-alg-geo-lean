@@ -71,6 +71,8 @@ private theorem affineLocalizationTopNatIso_hom_app (M : ModuleCat.{u} R) :
       G'.map ((pullbackSpecMapTildeIso f).inv.app M) := by
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The natural isomorphism sends the localization generator of a tilde section
 to that section's image under the actual pullback adjunction unit. -/
 theorem affineLocalizationTopNatIso_hom_localizedMk (M : ModuleCat.{u} R) (m : M) :

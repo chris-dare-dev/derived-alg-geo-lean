@@ -125,11 +125,11 @@ theorem sigma_hom_ext {X : ι → C} {Y : C} {ψ ψ' : L.obj (∐ X) ⟶ L.obj Y
   have huv : u ≫ (ρ.s ≫ φ.s) = v := by
     apply Sigma.hom_ext
     intro i
-    simp only [u, v, Sigma.ι_desc_assoc, Sigma.ι_map, assoc, hρi' i]
+    simp only [u, v, Sigma.ι_comp_desc_assoc, Sigma.ι_map, assoc, hρi' i]
   have hg : u ≫ g₁ = u ≫ g₂ := by
     apply Sigma.hom_ext
     intro i
-    simp only [u, Sigma.ι_desc_assoc, assoc, hw' i]
+    simp only [u, Sigma.ι_comp_desc_assoc, assoc, hw' i]
   haveI : IsIso (L.map v) := Localization.inverts L W _ hv
   haveI : IsIso (L.map u ≫ L.map (ρ.s ≫ φ.s)) := by rw [← L.map_comp, huv]; infer_instance
   haveI : IsIso (L.map u) := IsIso.of_isIso_comp_right (L.map u) (L.map (ρ.s ≫ φ.s))
@@ -176,7 +176,7 @@ theorem cofanDesc_fac (i : ι) : L.map (Sigma.ι X i) ≫ cofanDesc L W X t Y e 
         L.map (Sigma.ι (fun i => (cofanFraction L W X t Y e i).X') i) := by
     rw [IsIso.comp_inv_eq, assoc, ← L.map_comp, Sigma.ι_map, L.map_comp, IsIso.inv_hom_id_assoc]
   unfold cofanDesc
-  rw [← assoc, h1, assoc, ← L.map_comp_assoc, Sigma.ι_desc]
+  rw [← assoc, h1, assoc, ← L.map_comp_assoc, Sigma.ι_comp_desc]
   have := cofanFraction_map L W X t Y e i
   simp only [MorphismProperty.RightFraction.map] at this
   rw [← assoc, this, assoc, Iso.inv_hom_id, comp_id]

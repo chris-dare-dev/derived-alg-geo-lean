@@ -72,24 +72,34 @@ def liftOfLE (F : Functor C D) (hle : P ≤ Q.inverseImage F) :
     Functor P.FullSubcategory Q.FullSubcategory :=
   Q.lift (P.ι ⋙ F) (fun X ↦ hle X.obj X.property)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 instance instAdditiveLiftOfLE [F.Additive] (hle : P ≤ Q.inverseImage F) :
     (liftOfLE F hle).Additive :=
   inferInstanceAs (Q.lift (P.ι ⋙ F) (fun X ↦ hle X.obj X.property)).Additive
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 instance instCommShiftLiftOfLE [P.IsTriangulated] [Q.IsTriangulated]
     [F.CommShift ℤ] (hle : P ≤ Q.inverseImage F) :
     (liftOfLE F hle).CommShift ℤ :=
   inferInstanceAs ((Q.lift (P.ι ⋙ F) (fun X ↦ hle X.obj X.property)).CommShift ℤ)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 instance instIsTriangulatedLiftOfLE [P.IsTriangulated] [Q.IsTriangulated] [F.CommShift ℤ]
     [F.IsTriangulated] (hle : P ≤ Q.inverseImage F) :
     (liftOfLE F hle).IsTriangulated :=
   inferInstanceAs (Q.lift (P.ι ⋙ F) (fun X ↦ hle X.obj X.property)).IsTriangulated
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 instance instFaithfulLiftOfLE [F.Faithful] (hle : P ≤ Q.inverseImage F) :
     (liftOfLE F hle).Faithful :=
   inferInstanceAs (Q.lift (P.ι ⋙ F) (fun X ↦ hle X.obj X.property)).Faithful
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 instance instFullLiftOfLE [F.Full] (hle : P ≤ Q.inverseImage F) :
     (liftOfLE F hle).Full :=
   inferInstanceAs (Q.lift (P.ι ⋙ F) (fun X ↦ hle X.obj X.property)).Full
@@ -100,15 +110,21 @@ def preimageLift (F : Functor C D) (hmem : ∀ X : C, P X ↔ Q (F.obj X)) :
     Functor P.FullSubcategory Q.FullSubcategory :=
   liftOfLE F (fun X ↦ (hmem X).1)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 instance instAdditivePreimageLift [F.Additive] (hmem : ∀ X : C, P X ↔ Q (F.obj X)) :
     (preimageLift F hmem).Additive :=
   inferInstanceAs (liftOfLE F (fun X ↦ (hmem X).1)).Additive
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 instance instCommShiftPreimageLift [P.IsTriangulated] [Q.IsTriangulated]
     [F.CommShift ℤ] (hmem : ∀ X : C, P X ↔ Q (F.obj X)) :
     (preimageLift F hmem).CommShift ℤ :=
   inferInstanceAs ((liftOfLE F (fun X ↦ (hmem X).1)).CommShift ℤ)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 instance instIsTriangulatedPreimageLift [P.IsTriangulated] [Q.IsTriangulated] [F.CommShift ℤ]
     [F.IsTriangulated] (hmem : ∀ X : C, P X ↔ Q (F.obj X)) :
     (preimageLift F hmem).IsTriangulated :=
@@ -128,10 +144,14 @@ noncomputable instance instEssSurjPreimageLift [F.EssSurj] [Q.IsClosedUnderIsomo
     let XP : P.FullSubcategory := ⟨X, (hmem X).2 hFX⟩
     exact ⟨XP, ⟨Q.isoMk e⟩⟩
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 instance instFaithfulPreimageLift [F.Faithful] (hmem : ∀ X : C, P X ↔ Q (F.obj X)) :
     (preimageLift F hmem).Faithful :=
   inferInstanceAs (liftOfLE F (fun X ↦ (hmem X).1)).Faithful
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 instance instFullPreimageLift [F.Full] (hmem : ∀ X : C, P X ↔ Q (F.obj X)) :
     (preimageLift F hmem).Full :=
   inferInstanceAs (liftOfLE F (fun X ↦ (hmem X).1)).Full

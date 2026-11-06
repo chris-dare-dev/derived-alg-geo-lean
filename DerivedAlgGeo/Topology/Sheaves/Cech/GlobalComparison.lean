@@ -54,7 +54,7 @@ private lemma evalOp_map_π
       Limits.Pi.π (fun j ↦ F.obj (op (W.obj j))) (m.f i) ≫
         F.map (m.φ i).op) ≫
       Limits.Pi.π (fun q ↦ F.obj (op (V.obj q))) q = _
-  rw [Limits.Pi.lift_π]
+  rw [Limits.Pi.lift_comp_π]
 
 /-- Restriction of a global section to the degree-zero term of a Cech complex. -/
 noncomputable def globalSectionsToCechZero
@@ -110,7 +110,7 @@ lemma globalSectionsToCechZero_comp_d
       globalSectionsToCechZero hT U G ≫ Limits.Pi.π T₀ r =
         G.obj.map (hT.from ((V.cech.obj (op (SimplexCategory.mk 0))).obj r)).op := by
     dsimp [globalSectionsToCechZero, T₀]
-    rw [Limits.Pi.lift_π]
+    rw [Limits.Pi.lift_comp_π]
   rw [hd, Fin.sum_univ_two]
   rw [show (-1 : ℤ) ^ ((0 : Fin 2) : ℕ) = 1 by norm_num,
     show (-1 : ℤ) ^ ((1 : Fin 2) : ℕ) = -1 by norm_num]
@@ -149,12 +149,12 @@ lemma globalSectionsToCechZero_naturality
       globalSectionsToCechZero hT U G ≫ Limits.Pi.π TG q =
         G.obj.map (hT.from ((V.cech.obj (op (SimplexCategory.mk 0))).obj q)).op := by
     dsimp [globalSectionsToCechZero, TG]
-    rw [Limits.Pi.lift_π]
+    rw [Limits.Pi.lift_comp_π]
   have hH (q : (V.cech.obj (op (SimplexCategory.mk 0))).I) :
       globalSectionsToCechZero hT U H ≫ Limits.Pi.π TH q =
         H.obj.map (hT.from ((V.cech.obj (op (SimplexCategory.mk 0))).obj q)).op := by
     dsimp [globalSectionsToCechZero, TH]
-    rw [Limits.Pi.lift_π]
+    rw [Limits.Pi.lift_comp_π]
   apply Limits.Pi.hom_ext
   intro q
   dsimp [V, TG, TH] at hG hH ⊢
@@ -336,7 +336,7 @@ lemma globalSectionsToCechZero_exact
             ((SimplexCategory.δ (1 : Fin 2)).toOrderHom k)))
         (by
           intro k
-          exact (heq_of_eq (Limits.Pi.lift_π (fun k : Fin 1 ↦
+          exact (heq_of_eq (Limits.Pi.lift_comp_π (fun k : Fin 1 ↦
             Limits.Pi.π (U ∘ q)
               ((SimplexCategory.δ (1 : Fin 2)).toOrderHom k)) k)).trans
             (projectionHEq (hδ₁ k)))
@@ -348,7 +348,7 @@ lemma globalSectionsToCechZero_exact
             ((SimplexCategory.δ (0 : Fin 2)).toOrderHom k)))
         (by
           intro k
-          exact (heq_of_eq (Limits.Pi.lift_π (fun k : Fin 1 ↦
+          exact (heq_of_eq (Limits.Pi.lift_comp_π (fun k : Fin 1 ↦
             Limits.Pi.π (U ∘ q)
               ((SimplexCategory.δ (0 : Fin 2)).toOrderHom k)) k)).trans
             (projectionHEq (hδ₀ k)))
@@ -364,11 +364,11 @@ lemma globalSectionsToCechZero_exact
       simpa only [F.map_comp, ConcreteCategory.comp_apply] using hpull
     have hlf : l ≫ Limits.Pi.π (U ∘ q) 0 = f := by
       dsimp [l]
-      rw [Limits.Pi.lift_π]
+      rw [Limits.Pi.lift_comp_π]
       rfl
     have hlg : l ≫ Limits.Pi.π (U ∘ q) 1 = g := by
       dsimp [l]
-      rw [Limits.Pi.lift_π]
+      rw [Limits.Pi.lift_comp_π]
       rfl
     rw [← op_comp, ← op_comp, hlf, hlg] at hpull'
     exact hpull'
@@ -393,7 +393,7 @@ lemma globalSectionsToCechZero_exact
           G.obj.map (hT.from (∏ᶜ (U ∘ q))).op) ≫
         Limits.Pi.π (fun q : Fin 1 → index ↦
           G.obj.obj (op (∏ᶜ (U ∘ q)))) (r a))) (s.1 (op T)) = xV (r a)
-    rw [Limits.Pi.lift_π]
+    rw [Limits.Pi.lift_comp_π]
     have hs : s.1 (op (U a)) = family a := hfamily.section_apply hU hF a
     dsimp [family, F] at hs
     have hs' : F.map (hT.from (U a)).op (s.1 (op T)) =
@@ -447,7 +447,7 @@ lemma globalSectionsToCechZero_mono
     have hproj : globalSectionsToCechZero hT U G ≫ Limits.Pi.π T₀ r =
         G.obj.map (hT.from P).op := by
       dsimp [globalSectionsToCechZero, T₀, P, V]
-      rw [Limits.Pi.lift_π]
+      rw [Limits.Pi.lift_comp_π]
     erw [← ConcreteCategory.comp_apply, ← ConcreteCategory.comp_apply] at hp
     rw [hproj] at hp
     have hp' := congrArg (fun z ↦ (G.obj.map (e.inv).op).hom z) hp
@@ -613,7 +613,7 @@ noncomputable def globalSectionsToCechBicomplexMap
         change 0 + 1 = p' at hpp
         omega
       subst p'
-      simp only [dif_pos True.intro, dif_neg (by omega : ¬ (0 + 1 = (0 : ℤ))),
+      simp only [dite_eq_left True.intro, dite_eq_right (by omega : ¬ (0 + 1 = (0 : ℤ))),
         comp_zero]
       rw [Category.assoc]
       change (HomologicalComplex₂.singleZeroXIso A 0 rfl).hom.f q ≫
@@ -624,7 +624,7 @@ noncomputable def globalSectionsToCechBicomplexMap
   · intro p q q' hqq
     by_cases hp : p = 0
     · subst p
-      simp only [dif_pos True.intro]
+      simp only [dite_eq_left True.intro]
       exact (HomologicalComplex.Hom.comm
         ((HomologicalComplex₂.singleZeroXIso A 0 rfl).hom ≫ g) q q')
     · simp [hp]
@@ -825,6 +825,9 @@ noncomputable def cechToSectionsHomologyIso
     HomologicalComplex.homologyMapIso
       (injectiveResolutionSectionsComplexUnliftedIso I) (n : ℤ)
 
+set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+set_option backward.isDefEq.respectTransparency.types false in
+set_option backward.isDefEq.respectTransparency false in
 /-- **The Cech-to-derived comparison, as a named additive equivalence.**
 
 The existential form below records only that some isomorphism exists, which is enough for a

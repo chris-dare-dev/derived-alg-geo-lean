@@ -76,7 +76,7 @@ lemma cechScalarAction_apply (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))]
     (x : (cechCohomologyFunctor U n).obj ((Scheme.Modules.toSheaf Y).obj M)) :
     cechScalarAction k Y M U n r x =
       ((cechCohomologyFunctor U n).map
-        ((Scheme.Modules.toSheaf Y).map (varietyScalarAction Y M r))).hom x :=
+        ((Scheme.Modules.toSheaf Y).map (varietyScalarAction Y M r).asHom)).hom x :=
   rfl
 
 /-- **The Čech-to-derived comparison is `k`-linear.**
@@ -97,10 +97,10 @@ theorem cechComparisonAddEquiv_smul (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.
     cechComparisonAddEquiv Limits.isTerminalTop U I hExt hcover n
         (cechScalarAction k Y M U n r x) =
       @Sheaf.H.map (Opens Y) _ (Opens.grothendieckTopology Y) _ hExt _ _
-        ((Scheme.Modules.toSheaf Y).map (varietyScalarAction Y M r)) n
+        ((Scheme.Modules.toSheaf Y).map (varietyScalarAction Y M r).asHom) n
         (cechComparisonAddEquiv Limits.isTerminalTop U I hExt hcover n x) :=
   cechComparisonAddEquiv_naturality Limits.isTerminalTop U
-    ((Scheme.Modules.toSheaf Y).map (varietyScalarAction Y M r)) I I
+    ((Scheme.Modules.toSheaf Y).map (varietyScalarAction Y M r).asHom) I I
     (CategoryTheory.InjectiveResolution.descHom _ I I).hom'
     (CategoryTheory.InjectiveResolution.Hom.ι'_comp_hom' _) hExt hcover hcover n x
 

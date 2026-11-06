@@ -115,7 +115,7 @@ theorem IsPolynomialTwist.divMonomial_mem {σM : Type u} [SetLike σM (MvPolynom
   -- The quotient is nonzero, so some exponent of `p` is divisible by `X_{i₀}^{m * c}`; its degree
   -- is what pins the quotient's homogeneous degree.
   obtain ⟨β, hβ⟩ := MvPolynomial.support_nonempty.mpr hq
-  have hcoeff : MvPolynomial.coeff (Finsupp.single i₀ (m * c) + β) p ≠ 0 := by
+  have hcoeff : p.coeff (Finsupp.single i₀ (m * c) + β) ≠ 0 := by
     have := MvPolynomial.mem_support_iff.mp hβ
     rwa [MvPolynomial.coeff_divMonomial] at this
   have hmem : Finsupp.single i₀ (m * c) + β ∈ p.support :=
@@ -339,7 +339,7 @@ theorem laurentFace_mul {γ γ' : ι →₀ ℕ} {i₀ : ι} {c : ℕ}
     (hγ : γ = Finsupp.single i₀ c + γ') :
     (MvPolynomial.monomial γ' (1 : R)) * MvPolynomial.monomial (Finsupp.single i₀ c) 1 =
       MvPolynomial.monomial γ 1 := by
-  rw [MvPolynomial.monomial_mul, one_mul, hγ, add_comm]
+  rw [MvPolynomial.monomial_mul_monomial, one_mul, hγ, add_comm]
 
 theorem monomial_mem_add_degree {γ γ' : ι →₀ ℕ} {i₀ : ι} {c : ℕ}
     (hγ : γ = Finsupp.single i₀ c + γ') :

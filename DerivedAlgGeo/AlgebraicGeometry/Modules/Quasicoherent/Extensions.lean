@@ -243,6 +243,8 @@ noncomputable instance quasicoherent_isClosedUnderExtensions (X : Scheme.{u}) :
   prop_X₂_of_shortExact hS h₁ h₃ := isQuasicoherent_middle hS h₁ h₃
 
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **The zero sheaf is quasi-coherent.**
 
 `Scheme.coherent_containsZero` specializes the arbitrary-ringed-site zero theorem

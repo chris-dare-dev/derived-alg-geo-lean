@@ -192,6 +192,8 @@ instance pushforward_additive : (pushforward f).Additive :=
     infer_instance
   Functor.additive_of_comp_faithful (pushforward f) (ι Y)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Coherent pushforward along a finite morphism preserves epimorphisms.  This is where
 finiteness, through affineness, is spent on exactness: an epimorphism of coherent sheaves is an
 epimorphism of the underlying quasi-coherent sheaves, `pushforward_map_epi_of_isAffineHom`

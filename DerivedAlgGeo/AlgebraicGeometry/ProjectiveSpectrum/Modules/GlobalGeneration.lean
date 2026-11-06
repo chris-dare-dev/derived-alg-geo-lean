@@ -205,11 +205,11 @@ theorem exists_epi_free_tensorTwist_ge (F : (Proj 𝒜).Modules)
         (σ ⟨i, b⟩)).symm
       have hσ' := hσ ⟨i, b⟩
       dsimp only at hσ' ⊢
-      rw [dif_pos rfl, hres, hσ', twistBy_congr 𝒜 (1 * N)
+      rw [dite_eq_left rfl, hres, hσ', twistBy_congr 𝒜 (1 * N)
         (congrArg (fun k => g i ^ k) (one_mul N).symm) (pow_mem_mul 𝒜 (hg i) N)
         (pow_mem_deg 𝒜 (hg i) (1 * N)) F]
     · dsimp only
-      rw [dif_neg ha, zero_smul]
+      rw [dite_eq_right ha, zero_smul]
   have hsum := Scheme.Modules.IsLocalCombination.finset_sum (σ := σ) S _ (fun p _ => hpure p)
   obtain ⟨W, hWV₁, hxW, c, hc⟩ := hsum x hxV₁
   refine ⟨W, hWV₁.trans hV₁U, hxW, c, ?_⟩

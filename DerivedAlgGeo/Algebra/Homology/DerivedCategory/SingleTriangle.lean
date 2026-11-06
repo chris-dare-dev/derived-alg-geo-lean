@@ -26,7 +26,7 @@ attribute [local instance] HasDerivedCategory.standard
 @[simp]
 theorem singleTriangle.map_id {S : ShortComplex C} (hS : S.ShortExact) :
     singleTriangle.map hS hS (𝟙 S) = 𝟙 hS.singleTriangle := by
-  ext <;> simp [singleTriangle.map] <;> rfl
+  ext <;> simp [singleTriangle.map]
 
 @[simp, reassoc]
 theorem singleTriangle.map_comp {S₁ S₂ S₃ : ShortComplex C}
@@ -34,6 +34,6 @@ theorem singleTriangle.map_comp {S₁ S₂ S₃ : ShortComplex C}
     (f : S₁ ⟶ S₂) (g : S₂ ⟶ S₃) :
     singleTriangle.map h₁ h₃ (f ≫ g) =
       singleTriangle.map h₁ h₂ f ≫ singleTriangle.map h₂ h₃ g := by
-  ext <;> simp [singleTriangle.map] <;> rfl
+  ext <;> simp [singleTriangle.map]
 
 end CategoryTheory.ShortComplex.ShortExact

@@ -122,6 +122,8 @@ noncomputable def rawTransportedTwistTriangleObj₂Iso :
       Functor.isoWhiskerRight (Functor.rightUnitor eD.inverse) eD.functor ≪≫
       eD.counitIso
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem rawTransportedTwistTriangleObj₂Iso_hom_app (Z : Y) :
     (K.rawTransportedTwistTriangleObj₂Iso (eD := eD)).hom.app Z =
@@ -210,6 +212,8 @@ noncomputable def rawTransportedUnitTriangleObj₁Iso :
       Functor.isoWhiskerRight (Functor.rightUnitor eC.inverse) eC.functor ≪≫
       eC.counitIso
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem rawTransportedUnitTriangleObj₁Iso_hom_app (Z : X) :
     (K.rawTransportedUnitTriangleObj₁Iso (eC := eC)).hom.app Z =
@@ -307,6 +311,7 @@ private noncomputable def presentedObj₁IsoHomApp (Z : Y) :
       ((transportedH0Right (R := R) eC eD).obj Z) ≫
     rightIsoHomMapApp (R := R) (eC := eC) (eD := eD) P Z
 
+set_option backward.isDefEq.respectTransparency false in
 private theorem counitTriangleObj₁Iso_hom_app (Z : Y) :
     (P.counitTriangleObj₁Iso K).hom.app Z =
       counitSourceUnitApp (L := L) (R := R) (eC := eC) (eD := eD) K Z ≫
@@ -317,14 +322,7 @@ private theorem counitTriangleObj₁Iso_hom_app (Z : Y) :
   rw [whiskeredH0CompIso_hom_app (eD := eD),
     whiskeredAssociator_hom_app (eC := eC) (eD := eD)]
   simp
-  erw [Category.id_comp]
-  erw [Category.id_comp]
-  erw [Category.id_comp]
-  erw [Category.id_comp]
-  erw [Category.id_comp]
-  erw [Category.id_comp]
-  erw [Category.id_comp]
-  rfl
+  exact Category.id_comp _
 
 private theorem counitTriangleObj₁Iso_hom_app_eq_presentedObj₁IsoHomApp
     (Z : Y) :
@@ -363,7 +361,6 @@ private theorem counitSourceUnitApp_comp_transportedH0_counit (Z : Y) :
         eD.counit.app Z =
     eD.functor.map (A.h0Counit.app (eD.inverse.obj Z)) ≫ eD.counit.app Z
   rw [Iso.hom_inv_id_assoc]
-  rfl
 
 private theorem presentedObj₁IsoHomApp_comp_counit (Z : Y) :
     presentedObj₁IsoHomApp (L := L) (R := R) (eC := eC) (eD := eD)
@@ -533,6 +530,7 @@ private noncomputable def presentedObj₂IsoHomApp (Z : X) :
   unitTargetUnitApp (L := L) (R := R) (eC := eC) (eD := eD) K Z ≫
     presentedUnitTailApp (L := L) (R := R) (eC := eC) (eD := eD) P Z
 
+set_option backward.isDefEq.respectTransparency false in
 private theorem unitTriangleObj₂Iso_hom_app (Z : X) :
     (P.unitTriangleObj₂Iso K).hom.app Z =
       presentedObj₂IsoHomApp (L := L) (R := R) (eC := eC) (eD := eD)
@@ -540,12 +538,7 @@ private theorem unitTriangleObj₂Iso_hom_app (Z : X) :
   simp only [unitTriangleObj₂Iso, Iso.trans_hom, NatTrans.comp_app]
   rw [whiskeredH0CompIso_hom_app (L := R) (R := L) (eD := eC)]
   simp
-  erw [Category.id_comp]
-  erw [Category.id_comp]
-  erw [Category.id_comp]
-  erw [Category.id_comp]
-  erw [Category.id_comp]
-  rfl
+  exact Category.id_comp _
 
 private noncomputable def transportedUnitApp (Z : X) :
     (K.rawTransportedUnitTriangle (eC := eC) ⋙ Triangle.π₁).obj Z ⟶

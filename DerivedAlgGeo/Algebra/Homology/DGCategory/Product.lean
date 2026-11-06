@@ -150,6 +150,8 @@ lemma prod_dgComp_apply {X Y Z : C × D} (p q r : ℤ) (h : p + q = r)
     dgComp (C := C × D) p q r h f g =
       (dgComp p q r h f.1 g.1, dgComp p q r h f.2 g.2) := rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The product dg category. Every axiom holds componentwise and no sign
 enters, so each proof is `Prod.ext` followed by the corresponding axiom in each
 factor. -/

@@ -70,8 +70,8 @@ private noncomputable def cechCosimplicialOpenImmersionIso
     apply Limits.Pi.hom_ext
     intro q
     slice_lhs 2 3 => erw [Limits.Pi.mapIso_hom_π]
-    slice_lhs 1 2 => erw [Limits.Pi.lift_π]
-    slice_rhs 2 3 => erw [Limits.Pi.lift_π]
+    slice_lhs 1 2 => erw [Limits.Pi.lift_comp_π]
+    slice_rhs 2 3 => erw [Limits.Pi.lift_comp_π]
     slice_rhs 1 2 => erw [Limits.Pi.mapIso_hom_π]
     simp only [Category.assoc]
     congr 1
@@ -157,6 +157,8 @@ theorem modulesSpec_isCechAcyclicOnCompactBasis
       ((cechComplexFunctor W).mapIso
         ((sheafToPresheaf (Opens.grothendieckTopology (Spec R)) AddCommGrpCat).mapIso e))
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 set_option maxHeartbeats 1000000 in
 /-- The underlying abelian sheaf of a quasi-coherent module is Cech-acyclic on the local
 distinguished-open basis below an affine open. -/
@@ -295,6 +297,8 @@ theorem modules_H_subsingleton_of_cohomologicalBound
   exact (@CategoryTheory.Sheaf.subsingleton_HPrime_iff_H (Opens X) _
     (Opens.grothendieckTopology X) _ hExt ⊤ Limits.isTerminalTop _ n).mp hH'
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Coherent sheaves inherit the same explicit finite-affine-cover bound. -/
 theorem coherent_H_subsingleton_of_cohomologicalBound
     (F : Coh X) [CompactSpace X]

@@ -69,6 +69,8 @@ lemma transport_generators_I (i : q.I) :
     ((q.transport Y hY F η e).generators i).I = (q.generators i).I :=
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Locally free data is transported to locally free data: `GeneratingSections.map` sends an
 isomorphism `π` to an isomorphism, and so does pushing along `e i`. -/
 instance isLocallyFreeData_transport [q.IsLocallyFreeData] :

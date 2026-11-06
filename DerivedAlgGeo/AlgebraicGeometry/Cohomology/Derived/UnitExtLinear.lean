@@ -50,7 +50,7 @@ theorem extUnitAddEquivDerivedH_smul (F : Coh X) (n : ℕ) (r : k)
   rw [Abelian.Ext.smul_eq_comp_mk₀]
   rw [Variety.smul_eq_action_comp, Category.comp_id]
   change extComparisonMap (unitFromConstant X)
-      (e.comp (Ext.mk₀ (Cohomology.varietyScalarAction X ((Coh.ι X).obj F) r))
+      (e.comp (Ext.mk₀ (Cohomology.varietyScalarAction X ((Coh.ι X).obj F) r).asHom)
         (add_zero n)) = _
   rw [extComparisonMap_comp_mk₀]
   rfl

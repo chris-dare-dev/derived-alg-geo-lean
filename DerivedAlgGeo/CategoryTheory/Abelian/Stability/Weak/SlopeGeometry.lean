@@ -65,10 +65,10 @@ def chargeSlope (z : ℂ) : WithTop ℝ :=
 
 theorem chargeSlope_of_im_pos {z : ℂ} (h : 0 < z.im) :
     chargeSlope z = ((-z.re / z.im : ℝ) : WithTop ℝ) :=
-  if_pos h
+  ite_eq_left h
 
 theorem chargeSlope_of_im_nonpos {z : ℂ} (h : ¬0 < z.im) : chargeSlope z = ⊤ :=
-  if_neg h
+  ite_eq_right h
 
 theorem chargeSlope_ne_top_iff {z : ℂ} : chargeSlope z ≠ ⊤ ↔ 0 < z.im := by
   constructor

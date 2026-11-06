@@ -74,6 +74,8 @@ namespace Sections
 
 variable {𝒜 𝓜}
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 theorem zero_mem' (U : Opens X) :
     (isLocallyFraction 𝒜 𝓜).pred (0 : ∀ x : U, Fiber 𝒜 𝓜 x.1) := fun x =>
   ⟨U, x.2, 𝟙 U, 0, ⟨0, zero_mem _⟩, ⟨1, one_mem_graded _⟩,
@@ -81,6 +83,8 @@ theorem zero_mem' (U : Opens X) :
       apply DegreeZeroLocalization.ext
       simp [NumDenSameDeg.embedding]⟩
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 theorem add_mem' (U : Opens X) (a b : ∀ x : U, Fiber 𝒜 𝓜 x.1)
     (ha : (isLocallyFraction 𝒜 𝓜).pred a)
     (hb : (isLocallyFraction 𝒜 𝓜).pred b) :
@@ -104,6 +108,8 @@ theorem add_mem' (U : Opens X) (a b : ∀ x : U, Fiber 𝒜 𝓜 x.1)
     rw [LocalizedModule.mk_add_mk, LocalizedModule.mk_eq]
     exact ⟨1, by simp⟩
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 theorem neg_mem' (U : Opens X) (a : ∀ x : U, Fiber 𝒜 𝓜 x.1)
     (ha : (isLocallyFraction 𝒜 𝓜).pred a) :
     (isLocallyFraction 𝒜 𝓜).pred (-a) := fun x => by
@@ -137,6 +143,8 @@ noncomputable instance sectionFiberModule (U : Opens X) (x : U) :
   Module.compHom _
     (AlgebraicGeometry.openToLocalization 𝒜 U x.1 x.2).hom
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The locally fractional sections form a module over Mathlib's structure-sheaf sections. -/
 def sectionsSubmodule (U : Opens X) :
     Submodule (𝒪.1.obj (op U)) (∀ x : U, Fiber 𝒜 𝓜 x.1) where
@@ -412,6 +420,8 @@ theorem sectionAddEquivOfMemIff_apply {σN : Type u} [SetLike σN M] [AddSubgrou
 
 /-! ## Sections on a basic open -/
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The canonical additive map from the degree-zero homogeneous localization away from `f` to
 sections of `M̃` on `D₊(f)`.  At a point `x`, it enlarges the denominator submonoid from the
 powers of `f` to the complement of the corresponding homogeneous prime. -/
@@ -450,6 +460,8 @@ theorem moduleAwayToSection_apply (f : A)
         (𝒜 := 𝒜) (𝓜 := 𝓜) (Submonoid.powers_le.mpr x.2) z :=
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem moduleAwayToSection_mk (f : A)
     (c : NumDenSameDeg 𝒜 𝓜 (.powers f)) :
@@ -515,6 +527,8 @@ theorem mapOfLE_faceMap {f g h : A} {e : ℕ} (hh : h ∈ 𝒜 e)
   dsimp only
   rw [hgn, mul_smul]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The basic-open comparison commutes with restriction along a face.
 
 This is the sheaf-level form of `mapOfLE_faceMap`. It holds pointwise and for a cheap reason:
@@ -533,6 +547,8 @@ theorem moduleAwayToSection_res_faceMap {f g h : A} {e : ℕ} (hh : h ∈ 𝒜 e
   exact (mapOfLE_faceMap 𝒜 𝓜 hh hgh hg (Submonoid.powers_le.mpr (i.unop x).2)
     (Submonoid.powers_le.mpr x.2) z).symm
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Germ evaluation of the basic-open comparison is the canonical enlargement-of-denominators
 map into the homogeneous localization at the point. -/
 @[simp]
@@ -555,6 +571,8 @@ variable {N σN : Type u} [AddCommGroup N] [Module A N]
 variable [SetLike σN N] [AddSubgroupClass σN N]
 variable (𝓝 : ℕ → σN) [SetLike.GradedSMul 𝒜 𝓝]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Apply a grading-preserving linear map pointwise to a locally fractional section. -/
 noncomputable def mapSection (f : GradedLinearMap (A := A) 𝓜 𝓝)
     {U : (Opens X)ᵒᵖ} (s : (associatedSheafInType 𝒜 𝓜).1.obj U) :
@@ -576,6 +594,8 @@ noncomputable def mapSection (f : GradedLinearMap (A := A) 𝓜 𝓝)
           (𝒜 := 𝒜) (𝓜 := 𝓜) (𝓝 := 𝓝)
             (S := y.1.asHomogeneousIdeal.toIdeal.primeCompl) f _)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem mapSection_apply (f : GradedLinearMap (A := A) 𝓜 𝓝)
     {U : (Opens X)ᵒᵖ} (s : (associatedSheafInType 𝒜 𝓜).1.obj U) (x : U.unop) :
@@ -584,6 +604,8 @@ theorem mapSection_apply (f : GradedLinearMap (A := A) 𝓜 𝓝)
         (S := x.1.asHomogeneousIdeal.toIdeal.primeCompl) f (s.1 x) :=
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The pointwise map on sections, bundled as a linear map over the sections of `𝒪`. -/
 noncomputable def mapSectionLinear (f : GradedLinearMap (A := A) 𝓜 𝓝)
     (U : (Opens X)ᵒᵖ) :
@@ -604,6 +626,8 @@ noncomputable def mapSectionLinear (f : GradedLinearMap (A := A) 𝓜 𝓝)
         (S := x.1.asHomogeneousIdeal.toIdeal.primeCompl) f).map_smul
           (AlgebraicGeometry.openToLocalization 𝒜 U.unop x.1 x.2 r) (s.1 x)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- A grading-preserving map induces a morphism of the associated presheaves of modules. -/
 noncomputable def associatedMapPresheaf (f : GradedLinearMap (A := A) 𝓜 𝓝) :
     associatedPresheaf 𝒜 𝓜 ⟶ associatedPresheaf 𝒜 𝓝 where
@@ -637,6 +661,8 @@ noncomputable def associatedMapPresheaf (f : GradedLinearMap (A := A) 𝓜 𝓝)
     funext x
     rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- A grading-preserving linear map `M → N` induces the sheaf morphism `M̃ → Ñ`. -/
 noncomputable def associatedMap (f : GradedLinearMap (A := A) 𝓜 𝓝) :
     associatedSheaf 𝒜 𝓜 ⟶ associatedSheaf 𝒜 𝓝 :=
@@ -644,6 +670,8 @@ noncomputable def associatedMap (f : GradedLinearMap (A := A) 𝓜 𝓝) :
     (AlgebraicGeometry.Proj 𝒜)).preimage
       (associatedMapPresheaf (𝓜 := 𝓜) 𝒜 𝓝 f)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem associatedMap_app_apply (f : GradedLinearMap (A := A) 𝓜 𝓝)
     (U : Opens X) (s : (associatedSheafInType 𝒜 𝓜).1.obj (op U)) (x : U) :

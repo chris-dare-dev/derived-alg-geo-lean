@@ -4,7 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.Analysis.Complex.PhaseFiniteSums
 import Mathlib.Analysis.Complex.Basic
-import Mathlib.Data.Fin.SuccPredOrder
+import Mathlib.Order.SuccPred.Fin
 import Mathlib.Order.Interval.Set.Monotone
 
 /-!

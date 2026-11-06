@@ -101,7 +101,7 @@ omit [FiniteDimensional ℝ V] in
 @[simp]
 theorem chargeQuadratic_apply (Z : V →ₗ[ℝ] ℂ) (x : V) :
     chargeQuadratic Z x = ‖Z x‖ ^ 2 := by
-  rw [chargeQuadratic, QuadraticMap.add_apply,
+  rw [chargeQuadratic, add_apply,
     QuadraticMap.linMulLin_apply, QuadraticMap.linMulLin_apply]
   simpa [Complex.normSq_apply] using Complex.normSq_eq_norm_sq (Z x)
 
@@ -131,7 +131,7 @@ theorem hasQuadraticSupportProperty_of_finite_probes
           Finset.sum_le_sum fun i _ ↦ hsq i
         _ = D * ‖Z x‖ ^ 2 := by
           simp only [mul_pow, D, Finset.sum_mul]
-    simp only [Q, QuadraticMap.sub_apply, QuadraticMap.smul_apply,
+    simp only [Q, sub_apply, smul_apply,
       chargeQuadratic_apply, probeQuadratic_apply, smul_eq_mul]
     linarith
   · intro x hxZ hx
@@ -169,7 +169,7 @@ theorem HasMassHomBound.quadraticSupportData
   have hK_nonneg : ∀ i j, 0 ≤ K i j := by
     intro i j
     by_cases hj : j ∈ hwindow.shifts i
-    · simp only [K, dif_pos hj]
+    · simp only [K, dite_eq_left hj]
       exact (Classical.choose_spec
         (hs ((A i)⟦-j⟧) (hwindow.shifted_mem i j hj))).1.le
     · simp [K, hj]
@@ -188,7 +188,7 @@ theorem HasMassHomBound.quadraticSupportData
     _ ≤ ∑ j ∈ hwindow.shifts i,
         K i j * (stabilityMass s F).toReal := by
       refine Finset.sum_le_sum fun j hj ↦ ?_
-      simp only [K, dif_pos hj]
+      simp only [K, dite_eq_left hj]
       exact (Classical.choose_spec
         (hs ((A i)⟦-j⟧) (hwindow.shifted_mem i j hj))).2 F
     _ = B i * ‖Zlin (v₀ (K₀.of C F))‖ := by

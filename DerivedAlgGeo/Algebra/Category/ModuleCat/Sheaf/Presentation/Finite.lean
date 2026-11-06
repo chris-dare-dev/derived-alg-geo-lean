@@ -63,6 +63,7 @@ variable [∀ X, (J.over X).HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat
   [∀ X, HasSheafify (J.over X) AddCommGrpCat.{u}]
   [∀ X, (J.over X).WEqualsLocallyBijective AddCommGrpCat.{u}]
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Quasicoherent data built from a finite global presentation is finite.
 
 `quasicoherentData` covers by the terminal object alone and sets each local presentation to
@@ -75,7 +76,7 @@ instance Presentation.isFinitePresentation_quasicoherentData {M : SheafOfModules
     -- preserves colimits, but at its own hom universe. `Presentation.map` wants `.{u, u}`, and
     -- `preservesColimitsOfSize_shrink` is deliberately not a global instance — it loops — so
     -- the bridge is supplied by hand.
-    haveI : PreservesColimitsOfSize.{u, u} (pushforward.{u} (𝟙 (R.over x))) :=
+    haveI : PreservesColimitsOfSize.{u, u} (pushforward (𝟙 (R.over x))) :=
       preservesColimitsOfSize_shrink _
     -- `(S := R.over x)` is load-bearing; see the module docstring.
     exact Presentation.isFinite_map (S := R.over x) P _ _

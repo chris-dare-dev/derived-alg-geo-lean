@@ -92,6 +92,8 @@ theorem boundedDerivedObject_obj (D : CartierDivisor X) :
     (boundedDerivedObject D).obj = derivedObject D :=
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The bounded degree-zero object formed from an independently supplied
 coherence proof. This is the comparison target used by short exact sequences
 whose endpoints predate the canonical Cartier-divisor adapter. -/

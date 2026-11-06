@@ -110,6 +110,8 @@ noncomputable def fracPow {f g : A} (hf : f ∈ 𝒜 1) (hg : g ∈ 𝒜 1) (n :
     HomogeneousLocalization 𝒜 x.asHomogeneousIdeal.toIdeal.primeCompl :=
   frac 𝒜 (pow_mem_deg 𝒜 hf n) (pow_mem_deg 𝒜 hg n) (basicOpen_le_basicOpen_pow 𝒜 g n hx)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **Rescaling the section `gⁿ` of `O(n)` by `fⁿ/gⁿ` gives the section `fⁿ`.**
 
 `(fⁿ/gⁿ) · (gⁿ/1) = fⁿ/1`, at every point of an open inside `D₊(g)`.

@@ -94,6 +94,8 @@ lemma stupidTruncXIso_eq_stupidTruncGEXIso
   subst k
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 lemma stupidTrunc_d_eq (K : HomologicalComplex C (ComplexShape.up ℤ)) (p : ℤ)
     {i j : ℤ} (hi : p ≤ i) (hj : p ≤ j) :
     (K.stupidTrunc (ComplexShape.embeddingUpIntGE p)).d i j =
@@ -108,7 +110,6 @@ lemma stupidTrunc_d_eq (K : HomologicalComplex C (ComplexShape.up ℤ)) (p : ℤ
     K.restriction_d_eq (ComplexShape.embeddingUpIntGE p)
       (geIndex_spec p i hi) (geIndex_spec p j hj)]
   simp [stupidTruncXIso, restrictionXIso, Category.assoc]
-  all_goals aesop
 
 /-- On retained degrees this uses `HomologicalComplex.stupidTruncXIso`; below
 `p` its source component is zero. The resulting map is monic without an
@@ -124,7 +125,7 @@ noncomputable def stupidTruncGEι (K : HomologicalComplex C (ComplexShape.up ℤ
         have hij' : i + 1 = j := by
           simpa only [ComplexShape.up_Rel] using hij
         omega
-      rw [dif_pos hi, dif_pos hj, stupidTrunc_d_eq K p hi hj]
+      rw [dite_eq_left hi, dite_eq_left hj, stupidTrunc_d_eq K p hi hj]
       simp
     · apply IsZero.eq_of_src
       apply isZero_stupidTrunc_X
@@ -141,7 +142,7 @@ lemma stupidTruncMap_comp_stupidTruncGEι
   ext i
   by_cases hi : p ≤ i
   · dsimp [stupidTruncGEι]
-    rw [dif_pos hi, dif_pos hi]
+    rw [dite_eq_left hi, dite_eq_left hi]
     exact stupidTruncMap_stupidTruncXIso_hom f
       (ComplexShape.embeddingUpIntGE p) (geIndex_spec p i hi)
   · apply IsZero.eq_of_src
@@ -200,7 +201,7 @@ noncomputable def stupidTruncGEMap (K : HomologicalComplex C (ComplexShape.up �
         have hij' : i + 1 = j := by
           simpa only [ComplexShape.up_Rel] using hij
         omega
-      rw [dif_pos hi, dif_pos hj, stupidTrunc_d_eq K q hi hj,
+      rw [dite_eq_left hi, dite_eq_left hj, stupidTrunc_d_eq K q hi hj,
         stupidTrunc_d_eq K p (hpq.trans hi) (hpq.trans hj)]
       simp
     · apply IsZero.eq_of_src
@@ -251,7 +252,7 @@ lemma stupidTruncGEMap_naturality
   funext i
   by_cases hi : q ≤ i
   · dsimp [stupidTruncGEMap]
-    rw [dif_pos hi, dif_pos hi]
+    rw [dite_eq_left hi, dite_eq_left hi]
     let eK₀ := stupidTruncGEXIso K q i hi
     let eK₁ := stupidTruncGEXIso K p i (hpq.trans hi)
     let eL₀ := stupidTruncGEXIso L q i hi
@@ -312,7 +313,7 @@ noncomputable def stupidTruncGETowerCocone (K : CochainComplex C ℤ) (c : ℤ) 
 private lemma stupidTruncGEι_component_isIso (K : CochainComplex C ℤ) (p i : ℤ) (hi : p ≤ i) :
     IsIso ((HomologicalComplex.stupidTruncGEι K p).f i) := by
   dsimp [HomologicalComplex.stupidTruncGEι]
-  rw [dif_pos hi]
+  rw [dite_eq_left hi]
   infer_instance
 
 private noncomputable def isColimitStupidTruncGETowerEval (K : CochainComplex C ℤ) (c i : ℤ) :

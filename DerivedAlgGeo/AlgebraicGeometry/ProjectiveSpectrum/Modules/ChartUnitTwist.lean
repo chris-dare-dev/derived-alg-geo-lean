@@ -130,6 +130,8 @@ def chartFracPowSections :
     (SheafOfModules.unit (↑(chartOpen 𝒜 (g := g)) : Scheme).ringCatSheaf).sections :=
   PresheafOfModules.sectionsMk (fun U => chartFracPowAt 𝒜 hf hg n U) (fun _ _ _ => rfl)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **What the restricted map does to `1`: it is still `aᵐ / 1`.**
 
 `unitToTwist_app_one`'s role, one level down. Both `restrictUnitIso` and the restriction functor
@@ -157,6 +159,8 @@ def chartFracPowMul :
       SheafOfModules.unit (↑(chartOpen 𝒜 (g := g)) : Scheme).ringCatSheaf :=
   (SheafOfModules.unitHomEquiv _).symm (chartFracPowSections 𝒜 hf hg n)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **Over `D₊(g)`, multiplying by `fⁿ` is multiplying by `fⁿ/gⁿ` and then by `gⁿ`.**
 
 The comparison `#585` needs between two charts, with the correction carried as a morphism out of

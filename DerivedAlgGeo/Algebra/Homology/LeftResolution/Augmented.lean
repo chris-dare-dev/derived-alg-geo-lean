@@ -105,8 +105,11 @@ lemma chainComplexAugmentation_naturality {X Y : A} (f : X ⟶ Y) :
       Λ.chainComplexAugmentation ι Y =
     Λ.chainComplexAugmentation ι X ≫ (ChainComplex.single₀ A).map f := by
   apply HomologicalComplex.to_single_hom_ext
-  dsimp [chainComplexAugmentation]
-  simp only [ChainComplex.toSingle₀Equiv_symm_apply_f_zero,
+  have hY : (Λ.chainComplexAugmentation ι Y).f 0 = (Λ.augmentedShortComplex ι Y).g :=
+    ChainComplex.toSingle₀Equiv_symm_apply_f_zero _ _
+  have hX : (Λ.chainComplexAugmentation ι X).f 0 = (Λ.augmentedShortComplex ι X).g :=
+    ChainComplex.toSingle₀Equiv_symm_apply_f_zero _ _
+  simp only [HomologicalComplex.comp_f, hX, hY,
     Functor.mapHomologicalComplex_map_f, ChainComplex.single₀_map_f_zero]
   change ι.map ((Λ.chainComplexMap f).f 0) ≫
       (ι.map (Λ.chainComplexXZeroIso Y).hom ≫ Λ.π.app Y) =
@@ -115,7 +118,7 @@ lemma chainComplexAugmentation_naturality {X Y : A} (f : X ⟶ Y) :
   calc
     _ = ι.map (Λ.chainComplexXZeroIso X).hom ≫
           ι.map (Λ.F.map f) ≫ Λ.π.app Y := by cat_disch
-    _ = _ := by rw [Λ.π_naturality]; simp only [Category.assoc]; rfl
+    _ = _ := by rw [Λ.π_naturality]; simp only [Category.assoc]
 
 /-- The components come from `ChainComplex.toSingle₀Equiv` applied to the
 augmented short complex. -/
@@ -128,8 +131,8 @@ noncomputable def chainComplexAugmentationNatTrans :
 variable (X : A)
 
 private lemma chainComplexAugmentation_f_zero :
-    (Λ.chainComplexAugmentation ι X).f 0 = (Λ.augmentedShortComplex ι X).g := by
-  simp [chainComplexAugmentation]
+    (Λ.chainComplexAugmentation ι X).f 0 = (Λ.augmentedShortComplex ι X).g :=
+  ChainComplex.toSingle₀Equiv_symm_apply_f_zero _ _
 
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in

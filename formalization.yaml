@@ -90,11 +90,11 @@ source:
 
 toolchain:
   system: Lean 4
-  system_version: v4.32.1
+  system_version: v4.35.0
   dependencies:
     - name: mathlib
-      rev: 520045ab14e26149ee970e2e617ca04b09bde5d6
-      note: pinned directly as Lean/Mathlib v4.32.1
+      rev: 56a005855ea17e0b0958f73ec801ae140b0a1679
+      note: pinned directly as Lean/Mathlib v4.35.0
   build_manifest_url: https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/main/lake-manifest.json
 
 automation:

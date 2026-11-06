@@ -178,6 +178,8 @@ private noncomputable def toHomologyModel : K ⟶ homologyModel K where
     rw [← K.toCycles_i, Category.assoc,
       iCycles_comp_cyclesProjection_assoc, K.toCycles_comp_homologyπ]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The chosen inclusion of homology representatives into the complex. -/
 private noncomputable def fromHomologyModel : homologyModel K ⟶ K where
   f i := homologySection K i ≫ K.iCycles i
@@ -213,7 +215,7 @@ private lemma dNext_contractingHom :
     dNext i (contractingHom K) = -outgoingPart K i := by
   have hi : (ComplexShape.up ℤ).Rel i
       ((ComplexShape.up ℤ).next i) := by simp
-  rw [dNext_eq _ hi, contractingHom, dif_pos hi,
+  rw [dNext_eq _ hi, contractingHom, dite_eq_left hi,
     Preadditive.comp_neg]
   simp only [d_comp_cyclesProjection_assoc, outgoingPart]
 
@@ -224,7 +226,7 @@ private lemma prevD_contractingHom :
     change (ComplexShape.up ℤ).prev i + 1 = i
     rw [CochainComplex.prev]
     omega
-  rw [prevD_eq _ hi, contractingHom, dif_pos hi,
+  rw [prevD_eq _ hi, contractingHom, dite_eq_left hi,
     Preadditive.neg_comp]
   simp only [Category.assoc]
   rw [K.XIsoOfEq_hom_comp_d, ← K.toCycles_i]
@@ -249,7 +251,7 @@ private noncomputable def homotopyToFrom :
     Homotopy (toHomologyModel K ≫ fromHomologyModel K) (𝟙 K) where
   hom := contractingHom K
   zero i j hij := by
-    rw [contractingHom, dif_neg hij]
+    rw [contractingHom, dite_eq_right hij]
   comm i := by
     rw [dNext_contractingHom, prevD_contractingHom]
     exact toHomologyModel_comp_fromHomologyModel_f K i

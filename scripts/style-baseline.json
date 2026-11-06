@@ -1,11 +1,5 @@
 [
  [
-  "DerivedAlgGeo/Algebra/Category/ModuleCat.lean",
-  "LONG",
-  "`SheafOfModules` on an arbitrary ringed site. Scheme-indexed module sheaves, quasicoherent and coherent",
-  1
- ],
- [
   "DerivedAlgGeo/Algebra/Category/ModuleCat/Sheaf/Cohomology.lean",
   "LONG",
   "variable [hExtM : HasExt.{w} (SheafOfModules.{u} R)] [hExtA : HasExt.{w} (Sheaf J AddCommGrpCat.{u})]",
@@ -189,12 +183,6 @@
   "DerivedAlgGeo/AlgebraicGeometry/IntersectionTheory/ChernCharacter/Surface.lean",
   "LONG",
   "structure SurfaceChernCharacter (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] where",
-  1
- ],
- [
-  "DerivedAlgGeo/AlgebraicGeometry/Modules/Affine/Comparison.lean",
-  "LONG",
-  "* `AlgebraicGeometry.Scheme.Modules.basicOpenRestriction` — restriction of global sections to `D(f)`.",
   1
  ],
  [

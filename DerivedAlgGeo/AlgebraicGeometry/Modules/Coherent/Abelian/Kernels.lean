@@ -153,6 +153,8 @@ variable {S : Sheaf J RingCat.{w}} {R : Sheaf K RingCat.{w}}
 variable [F.IsContinuous J K]
 variable (φ : S ⟶ (F.sheafPushforwardContinuous RingCat.{w} J K).obj R)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private noncomputable instance pushforwardPreservesFiniteLimits :
     PreservesFiniteLimits (pushforward.{w} φ) := by
   letI : PreservesFiniteLimits (pushforward.{w} φ ⋙ forget S) := by
@@ -164,6 +166,8 @@ end SheafOfModules
 
 namespace AlgebraicGeometry
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The forgetful functor from module sheaves on `Spec R` to sheaves of `R`-modules preserves
 finite limits. -/
 noncomputable instance modulesSpecToSheaf_preservesFiniteLimits (R : CommRingCat.{u}) :
@@ -257,6 +261,8 @@ private noncomputable def basicOpenRestrictionNatTrans (R : CommRingCat.{u}) (f 
   app M := M.basicOpenRestriction f
   naturality _ _ φ := (Scheme.Modules.basicOpenRestriction_naturality φ f).symm
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Restriction to a basic open is a localization for the kernel of a morphism between
 quasi-coherent module sheaves. -/
 theorem Scheme.Modules.isLocalizedModule_basicOpenRestriction_kernel
@@ -274,6 +280,8 @@ theorem Scheme.Modules.isLocalizedModule_basicOpenRestriction_kernel
     (moduleSpecSectionsFunctor R (PrimeSpectrum.basicOpen f))
     (basicOpenRestrictionNatTrans R f) g
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Kernels of morphisms between coherent module sheaves on an affine noetherian scheme are
 coherent. -/
 theorem Scheme.Modules.isCoherent_kernel_affine [IsNoetherianRing R]
@@ -308,6 +316,8 @@ theorem Scheme.Modules.isCoherent_kernel_affine [IsNoetherianRing R]
     (asIso (kernel g).fromTildeΓ)
     (isCoherent_tilde_of_finite (moduleSpecΓFunctor.obj (kernel g)))
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Cokernels of morphisms between coherent module sheaves on an affine noetherian scheme are
 coherent. -/
 theorem Scheme.Modules.isCoherent_cokernel_affine [IsNoetherianRing R]

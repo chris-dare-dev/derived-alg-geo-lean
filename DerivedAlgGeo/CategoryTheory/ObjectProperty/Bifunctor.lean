@@ -45,11 +45,9 @@ def lift₂ (P : ObjectProperty C) (F : C ⥤ C ⥤ C)
   map_id X := by
     ext Y
     simp
-    rfl
   map_comp f g := by
     ext Y
     simp
-    rfl
 
 /-- Forgetting the output of `lift₂` recovers the original bifunctor restricted along the
 inclusion in both inputs. This is definitionally an identity isomorphism. -/
@@ -115,8 +113,6 @@ private lemma liftNatTrans_commShift
     ext X
     simp [liftNatTrans, ObjectProperty.liftCompιIso, ObjectProperty.lift,
       ObjectProperty.ι]
-    change τ.app X = 𝟙 (F.obj X) ≫ τ.app X ≫ 𝟙 (G.obj X)
-    simp
   exact commShift_of_whiskerRight (H := P.ι) (liftNatTrans P hF hG τ)
 
 private def liftOutput {D E : Type*} [Category* D] [Category* E]

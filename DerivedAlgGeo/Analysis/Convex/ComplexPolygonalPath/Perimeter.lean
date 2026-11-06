@@ -204,9 +204,9 @@ private theorem destutter'_ne_eq_cons {I : Type*} [DecidableEq I]
   | cons b xs ih =>
       rw [List.destutter']
       by_cases hab : a ≠ b
-      · rw [if_pos hab]
+      · rw [ite_eq_left hab]
         exact ⟨xs.destutter' (· ≠ ·) b, rfl⟩
-      · rw [if_neg hab]
+      · rw [ite_eq_right hab]
         exact ih a
 
 private theorem chainLength_map_destutter_ne {I : Type*} [DecidableEq I]
@@ -219,7 +219,7 @@ private theorem chainLength_map_destutter_ne {I : Type*} [DecidableEq I]
   | cons_cons a b xs ih ih₂ =>
       rw [List.destutter_cons_cons]
       by_cases hab : a ≠ b
-      · rw [if_pos hab]
+      · rw [ite_eq_left hab]
         change chainLength (f a :: ((b :: xs).destutter (· ≠ ·)).map f) =
           chainLength (f a :: f b :: xs.map f)
         obtain ⟨ys, hys⟩ := destutter'_ne_eq_cons b xs
@@ -232,7 +232,7 @@ private theorem chainLength_map_destutter_ne {I : Type*} [DecidableEq I]
         have hi := ih₂ b
         rw [hhead] at hi
         exact congrArg (fun t ↦ ‖f b - f a‖ + t) hi
-      · rw [if_neg hab]
+      · rw [ite_eq_right hab]
         have hab' : a = b := Classical.not_not.mp hab
         subst b
         change chainLength (((a :: xs).destutter (· ≠ ·)).map f) =
@@ -697,7 +697,7 @@ theorem length_le_of_convexHull_subset {n m : ℕ} (hn : 0 < n)
       simp only [Fin.val_last, Fin.val_zero] at this
       omega
     unfold q
-    rw [dif_neg hne, dif_pos rfl]
+    rw [dite_eq_right hne, dite_eq_left rfl]
   have hq : Monotone q := by
     intro a b hab
     rcases hab.eq_or_lt with rfl | hab
@@ -721,7 +721,7 @@ theorem length_le_of_convexHull_subset {n m : ℕ} (hn : 0 < n)
             lt_of_le_of_ne (Fin.le_last a) hal
           have hb_last : b < Fin.last n :=
             lt_of_le_of_ne (Fin.le_last b) hbl
-          simp only [q, dif_neg ha₀, dif_neg hal, dif_neg hb₀, dif_neg hbl]
+          simp only [q, dite_eq_right ha₀, dite_eq_right hal, dite_eq_right hb₀, dite_eq_right hbl]
           exact crossMaxIndex_mono_of_angle_gt w hwedge
             (interiorBisector_mem_Ioo z hzedge hzarg a ha_pos ha_last)
             (interiorBisector_mem_Ioo z hzedge hzarg b hb_pos hb_last)

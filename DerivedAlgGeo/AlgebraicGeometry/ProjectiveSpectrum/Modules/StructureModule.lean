@@ -33,6 +33,8 @@ variable (𝒜 : ℕ → σ) [GradedRing 𝒜]
 local notation3 "X" => ProjectiveSpectrum.top 𝒜
 local notation3 "𝒪" => AlgebraicGeometry.ProjectiveSpectrum.Proj.structureSheaf 𝒜
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The fiber comparison underlying the structure-module isomorphism. -/
 noncomputable def selfFiberLinearEquiv (x : X) :
     Fiber 𝒜 𝒜 x ≃ₗ[HomogeneousLocalization 𝒜 x.asHomogeneousIdeal.toIdeal.primeCompl]
@@ -40,6 +42,8 @@ noncomputable def selfFiberLinearEquiv (x : X) :
   (DegreeZeroLocalization.selfLinearEquiv 𝒜
     x.asHomogeneousIdeal.toIdeal.primeCompl).symm
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem selfFiberLinearEquiv_apply_mk (x : X)
     (c : NumDenSameDeg 𝒜 𝒜 x.asHomogeneousIdeal.toIdeal.primeCompl) :
@@ -52,6 +56,8 @@ theorem selfFiberLinearEquiv_apply_mk (x : X)
   DegreeZeroLocalization.selfLinearEquiv_symm_apply_mk 𝒜
     x.asHomogeneousIdeal.toIdeal.primeCompl c
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem selfFiberLinearEquiv_symm_apply_mk (x : X)
     (c : HomogeneousLocalization.NumDenSameDeg 𝒜
@@ -145,6 +151,8 @@ noncomputable def associatedSheafSelfIso :
 
 /-! ## The canonical basic-open comparison for the structure module -/
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- On a positive-degree basic open, the comparison for the graded ring as a module is the
 composite of the degree-zero localization comparison, Mathlib's structure-sheaf comparison, and
 the inverse of `associatedSheafSelfIso`. -/
@@ -157,6 +165,8 @@ noncomputable def selfBasicOpenSectionAddEquiv {f : A} {m : ℕ}
     (AlgebraicGeometry.Proj.basicOpenIsoAway 𝒜 f f_deg hm).commRingCatIsoToRingEquiv.toAddEquiv
       |>.trans (selfSectionAddEquiv 𝒜 _).symm
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The additive equivalence above has the canonical value on every homogeneous fraction. -/
 theorem selfBasicOpenSectionAddEquiv_apply_mk {f : A} {m : ℕ}
     (f_deg : f ∈ 𝒜 m) (hm : 0 < m)

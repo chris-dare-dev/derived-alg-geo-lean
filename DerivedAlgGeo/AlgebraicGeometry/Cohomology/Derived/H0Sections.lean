@@ -49,6 +49,8 @@ namespace AlgebraicGeometry.Cohomology
 
 attribute [local instance] HasDerivedCategory.standard
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Maps from the structure sheaf into the pure degree-zero truncation of an
 arbitrary scheme-derived object are additively equivalent to the top sections
 of its Mathlib degree-zero homology sheaf. This is pointwise and makes no

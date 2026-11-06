@@ -99,6 +99,8 @@ theorem boundedToDqc_faithful (h : CoherentExtComparison X) :
   exact Functor.Faithful.of_comp_iso (G := SchemeQuasicoherentDerivedCategory.ι X)
     (Functor.associator _ _ _ ≪≫ Functor.isoWhiskerLeft _ (coherentDerivedToDqcCompInclusion X))
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **Full faithfulness (#1070).** Under the `Ext` comparison, the concrete functor
 `Dᵇ(Coh X) ⥤ Dᵇ_coh(Dqc X)` is full. -/
 theorem boundedCoherentDerivedToDqc_full_of_coherentExtComparison (h : CoherentExtComparison X) :
@@ -108,6 +110,8 @@ theorem boundedCoherentDerivedToDqc_full_of_coherentExtComparison (h : CoherentE
     (DerivedCategory.Bounded.ι ⋙ coherentDerivedToDqc X) _).Full
   infer_instance
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **Full faithfulness (#1070).** Under the `Ext` comparison, the concrete functor
 `Dᵇ(Coh X) ⥤ Dᵇ_coh(Dqc X)` is faithful. -/
 theorem boundedCoherentDerivedToDqc_faithful_of_coherentExtComparison (h : CoherentExtComparison X) :

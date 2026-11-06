@@ -56,6 +56,8 @@ def scalarExtendedDivisor (x y : ℝ) :
   x ⊗ₜ[ℚ] (⟨rulingOneQ, rulingOneQ_mem⟩ : numericalRing.piece 1) +
     y ⊗ₜ[ℚ] (⟨rulingTwoQ, rulingTwoQ_mem⟩ : numericalRing.piece 1)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The scalar-extended ruling coordinates realize to the corresponding
 arbitrary real class in `N¹(Q)_ℝ`. -/
 @[simp]

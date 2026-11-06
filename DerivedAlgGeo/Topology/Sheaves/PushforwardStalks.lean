@@ -166,6 +166,8 @@ theorem stalkPushforward_naturality (F G : X.Presheaf AddCommGrpCat.{u}) (T : F 
 
 /-! ## Surjectivity on stalks, and local surjectivity -/
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **Pushforward along an inducing map is surjective on stalks**, given the vanishing off the
 range.
 

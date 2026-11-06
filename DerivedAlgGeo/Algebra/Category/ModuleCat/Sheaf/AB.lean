@@ -47,6 +47,7 @@ instance hasFilteredColimitsOfSize [HasFilteredColimitsOfSize.{w', w} AddCommGrp
     HasFilteredColimitsOfSize.{w', w} (SheafOfModules.{v} R) where
   HasColimitsOfShape _ _ _ := inferInstance
 
+set_option synthInstance.maxHeartbeats 100000 in
 /-- Sheaves of modules satisfy AB4 when abelian groups do. -/
 instance ab4OfSize [HasCoproducts.{w} AddCommGrpCat.{v}] [AB4OfSize.{w} AddCommGrpCat.{v}] :
     AB4OfSize.{w} (SheafOfModules.{v} R) where

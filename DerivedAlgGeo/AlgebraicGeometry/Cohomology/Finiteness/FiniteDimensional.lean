@@ -70,6 +70,8 @@ structure FiniteDimensionalCohomology (X : Scheme.{u}) [X.Over (Spec (CommRingCa
 
 variable {X : Scheme.{u}}
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Multiplication by a global function as an endomorphism of a sheaf of modules. -/
 noncomputable def globalSectionSmul (M : X.Modules)
     (r : Γ(X, (⊤ : X.Opens))) : M ⟶ M := by
@@ -125,11 +127,13 @@ theorem globalSectionSmul_app (M : X.Modules) (r : Γ(X, (⊤ : X.Opens)))
   simp [globalSectionSmul]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The ring action of global functions on a sheaf of modules. -/
 noncomputable def globalSectionAction (M : X.Modules) :
     Γ(X, (⊤ : X.Opens)) →+* End M where
-  toFun := globalSectionSmul M
+  toFun r := End.of (globalSectionSmul M r)
   map_one' := by
+    apply End.ext
     change globalSectionSmul M 1 = 𝟙 M
     apply SheafOfModules.hom_ext
     change (globalSectionSmul M 1).val = 𝟙 M.val
@@ -145,7 +149,8 @@ noncomputable def globalSectionAction (M : X.Modules) :
     rw [ha]
     exact one_smul _ _
   map_mul' r s := by
-    rw [CategoryTheory.End.mul_def]
+    apply End.ext
+    change globalSectionSmul M (r * s) = globalSectionSmul M s ≫ globalSectionSmul M r
     apply SheafOfModules.hom_ext
     change (globalSectionSmul M (r * s)).val =
       (globalSectionSmul M s).val ≫ (globalSectionSmul M r).val
@@ -173,6 +178,7 @@ noncomputable def globalSectionAction (M : X.Modules) :
       rw [map_mul]
     rw [hc, mul_smul]
   map_zero' := by
+    apply End.ext
     change globalSectionSmul M 0 = 0
     apply SheafOfModules.hom_ext
     have hz : (0 : M ⟶ M).val = 0 := by rfl
@@ -190,6 +196,7 @@ noncomputable def globalSectionAction (M : X.Modules) :
     rw [ha]
     exact zero_smul _ _
   map_add' r s := by
+    apply End.ext
     change globalSectionSmul M (r + s) =
       globalSectionSmul M r + globalSectionSmul M s
     apply SheafOfModules.hom_ext
@@ -220,6 +227,8 @@ noncomputable def globalSectionAction (M : X.Modules) :
       rw [map_add]
     rw [hc, add_smul]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Multiplication by a global function commutes with every morphism of module sheaves. -/
 theorem globalSectionSmul_naturality {M N : X.Modules} (f : M ⟶ N)
     (r : Γ(X, (⊤ : X.Opens))) :
@@ -248,31 +257,35 @@ noncomputable def varietyScalarAction (Y : Scheme.{u}) [Y.Over (Spec (CommRingCa
 /-- The canonical base-field action is central on morphisms of module sheaves. -/
 theorem varietyScalarAction_naturality (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))]
     {M N : Y.Modules} (f : M ⟶ N) (r : k) :
-    varietyScalarAction Y M r ≫ f = f ≫ varietyScalarAction Y N r :=
+    (varietyScalarAction Y M r).asHom ≫ f = f ≫ (varietyScalarAction Y N r).asHom :=
   globalSectionSmul_naturality f (baseFieldToGlobalSections Y r)
 
 /-- The canonical base-field action on a coherent sheaf. -/
 noncomputable def coherentScalarAction (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))]
     (F : Coh Y) : k →+* End F where
-  toFun r := ObjectProperty.homMk
-    (varietyScalarAction Y ((Coh.ι Y).obj F) r)
+  toFun r := End.of (ObjectProperty.homMk
+    (varietyScalarAction Y ((Coh.ι Y).obj F) r).asHom)
   map_one' := by
+    apply End.ext
     apply ObjectProperty.hom_ext
-    exact map_one (varietyScalarAction Y ((Coh.ι Y).obj F))
+    exact congrArg End.asHom (map_one (varietyScalarAction Y ((Coh.ι Y).obj F)))
   map_mul' r s := by
+    apply End.ext
     apply ObjectProperty.hom_ext
-    exact map_mul (varietyScalarAction Y ((Coh.ι Y).obj F)) r s
+    exact congrArg End.asHom (map_mul (varietyScalarAction Y ((Coh.ι Y).obj F)) r s)
   map_zero' := by
+    apply End.ext
     apply ObjectProperty.hom_ext
-    exact map_zero (varietyScalarAction Y ((Coh.ι Y).obj F))
+    exact congrArg End.asHom (map_zero (varietyScalarAction Y ((Coh.ι Y).obj F)))
   map_add' r s := by
+    apply End.ext
     apply ObjectProperty.hom_ext
-    exact map_add (varietyScalarAction Y ((Coh.ι Y).obj F)) r s
+    exact congrArg End.asHom (map_add (varietyScalarAction Y ((Coh.ι Y).obj F)) r s)
 
 /-- The canonical base-field action is central on coherent-sheaf morphisms. -/
 theorem coherentScalarAction_naturality (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))]
     {F G : Coh Y} (f : F ⟶ G) (r : k) :
-    coherentScalarAction Y F r ≫ f = f ≫ coherentScalarAction Y G r := by
+    (coherentScalarAction Y F r).asHom ≫ f = f ≫ (coherentScalarAction Y G r).asHom := by
   apply ObjectProperty.hom_ext
   exact varietyScalarAction_naturality Y f.hom r
 
@@ -281,13 +294,13 @@ noncomputable def additiveMapEndRingHom {C : Type u} {D : Type v}
     [Category.{w} C] [Category.{x} D] [Preadditive C] [Preadditive D]
     (H : C ⥤ D) [H.Additive] (A : C) : End A →+* End (H.obj A) where
   __ := H.mapEnd A
-  map_zero' := H.map_zero A A
-  map_add' _ _ := H.map_add
+  map_zero' := End.ext (H.map_zero A A)
+  map_add' _ _ := End.ext H.map_add
 
 /-- Endomorphisms of an abelian group in `AddCommGrpCat` are additive-monoid endomorphisms. -/
 noncomputable def addCommGrpEndRingHom (A : AddCommGrpCat) :
     End A →+* AddMonoid.End A where
-  toFun f := f.hom
+  toFun f := f.asHom.hom
   map_one' := rfl
   map_mul' _ _ := rfl
   map_zero' := rfl

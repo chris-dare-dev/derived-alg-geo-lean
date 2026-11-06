@@ -103,7 +103,7 @@ private def toDescentData_fullyFaithful
   letI : F.Full :=
     ⟨fun {A B} g ↦ by
       have heq : A.as = B.as :=
-        ((Presieve.isSheafFor_ofArrows_iff_bijective_toCompabible P f).1 hP).1 (by
+        ((Presieve.isSheafFor_ofArrows_iff_bijective_toCompatible P f).1 hP).1 (by
           apply Subtype.ext
           funext i
           exact Discrete.eq_of_hom (g.hom i))

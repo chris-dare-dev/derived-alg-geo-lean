@@ -83,7 +83,7 @@ theorem twist_apply (m : ℕ) (β : ℝ) (d : HDeg m) (i : Fin (m + 1)) :
   apply Finset.sum_congr rfl
   intro j _
   have h : j.val < m + 1 := by have := j.isLt; have := i.isLt; omega
-  simp only [expCoeff, degrees, dif_pos h]
+  simp only [expCoeff, degrees, dite_eq_left h]
 
 /-- The coefficientwise identity `e^{-βH} e^{-γH} = e^{-(β+γ)H}`.
 The finite Vandermonde convolution involves only lower degrees, so truncation
@@ -97,7 +97,7 @@ theorem twist_twist (m : ℕ) (β γ : ℝ) (d : HDeg m) :
   unfold convolution
   refine Finset.sum_congr rfl fun j hj => ?_
   have h : j < m + 1 := by have := i.isLt; simp only [Finset.mem_range] at hj; omega
-  simp only [degrees, dif_pos h, twist]
+  simp only [degrees, dite_eq_left h, twist]
   rfl
 
 /-- The zero parameter acts as the identity. -/
@@ -121,7 +121,7 @@ private theorem charge_convolution (m : ℕ) (w : ℂ) (d : HDeg m) :
   have hjm : j ≤ m := by simpa using hj
   have hsub : m - (m + 1 - 1 - j) = j := by omega
   have hlt : m + 1 - 1 - j < m + 1 := by omega
-  simp only [moments, dif_pos hjm, degrees, dif_pos hlt, hsub, expCoeff, coeff]
+  simp only [moments, dite_eq_left hjm, degrees, dite_eq_left hlt, hsub, expCoeff, coeff]
   simp only [Nat.add_sub_cancel]
   rw [neg_pow]
   ring
@@ -137,7 +137,7 @@ theorem charge_twist (m : ℕ) (w : ℂ) (β : ℝ) (d : HDeg m) :
   unfold convolution
   refine Finset.sum_congr rfl fun j hj => ?_
   have h : j < m + 1 := Finset.mem_range.mp hj
-  simp only [degrees, dif_pos h, twist, convolution, expCoeff]
+  simp only [degrees, dite_eq_left h, twist, convolution, expCoeff]
   push_cast
   rfl
 

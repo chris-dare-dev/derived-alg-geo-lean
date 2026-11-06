@@ -182,6 +182,8 @@ theorem tildeΓSectionEquiv_symm_res (N : (Spec R).Modules) [IsIso (fromTildeΓ 
   apply (tildeΓSectionEquiv N V).injective
   rw [LinearEquiv.apply_symm_apply, tildeΓSectionEquiv_res, LinearEquiv.apply_symm_apply]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **The affine extension lemma for any quasi-coherent module sheaf**, not only a tilde. -/
 theorem exists_pow_smul_eq_res_of_top_of_isQuasicoherent (N : (Spec R).Modules)
     [IsIso (fromTildeΓ N)] (r : R)

@@ -100,6 +100,8 @@ variable [HasBinaryProducts C] [HasPullbacks C]
 local instance (X : C) : HasBinaryProducts (Over X) :=
   Over.ConstructProducts.over_binaryProduct_of_pullback
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 set_option maxHeartbeats 1600000 in
 /-- Restrict one of the presentations in `q` to the product with `U`. -/
 noncomputable def QuasicoherentData.presentationOver {M : SheafOfModules.{u} R}
@@ -124,12 +126,16 @@ noncomputable def QuasicoherentData.presentationOver {M : SheafOfModules.{u} R}
   change (eY.functor.obj (M.over Y.left)).Presentation
   exact P'.map eY.functor (.refl _)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 omit hasSheafComposeOver hasSheafComposeOverOver in
 @[simp]
 theorem QuasicoherentData.presentationOver_generators_I {M : SheafOfModules.{u} R}
     (q : M.QuasicoherentData) (U : C) (i : q.I) :
     (q.presentationOver U i).generators.I = (q.presentation i).generators.I := rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 omit hasSheafComposeOver hasSheafComposeOverOver in
 @[simp]
 theorem QuasicoherentData.presentationOver_relations_I {M : SheafOfModules.{u} R}

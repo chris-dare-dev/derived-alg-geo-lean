@@ -39,10 +39,10 @@ local instance : Category X.Modules :=
 -- The structure presheaf is commutative, even though `X.Modules` deliberately exposes its
 -- `RingCat` forgetful image.
 local instance : MonoidalCategory X.PresheafOfModules :=
-  PresheafOfModules.monoidalCategory (R := X.presheaf)
+  PresheafOfModulesOfCommRing.monoidalCategory (R := X.presheaf)
 
 local instance : SymmetricCategory X.PresheafOfModules :=
-  PresheafOfModules.symmetricCategory (R := X.presheaf)
+  PresheafOfModulesOfCommRing.symmetricCategory (R := X.presheaf)
 
 private abbrev associatedSheaf (X : Scheme.{u}) :=
   PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)
@@ -126,6 +126,8 @@ noncomputable def unitorConjPre (M : X.Modules)
     ((toPresheafOfModules X).map (𝟙 M) ⊗ₘ (toPresheafOfModules X).map φ) ≫
     (ρ_ ((toPresheafOfModules X).obj M)).hom
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **The conjugate is the sheaf morphism whose presheaf image is `unitorConjPre`.**
 
 The point of the whole file's approach to this: sheafification is never computed on sections.
@@ -154,7 +156,6 @@ theorem unitorConj_eq (M : X.Modules)
         (ρ_ ((toPresheafOfModules X).obj M)).hom
       = (ρ_ ((toPresheafOfModules X).obj M)).hom ≫ unitorConjPre M φ := by
     rw [unitorConjPre, ← Category.assoc, Iso.hom_inv_id, Category.id_comp]
-    rfl
   have hnat' : (associatedSheaf X).map (unitorConjPre M φ) ≫
         ((asIso (PresheafOfModules.sheafificationAdjunction
           (𝟙 X.ringCatSheaf.obj)).counit).app M).hom
@@ -169,7 +170,6 @@ theorem unitorConj_eq (M : X.Modules)
       = (associatedSheaf X).map (ρ_ ((toPresheafOfModules X).obj M)).hom ≫
         (associatedSheaf X).map (unitorConjPre M φ) := by
     rw [← CategoryTheory.Functor.map_comp, ← CategoryTheory.Functor.map_comp, hpre]
-    rfl
   rw [tensorUnitRightIso, tensorHom]
   simp only [Iso.trans_hom, Functor.mapIso_hom, Category.assoc]
   exact ((Category.assoc _ _ _).symm.trans (congrArg (· ≫ _) hAB)).trans
@@ -216,6 +216,8 @@ noncomputable def tmulSection (M N : X.Modules) (U : X.Opensᵒᵖ)
       (t ⊗ₜ[Γ(X, U.unop)] y)
 
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **A scalar moves across the pure tensor.**
 
 Tensor bilinearity plus linearity of the unit's component. What makes it usable downstream is the
@@ -238,8 +240,9 @@ theorem smul_tmulSection (M N : X.Modules) (U : X.Opensᵒᵖ)
 
 The sheafification unit is a morphism of presheaves of modules, so it commutes with restriction,
 and the presheaf tensor restricts a pure tensor termwise by definition
-(`PresheafOfModules.Monoidal.tensorObj_map_tmul`). Without this a section built by `tmulSection`
-cannot be followed to a smaller open, which every chart-by-chart argument has to do. -/
+(`PresheafOfModulesOfCommRing.Monoidal.tensorObj_map_tmul`). Without this a section built by
+`tmulSection` cannot be followed to a smaller open, which every chart-by-chart argument has to
+do. -/
 theorem res_tmulSection (M N : X.Modules) {U V : X.Opens} (h : V ≤ U)
     (t : Γ(M, U)) (y : Γ(N, U)) :
     (tensorObj M N).presheaf.map (homOfLE h).op (tmulSection M N (Opposite.op U) t y)
@@ -338,6 +341,8 @@ theorem exists_eq_sum_tmulSection (M N : X.Modules) {U : X.Opens}
   refine (hz.symm : _ = _).trans ?_
   exact map_sum _ _ _
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **The `twistBy` shape, applied to a section: it is the pure tensor with `ψ`'s value on `1`.**
 
 `(ρ.inv ≫ tensorHom (𝟙 F) ψ)` is exactly the shape of `Proj.twistBy` and of
@@ -389,7 +394,6 @@ theorem tensorUnitRight_inv_tensorHom_app (F N : X.Modules)
         (associatedSheaf X).map ((ρ_ ((toPresheafOfModules X).obj F)).inv ≫
           ((toPresheafOfModules X).map (𝟙 F) ⊗ₘ (toPresheafOfModules X).map ψ)) := by
     rw [CategoryTheory.Functor.map_comp]
-    rfl
   refine (congrArg (fun m => (ModuleCat.Hom.hom
     ((m : F ⟶ tensorObj F N).val.app U)) t) hfuse).trans ?_
   have hsplit : (ModuleCat.Hom.hom

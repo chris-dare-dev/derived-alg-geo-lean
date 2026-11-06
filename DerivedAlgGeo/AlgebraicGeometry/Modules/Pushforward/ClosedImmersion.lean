@@ -63,6 +63,8 @@ theorem pullbackPushforwardAdjunction_counit_epi_of_isClosedImmersion
 
 variable [IsClosedImmersion f]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Module-sheaf pushforward along a closed immersion preserves epimorphisms. -/
 noncomputable instance pushforward_preservesEpimorphisms_of_isClosedImmersion :
     (pushforward f).PreservesEpimorphisms := by

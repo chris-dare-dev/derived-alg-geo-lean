@@ -146,6 +146,8 @@ noncomputable def homSeam (K L : Cdg A) :
 
 /-! ## The functor `H⁰(C^dg A) ⥤ K(A)` -/
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Composition of degree-zero cocycles names composition of morphisms. Both
 sides are `z.v i i ≫ w.v i i` in each degree. -/
 lemma homOf_comp {K L M : CochainComplex A ℤ} (z : Cocycle K L 0) (w : Cocycle L M 0)
@@ -238,6 +240,8 @@ instance : h0Functor (A := A).Faithful where
           abel
         exact key
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 instance : h0Functor (A := A).Full where
   map_surjective {K L} φ := by
     obtain ⟨f, hf⟩ := (HomotopyCategory.quotient A (ComplexShape.up ℤ)).map_surjective φ

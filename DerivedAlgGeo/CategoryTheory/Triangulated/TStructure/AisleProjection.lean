@@ -92,6 +92,8 @@ theorem aisleProjectionHomEquiv_symm_apply (n : ℤ)
       f.hom ≫ (t.truncLEι n).app Y :=
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The inclusion of a t-structure aisle is left adjoint to truncation into
 that aisle. -/
 def aisleProjectionAdjunction (n : ℤ) :

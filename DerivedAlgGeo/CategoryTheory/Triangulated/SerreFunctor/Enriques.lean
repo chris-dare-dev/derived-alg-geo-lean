@@ -85,8 +85,8 @@ theorem no_exceptional_of_serre_iso_shift [HomFinite k C]
     simpa only [Algebra.coe_linearMap] using hE.algebraMap_bijective
   let endEquiv : k ≃ₗ[k] End E :=
     LinearEquiv.ofBijective (Algebra.linearMap k (End E)) hAlg
-  have hend : Module.finrank k (End E) = 1 := by
-    rw [← endEquiv.finrank_eq, Module.finrank_self]
+  have hend : Module.finrank k (E ⟶ E) = 1 := by
+    rw [← (endEquiv.trans (End.linearEquiv (R := k))).finrank_eq, Module.finrank_self]
   have hserre := D.finrank_hom_eq E E
   have htransport :
       Module.finrank k (E ⟶ D.S.obj E) =

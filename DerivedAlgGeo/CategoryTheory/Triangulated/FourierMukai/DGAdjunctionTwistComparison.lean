@@ -92,6 +92,8 @@ noncomputable def presentedCounitTriangleObjIso (Z : Y) :
     (Iso.refl _) (Iso.refl _) ?_
   simp [RightAdjointKernelData.ofH0Presentation_adj]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The first component of the counit-triangle comparison is the identity. -/
 @[simp]
 theorem presentedCounitTriangleObjIso_hom_hom₁ (Z : Y) :
@@ -99,6 +101,8 @@ theorem presentedCounitTriangleObjIso_hom_hom₁ (Z : Y) :
       𝟙 ((C'.transform Q ⋙ C.transform P).obj Z) := by
   simp [presentedCounitTriangleObjIso]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The second component of the counit-triangle comparison is the identity. -/
 @[simp]
 theorem presentedCounitTriangleObjIso_hom_hom₂ (Z : Y) :

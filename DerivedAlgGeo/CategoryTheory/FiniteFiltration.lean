@@ -219,6 +219,8 @@ private structure AppendData (T U : FiniteExactTower C) where
   initialIso : T.object 0 ≅ tower.object 0
   terminalIso : tower.object (Fin.last tower.length) ≅ U.object (Fin.last U.length)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Recursive implementation of concatenation.
 
 The implementation consumes the left tower one step at a time. Its private result packages the
@@ -896,12 +898,16 @@ noncomputable def refineStep : FiniteFiltration C M := by
   exact F.spliceStep i (R.pullbackTower (F.projection i))
     (refinementInitialIso F i R) (refinementTerminalIso F i R)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem refineStep_length :
     (refineStep F i R).length = F.length - 1 + R.length := by
   letI : Epi (F.projection i) := (F.step_shortExact i).epi_g
   simp [refineStep]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem refineStep_gradedObjects :
     (refineStep F i R).toFiniteExactTower.gradedObjects =

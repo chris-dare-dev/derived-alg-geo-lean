@@ -36,7 +36,7 @@ def topPowerset (n : ℕ) :
 private noncomputable def topPowersetUnique (n : ℕ) :
     Unique (Set.powersetCard (ULift.{u} (Fin n)) n) where
   default := topPowerset n
-  uniq s := Subtype.ext (Finset.eq_univ_of_card s.1 (by simpa using s.2))
+  uniq s := Subtype.ext (Finset.eq_univ_of_card s.1 (by simp))
 
 /-- The top exterior power of a free rank-`n` module is the coefficient ring. -/
 noncomputable def topExteriorFreeEquiv (n : ℕ) :

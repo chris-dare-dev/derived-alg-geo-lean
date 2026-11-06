@@ -146,7 +146,7 @@ theorem exists_strictSubobject_of_phiPlus_gt
         (show F.phase Y.obj ∈ Set.Ioo (ψY - 1) (ψY + 1) by
           dsimp [ψY]; constructor <;> linarith)
         hbranch hYge
-      exact (lt_irrefl ψY) (by simpa [F, ψY] using hcontra)
+      exact (lt_irrefl ψY) (by simp [F, ψY] at hcontra)
     have hXphase : ψY < F.phase Xhi := by
       have hXwindow := hWindow XhiI hXhi
       have hYwindow := hWindow Y hY

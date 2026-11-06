@@ -93,7 +93,7 @@ theorem polarFactor_posDef : (polarFactor A).PosDef := by
   refine lt_of_le_of_ne ((polarFactor_posSemidef A).dotProduct_mulVec_nonneg x) ?_
   intro heq
   have hker : polarFactor A *ᵥ x = 0 :=
-    ((polarFactor_posSemidef A).dotProduct_mulVec_zero_iff x).mp heq.symm
+    ((polarFactor_posSemidef A).dotProduct_mulVec_zero_iff (x := x)).mp heq.symm
   refine hx ?_
   have hinv := isUnit_det_polarFactor hA
   have hx0 := congrArg (fun v => (polarFactor A)⁻¹ *ᵥ v) hker

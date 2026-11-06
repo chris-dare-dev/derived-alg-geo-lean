@@ -110,7 +110,7 @@ theorem awayMk_monomial_eq_iff [IsDomain R] {σM : Type u} [SetLike σM (MvPolyn
       m' • γ + β = m • γ + β' := by
   rw [DegreeZeroLocalization.awayMk_eq_awayMk_iff _ (monomial_one_ne_zero (R := R) γ),
     smul_eq_mul, smul_eq_mul, monomial_one_pow, monomial_one_pow,
-    MvPolynomial.monomial_mul, MvPolynomial.monomial_mul, one_mul,
+    MvPolynomial.monomial_mul_monomial, MvPolynomial.monomial_mul_monomial, one_mul,
     MvPolynomial.monomial_eq_monomial_iff]
   simp
 
@@ -343,10 +343,8 @@ theorem sum_monomial_eq_zero_iff (s : Finset (ι →₀ ℕ)) (c : (ι →₀ �
   classical
   constructor
   · intro h β hβ
-    have hcoeff := congrArg (MvPolynomial.coeff β) h
-    rwa [MvPolynomial.coeff_sum, MvPolynomial.coeff_zero,
-      Finset.sum_congr rfl (fun b _ => MvPolynomial.coeff_monomial β b (c b)),
-      Finset.sum_ite_eq' s β (fun b => c b), if_pos hβ] at hcoeff
+    have hcoeff := congrArg (fun p : MvPolynomial ι R => p.coeff β) h
+    simpa [MvPolynomial.coeff_sum, MvPolynomial.coeff_monomial, hβ] using hcoeff
   · intro h
     exact Finset.sum_eq_zero fun β hβ => by rw [h β hβ]; simp
 

@@ -227,10 +227,9 @@ theorem Scheme.Modules.isLocalizedModule_basicOpenRestriction_of_isIso (M : (Spe
   -- carries that to the underlying natural transformation, and
   -- `CategoryTheory.NatIso.isIso_app_of_isIso`
   -- then makes every component invertible.
-  haveI : IsIso (modulesSpecToSheaf.map M.fromTildeΓ) := inferInstance
-  haveI : IsIso (modulesSpecToSheaf.map M.fromTildeΓ).hom := by
-    change IsIso ((sheafToPresheaf _ _).map (modulesSpecToSheaf.map M.fromTildeΓ))
-    infer_instance
+  have hiso : IsIso (modulesSpecToSheaf.map M.fromTildeΓ) := inferInstance
+  have : IsIso (modulesSpecToSheaf.map M.fromTildeΓ).hom :=
+    (ObjectProperty.isIso_hom_iff _).2 hiso
   -- the naturality square, with both verticals invertible
   have key := Scheme.Modules.basicOpenRestriction_naturality (M := tilde N) (N := M)
     M.fromTildeΓ f

@@ -73,7 +73,6 @@ theorem surjective_app_top_of_epi_spec {R : CommRingCat.{u}} {M N : (Spec R).Mod
     have e : (tildeEquiv (R := R)).inverse.map u' = moduleSpecΓFunctor.map u := by
       change moduleSpecΓFunctor.map (P.ι.map u') = _
       rw [hu']
-      rfl
     rw [e] at h
     exact h
   exact (ModuleCat.epi_iff_surjective (moduleSpecΓFunctor.map u)).1 h2
@@ -88,7 +87,7 @@ theorem surjective_app_top_of_epi_of_isAffine {X : Scheme.{u}} [IsAffine X] {M N
     Function.Surjective (u.app ⊤) := by
   let e := X.isoSpec
   haveI : (pushforward e.hom).PreservesEpimorphisms :=
-    Functor.preservesEpimorphisms.of_iso (pushforwardIsoRestrict e).symm
+    Functor.PreservesEpimorphisms.of_iso (pushforwardIsoRestrict e).symm
   haveI hM : ((pushforward e.hom).obj M).IsQuasicoherent :=
     (SheafOfModules.isQuasicoherent (Spec Γ(X, ⊤)).ringCatSheaf).prop_of_iso
       ((pushforwardIsoRestrict e).app M).symm

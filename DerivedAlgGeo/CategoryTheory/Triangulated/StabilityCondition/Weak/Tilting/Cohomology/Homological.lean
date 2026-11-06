@@ -102,10 +102,7 @@ private theorem originalHeartH0ObjIsoH0prime_hom_naturality
           (t.truncGE 0).map ((t.truncLE 0).map f)) ≫
           (t.truncGELEIsoLEGE 0 0).hom.app Y := by
       rw [← Category.assoc]
-      simpa using
-        congrArg (fun k => k ≫ (t.truncGELEIsoLEGE 0 0).hom.app Y)
-          (NatTrans.naturality (shiftFunctorZero C ℤ).hom
-            ((t.truncGE 0).map ((t.truncLE 0).map f)))
+      simp
     _ = ((shiftFunctorZero C ℤ).hom.app
           ((t.truncGE 0).obj ((t.truncLE 0).obj X)) ≫
           (t.truncGELEIsoLEGE 0 0).hom.app X) ≫
@@ -214,9 +211,7 @@ private theorem toOriginalHeartH0primeHomOfIsLE_comp
         (originalHeartH0primeObjIsoTruncGEOfIsLE t Y).hom ≫
           t.descTruncGE g 0
   rw [← CategoryTheory.Triangulated.TStructure.truncGE_map_comp_descTruncGE t (C := C) f g 0]
-  simpa [originalHeartH0primeObjIsoTruncGEOfIsLE, Category.assoc] using
-    congrArg (fun k => k ≫ t.descTruncGE g 0)
-      ((t.truncLEι 0).naturality ((t.truncGE 0).map f)).symm
+  simp [originalHeartH0primeObjIsoTruncGEOfIsLE]
 
 @[reassoc]
 private theorem fromOriginalHeartH0primeHomOfIsLE_naturality
@@ -391,7 +386,7 @@ private theorem originalHeartH0primeFunctor_map_distinguished_exact_of_obj₁_is
     apply t.to_truncLE_obj_ext
     rw [Category.assoc, ← heQ]
     exact oct.comm₁.trans (by
-      simpa using ((t.truncLEι 0).naturality T.mor₂).symm)
+      simp)
   let Tle : Triangle C :=
     Triangle.mk a ((t.truncLE 0).map T.mor₂) (eQ.inv ≫ d)
   have hTle : Tle ∈ distTriang C := by
@@ -435,12 +430,11 @@ private theorem originalHeartH0primeFunctor_map_distinguished_exact_of_obj₁_is
       simp only [Category.id_comp]
       rw [← Functor.map_comp]
       exact congrArg ((originalHeartH0primeFunctor t).map)
-        (by simpa [a] using (t.liftTruncLE_ι T.mor₁ 0).symm))
+        (by simp [a]))
     (by
       dsimp [Sle, S, e₂, e₃, Tle]
       simp only [← Functor.map_comp]
-      simpa using congrArg ((originalHeartH0primeFunctor t).map)
-        ((t.truncLEι 0).naturality T.mor₂).symm)
+      simp)
   exact (ShortComplex.exact_iff_of_iso eS).mp
     (by simpa [Sle] using hExactLE)
 
@@ -466,7 +460,7 @@ private theorem toOriginalHeartH0primeHom_hom
   change t.liftTruncLE (f ≫ (t.truncGEπ 0).app X) 0 ≫
       (t.truncLEι 0).app ((t.truncGE 0).obj X) =
     f ≫ (t.truncGEπ 0).app X
-  simpa using t.liftTruncLE_ι (f ≫ (t.truncGEπ 0).app X) 0
+  simp
 
 private theorem hom_ext_toOriginalHeartH0prime
     (t : TStructure C) (E : t.heart.FullSubcategory) {X : C}
@@ -519,8 +513,7 @@ private theorem toOriginalHeartH0primeHom_comp_map
   have h₃ : rhs = f ≫ g ≫ (t.truncGEπ 0).app Y := by
     simpa only [rhs, Category.assoc] using
       congrArg (fun k => f ≫ k) (t.truncGEπ_naturality 0 g)
-  simpa [originalHeartH0primeFunctor, TStructure.truncLEGE,
-    Category.assoc, lhs] using h₁.trans (h₂.trans h₃)
+  simp [originalHeartH0primeFunctor, TStructure.truncLEGE, Category.assoc]
 
 @[simp]
 private theorem toOriginalHeartH0primeHom_zero
@@ -591,9 +584,7 @@ private theorem comp_originalHeartH0primeFunctor_map_eq_zero_iff
           (t.truncGE 0).map g =
         β.hom ≫ (t.truncLE 0).map ((t.truncGE 0).map g) ≫
           (t.truncLEι 0).app ((t.truncGE 0).obj Y) := by
-            simpa [Category.assoc] using
-              congrArg (fun k => β.hom ≫ k)
-                (((t.truncLEι 0).naturality ((t.truncGE 0).map g)).symm)
+            simp
       _ = 0 := hβ''
   · intro hβ
     apply hom_ext_toOriginalHeartH0prime t E
@@ -602,15 +593,12 @@ private theorem comp_originalHeartH0primeFunctor_map_eq_zero_iff
             (t.truncLEι 0).app ((t.truncGE 0).obj Y) =
           β.hom ≫ (t.truncLEι 0).app ((t.truncGE 0).obj X) ≫
             (t.truncGE 0).map g := by
-      simpa [originalHeartH0primeFunctor, originalHeartH0prime,
-        TStructure.truncLEGE, Category.assoc] using
-        congrArg (fun k => β.hom ≫ k)
-          ((t.truncLEι 0).naturality ((t.truncGE 0).map g))
+      simp [originalHeartH0primeFunctor, originalHeartH0prime, TStructure.truncLEGE, Category.assoc]
     have hzero :
         β.hom ≫ (t.truncLEι 0).app ((t.truncGE 0).obj X) ≫
             (t.truncGE 0).map g =
           0 ≫ (t.truncLEι 0).app ((t.truncGE 0).obj Y) := by
-      simpa [hβ]
+      simp [hβ]
     exact hcomp.trans hzero
 
 private theorem toOriginalHeartH0primeHom_eq_zero_iff
@@ -623,7 +611,7 @@ private theorem toOriginalHeartH0primeHom_eq_zero_iff
     simpa [hf] using (toOriginalHeartH0primeHom_hom t E f).symm
   · intro hf
     apply hom_ext_toOriginalHeartH0prime t E
-    simpa [hf] using toOriginalHeartH0primeHom_hom t E f
+    simp [hf]
 
 /-- Alternative degree-zero cohomology vanishes on `D^{≥1}`. -/
 private theorem isZero_originalHeartH0prime_of_isGE_one
@@ -663,11 +651,7 @@ private theorem originalHeartH0primeFunctor_preadditiveCoyoneda_exact_of_isIso_t
     calc
       _ = β.hom ≫ (t.truncLEι 0).app ((t.truncGE 0).obj Z) ≫
           (t.truncGE 0).map m₃ ≫ (t.truncGEδLT 0).app X₃ := by
-            simpa [Category.assoc] using
-              congrArg
-                (fun k =>
-                  β.hom ≫ (t.truncLEι 0).app ((t.truncGE 0).obj Z) ≫ k)
-                ((t.truncGEδLT 0).naturality m₃).symm
+            simp
       _ = 0 := hkernel'
   have hobs :
       β.hom ≫ (t.truncLEι 0).app ((t.truncGE 0).obj Z) ≫
@@ -714,8 +698,7 @@ private theorem originalHeartH0primeFunctor_preadditiveCoyoneda_exact_of_isIso_t
     have hu₁ :
         u' ≫ (t.truncLTι 0).app Z ≫ m₃ =
           u' ≫ (t.truncLT 0).map m₃ ≫ (t.truncLTι 0).app X₃ := by
-      simpa [Category.assoc] using
-        congrArg (fun k => u' ≫ k) ((t.truncLTι 0).naturality m₃).symm
+      simp
     have hu₂ :
         u' ≫ (t.truncLT 0).map m₃ ≫ (t.truncLTι 0).app X₃ =
           u ≫ (t.truncLTι 0).app X₃ := by
@@ -735,7 +718,7 @@ private theorem originalHeartH0primeFunctor_preadditiveCoyoneda_exact_of_isIso_t
         (t.truncLTι 0).app Z ≫ (t.truncGEπ 0).app Z = 0 :=
       comp_distTriang_mor_zero₁₂ _ (t.triangleLTGE_distinguished 0 Z)
     apply (toOriginalHeartH0primeHom_eq_zero_iff t E n).2
-    simpa [n, Category.assoc] using congrArg (fun k => u' ≫ k) hz
+    simp [n, Category.assoc]
   have hnegzero : toOriginalHeartH0primeHom t E (-n) = 0 := by
     apply (toOriginalHeartH0primeHom_eq_zero_iff t E (-n)).2
     simpa using congrArg Neg.neg

@@ -51,6 +51,8 @@ noncomputable def unitFromConstant :
   ((constantSheafAdj J AddCommGrpCat.{u} hT).homEquiv _ _).symm
     ((AddCommGrpCat.uliftZMultiplesAddEquiv _).symm (1 : R.obj.obj (op T)))
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 omit [J.WEqualsLocallyBijective AddCommGrpCat.{u}] in
 /-- Under the constant-sheaf adjunction, `unitFromConstant ≫ toSheaf.map f` is the section
 `f 1` over the terminal object. -/
@@ -65,6 +67,8 @@ lemma homEquiv_unitFromConstant_comp (M : SheafOfModules.{u} R) (f : unit R ⟶ 
     AddEquiv.apply_symm_apply]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 omit [J.WEqualsLocallyBijective AddCommGrpCat.{u}] in
 /-- **Degree zero.** `f ↦ unitFromConstant ≫ toSheaf.map f` is a bijection from maps
 `unit R ⟶ M` to maps `ℤ ⟶ toSheaf M`: both are the sections of `M` over the terminal

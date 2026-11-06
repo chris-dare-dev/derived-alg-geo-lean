@@ -48,6 +48,8 @@ abbrev polynomialNatGlobalSections (ι k : Type u) [Field k] (d : ℕ) :=
     (natShift (polynomialGrading ι k) d)).1.obj
       (op (⊤ : (AlgebraicGeometry.Proj (polynomialGrading ι k)).Opens))
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- A homogeneous polynomial of degree `d` defines the global section represented everywhere
 by the fraction `p / 1` in the shifted module. -/
 noncomputable def polynomialToNatGlobalSections (ι k : Type u) [Field k] (d : ℕ) :
@@ -56,7 +58,7 @@ noncomputable def polynomialToNatGlobalSections (ι k : Type u) [Field k] (d : �
   toFun p := by
     let num : ↥(GradedModule.natShift
         (polynomialGrading ι k) d 0) :=
-      ⟨p.1, by change p.1 ∈ polynomialGrading ι k (0 + d); simpa using p.2⟩
+      ⟨p.1, by change p.1 ∈ polynomialGrading ι k (0 + d); simp⟩
     let den : polynomialGrading ι k 0 :=
       ⟨1, one_mem_graded (polynomialGrading ι k)⟩
     refine ⟨fun x => DegreeZeroLocalization.mk
@@ -419,7 +421,7 @@ noncomputable def polynomialTwistingGlobalSectionsModuleIso
       polynomialTwistingGlobalSectionsModule ι k d := by
   let e := polynomialTwistingGlobalSectionsAddEquiv ι k d
   letI : Module k (polynomialTwistingGlobalSections ι k d) := e.symm.module k
-  exact LinearEquiv.toModuleIso (e.symm.linearEquiv (A := k)).symm
+  exact LinearEquiv.toModuleIso (e.symm.linearEquiv k).symm
 
 /-- Nonnegative twists on polynomial projective space are quasi-coherent.
 
@@ -510,6 +512,8 @@ noncomputable def cechTermSectionAddEquiv (ι k : Type u) [Field k] (d : ℕ) {n
       (natShiftSectionAddEquivOn (polynomialGrading ι k)
         (MvPolynomial.isHomogeneous_X k (x 0)) d (basicOpen_denominator_le ι k x)).symm)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The Čech comparison is the canonical homogeneous-fraction section map.
 
 This is what makes the comparison usable rather than merely existent. As defined,
@@ -626,6 +630,8 @@ noncomputable def intCechTermSectionAddEquiv (ι k : Type u) [Field k] (d : ℤ)
             (MvPolynomial.isHomogeneous_X k (x 0)) d
             (basicOpen_denominator_le ι k x)).symm))))
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 set_option maxHeartbeats 1600000 in
 set_option synthInstance.maxHeartbeats 400000 in
 /-- The integer Čech comparison is the canonical homogeneous-fraction section map.

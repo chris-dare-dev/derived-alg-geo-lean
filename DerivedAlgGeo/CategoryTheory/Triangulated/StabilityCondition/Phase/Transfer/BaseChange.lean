@@ -107,7 +107,7 @@ theorem semistable_iff_largePhase_of_iso_coproduct (φ : ℝ) (E : Q.FullSubcate
   let r : Retract E.obj (∐ fun _ : ι => E.obj) :=
     { i := Sigma.ι (fun _ : ι => E.obj) (Classical.arbitrary ι)
       r := Sigma.desc fun _ => 𝟙 E.obj
-      retract := Sigma.ι_desc _ _ }
+      retract := Sigma.ι_comp_desc _ _ }
   have hLE : ∀ ψ, (ind.tStructure ψ).IsLE E.obj 0 ↔ (ind.tStructure ψ).IsLE Y 0 := by
     intro ψ
     constructor

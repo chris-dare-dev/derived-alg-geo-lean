@@ -46,6 +46,8 @@ noncomputable def homologyLinearEquiv {Y Yn : C} {n : ℤ}
       (DGLinear.homComplex k X Yn)).toLinearEquiv.trans
         (H0.homologyZeroLinearEquiv (k := k) X Yn))
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- On a represented cohomology class, the explicit-shift comparison is right
 composition by the distinguished shift element. -/
 lemma homologyLinearEquiv_homologyπ_cyclesMk {Y Yn : C} {n : ℤ}

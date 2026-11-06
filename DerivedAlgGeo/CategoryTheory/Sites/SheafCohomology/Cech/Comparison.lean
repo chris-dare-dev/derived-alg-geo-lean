@@ -93,6 +93,8 @@ noncomputable abbrev freeAbelianYonedaSheaf (J : GrothendieckTopology C)
     Sheaf J AddCommGrpCat.{a} :=
   (presheafToSheaf J _).obj (yoneda.obj X ⋙ AddCommGrpCat.free)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Maps from the free abelian representable presheaf are sections. -/
 noncomputable def freeAbelianYonedaPresheafHomAddEquiv (X : C)
     (G : Cᵒᵖ ⥤ AddCommGrpCat.{a}) :
@@ -428,6 +430,8 @@ noncomputable def cechInjectiveBicomplexColumnIsoSectionsComplex
       simp only [Category.comp_id]
       rfl)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 omit [HasExt.{h} (Sheaf J AddCommGrpCat.{a})] in
 /-- Exactness of all the intersection-wise section complexes is preserved by the product that
 forms a fixed Cech column. -/

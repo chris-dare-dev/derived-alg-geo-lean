@@ -38,10 +38,10 @@ local instance dualCategory : Category X.Modules :=
   inferInstanceAs (Category (SheafOfModules X.ringCatSheaf))
 
 local instance dualMonoidalCategory : MonoidalCategory X.PresheafOfModules :=
-  PresheafOfModules.monoidalCategory (R := X.presheaf)
+  PresheafOfModulesOfCommRing.monoidalCategory (R := X.presheaf)
 
 local instance dualSymmetricCategory : SymmetricCategory X.PresheafOfModules :=
-  PresheafOfModules.symmetricCategory (R := X.presheaf)
+  PresheafOfModulesOfCommRing.symmetricCategory (R := X.presheaf)
 
 private def unitOne (U : X.Opens) (Y : (Over U)ᵒᵖ) :
     (SheafOfModules.unit (X.ringCatSheaf.over U)).val.obj Y :=
@@ -521,7 +521,8 @@ private lemma evaluationApp_eq_of_trivialization (L : X.Modules) (U : X.Opens)
   letI : CommRing (X.ringCatSheaf.obj.obj (Opposite.op U)) :=
     inferInstanceAs (CommRing Γ(X, U))
   change φ.val.app (Opposite.op (Over.mk (𝟙 U))) m =
-    (e.inv.val.app (Opposite.op (Over.mk (𝟙 U))) m) •
+    (show (X.ringCatSheaf.over U).obj.obj (Opposite.op (Over.mk (𝟙 U))) from
+      e.inv.val.app (Opposite.op (Over.mk (𝟙 U))) m) •
       φ.val.app (Opposite.op (Over.mk (𝟙 U)))
         (e.hom.val.app (Opposite.op (Over.mk (𝟙 U)))
           (unitOne U (Opposite.op (Over.mk (𝟙 U)))))
@@ -530,7 +531,8 @@ private lemma evaluationApp_eq_of_trivialization (L : X.Modules) (U : X.Opens)
     ((e.hom.val.app (Opposite.op (Over.mk (𝟙 U))))
       (unitOne U (Opposite.op (Over.mk (𝟙 U)))))
   have hm :
-      (e.inv.val.app (Opposite.op (Over.mk (𝟙 U))) m) •
+      (show (X.ringCatSheaf.over U).obj.obj (Opposite.op (Over.mk (𝟙 U))) from
+        e.inv.val.app (Opposite.op (Over.mk (𝟙 U))) m) •
           e.hom.val.app (Opposite.op (Over.mk (𝟙 U)))
             (unitOne U (Opposite.op (Over.mk (𝟙 U)))) = m := by
     have hecomp := congrArg
@@ -541,7 +543,8 @@ private lemma evaluationApp_eq_of_trivialization (L : X.Modules) (U : X.Opens)
         (e.inv.val.app (Opposite.op (Over.mk (𝟙 U))) m) = m at he
     calc
       _ = e.hom.val.app (Opposite.op (Over.mk (𝟙 U)))
-          ((e.inv.val.app (Opposite.op (Over.mk (𝟙 U))) m) •
+          ((show (X.ringCatSheaf.over U).obj.obj (Opposite.op (Over.mk (𝟙 U))) from
+            e.inv.val.app (Opposite.op (Over.mk (𝟙 U))) m) •
             unitOne U (Opposite.op (Over.mk (𝟙 U)))) :=
         ((e.hom.val.app (Opposite.op (Over.mk (𝟙 U)))).hom.map_smul _ _).symm
       _ = e.hom.val.app (Opposite.op (Over.mk (𝟙 U)))
@@ -554,7 +557,8 @@ private lemma evaluationApp_eq_of_trivialization (L : X.Modules) (U : X.Opens)
   calc
     φ.val.app (Opposite.op (Over.mk (𝟙 U))) m =
         φ.val.app (Opposite.op (Over.mk (𝟙 U)))
-          ((e.inv.val.app (Opposite.op (Over.mk (𝟙 U))) m) •
+          ((show (X.ringCatSheaf.over U).obj.obj (Opposite.op (Over.mk (𝟙 U))) from
+            e.inv.val.app (Opposite.op (Over.mk (𝟙 U))) m) •
             e.hom.val.app (Opposite.op (Over.mk (𝟙 U)))
               (unitOne U (Opposite.op (Over.mk (𝟙 U))))) :=
       congrArg _ hm.symm
@@ -565,7 +569,8 @@ private lemma evaluationApp_isIso_of_trivialization (L : X.Modules)
     (e : SheafOfModules.unit (X.ringCatSheaf.over U) ≅ L.over U) :
     IsIso (evaluationApp L (Opposite.op U)) := by
   rw [evaluationApp_eq_of_trivialization L U e]
-  infer_instance
+  exact (((localSectionLinearEquiv L U e).toModuleIso.symm ⊗ᵢ
+    (dualLinearEquiv L U e).toModuleIso) ≪≫ λ_ _).isIso_hom
 
 private lemma restrictedEvaluation_mem_W (L : X.Modules)
     (q : (show SheafOfModules X.ringCatSheaf from L).LocalGeneratorsData)
@@ -697,7 +702,7 @@ private noncomputable def tensorCancelTrivialization
     SheafOfModules.unit (X.ringCatSheaf.over U) ≅ D.over U := by
   letI : MonoidalCategory
       (_root_.PresheafOfModules.{u} (X.ringCatSheaf.over U).obj) :=
-    PresheafOfModules.monoidalCategory (R := (X.sheaf.over U).obj)
+    PresheafOfModulesOfCommRing.monoidalCategory (R := (X.sheaf.over U).obj)
   let aU := PresheafOfModules.sheafification
     (𝟙 (X.ringCatSheaf.over U).obj)
   let F := PresheafOfModules.pushforward

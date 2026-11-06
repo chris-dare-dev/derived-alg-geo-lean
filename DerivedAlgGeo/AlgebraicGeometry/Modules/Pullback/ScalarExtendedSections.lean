@@ -41,12 +41,12 @@ private noncomputable def fixedBaseSections_restrictScalars
       map_add' := by intros; rfl
       map_smul' := by
         intro r x
-        change (K.smul r).hom x =
-          (T.smul (a.hom r)).hom x
+        change (K.smul r).asHom.hom x =
+          (T.smul (a.hom r)).asHom.hom x
         have hK := modulesToFixedBaseSheaf_smul Z (φ ≫ f.appTop) N ⊤ r x
         have hT := modulesToFixedBaseSheaf_smul Z ψ N ⊤ (a.hom r) x
-        change (K.smul r).hom x = _ at hK
-        change (T.smul (a.hom r)).hom x = _ at hT
+        change (K.smul r).asHom.hom x = _ at hK
+        change (T.smul (a.hom r)).asHom.hom x = _ at hT
         rw [hK, hT]
         have htop : (⊤ : Z.Opens).leTop = 𝟙 _ := Subsingleton.elim _ _
         simp [htop]
@@ -83,7 +83,7 @@ theorem fixedBasePullbackTopAfterExtension_one_tmul
   change (1 : A) • ((fixedBasePullbackTop φ f M ≫
     fixedBaseSections_restrictScalars φ f a ψ compat ((pullback f).obj M)).hom x) = _
   rw [one_smul]
-  simp only [ModuleCat.comp_apply, fixedBasePullbackTop_apply]
+  simp only []
   rfl
 
 end AlgebraicGeometry.Scheme.Modules

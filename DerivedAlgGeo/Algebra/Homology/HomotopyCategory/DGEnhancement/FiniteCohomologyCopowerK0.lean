@@ -38,6 +38,8 @@ variable {k : Type v} [CommRing k] [Nontrivial k] [StrongRankCondition k]
   [DGLinear k C] [HasLinearCopowers k C]
   {K : CochainComplex (ModuleCat.{v} k) ℤ}
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- A supplied finite cohomology presentation with finite-free homology
 computes the class of the selected scalar-linear copower by Mathlib's
 homological Euler characteristic. -/

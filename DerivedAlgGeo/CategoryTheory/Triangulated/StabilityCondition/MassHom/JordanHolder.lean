@@ -168,8 +168,7 @@ private theorem exists_stable_strictQuotient
         s.P φ (M : s.IntervalCat C a b).obj ∧
         s.IsStableAt φ (cokernel M.arrow).obj := by
     intro S
-    induction S using IsWellFounded.induction
-        (· > · : StrictSubobject X → StrictSubobject X → Prop) with
+    induction S using WellFoundedGT.induction with
     | ind S ih =>
         intro hSφ hQSφ hQS
         have hStop : S.1 ≠ ⊤ := by

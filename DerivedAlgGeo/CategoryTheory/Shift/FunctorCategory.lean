@@ -55,7 +55,7 @@ universe v v' w u u'
 
 namespace CategoryTheory
 
-open Category Functor
+open Category CategoryTheory.Functor
 
 variable (X : Type u) [Category.{v} X] (Y : Type u') [Category.{v'} Y]
   (A : Type w) [AddMonoid A] [HasShift Y A]
@@ -136,6 +136,8 @@ lemma functorCategory_shiftFunctorAdd_inv_app (n m : A) (G : X ⥤ Y) (E : X) :
 
 variable (X Y A)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **Evaluation commutes with the pointwise shift on the nose.**
 
 `(G ⋙ Y⟦n⟧).obj E` and `(G.obj E)⟦n⟧` are the same object, so the commutation
@@ -204,15 +206,13 @@ noncomputable def firstFamilyCommShift : F.CommShift M where
     ext A E
     change ((F.flip.obj E).commShiftIso 0).hom.app A = _
     rw [(F.flip.obj E).commShiftIso_zero]
-    simp [Functor.CommShift.isoZero_hom_app,
-      functorCategory_shiftFunctorZero_inv_app]
+    simp [Functor.CommShift.isoZero_hom_app]
     rfl
   commShiftIso_add n m := by
     ext A E
     change ((F.flip.obj E).commShiftIso (n + m)).hom.app A = _
     rw [(F.flip.obj E).commShiftIso_add]
-    simp [Functor.CommShift.isoAdd_hom_app,
-      functorCategory_shiftFunctorAdd_inv_app]
+    simp [Functor.CommShift.isoAdd_hom_app]
     rfl
 
 /-- The first-family shift comparison evaluates to the partial comparison
@@ -239,15 +239,13 @@ noncomputable def secondFamilyCommShift : F.flip.CommShift M where
     ext E A
     change ((F.obj A).commShiftIso 0).hom.app E = _
     rw [(F.obj A).commShiftIso_zero]
-    simp [Functor.CommShift.isoZero_hom_app,
-      functorCategory_shiftFunctorZero_inv_app]
+    simp [Functor.CommShift.isoZero_hom_app]
     rfl
   commShiftIso_add n m := by
     ext E A
     change ((F.obj A).commShiftIso (n + m)).hom.app E = _
     rw [(F.obj A).commShiftIso_add]
-    simp [Functor.CommShift.isoAdd_hom_app,
-      functorCategory_shiftFunctorAdd_inv_app]
+    simp [Functor.CommShift.isoAdd_hom_app]
     rfl
 
 /-- The second-family shift comparison evaluates to the partial comparison

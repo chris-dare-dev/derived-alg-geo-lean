@@ -6,22 +6,30 @@ keywords = [
   "coherent-sheaves", "stability-conditions", "riemann-roch",
 ]
 
+# Lake >= 4.35 warns whenever a non-`module` file imports Mathlib, which is built for the
+# module system. This repository has not adopted `module` headers; say so once here
+# rather than accept one warning per import.
+allowNonModules = true
+
 [leanOptions]
 autoImplicit = false
 relaxedAutoImplicit = false
+# Mathlib v4.35's `haveI`/`letI` style linter is new with the toolchain bump. Adopting it
+# rewrites several hundred proofs, which is left to a follow-up so the bump stays reviewable.
+weak.linter.style.haveILetI = false
 
 # One direct Mathlib revision for every library in this repository.
 [[require]]
 name = "mathlib"
 scope = "leanprover-community"
-rev = "v4.32.1"
+rev = "v4.35.0"
 
 # Shared provenance/emission leaf. It has no Lake dependencies, so it cannot
 # introduce a competing Mathlib revision.
 [[require]]
 name = "MathFormalContract"
 git = "https://github.com/chris-dare-dev/math-formal-contract-lean"
-rev = "bda0e6130add381098f251b83f8bedfeec8d6a8b"
+rev = "5ddf2536e5e57097e568b63b9de06ec00fc8930d"
 
 [[lean_lib]]
 name = "DerivedAlgGeo"

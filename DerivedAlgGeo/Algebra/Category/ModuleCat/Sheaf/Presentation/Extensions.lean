@@ -10,7 +10,7 @@ import Mathlib.CategoryTheory.Sites.Abelian
 import Mathlib.Algebra.Category.Grp.EpiMono
 import Mathlib.Algebra.Category.Grp.Abelian
 import Mathlib.Algebra.Category.ModuleCat.Sheaf.PullbackFree
-import Mathlib.Data.Finite.Sum
+import Mathlib.Basic.Finite.Sum
 
 /-!
 # Extensions of finitely presented module sheaves

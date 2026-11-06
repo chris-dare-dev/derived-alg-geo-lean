@@ -73,6 +73,8 @@ theorem mem_cocycles_of_isClosed {F G : DGFunctor C D}
     η ∈ cocycles F G :=
   (HomogeneousNatTrans.complex_d_apply η).trans hη
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Descending a vertical composite is composing the descents. -/
 theorem HomogeneousNatTrans.h0_comp {F G H : DGFunctor C D}
     (η : HomogeneousNatTrans F G 0) (θ : HomogeneousNatTrans G H 0)
@@ -104,6 +106,8 @@ theorem HomogeneousNatTrans.h0_comp' {F G H : DGFunctor C D}
       (HomogeneousNatTrans.composition F G H 0 0 0 (by omega) η θ) _ = _
   exact HomogeneousNatTrans.h0_comp η θ hη hθ hηθ
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Descent to `H⁰` commutes with dg left whiskering, through the canonical
 comparisons between `H⁰` of a composite and the composite of `H⁰` functors. -/
 theorem HomogeneousNatTrans.h0_whiskerLeft {E : Type u''} [DGCategory.{v} E]
@@ -243,6 +247,8 @@ theorem h0Iso_inv_app {F G : Z0 (DGFunctor C D)} (e : F ≅ G) (X : H0 C) :
         (isClosed_of_mem_cocycles e.inv.2)).app X :=
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem h0Iso_refl (F : Z0 (DGFunctor C D)) :
     h0Iso (Iso.refl F) = Iso.refl (Z0.of (DGFunctor C D) F).h0 := by
@@ -251,12 +257,13 @@ theorem h0Iso_refl (F : Z0 (DGFunctor C D)) :
         (h0Comparison C D).mapIso
           (Iso.refl ((Z0.toH0 (DGFunctor C D)).obj F)) := by
       rw [h0Iso, Functor.mapIso_refl]
-      rfl
     _ = Iso.refl ((h0Comparison C D).obj
         ((Z0.toH0 (DGFunctor C D)).obj F)) :=
       Functor.mapIso_refl _ _
     _ = _ := rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 theorem h0Iso_trans {F G H : Z0 (DGFunctor C D)} (e : F ≅ G) (f : G ≅ H) :
     h0Iso (e.trans f) = (h0Iso e).trans (h0Iso f) := by
   calc
@@ -264,7 +271,6 @@ theorem h0Iso_trans {F G H : Z0 (DGFunctor C D)} (e : F ≅ G) (f : G ≅ H) :
         (((Z0.toH0 (DGFunctor C D)).mapIso e).trans
           ((Z0.toH0 (DGFunctor C D)).mapIso f)) := by
       rw [h0Iso, Functor.mapIso_trans]
-      rfl
     _ = ((h0Comparison C D).mapIso
           ((Z0.toH0 (DGFunctor C D)).mapIso e)).trans
         ((h0Comparison C D).mapIso

@@ -75,7 +75,7 @@ a quotient during unrelated typeclass searches is prohibitively expensive.
 Consumers can install it locally when needed. -/
 theorem saturatedQuotient_isAddTorsionFree (H : AddSubgroup A) :
     IsAddTorsionFree H.SaturatedQuotient where
-  nsmul_right_injective n hn x y hxy := by
+  eq_of_nsmul_eq_nsmul_of_addCommute n hn x y _ hxy := by
     induction x using Quotient.inductionOn with
     | _ x =>
       induction y using Quotient.inductionOn with

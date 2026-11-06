@@ -152,13 +152,11 @@ theorem IsCompactObject.bijective_directSumToHom (hK : IsCompactObject.{0} K) :
           totalIso.hom =
         AddCommGrpCat.ofHom (DirectSum.of (fun i => H i) i) := by
     dsimp [totalIso]
-    simp only [Iso.trans_hom]
     rw [map_ι_coproductComparisonIso_hom_assoc]
-    have he := HasColimit.isoOfNatIso_ι_hom_assoc e ⟨i⟩
+    have he := HasColimit.ι_isoOfNatIso_hom_assoc e ⟨i⟩
       (AddCommGrpCat.coproductIsoDirectSum H).hom
     refine he.trans ?_
     simp [e, H]
-    exact Category.id_comp _
   have key (i : ι) (a : K ⟶ X i) :
       totalIso.hom (a ≫ Sigma.ι X i) = DirectSum.of (fun i => H i) i a := by
     have h := CategoryTheory.congr_fun (totalIso_ι i) a
@@ -185,6 +183,8 @@ theorem IsCompactObject.bijective_directSumToHom (hK : IsCompactObject.{0} K) :
   · intro f
     exact ⟨totalIso.hom f, hinj (hcomp _)⟩
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **Bijective comparison maps give compactness.** -/
 theorem isCompactObject_of_bijective_directSumToHom
     (h : ∀ (ι : Type) [DecidableEq ι] (X : ι → C) [HasCoproduct X],
@@ -238,6 +238,8 @@ variable {C : Type u} [Category.{v} C] [Preadditive C]
 
 include hK
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- A morphism from a compact object into a coproduct is a finite sum of
 morphisms into individual summands followed by the coproduct injections. -/
 theorem exists_finite_sum {ι : Type} (X : ι → C)
@@ -263,14 +265,12 @@ theorem exists_finite_sum {ι : Type} (X : ι → C)
       (preadditiveCoyoneda.obj (Opposite.op K)).map (Sigma.ι X i) ≫
           totalIso.hom =
         AddCommGrpCat.ofHom (DirectSum.of (fun i => H i) i) := by
-    dsimp [totalIso]
-    simp only [Iso.trans_hom]
+    simp only [totalIso, Iso.trans_hom]
     rw [map_ι_coproductComparisonIso_hom_assoc]
-    have he := HasColimit.isoOfNatIso_ι_hom_assoc e ⟨i⟩
+    have he := HasColimit.ι_isoOfNatIso_hom_assoc e ⟨i⟩
       (AddCommGrpCat.coproductIsoDirectSum H).hom
     refine he.trans ?_
     simp [e, H]
-    exact Category.id_comp _
   have totalIso_hom_comp_ι (i : ι) (a : K ⟶ X i) :
       totalIso.hom (a ≫ Sigma.ι X i) =
         DirectSum.of (fun i => H i) i a := by

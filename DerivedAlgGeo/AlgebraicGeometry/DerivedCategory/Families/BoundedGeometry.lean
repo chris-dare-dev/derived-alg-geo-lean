@@ -165,12 +165,16 @@ def boundedCoherentDerivedPullback {T U : SchemeBaseChange S} (f : T ⟶ U)
     (DerivedCategory.Bounded.ι ⋙ coherentDerivedPullback f)
     (fun E ↦ HasCoherentPullback.preservesBounded E.obj E.property)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 instance {T U : SchemeBaseChange S} (f : T ⟶ U)
     [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
     [HasCoherentPullback f] : (boundedCoherentDerivedPullback f).Additive := by
   dsimp [boundedCoherentDerivedPullback]
   infer_instance
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 noncomputable instance {T U : SchemeBaseChange S} (f : T ⟶ U)
     [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
     [HasCoherentPullback f] : (boundedCoherentDerivedPullback f).CommShift ℤ := by
@@ -188,6 +192,8 @@ def boundedCoherentDerivedPullbackCompInclusion
     (DerivedCategory.Bounded.ι ⋙ coherentDerivedPullback f)
     (fun E ↦ HasCoherentPullback.preservesBounded E.obj E.property)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 noncomputable instance {T U : SchemeBaseChange S} (f : T ⟶ U)
     [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
     [HasCoherentPullback f] :

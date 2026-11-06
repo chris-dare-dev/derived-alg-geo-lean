@@ -142,10 +142,10 @@ theorem Slicing.exists_phase_truncation (s : Slicing C) (A : C)
             refine ⟨X, Z, hX, Or.inr ⟨GZ, hGZpos, ?_⟩,
               f ≫ u, v, w, hXZ, Or.inr ⟨GZ, hGZpos, ?_, ?_⟩⟩
             · change GZ.φ ⟨0, hGZpos⟩ ≤ 0
-              simp only [GZ, HNFiltration.appendFactor, dif_pos hGY]
+              simp only [GZ, HNFiltration.appendFactor, dite_eq_left hGY]
               exact hGYle
             · change GZ.φ ⟨0, hGZpos⟩ ≤ 0
-              simp only [GZ, HNFiltration.appendFactor, dif_pos hGY]
+              simp only [GZ, HNFiltration.appendFactor, dite_eq_left hGY]
               exact hGYle
             · intro _ j
               change F.φ ⟨F.n - 1, by omega⟩ ≤ GZ.φ j

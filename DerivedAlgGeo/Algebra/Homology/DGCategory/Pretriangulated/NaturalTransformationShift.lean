@@ -34,6 +34,8 @@ variable {C : Type u} {D : Type u'}
   [DGCategory.{v} C] [DGCategory.{v} D] [IsPretriangulated D]
   {F G : DGFunctor C D}
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The inverse selected by representability in the dg functor category is the
 pointwise inverse already selected in the target.  This makes the abstract
 source regrading below compute through the original objectwise witnesses. -/

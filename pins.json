@@ -5,21 +5,21 @@
     "The stability-condition foundation is repository-owned and has no external source dependency."
   ],
   "repo": "derived-alg-geo-lean",
-  "recorded_at": "2026-09-20",
-  "recorded_from": "agent/bump-mfc-timings b7f3ee61",
-  "lean_toolchain": "leanprover/lean4:v4.32.1",
-  "mathlib_rev": "520045ab14e26149ee970e2e617ca04b09bde5d6",
-  "mathlib_input_rev": "v4.32.1",
+  "recorded_at": "2026-11-05",
+  "recorded_from": "claude/toolchain-v4.35.0 (from af19c794)",
+  "lean_toolchain": "leanprover/lean4:v4.35.0",
+  "mathlib_rev": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+  "mathlib_input_rev": "v4.35.0",
   "mathlib_is_direct_require": true,
   "external_bridgeland_source_dependency": false,
   "literal_source_independence_recorded_at": "2026-08-14",
-  "mfc_rev": "bda0e6130add381098f251b83f8bedfeec8d6a8b",
+  "mfc_rev": "5ddf2536e5e57097e568b63b9de06ec00fc8930d",
   "mfc_repo": "https://github.com/chris-dare-dev/math-formal-contract-lean",
   "mfc_has_lake_dependencies": false,
   "cross_repo": {
     "status": "MERGED",
     "former_peer": "bridgeland-stab-lean",
-    "note": "Both owner-authored histories now share this v4.32.1 monorepo branch."
+    "note": "Both owner-authored histories now share this monorepo branch (merged at v4.32.1)."
   },
-  "mfc_cli_rev": "bda0e6130add381098f251b83f8bedfeec8d6a8b"
+  "mfc_cli_rev": "5ddf2536e5e57097e568b63b9de06ec00fc8930d"
 }

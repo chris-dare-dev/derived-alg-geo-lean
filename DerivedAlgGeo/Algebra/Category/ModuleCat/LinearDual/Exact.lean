@@ -62,7 +62,7 @@ theorem linearDualFunctor_preservesFiniteLimits_and_colimits :
       CategoryTheory.Limits.PreservesFiniteColimits
         (linearDualFunctor.{u, u + 1} k) :=
   (CategoryTheory.Functor.exact_tfae
-    (linearDualFunctor.{u, u + 1} k)).out 0 3 |>.mp
+    (linearDualFunctor.{u, u + 1} k)).out 1 4 |>.mp
     fun (S : ShortComplex ((ModuleCat.{u + 1} k)ᵒᵖ)) hS ↦
       linearDualFunctor_map_shortExact k S hS
 

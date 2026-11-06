@@ -35,7 +35,7 @@ private local instance tensorExact_category : Category X.Modules :=
 
 private noncomputable local instance tensorExact_monoidalCategory :
     MonoidalCategory X.PresheafOfModules :=
-  PresheafOfModules.monoidalCategory (R := X.presheaf)
+  PresheafOfModulesOfCommRing.monoidalCategory (R := X.presheaf)
 
 private noncomputable instance faithfulToSheaf : (toSheaf X).Faithful := by
   constructor

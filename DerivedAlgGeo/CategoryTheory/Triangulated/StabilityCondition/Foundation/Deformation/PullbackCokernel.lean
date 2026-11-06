@@ -322,7 +322,7 @@ theorem pullbackCokernel_ne_top {X : s.IntervalCat C a b}
         Subobject.underlying.obj (⊤ : Subobject X) :=
       congrArg Subobject.underlying.obj hpb
     have harr : pbB.arrow = eqToHom heqObj ≫ (⊤ : Subobject X).arrow := by
-      simpa using (Subobject.arrow_congr pbB ⊤ hpb).symm
+      exact (Subobject.arrow_congr pbB ⊤ hpb).symm
     rw [harr]
     infer_instance
   let r : X ⟶ (B : s.IntervalCat C a b) :=

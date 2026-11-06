@@ -64,7 +64,6 @@ instance complexPullbackComp_commShift {T U V : SchemeBaseChange S}
   dsimp [complexPullbackComp]
   simp [CategoryTheory.Functor.commShiftIso_comp_hom_app,
     CategoryTheory.Functor.mapHomologicalComplex_commShiftIso_hom_app_f]
-  erw [CategoryTheory.Functor.map_id, Category.id_comp]
 
 /-- The localized complex-level identity isomorphism commutes with shift. -/
 instance complexPullbackIdLocalized_commShift (T : SchemeBaseChange S) :
@@ -99,7 +98,6 @@ instance derivedPullbackId_commShift (T : SchemeBaseChange S) :
     (HomologicalComplex.quasiIso T.left.Modules (ComplexShape.up ℤ))
   intro K
   dsimp
-  simp only [CategoryTheory.Functor.whiskerRight_app, CategoryTheory.Functor.whiskerLeft_app]
   let q := ((SchemeDerivedCategory.Q T.left).commShiftIso a).hom.app K
   have happ (X : CochainComplex T.left.Modules ℤ) :
       (derivedPullbackId T).hom.app
@@ -139,7 +137,6 @@ instance derivedPullbackId_commShift (T : SchemeBaseChange S) :
     rw [← Category.assoc]
     erw [hnat]
     simp
-    rfl
   dsimp [q] at hnat ⊢
   rw [← cancel_epi ((derivedPullback (𝟙 T)).map
     q)]
@@ -165,7 +162,6 @@ instance derivedPullbackComp_commShift
     (HomologicalComplex.quasiIso V.left.Modules (ComplexShape.up ℤ))
   intro K
   dsimp
-  simp only [CategoryTheory.Functor.whiskerRight_app, CategoryTheory.Functor.whiskerLeft_app]
   let q := ((SchemeDerivedCategory.Q V.left).commShiftIso a).hom.app K
   let sourceFactor :
       SchemeDerivedCategory.Q V.left ⋙
@@ -184,7 +180,6 @@ instance derivedPullbackComp_commShift
           (complexPullbackCompLocalized f g).hom.app X ≫
             (derivedPullbackFactors (f ≫ g)).inv.app X := by
     simp [sourceFactor, derivedPullbackComp, Localization.liftNatTrans_app]
-    erw [Category.id_comp]
   have hnat := (derivedPullbackComp f g).hom.naturality q
   have hsource :
       (derivedPullback g ⋙ derivedPullback f).map q ≫
@@ -217,7 +212,6 @@ instance derivedPullbackComp_commShift
           derivedPullback f).commShiftIso a).hom.app K := by
     dsimp [sourceFactor]
     simp only [CategoryTheory.Functor.commShiftIso_comp_hom_app,
-      CategoryTheory.Functor.associator_hom_app, CategoryTheory.Functor.whiskerRight_app,
       CategoryTheory.Functor.comp_map]
     have hdf := ((derivedPullback f).commShiftIso a).hom.naturality
       ((derivedPullbackFactors g).hom.app K)

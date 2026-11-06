@@ -102,8 +102,7 @@ noncomputable def opIso (Y : CosimplicialObject A) :
     simp [AlternatingFaceMapComplex.objD, alternatingCofaceMapComplex,
       AlternatingCofaceMapComplex.obj,
       AlternatingCofaceMapComplex.objD, SimplicialObject.δ, CosimplicialObject.δ,
-      CochainComplex.of_d, op_sum, op_zsmul]
-    exact (Category.id_comp _).trans (Category.comp_id _).symm)
+      CochainComplex.of_d, op_sum])
 
 @[simp]
 lemma opIso_hom_f (Y : CosimplicialObject A) (n : ℕ) :
@@ -123,6 +122,8 @@ open SimplicialObject.Augmented
 
 variable {A : Type u} [Category.{v} A] [Abelian A]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **Positive-degree exactness from an extra degeneracy.** If the opposite of a cosimplicial
 object `Y` in `A` underlies an augmented simplicial object in `Aᵒᵖ` carrying an extra
 degeneracy, then the alternating coface complex of `Y` is exact in every positive degree.

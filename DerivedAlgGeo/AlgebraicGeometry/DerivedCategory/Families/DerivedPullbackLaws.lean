@@ -141,16 +141,9 @@ theorem derivedPullback_left_unitality
   simp [derivedPullbackComp, derivedPullbackId,
     Localization.liftNatTrans_app, complexPullbackIdLocalized,
     complexPullbackCompLocalized, derivedPullbackCongr]
-  slice_lhs 3 6 =>
-    rw [← CategoryTheory.Functor.map_comp_assoc, Iso.inv_hom_id_app,
-      CategoryTheory.Functor.map_id, Category.id_comp]
-  slice_lhs 4 5 => simp
   slice_lhs 2 3 => erw [← hnat]
   slice_lhs 1 2 => erw [hcomplex]
-  slice_lhs 2 4 => simp
   simp [complexPullbackCongr]
-  slice_lhs 3 4 => erw [CategoryTheory.Functor.map_id, Category.comp_id]
-  slice_lhs 2 3 => erw [Category.comp_id]
 
 set_option backward.isDefEq.respectTransparency false in
 set_option linter.tacticCheckInstances false in
@@ -188,14 +181,7 @@ theorem derivedPullback_right_unitality
   simp [derivedPullbackComp, derivedPullbackId,
     Localization.liftNatTrans_app, complexPullbackIdLocalized,
     complexPullbackCompLocalized, derivedPullbackCongr]
-  slice_lhs 4 5 => erw [Category.comp_id]
-  slice_lhs 3 4 => erw [hnat]
-  slice_lhs 2 3 => erw [heta]
-  slice_lhs 2 3 => rw [Iso.inv_hom_id_app]
-  slice_lhs 2 4 => simp [complexPullbackIdLocalized]
-  slice_lhs 1 2 => erw [Category.comp_id]
   slice_lhs 1 2 => erw [hcomplex]
-  slice_lhs 2 3 => erw [Category.id_comp]
   simp [complexPullbackCongr]
 
 set_option backward.isDefEq.respectTransparency false in
@@ -280,43 +266,11 @@ theorem derivedPullback_associativity
           (derivedPullbackFactors ((f ≫ g) ≫ h)).inv.app K)
   simp [derivedPullbackComp, Localization.liftNatTrans_app,
     complexPullbackCompLocalized, derivedPullbackCongr]
-  rw [← (derivedPullback f).map_comp_assoc,
-    Iso.inv_hom_id_app, CategoryTheory.Functor.map_id, Category.id_comp]
-  slice_lhs 5 8 => erw [hnat]
-  have hcancel :
-      ((derivedPullbackComp f g).hom.app
-          ((complexPullback h ⋙ SchemeDerivedCategory.Q V.left).obj K) ≫
-        (derivedPullback (f ≫ g)).map ((derivedPullbackFactors h).inv.app K)) ≫
-          (derivedPullback (f ≫ g)).map ((derivedPullbackFactors h).hom.app K) =
-        (derivedPullbackComp f g).hom.app
-          ((complexPullback h ⋙ SchemeDerivedCategory.Q V.left).obj K) := by
-    rw [Category.assoc, ← CategoryTheory.Functor.map_comp, Iso.inv_hom_id_app,
-      CategoryTheory.Functor.map_id, Category.comp_id]
-  have hcancelg :
-      (derivedPullback f).map
-          ((derivedPullbackFactors g).inv.app ((complexPullback h).obj K)) ≫
-        (derivedPullback f).map
-            ((derivedPullbackFactors g).hom.app ((complexPullback h).obj K)) ≫
-          (derivedPullbackFactors f).hom.app
-              ((complexPullback g).obj ((complexPullback h).obj K)) ≫
-            (SchemeDerivedCategory.Q T.left).map
-                ((complexPullbackComp f g).hom.app ((complexPullback h).obj K)) ≫
-            (SchemeDerivedCategory.Q T.left).map
-                ((complexPullbackComp (f ≫ g) h).hom.app K) ≫
-              (derivedPullbackFactors ((f ≫ g) ≫ h)).inv.app K =
-        (derivedPullbackFactors f).hom.app
-            ((complexPullback g).obj ((complexPullback h).obj K)) ≫
-          (SchemeDerivedCategory.Q T.left).map
-              ((complexPullbackComp f g).hom.app ((complexPullback h).obj K)) ≫
-          (SchemeDerivedCategory.Q T.left).map
-              ((complexPullbackComp (f ≫ g) h).hom.app K) ≫
-            (derivedPullbackFactors ((f ≫ g) ≫ h)).inv.app K := by
-    rw [← (derivedPullback f).map_comp_assoc, Iso.inv_hom_id_app,
-      CategoryTheory.Functor.map_id, Category.id_comp]
-  rw [hcancel]
+  erw [reassoc_of% hnat]
+  rw [← (derivedPullback (f ≫ g)).map_comp_assoc, Iso.inv_hom_id_app]
+  erw [CategoryTheory.Functor.map_id, Category.id_comp]
   erw [halpha]
   simp [complexPullbackCompLocalized]
-  erw [hcancelg]
   erw [hmove]
   rw [Iso.inv_hom_id_app_assoc]
   exact hcomplexTail

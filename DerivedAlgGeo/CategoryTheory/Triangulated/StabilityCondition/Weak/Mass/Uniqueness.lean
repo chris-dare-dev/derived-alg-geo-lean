@@ -7,7 +7,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundat
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.Basic
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Analysis.Complex.Basic
-import Mathlib.Data.ENNReal.Real
+import Mathlib.Basic.ENNReal.Real
 
 set_option backward.defeqAttrib.useBackward true
 set_option backward.isDefEq.respectTransparency false

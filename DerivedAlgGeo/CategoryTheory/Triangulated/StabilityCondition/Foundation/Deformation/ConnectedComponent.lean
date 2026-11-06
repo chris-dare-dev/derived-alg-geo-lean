@@ -127,7 +127,6 @@ theorem stabilitySeminorm_dominated_of_connected (σ τ : StabilityCondition.Wit
         exact hdom₂ f
       _ = (K₁ * K₂) * stabilitySeminorm C z f := by rw [mul_assoc]
   have hτ : τ ∈ connectedComponent σ := by
-    change τ ∈ connectedComponent σ
     exact ConnectedComponents.coe_eq_coe'.1 h.symm
   exact _root_.IsPreconnected.induction₂' hs P hlocal htrans mem_connectedComponent hτ
 

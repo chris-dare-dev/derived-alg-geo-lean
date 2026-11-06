@@ -82,10 +82,11 @@ theorem algebraMap_end_self_bijective (R : Type u) [CommRing R] :
     Function.Bijective (algebraMap R (End (ModuleCat.of R R))) := by
   constructor
   · intro c c' h
-    have := congrArg (fun f => (ModuleCat.Hom.hom f) (1 : R)) h
+    have := congrArg (fun f : End (ModuleCat.of R R) => (ModuleCat.Hom.hom f.asHom) (1 : R)) h
     simpa [algebraMap_end_apply] using this
   · intro f
-    refine ⟨(ModuleCat.Hom.hom f) 1, ?_⟩
+    refine ⟨(ModuleCat.Hom.hom f.asHom) 1, ?_⟩
+    apply End.ext
     rw [algebraMap_end_apply]
     apply ModuleCat.hom_ext
     ext
@@ -131,22 +132,22 @@ theorem isExceptional_residueObject : IsExceptional k (residueObject k) := by
           (Y := ModuleCat.of k k) (n := m + 1)).symm.subsingleton
       exact Subsingleton.elim f 0
   · have hcomp : ∀ c : k,
-        algebraMap k (End (residueObject k)) c
+        (algebraMap k (End (residueObject k)) c).asHom
           = (DerivedCategory.singleFunctor (ModuleCat.{u} k) 0).map
-              (algebraMap k (End (ModuleCat.of k k)) c) := by
+              (algebraMap k (End (ModuleCat.of k k)) c).asHom := by
       intro c
       rw [algebraMap_end_apply, algebraMap_end_apply,
         Functor.Linear.map_smul, Functor.map_id]
     constructor
     · intro c c' hcc
-      exact (ModuleCat.algebraMap_end_self_bijective k).1
+      exact (ModuleCat.algebraMap_end_self_bijective k).1 (End.ext
         ((DerivedCategory.singleFunctor (ModuleCat.{u} k) 0).map_injective
-          (by rw [← hcomp, ← hcomp, hcc]))
+          (by rw [← hcomp, ← hcomp, hcc])))
     · intro g
       obtain ⟨g', hg'⟩ :=
-        (DerivedCategory.singleFunctor (ModuleCat.{u} k) 0).map_surjective g
-      obtain ⟨c, hc⟩ := (ModuleCat.algebraMap_end_self_bijective k).2 g'
-      exact ⟨c, by rw [hcomp, hc, hg']⟩
+        (DerivedCategory.singleFunctor (ModuleCat.{u} k) 0).map_surjective g.asHom
+      obtain ⟨c, hc⟩ := (ModuleCat.algebraMap_end_self_bijective k).2 (End.of g')
+      exact ⟨c, End.ext (by rw [hcomp, hc]; exact hg')⟩
 
 /-- The length-one exceptional collection on the residue object — the honest
 inhabitant of `ExceptionalCollection` in the tree, through `ofExceptional`.

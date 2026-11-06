@@ -109,9 +109,9 @@ theorem pairing_smul_sum_left (g : Fin n → ℤ) (j : Fin n) :
           + if j = j then 0 else g j :=
         (Finset.sum_erase_add _ _ (Finset.mem_univ j)).symm
     _ = ∑ i ∈ Finset.univ.erase j, g i := by
-        rw [if_pos rfl, add_zero]
+        rw [ite_eq_left rfl, add_zero]
         exact Finset.sum_congr rfl fun i hi =>
-          if_neg (Finset.ne_of_mem_erase hi)
+          ite_eq_right (Finset.ne_of_mem_erase hi)
     _ = (∑ i, g i) - g j := by
         rw [← Finset.sum_erase_add Finset.univ g (Finset.mem_univ j)]
         ring
@@ -139,9 +139,9 @@ theorem pairing_sum_right (j : Fin n) :
           + if j = j then 0 else 1 :=
         (Finset.sum_erase_add _ _ (Finset.mem_univ j)).symm
     _ = ∑ _i ∈ Finset.univ.erase j, (1 : ℤ) := by
-        rw [if_pos rfl, add_zero]
+        rw [ite_eq_left rfl, add_zero]
         exact Finset.sum_congr rfl fun i hi =>
-          if_neg (Finset.ne_of_mem_erase hi)
+          ite_eq_right (Finset.ne_of_mem_erase hi)
     _ = (n : ℤ) - 1 := by
         rw [Finset.sum_const, Finset.card_erase_of_mem (Finset.mem_univ j),
           Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one,

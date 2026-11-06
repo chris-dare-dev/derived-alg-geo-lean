@@ -42,13 +42,15 @@ variable {S : Cᵒᵖ ⥤ CommRingCat.{u}}
 
 local instance : MonoidalCategory
     (PresheafOfModules.{u} (S ⋙ forget₂ CommRingCat RingCat)) :=
-  PresheafOfModules.monoidalCategory (R := S)
+  PresheafOfModulesOfCommRing.monoidalCategory (R := S)
 
 set_option pp.universes false in
 omit [HasWeakSheafify J AddCommGrpCat.{u}]
   [J.WEqualsLocallyBijective AddCommGrpCat.{u}]
   [∀ X, HasWeakSheafify (J.over X) AddCommGrpCat.{u}]
   [∀ X, (J.over X).WEqualsLocallyBijective AddCommGrpCat.{u}] in
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Tensoring on the left preserves local surjectivity on an arbitrary site. -/
 lemma isLocallySurjective_whiskerLeft
     (F : PresheafOfModules.{u} (S ⋙ forget₂ CommRingCat RingCat))
@@ -60,15 +62,7 @@ lemma isLocallySurjective_whiskerLeft
       ((PresheafOfModules.toPresheaf _).map (F ◁ g)) := by
   constructor
   intro U z
-  induction z using TensorProduct.induction_on with
-  | zero =>
-      have h : Presheaf.imageSieve
-          ((PresheafOfModules.toPresheaf _).map (F ◁ g))
-          (((PresheafOfModules.toPresheaf _).map (F ◁ g)).app (.op U) 0) ∈ J U := by
-        rw [Presheaf.imageSieve_app]
-        exact J.top_mem _
-      rw [map_zero] at h
-      exact h
+  induction z using TensorProduct.inductionOn with
   | tmul x y =>
       apply J.superset_covering
         (S := Presheaf.imageSieve ((PresheafOfModules.toPresheaf _).map g) y)
@@ -79,12 +73,7 @@ lemma isLocallySurjective_whiskerLeft
         let y₁ : G₁.obj (.op V) := y₁'
         let z₁ : (F ⊗ G₁).obj (.op V) := F.restrictₛₗ f.op x ⊗ₜ y₁
         refine ⟨z₁, ?_⟩
-        change (F ◁ g).app (.op V) z₁ = (F ⊗ G₂).map f.op (x ⊗ₜ y)
-        rw [PresheafOfModules.whiskerLeft_app]
-        dsimp only [z₁]
-        erw [ModuleCat.MonoidalCategory.whiskerLeft_apply,
-          PresheafOfModules.Monoidal.tensorObj_map_tmul]
-        change F.restrictₛₗ f.op x ⊗ₜ _ =
+        change F.restrictₛₗ f.op x ⊗ₜ g.app (.op V) y₁ =
           F.restrictₛₗ f.op x ⊗ₜ G₂.restrictₛₗ f.op y
         congr 1
         exact Presheaf.app_localPreimage
@@ -147,11 +136,11 @@ private abbrev ringSheaf (S : Sheaf K CommRingCat.{u}) : Sheaf K RingCat.{u} :=
 
 local instance : MonoidalCategory
     (PresheafOfModules.{u} (ringSheaf S).obj) :=
-  PresheafOfModules.monoidalCategory (R := S.obj)
+  PresheafOfModulesOfCommRing.monoidalCategory (R := S.obj)
 
 local instance : SymmetricCategory
     (PresheafOfModules.{u} (ringSheaf S).obj) :=
-  PresheafOfModules.symmetricCategory (R := S.obj)
+  PresheafOfModulesOfCommRing.symmetricCategory (R := S.obj)
 
 set_option maxHeartbeats 400000 in
 omit [HasWeakSheafify K AddCommGrpCat.{u}]
@@ -174,7 +163,7 @@ lemma isLocallyInjective_whiskerLeft_of_rankOneData
   letI : MonoidalCategory
       (PresheafOfModules.{u}
         ((ringSheaf S).over (q.X i)).obj) :=
-    PresheafOfModules.monoidalCategory (R := (S.over (q.X i)).obj)
+    PresheafOfModulesOfCommRing.monoidalCategory (R := (S.over (q.X i)).obj)
   haveI hg' : Presheaf.IsLocallyInjective (K.over (q.X i))
       ((PresheafOfModules.toPresheaf _).map g') := by
     haveI : Presheaf.IsLocallyInjective (K.over (q.X i))

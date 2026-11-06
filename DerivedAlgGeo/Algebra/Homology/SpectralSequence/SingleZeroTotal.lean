@@ -152,6 +152,8 @@ coproduct assumption. -/
 instance singleZeroHasTotal : (singleZeroBicomplex A).HasTotal (ComplexShape.up ℤ) :=
   GradedObject.CofanMapObjFun.hasMap _ _ (singleZeroCofan A) (singleZeroCofanIsColimit A)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Projects the total-degree diagonal onto its surviving `(0,n)` summand; the inverse is
 that summand's canonical inclusion. Every other summand is zero. -/
 noncomputable def singleZeroTotalXIso (n : ℤ) :

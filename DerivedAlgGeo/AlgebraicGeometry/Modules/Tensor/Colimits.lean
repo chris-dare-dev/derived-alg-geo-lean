@@ -33,7 +33,7 @@ variable {X : Scheme.{u}}
 
 private noncomputable local instance tensorColimits_monoidalCategory :
     MonoidalCategory X.PresheafOfModules :=
-  PresheafOfModules.monoidalCategory (R := X.presheaf)
+  PresheafOfModulesOfCommRing.monoidalCategory (R := X.presheaf)
 
 private noncomputable def tensorLeftComparisonIso (L : X.Modules) :
     ((MonoidalCategory.tensoringLeft X.PresheafOfModules).obj

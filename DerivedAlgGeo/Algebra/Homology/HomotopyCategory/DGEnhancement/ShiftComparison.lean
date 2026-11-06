@@ -112,7 +112,6 @@ lemma comp_shiftCocycle_id {M N : CochainComplex A ℤ} {n : ℤ} (γ : Cochain 
     Cochain.rightShift_v _ a (-a) (by omega) (p + n) q (by omega) (p + n) (add_zero _),
     Cochain.rightShift_v γ a n' hn' p q hpq (p + n) rfl, Cochain.ofHom_v]
   simp only [HomologicalComplex.id_f, Category.id_comp]
-  rfl
 
 /-! ## On `C^dg` -/
 

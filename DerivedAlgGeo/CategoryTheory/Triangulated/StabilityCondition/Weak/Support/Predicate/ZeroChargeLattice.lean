@@ -93,7 +93,7 @@ theorem quotientClass_eq_zero_iff (S : Set Λ) (x : Λ) :
 theorem quotient_isAddTorsionFree (S : Set Λ) :
     IsAddTorsionFree (Quotient S) := by
   constructor
-  intro n hn a b hab
+  intro n hn a b _ hab
   obtain ⟨x, rfl⟩ := QuotientAddGroup.mk'_surjective
     (saturatedClosure S) a
   obtain ⟨y, rfl⟩ := QuotientAddGroup.mk'_surjective
@@ -116,9 +116,10 @@ theorem quotient_moduleFinite [Module.Finite ℤ Λ] (S : Set Λ) :
 saturated quotient is a free abelian group, as asserted in Definition 21.9. -/
 theorem quotient_moduleFree [Module.Finite ℤ Λ] (S : Set Λ) :
     Module.Free ℤ (Quotient S) := by
-  letI : IsAddTorsionFree (Quotient S) := quotient_isAddTorsionFree S
+  letI : HasUniqueDiv (Quotient S) := ⟨fun _ hn a b h ↦
+    (quotient_isAddTorsionFree S).eq_of_nsmul_eq_nsmul_of_addCommute hn (AddCommute.all a b) h⟩
   letI : Module.IsTorsionFree ℤ (Quotient S) :=
-    Module.isTorsionFree_int_iff_isAddTorsionFree.mpr inferInstance
+    Module.isTorsionFree_int_iff_hasUniqueDiv.mpr inferInstance
   letI : Module.Finite ℤ (Quotient S) := quotient_moduleFinite S
   exact Module.free_of_finite_type_torsion_free'
 
@@ -137,7 +138,7 @@ theorem saturatedClosure_le_ker [IsAddTorsionFree Γ]
     · exact Or.inl hn
     right
     rw [AddMonoidHom.mem_ker] at hnx ⊢
-    apply IsAddTorsionFree.nsmul_right_injective hn
+    apply IsAddTorsionFree.eq_of_nsmul_eq_nsmul_of_addCommute hn (AddCommute.all _ _)
     simpa using hnx
 
 /-- The charge induced on the quotient by the saturated zero-charge

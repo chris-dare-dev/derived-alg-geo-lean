@@ -56,7 +56,7 @@ theorem laurentFilter_eq_zero_of_forall_mem (j₀ : ι) {F : Finset ι} (hF : �
     (hp : p ∈ natShift (polynomialGrading ι R) d (m • γ.degree)) :
     laurentFilter γ m F p = 0 := by
   ext β
-  rw [MvPolynomial.coeff_zero]
+  rw [AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply]
   by_cases hN : intNegSupport (laurentExponent γ m β) = F
   · rw [coeff_laurentFilter_of_eq hN]
     by_contra hc
@@ -204,14 +204,14 @@ theorem cechBlockPrimitive_of_exists (h𝓜 : IsPolynomialTwist 𝓜 d) {n : ℕ
     cechBlockPrimitive ι k h𝓜 F s y =
       cechHomotopy ι k h𝓜 h.choose y
         (cechBlockProj ι k h𝓜 (Fin.cons h.choose y) F (s (Fin.cons h.choose y))) := by
-  rw [cechBlockPrimitive, dif_pos h]
+  rw [cechBlockPrimitive, dite_eq_left h]
 
 theorem cechBlockPrimitive_of_forall (h𝓜 : IsPolynomialTwist 𝓜 d) {n : ℕ} {F : Finset ι}
     (h : ¬ ∃ i₀, i₀ ∉ F)
     (s : ∀ x : Fin (n + 2) → ι, cechTerm ι k 𝓜 x)
     (y : Fin (n + 1) → ι) :
     cechBlockPrimitive ι k h𝓜 F s y = 0 := by
-  rw [cechBlockPrimitive, dif_neg h]
+  rw [cechBlockPrimitive, dite_eq_right h]
 
 /-- The per-block primitive of a block off the tuple's support vanishes: the cone point is
 outside the block, so the cone tuple's support helps only through the base tuple's. -/

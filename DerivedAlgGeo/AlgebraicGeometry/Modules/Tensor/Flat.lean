@@ -64,10 +64,10 @@ namespace AlgebraicGeometry.Scheme.Modules
 set_option backward.isDefEq.respectTransparency false
 
 private local instance (X : Scheme.{u}) : MonoidalCategory X.PresheafOfModules :=
-  _root_.PresheafOfModules.monoidalCategory (R := X.presheaf)
+  _root_.PresheafOfModulesOfCommRing.monoidalCategory (R := X.presheaf)
 
 private local instance (X : Scheme.{u}) : SymmetricCategory X.PresheafOfModules :=
-  _root_.PresheafOfModules.symmetricCategory (R := X.presheaf)
+  _root_.PresheafOfModulesOfCommRing.symmetricCategory (R := X.presheaf)
 
 private def presheafModuleStalkLinearEquiv (X : Scheme.{u}) (P : _root_.PresheafOfModules.{u}
     (X.presheaf ⋙ forget₂ CommRingCat RingCat)) (x : X) :
@@ -170,7 +170,7 @@ theorem tensorRight_preservesHomology_of_isFlatOverId (X : Scheme.{u}) (L : X.Mo
   letI : (tensorLeftFunctor L).PreservesMonomorphisms :=
     ⟨fun f _ => mono_tensorLeft_of_isFlatOverId X L hL f⟩
   letI : (tensorRight L).PreservesMonomorphisms :=
-    Functor.preservesMonomorphisms.of_iso (flatTensorLeftRightIso X L)
+    Functor.PreservesMonomorphisms.of_iso (flatTensorLeftRightIso X L)
   letI : PreservesFiniteColimits (tensorRight L) :=
     preservesFiniteColimits_of_natIso (flatTensorLeftRightIso X L)
   letI := preservesBinaryBiproducts_of_preservesBinaryCoproducts (tensorRight L)

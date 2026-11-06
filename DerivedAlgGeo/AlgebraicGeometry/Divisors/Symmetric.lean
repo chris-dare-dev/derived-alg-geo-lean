@@ -28,10 +28,10 @@ local instance : Category X.Modules :=
   inferInstanceAs (Category (SheafOfModules X.ringCatSheaf))
 
 local instance : MonoidalCategory X.PresheafOfModules :=
-  PresheafOfModules.monoidalCategory (R := X.presheaf)
+  PresheafOfModulesOfCommRing.monoidalCategory (R := X.presheaf)
 
 local instance : SymmetricCategory X.PresheafOfModules :=
-  PresheafOfModules.symmetricCategory (R := X.presheaf)
+  PresheafOfModulesOfCommRing.symmetricCategory (R := X.presheaf)
 
 lemma tensorCommIso_naturality
     {L₁ L₂ M₁ M₂ : X.Modules} (f : L₁ ⟶ L₂) (g : M₁ ⟶ M₂) :
@@ -120,7 +120,6 @@ private lemma tensorHexagonForward (L M N : X.Modules)
       l₁ = l₂ ≫ tensorHom (𝟙 M) (tensorCommIso L N).hom at hL
   slice_rhs 3 4 => rw [← hL]
   slice_rhs 4 5 =>
-    change l₁ ≫ inv l₁
     rw [IsIso.hom_inv_id]
   rw [Category.comp_id, Category.comp_id]
   simp only [← Functor.map_comp]

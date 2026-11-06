@@ -572,6 +572,8 @@ theorem preimageData_of_coproduct_of_le [IsTriangulated C] (P : ObjectProperty C
   ind.preimageData_of_le P hle adj hF G tC hG htC htrunc hzero
     (ind.mapsSemistableAisle_of_coproduct (L ⋙ F) h)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **Proposition 3.8 of arXiv:2607.28411v1, the slicing half at `S = Spec ℤ`.**
 Let `F` have
 a left adjoint `L` and a right adjoint `R`, both of whose composites with

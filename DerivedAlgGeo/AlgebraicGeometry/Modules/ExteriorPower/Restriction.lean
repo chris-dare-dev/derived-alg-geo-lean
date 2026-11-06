@@ -48,7 +48,7 @@ private noncomputable def overFreeAppIsoFinsupp
 private lemma overFreeAppIsoFinsupp_ιFree
     (U : X.Opens) (I : Type u) [Finite I] (V : (Over U)ᵒᵖ)
     (i : I) (r : (X.sheaf.over U).obj.obj V) :
-    (overFreeAppIsoFinsupp (X := X) U I V).hom
+    (overFreeAppIsoFinsupp (X := X) U I V).hom.hom
         ((SheafOfModules.ιFree (R := X.ringCatSheaf.over U) i).val.app V r) =
       Finsupp.single i r := by
   let F := SheafOfModules.evaluation (X.ringCatSheaf.over U) V

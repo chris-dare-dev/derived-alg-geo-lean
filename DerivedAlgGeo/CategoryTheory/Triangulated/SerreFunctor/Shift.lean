@@ -256,8 +256,8 @@ theorem signedCommShift_one_inv_app
     (letI : D.S.CommShift ℤ := D.signedCommShift
      (D.S.commShiftIso (1 : ℤ)).inv.app X) =
        -(D.commShiftIso 1).hom.app X := by
-  dsimp only [Functor.commShiftIso, SerreFunctorData.signedCommShift,
-    signedCommShiftOfCommShift, SerreFunctorData.commShift]
+  unfold SerreFunctorData.signedCommShift signedCommShiftOfCommShift SerreFunctorData.commShift
+  dsimp only [Functor.commShiftIso]
   simp only [Int.negOnePow_one, Preadditive.smul_iso_inv,
     SerreFunctorData.commShiftIso, Iso.symm_hom]
   norm_num
