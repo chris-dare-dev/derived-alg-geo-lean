@@ -51,6 +51,12 @@ jobs:
     # quietly stopped being produced is exactly the "gate that silently does not
     # run" failure this repository keeps writing comments about, and a visible
     # red mark on a workflow nothing depends on is the cheapest way to notice.
+    #
+    # Public repository only. The private owner mirror sets OWNER_CI_RUNS_ON
+    # (see `build` in ci.yml); nothing there restores this cache, because the
+    # owner's runners keep their own `.lake`, and a hosted run there would bill
+    # private-repository minutes for an artifact nobody reads.
+    if: ${{ !vars.OWNER_CI_RUNS_ON }}
     runs-on: ubuntu-latest
     timeout-minutes: 90
     permissions:

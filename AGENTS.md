@@ -328,7 +328,9 @@ agent branch is no longer a gate run — opening the pull request is.** The
 `pull_request` lane runs the identical job set on `ubuntu-latest`; it is the
 faster lane and the one branch protection reads.
 
-To run the self-hosted Ubuntu lane on a branch, dispatch it by hand:
+To run CI on a branch without a pull request, dispatch it by hand. It runs on
+hosted Ubuntu: the owner's self-hosted runners serve a private mirror, not this
+repository ([owner lane](docs/ci/owner-lane.md)).
 
 ```bash
 gh workflow run ci.yml --ref <branch>

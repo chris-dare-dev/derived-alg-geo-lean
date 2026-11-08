@@ -109,7 +109,9 @@ class HostPickupTests(unittest.TestCase):
             with tarfile.open(archive, "w:gz") as bundle:
                 for name, body in (
                     ("config.sh", "#!/bin/sh\nexit 0\n"),
-                    ("run.sh", "#!/bin/sh\ntest ! -e ../registration-token || exit 42\nmkdir -p _diag _work/derived-alg-geo-lean/derived-alg-geo-lean\necho kept > _diag/trace.log\n"),
+                    ("run.sh", "#!/bin/sh\ntest ! -e ../registration-token || exit 42\n"
+                               f"mkdir -p _diag {host_pickup.RUNNER_CHECKOUT.relative_to('runner')}\n"
+                               "echo kept > _diag/trace.log\n"),
                 ):
                     data = body.encode()
                     member = tarfile.TarInfo(name)
@@ -140,7 +142,7 @@ class HostPickupTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             base, _, _ = fixture(Path(directory))
             root, _ = host_pickup._prepare(base, "abc123")
-            checkout = root / "runner/_work/derived-alg-geo-lean/derived-alg-geo-lean"
+            checkout = root / host_pickup.RUNNER_CHECKOUT
             checkout.mkdir(parents=True)
             diagnostics = root / "runner/_diag"
             diagnostics.mkdir()
@@ -189,11 +191,37 @@ class HostPickupTests(unittest.TestCase):
             self.assertNotIn("fixture-secret", str(failure.exception))
             self.assertFalse((root / "registration-token").exists())
 
+    def test_runner_registers_to_private_mirror_with_owner_lane_label(self) -> None:
+        # The public repository must keep ZERO runner registrations: a pull
+        # request there can edit its own `runs-on` (docs/ci/owner-lane.md).
+        self.assertNotEqual(host_pickup.REPOSITORY, "chris-dare-dev/derived-alg-geo-lean")
+        with tempfile.TemporaryDirectory() as directory:
+            base, _, _ = fixture(Path(directory))
+            argv_file = Path(directory) / "config-argv"
+            archive = Path(directory) / "runner.tar.gz"
+            with tarfile.open(archive, "w:gz") as bundle:
+                body = ("#!/bin/sh\n"
+                        f"printf '%s\\n' \"$@\" > '{argv_file}'\n"
+                        "exit 17\n").encode()
+                member = tarfile.TarInfo("config.sh")
+                member.mode = 0o755
+                member.size = len(body)
+                bundle.addfile(member, io.BytesIO(body))
+            digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+            root, identity = host_pickup._prepare(base, "abc123")
+            (root / "registration-token").write_text("fixture-secret\n", encoding="ascii")
+            with self.assertRaisesRegex(ValueError, "exit code 17"):
+                host_pickup._runner_worker(archive, digest, "owner-linux", root, identity)
+            argv = argv_file.read_text(encoding="utf-8").splitlines()
+            self.assertEqual(argv[argv.index("--url") + 1],
+                             "https://github.com/chris-dare-dev/derived-alg-geo-lean-ci")
+            self.assertEqual(argv[argv.index("--labels") + 1], "owner-ci,owner-linux")
+
     def test_absent_leaf_below_escaped_symlink_invalidates_inventory(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             base, _, _ = fixture(Path(directory))
             root, _ = host_pickup._prepare(base, "abc123")
-            checkout = root / "runner/_work/derived-alg-geo-lean/derived-alg-geo-lean"
+            checkout = root / host_pickup.RUNNER_CHECKOUT
             checkout.mkdir(parents=True)
             outside = Path(directory) / "outside"
             outside.mkdir()
@@ -215,7 +243,7 @@ class HostPickupTests(unittest.TestCase):
             def run_scope(unit: str, root: Path, profile: str, command: list[str]) -> int:
                 (root / "runner/_diag").mkdir(parents=True)
                 (root / "runner/_diag/trace.log").write_text("kept\n", encoding="utf-8")
-                (root / "runner/_work/derived-alg-geo-lean/derived-alg-geo-lean").mkdir(parents=True)
+                (root / host_pickup.RUNNER_CHECKOUT).mkdir(parents=True)
                 return 0
             with patch.object(host_pickup, "_verify_runner_archive"), \
                  patch.object(host_pickup, "_capacity", side_effect=capacity), \

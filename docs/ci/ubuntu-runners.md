@@ -1,5 +1,14 @@
 # Ubuntu workstation runners (historical topology)
 
+> **Status, 2026-11-08.** These four runners are no longer registered to this
+> repository. They are being re-registered, on the same host with the same
+> isolation and limits, to the private mirror described in
+> [the owner lane](owner-lane.md), with the extra label `owner-ci`. The
+> `gh api repos/chris-dare-dev/derived-alg-geo-lean/actions/runners` inspect
+> command below now correctly returns none; inspect the mirror's runners
+> instead. "Not instructions to re-register these runners" still holds for this
+> repository.
+
 The owner retired the Windows workstation setup on 2026-09-21 and authorized
 four runners on the personal Ubuntu PC. Windows is no longer a required
 platform for this repository. This operator-directed replacement is distinct

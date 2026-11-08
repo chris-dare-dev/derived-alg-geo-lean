@@ -29,7 +29,13 @@ permissions:
 jobs:
   # A nightly build on a day when nobody pushed regenerates the same site for forty minutes.
   # Skip it. A manual run always proceeds -- that is what it is for.
+  #
+  # The site is published from the public repository only. The private owner mirror sets
+  # OWNER_CI_RUNS_ON (see `build` in ci.yml), and there this job is skipped, which skips
+  # `build` and `deploy` behind it -- otherwise the nightly cron would bill forty minutes
+  # of private-repository time a day for a site that is never published.
   check:
+    if: ${{ !vars.OWNER_CI_RUNS_ON }}
     runs-on: ubuntu-latest
     outputs:
       should-build: ${{ steps.check.outputs.should-build }}
