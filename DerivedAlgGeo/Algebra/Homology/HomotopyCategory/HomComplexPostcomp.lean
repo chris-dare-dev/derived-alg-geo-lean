@@ -63,7 +63,6 @@ def Cocycle.postcompAddMonoidHom (A : CochainComplex C ℤ) {L L' : CochainCompl
 
 /-- Post-composition acts on a cochain by composing with the morphism, which is what makes the
 differential square commute. -/
-@[simp]
 lemma postcompMap_f_apply (A : CochainComplex C ℤ) {L L' : CochainComplex C ℤ}
     (g : L ⟶ L') (n : ℤ) (z : Cochain A L n) :
     ((postcompMap A g).f n).hom z = z.comp (Cochain.ofHom g) (add_zero n) :=

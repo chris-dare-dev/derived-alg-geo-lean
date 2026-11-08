@@ -134,7 +134,7 @@ def cohomologyClassLinearEquiv :
 
 /-- Integer scaling of cohomology classes agrees with scaling cocycle
 representatives, including when Lean uses the canonical integer action. -/
-@[simp] theorem cohomologyClass_mk_zsmul (r : ℤ) (z : Cocycle P Q n) :
+theorem cohomologyClass_mk_zsmul (r : ℤ) (z : Cocycle P Q n) :
     CohomologyClass.mk (r • z) = r • CohomologyClass.mk z := by
   change (CohomologyClass.mkAddMonoidHom P Q n) (r • z) =
     r • (CohomologyClass.mkAddMonoidHom P Q n) z

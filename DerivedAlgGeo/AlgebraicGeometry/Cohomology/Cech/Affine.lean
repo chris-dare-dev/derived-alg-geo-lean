@@ -295,14 +295,14 @@ private def iicIncl {X : Type*} [TopologicalSpace X] (V : Opens X) :
   map f := homOfLE (leOfHom f)
 
 private noncomputable def tildeCechComplex {R : CommRingCat.{u}} {ι : Type u}
-    [Fintype ι] (f : ι → R) (M : ModuleCat.{u} R) :
+    (f : ι → R) (M : ModuleCat.{u} R) :
     CochainComplex (ModuleCat R) ℕ :=
   (CategoryTheory.cechComplexFunctor fun i ↦
     _root_.PrimeSpectrum.basicOpen (f i)).obj
       (modulesSpecToSheaf.obj (tilde M)).presheaf
 
 private lemma tildeCechComplex_isUnit_of_le_basicOpen
-    {R : CommRingCat.{u}} {ι : Type u} [Fintype ι]
+    {R : CommRingCat.{u}} {ι : Type u}
     (f : ι → R) (d : R)
     (hfd : ∀ i, _root_.PrimeSpectrum.basicOpen (f i) ≤
       _root_.PrimeSpectrum.basicOpen d)

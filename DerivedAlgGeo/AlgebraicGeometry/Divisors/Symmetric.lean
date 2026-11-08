@@ -55,13 +55,7 @@ lemma tensorCommIso_naturality
   exact BraidedCategory.braiding_naturality
     ((toPresheafOfModules X).map f) ((toPresheafOfModules X).map g)
 
-private lemma tensorHexagonForward (L M N : X.Modules)
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from L)]
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from M)]
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from N)] :
+private lemma tensorHexagonForward (L M N : X.Modules) :
     (tensorAssocIso L M N).hom ≫
         (tensorCommIso L (tensorObj M N)).hom ≫
           (tensorAssocIso M N L).hom =
@@ -157,13 +151,7 @@ lemma tensorCommIso_inv (L M : X.Modules) :
   rw [← cancel_epi (tensorCommIso L M).hom]
   rw [Iso.hom_inv_id, tensorCommIso_symmetry]
 
-private lemma tensorHexagonReverse (L M N : X.Modules)
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from L)]
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from M)]
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from N)] :
+private lemma tensorHexagonReverse (L M N : X.Modules) :
     (tensorAssocIso L M N).inv ≫
         (tensorCommIso (tensorObj L M) N).hom ≫
           (tensorAssocIso N L M).inv =

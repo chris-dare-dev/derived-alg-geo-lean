@@ -220,7 +220,6 @@ noncomputable def freeAbelianYonedaHomComplexXIso
       AddEquiv.ulift.symm)).toAddCommGrpIso
 
 omit [HasExt.{h} (Sheaf J AddCommGrpCat.{a})] in
-@[simp]
 lemma freeAbelianYonedaHomComplexXIso_hom_apply
     {F : Sheaf J AddCommGrpCat.{a}} (X : C) (I : InjectiveResolution F) (n : ℤ)
     (α : CochainComplex.HomComplex.Cochain

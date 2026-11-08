@@ -187,7 +187,7 @@ def basicOpenSubobjectRawModule {R : CommRingCat.{u}} [IsNoetherianRing R]
       (LocalizedModule.Away r M.obj)).toLinearMap
 
 private theorem shrink_localizedModuleMk_apply {R : CommRingCat.{u}}
-    [IsNoetherianRing R] (r : R) (M : FGModuleCat.{u} R) (m : M.obj) :
+    (r : R) (M : FGModuleCat.{u} R) (m : M.obj) :
     (Shrink.linearEquiv.{u} (Localization.Away r)
       (LocalizedModule.Away r M.obj))
         (M.obj.localizedModuleMkLinearMap (Submonoid.powers r) m) =
@@ -199,7 +199,7 @@ private theorem shrink_localizedModuleMk_apply {R : CommRingCat.{u}}
 
 set_option backward.isDefEq.respectTransparency false in
 private theorem localized'_map_shrink_eq {R : CommRingCat.{u}}
-    [IsNoetherianRing R] (r : R) (M : FGModuleCat.{u} R)
+    (r : R) (M : FGModuleCat.{u} R)
     (N : Submodule R M.obj) :
     (N.localized' (Localization.Away r) (Submonoid.powers r)
       (M.obj.localizedModuleMkLinearMap (Submonoid.powers r))).map

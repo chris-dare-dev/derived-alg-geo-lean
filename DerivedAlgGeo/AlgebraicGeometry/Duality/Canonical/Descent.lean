@@ -294,6 +294,10 @@ private def chartBasicOpen {n : ℕ} {x : X}
 set_option backward.isDefEq.respectTransparency false in
 set_option backward.defeqAttrib.useBackward true in
 set_option maxHeartbeats 1600000 in
+-- The chart computation is local and never uses `IsVariety k X`. Dropping it here would
+-- cascade through the `chartBasisHom` lemmas and silently remove the hypothesis from the
+-- public `SmoothProperVariety.CanonicalSheafData.ofSmoothRelativeDifferentials`.
+@[nolint unusedArguments]
 private lemma chartBasisHom_app_basicOpen_isIso {n : ℕ} {x : X}
     (C : SmoothChart k X n x) (f : Γ(X, C.source)) :
     IsIso ((chartBasisHom k X C).app (Opposite.op (chartBasicOpen k X C f))) := by

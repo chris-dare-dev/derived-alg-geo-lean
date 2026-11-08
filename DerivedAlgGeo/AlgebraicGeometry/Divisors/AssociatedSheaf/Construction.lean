@@ -545,6 +545,7 @@ private lemma tensorEquationHom_eq_tensor (D E : CartierDivisor X) (U : X.Opens)
   rw [equationHom_app_one D U f hf V,
     equationHom_app_one E U g hg V]
 
+omit [IsIntegral X] in
 private lemma unitHomEquiv_symm_comp' (U : X.Opens)
     {M N : _root_.PresheafOfModules (X.ringCatSheaf.over U).obj}
     (s : M.sections) (p : M ⟶ N) :

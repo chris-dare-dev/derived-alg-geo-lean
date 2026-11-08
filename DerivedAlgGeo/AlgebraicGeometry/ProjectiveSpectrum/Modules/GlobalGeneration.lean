@@ -129,7 +129,7 @@ theorem exists_res_tmulSection_eq_sum (F : (Proj 𝒜).Modules) {g : A} (hg : g 
     (Scheme.Modules.homApp_res (twistBy 𝒜 N (pow_mem_deg 𝒜 hg N) F) hW₂g (s b)).symm)
 
 /-- **A sum over a sigma type supported on one fiber is the sum over that fiber.** -/
-private theorem sum_sigma_eq_of_support {ι : Type*} [Fintype ι] [DecidableEq ι]
+private theorem sum_sigma_eq_of_support {ι : Type*} [Fintype ι]
     {κ : ι → Type*} [∀ i, Fintype (κ i)] {G : Type*} [AddCommMonoid G] (i : ι)
     (f : (Σ j, κ j) → G) (c : κ i → G) (hf : ∀ b : κ i, f ⟨i, b⟩ = c b)
     (hf0 : ∀ a : Σ j, κ j, a.1 ≠ i → f a = 0) :

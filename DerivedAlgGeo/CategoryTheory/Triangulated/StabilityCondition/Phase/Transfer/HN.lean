@@ -53,7 +53,7 @@ filtration is nonempty, the output phases remain in a strict finite window
 around its lowest and highest phases. The window is the induction invariant
 used to keep the head phase strictly above every tail phase. -/
 private theorem exists_hn_of_target {s : Slicing D} {F : C ⥤ D}
-    [F.Additive] [F.CommShift ℤ] [F.IsTriangulated]
+    [F.CommShift ℤ] [F.IsTriangulated]
     (h : s.InducedTStructures F) {E : C}
     (G : HNFiltration D s.P (F.obj E)) :
     ∃ H : HNFiltration C (s.preimagePhase F) E,
@@ -197,7 +197,9 @@ private theorem exists_hn_of_target {s : Slicing D} {F : C ⥤ D}
         exact ⟨hHgt, hHle⟩
 
 /-- The finite phase-truncation argument supplies the remaining HN field of
-`Slicing.PreimageData`. -/
+`Slicing.PreimageData`. The additivity hypothesis is part of the stated interface, as for
+`Slicing.preimage`; the proof does not consume it. -/
+@[nolint unusedArguments]
 theorem hn_exists {s : Slicing D} {F : C ⥤ D}
     [F.Additive] [F.CommShift ℤ] [F.IsTriangulated]
     (h : s.InducedTStructures F) :

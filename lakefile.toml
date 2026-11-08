@@ -11,12 +11,16 @@ keywords = [
 # rather than accept one warning per import.
 allowNonModules = true
 
+# Mathlib v4.35's `haveI`/`letI` style linter is new with the toolchain bump. Adopting it
+# rewrites several hundred proofs, which is left to a follow-up so the bump stays reviewable.
+# It is switched off here rather than in `[leanOptions]`: a style linter does not change what
+# elaborates, so it stays out of the build trace, and `[leanOptions]` is the elaboration
+# environment that `mfc env` records and `exe/Emit.lean` mirrors, scalar values only.
+weakLeanArgs = ["-Dweak.linter.style.haveILetI=false"]
+
 [leanOptions]
 autoImplicit = false
 relaxedAutoImplicit = false
-# Mathlib v4.35's `haveI`/`letI` style linter is new with the toolchain bump. Adopting it
-# rewrites several hundred proofs, which is left to a follow-up so the bump stays reviewable.
-weak.linter.style.haveILetI = false
 
 # One direct Mathlib revision for every library in this repository.
 [[require]]

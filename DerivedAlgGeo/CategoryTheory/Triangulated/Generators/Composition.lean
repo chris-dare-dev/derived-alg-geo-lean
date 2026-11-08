@@ -57,7 +57,7 @@ open Category Limits Preadditive ZeroObject Pretriangulated Triangulated
 variable {C : Type u} [Category.{v} C] [HasZeroObject C] [Preadditive C]
   [HasShift C ℤ] [∀ (n : ℤ), (shiftFunctor C n).Additive] [Pretriangulated C]
 
-private noncomputable def retractBinaryProduct [HasBinaryProducts C]
+private noncomputable def retractBinaryProduct
     {X X' Y Y' : C} (rX : Retract X X') (rY : Retract Y Y') :
     Retract (X ⨯ Y) (X' ⨯ Y') where
   i := Limits.prod.map rX.i rY.i
@@ -86,7 +86,7 @@ private lemma retractClosure_isClosedUnderBinaryProducts (Q : ObjectProperty C)
     exact Q.retractClosure.prop_of_iso e.symm hprod
 
 private lemma extensionProduct_prop_prod (Q R : ObjectProperty C)
-    [HasBinaryProducts C] [Q.IsClosedUnderBinaryProducts] [R.IsClosedUnderBinaryProducts]
+    [Q.IsClosedUnderBinaryProducts] [R.IsClosedUnderBinaryProducts]
     {X Y : C} (hX : extensionProduct Q R X) (hY : extensionProduct Q R Y) :
     extensionProduct Q R (X ⨯ Y) := by
   rcases hX with ⟨A₁, B₁, f₁, g₁, k₁, hT₁, hQ₁, hR₁⟩

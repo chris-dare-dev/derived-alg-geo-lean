@@ -211,7 +211,7 @@ variable (D : SerreFunctorData k C)
 private noncomputable def signedCommShiftOfCommShift
     {C : Type u} [Category.{v} C] [Preadditive C] [HasShift C ℤ]
     [∀ n : ℤ, (shiftFunctor C n).Additive]
-    (F : C ⥤ C) [F.Additive] [F.CommShift ℤ] : F.CommShift ℤ where
+    (F : C ⥤ C) [F.CommShift ℤ] : F.CommShift ℤ where
   commShiftIso a := a.negOnePow • F.commShiftIso a
   commShiftIso_zero := by
     ext X
