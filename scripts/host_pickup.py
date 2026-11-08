@@ -40,7 +40,15 @@ LEGACY_DISK_RESERVATION = 16 * GIB  # measured roots are currently below this
 HOST_CPU_HEADROOM = 1
 HOST_MEMORY_HEADROOM = 8 * GIB
 HOST_DISK_HEADROOM = 8 * GIB
-REPOSITORY = "chris-dare-dev/derived-alg-geo-lean"
+# Owner runners register to the PRIVATE mirror, never to the public repository:
+# a pull request there can edit its own `runs-on`, so any runner registered
+# there is reachable by untrusted code. See docs/ci/owner-lane.md.
+REPOSITORY = "chris-dare-dev/derived-alg-geo-lean-ci"
+# Every owner runner carries this label; the mirror's OWNER_CI_RUNS_ON variable
+# routes `ci.yml` to it.
+OWNER_LANE_LABEL = "owner-ci"
+# actions/checkout's default location under the work folder: <repo>/<repo>.
+RUNNER_CHECKOUT = Path("runner/_work", REPOSITORY.split("/")[1], REPOSITORY.split("/")[1])
 
 
 def _host_id() -> str:
@@ -488,7 +496,7 @@ def _runner_worker_started(archive: Path, digest: str, label: str, root: Path,
         configured = subprocess.run([
             "./config.sh", "--unattended", "--ephemeral", "--disableupdate",
             "--url", f"https://github.com/{REPOSITORY}",
-            "--name", name, "--labels", label, "--work", "_work",
+            "--name", name, "--labels", f"{OWNER_LANE_LABEL},{label}", "--work", "_work",
         ], cwd=runner_dir, env={**os.environ, "ACTIONS_RUNNER_INPUT_TOKEN": token}, check=False)
     finally:
         _unlink_registration_token(root, expected)
@@ -561,7 +569,7 @@ def _archive_runner_logs(base: Path, root: Path, namespace: str,
     if (source.is_symlink() or
             (resolved_source != root and root not in resolved_source.parents)):
         raise ValueError("runner diagnostic directory escapes job root; lease retained")
-    checkout = root / "runner/_work/derived-alg-geo-lean/derived-alg-geo-lean"
+    checkout = root / RUNNER_CHECKOUT
     actual_paths = {
         "checkout": checkout,
         "git_index": checkout / ".git/index",
