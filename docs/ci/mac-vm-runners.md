@@ -63,7 +63,21 @@ table inet dag_runner_egress {
 ```
 
 The file deletes and recreates the table, so it can be reloaded in place. The
-oneshot unit `dag-runner-egress.service` loads it at boot. A drop-in,
+oneshot unit `dag-runner-egress.service` loads it at boot. It has default
+dependencies and no ordering of its own. Do not order it
+`Before=network-pre.target`; that deadlocks the boot:
+
+- cloud-init's network stage runs before `sysinit.target`, and it waits for
+  the network inside its own process, so systemd sees no cycle;
+- with that line, the network waits for this unit;
+- this unit, with default dependencies, waits for `sysinit.target`.
+
+On 2026-11-08 the VM hung that way, with no SSH, until the line was removed.
+To get in, the VM was booted once from the cloud image's own kernel. Lima
+boots `~/.lima/dag-ci/kernel` and `initrd` with the arguments in
+`kernel.cmdline` when those files exist. The arguments were
+`root=LABEL=cloudimg-rootfs ro console=hvc0 systemd.mask=dag-runner-egress.service`,
+and the three files were removed afterwards. A drop-in,
 `/etc/systemd/system/dag-runner@.service.d/egress.conf`, makes each runner
 `Requires=` and `After=` that unit. A runner therefore does not start without
 the rule, and stops if the rule's unit is stopped. Check it with:
@@ -158,11 +172,23 @@ limactl shell --workdir / dag-ci -- sudo systemctl enable --now dag-runner@mac-1
 runners come online about 20 seconds after the VM starts.
 
 ```bash
-launchctl kickstart gui/$(id -u)/io.lima-vm.autostart.dag-ci   # start the VM now
-limactl stop dag-ci                                             # stop it
 limactl shell dag-ci -- systemctl status dag-runner@mac-1 dag-runner@mac-2
 limactl shell dag-ci -- journalctl -u dag-runner@mac-1 -n 80
 ```
+
+`limactl stop dag-ci` stops the VM and also unloads the login agent. It may
+print `did not receive an event with the exiting status` even though the VM
+stopped; `limactl list` shows the state. To start the VM again under the
+agent, load the agent and start it:
+
+```bash
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/io.lima-vm.autostart.dag-ci.plist
+launchctl kickstart gui/$(id -u)/io.lima-vm.autostart.dag-ci
+```
+
+`kickstart` alone is not enough after a stop, because the agent is no longer
+loaded. Loading it does not always start the VM, so run both. The next login
+loads the agent again in any case.
 
 Wait until both runners are idle before stopping the VM:
 
