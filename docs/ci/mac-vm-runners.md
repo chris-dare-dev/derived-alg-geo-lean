@@ -30,12 +30,53 @@ limactl start dag-ci
 `--plain` turns off Lima's host directory mounts, port forwarding and
 containerd, so jobs cannot read the Mac's files.
 
-It is not network isolation. The VM reaches the internet through the Mac, and
-it reaches the Mac itself at `host.lima.internal` (192.168.5.2), which Lima
-maps to the Mac's loopback. A job can therefore connect to services that
-listen only on the Mac's `127.0.0.1`; this was checked from a runner account
-on 2026-11-08. Treat what you push to the mirror as code that runs with that
-reach.
+`--plain` does not isolate the network. The VM reaches the internet through
+the Mac, and without a rule a job could also reach:
+
+- the Mac itself at `host.lima.internal` (192.168.5.2), which Lima maps to the
+  Mac's loopback, so services that listen only on the Mac's `127.0.0.1` too;
+- the Mac's home-network and Tailscale addresses;
+- the home router;
+- the Ubuntu PC over Tailscale.
+
+A runner account reached all of these on 2026-11-08.
+
+An nftables rule in the VM now refuses connections from the two runner users
+to private, link-local, Tailscale (100.64.0.0/10) and multicast addresses,
+IPv4 and IPv6. Their own loopback inside the VM stays open, and so does DNS,
+because `systemd-resolved` sends the upstream queries as its own user.
+Internet hosts are unaffected. The rule is `/etc/dag-runner-egress.nft`:
+
+```nft
+table inet dag_runner_egress {
+	chain output {
+		type filter hook output priority filter; policy accept;
+		meta skuid { "dag-mac-1", "dag-mac-2" } jump runner
+	}
+
+	chain runner {
+		oifname "lo" return
+		ip daddr { 0.0.0.0/8, 10.0.0.0/8, 100.64.0.0/10, 169.254.0.0/16, 172.16.0.0/12, 192.168.0.0/16, 224.0.0.0/4, 240.0.0.0/4 } counter reject with icmpx admin-prohibited
+		ip6 daddr { fc00::/7, fe80::/10, ff00::/8 } counter reject with icmpx admin-prohibited
+	}
+}
+```
+
+The file deletes and recreates the table, so it can be reloaded in place. The
+oneshot unit `dag-runner-egress.service` loads it at boot. A drop-in,
+`/etc/systemd/system/dag-runner@.service.d/egress.conf`, makes each runner
+`Requires=` and `After=` that unit. A runner therefore does not start without
+the rule, and stops if the rule's unit is stopped. Check it with:
+
+```bash
+limactl shell dag-ci -- sudo nft list table inet dag_runner_egress
+```
+
+Each `counter` shows how many packets were refused.
+
+Other users in the VM, such as the Lima login user, are not restricted. The
+rule matches addresses, not names: a public host the jobs need keeps working,
+and a name that resolves to a private address is refused.
 
 ## Inside the VM
 
