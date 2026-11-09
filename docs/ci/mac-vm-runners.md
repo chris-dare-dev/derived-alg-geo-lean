@@ -214,5 +214,5 @@ credential header was removed from the copy. Lake rechecks every trace against
 the source it finds, so a stale file is rebuilt, never trusted.
 
 This does not need repeating unless a runner's tree is lost. A Mac runner that
-has to build from cold will probably exceed `build`'s 90-minute timeout; see
-[Speed](owner-lane.md#speed).
+has to build from cold is the reason `build` allows the owner's runners 180
+minutes, against 90 on hosted runners; see [Speed](owner-lane.md#speed).

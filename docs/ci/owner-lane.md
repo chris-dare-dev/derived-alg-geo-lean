@@ -102,9 +102,20 @@ steps take the most time. The VM's memory limits were not the cause. The build
 job peaked at its 10 GiB `MemoryHigh` and was held back by memory pressure for
 about 7 seconds in all, with no OOM kill.
 
-`build` has `timeout-minutes: 90`. A cold build on a Mac runner, such as the
-first build after a Mathlib bump, will probably exceed it. The partial `.lake`
-is kept, so the next job on that runner continues from where it stopped.
+`build` times out after 90 minutes on hosted runners and after 180 minutes on
+the owner's runners. The timeout reads the routing variable:
+
+```yaml
+timeout-minutes: ${{ vars.OWNER_CI_RUNS_ON && 180 || 90 }}
+```
+
+The extra time is for a cold build on a Mac runner, such as the first build
+after a Mathlib bump. No such build has been measured yet. Of the 180 minutes,
+the Mac's 57 minutes after the library build leave 123 for the library build
+itself. That is about four times the Ubuntu PC's cold 29 minutes, the same
+ratio as the Mac's steps after the library build. If a build still runs out of
+time, the partial `.lake` is kept, so the next job on that runner continues
+from where it stopped.
 
 ## Using the lane
 

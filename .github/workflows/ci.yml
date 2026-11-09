@@ -115,7 +115,12 @@ jobs:
     # runner and stays queued. Keep the registration count at zero. See
     # docs/ci/owner-lane.md and docs/ci/hosted-cutover.md.
     runs-on: ${{ vars.OWNER_CI_RUNS_ON && fromJSON(vars.OWNER_CI_RUNS_ON) || 'ubuntu-latest' }}
-    timeout-minutes: 90
+    # Keyed on the same variable, with the same fallback: 90 minutes here and
+    # in every fork, 180 on the owner's runners in the mirror. The Mac VM
+    # runners took 60 minutes with a warm `.lake`, 57 of them after the library
+    # build, so a cold build there (after a Mathlib bump, say) would not fit in
+    # 90. See "Speed" in docs/ci/owner-lane.md for how 180 was chosen.
+    timeout-minutes: ${{ vars.OWNER_CI_RUNS_ON && 180 || 90 }}
 
     defaults:
       run:
