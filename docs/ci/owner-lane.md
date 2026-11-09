@@ -47,22 +47,64 @@ runs-on: ${{ vars.OWNER_CI_RUNS_ON && fromJSON(vars.OWNER_CI_RUNS_ON) || 'ubuntu
 the mirror nothing reads the hosted Linux cache, the Pages site is not
 published, and a hosted job in a private repository bills minutes.
 
-Every owner runner carries the `owner-ci` label. To keep jobs on one platform
-while another is being proven, narrow the variable, for example
-`["self-hosted","owner-ci","Linux"]`. Never set the variable in the public
-repository. That fails closed, with jobs queued for a runner that isn't there,
-but it stops CI for everyone.
+Every owner runner carries the `owner-ci` label. To keep jobs on one host
+while it is being proven, narrow the variable to that host's label:
+`["self-hosted","owner-mac-vm"]` for the Mac, or
+`["self-hosted","owner-linux"]` for the three general Ubuntu runners. Both
+hosts report `Linux`, so that label does not separate them. Restore
+`["self-hosted","owner-ci"]` when the run being proven has finished. Never set
+the variable in the public repository. That fails closed,
+with jobs queued for a runner that isn't there, but it stops CI for everyone.
 
 ## Runners
 
-| Host | Runners | Labels |
-| --- | --- | --- |
-| Ubuntu PC | `chris-ubuntu-main-runner`, `chris-ubuntu-runner-1`..`-3` | `owner-ci`, `owner-linux-main` or `owner-linux`, and the runner name |
-| Intel MacBook Pro | two, planned | `owner-ci` and per-runner names, to be recorded when registered |
+Six runners, all registered to the mirror on 2026-11-08:
+
+| Host | Runners | Labels | Notes |
+| --- | --- | --- | --- |
+| Ubuntu PC | `chris-ubuntu-main-runner`, `chris-ubuntu-runner-1`..`-3` | `owner-ci`, `owner-linux-main` or `owner-linux`, and the runner name | [Ubuntu runner notes](ubuntu-runners.md) |
+| Intel MacBook Pro, 32 GB | `chris-mac-vm-runner-1`, `chris-mac-vm-runner-2` | `owner-ci`, `owner-mac-vm`, and the runner name | in a Linux VM; [Mac VM runner notes](mac-vm-runners.md) |
+
+All six also carry `self-hosted`, `Linux` and `X64`. The Mac runners run in an
+Ubuntu VM, not on macOS: `roadmap` runs `scripts/tests`, which assume Linux,
+and the `Restore build output` step of `build` runs on Linux only.
 
 `LEAN_NUM_THREADS=3` still applies to every self-hosted job (the first step of
 `build`). Labels are not capacity: four runners on the Ubuntu PC are four
-processes on one machine.
+processes on one machine, and the two Mac runners share one VM.
+
+Every runner host needs a current `gh`. `scripts/check_roadmap.py` asks for
+the `parent` and `blockedBy` issue fields, which the `gh` 2.46 in Ubuntu's own
+archive does not know, and `roadmap` runs it with `--require-api`, so an old
+`gh` fails the job. Both hosts install `gh` from GitHub's apt repository at
+`https://cli.github.com/packages`.
+
+### Speed
+
+Measured on 2026-11-08, on `main` at `2f7f7c22`. Each runner's `.lake` is kept
+between jobs, so a warm build compiles only what changed.
+
+| Job | Ubuntu PC | Mac VM |
+| --- | --- | --- |
+| `build`, total | 44 min, cold | 60 min, warm |
+| `lean-action` (the library build) | 29.0 min, cold | 2.5 min, warm |
+| `build`, after the library build | 15 min | 57 min |
+| algebraic-geometry and stability-condition axiom audits | 4.2 and 2.6 min | 9.3 and 5.7 min |
+| `Audit completeness` and `Single instantiation` | 0.7 and 0.7 min | 5.3 and 5.1 min |
+| `Emit combined environment` | 2.6 min | 14.1 min |
+| `Emitter reproducibility` | 2.7 min | 13.2 min |
+| `roadmap` | 0.9 min | 4.4 min |
+
+After the library build the Mac VM is about four times slower overall, from
+about twice as slow on the axiom audits to about seven times on
+`Audit completeness` and `Single instantiation`. The two whole-environment emit
+steps take the most time. The VM's memory limits were not the cause. The build
+job peaked at its 10 GiB `MemoryHigh` and was held back by memory pressure for
+about 7 seconds in all, with no OOM kill.
+
+`build` has `timeout-minutes: 90`. A cold build on a Mac runner, such as the
+first build after a Mathlib bump, will probably exceed it. The partial `.lake`
+is kept, so the next job on that runner continues from where it stopped.
 
 ## Using the lane
 
@@ -104,8 +146,22 @@ owner's hardware.
 
 ## Enabling and rolling back
 
-The mirror was created with Actions disabled. Enable it only after this routing
-is on `main`, and in this order, so that no job falls back to hosted minutes:
+Enabled on 2026-11-08, on `main` at `2f7f7c22`. The mirror's Actions were
+turned on in the order below. Two runs of `ci.yml` in the mirror then passed
+on that commit:
+
+| Run | Variable at dispatch | `build` | `roadmap` | `ci` |
+| --- | --- | --- | --- | --- |
+| 42488589144 (`main` push) | `["self-hosted","owner-ci"]` | `chris-ubuntu-runner-3` | `chris-ubuntu-runner-2`, on re-run | `chris-ubuntu-runner-1` |
+| 42492738556 (dispatch) | `["self-hosted","owner-mac-vm"]` | `chris-mac-vm-runner-2` | `chris-mac-vm-runner-1` | `chris-mac-vm-runner-1` |
+
+The first attempt of `roadmap` failed on the Ubuntu PC's `gh` 2.46 (see
+[Runners](#runners)); it passed once `gh` was upgraded. The public
+repository's runner count stayed 0 throughout.
+
+The mirror was created with Actions disabled. To enable it again, wait until
+this routing is on `main`, then run these in order, so that no job falls back
+to hosted minutes:
 
 ```bash
 gh variable set OWNER_CI_RUNS_ON -R chris-dare-dev/derived-alg-geo-lean-ci --body '["self-hosted","owner-ci"]'

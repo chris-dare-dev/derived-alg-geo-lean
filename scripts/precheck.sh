@@ -245,7 +245,7 @@ fi
 echo
 if [ ${#FAILED[@]} -eq 0 ]; then
   echo "precheck clean -- this is NOT a CI verdict."
-  echo "Open the pull request for the verdict, or dispatch the self-hosted lane (never in a loop run):"
+  echo "Open the pull request for the verdict, or dispatch CI on the pushed branch (never in a loop run):"
   echo "  gh workflow run ci.yml --ref \$(git branch --show-current)"
   exit 0
 fi
