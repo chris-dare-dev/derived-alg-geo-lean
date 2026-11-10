@@ -85,6 +85,23 @@ family, HN structure over a curve, boundedness, or moduli theory. -/
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.Support.ZeroChargeLattice.scalarExtensionEquiv
 #print axioms CategoryTheory.Triangulated.WeakStabilityCondition.Support.ZeroChargeLattice.scalarExtensionEquiv_apply
 
+/-! ## Support lane — finitely many classes and local finiteness (Remark 12.3)
+
+Remark 12.3 of arXiv:1902.08184v4. The finiteness theorem is about a lattice:
+classes reach `V` through an additive map whose image is discrete. The
+local-finiteness theorems fill the `locallyFinite` field of
+`StabilityCondition.WithClassMap` by proof, never by hypothesis. -/
+
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.Support.finite_range_inter_closedBall
+#print axioms CategoryTheory.Triangulated.WeakStabilityCondition.Support.finite_classes_of_isCompatible
+#print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.isLocallyFinite_of_hasSupportProperty
+#print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.isLocallyFinite_of_quadraticSupport
+#print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.toStabilityCondition_of_quadraticSupport
+#print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.toStabilityCondition_of_quadraticSupport_toWithClassMap
+#print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.QuadraticSupportData.isLocallyFinite
+#print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.QuadraticSupportData.toStabilityCondition
+#print axioms CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap.QuadraticSupportData.toStabilityCondition_toWithClassMap
+
 /-! ## FiniteLength lane — charges on the free lattice of simples
 
 `Fin n -> Z` is a MODEL of `K_0(A)` for a finite-length abelian category, not
