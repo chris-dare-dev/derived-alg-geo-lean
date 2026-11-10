@@ -1498,6 +1498,11 @@ report them. They become visible with the instance fix, and are recorded here ra
 #print axioms AlgebraicGeometry.Cohomology.affineRGammaPlusEval
 #print axioms AlgebraicGeometry.Cohomology.affineRGammaPlusEval_naturality
 #print axioms AlgebraicGeometry.Cohomology.affineRGammaPlusEvalAddHom
+#print axioms AlgebraicGeometry.Cohomology.affineRGammaPlusEvalAddEquiv
+#print axioms AlgebraicGeometry.Cohomology.affineRGammaPlusEvalAddEquiv_apply
+#print axioms AlgebraicGeometry.Cohomology.affineRGammaPlusEvalAddEquiv_toAddMonoidHom
+#print axioms AlgebraicGeometry.Cohomology.affineRGammaPlusDqcHomologyZeroSectionsAddEquiv
+#print axioms AlgebraicGeometry.Cohomology.affineRGammaPlusDqcHomologyZeroSectionsAddEquiv_apply_eval
 
 -- Topological prime-spectrum infrastructure consumed by the affine Cech argument.
 #print axioms PrimeSpectrum.basicOpen_prod_eq_pi
