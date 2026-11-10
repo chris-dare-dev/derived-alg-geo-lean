@@ -274,6 +274,29 @@ three uses of "perfect" (`schemePerfect`, `schemeRelativePerfect`,
   probes) and `AlgebraicGeometry/DerivedCategory/Stability/` (base change of
   pre-stability data, the geometric Fourier--Mukai action).
 
+## Stacks and moduli
+
+[ADR-0014](.claude/decisions/ADR-0014-stacks-and-moduli-ownership.md) fixes
+these conventions; cite it rather than re-deciding them.
+
+- **Carrier.** Every stack is a `CategoryTheory.StackInGroupoids`. Fibred
+  categories are reached only by a proved comparison, and a moduli problem is
+  a prestack in groupoids, not a new carrier. A stack over `S` lives on
+  `Over S`.
+- **Representability** is natural in the test object (Tag 02Y4). The current
+  notions are pointwise and take the `Pointwise` qualifier (#1626): a prefix
+  on structures (`PointwiseFiberRepresentation`), after the verb on `Is…`/`Has…`
+  predicates (`IsPointwiseRepresentable`). The standard names are reserved for
+  the natural notions.
+- **Hypotheses.** Algebraicity, good-moduli existence and Quot
+  representability are explicit typed hypotheses over genuine definitions,
+  never structure fields, instances or arbitrary `Prop` parameters.
+- **Placement.** Site-generic stacks, neutral moduli interfaces, algebraic
+  stacks and spaces, and moduli problems reach no stability module; stacks
+  reach no moduli problem. `AlgebraicSpace/`, `Stacks/{ModuliSpace,Test}/`,
+  `Moduli/StabilityCondition/` and `CategoryTheory/FiberedCategory/` are
+  targets: do not import them. The table is ADR-0014 §8.
+
 ## Umbrellas
 
 Every non-leaf directory normally has a same-named umbrella re-exporting its

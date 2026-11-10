@@ -29,9 +29,11 @@ and future upstream work; matching directories is not required to import Mathlib
 | `HomologicalComplex.mapBifunctorMap` and its finite-support quasi-isomorphism criteria | `Algebra/Homology/Bifunctor.lean` | `Algebra/Homology/Bifunctor.lean` |
 | `SheafOfModules` and `PresheafOfModules` | `Algebra/Category/ModuleCat/{Sheaf,Presheaf}/` | `Algebra/Category/ModuleCat/{Sheaf,Presheaf}/` |
 | `ModuleCat`, `Grp` | `Algebra/Category/{ModuleCat,Grp}/` | `Algebra/Category/{ModuleCat,Grp}/` |
+| Effective descent for modules along faithfully flat ring maps (Mathlib's `comonadicExtendScalars` and its descent TODO) | `Algebra/Category/ModuleCat/Descent.lean` | `Algebra/Category/ModuleCat/Descent/`: target (STK2.3, #1644); no module yet; do not import (ADR-0014 §8) |
 | `ObjectProperty`, the full subcategory it cuts out, and functor lifts into it | `CategoryTheory/ObjectProperty/` | `CategoryTheory/ObjectProperty/` |
-| Sites, sheaves, sheaf cohomology, descent, stacks | `CategoryTheory/Sites/` | `CategoryTheory/Sites/`, with Čech theory under `SheafCohomology/Cech/` and stacks under `Descent/` |
-| Bicategories, pseudofunctors, `Pseudofunctor.ObjectProperty` | `CategoryTheory/Bicategory/` | `CategoryTheory/Bicategory/`, with Cat-valued pseudofunctor loci and transport under `Functor/Cat/` |
+| Sites, sheaves, sheaf cohomology, descent, stacks | `CategoryTheory/Sites/` | `CategoryTheory/Sites/`, with Čech theory under `SheafCohomology/Cech/` and stacks under `Descent/`, where `StackInGroupoids/` holds the one stack carrier (ADR-0014 §1) with its morphisms, discrete and representable stacks; 2-fibre products, representable morphisms and substacks belong there when built |
+| Bicategories, pseudofunctors, `Pseudofunctor.ObjectProperty` | `CategoryTheory/Bicategory/` | `CategoryTheory/Bicategory/`, with Cat-valued pseudofunctor loci, cores and transport under `Functor/Cat/` (ADR-0014 §5) |
+| Categories fibred over a base: `Functor.IsFibered`, `HasFibers`, `Pseudofunctor.CoGrothendieck` | `CategoryTheory/FiberedCategory/` | `CategoryTheory/FiberedCategory/`: target (STK1.6, #1638); no module yet; do not import. `StackInGroupoids` reaches it only by a proved comparison, never as a second stack root (ADR-0014 §1) |
 | Abelian categories, Serre classes | `CategoryTheory/Abelian/` | `CategoryTheory/Abelian/` |
 | Quasi-abelian categories and strict morphisms | `CategoryTheory/Abelian/` (precedent `Abelian/NonPreadditive.lean`) | `CategoryTheory/Abelian/QuasiAbelian.lean` |
 | Linear categories and opposite linearity | `CategoryTheory/Linear/` | `CategoryTheory/Linear/` |
@@ -203,8 +205,13 @@ Read that map before proposing a destination for code it already covers.
 | A structure on an abstract abelian category | `Abelian/SerreClass/`, `Abelian/GrothendieckCategory/` | `CategoryTheory/Abelian/<Name>/` |
 | A geometric realization of a categorical interface | `Algebra/Category/ModuleCat/Abelian.lean`, `AlgebraicGeometry/Modules/Sheaf.lean` | with the geometric object under `AlgebraicGeometry/`; the declaration may keep the interface's namespace for dot notation |
 | A bespoke carrier built on a Mathlib API | definition site | beside that API |
-| A neutral predicate on pseudofunctors used by both geometry and stability | `CategoryTheory/Bicategory/Functor/Cat/` | `CategoryTheory/Moduli/` until Mathlib has a home for it |
+| A neutral predicate on pseudofunctors used by both geometry and stability, and the neutral family probes (`ChargeProbe`, `OpenLocusProbe`, `GenericSemistabilityProbe`, `DedekindHNProblem`, `WeakDedekindHNProblem` and their predicates) | `CategoryTheory/Bicategory/Functor/Cat/` | `CategoryTheory/Moduli/` until Mathlib has a home for it; the probes' file `CategoryTheory/Moduli/Probes.lean` is a target (MO2.5, #1627); no module yet; do not import. Until #1627 lands the probes sit in `CategoryTheory/Triangulated/StabilityCondition/Weak/Families/Basic.lean` |
 | A theorem whose public type mentions a scheme, variety, `Coh X`, `Dqc X`, or a geometric morphism property | `AlgebraicGeometry/` | `AlgebraicGeometry/`, organized by geometric object |
+| Algebraic spaces over a scheme (ADR-0014 §6, §8) | one directory per geometric object: `AlgebraicGeometry/ProjectiveSpectrum/`, `AlgebraicGeometry/EllipticCurve/` | `AlgebraicGeometry/AlgebraicSpace/`: target (ASP1, #1651); no module yet; do not import |
+| Algebraic stacks, their properties and valuative criteria | the same object-directory precedent | `AlgebraicGeometry/Stacks/`; today it holds pointwise presentations only (ADR-0014 §4) |
+| Good, coarse and categorical moduli spaces of stacks | inside an object directory, a child named by what it adds, as Mathlib's `Algebra/Category/ModuleCat/Monoidal/` | `AlgebraicGeometry/Stacks/ModuliSpace/`, never `Moduli/GoodModuli`: target (GM1); no module yet; do not import |
+| Test stacks Θ, B𝔾_m, ST_R | the same | `AlgebraicGeometry/Stacks/Test/`: target (STK4.4, #1699); no module yet; do not import |
+| Moduli problems, versus their stability consumers | the repository's `AlgebraicGeometry/DerivedCategory/` umbrella, which omits its `Stability/` child | moduli problems under `AlgebraicGeometry/Moduli/`; their stability consumers under `AlgebraicGeometry/Moduli/StabilityCondition/`, a target (MO2.3, #1628; no module yet; do not import) that the `Moduli` umbrella will omit. Until #1628 lands they sit at `Moduli/{Semistability,HarderNarasimhan}/` |
 
 Within Tier 2, identify the mathematical object and its independently useful
 theory. Use the weakest sufficient hypotheses to separate a reusable block
@@ -367,13 +374,21 @@ reconstruct or rename the ambient zero.
 
 ## Moduli and subprestacks
 
-`CategoryTheory.Moduli.BoundednessProblem` is the neutral boundedness root. A
-stability-family package may require it and a geometric moduli package may
-realize it with finite-type parameter data, but neither consumer owns the
-predicate.
+[ADR-0014](../../.claude/decisions/ADR-0014-stacks-and-moduli-ownership.md)
+fixes the carrier and the placement table for stacks, algebraic spaces and
+moduli problems. Every stack is a `CategoryTheory.StackInGroupoids`; a moduli
+problem is a prestack in groupoids, with no separate `ModuliProblem` carrier.
+Moduli of objects is to be one construction (STK1.5, #1634; not yet built):
+`Pseudofunctor.ObjectProperty` cuts the substack out of a stack of categories,
+and the core makes it a stack in groupoids.
+
+`CategoryTheory.Moduli.BoundednessProblem` is the neutral boundedness root
+only until #1692 replaces it by bounded families. A stability-family package
+may require it and a geometric moduli package may realize it with finite-type
+parameter data, but neither consumer owns the predicate.
 
 Mathlib's `Pseudofunctor.ObjectProperty` is the canonical fiberwise locus for a
-Cat-valued pseudofunctor:
+Cat-valued pseudofunctor, and the substack mechanism:
 
 - `IsClosedUnderIsomorphisms` makes the locus replete;
 - `IsClosedUnderMapObj` makes it stable under restriction;
