@@ -1,5 +1,17 @@
 # Ubuntu workstation runners (historical topology)
 
+> **Status, 2026-11-08.** These four runners are no longer registered to this
+> repository. They were re-registered on 2026-11-08, on the same host with the
+> same isolation and limits, to the private mirror described in
+> [the owner lane](owner-lane.md), with the extra label `owner-ci`. They now
+> run beside two runners on the owner's Mac ([Mac VM runners](mac-vm-runners.md)).
+> The `gh api repos/chris-dare-dev/derived-alg-geo-lean/actions/runners`
+> inspect command below now correctly returns none; inspect the mirror's
+> runners with
+> `gh api repos/chris-dare-dev/derived-alg-geo-lean-ci/actions/runners`
+> instead. "Not instructions to re-register these runners" still holds for this
+> repository.
+
 The owner retired the Windows workstation setup on 2026-09-21 and authorized
 four runners on the personal Ubuntu PC. Windows is no longer a required
 platform for this repository. This operator-directed replacement is distinct
@@ -129,6 +141,9 @@ auto-updates retain the same directory and service identity.
 Required host packages include build-essential, python3-venv, python3-pip,
 pkg-config, libgmp-dev, unzip, zstd and the runner's ICU/OpenSSL runtime
 libraries. Lean setup follows the committed toolchain through lean-action.
+`gh` must come from GitHub's apt repository, not Ubuntu's archive, whose
+2.46 fails `roadmap` (see [the owner lane](owner-lane.md#runners)). Since
+2026-11-08 this host has `gh` 2.103.3 from `https://cli.github.com/packages`.
 
 If routing must be rolled back, use hosted Ubuntu through a reviewed change;
 do not recreate the repository's Ubuntu or former Windows registrations.

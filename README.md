@@ -44,8 +44,10 @@ LEAN_NUM_THREADS=2 lake build DerivedAlgGeo.The.Module.You.Changed
 
 **Full verification runs in CI, not on your machine.** Opening a pull request
 runs the whole gate on `ubuntu-latest`; since 2026-09-19 a push on its own no
-longer does, and `gh workflow run ci.yml --ref <branch>` dispatches the
-self-hosted Windows lane when you want the platform check. A bare `lake build`
+longer does, and `gh workflow run ci.yml --ref <branch>` dispatches the same
+gate on hosted Ubuntu for a branch with no pull request. The owner's
+self-hosted runners serve a private mirror, not this repository; see
+`docs/ci/owner-lane.md`. A bare `lake build`
 and `scripts/gates.sh` are refused locally by a `PreToolUse` hook.
 For the local pre-flight the hook allows — every gate that needs no Lean build,
 plus a targeted build of what you changed, in seconds — run:

@@ -29,6 +29,8 @@ on:
   #
   # The owner retired Windows on 2026-09-21. The later CI1.07 cutover routes
   # main and manual jobs to hosted Ubuntu as well as PR and merge-group jobs.
+  # Since 2026-11-08 this repository has no runner registrations at all: the
+  # owner's runners serve a private mirror instead (see `runs-on` on `build`).
   push:
     branches: [main]
   pull_request:
@@ -99,12 +101,26 @@ concurrency:
 
 jobs:
   build:
-    # All public-repository events use hosted Ubuntu. This workflow expression
-    # alone is not the trust boundary: PRs can edit their own workflow version.
-    # The four repository runner registrations must be removed separately.
-    # See docs/ci/hosted-cutover.md for the coordinated rollout and rollback.
-    runs-on: ubuntu-latest
-    timeout-minutes: 90
+    # Every event in this public repository uses hosted Ubuntu. The owner's
+    # self-hosted runners are registered ONLY to the private mirror
+    # chris-dare-dev/derived-alg-geo-lean-ci, which sets the repository
+    # variable OWNER_CI_RUNS_ON to a JSON label list such as
+    # ["self-hosted","owner-ci"]. This repository leaves it unset, and so does
+    # every fork, so the expression falls back to ubuntu-latest. A fork pull
+    # request reads the BASE repository's variables, so it falls back too.
+    #
+    # The expression is NOT the trust boundary: a pull request can edit its
+    # own copy of this file, `runs-on` included. The boundary is that no runner
+    # is registered here, so a pull request that asks for `self-hosted` gets no
+    # runner and stays queued. Keep the registration count at zero. See
+    # docs/ci/owner-lane.md and docs/ci/hosted-cutover.md.
+    runs-on: ${{ vars.OWNER_CI_RUNS_ON && fromJSON(vars.OWNER_CI_RUNS_ON) || 'ubuntu-latest' }}
+    # Keyed on the same variable, with the same fallback: 90 minutes here and
+    # in every fork, 180 on the owner's runners in the mirror. The Mac VM
+    # runners took 60 minutes with a warm `.lake`, 57 of them after the library
+    # build, so a cold build there (after a Mathlib bump, say) would not fit in
+    # 90. See "Speed" in docs/ci/owner-lane.md for how 180 was chosen.
+    timeout-minutes: ${{ vars.OWNER_CI_RUNS_ON && 180 || 90 }}
 
     defaults:
       run:
@@ -1267,10 +1283,11 @@ jobs:
   # ---------------------------------------------------------------------------
   # The roadmap-vs-tracker gate (#620), in its own job since #1392.
   #
-  # ubuntu-latest UNCONDITIONALLY, like `build` after the hosted cutover. This
-  # job has no reason to want a warm `.lake` or a persistent runner.
+  # Routed exactly like `build`: ubuntu-latest here, the owner's runners in the
+  # private mirror. This job has no reason to want a warm `.lake`; it follows
+  # `build` only because a hosted job in a PRIVATE repository bills minutes.
   roadmap:
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.OWNER_CI_RUNS_ON && fromJSON(vars.OWNER_CI_RUNS_ON) || 'ubuntu-latest' }}
     # Seconds of work. The cap is here so a hung `gh` call cannot hold the
     # merge open for the default six hours.
     timeout-minutes: 10
@@ -1379,6 +1396,12 @@ jobs:
           # the lookup finds nothing -- no pull request, or no `gh` -- PR_NUM
           # stays empty and the unscoped invocation runs, which is the strict
           # direction and the pre-existing behaviour.
+          #
+          # `--repo` names the tracker rather than letting `gh` infer it from
+          # the checkout. In the private owner mirror the checkout's remote is
+          # the mirror, which has no pull requests, so the lookup would always
+          # come back empty and judge every entry -- the 15-of-18 failure
+          # above. scripts/check_roadmap.py hard-codes the same repository.
           PR_NUM=""
           case "${GITHUB_EVENT_NAME}" in
             pull_request)
@@ -1386,7 +1409,8 @@ jobs:
               ;;
             push)
               if [ "${GITHUB_REF_NAME}" != "main" ]; then
-                PR_NUM="$(gh pr list --head "${GITHUB_REF_NAME}" \
+                PR_NUM="$(gh pr list --repo chris-dare-dev/derived-alg-geo-lean \
+                  --head "${GITHUB_REF_NAME}" \
                   --state open --json number --jq '.[].number' \
                   2>/dev/null | head -1 || true)"
               fi
@@ -1482,7 +1506,8 @@ jobs:
     # is the vacuous pass this repository keeps finding in new places, and it
     # is strictly worse than a skip.
     if: ${{ !cancelled() }}
-    runs-on: ubuntu-latest
+    # Routed like `build` and `roadmap`, for the same private-minutes reason.
+    runs-on: ${{ vars.OWNER_CI_RUNS_ON && fromJSON(vars.OWNER_CI_RUNS_ON) || 'ubuntu-latest' }}
     steps:
       - name: Every required job succeeded
         # Through `env`, not interpolated into the script. Two reasons, and the

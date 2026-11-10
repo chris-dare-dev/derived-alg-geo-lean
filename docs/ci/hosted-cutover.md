@@ -1,5 +1,15 @@
 # Proposed hosted-only CI cutover for CI1.07
 
+> **Status, 2026-11-08.** Hosted routing is on `main` for every event. At the
+> owner's direction, the four repository runner registrations (ids 27–30) were
+> deleted on 2026-11-08 while all four were idle and no run was queued. The
+> runner API now reports `total_count` 0. The owner's runners now serve a
+> private mirror instead. That is the separate, owner-approved boundary the
+> last paragraph of this plan requires; see [the owner lane](owner-lane.md).
+> The step-4 negative test (a disposable PR requesting an old self-hosted
+> label set) has **not** been run. The rest of this file is the plan as
+> written.
+
 This is a staged plan for #1436, not a record of an applied routing change.
 The public repository currently has four registered Ubuntu runners. Its
 `pull_request` and `merge_group` builds are hosted, while `main` push and

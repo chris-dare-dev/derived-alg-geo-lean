@@ -1,8 +1,17 @@
 self-hosted-runner:
   labels:
+    # The owner lane's routing label (docs/ci/owner-lane.md). Every owner
+    # runner carries it; the runners are registered to the private mirror,
+    # never to this repository.
+    - owner-ci
     - owner-linux
     - owner-linux-main
     - chris-ubuntu-main-runner
     - chris-ubuntu-runner-1
     - chris-ubuntu-runner-2
     - chris-ubuntu-runner-3
+# Every repository variable a workflow reads, so a misspelt `vars.` name is a
+# lint error instead of a silent empty string -- which, for OWNER_CI_RUNS_ON,
+# would quietly route a mirror job onto billed hosted minutes.
+config-variables:
+  - OWNER_CI_RUNS_ON

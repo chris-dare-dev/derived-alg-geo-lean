@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 r"""Refuse whole-library Lean builds on the developer's machine.
 
-Lean builds for this repository belong on a runner. `ci.yml` routes `push`
-and `workflow_dispatch` to the owner's Ubuntu workstation (`owner-linux-main`
-for `main`, `owner-linux` for other refs) and everything else to
-`ubuntu-latest`. Since 2026-09-19 `push` fires on `main` alone, so the way to
-get a verdict on a branch is to OPEN THE PULL REQUEST -- or to dispatch the
-self-hosted lane by hand -- not to run `lake` locally.
+Lean builds for this repository belong on a runner. In this repository
+`ci.yml` runs every event on `ubuntu-latest`; the owner's self-hosted runners
+serve a private mirror instead (`docs/ci/owner-lane.md`). Since 2026-09-19
+`push` fires on `main` alone, so the way to get a verdict on a branch is to
+OPEN THE PULL REQUEST -- or to dispatch `ci.yml` on it by hand -- not to run
+`lake` locally.
 
 ## What is refused, and what is not
 
@@ -499,12 +499,12 @@ def main() -> int:
         "local-build gate: refused.\n"
         f"  {reason}\n"
         "\n"
-        "Lean builds for this repository run on a runner (`ci.yml` routes\n"
-        "`push` and `workflow_dispatch` to the owner's Ubuntu workstation, and\n"
-        "everything else to ubuntu-latest).\n"
+        "Lean builds for this repository run on a runner (`ci.yml` runs on\n"
+        "ubuntu-latest here; the owner's runners serve a private mirror, see\n"
+        "docs/ci/owner-lane.md).\n"
         "\n"
         "`push` triggers on `main` alone, so for a verdict on a branch OPEN THE\n"
-        "PULL REQUEST, or dispatch the self-hosted lane without pushing:\n"
+        "PULL REQUEST, or dispatch CI on the pushed branch:\n"
         "    gh workflow run ci.yml --ref <branch>\n"
         "\n"
         "Still allowed locally: `scripts/precheck.sh` (every gate that needs no\n"
