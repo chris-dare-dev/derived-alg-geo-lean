@@ -191,6 +191,15 @@ that true.
   one-way perfectness comparisons and the warning that the current
   cohomological pseudo-coherence criterion is not automatically the standard
   notion on arbitrary non-Noetherian bases.
+- **Stacks and moduli before stability:** site-generic stacks, algebraic
+  spaces and moduli problems precede their stability consumers, and stacks
+  precede the moduli problems they carry. Every stack is a
+  `CategoryTheory.StackInGroupoids`; representability is natural in the test
+  object, and the existing per-test-object notions are pointwise; algebraicity,
+  good-moduli existence and Quot representability enter as typed hypotheses
+  over genuine definitions. The first consumer of a new root is not Bridgeland
+  stability. Paths, targets and the dependency direction are in
+  [ADR-0014](../../.claude/decisions/ADR-0014-stacks-and-moduli-ownership.md).
 - **Covering groups and convex geometry:** the independent GL-cover
   construction precedes its stability action. Neutral planar perimeter lemmas
   precede HN-polygon applications. Mass is a stability invariant consumed by

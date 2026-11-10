@@ -354,7 +354,7 @@ Category
 │  └─ Ext adjunction / dimension shift / resolution naturality
 ├─ filtered-complex spectral sequences
 ├─ Moduli
-│  └─ BoundednessProblem                 neutral boundedness predicate
+│  └─ BoundednessProblem                 neutral boundedness predicate, the root until #1692
 ├─ GrothendieckPresentation
 │  ├─ K₀Ab                               short-exact relations
 │  ├─ K₀                                 triangle relations
@@ -367,6 +367,14 @@ Category
 │  │     └─ Preserves                   exact-functor compatibility
 │  └─ K₀dg := K₀ (H0 C)                 reuse, not a third presentation
 └─ Sites / descent / stacks in groupoids
+   ├─ StackInGroupoids                     the one stack carrier (ADR-0014 §1)
+   │  ├─ fibres in `Cat.{v', u'}`          target (#1631); `Cat.{w, w}` today
+   │  ├─ discrete, representable stacks    on subcanonical sites (STK2.1)
+   │  ├─ pointwise representability        `FiberRepresentation`: one equivalence per
+   │  │                                    test object, no naturality; `Pointwise…` (#1626)
+   │  ├─ natural representability          Tag 02Y4; target (#1636), with a proved
+   │  │                                    projection to its `Pointwise…` predecessor
+   │  └─ categories fibred in groupoids    proved comparison only; target (#1638)
    ├─ over-site functoriality
    │  └─ cocontinuity of `Over.post`
    ├─ `CoversTop` equivalence transport
@@ -470,12 +478,13 @@ AlgebraicGeometry
 │     ├─ κ = √td is inhabited            = mukaiCharge at sqrtTodd on rankOne
 │     │  any surface                     no K3 hypothesis is needed
 │     └─ κ = 1 and κ = √td               two pullbacks; different walls, not one
-├─ moduli
+├─ moduli                                 prestacks in groupoids; carrier `StackInGroupoids`
 │  ├─ fiberwise replete locus selector     not a subprestack
-│  ├─ finite-type boundedness witness      consumes selector + generic predicate
+│  ├─ finite-type boundedness witness      consumes selector + generic predicate;
+│  │                                       a pointwise cover, it does not bound (#1626)
 │  ├─ affine stable subprestack            consumes pseudofunctor object property
-│  ├─ stack presentation
-│  └─ perfect-complex specialization
+│  ├─ stack presentation                   pointwise (Zariski, fppf); not an algebraic stack
+│  └─ perfect-complex specialization       pointwise presentations only
 └─ stability-consuming children                `DerivedCategory/Stability/`, `Moduli/`,
                                                `Numerical/`, `Stability/` — four, not one
 ```

@@ -2622,6 +2622,51 @@ short exact construction downstream. The accompanying source change moves
 `HomologicalComplex.HomologySequence.quasiIso_τ₂` to the repository's
 `HomologySequenceLemmas` owner; only the tail cutover remains pending here.
 
+### Stacks and moduli boundary (ADR-0014)
+
+[ADR-0014](../../.claude/decisions/ADR-0014-stacks-and-moduli-ownership.md)
+confirms two pending MO2 path cutovers. Take them one per pull request, #1627
+before #1628. Paths move and fully qualified names do not. Every destination
+below is a target: no module yet; do not import.
+
+- **MO2.5 ([#1627](https://github.com/chris-dare-dev/derived-alg-geo-lean/issues/1627)):
+  the neutral family probes.** Source:
+  `CategoryTheory/Triangulated/StabilityCondition/Weak/Families/Basic.lean`,
+  which holds the five probe structures (`ChargeProbe`, `OpenLocusProbe`,
+  `GenericSemistabilityProbe`, `DedekindHNProblem`, `WeakDedekindHNProblem`)
+  and their eight predicates. Target: `CategoryTheory/Moduli/Probes.lean`, in
+  the unchanged namespace `CategoryTheory.Triangulated.WeakStabilityCondition.Families`.
+  The two Definition 20.5 bundles stay in `Weak/Families/Basic.lean`, which
+  imports the new module.
+- **MO2.3 ([#1628](https://github.com/chris-dare-dev/derived-alg-geo-lean/issues/1628)):
+  the stability consumers leave the `Moduli` umbrella.** Sources and targets:
+  `AlgebraicGeometry/Moduli/HarderNarasimhan.lean` and its children
+  `RelativeFiltration.lean` and `DedekindProblem.lean` move below
+  `AlgebraicGeometry/Moduli/StabilityCondition/HarderNarasimhan`;
+  `AlgebraicGeometry/Moduli/Semistability.lean` and its children `Locus.lean`,
+  `LocusProbes.lean` and `FiniteType.lean` move below
+  `AlgebraicGeometry/Moduli/StabilityCondition/Semistability`; and
+  `AlgebraicGeometry/Moduli/Semistability/SchemeProbes.lean`, stability-free
+  once #1627 lands, moves to the neutral `AlgebraicGeometry/Moduli/Probes.lean`.
+  A new umbrella `AlgebraicGeometry/Moduli/StabilityCondition.lean` is omitted
+  by `AlgebraicGeometry/Moduli.lean` and imported by the top-level
+  `AlgebraicGeometry` umbrella, the shape `DerivedCategory/Stability/` already
+  has. The vacated paths are retired.
+
+ADR-0014 §8 also names these target directories. Each is a target; no module
+yet; do not import.
+
+| Target | Owner | What it will hold |
+| --- | --- | --- |
+| `CategoryTheory/FiberedCategory/` | STK1.6 (#1638) | the comparison of `StackInGroupoids` with Mathlib's categories fibred in groupoids |
+| `Algebra/Category/ModuleCat/Descent/` | STK2.3 (#1644) | effective descent for modules along faithfully flat maps |
+| `AlgebraicGeometry/AlgebraicSpace/` | ASP1 (#1651 first) | algebraic spaces over a scheme |
+| `AlgebraicGeometry/Stacks/Test/` | STK4.4 (#1699) | the test stacks Θ, B𝔾_m, ST_R |
+| `AlgebraicGeometry/Stacks/ModuliSpace/` | GM1 (#1706 first) | good, coarse and categorical moduli spaces |
+| `AlgebraicGeometry/Moduli/StabilityCondition/` | MO2.3 (#1628) | the stability consumers of moduli problems |
+| `AlgebraicGeometry/Moduli/Probes.lean` | MO2.3 (#1628), after MO2.5 | scheme realizations of the neutral family probes |
+| `CategoryTheory/Moduli/Probes.lean` | MO2.5 (#1627) | the neutral family probes |
+
 Every path lane confirmed by the 2026-09-01 audit has landed, and so have
 both lanes recorded after it: the `ObjectProperty` lift block (2026-09-02)
 and the left-orthogonal colimit closure (2026-09-03). Both are entries under

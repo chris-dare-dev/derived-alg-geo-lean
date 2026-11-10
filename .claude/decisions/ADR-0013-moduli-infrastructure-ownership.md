@@ -1,6 +1,8 @@
 # ADR-0013 — Own reusable moduli infrastructure in the monorepo
 
-- **Status:** accepted
+- **Status:** partially superseded by ADR-0014. Its paths (the Decision list)
+  and the SF8/SF9 ownership lines under Consequences are superseded; the
+  monorepo choice and the final trust clause remain in force.
 - **Date:** 2026-08-17 (America/New_York)
 - **Decider:** Chris Dare
 - **Decision:** implement relative-perfect, Quot, stack, and good-moduli
