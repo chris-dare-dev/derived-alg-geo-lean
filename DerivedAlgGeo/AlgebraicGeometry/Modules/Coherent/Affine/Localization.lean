@@ -79,6 +79,8 @@ noncomputable def affineTildePullbackIso [IsNoetherianRing R]
   Functor.fullyFaithfulCancelRight (Coh.ι (Spec (CommRingCat.of A)))
     (affineTildePullbackCompιIso (R := R) (A := A))
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private theorem finiteExtendScalars_fixedTargetArrow [IsNoetherianRing R]
     (S : Submonoid R) [IsLocalization S A] (M : FGModuleCat.{u} R) :
     Subobject.FixedTargetArrowExtension
@@ -114,8 +116,7 @@ private theorem finiteExtendScalars_fixedTargetArrow [IsNoetherianRing R]
           (ModuleCat.ofHom f)).hom := by
     apply LinearMap.ext
     intro x
-    induction x using TensorProduct.induction_on with
-    | zero => simp
+    induction x using TensorProduct.inductionOn with
     | tmul a l =>
       have ht : a ⊗ₜ[R] l = a • ((1 : A) ⊗ₜ[R] l) := by
         simp only [TensorProduct.smul_tmul', smul_eq_mul, mul_one]
@@ -140,6 +141,8 @@ private theorem finiteExtendScalars_fixedTargetArrow [IsNoetherianRing R]
   rw [← hmap]
   exact hβ
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private theorem finiteExtendScalars_fixedTerminalThreeTerm [IsNoetherianRing R]
     (S : Submonoid R) [IsLocalization S A]
     (M : FGModuleCat.{u} R) (N₀ N₁ : FGModuleCat.{u} A)
@@ -197,8 +200,7 @@ private theorem finiteExtendScalars_fixedTerminalThreeTerm [IsNoetherianRing R]
     intro L T _ _ _ _ q
     apply LinearMap.ext
     intro x
-    induction x using TensorProduct.induction_on with
-    | zero => simp
+    induction x using TensorProduct.inductionOn with
     | tmul a l =>
       have ht : a ⊗ₜ[R] l = a • ((1 : A) ⊗ₜ[R] l) := by
         simp only [TensorProduct.smul_tmul', smul_eq_mul, mul_one]
@@ -269,7 +271,7 @@ theorem fixedTargetArrowExtension_pullbackSpecMap_of_isLocalization
   refine ⟨L, fCoh, eCoh, ?_⟩
   have hα : FA.map (G.map g) ≫ (α.app M).inv =
       (α.app Y).inv ≫ F.map (FR.map g) := by
-    convert α.inv.naturality g using 1; rfl
+    convert α.inv.naturality g using 1 <;> rfl
   have hβFA : FA.map βG =
       cA.inv ≫ β ≫ F.map cR.hom ≫ (α.app M).hom := by
     exact FA.map_preimage _
@@ -283,7 +285,6 @@ theorem fixedTargetArrowExtension_pullbackSpecMap_of_isLocalization
           F.map (FR.map g) ≫ F.map cR.inv := by
       simp only [eCoh, fCoh, Iso.trans_hom, Functor.map_comp,
         Iso.symm_hom, Functor.mapIso_hom, Category.assoc]
-      rfl
     _ = cA.hom ≫ FA.map e.hom ≫
           ((α.app Y).inv ≫ F.map (FR.map g)) ≫ F.map cR.inv := by
       simp only [Category.assoc]
@@ -405,7 +406,7 @@ theorem exists_fixedTerminalThreeTerm_pullbackSpecMap_of_isLocalization
   · change d ≫ eCoh₁.hom = eCoh₀.hom ≫ F.map dCoh
     have hαg : FA.map (G.map g) ≫ (α.app Y₁).inv =
         (α.app Y₀).inv ≫ F.map (FR.map g) := by
-      convert α.inv.naturality g using 1; rfl
+      convert α.inv.naturality g using 1 <;> rfl
     have hdGFA : FA.map dG ≫ FA.map e₁.hom =
         FA.map e₀.hom ≫ FA.map (G.map g) := by
       simpa only [← Functor.map_comp] using congrArg FA.map hdG
@@ -439,7 +440,7 @@ theorem exists_fixedTerminalThreeTerm_pullbackSpecMap_of_isLocalization
   · change β = eCoh₁.hom ≫ F.map fCoh
     have hαk : FA.map (G.map k) ≫ (α.app M).inv =
         (α.app Y₁).inv ≫ F.map (FR.map k) := by
-      convert α.inv.naturality k using 1; rfl
+      convert α.inv.naturality k using 1 <;> rfl
     have hβGFA : FA.map βG = FA.map e₁.hom ≫ FA.map (G.map k) := by
       rw [hβG, Functor.map_comp]
     symm
@@ -449,7 +450,6 @@ theorem exists_fixedTerminalThreeTerm_pullbackSpecMap_of_isLocalization
             F.map (FR.map k) ≫ F.map cR.inv := by
         simp only [eCoh₁, fCoh, Iso.trans_hom, Functor.map_comp,
           Iso.symm_hom, Functor.mapIso_hom, Category.assoc]
-        rfl
       _ = c₁.hom ≫ FA.map e₁.hom ≫
             ((α.app Y₁).inv ≫ F.map (FR.map k)) ≫ F.map cR.inv := by
         simp only [Category.assoc]

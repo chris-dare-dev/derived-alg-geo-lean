@@ -113,7 +113,7 @@ lemma shiftCommIso_zero_hom_app (F : DGFunctor C D)
     (shiftCommIso F hF 0).hom.app X =
       F.h0.map ((H0.shiftFunctorZeroIso C).hom.app X) ≫
         (H0.shiftFunctorZeroIso D).inv.app (F.h0.obj X) := by
-  dsimp [shiftCommIso, H0.shiftFunctorZeroIso, H0.compareIso]
+  dsimp only [shiftCommIso, H0.shiftFunctorZeroIso, H0.compareIso]
   change H0.homMk (C := D) _ =
     F.h0.map (H0.homMk (C := C) _) ≫ H0.homMk (C := D) _
   change H0.homMk (C := D) _ =

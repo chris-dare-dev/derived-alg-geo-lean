@@ -65,7 +65,7 @@ noncomputable def cofanDesc (t : Cofan fun k => (quotient C c).obj (X k)) :
 lemma cofanDesc_fac (t : Cofan fun k => (quotient C c).obj (X k)) (k : κ) :
     (quotient C c).map (Sigma.ι X k) ≫ cofanDesc X t = t.inj k := by
   unfold cofanDesc
-  rw [← assoc, ← Functor.map_comp, Sigma.ι_desc, Functor.map_preimage, assoc, Iso.inv_hom_id,
+  rw [← assoc, ← Functor.map_comp, Sigma.ι_comp_desc, Functor.map_preimage, assoc, Iso.inv_hom_id,
     comp_id]
 
 /-- A morphism out of the quotient of `∐ X` is determined by its restrictions to the summands:
@@ -85,7 +85,7 @@ lemma cofanDesc_uniq (t : Cofan fun k => (quotient C c).obj (X k))
   apply Homotopy.sigma
   intro k
   apply HomotopyCategory.homotopyOfEq
-  rw [Functor.map_comp, hg, ← assoc, hm k, Sigma.ι_desc, Functor.map_preimage]
+  rw [Functor.map_comp, hg, ← assoc, hm k, Sigma.ι_comp_desc, Functor.map_preimage]
 
 /-- The quotient of a coproduct of complexes is a coproduct in the homotopy category. -/
 noncomputable def isColimitCofan :

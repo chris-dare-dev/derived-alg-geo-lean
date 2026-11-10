@@ -66,6 +66,8 @@ noncomputable def singleColumnXIso (p i : ℤ) (hi : i = p) :
   subst i
   exact HomologicalComplex.singleObjXSelf (ComplexShape.up ℤ) p (K.X p)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Proof irrelevance for the supported-degree witness permits this cancellation
 inside the diagonal splitting. -/
 @[reassoc (attr := simp)]
@@ -75,6 +77,8 @@ lemma singleColumnXIso_hom_inv_f (p i j : ℤ) (hi hi' : i = p) :
   subst i
   simp [singleColumnXIso, ← HomologicalComplex.comp_f]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The reverse cancellation uses the same proof-irrelevant support witness. -/
 @[reassoc (attr := simp)]
 lemma singleColumnXIso_inv_hom_f (p i j : ℤ) (hi hi' : i = p) :
@@ -87,6 +91,8 @@ noncomputable def adjacentColumnInclusion (p : ℤ) :
     truncatedBicomplex K (p + 1) ⟶ truncatedBicomplex K p :=
   HomologicalComplex.stupidTruncGEMap K p (p + 1) (by omega)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 noncomputable def adjacentColumnProjection (p : ℤ) :
     truncatedBicomplex K p ⟶ singleColumnBicomplex K p where
   f i := if hi : i = p then
@@ -106,10 +112,8 @@ noncomputable def adjacentColumnProjection (p : ℤ) :
       apply HomologicalComplex.isZero_stupidTrunc_X
       rw [ComplexShape.notMem_range_embeddingUpIntGE_iff]
       omega
-    · rw [dif_neg hj]
+    · rw [dite_eq_right hj]
       simp [singleColumnBicomplex]
-      symm
-      apply comp_zero
 
 noncomputable def adjacentColumnBicomplexShortComplex (p : ℤ) :
     ShortComplex (HomologicalComplex₂ C
@@ -123,7 +127,7 @@ noncomputable def adjacentColumnBicomplexShortComplex (p : ℤ) :
       by_cases hi : p + 1 ≤ i
       · have hip : i ≠ p := by omega
         dsimp [adjacentColumnProjection]
-        rw [dif_neg hip]
+        rw [dite_eq_right hip]
         apply comp_zero
       · apply IsZero.eq_of_src
         apply HomologicalComplex.isZero_stupidTrunc_X
@@ -225,6 +229,8 @@ noncomputable def adjacentColumnTotalRetraction (p n : ℤ)
           (ComplexShape.up ℤ) i j n hij
     else 0)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 noncomputable def adjacentColumnTotalSection (p n : ℤ)
     [(truncatedBicomplex K p).HasTotal (ComplexShape.up ℤ)] :
     ((singleColumnBicomplex K p).total (ComplexShape.up ℤ)).X n ⟶
@@ -240,6 +246,8 @@ noncomputable def adjacentColumnTotalSection (p n : ℤ)
           (ComplexShape.up ℤ) i j n hij
     else 0)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Diagonal coproduct injections split the sequence degreewise without an
 abelian hypothesis. -/
 noncomputable def adjacentColumnTotalDegreewiseSplitting (p n : ℤ)
@@ -264,10 +272,10 @@ noncomputable def adjacentColumnTotalDegreewiseSplitting (p n : ℤ)
     · rw [← Category.assoc, HomologicalComplex₂.ιTotal_map]
       dsimp [adjacentColumnTotalRetraction, truncatedBicomplex]
       rw [Category.assoc, HomologicalComplex₂.ι_totalDesc]
-      simp only [dif_pos hi]
+      simp only [dite_eq_left hi]
       simp [adjacentColumnInclusion,
         HomologicalComplex.stupidTruncGEMap, Category.assoc]
-      rw [dif_pos hi]
+      rw [dite_eq_left hi]
       simp [HomologicalComplex.comp_f, Category.assoc]
     · apply IsZero.eq_of_src
       apply (HomologicalComplex.eval C (ComplexShape.up ℤ) j).map_isZero
@@ -288,26 +296,11 @@ noncomputable def adjacentColumnTotalDegreewiseSplitting (p n : ℤ)
     · rw [← Category.assoc]
       dsimp [adjacentColumnTotalSection, truncatedBicomplex]
       rw [HomologicalComplex₂.ι_totalDesc]
-      simp only [dif_pos hi]
+      simp only [dite_eq_left hi]
       rw [Category.assoc, Category.assoc, Category.assoc,
         HomologicalComplex₂.ιTotal_map]
       subst i
       simp [adjacentColumnProjection, singleColumnBicomplex]
-      let e₀ := stupidTruncGEXIso K p p le_rfl
-      let e₁ := singleColumnXIso K p p rfl
-      change e₁.hom.f j ≫ e₀.inv.f j ≫
-        ((e₀.hom.f j ≫ e₁.inv.f j) ≫
-          (singleColumnBicomplex K p).ιTotal
-            (ComplexShape.up ℤ) p j n hij) = _
-      rw [show (e₀.hom.f j ≫ e₁.inv.f j) ≫
-          (singleColumnBicomplex K p).ιTotal
-            (ComplexShape.up ℤ) p j n hij =
-        e₀.hom.f j ≫ e₁.inv.f j ≫
-          (singleColumnBicomplex K p).ιTotal
-            (ComplexShape.up ℤ) p j n hij by apply Category.assoc,
-        stupidTruncGEXIso_inv_hom_f_assoc,
-        singleColumnXIso_hom_inv_f_assoc]
-      rfl
     · apply IsZero.eq_of_src
       apply (HomologicalComplex.eval C (ComplexShape.up ℤ) j).map_isZero
       apply HomologicalComplex.isZero_single_obj_X
@@ -334,14 +327,14 @@ noncomputable def adjacentColumnTotalDegreewiseSplitting (p n : ℤ)
       dsimp [adjacentColumnTotalRetraction,
         adjacentColumnTotalSection]
       rw [← Category.assoc, HomologicalComplex₂.ι_totalDesc]
-      simp only [dif_pos hi]
+      simp only [dite_eq_left hi]
       rw [Category.assoc]
       erw [HomologicalComplex₂.ιTotal_map
         (truncatedBicomplex K (p + 1)) (truncatedBicomplex K p)
         (adjacentColumnInclusion K p) (ComplexShape.up ℤ) i j n hij]
       simp [adjacentColumnInclusion, HomologicalComplex.stupidTruncGEMap,
         adjacentColumnProjection, hip, Category.assoc]
-      rw [dif_pos hi]
+      rw [dite_eq_left hi]
       let e₀ := stupidTruncGEXIso K p i (by omega)
       let e₁ := stupidTruncGEXIso K (p + 1) i hi
       change e₀.hom.f j ≫ e₁.inv.f j ≫
@@ -364,7 +357,7 @@ noncomputable def adjacentColumnTotalDegreewiseSplitting (p n : ℤ)
         dsimp [adjacentColumnTotalRetraction,
           adjacentColumnTotalSection]
         rw [← Category.assoc, HomologicalComplex₂.ι_totalDesc]
-        rw [dif_neg (show ¬ p + 1 ≤ p by omega)]
+        rw [dite_eq_right (show ¬ p + 1 ≤ p by omega)]
         have hz : (0 : ((truncatedBicomplex K p).X p).X j ⟶
             ((truncatedBicomplex K (p + 1)).total
               (ComplexShape.up ℤ)).X n) ≫
@@ -376,11 +369,6 @@ noncomputable def adjacentColumnTotalDegreewiseSplitting (p n : ℤ)
         dsimp [adjacentColumnProjection]
         rw [Category.assoc, HomologicalComplex₂.ι_totalDesc]
         simp [singleColumnBicomplex, Category.assoc]
-        let e₀ := stupidTruncGEXIso K p p le_rfl
-        change e₀.hom.f j ≫ e₀.inv.f j ≫
-            (truncatedBicomplex K p).ιTotal
-              (ComplexShape.up ℤ) p j n hij = _
-        rw [stupidTruncGEXIso_hom_inv_f_assoc]
       · apply IsZero.eq_of_src
         apply (HomologicalComplex.eval C (ComplexShape.up ℤ) j).map_isZero
         apply HomologicalComplex.isZero_stupidTrunc_X
@@ -458,7 +446,7 @@ noncomputable def adjacentColumnTotalShortComplexMap (f : K ⟶ L) (p : ℤ)
       let sL := singleColumnXIso L p p rfl
       rw [HomologicalComplex.comp_f, HomologicalComplex.comp_f]
       dsimp [adjacentColumnProjection]
-      rw [dif_pos rfl, dif_pos rfl]
+      rw [dite_eq_left rfl, dite_eq_left rfl]
       simp only [Category.id_comp]
       simp only [Category.assoc]
       change (truncatedBicomplexMap f p).f p ≫ eL.hom ≫ sL.inv =
@@ -544,6 +532,8 @@ theorem adjacentColumnTotalShortExact (p : ℤ)
         epi_g := s.epi_g
         exact := s.exact })
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 noncomputable instance adjacentColumnConeToShift_quasiIso (p : ℤ)
     [(truncatedBicomplex K p).HasTotal (ComplexShape.up ℤ)]
     [(truncatedBicomplex K (p + 1)).HasTotal (ComplexShape.up ℤ)] :

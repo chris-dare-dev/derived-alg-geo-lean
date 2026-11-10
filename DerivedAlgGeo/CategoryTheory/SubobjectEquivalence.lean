@@ -92,10 +92,10 @@ theorem mapFunctor_sup [Abelian A] [Abelian B]
   have hc : h' = c ≫ F.map h := by
     apply coprod.hom_ext
     · dsimp [h', h, c]
-      rw [coprod.inl_desc, ← Category.assoc, coprodComparison_inl, ← F.map_comp,
+      rw [coprod.inl_desc, ← Category.assoc, inl_coprodComparison, ← F.map_comp,
         coprod.inl_desc]
     · dsimp [h', h, c]
-      rw [coprod.inr_desc, ← Category.assoc, coprodComparison_inr, ← F.map_comp,
+      rw [coprod.inr_desc, ← Category.assoc, inr_coprodComparison, ← F.map_comp,
         coprod.inr_desc]
   haveI : StrongEpi (F.map (factorThruImage h)) := strongEpi_of_epi _
   let eI : F.obj (image h) ≅ image (F.map h) :=

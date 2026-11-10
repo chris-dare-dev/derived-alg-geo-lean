@@ -186,6 +186,9 @@ starts from: `Hⁱ(Pⁿ, O(d))` *is* the degree-`i` cohomology of a complex writ
 degree-zero homogeneous localizations, with the differential of
 `polynomialVariableCechComplex_d_apply`. -/
 
+set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+set_option backward.isDefEq.respectTransparency.types false in
+set_option backward.isDefEq.respectTransparency false in
 set_option maxHeartbeats 1600000 in
 set_option synthInstance.maxHeartbeats 400000 in
 /-- **The explicit Čech complex computes the cohomology of `O(d)`.**
@@ -278,6 +281,9 @@ theorem polynomialVariableIntShift_isCechAcyclicCover (ι k : Type u) [Field k] 
   polynomialVariable_isCechAcyclicCover_of_isQuasicoherent ι k
     (intShift (polynomialGrading ι k) d) (polynomialIntShift_isQuasicoherent ι k d)
 
+set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+set_option backward.isDefEq.respectTransparency.types false in
+set_option backward.isDefEq.respectTransparency false in
 set_option maxHeartbeats 1600000 in
 set_option synthInstance.maxHeartbeats 400000 in
 /-- **The explicit Čech complex computes the cohomology of `O(d)` for a twist of either sign.**

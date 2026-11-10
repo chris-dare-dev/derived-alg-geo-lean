@@ -68,7 +68,7 @@ theorem exists_isPositiveFrame (hsig : HasSignatureTwo Q) : ∃ x y : M, IsPosit
     rw [htop] at h1
     simp only [finrank_top] at h1
     omega
-  obtain ⟨y', hy'⟩ := SetLike.exists_of_lt (lt_top_iff_ne_top.mpr hline)
+  obtain ⟨y', hy'⟩ := IsConcreteLE.exists_of_lt (lt_top_iff_ne_top.mpr hline)
   set x : M := (x' : M) with hx
   set y : M := (y' : M) with hy
   have hxW : x ∈ W := x'.2

@@ -181,6 +181,8 @@ def commStalkAddEquiv
     (stalkLinearEquiv X
       (show X.Presheaf RingCat.{u} from R ⋙ forget₂ CommRingCat RingCat) x M).toAddEquiv.symm
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The additive comparison respects scalar multiplication through the
 canonical ring-stalk isomorphism. -/
 theorem commStalkAddEquiv_symm_smul

@@ -116,6 +116,7 @@ variable {S} {H : D}
 
 /-! ### A uniform negative-definiteness constant on the family -/
 
+omit [FiniteDimensional ℝ D] in
 /-- The scaling step: a bound on the normalization of `x` is a bound on `x`. -/
 private theorem scale_bound {c : ℝ} {u : D} (hu : u ≠ 0)
     (hle : c ≤ -(S.pair (‖u‖⁻¹ • u) (‖u‖⁻¹ • u))) : S.pair u u ≤ -c * ‖u‖ ^ 2 := by

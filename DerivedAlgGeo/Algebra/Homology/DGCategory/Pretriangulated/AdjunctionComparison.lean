@@ -159,6 +159,8 @@ noncomputable def cotwistAdjointComparisonH0 :
     (cotwistAdjointComparison (rightAdj := rightAdj) leftAdj K)
     (cotwistAdjointComparison_isClosed (rightAdj := rightAdj) leftAdj K)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **The cotwist adjunction comparison factors through the ordinary `H⁰`
 unit and the cone inclusion.**
 

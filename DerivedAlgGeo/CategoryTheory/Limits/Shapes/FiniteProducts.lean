@@ -57,7 +57,7 @@ private noncomputable def finiteSupportCofanIsColimit {I : Type w} (X : I → C)
   · intro t m hm
     apply Sigma.hom_ext m (Sigma.desc (fun i : s => t.inj i))
     intro i
-    rw [Sigma.ι_desc]
+    rw [Sigma.ι_comp_desc]
     simpa [finiteSupportCofan, i.property] using hm i
 
 /-- Extend the coproduct cocone of a finite subfamily by zero maps on all other indices.

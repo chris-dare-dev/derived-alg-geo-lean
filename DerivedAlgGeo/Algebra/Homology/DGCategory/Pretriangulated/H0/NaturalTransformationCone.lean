@@ -305,6 +305,8 @@ theorem squareTriangleMorphism_hom₃ (X : C) :
       H0.homMk (C := D) (K.squareConeMorphism K' hu hv hsq X).hom :=
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **The triangle functors are natural in the transformation.**
 
 A strictly commuting square of closed degree-zero dg natural transformations
@@ -356,6 +358,8 @@ section StrictSquareIso
 
 variable {F' G' : DGFunctor C D} {α' : HomogeneousNatTrans F' G' 0}
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private noncomputable def squareTriangleIsoOfStrictSquare
     (K : ConeData α) (hα : IsClosed α)
     (K' : ConeData α') (hα' : IsClosed α')
@@ -408,6 +412,8 @@ private lemma squareTriangleIsoOfStrictSquare_hom
         (DGFunctor.isClosed_of_mem_cocycles eG.hom.2) hsq X := by
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- A strict square of closed dg natural transformations whose two endpoint
 maps are isomorphisms induces a natural isomorphism of their cone triangle
 functors.  Its third component is the `H⁰` image of the dg cone-functor
@@ -479,6 +485,8 @@ theorem triangleIsoOfStrictSquare_hom_app_hom₂
       (DGFunctor.h0Iso eG).hom.app X :=
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 theorem triangleIsoOfStrictSquare_hom_app_hom₃
     (K : ConeData α) (hα : IsClosed α)
     (K' : ConeData α') (hα' : IsClosed α')

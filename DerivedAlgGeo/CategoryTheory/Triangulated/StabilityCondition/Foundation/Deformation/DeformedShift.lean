@@ -29,6 +29,8 @@ variable {Λ : Type u'} [AddCommGroup Λ] {κ : K₀ C →+ Λ}
 
 namespace StabilityCondition.WithClassMap
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Forward shift for the owner deformed predicate. -/
 theorem deformedPred_shift_one
     (σ : StabilityCondition.WithClassMap C κ)

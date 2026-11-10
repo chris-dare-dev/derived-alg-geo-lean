@@ -58,6 +58,8 @@ lemma hom_singleFunctor_eq_zero_of_ext_subsingleton {Y : A} (hY : P Y) {a : ℤ}
   calc f = (f ≫ e.hom) ≫ e.inv := by rw [Category.assoc, e.hom_inv_id, Category.comp_id]
     _ = 0 := by rw [h, zero_comp]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **Dévissage.** No maps from `single 0 E` into a bounded object of `D^{≤ -1}` whose
 cohomology lies in `P`. Induction on the amplitude along the truncation triangles
 `τ_{< b} M → M → τ_{≥ b} M`; the first term is concentrated in one degree and the third has

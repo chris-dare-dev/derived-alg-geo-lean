@@ -220,9 +220,9 @@ def affineQuasicoherentDerivedPushforwardGammaIso
   letI : PreservesFiniteColimits H := by
     dsimp [H]
     exact comp_preservesFiniteColimits _ _
-  exact Functor.mapDerivedCategoryCompIso
+  exact Functor.mapDerivedCategoryCompIsoOfIso
       (affineQuasicoherentSheavesPushforwardGammaIso f) ≪≫
-    (Functor.mapDerivedCategoryCompIso (Iso.refl H)).symm
+    (Functor.mapDerivedCategoryCompIsoOfIso (Iso.refl H)).symm
 
 /-- Geometric affine derived pushforward is the transport of derived
 restriction of scalars through the affine derived equivalences. -/

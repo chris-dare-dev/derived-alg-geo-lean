@@ -60,6 +60,8 @@ variable {R : CommRingCat.{u}}
 local instance (U : TopologicalSpace.Opens (Spec R)) : HasBinaryProducts (Over U) :=
   Over.ConstructProducts.over_binaryProduct_of_pullback
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Explicit quasi-coherent data on `Spec R` refines to presentations on a basic-open cover. -/
 theorem exists_basicOpen_presentation_cover_of_quasicoherentData
     (M : (Spec R).Modules) (q : SheafOfModules.QuasicoherentData.{u, u, u, u} M) :
@@ -87,6 +89,8 @@ theorem exists_basicOpen_presentation_cover_of_quasicoherentData
     let W : Over (q.X i) := Over.mk (homOfLE ha)
     exact ⟨(q.presentation i).over W⟩
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- A quasi-coherent sheaf on `Spec R` has presentations on a basic-open cover.
 
 The algebraic cover condition says that the defining elements generate the unit ideal; equivalently,

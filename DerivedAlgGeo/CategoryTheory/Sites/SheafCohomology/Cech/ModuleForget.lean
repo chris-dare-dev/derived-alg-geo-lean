@@ -48,8 +48,8 @@ noncomputable def evalOpForget₂AddCommGrpIso
     rw [Limits.map_lift_piComparison]
     apply Limits.Pi.hom_ext
     intro i
-    rw [Limits.Pi.lift_π]
-    rw [Category.assoc, Limits.Pi.lift_π]
+    rw [Limits.Pi.lift_comp_π]
+    rw [Category.assoc, Limits.Pi.lift_comp_π]
     rw [← Category.assoc, Limits.piComparison_comp_π, ← F.map_comp]
 
 set_option backward.defeqAttrib.useBackward true in

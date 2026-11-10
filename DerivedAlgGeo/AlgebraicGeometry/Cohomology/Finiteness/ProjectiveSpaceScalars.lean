@@ -69,6 +69,8 @@ theorem openToLocalization_baseFieldToGlobalSections (r : k)
   exact openToLocalization_toSpecZero_appTop (polynomialGrading ι k)
     (algebraMap k ↥(polynomialGrading ι k 0) r) x
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **The base-field action on sections is scalar multiplication, fiber by fiber.**
 
 `varietyScalarAction` is multiplication by the global function attached to the scalar, and the
@@ -80,7 +82,7 @@ theorem varietyScalarAction_apply_fiber (r : k)
     (m : (associatedSheafInType (polynomialGrading ι k) 𝓜).1.obj (op U))
     (x : ProjectiveSpectrum.top (polynomialGrading ι k)) (hx : x ∈ U) :
     ((((Cohomology.varietyScalarAction (Proj (polynomialGrading ι k))
-        (associatedSheaf (polynomialGrading ι k) 𝓜) r).val.app (op U)).hom m) :
+        (associatedSheaf (polynomialGrading ι k) 𝓜) r).asHom.val.app (op U)).hom m) :
           (associatedSheafInType (polynomialGrading ι k) 𝓜).1.obj (op U)).1 ⟨x, hx⟩ =
       polynomialToHomogeneousLocalization ι k
           x.asHomogeneousIdeal.toIdeal.primeCompl r • (m.1 ⟨x, hx⟩) := by
@@ -120,12 +122,14 @@ theorem varietyScalarAction_app_eq (r : k)
     (U : Opens (ProjectiveSpectrum.top (polynomialGrading ι k)))
     (m : (associatedSheafInType (polynomialGrading ι k) 𝓜).1.obj (op U)) :
     (((Cohomology.varietyScalarAction (Proj (polynomialGrading ι k))
-        (associatedSheaf (polynomialGrading ι k) 𝓜) r).val.app (op U)).hom m :
+        (associatedSheaf (polynomialGrading ι k) 𝓜) r).asHom.val.app (op U)).hom m :
         (associatedSheafInType (polynomialGrading ι k) 𝓜).1.obj (op U)) =
       constSectionOn ι k U r • m :=
   Cohomology.globalSectionSmul_app (associatedSheaf (polynomialGrading ι k) 𝓜)
     (Cohomology.baseFieldToGlobalSections (Proj (polynomialGrading ι k)) r) U m
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **The canonical fraction-to-section map is `k`-linear.** It is pointwise `mapOfLE`, and the
 constant `r` restricted to the chart has value `r / 1` at every point, so both sides scale the
 same fiber by the same scalar. -/

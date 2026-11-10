@@ -173,11 +173,11 @@ noncomputable def slope (E : C) : WithTop ℝ :=
 
 theorem slope_of_im_pos {E : C} (h : 0 < (W.charge E).im) :
     W.slope E = ((-(W.charge E).re / (W.charge E).im : ℝ) : WithTop ℝ) :=
-  if_pos h
+  ite_eq_left h
 
 theorem slope_of_im_nonpos {E : C} (h : ¬0 < (W.charge E).im) :
     W.slope E = ⊤ :=
-  if_neg h
+  ite_eq_right h
 
 /-- The charge is invariant under isomorphism of ambient objects. -/
 theorem charge_eq_of_iso {E E' : C} (e : E ≅ E') :

@@ -88,6 +88,8 @@ theorem mem_intShift_zero_of_mem (n : ℕ) {m : M} (hm : m ∈ 𝓜 n) :
     m ∈ intShift 𝓜 (n : ℤ) 0 :=
   Or.inr ⟨n, by simp, hm⟩
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **A degree-`n` element of `𝓜` is the section `m / 1` of `M(n)~`, over any open.**
 
 Nothing is inverted, so the same fraction is valid at every point of every open, and restriction
@@ -103,6 +105,8 @@ def sectionOfMem (U : Opens X) (n : ℕ) {m : M} (hm : m ∈ 𝓜 n) :
       ⟨U, x.2, 𝟙 _, 0, ⟨m, mem_intShift_zero_of_mem 𝓜 n hm⟩, ⟨1, SetLike.one_mem_graded 𝒜⟩,
         fun _ => Ideal.IsPrime.one_notMem inferInstance, fun _ => rfl⟩⟩
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem sectionOfMem_apply (U : Opens X) (n : ℕ) {m : M} (hm : m ∈ 𝓜 n) (x : U) :
     (sectionOfMem 𝒜 𝓜 U n hm).1 x = DegreeZeroLocalization.mk

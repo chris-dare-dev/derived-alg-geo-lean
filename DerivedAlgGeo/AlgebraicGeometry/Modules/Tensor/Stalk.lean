@@ -56,7 +56,7 @@ noncomputable section
 variable (X : Scheme.{u}) (x : X) (L : X.Modules)
 
 private local instance : MonoidalCategory X.PresheafOfModules :=
-  PresheafOfModules.monoidalCategory (R := X.presheaf)
+  PresheafOfModulesOfCommRing.monoidalCategory (R := X.presheaf)
 
 private noncomputable def stalkTensorLinearEquiv (M : X.Modules) :
     TensorProduct (X.presheaf.stalk x)
@@ -89,8 +89,7 @@ private theorem stalkTensorLinearEquiv_natural {M N : X.Modules} (f : M ⟶ N) :
         (presheafModuleStalkFunctor X x).map
           (((toPresheafOfModules X).obj L) ◁ ((toPresheafOfModules X).map f)) := by
   ext t
-  refine TensorProduct.induction_on t ?_ ?_ ?_
-  · simp
+  refine TensorProduct.inductionOn t ?_ ?_
   · intro a b
     let P := (toPresheafOfModules X).obj L
     let Q := (toPresheafOfModules X).obj M
@@ -116,7 +115,7 @@ private theorem stalkTensorLinearEquiv_natural {M N : X.Modules} (f : M ⟶ N) :
       change _root_.PresheafOfModules.stalkMapAdd (𝟙 P) x
           (TopCat.Presheaf.germ P.presheaf U x hxU m) = _
       rw [_root_.PresheafOfModules.stalkMapAdd_germ]
-      simp
+      rfl
     have hwhisker : (𝟙 P) ⊗ₘ g = P ◁ g := by
       rfl
     simpa only [TensorProduct.map_tmul, hid, LinearMap.id_apply, hwhisker] using h.symm

@@ -82,29 +82,29 @@ left as it is. -/
 @[reducible]
 noncomputable def homModuleGlobal (M N : X.Modules) :
     Module Γ(X, (⊤ : X.Opens)) (M ⟶ N) where
-  smul r f := globalSectionAction M r ≫ f
+  smul r f := (globalSectionAction M r).asHom ≫ f
   one_smul f := by
-    show globalSectionAction M 1 ≫ f = f
+    show (globalSectionAction M 1).asHom ≫ f = f
     rw [map_one]
     exact Category.id_comp f
   mul_smul r s f := by
-    show globalSectionAction M (r * s) ≫ f
-      = globalSectionAction M r ≫ globalSectionAction M s ≫ f
-    rw [mul_comm, map_mul, End.mul_def, Category.assoc]
+    show (globalSectionAction M (r * s)).asHom ≫ f
+      = (globalSectionAction M r).asHom ≫ (globalSectionAction M s).asHom ≫ f
+    rw [mul_comm, map_mul, End.mul_asHom, Category.assoc]
   smul_zero r := by
-    show globalSectionAction M r ≫ (0 : M ⟶ N) = 0
+    show (globalSectionAction M r).asHom ≫ (0 : M ⟶ N) = 0
     exact Limits.comp_zero
   smul_add r f g := by
-    show globalSectionAction M r ≫ (f + g)
-      = globalSectionAction M r ≫ f + globalSectionAction M r ≫ g
+    show (globalSectionAction M r).asHom ≫ (f + g)
+      = (globalSectionAction M r).asHom ≫ f + (globalSectionAction M r).asHom ≫ g
     exact Preadditive.comp_add _ _ _ _ _ _
   add_smul r s f := by
-    show globalSectionAction M (r + s) ≫ f
-      = globalSectionAction M r ≫ f + globalSectionAction M s ≫ f
+    show (globalSectionAction M (r + s)).asHom ≫ f
+      = (globalSectionAction M r).asHom ≫ f + (globalSectionAction M s).asHom ≫ f
     rw [map_add]
     exact Preadditive.add_comp _ _ _ _ _ _
   zero_smul f := by
-    show globalSectionAction M 0 ≫ f = 0
+    show (globalSectionAction M 0).asHom ≫ f = 0
     rw [map_zero]
     exact Limits.zero_comp
 
@@ -120,10 +120,10 @@ noncomputable instance modulesLinearGlobal :
     Linear Γ(X, (⊤ : X.Opens)) X.Modules where
   homModule M N := homModuleGlobal X M N
   smul_comp M N P r f g := by
-    show (globalSectionAction M r ≫ f) ≫ g = globalSectionAction M r ≫ f ≫ g
+    show ((globalSectionAction M r).asHom ≫ f) ≫ g = (globalSectionAction M r).asHom ≫ f ≫ g
     exact Category.assoc _ _ _
   comp_smul M N P f r g := by
-    show f ≫ globalSectionAction N r ≫ g = globalSectionAction M r ≫ f ≫ g
+    show f ≫ (globalSectionAction N r).asHom ≫ g = (globalSectionAction M r).asHom ≫ f ≫ g
     rw [← Category.assoc, ← Category.assoc]
     congr 1
     exact (globalSectionSmul_naturality f r).symm
@@ -142,29 +142,29 @@ Precomposition rather than postcomposition is an arbitrary choice;
 where that is spent. -/
 @[reducible]
 noncomputable def homModule (M N : Y.Modules) : Module k (M ⟶ N) where
-  smul r f := varietyScalarAction Y M r ≫ f
+  smul r f := (varietyScalarAction Y M r).asHom ≫ f
   one_smul f := by
-    show varietyScalarAction Y M 1 ≫ f = f
+    show (varietyScalarAction Y M 1).asHom ≫ f = f
     rw [map_one]
     exact Category.id_comp f
   mul_smul r s f := by
-    show varietyScalarAction Y M (r * s) ≫ f
-      = varietyScalarAction Y M r ≫ varietyScalarAction Y M s ≫ f
-    rw [mul_comm, map_mul, End.mul_def, Category.assoc]
+    show (varietyScalarAction Y M (r * s)).asHom ≫ f
+      = (varietyScalarAction Y M r).asHom ≫ (varietyScalarAction Y M s).asHom ≫ f
+    rw [mul_comm, map_mul, End.mul_asHom, Category.assoc]
   smul_zero r := by
-    show varietyScalarAction Y M r ≫ (0 : M ⟶ N) = 0
+    show (varietyScalarAction Y M r).asHom ≫ (0 : M ⟶ N) = 0
     exact Limits.comp_zero
   smul_add r f g := by
-    show varietyScalarAction Y M r ≫ (f + g)
-      = varietyScalarAction Y M r ≫ f + varietyScalarAction Y M r ≫ g
+    show (varietyScalarAction Y M r).asHom ≫ (f + g)
+      = (varietyScalarAction Y M r).asHom ≫ f + (varietyScalarAction Y M r).asHom ≫ g
     exact Preadditive.comp_add _ _ _ _ _ _
   add_smul r s f := by
-    show varietyScalarAction Y M (r + s) ≫ f
-      = varietyScalarAction Y M r ≫ f + varietyScalarAction Y M s ≫ f
+    show (varietyScalarAction Y M (r + s)).asHom ≫ f
+      = (varietyScalarAction Y M r).asHom ≫ f + (varietyScalarAction Y M s).asHom ≫ f
     rw [map_add]
     exact Preadditive.add_comp _ _ _ _ _ _
   zero_smul f := by
-    show varietyScalarAction Y M 0 ≫ f = 0
+    show (varietyScalarAction Y M 0).asHom ≫ f = 0
     rw [map_zero]
     exact Limits.zero_comp
 
@@ -177,17 +177,19 @@ statement that multiplication by a global function is central. -/
 noncomputable instance modulesLinear : Linear k Y.Modules where
   homModule M N := homModule Y M N
   smul_comp M N P r f g := by
-    show (varietyScalarAction Y M r ≫ f) ≫ g = varietyScalarAction Y M r ≫ f ≫ g
+    show ((varietyScalarAction Y M r).asHom ≫ f) ≫ g =
+      (varietyScalarAction Y M r).asHom ≫ f ≫ g
     exact Category.assoc _ _ _
   comp_smul M N P f r g := by
-    show f ≫ varietyScalarAction Y N r ≫ g = varietyScalarAction Y M r ≫ f ≫ g
+    show f ≫ (varietyScalarAction Y N r).asHom ≫ g =
+      (varietyScalarAction Y M r).asHom ≫ f ≫ g
     rw [← Category.assoc, ← varietyScalarAction_naturality Y f r, Category.assoc]
 
 omit [IsVariety k Y] in
 /-- The scalar action, unfolded. This is the computation rule for everything
 above; `Linear k` alone says a `k`-module structure exists but not which one. -/
 theorem smul_eq_action_comp {M N : Y.Modules} (r : k) (f : M ⟶ N) :
-    r • f = varietyScalarAction Y M r ≫ f :=
+    r • f = (varietyScalarAction Y M r).asHom ≫ f :=
   rfl
 
 /-- **Coherent sheaves on a variety form a `k`-linear category**, inherited from

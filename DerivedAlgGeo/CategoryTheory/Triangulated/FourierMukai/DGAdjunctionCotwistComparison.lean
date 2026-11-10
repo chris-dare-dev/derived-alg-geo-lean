@@ -95,12 +95,16 @@ noncomputable def presentedUnitTriangleObjIso (Z : X) :
     (Iso.refl _) (Iso.refl _) ?_
   simp [RightAdjointKernelData.ofH0Presentation_adj]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The first component of the unit-triangle comparison is the identity. -/
 @[simp]
 theorem presentedUnitTriangleObjIso_hom_hom₁ (Z : X) :
     ((S.presentedUnitTriangleObjIso adj H K hE Z).hom).hom₁ = 𝟙 Z := by
   simp [presentedUnitTriangleObjIso]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The second component of the unit-triangle comparison is the identity. -/
 @[simp]
 theorem presentedUnitTriangleObjIso_hom_hom₂ (Z : X) :

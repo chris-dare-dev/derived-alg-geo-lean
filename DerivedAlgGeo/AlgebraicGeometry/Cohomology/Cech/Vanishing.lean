@@ -41,6 +41,8 @@ attribute [local instance] MvPolynomial.gradedAlgebra
 
 variable (ι k : Type u) [Field k]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **The algebraic Čech complex of `O(d)` is exact in every positive degree.** This is the
 cochain-level homotopy computation `cechPrimitive_isPrimitive`, read through the coordinate
 formula for the differential. -/
@@ -74,6 +76,10 @@ theorem polynomialVariableCechComplex_homology_isZero (d n : ℕ) :
   ((polynomialVariableCechComplex ι k d).exactAt_iff_isZero_homology (n + 1)).mp
     (polynomialVariableCechComplex_exactAt ι k d n)
 
+set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+set_option backward.isDefEq.respectTransparency.types false in
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **`Hⁿ(Pⁿ, O(d)) = 0` for `n ≥ 1` and `d ≥ 0`**, stated as the triviality of the derived
 sections group. The twist is a natural number, which is the whole of the `d ≥ 0` hypothesis;
 the projective space is `Proj` of a polynomial ring in an arbitrary — possibly infinite —
@@ -108,6 +114,8 @@ takes the vanishing of the full block as an input, and the two statements differ
 lemma discharges it. The consequence is the expected one — over `Fintype.card ι = N + 1`
 variables, `Hⁱ` vanishes for `0 < i < N` at either sign, and degree `N` is left open. -/
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **The algebraic Čech complex of an integer twist is exact below the top degree.**
 
 `hcard` is the whole of the difference from `polynomialVariableCechComplex_exactAt`: a cochain in
@@ -147,6 +155,10 @@ theorem polynomialVariableIntCechComplex_homology_isZero [Fintype ι] (d : ℤ) 
   ((polynomialVariableIntCechComplex ι k d).exactAt_iff_isZero_homology (n + 1)).mp
     (polynomialVariableIntCechComplex_exactAt ι k d n hcard)
 
+set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+set_option backward.isDefEq.respectTransparency.types false in
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **`Hⁱ(Pⁿ, O(d)) = 0` for `0 < i < n` and either sign of `d`.**
 
 With `Fintype.card ι = n + 1` the hypothesis `i + 1 < Fintype.card ι` reads `i < n`, so this is

@@ -89,6 +89,8 @@ theorem moduleFinite_gammaPushforward (hφ : Function.Surjective φ.hom)
       (moduleSpecΓFunctor.obj ((Scheme.Modules.pushforward (Spec.map φ)).obj M)) :=
   moduleFinite_gammaPushforward_of_finite φ (RingHom.Finite.of_surjective φ.hom hφ) M hM
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **Coherence is preserved by pushforward along a finite map of affine schemes.**
 
 The tilde identification is what makes this true rather than merely plausible: the pushforward

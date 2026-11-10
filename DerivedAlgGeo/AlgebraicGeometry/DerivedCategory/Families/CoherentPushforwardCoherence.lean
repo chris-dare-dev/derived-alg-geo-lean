@@ -108,14 +108,14 @@ def coherentDerivedPushforwardId (T : SchemeBaseChange S)
     Functor.mapDerivedCategoryIdIso (Coh T.left)
 
 /-- The composite of two derived direct images is the derived direct image along the
-composite: `Functor.mapDerivedCategoryCompIso` at the factorization `sheafPushforwardComp`,
+composite: `Functor.mapDerivedCategoryCompIsoOfIso` at the factorization `sheafPushforwardComp`,
 which is exactly the shape of `derivedPullbackComp` on the pullback side. -/
 def coherentDerivedPushforwardComp {T U V : SchemeBaseChange S} (f : T ⟶ U) (g : U ⟶ V)
     [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left] [IsLocallyNoetherian V.left]
     [HasCoherentPushforward f] [HasCoherentPushforward g] [HasCoherentPushforward (f ≫ g)] :
     coherentDerivedPushforward f ⋙ coherentDerivedPushforward g ≅
       coherentDerivedPushforward (f ≫ g) :=
-  Functor.mapDerivedCategoryCompIso (HasCoherentPushforward.sheafPushforwardComp f g)
+  Functor.mapDerivedCategoryCompIsoOfIso (HasCoherentPushforward.sheafPushforwardComp f g)
 
 end Derived
 

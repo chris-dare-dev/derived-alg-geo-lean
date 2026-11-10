@@ -87,8 +87,8 @@ theorem betaTwist_eq_exp (β : ℝ) (v : NumClass) :
     threefoldVec (betaTwist β v) = Exp.twist 3 β (threefoldVec v) := by
   funext i
   fin_cases i <;>
-    norm_num [Exp.twist_apply, Fin.sum_univ_succ, Nat.factorial,
-      threefoldVec, betaTwist, deg0, deg1, deg2, deg3] <;> ring
+    simp [Exp.twist_apply, Fin.sum_univ_succ, Nat.factorial, threefoldVec, betaTwist, deg0, deg1,
+      deg2, deg3, Fin.succ] <;> ring
 
 /-- **The group law**: twisting by `β₁ + β₂` is twisting by `β₂` and then by
 `β₁`.  This is `e^{-(β₁+β₂)H} = e^{-β₁H}e^{-β₂H}` on the four degrees, and it is

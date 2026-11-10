@@ -186,6 +186,8 @@ theorem targetTransformIso_hom :
       E.transformMap (e.equiv.counitIso.app L).hom ≫ targetIso.hom :=
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The stored transform equation rewritten as the literal endpoint square. -/
 theorem transform_arrow_square :
     E.transformMap (e.equiv.functor.map
@@ -208,12 +210,10 @@ theorem transform_arrow_square :
             simp only [← Correspondence.transformMapIso_hom,
               ← Correspondence.transformMapIso_inv, Category.assoc,
               Iso.hom_inv_id_assoc]
-            rfl
     _ = (E.transformMapIso (e.equiv.counitIso.app K)).hom ≫
         (sourceIso.hom ≫ α ≫ targetIso.inv) ≫
           targetIso.hom := by
             rw [S.transform_arrow]
-            rfl
     _ = (E.transformMap (e.equiv.counitIso.app K).hom ≫
         sourceIso.hom) ≫ α := by
           simp [Category.assoc]

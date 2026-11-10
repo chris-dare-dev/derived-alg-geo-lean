@@ -46,8 +46,8 @@ private theorem Module.fixedTerminal_mapExtendScalars_mk
 private theorem Module.fixedTerminal_uniformDenominator
     {R A M₀ M₁ L₀ L₁ T : Type*} [CommRing R] [CommRing A] [Algebra R A]
     (S : Submonoid R) [IsLocalization S A]
-    [AddCommGroup M₀] [Module R M₀] [Module A M₀] [IsScalarTower R A M₀]
-    [AddCommGroup M₁] [Module R M₁] [Module A M₁] [IsScalarTower R A M₁]
+    [AddCommGroup M₀] [Module A M₀]
+    [AddCommGroup M₁] [Module A M₁]
     [AddCommGroup L₀] [Module R L₀] [Module.FinitePresentation R L₀]
     [AddCommGroup L₁] [Module R L₁]
     [AddCommGroup T] [Module R T]

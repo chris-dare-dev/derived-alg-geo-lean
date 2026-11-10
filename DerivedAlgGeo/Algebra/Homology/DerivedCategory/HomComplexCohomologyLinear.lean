@@ -51,9 +51,9 @@ def derivedCategoryHomLinearEquiv :
     map_smul' := by
       intro r x
       obtain ⟨z, rfl⟩ := CohomologyClass.mk_surjective x
-      rw [← cohomologyClass_mk_smul K L 0 r z]
-      change derivedCategoryHomAddEquiv K L (CohomologyClass.mk (r • z)) =
+      change derivedCategoryHomAddEquiv K L (r • CohomologyClass.mk z) =
         r • derivedCategoryHomAddEquiv K L (CohomologyClass.mk z)
+      rw [← cohomologyClass_mk_smul K L 0 r z]
       simp only [derivedCategoryHomAddEquiv_apply_eq,
         cohomologyClassHomotopyAddEquiv_mk]
       have h : (r • z).homOf = r • z.homOf := by

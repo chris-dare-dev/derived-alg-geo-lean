@@ -197,6 +197,8 @@ theorem cochainLocalizedMap_delta (m : ℤ) (γ : Cochain P Q n) :
       δ n m (cochainLocalizedMap P Q n S γ) := by
   exact (δ_map n m γ (ModuleCat.localizedModuleFunctor.{u} S)).symm
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private def localizedHomEquiv (M N : ModuleCat.{u} R) :
     ((ModuleCat.localizedModuleFunctor.{u} S).obj M ⟶
       (ModuleCat.localizedModuleFunctor.{u} S).obj N) ≃ₗ[R]
@@ -359,16 +361,16 @@ private def halfBoundedFiniteEquiv :
     by_cases hp : p ∈ Finset.Icc (c - n) b
     · change (if h : p ∈ Finset.Icc (c - n) b then
           γ.v p (p + n) rfl else 0) = γ.v p (p + n) rfl
-      simp only [dif_pos hp]
+      simp only [dite_eq_left hp]
     · rw [halfBounded_eq_zero_outside P Q c b n γ p hp]
       change (if h : p ∈ Finset.Icc (c - n) b then
           γ.v p (p + n) rfl else 0) = 0
-      simp only [dif_neg hp]
+      simp only [dite_eq_right hp]
   right_inv v := by
     funext i
     change (if h : (i : ℤ) ∈ Finset.Icc (c - n) b then
         v ⟨i.1, h⟩ else 0) = v i
-    simp only [dif_pos i.2]
+    simp only [dite_eq_left i.2]
 
 end HalfBoundedCochains
 

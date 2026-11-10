@@ -195,6 +195,8 @@ private lemma freeYonedaEquivFreeMapComp {C : Type u} [Category C]
   rw [h1]
   exact (yonedaEquiv_naturality _ _).symm
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private lemma freeYonedaUnitMap_app_freeMk
     (X : Scheme.{u}) (U W : X.Opens) (f : W ⟶ U) :
     (freeYonedaUnitMap X U).app (op W) (ModuleCat.freeMk f) =
@@ -210,9 +212,11 @@ private lemma freeYonedaUnitMap_app_freeMk
   have hu : (PresheafOfModules.unit X.ringCatSheaf.obj).map f.op
       (moduleUnitOne (X.ringCatSheaf.obj.obj (op U))) =
       moduleUnitOne (X.ringCatSheaf.obj.obj (op W)) := by
-    simp [moduleUnitOne, _root_.PresheafOfModules.unit_map_one]
+    exact _root_.PresheafOfModules.unit_map_one _ f.op
   exact h.trans hu
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private noncomputable def freePUnitRegularIso (S : Type u) [Ring S] :
     ModuleCat.of S S ≅ (ModuleCat.free S).obj PUnit.{u + 1} := by
   refine ⟨ModuleCat.ofHom (Finsupp.lsingle PUnit.unit),
@@ -237,6 +241,8 @@ private noncomputable def freeUniqueRegularIso (S : Type u) [Ring S]
   exact (Functor.mapIso (ModuleCat.free S) (Equiv.toIso e)) ≪≫
     (freePUnitRegularIso S).symm
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private theorem freeUniqueRegularIso_hom_freeMk (S : Type u) [Ring S]
     (T : Type u) [Unique T] (t : T) :
     (freeUniqueRegularIso S T).hom (ModuleCat.freeMk t) = 1 := by
@@ -246,6 +252,8 @@ private theorem freeUniqueRegularIso_hom_freeMk (S : Type u) [Ring S]
   change (Finsupp.lapply PUnit.unit) (Finsupp.single PUnit.unit 1) = 1
   rw [Finsupp.lapply_apply, Finsupp.single_eq_same]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private lemma freeYonedaUnitMap_app_isIso_of_le
     (X : Scheme.{u}) (U W : X.Opens) (hWU : W ≤ U) :
     IsIso ((freeYonedaUnitMap X U).app (op W)) := by
@@ -358,6 +366,8 @@ private noncomputable def freeYonedaUnitSheafMap
     (PresheafOfModules.sheafificationAdjunction (𝟙 X.ringCatSheaf.obj)).counit.app
       (SheafOfModules.unit X.ringCatSheaf)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private lemma freeYonedaUnitSheafMap_stalk_isIso
     (X : Scheme.{u}) (U : X.Opens) (x : X) (hxU : x ∈ U) :
     IsIso ((moduleStalkFunctor X x).map (freeYonedaUnitSheafMap X U)) := by

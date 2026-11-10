@@ -98,18 +98,18 @@ theorem isStrictArtinianObject_of_strictMono {X : A} {Y : D}
     [IsStrictArtinianObject Y] : IsStrictArtinianObject X :=
   ObjectProperty.is_of_prop _
     (show WellFoundedLT (StrictSubobject X) from
-      ⟨Subrelation.wf (fun hab => hG hab)
-        (InvImage.wf G (IsWellFounded.wf :
-          WellFounded ((· < ·) : StrictSubobject Y → _ → Prop)))⟩)
+      Subrelation.wf (fun hab => hG hab)
+        (InvImage.wf G (isStrictArtinianObject.prop_of_is Y :
+          WellFounded ((· < ·) : StrictSubobject Y → _ → Prop))))
 
 /-- **The strict-Noetherian condition descends along any strictly monotone map
 of strict subobjects**, by the same argument with the order reversed. -/
 theorem isStrictNoetherianObject_of_strictMono {X : A} {Y : D}
     (G : StrictSubobject X → StrictSubobject Y) (hG : StrictMono G)
     [IsStrictNoetherianObject Y] : IsStrictNoetherianObject X := by
-  refine ObjectProperty.is_of_prop _ ⟨?_⟩
+  refine ObjectProperty.is_of_prop _ ?_
   have hw : WellFounded (InvImage (· > · : StrictSubobject Y → _ → Prop) G) :=
-    InvImage.wf _ IsWellFounded.wf
+    InvImage.wf _ (isStrictNoetherianObject.prop_of_is Y)
   exact Subrelation.wf (fun hab => hG hab) hw
 
 include hF harr in

@@ -45,6 +45,8 @@ attribute [local instance] Coh.ι_additive Coh.ι_preservesFiniteLimits
 
 variable {R : CommRingCat.{u}} [IsNoetherianRing R]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- `Ext^(n+1) (𝒪^k, G)` in all module sheaves vanishes for coherent `G` on `Spec R`: it is
 `H^(n+1)(G)^k`, and quasi-coherent sheaves on an affine scheme have no higher cohomology. -/
 theorem subsingleton_ext_ι_affineFree (k : ℕ) (Y : Coh (Spec R)) (n : ℕ) :

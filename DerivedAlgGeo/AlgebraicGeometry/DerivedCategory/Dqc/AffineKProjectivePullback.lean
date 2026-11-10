@@ -81,10 +81,8 @@ noncomputable def affineKProjectiveSchemeModulePullbackComparison
   let QhTarget := DerivedCategory.Qh (C := (Spec A).Modules)
   let E := CategoryTheory.kProjectiveQhEquivalence (ModuleCat R)
   let I := ObjectProperty.ι (CategoryTheory.kProjectiveHomotopy (ModuleCat R))
-  letI : (AlgebraicGeometry.tilde.functor R).Additive :=
-    AlgebraicGeometry.instAdditiveModuleCatCarrierModulesSpecOfFunctor
-  letI : (AlgebraicGeometry.tilde.functor A).Additive :=
-    AlgebraicGeometry.instAdditiveModuleCatCarrierModulesSpecOfFunctor
+  letI : (AlgebraicGeometry.tilde.functor R).Additive := inferInstance
+  letI : (AlgebraicGeometry.tilde.functor A).Additive := inferInstance
   letI : G.Additive := affineExtendScalars_additive f
   letI : F.Additive := inferInstance
   letI : (G ⋙ T).Additive := inferInstance

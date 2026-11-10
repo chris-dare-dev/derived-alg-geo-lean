@@ -129,14 +129,14 @@ noncomputable def matchIndex (i : I) : J :=
 /-- Singleton source blocks match singleton target blocks. -/
 theorem matchIndex_length_eq_one {i : I} (hi : A.blockLength i = 1) :
     B.blockLength (A.matchIndex B F hA i) = 1 := by
-  rw [matchIndex, dif_pos hi]
+  rw [matchIndex, dite_eq_left hi]
   exact (Classical.choose_spec ((B.spherical_complete _).mp
       (F.mapSpherical (A.candidate_spherical (i := i) hi)))).1
 
 /-- Longer source blocks match longer target blocks. -/
 theorem matchIndex_length_two_le {i : I} (hi : 2 ≤ A.blockLength i) :
     2 ≤ B.blockLength (A.matchIndex B F hA i) := by
-  rw [matchIndex, dif_neg (by omega)]
+  rw [matchIndex, dite_eq_right (by omega)]
   exact (Classical.choose_spec ((B.pseudoprojective_complete _).mp
     (F.mapPseudoprojective
       (A.candidate_pseudoprojective (i := i) hi)))).1
@@ -147,10 +147,10 @@ theorem matchIndex_spec (i : I) :
     IsShiftOf (F.equiv.functor.obj (A.candidate i))
       (B.candidate (A.matchIndex B F hA i)) := by
   by_cases hi : A.blockLength i = 1
-  · rw [matchIndex, dif_pos hi]
+  · rw [matchIndex, dite_eq_left hi]
     exact (Classical.choose_spec ((B.spherical_complete _).mp
       (F.mapSpherical (A.candidate_spherical (i := i) hi)))).2
-  · rw [matchIndex, dif_neg hi]
+  · rw [matchIndex, dite_eq_right hi]
     exact (Classical.choose_spec ((B.pseudoprojective_complete _).mp
       (F.mapPseudoprojective
         (A.candidate_pseudoprojective (i := i) (by

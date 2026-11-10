@@ -623,8 +623,7 @@ theorem weakStabilityFunctionOnHeart_hasHN
           rw [σ.slicing.phiMinus_eq C X.obj hXobj F hnF hlast]
           have hidx : (⟨F.n - 1, by lia⟩ : Fin F.n) = ⟨0, hnF⟩ :=
             Fin.ext (by lia)
-          simpa only [CategoryTheory.Triangulated.HNFiltration.phiMinus,
-            hidx, phi]
+          simp only [CategoryTheory.Triangulated.HNFiltration.phiMinus, hidx, phi]
         have hphiPlus : σ.slicing.phiPlus C X.obj hXobj = phi := by
           simpa only [phi,
             CategoryTheory.Triangulated.HNFiltration.phiPlus] using

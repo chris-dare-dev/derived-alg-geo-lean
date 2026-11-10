@@ -39,9 +39,9 @@ variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 The three components are the scalar endomorphisms, and they commute with the differentials by
 `coherentScalarAction_naturality`. -/
 noncomputable def coherentScalarShortComplexHom (S : ShortComplex (Coh X)) (r : k) : S ⟶ S where
-  τ₁ := coherentScalarAction X S.X₁ r
-  τ₂ := coherentScalarAction X S.X₂ r
-  τ₃ := coherentScalarAction X S.X₃ r
+  τ₁ := (coherentScalarAction X S.X₁ r).asHom
+  τ₂ := (coherentScalarAction X S.X₂ r).asHom
+  τ₃ := (coherentScalarAction X S.X₃ r).asHom
   comm₁₂ := coherentScalarAction_naturality X S.f r
   comm₂₃ := coherentScalarAction_naturality X S.g r
 

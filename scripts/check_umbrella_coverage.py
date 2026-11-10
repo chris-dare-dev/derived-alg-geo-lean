@@ -55,8 +55,8 @@ DECLARATION_OWNERS: dict[str, OwnerWitness] = {
         "f6b638dcf86abf6c283430e653c272d8fd954ab8505861b8e4427c71db040572",
     ),
     "DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor": OwnerWitness(
-        52, "noncomputable def Adjunction.mapHomologicalComplex {F : A ⥤ B} {G : B ⥤ A}",
-        "1942305c616505a96521329d29eeee59f56a0a997c57cbd7efda11badb5aaf90",
+        68, "noncomputable def Adjunction.mapHomologicalComplex {F : A ⥤ B} {G : B ⥤ A}",
+        "ffeaa23911af287a408bb8cd37300c817e84f4cbe7c6dd58d4191a0039e4264a",
     ),
     "DerivedAlgGeo.Algebra.Homology.DerivedCategory.GrothendieckGroup": OwnerWitness(
         39, "noncomputable abbrev boundedHomologyFunctor (n : ℤ) : Bounded A ⥤ A :=",
@@ -64,11 +64,11 @@ DECLARATION_OWNERS: dict[str, OwnerWitness] = {
     ),
     "DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc": OwnerWitness(
         69, "def schemeQuasicoherentCohomology (X : Scheme.{u}) :",
-        "086a240909d517ef39778d2849fd19cef4554c7aa24a1e5ce0e156119fe5b461",
+        "cab1b1ba7cd9f40af4d175a3ec76d5a7adf020b8a230de15672b90fa0b2b1433",
     ),
     "DerivedAlgGeo.AlgebraicGeometry.Modules.ExteriorPower": OwnerWitness(
         38, "noncomputable def exteriorPower (E : X.Modules) (n : ℕ) : X.Modules :=",
-        "462550a756d79d7d97520e2acffdbf5aee863f4e0cb77a1e1f9049028fd493ba",
+        "19290a0c4f31c13adce63d9f0383a3befa8d39f15059bdd4db594a6301f3c9a6",
     ),
     "DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids": OwnerWitness(
         35, "structure StackInGroupoids (C : Type u) [Category.{v} C]",
@@ -80,11 +80,11 @@ DECLARATION_OWNERS: dict[str, OwnerWitness] = {
     ),
     "DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing": OwnerWitness(
         37, "structure HNFiltration (P : ℝ → ObjectProperty C) (E : C)",
-        "682eed28ebde9ebd721e1a5c83ea380a714c635843a8bf6bf475d6c99ebb6ad8",
+        "25bf8a6514b3969583fded99bc645bf5d0e52ae2691aca048f493245da34a554",
     ),
     "DerivedAlgGeo.Topology.Sheaves.ModuleTensor": OwnerWitness(
         29, "lemma W_whiskerLeft_of_isIso_stalk",
-        "6846f0bd32b52ebcf58062b76a92ae891d9149e8cfaf4b8595baa364dc8c0e3d",
+        "100432a9057017e6746e5b6f771a71a67c744a1cb52fa096f345f17c081a53d9",
     ),
 }
 

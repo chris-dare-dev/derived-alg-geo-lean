@@ -24,6 +24,8 @@ noncomputable section
 
 namespace AlgebraicGeometry.Coh
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- A mono of coherent sheaves on a noetherian affine scheme is represented by
 the tilde inclusion of the range of its map on finite global sections. -/
 private theorem exists_tilde_representation_of_mono

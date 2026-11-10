@@ -219,12 +219,12 @@ theorem phaseOne_endpoints_of_heart_shortExact
       have hre₁ : (Z.charge S.X₁).re < 0 := by
         rcases Z.nonzero_mem S.X₁ h₁ with h | h
         · exfalso
-          simpa [him₁] using h
+          simp [him₁] at h
         · exact h.2
       have hre₃ : (Z.charge S.X₃).re < 0 := by
         rcases Z.nonzero_mem S.X₃ h₃ with h | h
         · exfalso
-          simpa [him₃] using h
+          simp [him₃] at h
         · exact h.2
       have hphase₁ : Z.phase S.X₁ = 1 := by
         rw [StabilityFunction.phase]

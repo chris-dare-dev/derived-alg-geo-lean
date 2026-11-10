@@ -180,6 +180,8 @@ noncomputable def shiftSignIso (n : ℤ) (X : C) : X ≅ X where
     simp only [Linear.comp_units_smul, Category.comp_id, smul_smul,
       Int.units_mul_self, one_smul]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Mapping a triangle by `[n]` with the sign-correct `CommShift` agrees with
 the canonical shift of that triangle. -/
 noncomputable def shiftFunctorMapTriangleIso (n : ℤ) :

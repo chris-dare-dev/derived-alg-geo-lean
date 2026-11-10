@@ -107,6 +107,8 @@ theorem awayToSection_isLocalizationElem_apply {d e : ℕ} {f g : A} (hf : f ∈
         (basicOpen_le_basicOpen_pow 𝒜 g e x.2) :=
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **`awayToSection` carries `(f ^ d / g ^ e) ^ n` to the section of the same name.**
 
 This is the dictionary entry `#585` needs: the chart lemmas clear the away-ring element

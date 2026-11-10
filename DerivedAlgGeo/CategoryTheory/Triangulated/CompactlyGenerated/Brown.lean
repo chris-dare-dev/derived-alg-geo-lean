@@ -199,7 +199,7 @@ theorem initialHom_surjective (A Z : C) (hZ : G Z) :
   refine
     ⟨eqToHom hj.symm ≫ Sigma.ι (evaluationSource (G := G) A) j, ?_⟩
   change (eqToHom hj.symm ≫ Sigma.ι _ j) ≫ Sigma.desc _ = f
-  rw [Category.assoc, Sigma.ι_desc, hmap]
+  rw [Category.assoc, Sigma.ι_comp_desc, hmap]
 
 /-- One stage of the Brown approximation tower. -/
 structure Stage (G : ObjectProperty C) (A : C) where
@@ -248,7 +248,7 @@ theorem kernelHom_comp_stageHom {A : C} (s : Stage G A) :
   change Sigma.desc (kernelMap s) ≫ s.hom = 0
   apply Sigma.hom_ext
   intro i
-  rw [← Category.assoc, Sigma.ι_desc]
+  rw [← Category.assoc, Sigma.ι_comp_desc]
   rw [comp_zero]
   change ((equivShrink
     { f : (generator (G := G) i.1)⟦(-1 : ℤ)⟧ ⟶ s.obj //
@@ -305,7 +305,7 @@ theorem stepData_nonempty {A : C} (s : Stage G A) :
     calc
       kernelMap s i ≫ t =
           (Sigma.ι (kernelSource s) i ≫ Sigma.desc (kernelMap s)) ≫ t := by
-            rw [Sigma.ι_desc]
+            rw [Sigma.ι_comp_desc]
       _ = Sigma.ι (kernelSource s) i ≫
           (Sigma.desc (kernelMap s) ≫ t) := Category.assoc _ _ _
       _ = Sigma.ι (kernelSource s) i ≫ 0 := by rw [hzero]

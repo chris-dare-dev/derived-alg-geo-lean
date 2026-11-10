@@ -77,7 +77,7 @@ def congr : WeakSlopeData B where
     simpa using D.rank_nonneg (e.inverse.obj E)
   degree_nonneg_of_rank_zero E hE hrank := by
     simp only [AddMonoidHom.coe_comp, Function.comp_apply, AddEquiv.toAddMonoidHom_eq_coe,
-      AddMonoidHom.coe_coe, K₀Ab.congr_symm_of] at hrank ⊢
+      AddMonoidHom.coe_ofClass, K₀Ab.congr_symm_of] at hrank ⊢
     exact D.degree_nonneg_of_rank_zero _ (not_isZero_inverse_obj e hE) hrank
 
 @[simp]

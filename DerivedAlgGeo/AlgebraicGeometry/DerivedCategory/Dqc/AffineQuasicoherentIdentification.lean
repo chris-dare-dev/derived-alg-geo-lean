@@ -99,6 +99,8 @@ noncomputable def affineQuasicoherentFreeInclusionIso
       SheafOfModules.free.{u} I :=
   tildeFinsupp I
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Higher `Ext` from an arbitrary-rank affine quasi-coherent free sheaf vanishes after
 forgetting to all module sheaves.  The free sheaf is a coproduct of copies of the structure
 sheaf, whose `Ext` computes affine quasi-coherent cohomology. -/

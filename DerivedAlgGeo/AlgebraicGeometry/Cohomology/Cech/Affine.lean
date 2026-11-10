@@ -190,7 +190,7 @@ open CategoryTheory Limits
 variable {X : Type*} [TopologicalSpace X]
 
 local instance iicHasTerminal (V : Opens X) : HasTerminal (Set.Iic V) :=
-  (IsTerminal.ofUniqueHom (Y := (⟨V, by exact le_refl V⟩ : Set.Iic V))
+  (IsTerminal.ofUniqueHom (X := (⟨V, by exact le_refl V⟩ : Set.Iic V))
     (fun (U : Set.Iic V) ↦ homOfLE (show U ≤ (⟨V, by exact le_refl V⟩ : Set.Iic V)
       from U.2)) (fun _ _ ↦ Subsingleton.elim _ _)).hasTerminal
 
@@ -295,14 +295,14 @@ private def iicIncl {X : Type*} [TopologicalSpace X] (V : Opens X) :
   map f := homOfLE (leOfHom f)
 
 private noncomputable def tildeCechComplex {R : CommRingCat.{u}} {ι : Type u}
-    [Fintype ι] (f : ι → R) (M : ModuleCat.{u} R) :
+    (f : ι → R) (M : ModuleCat.{u} R) :
     CochainComplex (ModuleCat R) ℕ :=
   (CategoryTheory.cechComplexFunctor fun i ↦
     _root_.PrimeSpectrum.basicOpen (f i)).obj
       (modulesSpecToSheaf.obj (tilde M)).presheaf
 
 private lemma tildeCechComplex_isUnit_of_le_basicOpen
-    {R : CommRingCat.{u}} {ι : Type u} [Fintype ι]
+    {R : CommRingCat.{u}} {ι : Type u}
     (f : ι → R) (d : R)
     (hfd : ∀ i, _root_.PrimeSpectrum.basicOpen (f i) ≤
       _root_.PrimeSpectrum.basicOpen d)
@@ -395,6 +395,8 @@ private noncomputable def affineCechLocalizationData
           subsingleton
         · rfl }
   let P := (modulesSpecToSheaf.obj (tilde M)).presheaf
+  -- Supplied by hand: on Lean 4.35 the search for this family times out at the default budget.
+  haveI : ∀ J : Type u, HasLimitsOfShape (Discrete J) (ModuleCat.{u} R) := fun _ ↦ inferInstance
   let G := (FormalCoproduct.evalOp (Opens (PrimeSpectrum R)) (ModuleCat R)).obj P
   let Y := V.cech.rightOp ⋙ G
   let Yloc := Z.rightOp ⋙ G
@@ -463,7 +465,7 @@ private noncomputable def affineCechLocalizationData
       ModuleCat.piIsoPi_hom_ker_subtype_apply]
     change ((Pi.lift (fun x ↦ Pi.π A x ≫ q x) ≫ Pi.π B x).hom) s =
       ((Pi.π A x ≫ q x).hom) s
-    rw [Pi.lift_π]
+    rw [Pi.lift_comp_π]
   have hloc (n : ℕ) : Kloc.ExactAt (n + 1) := by
     apply AlgebraicTopology.exactAt_succ_of_extraDegeneracy_map edloc G
       (Y := Yloc) (n := n)

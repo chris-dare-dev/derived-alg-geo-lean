@@ -64,6 +64,8 @@ variable (𝒜 : ℕ → σA) [GradedRing 𝒜]
 
 local notation3 "X" => ProjectiveSpectrum.top 𝒜
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **`gᴺ / 1` generates `O(N)` near every point of `D₊(g)`.**
 
 For `g` of degree one and `w` a section of `O(N)` over `V`, every point of `V ⊓ D₊(g)` has a

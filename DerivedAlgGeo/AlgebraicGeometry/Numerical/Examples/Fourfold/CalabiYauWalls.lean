@@ -110,7 +110,7 @@ theorem sextic_hDegrees_eq_chCoeff (k : Fin 5) (E : FourfoldNum) :
       (Polarised.corrComp sexticNumericalVariety (Polarised.unitCorr (RankOneRing 4)) E (k : ℕ)
         * sexticPolarization.cls ^ (4 - (k : ℕ))) : ℚ) : ℝ) = _
   rw [Polarised.corrComp_unitCorr, sexticPolarization_cls, sextic_degree_chComp_mul,
-    if_pos (show (k : ℕ) + (4 - (k : ℕ)) = 4 by omega)]
+    ite_eq_left (show (k : ℕ) + (4 - (k : ℕ)) = 4 by omega)]
 
 /-! ### The charge family on the model -/
 
@@ -143,7 +143,7 @@ theorem sextic_charge (w : ℂ) (E : FourfoldNum) :
   rw [sexticWallChargeFamily_charge, Wall.Exp.charge_apply, Wall.Exp.ofMoments]
   rw [Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_succ,
     Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_zero, zero_add]
-  simp only [Wall.Exp.moments, Nat.zero_le, Nat.le_refl, dif_pos,
+  simp only [Wall.Exp.moments, Nat.zero_le, Nat.le_refl, dite_eq_left,
     sextic_hDegrees_eq_chCoeff]
   norm_num [Wall.Exp.coeff, Nat.factorial]
   ring

@@ -33,10 +33,10 @@ local instance : Category X.Modules :=
   inferInstanceAs (Category (SheafOfModules X.ringCatSheaf))
 
 local instance : MonoidalCategory X.PresheafOfModules :=
-  PresheafOfModules.monoidalCategory (R := X.presheaf)
+  PresheafOfModulesOfCommRing.monoidalCategory (R := X.presheaf)
 
 local instance : SymmetricCategory X.PresheafOfModules :=
-  PresheafOfModules.symmetricCategory (R := X.presheaf)
+  PresheafOfModulesOfCommRing.symmetricCategory (R := X.presheaf)
 
 private noncomputable local instance : MonoidalPreadditive X.PresheafOfModules :=
   PresheafOfModules.monoidalPreadditive X.presheaf

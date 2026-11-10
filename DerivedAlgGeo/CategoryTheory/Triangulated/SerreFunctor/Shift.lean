@@ -211,7 +211,7 @@ variable (D : SerreFunctorData k C)
 private noncomputable def signedCommShiftOfCommShift
     {C : Type u} [Category.{v} C] [Preadditive C] [HasShift C ℤ]
     [∀ n : ℤ, (shiftFunctor C n).Additive]
-    (F : C ⥤ C) [F.Additive] [F.CommShift ℤ] : F.CommShift ℤ where
+    (F : C ⥤ C) [F.CommShift ℤ] : F.CommShift ℤ where
   commShiftIso a := a.negOnePow • F.commShiftIso a
   commShiftIso_zero := by
     ext X
@@ -256,8 +256,8 @@ theorem signedCommShift_one_inv_app
     (letI : D.S.CommShift ℤ := D.signedCommShift
      (D.S.commShiftIso (1 : ℤ)).inv.app X) =
        -(D.commShiftIso 1).hom.app X := by
-  dsimp only [Functor.commShiftIso, SerreFunctorData.signedCommShift,
-    signedCommShiftOfCommShift, SerreFunctorData.commShift]
+  unfold SerreFunctorData.signedCommShift signedCommShiftOfCommShift SerreFunctorData.commShift
+  dsimp only [Functor.commShiftIso]
   simp only [Int.negOnePow_one, Preadditive.smul_iso_inv,
     SerreFunctorData.commShiftIso, Iso.symm_hom]
   norm_num

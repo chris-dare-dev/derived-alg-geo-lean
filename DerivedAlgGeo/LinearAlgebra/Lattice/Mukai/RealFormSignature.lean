@@ -197,7 +197,7 @@ private theorem one_le_sigNeg_hyp : 1 ≤ sigNeg (hypQ b) := by
   have ha : a ≠ 0 := by
     intro h
     exact hu0 (by simp [h])
-  rw [restrict_apply, QuadraticMap.neg_apply, comp_hyperbolicIncl_apply]
+  rw [restrict_apply, neg_apply, comp_hyperbolicIncl_apply]
   simp only [Prod.smul_fst, Prod.smul_snd, smul_eq_mul, mul_one]
   nlinarith [mul_self_pos.mpr ha]
 

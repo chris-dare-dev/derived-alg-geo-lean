@@ -71,6 +71,8 @@ noncomputable def h0Counit (A : DGAdjunction L R) : R.h0 ⋙ L.h0 ⟶ 𝟭 (H0 D
     DGFunctor.HomogeneousNatTrans.h0 A.counit A.counit_isClosed ≫
       (DGFunctor.h0IdIso).hom
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem h0Unit_app (A : DGAdjunction L R) (X : H0 C) :
     A.h0Unit.app X =
@@ -81,6 +83,8 @@ theorem h0Unit_app (A : DGAdjunction L R) (X : H0 C) :
   rw [Category.comp_id, Category.id_comp]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp]
 theorem h0Counit_app (A : DGAdjunction L R) (Y : H0 D) :
     A.h0Counit.app Y =
@@ -91,6 +95,8 @@ theorem h0Counit_app (A : DGAdjunction L R) (Y : H0 D) :
   rw [Category.comp_id, Category.id_comp]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Descending a left-whiskered dg counit is ordinary left whiskering of the
 `H⁰` counit, after the canonical compositor, associator, and unitor
 comparisons.  The leading inverse compositor presents the source as
@@ -140,7 +146,6 @@ theorem h0_whiskerLeft_counit {E : Type u''} [DGCategory.{v} E]
         rw [← cancel_epi (DGFunctor.h0CompIso (P.comp R) L).hom]
         simp only [Iso.hom_inv_id_assoc]
         convert hassoc.symm using 1
-        all_goals rfl
       have hunit :
           Functor.whiskerLeft P.h0 (DGFunctor.h0IdIso (C := D)).inv ≫
               (DGFunctor.h0CompIso P (DGFunctor.id D)).inv =
@@ -168,8 +173,9 @@ theorem h0_whiskerLeft_counit {E : Type u''} [DGCategory.{v} E]
           simpa only [Category.assoc] using h₁
         _ = _ := by
           convert h₂ using 1
-          all_goals simp only [DGFunctor.comp_id]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Descending a right-whiskered dg unit is ordinary right whiskering of the
 `H⁰` unit, after the canonical unitor, associator, and compositor
 comparisons.  The trailing compositor presents the target as
@@ -227,7 +233,6 @@ theorem h0_whiskerRight_unit {E : Type u''} [DGCategory.{v} E]
         simp only [Iso.trans_inv, Functor.isoWhiskerRight_inv,
           Functor.isoWhiskerLeft_inv, Category.assoc] at h
         convert h using 1
-        all_goals rfl
       have hassoc' :
           Functor.whiskerRight (DGFunctor.h0CompIso L R).inv P.h0 ≫
               (DGFunctor.h0CompIso (L.comp R) P).inv ≫
@@ -276,6 +281,8 @@ theorem h0_whiskerRight_unit {E : Type u''} [DGCategory.{v} E]
           simpa only [DGFunctor.id_comp, Category.assoc] using h₁
         _ = _ := h₂
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **A dg adjunction induces an adjunction on `H⁰`.**
 
 The unit and counit are the descended dg transformations, and each triangle

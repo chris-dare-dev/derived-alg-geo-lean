@@ -210,14 +210,12 @@ theorem mapEquiv_isLocallyFinite (s : Slicing C) (hs : s.IsLocallyFinite C) :
     exact hGstrictLT hAB
   have hbig := hlf t (F.obj E)
   constructor
-  · letI : WellFoundedLT (s.AdmissibleSubobject C (F.obj E)) := hbig.1
-    exact ⟨Subrelation.wf hGstrictLT
+  · exact Subrelation.wf hGstrictLT
       (InvImage.wf G (show WellFounded ((· < ·) :
-        s.AdmissibleSubobject C (F.obj E) → _ → Prop) from IsWellFounded.wf))⟩
-  · letI : WellFoundedGT (s.AdmissibleSubobject C (F.obj E)) := hbig.2
-    exact ⟨Subrelation.wf hGstrictGT
+        s.AdmissibleSubobject C (F.obj E) → _ → Prop) from hbig.1))
+  · exact Subrelation.wf hGstrictGT
       (InvImage.wf G (show WellFounded ((· > ·) :
-        s.AdmissibleSubobject C (F.obj E) → _ → Prop) from IsWellFounded.wf))⟩
+        s.AdmissibleSubobject C (F.obj E) → _ → Prop) from hbig.2))
 
 /-! ## The action -/
 

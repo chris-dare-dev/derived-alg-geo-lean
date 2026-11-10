@@ -503,7 +503,7 @@ theorem quasiIso_freeYonedaSheafCoproductTotalAugmentation
   haveI : QuasiIso (H.map e.hom ≫ α.app (colimit T)) :=
     quasiIso_comp (H.map e.hom) (α.app (colimit T))
   have hcomp : α.app M ≫ e.hom = H.map e.hom ≫ α.app (colimit T) := by
-    simpa using hn.symm
+    simp
   haveI : QuasiIso (α.app M ≫ e.hom) := by
     rw [hcomp]
     exact ‹QuasiIso (H.map e.hom ≫ α.app (colimit T))›

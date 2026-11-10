@@ -696,9 +696,11 @@ private theorem hasCoproduct_pointwise_biprod :
         · intro t i
           apply biprod.hom_ext'
           · simp only [cofan_mk_inj]
-            rw [← Category.assoc, biprod.inl_desc, Category.assoc, biprod.inl_desc, Sigma.ι_desc]
+            rw [← Category.assoc, biprod.inl_desc, Category.assoc, biprod.inl_desc,
+              Sigma.ι_comp_desc]
           · simp only [cofan_mk_inj]
-            rw [← Category.assoc, biprod.inr_desc, Category.assoc, biprod.inr_desc, Sigma.ι_desc]
+            rw [← Category.assoc, biprod.inr_desc, Category.assoc, biprod.inr_desc,
+              Sigma.ι_comp_desc]
         · intro t m hm
           apply biprod.hom_ext'
           · apply Sigma.hom_ext

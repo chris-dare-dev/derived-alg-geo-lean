@@ -36,11 +36,11 @@ local instance : Category X.Modules :=
 
 local instance : MonoidalCategory
     (_root_.PresheafOfModules.{u} X.ringCatSheaf.obj) :=
-  PresheafOfModules.monoidalCategory (R := X.presheaf)
+  PresheafOfModulesOfCommRing.monoidalCategory (R := X.presheaf)
 
 local instance : SymmetricCategory
     (_root_.PresheafOfModules.{u} X.ringCatSheaf.obj) :=
-  PresheafOfModules.symmetricCategory (R := X.presheaf)
+  PresheafOfModulesOfCommRing.symmetricCategory (R := X.presheaf)
 
 private abbrev associatedSheaf' (X : Scheme.{u}) :=
   PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)
@@ -129,7 +129,7 @@ set_option maxHeartbeats 800000 in
 private noncomputable def tensorPresheaf'
     (X : Scheme.{u}) (P Q : X.PresheafOfModules) : X.PresheafOfModules := by
   letI : MonoidalCategory X.PresheafOfModules :=
-    PresheafOfModules.monoidalCategory (R := X.presheaf)
+    PresheafOfModulesOfCommRing.monoidalCategory (R := X.presheaf)
   exact P ⊗ Q
 
 set_option maxHeartbeats 800000 in
@@ -138,7 +138,7 @@ noncomputable def overTensorPresheafIso
     (P Q : X.PresheafOfModules) (U : X.Opens) :
     letI : MonoidalCategory
         (_root_.PresheafOfModules.{u} (X.ringCatSheaf.over U).obj) :=
-      PresheafOfModules.monoidalCategory (R := (X.sheaf.over U).obj)
+      PresheafOfModulesOfCommRing.monoidalCategory (R := (X.sheaf.over U).obj)
     (overPresheafFunctor X U).obj (tensorPresheaf' X P Q) ≅
       (overPresheafFunctor X U).obj P ⊗ (overPresheafFunctor X U).obj Q := by
   exact Iso.refl _
@@ -151,7 +151,7 @@ noncomputable def tensorOverIsoOfTrivializations
     (tensorObj L M).over U ≅ SheafOfModules.unit (X.ringCatSheaf.over U) := by
   letI : MonoidalCategory
       (_root_.PresheafOfModules.{u} (X.ringCatSheaf.over U).obj) :=
-    PresheafOfModules.monoidalCategory (R := (X.sheaf.over U).obj)
+    PresheafOfModulesOfCommRing.monoidalCategory (R := (X.sheaf.over U).obj)
   let eLP := (SheafOfModules.forget (X.ringCatSheaf.over U)).mapIso eL
   let eMP := (SheafOfModules.forget (X.ringCatSheaf.over U)).mapIso eM
   let aU := PresheafOfModules.sheafification
@@ -183,7 +183,7 @@ noncomputable def tensorOverIsoOfTrivializationRight
     (tensorObj L M).over U ≅ L.over U := by
   letI : MonoidalCategory
       (_root_.PresheafOfModules.{u} (X.ringCatSheaf.over U).obj) :=
-    PresheafOfModules.monoidalCategory (R := (X.sheaf.over U).obj)
+    PresheafOfModulesOfCommRing.monoidalCategory (R := (X.sheaf.over U).obj)
   let eMP := (SheafOfModules.forget (X.ringCatSheaf.over U)).mapIso eM
   let aU := PresheafOfModules.sheafification
     (𝟙 (X.ringCatSheaf.over U).obj)

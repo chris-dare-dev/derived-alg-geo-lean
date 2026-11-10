@@ -129,7 +129,7 @@ theorem exists_res_tmulSection_eq_sum (F : (Proj 𝒜).Modules) {g : A} (hg : g 
     (Scheme.Modules.homApp_res (twistBy 𝒜 N (pow_mem_deg 𝒜 hg N) F) hW₂g (s b)).symm)
 
 /-- **A sum over a sigma type supported on one fiber is the sum over that fiber.** -/
-private theorem sum_sigma_eq_of_support {ι : Type*} [Fintype ι] [DecidableEq ι]
+private theorem sum_sigma_eq_of_support {ι : Type*} [Fintype ι]
     {κ : ι → Type*} [∀ i, Fintype (κ i)] {G : Type*} [AddCommMonoid G] (i : ι)
     (f : (Σ j, κ j) → G) (c : κ i → G) (hf : ∀ b : κ i, f ⟨i, b⟩ = c b)
     (hf0 : ∀ a : Σ j, κ j, a.1 ≠ i → f a = 0) :
@@ -205,11 +205,11 @@ theorem exists_epi_free_tensorTwist_ge (F : (Proj 𝒜).Modules)
         (σ ⟨i, b⟩)).symm
       have hσ' := hσ ⟨i, b⟩
       dsimp only at hσ' ⊢
-      rw [dif_pos rfl, hres, hσ', twistBy_congr 𝒜 (1 * N)
+      rw [dite_eq_left rfl, hres, hσ', twistBy_congr 𝒜 (1 * N)
         (congrArg (fun k => g i ^ k) (one_mul N).symm) (pow_mem_mul 𝒜 (hg i) N)
         (pow_mem_deg 𝒜 (hg i) (1 * N)) F]
     · dsimp only
-      rw [dif_neg ha, zero_smul]
+      rw [dite_eq_right ha, zero_smul]
   have hsum := Scheme.Modules.IsLocalCombination.finset_sum (σ := σ) S _ (fun p _ => hpure p)
   obtain ⟨W, hWV₁, hxW, c, hc⟩ := hsum x hxV₁
   refine ⟨W, hWV₁.trans hV₁U, hxW, c, ?_⟩

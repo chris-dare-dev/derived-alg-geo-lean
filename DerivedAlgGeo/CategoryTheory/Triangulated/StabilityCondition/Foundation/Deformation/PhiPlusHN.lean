@@ -101,10 +101,13 @@ theorem skewedPhase_gt_of_strictQuotient_inner
       hKgt (by linarith) hT
   have hBge : σ.slicing.geProp C ((a + ε) + ε) B.obj := by
     have := σ.slicing.geProp_of_phiMinus_ge C hB hBminus.le
-    convert this using 1 <;> ring
+    convert this using 1
+    ring
   exact σ.skewedPhase_gt_of_geProp C W hr0 hr1 hW hab hε hε2
     hthin hsin le_rfl (by linarith) B.property hB hBge
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Iterating the owner two-branch MDQ construction produces an HN
 filtration above the explicit quotient lower bound. -/
 theorem hn_exists_with_phiPlus_reduction

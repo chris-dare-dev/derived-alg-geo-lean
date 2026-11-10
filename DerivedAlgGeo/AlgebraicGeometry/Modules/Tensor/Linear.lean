@@ -46,11 +46,11 @@ noncomputable section
 
 private noncomputable instance presheafMonoidalCategory :
     MonoidalCategory X.PresheafOfModules :=
-  PresheafOfModules.monoidalCategory (R := X.presheaf)
+  PresheafOfModulesOfCommRing.monoidalCategory (R := X.presheaf)
 
 private noncomputable instance presheafSymmetricCategory :
     SymmetricCategory X.PresheafOfModules :=
-  PresheafOfModules.symmetricCategory (R := X.presheaf)
+  PresheafOfModulesOfCommRing.symmetricCategory (R := X.presheaf)
 
 private abbrev associatedSheaf (X : Scheme.{u}) :=
   PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)
@@ -116,6 +116,8 @@ noncomputable instance modulesMonoidalPreadditive : MonoidalPreadditive X.Module
     rw [Functor.map_add, MonoidalPreadditive.add_tensor, Functor.map_add]
     rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **Multiplication by a global function is the tensor-unit action.**
 
 The endomorphism of the unit is multiplication by `r`.  Its value on `1` over an open is the

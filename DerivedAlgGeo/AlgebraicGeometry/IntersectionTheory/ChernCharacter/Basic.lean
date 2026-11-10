@@ -208,9 +208,9 @@ noncomputable def tauComponent (R : P.ReconstructionData F) (i : ℕ) : A :=
 theorem tauComponent_mem (R : P.ReconstructionData F) (i : ℕ) :
     R.tauComponent i ∈ P.ring.piece i := by
   by_cases hi : i ≤ d
-  · rw [tauComponent, dif_pos hi]
+  · rw [tauComponent, dite_eq_left hi]
     exact (Classical.choose_spec (R.representable i hi)).1
-  · rw [tauComponent, dif_neg hi]
+  · rw [tauComponent, dite_eq_right hi]
     exact Submodule.zero_mem _
 
 theorem degree_tauComponent_mul_divisorProduct (R : P.ReconstructionData F)
@@ -219,7 +219,7 @@ theorem degree_tauComponent_mul_divisorProduct (R : P.ReconstructionData F)
     P.ring.degree
         (R.tauComponent i * divisorProduct P.divisorClass classes) =
       twistPairing R.twists i classes := by
-  rw [tauComponent, dif_pos hi]
+  rw [tauComponent, dite_eq_left hi]
   exact (Classical.choose_spec (R.representable i hi)).2 classes hlength
 
 theorem tauComponent_eq_of_twistPairing_eq

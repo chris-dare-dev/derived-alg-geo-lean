@@ -29,20 +29,6 @@ noncomputable section
 
 universe u v w
 
-@[simp]
-private theorem coreToCatHom_obj_of
-    {C D : Type w} [Category.{v} C] [Category.{v} D]
-    (F : C ⥤ D) (X : Core C) :
-    ((F.core.toCatHom).toFunctor.obj X).of = F.obj X.of :=
-  rfl
-
-@[simp]
-private theorem coreToCatHom_map_iso_hom
-    {C D : Type w} [Category.{v} C] [Category.{v} D]
-    (F : C ⥤ D) {X Y : Core C} (f : X ⟶ Y) :
-    (((F.core.toCatHom).toFunctor.map f).iso.hom) = F.map f.iso.hom :=
-  rfl
-
 /-- The groupoid of geometric affine bounded-above projective derived
 objects over `Spec R`. -/
 abbrev AffineBoundedAboveProjectiveModuliFiber (R : CommRingCat.{u}) :=
@@ -73,6 +59,7 @@ noncomputable def affineGeometricBoundedAboveProjectiveCorePullbackCompIso
         affineGeometricBoundedAboveProjectiveCorePullback g :=
   (affineGeometricBoundedAboveProjectiveDerivedPullbackCompIso f g).symm.core
 
+set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
 /-- The genuine geometric affine bounded-above projective moduli groupoids
 and their arbitrary pullbacks, packaged as a Cat-valued pseudofunctor. -/

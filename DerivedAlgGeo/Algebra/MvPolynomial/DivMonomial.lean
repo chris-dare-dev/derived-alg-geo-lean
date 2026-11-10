@@ -71,13 +71,13 @@ theorem divMonomial_monomial_mul_comm {a s : ι →₀ ℕ}
   ext β
   rw [coeff_divMonomial, coeff_monomial_mul', coeff_monomial_mul']
   by_cases h : a ≤ β
-  · rw [if_pos ((hiff β).mpr h), if_pos h, coeff_divMonomial]
+  · rw [ite_eq_left ((hiff β).mpr h), ite_eq_left h, coeff_divMonomial]
     congr 2
     ext j
     have := h j
     simp only [Finsupp.coe_tsub, Pi.sub_apply, Finsupp.coe_add, Pi.add_apply]
     omega
-  · rw [if_neg (fun hc => h ((hiff β).mp hc)), if_neg h]
+  · rw [ite_eq_right (fun hc => h ((hiff β).mp hc)), ite_eq_right h]
 
 set_option maxHeartbeats 800000 in
 /-- Raising a numerator by a power of one monomial and then dividing off one
@@ -93,7 +93,7 @@ theorem divMonomial_pow_mul {γ γ' : ι →₀ ℕ} {i₀ : ι} {c : ℕ}
   have hpow : (monomial γ (1 : R)) ^ t =
       monomial (Finsupp.single i₀ (t * c)) 1 *
         monomial (t • γ') 1 := by
-    rw [monomial_pow, one_pow, monomial_mul, one_mul, hγ, smul_add,
+    rw [monomial_pow, one_pow, monomial_mul_monomial, one_mul, hγ, smul_add,
       Finsupp.smul_single, smul_eq_mul]
   have hsplit : Finsupp.single i₀ ((m + t) * c) =
       Finsupp.single i₀ (t * c) + Finsupp.single i₀ (m * c) := by
@@ -118,7 +118,7 @@ theorem divMonomial_single_mem_homogeneousSubmodule
     (hp : p ∈ homogeneousSubmodule ι k (n + d)) :
     p.divMonomial (Finsupp.single i n) ∈ homogeneousSubmodule ι k d := by
   intro s hs
-  have hcoeff : coeff (Finsupp.single i n + s) p ≠ 0 := by
+  have hcoeff : p.coeff (Finsupp.single i n + s) ≠ 0 := by
     simpa only [coeff_divMonomial] using hs
   have hdeg := hp hcoeff
   simp only [map_add, Finsupp.weight_single, Pi.one_apply, nsmul_eq_mul, mul_one] at hdeg
@@ -164,7 +164,7 @@ theorem eq_zero_of_X_pow_dvd_of_isHomogeneous_of_lt
     p = 0 := by
   classical
   by_contra hne
-  obtain ⟨s, hs⟩ : ∃ s, coeff s p ≠ 0 := by
+  obtain ⟨s, hs⟩ : ∃ s, p.coeff s ≠ 0 := by
     by_contra hall
     push Not at hall
     exact hne (ext _ _ (by simpa using hall))
@@ -174,7 +174,7 @@ theorem eq_zero_of_X_pow_dvd_of_isHomogeneous_of_lt
     obtain ⟨q, rfl⟩ := hdvd
     rw [X_pow_eq_monomial, coeff_monomial_mul'] at hs
     refine hs ?_
-    rw [if_neg]
+    rw [ite_eq_right]
     intro hle
     exact absurd (by simpa using hle i) (by omega)
   have hdeg : (Finsupp.weight 1) s = m := hp hs

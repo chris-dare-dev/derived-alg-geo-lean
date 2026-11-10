@@ -96,7 +96,7 @@ noncomputable def sigmaXDesc (φ : ∀ k, ∀ i j, (X k).X i ⟶ Y.X j) (i j : �
 @[reassoc (attr := simp)]
 lemma ι_f_sigmaXDesc (φ : ∀ k, ∀ i j, (X k).X i ⟶ Y.X j) (k : κ) (i j : ι) :
     (Sigma.ι X k).f i ≫ sigmaXDesc φ i j = φ k i j := by
-  simp only [sigmaXDesc, ι_f_sigmaXIso_hom_assoc, Sigma.ι_desc]
+  simp only [sigmaXDesc, ι_f_sigmaXIso_hom_assoc, Sigma.ι_comp_desc]
 
 section Colimits
 

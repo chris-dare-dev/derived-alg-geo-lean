@@ -134,6 +134,5 @@ theorem Slicing.MapsSemistableGE.of_mapsSemistableLE {L : D ⥤ C} {F : C ⥤ D}
       Adjunction.homEquiv_counit, L.map_zero, zero_comp]
   rw [← (adjR.homEquiv (L.obj E) G).symm_apply_apply g, hk, Adjunction.homEquiv_counit,
     F.map_zero, zero_comp]
-  rfl
 
 end CategoryTheory.Triangulated

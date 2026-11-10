@@ -74,7 +74,7 @@ private noncomputable def freeAppIsoFinsupp
 private lemma freeAppIsoFinsupp_ιFree
     (I : Type u) [Finite I] (U : X.Opensᵒᵖ)
     (i : I) (r : X.presheaf.obj U) :
-    (freeAppIsoFinsupp (X := X) I U).hom
+    (freeAppIsoFinsupp (X := X) I U).hom.hom
         ((SheafOfModules.ιFree (R := X.ringCatSheaf) i).val.app U r) =
       Finsupp.single i r := by
   let F := SheafOfModules.evaluation X.ringCatSheaf U

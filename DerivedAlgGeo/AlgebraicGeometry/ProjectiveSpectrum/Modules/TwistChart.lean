@@ -84,6 +84,8 @@ The same construction as the nonnegative case, pointwise, with the certificate r
 single computation rules `intShiftZeroLinearEquiv_apply_mk` and its `symm` sibling. Because
 those rules are uniform in the sign of `d`, nothing here splits on it. -/
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Trivialize a locally fractional section of `A(d)̃`, over any open contained in `D₊(f)`. -/
 noncomputable def intShiftSectionToZeroOn {f : A} (hf : f ∈ 𝒜 1) (d : ℤ)
     {U : Opens X} (hU : U ≤ ProjectiveSpectrum.basicOpen 𝒜 f)
@@ -106,6 +108,8 @@ noncomputable def intShiftSectionToZeroOn {f : A} (hf : f ∈ 𝒜 1) (d : ℤ)
   rw [hy]
   exact DegreeZeroLocalization.intShiftZeroLinearEquiv_apply_mk 𝒜 hf d (hU (i y).2) _
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The inverse trivialization on sections, over any open contained in `D₊(f)`. -/
 noncomputable def intShiftSectionFromZeroOn {f : A} (hf : f ∈ 𝒜 1) (d : ℤ)
     {U : Opens X} (hU : U ≤ ProjectiveSpectrum.basicOpen 𝒜 f)
@@ -192,6 +196,8 @@ noncomputable def intShiftSectionLinearEquivOn {f : A} (hf : f ∈ 𝒜 1) (d : 
       exact (intShiftFiberLinearEquivOfMem 𝒜 hf d (hU x.2)).map_smul
         (AlgebraicGeometry.openToLocalization 𝒜 U x.1 x.2 r) (s.1 x) }
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Divide a locally fractional section of `A(d)̃` by `f ^ d`, over any open contained in
 `D₊(f)`.
 
@@ -347,6 +353,8 @@ noncomputable def natShiftSectionLinearEquivOn {f : A} (hf : f ∈ 𝒜 1) (d : 
       exact (natShiftFiberLinearEquivOfMem 𝒜 hf d (hU x.2)).map_smul
         (AlgebraicGeometry.openToLocalization 𝒜 U x.1 x.2 r) (s.1 x) }
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Untwisting a canonical structure-module section is the canonical twisted section.
 
 This is the pointwise heart of every "the constructed comparison is the canonical one" argument
@@ -406,6 +414,8 @@ noncomputable def natShiftBasicOpenSectionAddEquiv {f : A} (hf : f ∈ 𝒜 1) (
     (selfBasicOpenSectionAddEquiv 𝒜 hf Nat.zero_lt_one) |>.trans
       (natShiftSectionAddEquiv 𝒜 hf d).symm
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The chart equivalence above is the canonical homogeneous-fraction section map. -/
 theorem natShiftBasicOpenSectionAddEquiv_apply_mk {f : A} (hf : f ∈ 𝒜 1) (d : ℕ)
     (c : NumDenSameDeg 𝒜 (natShift 𝒜 d) (.powers f)) :
@@ -497,6 +507,8 @@ local-fraction certificate with the `_apply_mk` rule. The numerator becomes `f ^
 `r * f ^ k`, which is the order `LocalizedModule.mk_smul_mk` produces; the denominator is
 unchanged, because it lives in `𝒜` either way. -/
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Divide a locally fractional section of `M(d)~` by `f ^ d`, over any open inside `D₊(f)`. -/
 noncomputable def intShiftModuleSectionToZeroOn {f : A} (hf : f ∈ 𝒜 1) (d : ℤ)
     {U : Opens X} (hU : U ≤ ProjectiveSpectrum.basicOpen 𝒜 f)
@@ -519,6 +531,8 @@ noncomputable def intShiftModuleSectionToZeroOn {f : A} (hf : f ∈ 𝒜 1) (d :
   rw [hy]
   exact DegreeZeroLocalization.intShiftZeroModuleLinearEquiv_apply_mk 𝒜 𝓜 hf d (hU (i y).2) _
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The inverse trivialization on sections, over any open contained in `D₊(f)`. -/
 noncomputable def intShiftModuleSectionFromZeroOn {f : A} (hf : f ∈ 𝒜 1) (d : ℤ)
     {U : Opens X} (hU : U ≤ ProjectiveSpectrum.basicOpen 𝒜 f)

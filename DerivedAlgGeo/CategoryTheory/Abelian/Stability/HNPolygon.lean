@@ -6,7 +6,7 @@ import DerivedAlgGeo.Analysis.Convex.ComplexPolygonalPath.Basic
 import DerivedAlgGeo.CategoryTheory.Abelian.Stability.Uniqueness
 import Mathlib.Analysis.Convex.Hull
 import Mathlib.Analysis.Convex.Jensen
-import Mathlib.Data.Fin.SuccPredOrder
+import Mathlib.Order.SuccPred.Fin
 import Mathlib.Order.Interval.Set.Monotone
 
 set_option backward.defeqAttrib.useBackward true
@@ -516,7 +516,6 @@ theorem subobject_phase_le_first (hHN : Z.HasHNProperty) {B : Subobject E}
     exact Z.isSemistable_of_iso
       (StabilityFunction.subobjectCokernelBotIso C₁ bot_le) hfactorBot
   have hC₁phase : Z.phase (C₁ : A) = G.phase i₀ := by
-    change Z.phase (C₁ : A) = G.phase i₀
     rw [← G.factor_phase i₀]
     exact ((StabilityFunction.phase_cokernel_ofLE_congr Z hchainBot rfl).trans
       (Z.phase_eq_of_iso

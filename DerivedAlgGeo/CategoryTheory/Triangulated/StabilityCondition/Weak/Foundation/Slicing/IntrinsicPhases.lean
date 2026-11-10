@@ -24,6 +24,8 @@ namespace CategoryTheory.Triangulated
 variable (C : Type u) [Category.{v} C] [HasZeroObject C] [HasShift C ℤ]
   [Preadditive C] [∀ n : ℤ, (shiftFunctor C n).Additive] [Pretriangulated C]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- If every map from the first factor to the filtered object vanishes, then
 every map from that factor to every stage of the filtration vanishes. -/
 theorem HNFiltration.firstFactor_hom_chain_eq_zero (s : Slicing C) {E : C}

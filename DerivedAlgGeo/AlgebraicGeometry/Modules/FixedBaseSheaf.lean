@@ -26,6 +26,8 @@ namespace AlgebraicGeometry
 variable {R : CommRingCat.{u}} (Y : Scheme.{u})
   (φ : R ⟶ Γ(Y, ⊤))
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- View an `𝒪_Y`-module sheaf as a sheaf of modules over a fixed ring `R`,
 using `R → Γ(Y, 𝒪_Y)`. The sheaf and all its restriction maps are retained. -/
 noncomputable def modulesToFixedBaseSheaf :
@@ -34,11 +36,13 @@ noncomputable def modulesToFixedBaseSheaf :
       (initialOpOfTerminal isTerminalTop) ⋙
     sheafCompose _ (ModuleCat.restrictScalars φ.hom)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The fixed `R`-action is the original `𝒪_Y(U)`-action after restricting
 `φ(r)` from the whole scheme to `U`. -/
 theorem modulesToFixedBaseSheaf_smul (M : Y.Modules) (U : Y.Opens)
     (r : R) (x : ((modulesToFixedBaseSheaf Y φ).obj M).presheaf.obj (.op U)) :
-    r • x = (M.smul (Y.presheaf.map U.leTop.op (φ.hom r))).hom x :=
+    r • x = (M.smul (Y.presheaf.map U.leTop.op (φ.hom r))).asHom.hom x :=
   rfl
 
 /-- Sections on an open as `R`-modules, obtained by evaluating the fixed-base

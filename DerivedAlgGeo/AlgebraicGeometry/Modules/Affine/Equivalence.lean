@@ -124,6 +124,8 @@ Issue #59 asked for exactly this goal to close by instance search. It does, thro
 `epi_sheafOfModules` — recorded here so a regression is a build failure rather than a
 rediscovery. -/
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 example {M N : X.Modules} (f : M ⟶ N) [Epi f] :
     Epi ((SheafOfModules.toSheaf.{u} X.ringCatSheaf).map f) := by infer_instance
 

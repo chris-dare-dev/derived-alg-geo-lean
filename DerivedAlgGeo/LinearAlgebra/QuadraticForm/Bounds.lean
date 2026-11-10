@@ -54,7 +54,7 @@ theorem PosDef.isBounded_setOf_eq {Q : QuadraticForm ℝ M} (hQ : Q.PosDef) (r :
   rw [isBounded_iff_forall_norm_le]
   refine ⟨Real.sqrt (r / c), fun x hx => ?_⟩
   have h := hle x
-  rw [Set.mem_setOf_eq] at hx
+  rw [Set.mem_ofPred_eq] at hx
   rw [hx] at h
   have hr : 0 ≤ r := le_trans (mul_nonneg hc.le (sq_nonneg _)) h
   have hsq : ‖x‖ ^ 2 ≤ r / c := by

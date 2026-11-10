@@ -71,11 +71,11 @@ attribute [local instance] HasDerivedCategory.standard
 
 private instance intTildeFunctor_additive :
     (AlgebraicGeometry.tilde.functor (CommRingCat.of ℤ)).Additive :=
-  AlgebraicGeometry.instAdditiveModuleCatCarrierModulesSpecOfFunctor
+  AlgebraicGeometry.instAdditiveModuleCatCarrierModulesSpecFunctor
 
 private instance zmodTwoTildeFunctor_additive :
     (AlgebraicGeometry.tilde.functor zmodTwoRing).Additive :=
-  AlgebraicGeometry.instAdditiveModuleCatCarrierModulesSpecOfFunctor
+  AlgebraicGeometry.instAdditiveModuleCatCarrierModulesSpecFunctor
 
 private instance zmodTwoTildeFunctor_preservesFiniteLimits :
     PreservesFiniteLimits (AlgebraicGeometry.tilde.functor zmodTwoRing) :=
@@ -232,8 +232,7 @@ private theorem extend_timesTwo_eq_zero : zmodTwoExtend.map timesTwo = 0 := by
   ext x
   change ((2 • 𝟙 (zmodTwoExtend.obj zModule)).hom)
       (zmodTwoOneAsZModule ⊗ₜ[ℤ] x) = 0
-  simp only [ModuleCat.hom_zsmul, ModuleCat.hom_id,
-    LinearMap.smul_apply, LinearMap.id_apply]
+  simp only [ModuleCat.hom_zsmul, ModuleCat.hom_id]
   rw [two_zsmul]
   change zmodTwoOneAsZModule ⊗ₜ[ℤ] x + zmodTwoOneAsZModule ⊗ₜ[ℤ] x = 0
   rw [← TensorProduct.add_tmul]
@@ -560,19 +559,19 @@ private noncomputable def torAugmentationShortComplexX₃Iso :
   (HomologicalComplex.singleObjXSelf (ComplexShape.up ℤ) 0 torDerivedModule) ≪≫
     (HomologicalComplex.singleObjXSelf (ComplexShape.down ℕ) 0 torDerivedModule).symm
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private noncomputable def torAugmentationShortComplexIso :
     torAugmentationShortComplex ≅ torResolutionShortComplex :=
   ShortComplex.isoMk torAugmentationShortComplexX₁Iso torAugmentationShortComplexX₂Iso
     torAugmentationShortComplexX₃Iso (by
       dsimp [torAugmentationShortComplexX₁Iso, torAugmentationShortComplexX₂Iso,
         torAugmentationShortComplex, torResolutionShortComplex]
-      rw [twoTermResolution.restriction_d_eq ComplexShape.embeddingDownNat
-        (i' := (-1 : ℤ)) (j' := (0 : ℤ)) (by norm_num) (by norm_num)]
-      simp) (by
+      simp [HomologicalComplex.restrictionXIso]) (by
       dsimp [torAugmentationShortComplexX₂Iso, torAugmentationShortComplexX₃Iso,
         torAugmentationShortComplex, torResolutionShortComplex, torResolutionAugmentation,
         torResolutionAugmentationAtZero]
-      simp)
+      simp [HomologicalComplex.restrictionXIso, ChainComplex.toSingle₀Equiv])
 
 private theorem torAugmentationShortComplex_exact_epi :
     torAugmentationShortComplex.Exact ∧ Epi torAugmentationShortComplex.g := by

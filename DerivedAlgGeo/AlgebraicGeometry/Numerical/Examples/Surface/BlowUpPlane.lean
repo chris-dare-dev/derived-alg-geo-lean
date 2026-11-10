@@ -281,14 +281,24 @@ def basis : Module.Basis (Fin 5) ℚ Ring := Module.Basis.ofEquivFun coordEquiv
 /-- Codimension weights on the product basis. -/
 def weight : Fin 5 → ℕ := ![0, 1, 1, 1, 2]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp] theorem basis_zero : basis 0 = 1 := by
   apply coordEquiv.injective; funext i; fin_cases i <;> simp [basis, coordEquiv]
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp] theorem basis_one : basis 1 = hQ := by
   apply coordEquiv.injective; funext i; fin_cases i <;> simp [basis, coordEquiv, hQ]
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp] theorem basis_two : basis 2 = e₁Q := by
   apply coordEquiv.injective; funext i; fin_cases i <;> simp [basis, coordEquiv, e₁Q]
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp] theorem basis_three : basis 3 = e₂Q := by
   apply coordEquiv.injective; funext i; fin_cases i <;> simp [basis, coordEquiv, e₂Q]
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 @[simp] theorem basis_four : basis 4 = pointQ := by
   apply coordEquiv.injective; funext i; fin_cases i <;> simp [basis, coordEquiv, pointQ]
 

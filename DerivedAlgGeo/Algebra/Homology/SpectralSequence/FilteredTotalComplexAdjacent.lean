@@ -100,6 +100,8 @@ private lemma totalStupidTruncGEMap_eqToHom
   subst b₁
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Reindexing filtration stage `-p` gives precisely the tail beginning at
 `p`; the comparison commutes with the adjacent-stage inclusion by the
 naturality of nested stupid-truncation maps. -/
@@ -128,6 +130,8 @@ lemma columnFilteredStageIso_comm
         (by simp [columnFiltrationIndex])
         (by simp [columnFiltrationIndex]) (by simp [columnFiltrationIndex])
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Invert the preceding adjacent-stage square. Cancellation by the stage
 isomorphism turns its commutative square into this inverse orientation. -/
 @[reassoc]
@@ -155,6 +159,8 @@ lemma columnFilteredStageIso_inv_comm
             rw [columnFilteredStageIso_comm]
     _ = _ := (Category.assoc _ _ _).symm
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The adjacent filtration mapping cone is canonically isomorphic to the mapping cone of the
 degreewise split adjacent-column short complex. -/
 noncomputable def columnFilteredAdjacentLayerIso
@@ -414,8 +420,8 @@ lemma columnFilteredConnecting_comp_homologyFactor
       columnFiltrationIndex p := homOfLE (by simp [columnFiltrationIndex])
   let e := filteredComplexPrecompTriangleIso X F f g
   have h := H.homologySequenceδ_naturality
-    ((X.precomp F).triangle f g)
-    (X.triangle (F.map f) (F.map g)) e.hom
+    (T := (X.precomp F).triangle f g)
+    (T' := X.triangle (F.map f) (F.map g)) e.hom
     (p + q) (p + 1 + q) (by omega)
   have he3 : (H.shift (p + q)).map e.hom.hom₃ ≫
         (HomotopyCategory.homologyFunctorFactors AddCommGrpCat.{w}
@@ -642,11 +648,11 @@ lemma columnFilteredRawConnecting_comp_stageIso
     (columnFilteredStageIso K p).hom
     (columnFilteredStageIso_comm K p)
   have h := H.homologySequenceδ_naturality
-    (CochainComplex.mappingCone.triangle
+    (T := CochainComplex.mappingCone.triangle
       ((columnFilteredTotalComplex K).map
         (homOfLE (show columnFiltrationIndex (p + 1) ≤
           columnFiltrationIndex p by simp [columnFiltrationIndex]))))
-    (CochainComplex.mappingCone.triangle
+    (T' := CochainComplex.mappingCone.triangle
       (adjacentColumnTotalShortComplex K p).f)
     e (p + q) (p + 1 + q) (by omega)
   dsimp only [Functor.homologySequenceδ, e,
@@ -671,6 +677,8 @@ lemma columnFilteredRawConnecting_comp_stageIso
         (p + 1 + q) at h
   exact h.symm
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The inclusion of the middle filtration stage followed by the adjacent-layer comparison, on
 homology. -/
 @[reassoc]
@@ -706,6 +714,8 @@ lemma columnFilteredHomologyMap_inr_comp_coneToShift
       simp only [HomologicalComplex.homologyMap_comp]
       rfl
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The adjacent-layer cone comparison factors through the short-complex
 cone projection and the single-column total isomorphism. Cancel that final
 isomorphism after applying homology to expose the short-complex map. -/

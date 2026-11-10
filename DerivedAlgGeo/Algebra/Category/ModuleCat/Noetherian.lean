@@ -25,6 +25,6 @@ variable {R : Type u} [Ring R]
 instance isNoetherianObject_of_isNoetherian (M : ModuleCat.{v} R) [IsNoetherian R M] :
     IsNoetherianObject M := by
   apply ObjectProperty.is_of_prop isNoetherianObject
-  exact RelHomClass.isWellFounded (subobjectModule M).toOrderEmbedding.dual.ltEmbedding
+  exact RelHomClass.wellFounded' (subobjectModule M).toOrderEmbedding.dual.ltEmbedding
 
 end ModuleCat

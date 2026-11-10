@@ -214,6 +214,8 @@ private theorem affineAdjunction_unit_isIso [IsNoetherianRing R]
     exact h.symm ▸ IsIso.comp_isIso' hUnit (IsIso.comp_isIso' hMap hComm₂)
   exact (ModuleCat.isFG R).fullyFaithfulι.isIso_of_isIso_map _
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private theorem affineAdjunction_counit_isIso [IsNoetherianRing R]
     (M : Coh (Spec R)) :
     IsIso ((Coh.affineAdjunction (R := R)).counit.app M) := by

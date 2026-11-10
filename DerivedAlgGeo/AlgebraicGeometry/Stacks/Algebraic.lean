@@ -280,6 +280,8 @@ abbrev StackMorphism.IsOpenImmersion
     (f : StackMorphism F G) : Prop :=
   StackMorphism.HasRepresentableProperty @AlgebraicGeometry.IsOpenImmersion f
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The identity atlas of every representable stack is an actual
 smooth-surjective representable morphism. -/
 theorem representableZariskiStackMap_id_isSmoothSurjective
@@ -334,6 +336,8 @@ class StackInGroupoids.HasRepresentableDiagonal
     Nonempty
       (AlgebraicGeometry.StackInGroupoids.DiagonalFiberRepresentation F x y)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- For a representable stack, the diagonal fiber over two maps `x,y : S ⟶ X`
 is the scheme-theoretic equalizer of those maps. -/
 def representableZariskiDiagonalFiberRepresentation

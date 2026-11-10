@@ -76,7 +76,7 @@ theorem tupleDenominator_eq {n : ℕ} (x : Fin (n + 1) → ι) :
       rw [Finset.prod_insert ha, Finset.sum_insert ha, ih,
         show (MvPolynomial.X (x a) : MvPolynomial ι k) =
           MvPolynomial.monomial (Finsupp.single (x a) 1) 1 from rfl,
-        MvPolynomial.monomial_mul, one_mul]
+        MvPolynomial.monomial_mul_monomial, one_mul]
 
 variable {ι}
 

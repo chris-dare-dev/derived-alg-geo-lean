@@ -42,6 +42,8 @@ private lemma generatingSections_isFiniteType_cast {M : (Spec R).Modules}
   subst V
   infer_instance
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Generating sections on `D(g)` transport to generating sections on `Spec R[1/g]`. -/
 noncomputable def GeneratingSections.restrictBasicOpen (M : (Spec R).Modules) (g : R)
     (σ : (M.over (PrimeSpectrum.basicOpen g)).GeneratingSections) :
@@ -51,6 +53,8 @@ noncomputable def GeneratingSections.restrictBasicOpen (M : (Spec R).Modules) (g
   σ'.map (basicOpenSpecMap g).opensRangeModulesEquivalence.inverse
     (basicOpenSpecMap g).opensRangeModulesEquivalenceInverseUnitIso.symm
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 set_option maxHeartbeats 1600000 in
 set_option synthInstance.maxHeartbeats 400000 in
 /-- Restriction from a basic open to its affine spectrum preserves finite generation. -/
@@ -91,6 +95,8 @@ theorem isIso_fromTildeΓ_restrictBasicOpen_of_quasicoherentData
   isIso_fromTildeΓ_of_quasicoherentData _
     (QuasicoherentData.restrictBasicOpen M g q)
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- A finite family of global generators gives finitely generated global sections whenever the
 affine comparison map is an isomorphism. -/
 theorem moduleFinite_globalSections_of_generatingSections (M : (Spec R).Modules)
@@ -201,6 +207,8 @@ theorem exists_finite_free_epi_of_moduleFinite (M : (Spec R).Modules) [IsIso M.f
   exact ⟨(t : Set (moduleSpecΓFunctor.obj M)), inferInstance,
     freeEpiOfSpan M _, epi_freeEpiOfSpan M _ ht⟩
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- A finite global presentation on an affine scheme gives finitely generated global sections. -/
 theorem moduleFinite_globalSections_of_presentation (M : (Spec R).Modules)
     (P : M.Presentation) [Presentation.IsFinite.{u, u, u} P] :
@@ -208,6 +216,8 @@ theorem moduleFinite_globalSections_of_presentation (M : (Spec R).Modules)
   letI : IsIso M.fromTildeΓ := isIso_fromTildeΓ_of_presentation M P
   exact moduleFinite_globalSections_of_generatingSections M P.generators
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 set_option maxHeartbeats 1600000 in
 /-- A finite-type module sheaf on `Spec R` has finite generating families on a basic-open
 cover whose defining elements generate the unit ideal. -/
@@ -243,6 +253,8 @@ theorem exists_basicOpen_finiteGenerating_cover (M : (Spec R).Modules)
     haveI hσ : σ.IsFiniteType := GeneratingSections.isFiniteType_over (q.generators i) W
     exact ⟨σ, hσ⟩
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 set_option maxHeartbeats 1600000 in
 set_option synthInstance.maxHeartbeats 400000 in
 /-- A quasi-coherent finite-type module sheaf on an affine scheme has finitely generated global
@@ -296,6 +308,8 @@ theorem moduleFinite_globalSections_of_isFiniteType (M : (Spec R).Modules)
       (.of (Localization.Away x.1)) (N x) σN hσN hN
   exact Module.Finite.of_localizationSpan' (Set.range g) hg f hfinite
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- A finitely presented module sheaf on an affine scheme has finitely generated global
 sections. -/
 theorem moduleFinite_globalSections (M : (Spec R).Modules)

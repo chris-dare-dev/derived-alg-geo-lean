@@ -137,7 +137,6 @@ noncomputable def weakStabilityFunctionOnHeart
               (by nlinarith [Real.pi_pos]))
         exact ⟨himpos.le, fun hzeroim => absurd hzeroim (ne_of_gt himpos)⟩
     have hsum : (σ.Z.comp v) (K₀.of C E) = ∑ i, f i := by
-      change (σ.Z.comp v) (CategoryTheory.Triangulated.K₀.of C E) = ∑ i, f i
       rw [CategoryTheory.Triangulated.K₀.of_postnikovTower_eq_sum C P, map_sum]
       simp [f]
       rfl
@@ -307,7 +306,6 @@ theorem charge_mem_upperHalfPlane_and_arg_le_phiPlus
       nlinarith
   have hsum_all : σ.weakStabilityFunctionOnHeart.charge E = ∑ i, f i := by
     rw [weakStabilityFunctionOnHeart_charge]
-    change σ.Z (v (CategoryTheory.Triangulated.K₀.of C E)) = ∑ i, f i
     rw [CategoryTheory.Triangulated.K₀.of_postnikovTower_eq_sum C P, map_sum]
     rw [map_sum]
   let z : Finset (Fin F.n) := Finset.univ.filter (fun i => IsZero (P.factor i))
@@ -373,7 +371,6 @@ theorem pi_mul_phiMinus_le_charge_arg_of_im_pos
         _ ≤ 1 := σ.slicing.phiPlus_le_of_leProp C hE hEheart.2
   have hsum_all : σ.weakStabilityFunctionOnHeart.charge E = ∑ i, f i := by
     rw [weakStabilityFunctionOnHeart_charge]
-    change σ.Z (v (CategoryTheory.Triangulated.K₀.of C E)) = ∑ i, f i
     rw [CategoryTheory.Triangulated.K₀.of_postnikovTower_eq_sum C P, map_sum]
     rw [map_sum]
   have hs : s.Nonempty := by

@@ -147,7 +147,7 @@ theorem awayMk_eq_blockRep (γ : ι →₀ ℕ) {m : ℕ} {β : ι →₀ ℕ}
   have hex : ∃ mb : ℕ × (ι →₀ ℕ),
       (MvPolynomial.monomial mb.2 (1 : k) ∈ 𝓜 (mb.1 • γ.degree)) ∧
         laurentExponent γ mb.1 mb.2 = laurentExponent γ m β := ⟨(m, β), h, rfl⟩
-  rw [blockRep, dif_pos hex]
+  rw [blockRep, dite_eq_left hex]
   exact (awayMk_monomial_eq_iff_laurentExponent γ h hex.choose_spec.1).mpr
     hex.choose_spec.2.symm
 

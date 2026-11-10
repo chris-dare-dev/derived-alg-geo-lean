@@ -81,16 +81,16 @@ theorem isStrictArtinian_of_faithful_strict {E : A}
     [IsStrictArtinianObject (F.obj E)] : IsStrictArtinianObject E :=
   ObjectProperty.is_of_prop _
     (show WellFoundedLT (StrictSubobject E) from
-      ⟨Subrelation.wf (strictImage_strictMono F hF harr)
-        (InvImage.wf _ IsWellFounded.wf)⟩)
+      Subrelation.wf (strictImage_strictMono F hF harr)
+        (InvImage.wf _ (isStrictArtinianObject.prop_of_is (F.obj E))))
 
 include hF harr in
 /-- Strict-Noetherian, the same route with the order reversed. -/
 theorem isStrictNoetherian_of_faithful_strict {E : A}
     [IsStrictNoetherianObject (F.obj E)] : IsStrictNoetherianObject E := by
-  refine ObjectProperty.is_of_prop _ ⟨?_⟩
+  refine ObjectProperty.is_of_prop _ ?_
   have hw : WellFounded (InvImage (· > · : StrictSubobject (F.obj E) → _ → Prop)
-      (strictImage F hF harr)) := InvImage.wf _ IsWellFounded.wf
+      (strictImage F hF harr)) := InvImage.wf _ (isStrictNoetherianObject.prop_of_is (F.obj E))
   refine Subrelation.wf ?_ hw
   intro a b hab
   exact strictImage_strictMono F hF harr hab
@@ -211,14 +211,12 @@ theorem interval_finiteLength_of_inclusion
     exact hFstrictLT hAB
   have hBig := hFinite (I.obj X)
   constructor
-  · letI : WellFoundedLT (s₂.AdmissibleSubobject C (I.obj X)) := hBig.1
-    exact ⟨Subrelation.wf hFstrictLT
+  · exact Subrelation.wf hFstrictLT
       (InvImage.wf F (show WellFounded ((· < ·) :
-        s₂.AdmissibleSubobject C (I.obj X) → _ → Prop) from IsWellFounded.wf))⟩
-  · letI : WellFoundedGT (s₂.AdmissibleSubobject C (I.obj X)) := hBig.2
-    exact ⟨Subrelation.wf hFstrictGT
+        s₂.AdmissibleSubobject C (I.obj X) → _ → Prop) from hBig.1))
+  · exact Subrelation.wf hFstrictGT
       (InvImage.wf F (show WellFounded ((· > ·) :
-        s₂.AdmissibleSubobject C (I.obj X) → _ → Prop) from IsWellFounded.wf))⟩
+        s₂.AdmissibleSubobject C (I.obj X) → _ → Prop) from hBig.2))
 
 end IntervalInclusion
 

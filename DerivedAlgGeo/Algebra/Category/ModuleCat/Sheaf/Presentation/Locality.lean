@@ -52,6 +52,8 @@ variable [HasBinaryProducts C] [HasPullbacks C]
 local instance (X : C) : HasBinaryProducts (Over X) :=
   Over.ConstructProducts.over_binaryProduct_of_pullback
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 instance QuasicoherentData.isFinitePresentation_over {M : SheafOfModules.{u} R}
     (q : M.QuasicoherentData) (U : C) [q.IsFinitePresentation] :
     (q.over U).IsFinitePresentation where

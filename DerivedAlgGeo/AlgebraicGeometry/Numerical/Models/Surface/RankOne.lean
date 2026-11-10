@@ -61,12 +61,13 @@ theorem surfacePB_gen : surfacePB.gen = H := AdjoinRoot.powerBasis_gen _
 theorem surfacePB_basis_apply (i : Fin surfacePB.dim) : surfacePB.basis i = H ^ (i : ℕ) := by
   rw [surfacePB.basis_eq_pow, surfacePB_gen]
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- `H³ = 0`: the relation, in the ring. -/
 theorem H_pow_three : H ^ 3 = 0 := by
   change AdjoinRoot.root surfaceRel ^ 3 = 0
   rw [← AdjoinRoot.eval₂_root surfaceRel]
   simp [surfaceRel]
-  rfl
 
 theorem H_pow_four : H ^ 4 = 0 := by
   rw [show (4 : ℕ) = 3 + 1 from rfl, pow_add, H_pow_three, zero_mul]

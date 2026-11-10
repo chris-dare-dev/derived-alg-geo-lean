@@ -135,7 +135,7 @@ theorem realDiscriminantC_apply (P : StabilityParameters D) (C : ℝ)
     (v : Mukai.RealExtension D) :
     S.realDiscriminantC P C v =
       S.realDiscriminant v + C * S.omegaTwistedDegree P v ^ 2 := by
-  simp only [realDiscriminantC, QuadraticMap.add_apply, QuadraticMap.smul_apply,
+  simp only [realDiscriminantC, add_apply, smul_apply,
     QuadraticMap.comp_apply, QuadraticMap.sq_apply, smul_eq_mul]
   ring
 

@@ -74,13 +74,13 @@ theorem monomial_mul_divMonomial_cancel {s : ι →₀ ℕ} {q : MvPolynomial ι
   ext β
   rw [MvPolynomial.coeff_monomial_mul']
   by_cases hle : s ≤ β
-  · rw [if_pos hle, one_mul, MvPolynomial.coeff_divMonomial]
+  · rw [ite_eq_left hle, one_mul, MvPolynomial.coeff_divMonomial]
     congr 1
     ext j
     have hj := Finsupp.le_def.mp hle j
     simp only [Finsupp.add_apply, Finsupp.tsub_apply]
     omega
-  · rw [if_neg hle]
+  · rw [ite_eq_right hle]
     exact (MvPolynomial.notMem_support_iff.mp fun hs => hle (h β hs)).symm
 
 /-- On block `F` with `i₀ ∉ F`, every numerator term carries at least the denominator's power
@@ -320,7 +320,7 @@ theorem laurentHomotopy_laurentFace_comm [IsDomain R] (h𝓜 : IsPolynomialTwist
         congr 1
         ring
       rw [hsplit, divMonomial_monomial_mul_add, ← mul_assoc,
-        MvPolynomial.monomial_mul, ← Finsupp.single_add, one_mul,
+        MvPolynomial.monomial_mul_monomial, ← Finsupp.single_add, one_mul,
         show m + m * γ₀ e = m * (γ₀ e + 1) from by ring]
     · -- The face is in another variable: the #539 disjointness pulls it through.
       have happ : (γ₀ + Finsupp.single e 1 : ι →₀ ℕ) i₀ = γ₀ i₀ := by

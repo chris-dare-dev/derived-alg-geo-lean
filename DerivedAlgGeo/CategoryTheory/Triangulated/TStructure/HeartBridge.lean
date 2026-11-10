@@ -311,8 +311,7 @@ theorem truncGE_map_comp_descTruncGE
   rw [← Category.assoc, t.truncGEπ_naturality]
   calc
     (g ≫ (t.truncGEπ n).app Y) ≫ t.descTruncGE f n = g ≫ f := by
-      simpa [Category.assoc] using
-        congrArg (fun k ↦ g ≫ k) (t.π_descTruncGE (f := f) (n := n))
+      simp [Category.assoc]
     _ = (t.truncGEπ n).app X ≫ t.descTruncGE (g ≫ f) n :=
       (t.π_descTruncGE (f := g ≫ f) (n := n)).symm
 

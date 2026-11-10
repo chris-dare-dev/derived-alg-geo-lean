@@ -242,6 +242,8 @@ noncomputable def cechCochainsIso (d n : ℕ) :
       AddCommGrpCat.of (polynomialVariableCechCochains ι k d n) :=
   (cechCochainsDegreewiseAddEquiv ι k d n).toAddCommGrpIso
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **The Čech differential in homogeneous localizations.** Reading Mathlib's Čech differential
 through the degreewise comparison gives the alternating sum of the algebraic face maps.
 
@@ -454,6 +456,8 @@ noncomputable def intCechCochainsIso (d : ℤ) (n : ℕ) :
       AddCommGrpCat.of (polynomialVariableIntCechCochains ι k d n) :=
   (intCechCochainsDegreewiseAddEquiv ι k d n).toAddCommGrpIso
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- **The Čech differential of an integer twist in homogeneous localizations.** -/
 theorem intCechCochainsDegreewiseAddEquiv_d (d : ℤ) (n : ℕ)
     (t : ((intCechComplexOfTwist ι k d).X n : AddCommGrpCat)) (x : Fin (n + 2) → ι) :

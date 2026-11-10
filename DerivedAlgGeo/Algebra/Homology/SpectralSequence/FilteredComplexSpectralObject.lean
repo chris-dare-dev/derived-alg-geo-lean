@@ -6,6 +6,7 @@ import Mathlib.Algebra.Homology.SpectralObject.SpectralSequence
 import Mathlib.Algebra.Homology.HomotopyCategory.HomologicalFunctor
 import Mathlib.Algebra.Homology.HomotopyCategory.ShiftSequence
 import Mathlib.Algebra.Homology.HomotopyCategory.SpectralObject
+import Mathlib.CategoryTheory.Triangulated.SpectralObject
 
 /-!
 # The spectral object of a filtered complex
@@ -15,50 +16,39 @@ precomposing it with a functor into cochain complexes produces the spectral obje
 a filtered complex. The remaining bridge applies a homological functor to obtain a spectral
 object in an abelian category.
 
-This file supplies that bridge for an arbitrary homological functor and then specializes it to
+Mathlib (since v4.35) supplies that bridge for an arbitrary homological functor as
+`CategoryTheory.Triangulated.SpectralObject.mapHomologicalFunctor`; this file specializes it to
 homology on the homotopy category.  Thus a filtration
 `K : ι ⥤ CochainComplex C ℤ` canonically produces an
 `Abelian.SpectralObject C ι`, which Mathlib assembles into a spectral sequence.
+
+## Main definitions
+
+* `HomotopyCategory.filteredComplexSpectralObject`: the abelian spectral object of a filtered
+  cochain complex.
+
+## Main results
+
+* None beyond the definition: its properties are those of Mathlib's spectral objects.
+
+## Implementation notes
+
+Until the Lean/Mathlib v4.35 bump this file also defined
+`CategoryTheory.Triangulated.SpectralObject.mapHomologicalFunctor`; Mathlib now provides it
+under the same name and shape, so the local copy was removed.
+
+## References
+
+* Mathlib `CategoryTheory/Triangulated/SpectralObject.lean` and
+  `Algebra/Homology/HomotopyCategory/SpectralObject.lean`.
+
+## Tags
+
+spectral object, spectral sequence, filtered complex, homological functor
 -/
 
-namespace CategoryTheory
-
-open ComposableArrows Limits Pretriangulated
-
-namespace Triangulated
-
-namespace SpectralObject
-
-variable {D A ι : Type*} [Category* D] [HasZeroObject D] [HasShift D ℤ]
-  [Preadditive D] [∀ n : ℤ, (shiftFunctor D n).Additive] [Pretriangulated D]
-  [Category* A] [Abelian A] [Category* ι]
-
-/-- Applying a homological functor, in every shifted degree, to a triangulated spectral object
-produces a spectral object in the target abelian category. -/
-noncomputable def mapHomologicalFunctor (X : SpectralObject D ι) (F : D ⥤ A)
-    [F.ShiftSequence ℤ] [F.IsHomological] :
-    Abelian.SpectralObject A ι where
-  H n := X.ω₁ ⋙ F.shift n
-  δ' n₀ n₁ hn₁ :=
-    { app T := F.homologySequenceδ (X.ω₂.obj T) n₀ n₁ hn₁
-      naturality T T' φ :=
-        F.homologySequenceδ_naturality (X.ω₂.obj T) (X.ω₂.obj T') (X.ω₂.map φ)
-          n₀ n₁ hn₁ }
-  exact₁' n₀ n₁ hn₁ T :=
-    (F.homologySequence_exact₁ (X.ω₂.obj T) (X.ω₂_obj_distinguished T)
-      n₀ n₁ hn₁).exact_toComposableArrows
-  exact₂' n T :=
-    (F.homologySequence_exact₂ (X.ω₂.obj T) (X.ω₂_obj_distinguished T)
-      n).exact_toComposableArrows
-  exact₃' n₀ n₁ hn₁ T :=
-    (F.homologySequence_exact₃ (X.ω₂.obj T) (X.ω₂_obj_distinguished T)
-      n₀ n₁ hn₁).exact_toComposableArrows
-
-end SpectralObject
-
-end Triangulated
-
-end CategoryTheory
+-- `CategoryTheory.Triangulated.SpectralObject.mapHomologicalFunctor`, formerly defined here, is
+-- upstream in Mathlib since v4.35 (`Mathlib/CategoryTheory/Triangulated/SpectralObject.lean`).
 
 namespace HomotopyCategory
 

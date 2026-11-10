@@ -25,8 +25,8 @@ variable {R : CommRingCat.{u}} {Z Y : Scheme.{u}}
 
 private theorem pushforward_smul_open (N : Z.Modules) (U : Y.Opens)
     (a : Γ(Y, ⊤)) (x : Γ((pushforward f).obj N, U)) :
-    (((pushforward f).obj N).smul (Y.presheaf.map U.leTop.op a)).hom x =
-      (N.smul (Z.presheaf.map (f ⁻¹ᵁ U).leTop.op (f.appTop.hom a))).hom
+    (((pushforward f).obj N).smul (Y.presheaf.map U.leTop.op a)).asHom.hom x =
+      (N.smul (Z.presheaf.map (f ⁻¹ᵁ U).leTop.op (f.appTop.hom a))).asHom.hom
         (show Γ(N, f ⁻¹ᵁ U) from x) := by
   change (f.app U).hom (Y.presheaf.map U.leTop.op a) •
       (show Γ(N, f ⁻¹ᵁ U) from x) =
@@ -52,12 +52,12 @@ noncomputable def fixedBasePullbackOpen (U : Y.Opens) :
         map_add' := by intros; rfl
         map_smul' := by
           intro r x
-          change (X.smul r).hom x = (T.smul r).hom x
+          change (X.smul r).asHom.hom x = (T.smul r).asHom.hom x
           have hX := modulesToFixedBaseSheaf_smul Y φ ((pushforward f).obj N) U r x
-          change (X.smul r).hom x = _ at hX
+          change (X.smul r).asHom.hom x = _ at hX
           have hT := modulesToFixedBaseSheaf_smul Z (φ ≫ f.appTop) N
             (f ⁻¹ᵁ U) r x
-          change (T.smul r).hom x = _ at hT
+          change (T.smul r).asHom.hom x = _ at hT
           rw [hX, hT]
           exact pushforward_smul_open f N U (φ.hom r) x }
   exact g ≫ cmp

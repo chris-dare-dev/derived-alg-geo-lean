@@ -82,13 +82,13 @@ namespace CategoryTheory
 
 /-- The `algebraMap` into an endomorphism ring, unfolded to the `smul` form
 every later proof works with. A pure linear-category fact — no shift or
-triangulation enters — discharged from `Algebra.algebraMap_eq_smul_one` and
-`End.one_def`. -/
+triangulation enters — discharged from `Algebra.algebraMap_eq_smul_one`,
+`End.smul_asHom` and `End.one_asHom`. `End E` is a structure wrapping
+`E ⟶ E`, so the identity is stated on the underlying morphism `asHom`. -/
 theorem algebraMap_end_apply {C : Type u} [Category.{v} C] [Preadditive C]
     {R : Type*} [CommSemiring R] [Linear R C] (c : R) (E : C) :
-    algebraMap R (End E) c = c • 𝟙 E := by
-  rw [Algebra.algebraMap_eq_smul_one, End.one_def]
-  rfl
+    (algebraMap R (End E) c).asHom = c • 𝟙 E := by
+  rw [Algebra.algebraMap_eq_smul_one, End.smul_asHom, End.one_asHom]
 
 namespace Triangulated
 
@@ -118,7 +118,7 @@ include h
 /-- Every endomorphism of an exceptional object is a scalar multiple of the
 identity — surjectivity of `algebraMap`, read through
 `algebraMap_end_apply`. -/
-theorem end_eq_smul_id (f : End E) : ∃ c : k, f = c • 𝟙 E := by
+theorem end_eq_smul_id (f : End E) : ∃ c : k, f.asHom = c • 𝟙 E := by
   obtain ⟨c, hc⟩ := h.algebraMap_bijective.2 f
   exact ⟨c, by rw [← hc, algebraMap_end_apply]⟩
 
@@ -127,6 +127,7 @@ theorem end_eq_smul_id (f : End E) : ∃ c : k, f = c • 𝟙 E := by
 theorem not_isZero : ¬ IsZero E := by
   intro hE
   have h10 : algebraMap k (End E) 1 = algebraMap k (End E) 0 := by
+    apply End.ext
     rw [algebraMap_end_apply, algebraMap_end_apply, one_smul, zero_smul]
     exact hE.eq_of_src _ _
   exact one_ne_zero (h.algebraMap_bijective.1 h10)
@@ -191,7 +192,8 @@ which is a `k`-algebra map only when the functor is `k`-linear. -/
 theorem shift [∀ n : ℤ, (shiftFunctor C n).Linear k] (m : ℤ) :
     IsExceptional k (E⟦m⟧) := by
   have hcomp : ∀ c : k,
-      algebraMap k (End (E⟦m⟧)) c = (shiftFunctor C m).map (algebraMap k (End E) c) := by
+      (algebraMap k (End (E⟦m⟧)) c).asHom =
+        (shiftFunctor C m).map (algebraMap k (End E) c).asHom := by
     intro c
     rw [algebraMap_end_apply, algebraMap_end_apply, Functor.Linear.map_smul,
       Functor.map_id]
@@ -201,10 +203,11 @@ theorem shift [∀ n : ℤ, (shiftFunctor C n).Linear k] (m : ℤ) :
       h.hom_shift_shift_eq_zero m (m + n) (by omega) _
     exact (cancel_mono ((shiftFunctorAdd' C m n (m + n) rfl).inv.app E)).1
       (h0.trans zero_comp.symm)
-  · exact ⟨fun c c' hcc => h.algebraMap_bijective.1
-        ((shiftFunctor C m).map_injective (by rw [← hcomp, ← hcomp, hcc])),
-      fun g => ((shiftFunctor C m).map_surjective g).elim fun g' hg' =>
-        (h.algebraMap_bijective.2 g').elim fun c hc => ⟨c, by rw [hcomp, hc, hg']⟩⟩
+  · exact ⟨fun c c' hcc => h.algebraMap_bijective.1 (End.ext
+        ((shiftFunctor C m).map_injective (by rw [← hcomp, ← hcomp, hcc]))),
+      fun g => ((shiftFunctor C m).map_surjective g.asHom).elim fun g' hg' =>
+        (h.algebraMap_bijective.2 (End.of g')).elim fun c hc =>
+          ⟨c, End.ext (by rw [hcomp, hc]; exact hg')⟩⟩
 
 /-- Exceptionality transports along a shift-commuting `k`-linear equivalence.
 The functor's linearity is an assumption for the same reason as in `shift`.
@@ -217,8 +220,8 @@ theorem of_equivalence {D : Type*} [Category.{v} D] [Preadditive D]
     [e.functor.CommShift ℤ] [e.functor.Additive] [e.functor.Linear k] :
     IsExceptional k (e.functor.obj E) := by
   have hcomp : ∀ c : k,
-      algebraMap k (End (e.functor.obj E)) c
-        = e.functor.map (algebraMap k (End E) c) := by
+      (algebraMap k (End (e.functor.obj E)) c).asHom
+        = e.functor.map (algebraMap k (End E) c).asHom := by
     intro c
     rw [algebraMap_end_apply, algebraMap_end_apply, Functor.Linear.map_smul,
       Functor.map_id]
@@ -231,10 +234,11 @@ theorem of_equivalence {D : Type*} [Category.{v} D] [Preadditive D]
         (e.functor.map_zero _ _))
     exact (cancel_mono ((e.functor.commShiftIso n).inv.app E)).1
       (hf0.trans zero_comp.symm)
-  · exact ⟨fun c c' hcc => h.algebraMap_bijective.1
-        (e.functor.map_injective (by rw [← hcomp, ← hcomp, hcc])),
-      fun g => (e.functor.map_surjective g).elim fun g' hg' =>
-        (h.algebraMap_bijective.2 g').elim fun c hc => ⟨c, by rw [hcomp, hc, hg']⟩⟩
+  · exact ⟨fun c c' hcc => h.algebraMap_bijective.1 (End.ext
+        (e.functor.map_injective (by rw [← hcomp, ← hcomp, hcc]))),
+      fun g => (e.functor.map_surjective g.asHom).elim fun g' hg' =>
+        (h.algebraMap_bijective.2 (End.of g')).elim fun c hc =>
+          ⟨c, End.ext (by rw [hcomp, hc]; exact hg')⟩⟩
 
 end IsExceptional
 

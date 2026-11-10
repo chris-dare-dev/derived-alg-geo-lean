@@ -66,6 +66,7 @@ theorem baseFieldToGlobalSections_comp (g : X ⟶ Y)
   rw [baseFieldToGlobalSections, baseFieldToGlobalSections, hg, Scheme.Hom.comp_appTop]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 /-- **Pushforward carries the scalar action to the scalar action.** Over an open `U` of `Y`, both
 sides multiply a section of `F` over `g⁻¹ U` by the restriction of the same global function of
 `X`; the pushforward's module structure is restriction of scalars along `g`, which is what turns
@@ -73,8 +74,8 @@ the function of `Y` into that function of `X`. -/
 theorem pushforward_varietyScalarAction (g : X ⟶ Y)
     (hg : X ↘ Spec (CommRingCat.of k) = g ≫ (Y ↘ Spec (CommRingCat.of k)))
     (F : X.Modules) (r : k) :
-    (Scheme.Modules.pushforward g).map (varietyScalarAction X F r)
-      = varietyScalarAction Y ((Scheme.Modules.pushforward g).obj F) r := by
+    (Scheme.Modules.pushforward g).map (varietyScalarAction X F r).asHom
+      = (varietyScalarAction Y ((Scheme.Modules.pushforward g).obj F) r).asHom := by
   ext U m
   change ((globalSectionSmul F (baseFieldToGlobalSections X r)).val.app (op (g ⁻¹ᵁ U))).hom m
     = ((globalSectionSmul ((Scheme.Modules.pushforward g).obj F)
@@ -88,8 +89,8 @@ theorem pushforward_varietyScalarAction (g : X ⟶ Y)
 theorem pushforward_coherentScalarAction [IsLocallyNoetherian Y] (g : X ⟶ Y) [IsFinite g]
     (hg : X ↘ Spec (CommRingCat.of k) = g ≫ (Y ↘ Spec (CommRingCat.of k)))
     (F : Coh X) (r : k) :
-    (Coh.pushforward g).map (coherentScalarAction X F r)
-      = coherentScalarAction Y ((Coh.pushforward g).obj F) r :=
+    (Coh.pushforward g).map (coherentScalarAction X F r).asHom
+      = (coherentScalarAction Y ((Coh.pushforward g).obj F) r).asHom :=
   ObjectProperty.hom_ext _ (pushforward_varietyScalarAction g hg ((Coh.ι X).obj F) r)
 
 omit [X.Over (Spec (CommRingCat.of k))] [Y.Over (Spec (CommRingCat.of k))] in
@@ -128,8 +129,9 @@ theorem coherentHPushforwardAddEquiv_smul [IsLocallyNoetherian Y] (g : X ⟶ Y)
     letI := coherentHModule k X n F
     letI := coherentHModule k Y n ((Coh.pushforward g).obj F)
     coherentHPushforwardAddEquiv g F n (r • x) = r • coherentHPushforwardAddEquiv g F n x := by
-  change coherentHPushforwardAddEquiv g F n ((coherentH X n).map (coherentScalarAction X F r) x)
-    = (coherentH Y n).map (coherentScalarAction Y ((Coh.pushforward g).obj F) r)
+  change coherentHPushforwardAddEquiv g F n
+      ((coherentH X n).map (coherentScalarAction X F r).asHom x)
+    = (coherentH Y n).map (coherentScalarAction Y ((Coh.pushforward g).obj F) r).asHom
         (coherentHPushforwardAddEquiv g F n x)
   rw [coherentHPushforwardAddEquiv_naturality, pushforward_coherentScalarAction g hg F r]
 

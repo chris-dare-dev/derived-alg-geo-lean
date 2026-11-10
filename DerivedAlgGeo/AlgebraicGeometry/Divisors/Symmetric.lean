@@ -28,10 +28,10 @@ local instance : Category X.Modules :=
   inferInstanceAs (Category (SheafOfModules X.ringCatSheaf))
 
 local instance : MonoidalCategory X.PresheafOfModules :=
-  PresheafOfModules.monoidalCategory (R := X.presheaf)
+  PresheafOfModulesOfCommRing.monoidalCategory (R := X.presheaf)
 
 local instance : SymmetricCategory X.PresheafOfModules :=
-  PresheafOfModules.symmetricCategory (R := X.presheaf)
+  PresheafOfModulesOfCommRing.symmetricCategory (R := X.presheaf)
 
 lemma tensorCommIso_naturality
     {L₁ L₂ M₁ M₂ : X.Modules} (f : L₁ ⟶ L₂) (g : M₁ ⟶ M₂) :
@@ -55,13 +55,7 @@ lemma tensorCommIso_naturality
   exact BraidedCategory.braiding_naturality
     ((toPresheafOfModules X).map f) ((toPresheafOfModules X).map g)
 
-private lemma tensorHexagonForward (L M N : X.Modules)
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from L)]
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from M)]
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from N)] :
+private lemma tensorHexagonForward (L M N : X.Modules) :
     (tensorAssocIso L M N).hom ≫
         (tensorCommIso L (tensorObj M N)).hom ≫
           (tensorAssocIso M N L).hom =
@@ -120,7 +114,6 @@ private lemma tensorHexagonForward (L M N : X.Modules)
       l₁ = l₂ ≫ tensorHom (𝟙 M) (tensorCommIso L N).hom at hL
   slice_rhs 3 4 => rw [← hL]
   slice_rhs 4 5 =>
-    change l₁ ≫ inv l₁
     rw [IsIso.hom_inv_id]
   rw [Category.comp_id, Category.comp_id]
   simp only [← Functor.map_comp]
@@ -158,13 +151,7 @@ lemma tensorCommIso_inv (L M : X.Modules) :
   rw [← cancel_epi (tensorCommIso L M).hom]
   rw [Iso.hom_inv_id, tensorCommIso_symmetry]
 
-private lemma tensorHexagonReverse (L M N : X.Modules)
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from L)]
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from M)]
-    [SheafOfModules.IsInvertible.{u, u, u}
-      (show SheafOfModules X.ringCatSheaf from N)] :
+private lemma tensorHexagonReverse (L M N : X.Modules) :
     (tensorAssocIso L M N).inv ≫
         (tensorCommIso (tensorObj L M) N).hom ≫
           (tensorAssocIso N L M).inv =

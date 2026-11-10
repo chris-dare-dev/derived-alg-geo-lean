@@ -202,6 +202,8 @@ private theorem localizedSubtype_range {R : Type u} [CommRing R]
     (M.localizedModuleMkLinearMap S) N.subtype)
   simpa only [Submodule.range_subtype] using h.symm
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- The transported pullback of the coherent tilde subobject has precisely the
 localized finite submodule as its underlying submodule. The target module is
 the canonical localized-module carrier, with transport through `κ` explicit

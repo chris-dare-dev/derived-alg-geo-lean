@@ -258,7 +258,7 @@ theorem exists_hn_with_last_phase_of_semistable (Z : StabilityFunction A)
     have hj1 : j = 1 := by omega
     subst hi0
     subst hj1
-    simp only [Fin.zero_eta, Fin.mk_one, one_ne_zero, if_false, if_true]
+    simp only [Fin.zero_eta, Fin.mk_one, one_ne_zero, ite_false, ite_true]
     exact lt_of_le_of_ne bot_le
       (Ne.symm (StabilityFunction.subobject_top_ne_bot_of_not_isZero hE.1))
   · intro ⟨j, hj⟩

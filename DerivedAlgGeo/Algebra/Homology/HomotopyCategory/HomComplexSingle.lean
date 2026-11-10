@@ -69,7 +69,7 @@ noncomputable def singleCoyonedaIso (X : C) (K : CochainComplex C ℤ) :
       apply AddMonoidHom.ext
       intro α
       obtain ⟨f, rfl⟩ := Cochain.fromSingleMk_surjective α i (zero_add i)
-      simp only [CategoryTheory.comp_apply, AddEquiv.toAddCommGrpIso_hom]
+      simp only [CategoryTheory.comp_apply]
       change Cochain.fromSingleEquiv (zero_add i)
           (Cochain.fromSingleMk f (zero_add i)) ≫ K.d i j =
         Cochain.fromSingleEquiv (zero_add j)

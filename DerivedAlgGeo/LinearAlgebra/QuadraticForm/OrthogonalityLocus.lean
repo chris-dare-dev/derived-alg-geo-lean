@@ -55,7 +55,7 @@ theorem isSphericalClass_iff_apply {δ : M} : IsSphericalClass Q δ ↔ Q δ = -
 lies in its orthogonal complement. -/
 theorem mem_orthogonalityLocus_iff_mem_orthogonal {W : Submodule ℝ M} {δ : M}
     (hW : IsPositivePlane Q W) : W ∈ orthogonalityLocus Q δ ↔ δ ∈ orthogonal Q W := by
-  rw [orthogonalityLocus, Set.mem_setOf_eq, mem_orthogonal_iff]
+  rw [orthogonalityLocus, Set.mem_ofPred_eq, mem_orthogonal_iff]
   refine ⟨fun h w hw => ?_, fun h => ⟨hW, fun w hw => ?_⟩⟩
   · exact (polar_comm (⇑Q) w δ).trans (h.2 w hw)
   · exact (polar_comm (⇑Q) δ w).trans (h w hw)

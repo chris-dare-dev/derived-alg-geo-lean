@@ -65,6 +65,8 @@ private theorem baseToGlobal_specMap {R A : Type u} [CommRing R] [CommRing A]
   exact (congrArg (fun q : CommRingCat.of R ⟶ Γ(Spec (CommRingCat.of A), ⊤) =>
     p.appTop.hom (q.hom r)) h).symm
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 private theorem pushforward_scalar {R A : Type u} [CommRing R] [CommRing A]
     (φ : R →+* A) {X Y : Scheme.{u}} (f : X ⟶ Y)
     (p : Y ⟶ Spec (CommRingCat.of A)) (M : X.Modules) (r : R) :
@@ -325,6 +327,8 @@ theorem boundedFunctor_linearOfLocalization {R A : Type u}
   letI : IsExactPullback f := isExactPullback_of_flat f
   exact relativeBoundedPullback_linear X P h
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 /-- Relative bounded-coherent pullback along an affine localization is additive.
 Together with `boundedFunctor_linearOfLocalization`, this makes its actual
 action on Hom groups available as `Functor.mapLinearMap` for the affine-base
