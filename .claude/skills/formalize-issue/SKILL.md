@@ -12,9 +12,7 @@ This is **one** iteration and it **halts** at the PR. It never merges, never
 pushes to `main`, and never leaves a `sorry` behind. Under `/loop` it will be
 re-entered from a clean state, so everything below must be safe to re-run.
 
-The manifest controller (`scripts/loop_engine.py`) is retired from every run
-path; a manifest, OpenSpec change or ledger never scopes this skill. A style
-review is not a mathematical verdict.
+A style review is not a mathematical verdict.
 
 Issues live on `chris-dare-dev/derived-alg-geo-lean`.
 

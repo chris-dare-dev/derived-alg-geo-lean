@@ -129,7 +129,7 @@ def corpus(paths: list[Path], base: str) -> list[tuple[str, int, str, bool]]:
                 # primary-template enforcement preserves untouched old debt.
                 revised_primary = primary and (body, primary) not in previous
                 result.append((str(path), line, body, revised_primary))
-        elif path.suffix == ".md" and path.parts[0] not in (".claude", "openspec"):
+        elif path.suffix == ".md" and path.parts[0] != ".claude":
             diff = git("diff", "--unified=0", merge_base, "--", str(path))
             touched = set()
             for start, count in re.findall(r"^@@ .*? \+(\d+)(?:,(\d+))? @@", diff, re.M):

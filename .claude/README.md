@@ -16,7 +16,6 @@ evidence behind one.
 | `references/mathlib-style.md` | The Mathlib conventions this repo holds itself to, and the deltas it keeps on purpose. The spec `agents/mathlib-reviewer.md` enforces. |
 | `agents/` | Repo-local agent specifications. One per file. |
 | `skills/` | Repo-local skills, one directory each. `run-loop` works issues or a milestone to merged PRs; `formalize-issue` and `land-pr` are single iterations, not for loop runs. |
-| `loop-specs/` | Manifests of the retired loop controller. Runs no longer write them; they are kept for the ledgers they produced. |
 | `settings.json` | Hooks. Currently: the Mathlib-convention check on every Lean edit. |
 
 Repository-specific reviewers and the loop protocol live in `.claude/agents/`
@@ -27,7 +26,7 @@ to both runtimes. Codex lists a symlinked skill directory but ignores a
 symlinked `SKILL.md` (checked with `codex debug prompt-input`), so keep the link
 on the directory.
 
-## Loop runs and OpenSpec
+## Loop runs
 
 A loop run follows `skills/run-loop/SKILL.md`:
 - it takes GitHub issues or a milestone, researches each issue, and writes its
@@ -37,32 +36,11 @@ A loop run follows `skills/run-loop/SKILL.md`:
 - the PR description is its record. There is no manifest, ledger or controller
   on the run path.
 
-OpenSpec lives in `openspec/`. It remains available for interactive design
-work; a run does not use it. Install its generated Codex skills per user, in
-`$CODEX_HOME/skills/` (default `~/.codex/skills/`, once per Codex home), not in
-`.agents/skills/`, so that the skill catalog every loop thread carries lists
-run-loop and not OpenSpec. To restore them from before their removal:
-
-```bash
-c=$(git log --diff-filter=D -1 --format=%H -- .agents/skills/openspec-propose/SKILL.md)
-tmp=$(mktemp -d) && git archive "$c^" .agents/skills | tar -x -C "$tmp"
-mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
-cp -r "$tmp"/.agents/skills/openspec-* "${CODEX_HOME:-$HOME/.codex}/skills/"
-```
-
-If `openspec update` writes them back into `.agents/skills/`, move them again.
-
-`scripts/loop_engine.py` and the manifests in `loop-specs/` are the retired
-manifest controller. It kept a digest-bound review ledger under the ignored
-`.loop-runs/` directory and gated every provider action on it. Runs no longer
-use it. It is kept, with `docs/architecture/loop-recovery.md`, for the ledgers it
-already wrote.
-
 `scripts/loop_tokens.py` is the cost side of the same run. It reconstructs
 token totals from the Claude Code and Codex transcripts after the fact, so
 neither runtime has to be instrumented in advance, and attributes them to the
-frozen chunks recorded in `.loop-runs/`. It reads those ledgers and never
-writes to them.
+frozen chunks recorded in the ignored `.loop-runs/` ledgers that the retired
+manifest controller wrote. It reads those ledgers and never writes to them.
 
 `scripts/loop_transcripts.py` is the behaviour side. `sync` copies every Codex
 and Claude Code transcript that touches this repository -- from every Codex
