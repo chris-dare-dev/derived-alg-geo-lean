@@ -283,7 +283,7 @@ items:
     kind: task
     parent: stacks-and-moduli-mo2
     title: "MO2.1: ADR-0014 fixes the owners and conventions for stacks and moduli"
-    status: planned
+    status: done
     priority: must
     size: S
     summary: "ADR-0014 fixes, once, the conventions every stacks and moduli issue in this plan builds on: one stack carrier, fibres in independent universes, relative stacks over Over S, representability natural in the test object, one moduli-of-objects construction, typed hypotheses over genuine definitions, and the paths in its placement table. It supersedes ADR-0013's paths. The architecture documents and AGENTS.md are brought into agreement with it in the same change."
