@@ -1067,7 +1067,7 @@ items:
     kind: task
     parent: stacks-and-moduli-stk4
     title: "STK4.7: Nagata and universally Japanese rings and schemes, and BLMNPS's essentially-finite-type DVR lemmas (11.15, 11.16, 11.19)"
-    status: planned
+    status: done
     priority: must
     size: L
     summary: "The commutative algebra and scheme theory behind BLMNPS §11.4 (Nagata valuative criteria), for rings and schemes. Stack-level statements are #1697's."
