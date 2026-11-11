@@ -373,7 +373,7 @@ items:
     kind: task
     parent: stacks-and-moduli-stk1
     title: "STK1.3a: Two-fibre products of Cat-valued pseudofunctors, with projections, lifts and the diagonal"
-    status: planned
+    status: done
     priority: must
     size: M
     summary: "Given strong transformations α : F ⟶ H and β : G ⟶ H between pseudofunctors LocallyDiscrete B₀ ⥤ᵖ Cat, this issue builds their 2-fibre product Pseudofunctor.fiberProduct α β. Its fibre over X is Mathlib's categorical pullback (α.app X).toFunctor ⊡ (β.app X).toFunctor. It comes with: the two projections and the 2-commutativity isomorphism; the lift of any 2-commutative square; the relative diagonal F ⟶ fiberProduct α α;"
