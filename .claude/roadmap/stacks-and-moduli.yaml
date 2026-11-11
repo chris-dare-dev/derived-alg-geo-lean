@@ -832,7 +832,7 @@ items:
     kind: task
     parent: stacks-and-moduli-pj1
     title: "PJ1.1: Projective space ℙ(n; S) over a base scheme, its twisting sheaves, and base change of Proj"
-    status: planned
+    status: done
     priority: must
     size: M
     summary: "Projective space over a base scheme, its twisting sheaves, and base change of Proj. For a type n of homogeneous coordinates and a scheme S, define"
