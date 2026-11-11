@@ -3,6 +3,7 @@ Projective-variety slice of the AlgebraicGeometry audit, split out so concurrent
 branches append to different files (#480). See the umbrella file for the contract.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward
+import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpace
 import DerivedAlgGeo.AlgebraicGeometry.Variety.Projective
 open AlgebraicGeometry
 
@@ -78,3 +79,51 @@ affine-pushforward exactness on quasi-coherent sheaves.
 #print axioms AlgebraicGeometry.Coh.pushforward_additive
 #print axioms AlgebraicGeometry.Coh.pushforward_preservesEpimorphisms
 #print axioms AlgebraicGeometry.Coh.pushforward_preservesFiniteColimits
+
+/-! ## Base change of graded algebras and of `Proj`
+
+The graded inclusion `a ↦ 1 ⊗ a` into the base change, the irrelevant-ideal hypotheses `Proj.map`
+asks of it and of a bijective graded map, and homogeneous localization commuting with base change
+without flatness. On `Proj`, the base-change square is cartesian (Stacks 01N2).
+-/
+
+#print axioms GradedRingHom.includeRight
+#print axioms GradedRingHom.includeRight_apply
+#print axioms GradedRingHom.irrelevant_baseChange_le_map
+#print axioms GradedRingHom.symmOfBijective
+#print axioms GradedRingHom.symmOfBijective_apply_apply
+#print axioms GradedRingHom.apply_symmOfBijective_apply
+#print axioms GradedRingHom.bijective_symmOfBijective
+#print axioms GradedRingHom.irrelevant_le_map_of_bijective
+#print axioms HomogeneousLocalization.Away.isPushout_baseChange
+#print axioms AlgebraicGeometry.Proj.map_toSpecZero
+#print axioms AlgebraicGeometry.Proj.map_toSpecZero_assoc
+#print axioms AlgebraicGeometry.Proj.isIso_map_of_bijective
+#print axioms AlgebraicGeometry.Proj.isPullback_map_baseChange
+
+/-! ## Projective space over a base scheme
+
+`ℙ(n; S) := S ×_ℤ Proj ℤ[n]` (Stacks 01NF), its structure morphism, properness for finite `n`,
+base change in `S`, the comparison `ℙ(n; Spec R) ≅ Proj R[n]` with the field-level model, and the
+twisting sheaves pulled back from `Proj ℤ[n]`.
+-/
+
+#print axioms AlgebraicGeometry.ProjectiveSpace
+#print axioms AlgebraicGeometry.«termℙ(_;_)»
+#print axioms AlgebraicGeometry.ProjectiveSpace.over
+#print axioms AlgebraicGeometry.ProjectiveSpace.over_over
+#print axioms AlgebraicGeometry.ProjectiveSpace.toProj
+#print axioms AlgebraicGeometry.ProjectiveSpace.isProper
+#print axioms AlgebraicGeometry.ProjectiveSpace.map
+#print axioms AlgebraicGeometry.ProjectiveSpace.map_over
+#print axioms AlgebraicGeometry.ProjectiveSpace.map_over_assoc
+#print axioms AlgebraicGeometry.ProjectiveSpace.map_toProj
+#print axioms AlgebraicGeometry.ProjectiveSpace.map_toProj_assoc
+#print axioms AlgebraicGeometry.ProjectiveSpace.isPullback_map
+#print axioms AlgebraicGeometry.ProjectiveSpace.SpecIso
+#print axioms AlgebraicGeometry.ProjectiveSpace.SpecIso_hom_toSpecZero
+#print axioms AlgebraicGeometry.ProjectiveSpace.SpecIso_hom_toSpecZero_assoc
+#print axioms AlgebraicGeometry.ProjectiveSpace.SpecIso_hom_comp_projectiveSpaceToSpec
+#print axioms AlgebraicGeometry.ProjectiveSpace.twistingSheaf
+#print axioms AlgebraicGeometry.ProjectiveSpace.isInvertible_twistingSheaf
+#print axioms AlgebraicGeometry.ProjectiveSpace.twistingSheafTensorIso
