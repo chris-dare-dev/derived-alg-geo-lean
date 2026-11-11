@@ -47,6 +47,7 @@ and future upstream work; matching directories is not required to import Mathlib
 | Sheaves on a topological space, stalks, the category of opens | `Topology/Sheaves/`, `Topology/Category/TopCat/` | `Topology/Sheaves/`, `Topology/Category/TopCat/` |
 | `PrimeSpectrum` and its topology | `RingTheory/Spectrum/Prime/` | `RingTheory/Spectrum/Prime/` |
 | `HomogeneousLocalization` and graded algebras | `RingTheory/GradedAlgebra/` | `RingTheory/GradedAlgebra/` |
+| `LocalSubring` and its domination order | `RingTheory/LocalRing/` | `RingTheory/LocalRing/` |
 | Modules, localization, graded modules, polynomials | `Algebra/Module/`, `Algebra/MvPolynomial/` | the same |
 | Lattices, bilinear forms, exterior powers, finite-dimensional lemmas | `LinearAlgebra/` | `LinearAlgebra/` |
 | Upper half-planes of `ℂ`, argument bounds, polygonal-path length and perimeter | `Analysis/Complex/`, `Analysis/Convex/` (no Mathlib owner: the pinned revision has no chain length and no perimeter) | `Analysis/Complex/`, `Analysis/Convex/ComplexPolygonalPath/` |
