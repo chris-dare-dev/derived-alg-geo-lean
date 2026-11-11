@@ -4,6 +4,7 @@ branches append to different files (#480). See the umbrella file for the contrac
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpace
+import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.MapPullback
 import DerivedAlgGeo.AlgebraicGeometry.Variety.Projective
 open AlgebraicGeometry
 
@@ -127,3 +128,33 @@ twisting sheaves pulled back from `Proj ℤ[n]`.
 #print axioms AlgebraicGeometry.ProjectiveSpace.twistingSheaf
 #print axioms AlgebraicGeometry.ProjectiveSpace.isInvertible_twistingSheaf
 #print axioms AlgebraicGeometry.ProjectiveSpace.twistingSheafTensorIso
+#print axioms AlgebraicGeometry.ProjectiveSpace.twistingSheafSpecIso
+
+/-! ## Twisting sheaves along `Proj.map`
+
+Degree-zero localizations along a graded ring map, the map `M̃ ⟶ (Proj.map ψ)_* Ñ` it induces, and
+the adjoint comparison `θ : (Proj.map ψ)^* 𝒪(d) ⟶ 𝒪(d)` (Stacks 01MY), an isomorphism once the
+source is generated in degree one.
+-/
+
+#print axioms GradedModule.localizedMapOfRingHom
+#print axioms GradedModule.localizedMapOfRingHom_mk
+#print axioms GradedModule.NumDenSameDeg.mapOfRingHom
+#print axioms GradedModule.DegreeZeroLocalization.mapOfRingHom
+#print axioms GradedModule.DegreeZeroLocalization.coe_mapOfRingHom
+#print axioms GradedModule.DegreeZeroLocalization.mapOfRingHom_mk
+#print axioms GradedModule.DegreeZeroLocalization.mapOfRingHom_smul
+#print axioms AlgebraicGeometry.Proj.primeCompl_comap_le
+#print axioms AlgebraicGeometry.Proj.fiberMapOfRingHom
+#print axioms AlgebraicGeometry.Proj.sectionMapOfRingHom
+#print axioms AlgebraicGeometry.Proj.sectionMapOfRingHom_apply
+#print axioms AlgebraicGeometry.Proj.associatedPresheafMapOfRingHom
+#print axioms AlgebraicGeometry.Proj.associatedSheafMapOfRingHom
+#print axioms AlgebraicGeometry.Proj.associatedSheafMapOfRingHom_app
+#print axioms AlgebraicGeometry.Proj.map_mem_intShift
+#print axioms AlgebraicGeometry.Proj.twistingSheafMapOfRingHom
+#print axioms AlgebraicGeometry.Proj.mapPullbackTwistingSheaf
+#print axioms AlgebraicGeometry.Proj.mapPullbackTwistingSheaf_app_unit
+#print axioms AlgebraicGeometry.Proj.isIso_mapPullbackTwistingSheaf
+#print axioms AlgebraicGeometry.Proj.mapPullbackTwistingSheafIso
+#print axioms AlgebraicGeometry.Proj.mapPullbackTwistingSheafIso_hom
