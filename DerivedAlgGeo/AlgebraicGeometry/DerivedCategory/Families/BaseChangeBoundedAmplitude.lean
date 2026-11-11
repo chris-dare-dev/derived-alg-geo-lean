@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.BoundedCoherent
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.TStructure
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeProposition315
 import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition.Amplitude
 
@@ -25,17 +25,45 @@ presentation of the cohomology sheaves of a projected object is a genuine
 coherence statement about the geometry, so `PreservesCoherentCohomology`
 stays an input, as does generation of the restricted locus.
 
-Amplitude is measured against a t-structure on `Dqc(X_T)`. The repository has
-no such t-structure -- boundedness in `Dqc(X_T)` is measured through the
-inclusion by the canonical t-structure of the ambient all-sheaf derived
-category -- so `TargetBoundedTStructure` carries one together with the only
-property of it the argument uses: that its bounded objects are the ambiently
-bounded ones. Supplying that structure is a geometric obligation, and it is
-deliberately not the base-changed t-structure of a source t-structure, which
-belongs to a separate lane.
+Nothing here asserts finite amplitude for any projector.
 
-Nothing here asserts finite amplitude for any projector, or constructs a
-t-structure on `Dqc(X_T)`.
+## Main definitions
+
+* `TargetBoundedTStructure`: a t-structure on `Dqc(X_T)` whose bounded objects are the
+  ambiently bounded ones.
+* `TargetBoundedTStructure.standard`: the standard t-structure on `Dqc(X_T)`.
+* `DerivedBaseChangeData.DecompositionData.HasFiniteAmplitude` and
+  `DerivedBaseChangeData.DecompositionData.PreservesCoherentCohomology`: the two
+  inputs of the bounded-coherent restriction.
+
+## Main results
+
+* `DerivedBaseChangeData.DecompositionData.preservesBoundedQuasicoherent`: finite
+  amplitude preserves ambient boundedness.
+* `DerivedBaseChangeData.DecompositionData.toBoundedData`: finite amplitude, coherence
+  preservation and generation give the bounded-coherent restriction.
+* `KFlatBaseChangeData.Proposition315CoreData.boundedSequence_isStrong`: the
+  bounded-coherent sequence of Proposition 3.15 is strong under the same inputs.
+
+## Implementation notes
+
+Amplitude is measured against a t-structure on `Dqc(X_T)`, and
+`TargetBoundedTStructure` carries one together with the only property of it the
+argument uses: that its bounded objects are the ambiently bounded ones.
+`TargetBoundedTStructure.standard` is the standard t-structure
+`Dqc.standardTStructure`, whose `IsLE` and `IsGE` are those of the canonical
+t-structure of the all-sheaf derived category. The structure still accepts any
+t-structure with the same bounded objects. The base-changed t-structure of a
+source t-structure is a separate construction and is not provided here.
+
+## References
+
+* A. Bayer, M. Lahoz, E. Macrì, H. Nuer, A. Perry, P. Stellari, *Stability conditions
+  in families*, arXiv:1902.08184v4, Proposition 3.15.
+
+## Tags
+
+base change, semiorthogonal decomposition, t-structure, amplitude
 -/
 
 noncomputable section
@@ -71,6 +99,12 @@ structure TargetBoundedTStructure (X T : SchemeBaseChange S) where
   /-- Its bounded objects are exactly the ambiently bounded ones. -/
   bounded_iff (E : TargetDqc X T) :
     tStructure.bounded E ↔ Dqc.schemeBoundedQuasicoherent (X ⨯ T).left E
+
+/-- The standard t-structure on `Dqc(X_T)` presents the ambient bounded locus. -/
+def TargetBoundedTStructure.standard (X T : SchemeBaseChange S) :
+    TargetBoundedTStructure X T where
+  tStructure := Dqc.standardTStructure (X ⨯ T).left
+  bounded_iff := Dqc.standardTStructure_bounded_iff (X ⨯ T).left
 
 namespace DerivedBaseChangeData
 

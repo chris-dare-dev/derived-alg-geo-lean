@@ -44,4 +44,9 @@ example (E : Dqc.SchemeBoundedCoherentDqcCategory (X ⨯ T).left) (n : ℤ) :
       τ.tStructure.IsGE E.obj n :=
   τ.boundedCoherentTStructureIsGE hfpLE E n
 
+-- The standard target t-structure discharges the truncation-coherence input.
+example : TStructure (Dqc.SchemeBoundedCoherentDqcCategory (X ⨯ T).left) :=
+  (standard X T).boundedCoherentTStructure fun E hE n ↦
+    Dqc.standardTStructure_truncLE_mem_finitePresentation _ E hE.2 n
+
 end AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.TargetBoundedTStructure

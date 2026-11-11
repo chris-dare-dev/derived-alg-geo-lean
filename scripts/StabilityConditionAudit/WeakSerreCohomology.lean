@@ -6,6 +6,7 @@ contract and reading guide.
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty.Termwise
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty.Bounded
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty.TStructure
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty.HomVanishing
 import DerivedAlgGeo.CategoryTheory.Abelian.SerreClass.FullSubcategory
 
@@ -65,3 +66,27 @@ resulting induction on amplitude is what the derived-functor dévissage runs on.
 #print axioms DerivedCategory.bounded_induction
 #print axioms DerivedCategory.hom_singleFunctor_eq_zero_of_ext_subsingleton
 #print axioms DerivedCategory.hom_eq_zero_of_isGE_of_isLE_neg_of_cohomologyIn
+
+/-! ## The canonical t-structure on cohomology in a weak Serre subcategory
+
+The canonical t-structure of `DerivedCategory A` induces one on `cohomologyIn P`,
+because the canonical truncations above do not leave it. The inclusion is t-exact,
+boundedness is the ambient one, and the heart is `P`, by restricting the heart
+equivalence of the canonical t-structure.
+-/
+
+#print axioms DerivedCategory.cohomologyIn_singleFunctor_obj
+#print axioms DerivedCategory.cohomologyIn_hasInducedTStructure
+#print axioms DerivedCategory.cohomologyInTStructure
+#print axioms DerivedCategory.cohomologyIn_ι_isTExact
+#print axioms DerivedCategory.cohomologyInTStructure_bounded_iff
+#print axioms DerivedCategory.cohomologyIn_cohomologyInTStructure_truncLE
+#print axioms DerivedCategory.toCohomologyInHeart
+#print axioms DerivedCategory.fullyFaithfulToCohomologyInHeart
+#print axioms DerivedCategory.toCohomologyInHeart_full
+#print axioms DerivedCategory.toCohomologyInHeart_faithful
+#print axioms DerivedCategory.toCohomologyInHeart_essSurj
+#print axioms DerivedCategory.toCohomologyInHeart_isEquivalence
+#print axioms DerivedCategory.cohomologyInHeartEquivalence
+#print axioms DerivedCategory.cohomologyInHeartEquivalence_functor
+#print axioms DerivedCategory.toCohomologyInHeart_obj_obj_obj

@@ -952,6 +952,24 @@ restricted locus.
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.TargetBoundedTStructure.mk.sizeOf_spec
 #print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.TargetBoundedTStructure.tStructure
 
+/-! ## The standard t-structure on `Dqc(X)`
+
+The canonical t-structure of the all-sheaf derived category restricts to `Dqc(X)` on
+every scheme, with heart the quasi-coherent sheaves. It presents the ambient bounded
+locus, so it inhabits `TargetBoundedTStructure`, and its truncations keep finite
+presentation of cohomology, which is the truncation premise of the bounded-coherent
+restriction.
+-/
+
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.schemeQuasicoherentCohomology_hasInducedTStructure
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.standardTStructure
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.standardTStructure_isLE_iff
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.standardTStructure_isGE_iff
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.standardTStructure_bounded_iff
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.standardHeartEquivalence
+#print axioms AlgebraicGeometry.DerivedCategory.Dqc.standardTStructure_truncLE_mem_finitePresentation
+#print axioms AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange.TargetBoundedTStructure.standard
+
 /-! ## Base-change data carriers missed by earlier tranches (SF11 A-G)
 
 Generated structure-equality and size lemmas, plus the four category
