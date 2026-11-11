@@ -351,7 +351,7 @@ items:
     kind: task
     parent: stacks-and-moduli-stk1
     title: "STK1.2: Being a stack is invariant under pseudonatural equivalence"
-    status: planned
+    status: done
     priority: must
     size: M
     summary: "Let F G : LocallyDiscrete Cᵒᵖ ⥤ᵖ Cat.{v', u'} and let α : F ⟶ G be a strong transformation all of whose components (α.app X).toFunctor are equivalences of categories. Then: descent data map functorially along α; restriction to descent data commutes with α up to a natural isomorphism; F is a prestack (a stack) for J if and only if G is."
