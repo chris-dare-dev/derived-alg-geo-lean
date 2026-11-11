@@ -24,6 +24,10 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Stalk
 #print axioms AlgebraicGeometry.Scheme.Modules.pullbackStalkPresheafIso
 #print axioms AlgebraicGeometry.Scheme.Modules.presheafModulePullbackStalkIso
 #print axioms AlgebraicGeometry.Scheme.Modules.pullbackStalkIso
+#print axioms AlgebraicGeometry.Scheme.Modules.presheafModulePullbackStalkIso_hom_app_germ_unit
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackStalkIso_hom_app_germ_unit
+#print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor_map_germ
+#print axioms AlgebraicGeometry.Scheme.Modules.presheafModuleStalkFunctor_map_germ
 #print axioms AlgebraicGeometry.Scheme.Modules.exists_sheaf_with_stalk
 #print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor_preservesSmallColimits
 #print axioms AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor_preservesFiniteColimits

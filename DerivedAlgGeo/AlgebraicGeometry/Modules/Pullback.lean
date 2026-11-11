@@ -7,6 +7,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.FixedBaseOpenSections
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.LocallyFree
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Monoidal
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Presentation
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.ProjectionFormula
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Restriction
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.SliceSiteBaseChange
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.ScalarExtendedSections

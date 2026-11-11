@@ -45,6 +45,9 @@ an arbitrary scheme morphism is exact.
   scalars on stalks.
 * `AlgebraicGeometry.Scheme.Modules.pullbackStalkIso`
   gives the corresponding comparison for module sheaves.
+* `AlgebraicGeometry.Scheme.Modules.pullbackStalkIso_hom_app_germ_unit`
+  computes it on germs: the germ of the adjunction unit applied to a section `s`
+  goes to `1 ⊗ s`.
 * `AlgebraicGeometry.Scheme.Modules.exists_sheaf_with_stalk`
   realizes any local-ring module as a sheaf stalk.
 
@@ -1193,6 +1196,155 @@ def pullbackStalkIso {X Y : Scheme.{u}} (f : X ⟶ Y) (x : X) :
     CategoryTheory.Functor.isoWhiskerLeft (toPresheafOfModules Y)
       (presheafModulePullbackStalkIso f x) ≪≫
     (CategoryTheory.Functor.associator _ _ _).symm
+
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
+private theorem skyscraperAdjunction_unit_app_apply (X : Scheme.{u}) (x : X)
+    (M : X.PresheafOfModules) (U : (Opens X)ᵒᵖ) (hU : x ∈ U.unop) (m : M.obj U) :
+    moduleSkyscraperPositiveEquiv X x ((presheafModuleStalkFunctor X x).obj M) U hU
+        (((presheafModuleStalkSkyscraperAdjunction X x).unit.app M).app U m) =
+      TopCat.Presheaf.germ M.presheaf U.unop x hU m := by
+  let : InitiallySmall.{u} (OpenNhds x) := initiallySmall_of_essentiallySmall _
+  change moduleSkyscraperPositiveEquiv X x _ U hU
+    (((neighborhoodHomToSkyscraperHom X x M _
+      (((_root_.PresheafOfModules.colimitAdjunction (moduleStalkRingIsColimit X x)).homEquiv
+        _ _) (𝟙 _))).app U) m) = _
+  dsimp only [neighborhoodHomToSkyscraperHom]
+  rw [dite_eq_left hU]
+  change moduleSkyscraperPositiveEquiv X x _ U hU
+    ((moduleSkyscraperPresheafAppIso X x _ U hU).inv.hom
+      ((((_root_.PresheafOfModules.colimitAdjunction (moduleStalkRingIsColimit X x)).homEquiv
+        ((_root_.PresheafOfModules.pushforward₀ (OpenNhds.inclusion x) X.ringCatSheaf.obj).obj M)
+          _) (𝟙 _)).app (op (⟨U.unop, hU⟩ : OpenNhds x)) m)) = _
+  rw [moduleSkyscraperPresheafAppIso_inv_apply, AddEquiv.apply_symm_apply]
+  rfl
+
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
+/-- The presheaf pullback-to-stalk comparison sends the germ of the pullback unit applied to a
+section `s` near `f x` to `1 ⊗ s`. -/
+theorem presheafModulePullbackStalkIso_hom_app_germ_unit {X Y : Scheme.{u}} (f : X ⟶ Y)
+    (x : X) (P : Y.PresheafOfModules) (V : Y.Opens) (hV : f x ∈ V) (s : P.obj (op V)) :
+    (presheafModulePullbackStalkIso f x).hom.app P
+        (TopCat.Presheaf.germ
+          ((_root_.PresheafOfModules.pullback f.toRingCatSheafHom.hom).obj P).presheaf
+          (f ⁻¹ᵁ V) x hV
+          (((_root_.PresheafOfModules.pullbackPushforwardAdjunction
+            f.toRingCatSheafHom.hom).unit.app P).app (op V) s)) =
+      (ModuleCat.extendRestrictScalarsAdj (f.stalkMap x).hom).unit.app
+        ((presheafModuleStalkFunctor Y (f x)).obj P)
+        (TopCat.Presheaf.germ P.presheaf V (f x) hV s) := by
+  have h := unit_conjugateEquiv_symm
+    ((presheafModuleStalkSkyscraperAdjunction Y (f x)).comp
+      (ModuleCat.extendRestrictScalarsAdj (f.stalkMap x).hom))
+    ((_root_.PresheafOfModules.pullbackPushforwardAdjunction f.toRingCatSheafHom.hom).comp
+      (presheafModuleStalkSkyscraperAdjunction X x))
+    (moduleSkyscraperPushforwardIso f x).inv P
+  have h2 := congrArg (fun k => moduleSkyscraperPositiveEquiv X x _ (op (f ⁻¹ᵁ V)) hV
+    ((k.app (op V)).hom s)) h
+  let N := (ModuleCat.extendScalars (f.stalkMap x).hom).obj
+    ((presheafModuleStalkFunctor Y (f x)).obj P)
+  have hL : moduleSkyscraperPositiveEquiv X x N (op (f ⁻¹ᵁ V)) hV
+      ((moduleSkyscraperPushforwardIsoApp f x N (op V)).inv.hom
+        ((((presheafModuleStalkSkyscraperAdjunction Y (f x)).comp
+          (ModuleCat.extendRestrictScalarsAdj (f.stalkMap x).hom)).unit.app P).app (op V) s)) =
+      (ModuleCat.extendRestrictScalarsAdj (f.stalkMap x).hom).unit.app
+        ((presheafModuleStalkFunctor Y (f x)).obj P)
+        (TopCat.Presheaf.germ P.presheaf V (f x) hV s) := by
+    rw [← moduleSkyscraperPushforwardIsoApp_hom_apply f x N (op V) hV, Iso.inv_hom_id_apply,
+      Adjunction.comp_unit_app]
+    change moduleSkyscraperPositiveEquiv Y (f x) _ (op V) hV
+      (moduleSkyscraperMapApp Y (f x) _ (op V)
+        (((presheafModuleStalkSkyscraperAdjunction Y (f x)).unit.app P).app (op V) s)) = _
+    rw [moduleSkyscraperPositiveEquiv_mapApp, skyscraperAdjunction_unit_app_apply]
+    rfl
+  have hR : moduleSkyscraperPositiveEquiv X x
+      ((presheafModuleStalkFunctor Y (f x) ⋙
+        ModuleCat.extendScalars (f.stalkMap x).hom).obj P) (op (f ⁻¹ᵁ V)) hV
+      (moduleSkyscraperMapApp X x ((presheafModulePullbackStalkIso f x).hom.app P)
+        (op (f ⁻¹ᵁ V))
+        ((((_root_.PresheafOfModules.pullbackPushforwardAdjunction
+          f.toRingCatSheafHom.hom).comp (presheafModuleStalkSkyscraperAdjunction X x)).unit.app
+            P).app (op V) s)) =
+      (presheafModulePullbackStalkIso f x).hom.app P
+        (TopCat.Presheaf.germ
+          ((_root_.PresheafOfModules.pullback f.toRingCatSheafHom.hom).obj P).presheaf
+          (f ⁻¹ᵁ V) x hV
+          (((_root_.PresheafOfModules.pullbackPushforwardAdjunction
+            f.toRingCatSheafHom.hom).unit.app P).app (op V) s)) := by
+    rw [moduleSkyscraperPositiveEquiv_mapApp, Adjunction.comp_unit_app]
+    change (presheafModulePullbackStalkIso f x).hom.app P
+      (moduleSkyscraperPositiveEquiv X x _ (op (f ⁻¹ᵁ V)) hV
+        (((presheafModuleStalkSkyscraperAdjunction X x).unit.app _).app (op (f ⁻¹ᵁ V))
+          ((((_root_.PresheafOfModules.pullbackPushforwardAdjunction
+            f.toRingCatSheafHom.hom).unit.app P).app (op V) s)))) = _
+    exact congrArg ((presheafModulePullbackStalkIso f x).hom.app P).hom
+      (skyscraperAdjunction_unit_app_apply X x _ (op (f ⁻¹ᵁ V)) hV _)
+  exact hR.symm.trans (h2.symm.trans hL)
+
+/-- A module-sheaf morphism acts on germs through its sections. -/
+theorem moduleStalkFunctor_map_germ {X : Scheme.{u}} (x : X) {M N : X.Modules} (g : M ⟶ N)
+    (U : X.Opens) (hx : x ∈ U) (z : Γ(M, U)) :
+    (moduleStalkFunctor X x).map g (TopCat.Presheaf.germ M.presheaf U x hx z) =
+      TopCat.Presheaf.germ N.presheaf U x hx (g.app U z) :=
+  TopCat.Presheaf.stalkFunctor_map_germ_apply U x hx g.mapPresheaf z
+
+/-- A presheaf-of-modules morphism acts on germs through its sections. -/
+theorem presheafModuleStalkFunctor_map_germ {X : Scheme.{u}} (x : X)
+    {M N : X.PresheafOfModules} (g : M ⟶ N) (U : X.Opens) (hx : x ∈ U) (z : M.obj (op U)) :
+    (presheafModuleStalkFunctor X x).map g (TopCat.Presheaf.germ M.presheaf U x hx z) =
+      TopCat.Presheaf.germ N.presheaf U x hx (g.app (op U) z) :=
+  TopCat.Presheaf.stalkFunctor_map_germ_apply U x hx
+    ((_root_.PresheafOfModules.toPresheaf _).map g) z
+
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
+/-- The comparison `pullbackStalkIso` sends the germ of the pullback unit applied to a section
+`s` near `f x` to `1 ⊗ s`. -/
+theorem pullbackStalkIso_hom_app_germ_unit {X Y : Scheme.{u}} (f : X ⟶ Y) (x : X)
+    (P : Y.Modules) (V : Y.Opens) (hV : f x ∈ V) (s : Γ(P, V)) :
+    (pullbackStalkIso f x).hom.app P
+        (TopCat.Presheaf.germ ((pullback f).obj P).presheaf (f ⁻¹ᵁ V) x hV
+          (((pullbackPushforwardAdjunction f).unit.app P).app V s)) =
+      (ModuleCat.extendRestrictScalarsAdj (f.stalkMap x).hom).unit.app
+        ((moduleStalkFunctor Y (f x)).obj P)
+        (TopCat.Presheaf.germ P.presheaf V (f x) hV s) := by
+  let φ := f.toRingCatSheafHom
+  let Q := (_root_.PresheafOfModules.pullback φ.hom).obj ((toPresheafOfModules Y).obj P)
+  let u := (_root_.PresheafOfModules.sheafificationAdjunction (𝟙 X.ringCatSheaf.obj)).unit.app Q
+  let t := (((_root_.PresheafOfModules.pullbackPushforwardAdjunction φ.hom).unit.app
+    ((toPresheafOfModules Y).obj P)).app (op V)).hom s
+  have h1 : (((SheafOfModules.pullbackIso φ).hom.app P).val.app (op (f ⁻¹ᵁ V))).hom
+      ((((pullbackPushforwardAdjunction f).unit.app P).val.app (op V)).hom s) =
+      (u.app (op (f ⁻¹ᵁ V))).hom t :=
+    congrArg (fun k => (k.val.app (op V)).hom s)
+      (Adjunction.unit_leftAdjointUniq_hom_app (SheafOfModules.pullbackPushforwardAdjunction φ)
+        (SheafOfModules.PullbackConstruction.adjunction φ) P)
+  have h2 : (presheafModuleStalkSheafificationIso X x).inv.app Q
+      (TopCat.Presheaf.germ ((toPresheafOfModules X).obj
+        ((_root_.PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).obj Q)).presheaf
+        (f ⁻¹ᵁ V) x hV ((u.app (op (f ⁻¹ᵁ V))).hom t)) =
+      TopCat.Presheaf.germ Q.presheaf (f ⁻¹ᵁ V) x hV t := by
+    exact (congrArg ((presheafModuleStalkSheafificationIso X x).inv.app Q).hom
+      (presheafModuleStalkFunctor_map_germ x u (f ⁻¹ᵁ V) hV t).symm).trans
+        (ConcreteCategory.congr_hom
+          ((presheafModuleStalkSheafificationIso X x).hom_inv_id_app Q) _)
+  change (presheafModulePullbackStalkIso f x).hom.app ((toPresheafOfModules Y).obj P)
+    ((presheafModuleStalkSheafificationIso X x).inv.app Q
+      ((moduleStalkFunctor X x).map ((SheafOfModules.pullbackIso φ).hom.app P)
+        (TopCat.Presheaf.germ ((pullback f).obj P).presheaf (f ⁻¹ᵁ V) x hV
+          (((pullbackPushforwardAdjunction f).unit.app P).app V s)))) = _
+  refine (congrArg (fun z => (presheafModulePullbackStalkIso f x).hom.app _
+    ((presheafModuleStalkSheafificationIso X x).inv.app Q z))
+      (moduleStalkFunctor_map_germ x ((SheafOfModules.pullbackIso φ).hom.app P) (f ⁻¹ᵁ V) hV
+        (((pullbackPushforwardAdjunction f).unit.app P).app V s))).trans ?_
+  refine (congrArg (fun w => (presheafModulePullbackStalkIso f x).hom.app _
+    ((presheafModuleStalkSheafificationIso X x).inv.app Q
+      (TopCat.Presheaf.germ ((toPresheafOfModules X).obj
+        ((_root_.PresheafOfModules.sheafification (𝟙 X.ringCatSheaf.obj)).obj Q)).presheaf
+        (f ⁻¹ᵁ V) x hV w))) h1).trans ?_
+  refine (congrArg ((presheafModulePullbackStalkIso f x).hom.app _).hom h2).trans ?_
+  exact presheafModulePullbackStalkIso_hom_app_germ_unit f x _ V hV s
 
 private def skyscraperStalkMap (X : Scheme.{u}) (x : X)
     (N : ModuleCat.{u} (X.presheaf.stalk x)) :

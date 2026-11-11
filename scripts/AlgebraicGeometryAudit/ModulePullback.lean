@@ -8,7 +8,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pullback
 This slice checks the neutral pullback root independently of line-bundle, determinant, divisor,
 and Picard-group consumers. Intrinsic rank-one invertibility is inherited through Mathlib's
 existing scheme-module pullback rather than stored in a parallel carrier. Strong monoidality is
-likewise consumed through Mathlib's standard `Functor.Monoidal` class rather than a parallel
+likewise expressed through Mathlib's standard `Functor.Monoidal` class rather than a parallel
 capability record.
 -/
 
@@ -72,14 +72,23 @@ it preserves finite colimits and also finite limits when module-sheaf pullback d
 #print axioms AlgebraicGeometry.Coh.pullback_preservesFiniteLimits
 #print axioms AlgebraicGeometry.Coh.pullback_additive
 
-/-! ## Monoidal comparisons
+/-! ## Monoidal structure
 
-The tensor and unit comparisons are read off a standard `Functor.Monoidal` structure on module
-pullback; the repository stores no parallel capability record for them.
+Pushforward is lax monoidal and pullback is strong monoidal; the oplax part of the strong
+structure is the one the adjunction induces. The tensor and unit comparisons are read off that
+`Functor.Monoidal` instance; the repository stores no parallel capability record for them.
 -/
 
+#print axioms AlgebraicGeometry.Scheme.Modules.pushforwardLaxMonoidal
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackMonoidal
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackMonoidal_toOplaxMonoidal
 #print axioms AlgebraicGeometry.Scheme.Modules.pullbackTensorIso
 #print axioms AlgebraicGeometry.Scheme.Modules.pullbackUnitIso
+
+/-! ## Projection formula -/
+
+#print axioms AlgebraicGeometry.Scheme.Modules.projectionMap
+#print axioms AlgebraicGeometry.Scheme.Modules.isIso_projectionMap_of_isInvertible
 
 example [SheafOfModules.IsInvertible.{u, u, u}
     (show SheafOfModules Y.ringCatSheaf from M)] :
