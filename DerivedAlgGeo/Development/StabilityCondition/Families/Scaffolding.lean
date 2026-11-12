@@ -10,18 +10,42 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Familie
 
 This module records that the abstract condition structures are logically
 inhabitable by constant functions, full loci, `PUnit` witnesses, and a
-constant-true boundedness predicate.  Those inhabitants are useful for API
+constant-true boundedness predicate. Those inhabitants are useful for API
 reconnaissance, but they are not mathematical families and therefore expose
 no public declarations.
 
+## Main definitions
+
+None public. The private probes `constantChargeProbe`, `fullOpenLocusProbe`,
+`fullGenericSemistabilityProbe`, `constantDedekindHNProblem`,
+`constantWeakDedekindHNProblem`, `trueBoundednessProblem`,
+`constantWeakChargeProbe` and `constantWeakSemistabilityProbe` are the
+vacuous inhabitants.
+
+## Main results
+
+None public. The anonymous examples check that `OrdinaryStabilityInFamiliesData`,
+`CategoricalOrdinaryFiberStabilityInFamiliesData` and
+`WeakStabilityInFamiliesData` are inhabited by those probes.
+
+## Implementation notes
+
 The stable family modules deliberately provide no such vacuous-probe
 constructors: nothing in stable discharges a field with a constant-true
-predicate, a full-locus probe, or an arbitrary-`Prop` ledger.  Stable modules
+predicate, a full-locus probe, or an arbitrary-`Prop` ledger. Stable modules
 do still export constant-family reindexings (`_constant`/`_punit` witnesses
 in `FiberwiseSupport`, `PreStabilityBaseChange.constant`, and the scheme and
 relative-HN constant models); each of those requires a genuine support or
-pre-stability input and asserts nothing vacuously (2026-08-18 adversarial
-review, finding P2-10).
+pre-stability input and asserts nothing vacuously.
+
+## References
+
+The condition structures of `Families.Ordinary`, `Families.CategoricalOrdinary`
+and `Weak.Families.Weak`.
+
+## Tags
+
+stability conditions in families, compile-only probe, vacuous inhabitant
 -/
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.Development
