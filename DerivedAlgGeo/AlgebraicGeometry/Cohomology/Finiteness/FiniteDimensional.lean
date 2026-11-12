@@ -14,16 +14,61 @@ import Mathlib.LinearAlgebra.FiniteDimensional.Basic
 # Finite-dimensional coherent cohomology data
 
 This file defines the output interface for the projective finiteness theorem independently of
-eventual cohomological vanishing. The separation matters mathematically and for the issue graph:
+eventual cohomological vanishing. The separation matters mathematically:
 
-* finite-dimensionality of each `Hⁱ(X, F)` is the content of #29;
-* a bound above which the groups vanish is the separate content of #30.
+* finite-dimensionality of each `Hⁱ(X, F)` is the content of the finiteness theorem;
+* a bound above which the groups vanish is separate content, supplied by a finite affine cover.
 
 Mathlib currently exposes `Sheaf.H` only as an abelian group. This file constructs its canonical
 functorial `k`-linear lift from the central action of global functions and proves the natural
 comparison after forgetting scalars. `LinearCohomology` records that lift, while
 `FiniteDimensionalCohomology` adds exactly the still-geometric degreewise `Module.Finite`
 conclusion. These are structures carrying explicit proof data, not global existence axioms.
+
+## Main definitions
+
+* `AlgebraicGeometry.Cohomology.coherentH`: Mathlib's abelian-group-valued degree-`i` cohomology
+  functor on coherent sheaves.
+* `AlgebraicGeometry.Cohomology.LinearCohomology`: a functorial base-field-linear realization of
+  coherent sheaf cohomology, compared with `coherentH` after forgetting scalars.
+* `AlgebraicGeometry.Cohomology.FiniteDimensionalCohomology`: a `LinearCohomology` whose groups
+  are degreewise finite-dimensional.
+* `AlgebraicGeometry.Cohomology.globalSectionSmul`, `globalSectionAction`: multiplication by a
+  global function as an endomorphism of a sheaf of modules.
+* `AlgebraicGeometry.Cohomology.varietyScalarAction`, `coherentScalarAction`: the canonical
+  base-field action on module and coherent sheaves over a variety.
+* `AlgebraicGeometry.Cohomology.coherentHModule`: the induced base-field module structure on a
+  cohomology group.
+* `AlgebraicGeometry.Cohomology.linearCoherentH`, `canonicalLinearCohomology`: the canonical
+  functorial linear realization.
+
+## Main results
+
+* `AlgebraicGeometry.Cohomology.globalSectionSmul_naturality`,
+  `varietyScalarAction_naturality`, `coherentScalarAction_naturality`: the actions are central
+  on morphisms.
+* `AlgebraicGeometry.Cohomology.coherentH_map_smul`: every cohomology map respects the canonical
+  base-field action.
+* `AlgebraicGeometry.Cohomology.linearCoherentHComparison`: forgetting scalars from
+  `linearCoherentH` recovers Mathlib's derived cohomology functor.
+* `AlgebraicGeometry.Cohomology.FiniteDimensionalCohomology.dimension_iso`: isomorphic coherent
+  sheaves have equal cohomology dimensions.
+
+## Implementation notes
+
+The natural comparison in `LinearCohomology` rules out an unrelated family of vector spaces with
+the desired dimensions: after forgetting scalars these are the actual `Sheaf.H` groups and maps.
+The eventual-vanishing bound is added downstream by `FiniteCohomology`, so neither interface
+repackages the other's data.
+
+## References
+
+The file cites no literature. It builds on Mathlib's `Sheaf.H` and `Sheaf.functorH`, and on
+`Scheme.Modules.toSheaf`.
+
+## Tags
+
+sheaf cohomology, coherent sheaf, variety, finite-dimensional, base field action
 -/
 
 universe u v w x
@@ -62,8 +107,8 @@ structure LinearCohomology (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [
 variable (k) in
 /-- Degreewise finite-dimensional coherent cohomology, with no eventual-vanishing claim.
 
-This is the exact output interface for #29. A later boundedness result can extend it without
-re-proving or repackaging the linear comparison. -/
+This is the exact output interface for the projective finiteness theorem. A boundedness result
+extends it without re-proving or repackaging the linear comparison. -/
 structure FiniteDimensionalCohomology (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] extends LinearCohomology k X where
   /-- Every coherent cohomology vector space is finite-dimensional. -/
   finite : ∀ (i : ℕ) (F : Coh X), Module.Finite k ((moduleH i).obj F)

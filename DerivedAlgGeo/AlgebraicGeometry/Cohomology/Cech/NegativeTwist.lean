@@ -11,7 +11,23 @@ import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Cech.Vanishing
 The degree-zero end of the integer-twist computation. `Cech/Vanishing.lean` closes the middle
 degrees at either sign; this file closes the bottom one at `d < 0`.
 
-## The argument
+## Main definitions
+
+This file introduces no new definitions; it proves facts about the algebraic Čech complex
+`AlgebraicGeometry.Proj.polynomialVariableIntCechComplex` of the integer twist.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.intCechComplex_ker_zero_eq_zero_of_neg`: a degree-zero Čech cocycle
+  of a negative twist is zero.
+* `AlgebraicGeometry.Proj.polynomialVariableIntCechComplex_homology_zero_isZero`: the
+  degree-zero homology of the algebraic Čech complex vanishes at `d < 0`.
+* `AlgebraicGeometry.Proj.polynomialIntTwisting_H_zero_subsingleton`: `H⁰(Pⁿ, O(d))` is trivial
+  for `d < 0`.
+
+## Implementation notes
+
+### The argument
 
 `H⁰` of the Čech complex is the kernel of `d⁰`, and unfolding the differential at `n = 0` says a
 cocycle is a family `(sᵢ)` of degree-`d` fractions on the variable charts agreeing on every
@@ -27,7 +43,7 @@ denominator `X_i ^ a` is homogeneous of degree `a + d`, and at `d < 0` that is *
 — so a nonzero `p` would be a multiple of `X_i ^ a` of degree below `a`, which cannot happen.
 Hence `p = 0`, hence `sᵢ = 0`.
 
-## Where the sign enters, and where it does not
+### Where the sign enters, and where it does not
 
 Only in the last step. Everything before it is the two-chart argument that
 `polynomialToNatGlobalSections_surjective` runs for `d : ℕ`, and it is insensitive to the sign;
@@ -43,15 +59,25 @@ homogeneous of degree `a + d`, so `d < 0` reads `a + d < a`, and
 *not* on that path: the cross equation kills the numerator while its degree is still a natural
 number. It is what makes the `ℕ`-indexing of `intShift` legible, and nothing below depends on it.
 
-## Scope
+### Scope
 
-The **abelian-group** statement, per #665. The `k`-vector-space structure that
-`FiniteDimensionalCohomology.finite` asks for is separate, and the comparison `AddEquiv` is not
+The **abelian-group** statement. The `k`-vector-space structure that
+`FiniteDimensionalCohomology.finite` requires is separate, and the comparison `AddEquiv` is not
 assumed `k`-linear anywhere here.
 
 `Nontrivial ι` is needed and is not cosmetic: with a single variable there is no second chart, the
 overlap condition is vacuous, and the statement is false — `P⁰` is a point and `O(d)` is free on
 it. `Fintype ι` is *not* needed; the argument uses two charts, never all of them.
+
+## References
+
+The file cites no literature. It builds on `MvPolynomial.X_pow_dvd_of_cross_mul` and
+`MvPolynomial.eq_zero_of_X_pow_dvd_of_isHomogeneous_of_lt`, and on the comparison
+`AlgebraicGeometry.Proj.polynomialVariableIntCechComplex_computesCohomology`.
+
+## Tags
+
+projective space, Serre twist, Čech cohomology, global sections, vanishing
 -/
 
 universe u
@@ -250,7 +276,7 @@ set_option backward.isDefEq.respectTransparency false in
 set_option backward.defeqAttrib.useBackward true in
 /-- **`H⁰(Pⁿ, O(d)) = 0` for `d < 0`.**
 
-The abelian-group statement of #665. `Nontrivial ι` is the only hypothesis on the variable set:
+This is the abelian-group statement. `Nontrivial ι` is the only hypothesis on the variable set:
 the argument compares two charts and never enumerates them, so no finiteness is needed, and at one
 variable the statement is false rather than merely unproved. -/
 theorem polynomialIntTwisting_H_zero_subsingleton [Nontrivial ι] (d : ℤ) (hd : d < 0)

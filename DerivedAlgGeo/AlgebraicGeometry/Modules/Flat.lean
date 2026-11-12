@@ -14,26 +14,46 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Stalk
 module over the corresponding stalk of `S`, restricted along the local-ring
 map `p` induces.
 
+Flatness over the identity is equivalent to flatness at each module stalk,
+and is preserved by indexed coproducts of module sheaves.
+
+## Main definitions
+
+* `AlgebraicGeometry.Scheme.Modules.IsFlatOver` — stalkwise flatness of a module sheaf over a
+  morphism.
+
+## Main results
+
+* `AlgebraicGeometry.Scheme.Modules.isFlatOverId_iff_stalkwiseFlat` — flatness over the identity
+  is flatness of each module stalk over the local ring.
+* `AlgebraicGeometry.Scheme.Modules.isFlatOverId_coprod` — flatness over the identity is closed
+  under indexed coproducts.
+
+## Implementation notes
+
 This is a property of one module sheaf and one morphism. It needs no derived
 category, no moduli problem and no perfectness notion, and it is used before
 any of them: Tor-amplitude models, geometric fibers and base-change arguments
-all ask for flat terms. It lives with `X.Modules` for that reason — the
+all require flat terms. It lives with `X.Modules` for that reason — the
 carrier in its public type is a module sheaf, and `moduleStalkFunctor`, the
 only other repository construction it mentions, is the neighbouring
 `Modules/Pullback/Stalk.lean`.
 
-Flatness over the identity is equivalent to flatness at each module stalk,
-and is preserved by indexed coproducts of module sheaves.
-
-It previously sat in `Moduli/PerfectComplex/Relative.lean`, where its first
-consumer was; see `docs/architecture/cutover-ledger.md`, finding 11.
-
-## Not a morphism-flatness predicate
+### Not a morphism-flatness predicate
 
 `Mathlib.AlgebraicGeometry.Morphisms.Flat` is a different subject: it asks
 that the *morphism* be flat, which is this condition for the structure sheaf
 alone. Nothing here specializes to or is implied by that class, and no
 instance relates them.
+
+## References
+
+The file cites no literature. It builds on Mathlib's `Module.Flat` and
+`ModuleCat.restrictScalars`, and on `AlgebraicGeometry.Scheme.Modules.moduleStalkFunctor`.
+
+## Tags
+
+flat module, module sheaf, stalk, morphism of schemes
 -/
 
 namespace AlgebraicGeometry

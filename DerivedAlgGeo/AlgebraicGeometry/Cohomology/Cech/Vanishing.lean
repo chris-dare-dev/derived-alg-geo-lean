@@ -8,21 +8,48 @@ import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.ProjectiveSpace
 /-!
 # `Hⁿ(Pⁿ, O(d)) = 0` for `n ≥ 1` and `d ≥ 0`
 
-The headline of #340. Everything difficult happened earlier: the block decomposition, the
-contracting homotopy, and the cochain-level computation `cechPrimitive_isPrimitive` that every
-positive-degree cocycle of the variable Čech complex is a coboundary. This file only converts:
-the cochain statement becomes exactness of the algebraic Čech complex through
-`ShortComplex.ab_exact_iff` and `polynomialVariableCechComplex_d_apply`, exactness becomes
-vanishing homology, and vanishing homology becomes the vanishing of `Hⁿ(Pⁿ, O(d))` through the
-comparison `polynomialVariableCechComplex_computesCohomology` of #495.
+Higher cohomology of a nonnegative twist on polynomial projective space vanishes, and higher
+cohomology of a twist of either sign vanishes strictly below the top degree. Everything difficult
+is proved upstream: the block decomposition, the contracting homotopy, and the cochain-level
+computation `cechPrimitive_isPrimitive` that every positive-degree cocycle of the variable Čech
+complex is a coboundary. This file only converts: the cochain statement becomes exactness of the
+algebraic Čech complex through `ShortComplex.ab_exact_iff` and
+`polynomialVariableCechComplex_d_apply`, exactness becomes vanishing homology, and vanishing
+homology becomes the vanishing of `Hⁿ(Pⁿ, O(d))` through the comparison
+`polynomialVariableCechComplex_computesCohomology`.
+
+## Main definitions
+
+This file introduces no new definitions; it proves facts about the algebraic Čech complexes
+`AlgebraicGeometry.Proj.polynomialVariableCechComplex` and
+`AlgebraicGeometry.Proj.polynomialVariableIntCechComplex`.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.polynomialVariableCechComplex_exactAt`: the algebraic Čech complex of a
+  nonnegative twist is exact in every positive degree.
+* `AlgebraicGeometry.Proj.polynomialTwisting_H_subsingleton`: `Hⁿ(Pⁿ, O(d))` is trivial for
+  `n ≥ 1` and `d ≥ 0`.
+* `AlgebraicGeometry.Proj.polynomialVariableIntCechComplex_exactAt`: the algebraic Čech complex of
+  an integer twist is exact below the top degree.
+* `AlgebraicGeometry.Proj.polynomialIntTwisting_H_subsingleton`: `Hⁱ(Pⁿ, O(d))` is trivial for
+  `0 < i < n` and either sign of `d`.
+
+## Implementation notes
 
 The `H⁰` companion is not restated here: degree-zero global sections of `O(d)` are the
 degree-`d` homogeneous polynomials by `polynomialTwistingGlobalSectionsModuleIso`, which
 remains the canonical statement and is deliberately not reproved.
 
-The `HasExt` witness is passed positionally, as everywhere in this lane: `Sheaf.H` lands in
-the `HasExt` universe, and letting instance search pick would allow the small-site
-`HasExt.{u}` to name different groups.
+The `HasExt` witness is passed positionally, as everywhere in this Čech computation: `Sheaf.H`
+takes values in the `HasExt` universe, and letting instance search pick would allow the
+small-site `HasExt.{u}` to name different groups.
+
+## References
+
+The file cites no literature. It builds on `MvPolynomial.cechPrimitive_isPrimitive`,
+`AlgebraicGeometry.Proj.polynomialVariableCechComplex_d_apply` and
+`AlgebraicGeometry.Proj.polynomialVariableCechComplex_computesCohomology`.
 
 ## Tags
 
@@ -109,7 +136,7 @@ makes the block of all variables empty outright. At a negative twist that block 
 is exactly where the top cohomology lives — so the same contracting homotopy closes only the
 degrees whose tuples are too short to meet every variable.
 
-That is not a weakening of the argument but a sharpening of its hypothesis: `cechPrimitive` now
+That is not a weakening of the argument but a sharpening of its hypothesis: `cechPrimitive`
 takes the vanishing of the full block as an input, and the two statements differ only in which
 lemma discharges it. The consequence is the expected one — over `Fintype.card ι = N + 1`
 variables, `Hⁱ` vanishes for `0 < i < N` at either sign, and degree `N` is left open. -/
@@ -163,7 +190,7 @@ set_option backward.defeqAttrib.useBackward true in
 
 With `Fintype.card ι = n + 1` the hypothesis `i + 1 < Fintype.card ι` reads `i < n`, so this is
 vanishing strictly between the two ends: `H⁰` is the global sections and `Hⁿ` is the group the
-dévissage of #332 consumes, and neither is claimed here.
+dévissage proof of Serre finiteness consumes, and neither is claimed here.
 
 The nonnegative companion `polynomialTwisting_H_subsingleton` is stronger where it applies — it
 needs no finiteness and reaches every positive degree — and is not a corollary of this. -/

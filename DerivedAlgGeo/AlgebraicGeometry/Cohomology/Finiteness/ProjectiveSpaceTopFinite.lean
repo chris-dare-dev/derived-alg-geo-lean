@@ -15,7 +15,28 @@ block. `Algebra/MvPolynomial/Cech/Finite.lean` shows those full blocks form a
 finite-dimensional `k`-space. This file joins the algebraic result to the geometric Čech complex
 and discharges the finiteness interface.
 
-## The argument
+## Main definitions
+
+* `AlgebraicGeometry.Proj.intCechBlockCocycles`: the full-block cocycles of a Čech degree, a
+  finite-dimensional `k`-space.
+* `AlgebraicGeometry.Proj.intCechBlockClass`: the class of a full-block cocycle in Čech
+  cohomology; `intCechBlockClassLinear` is the same map, `k`-linearly.
+* `AlgebraicGeometry.Proj.intTwistModules` and `AlgebraicGeometry.Proj.intChart`: the twist and
+  the variable charts presented at the variety.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.intCechBlockSmul_comp_class`: the class map is `k`-linear.
+* `AlgebraicGeometry.Proj.intCechBlockClass_surjective`: every positive-degree class is the class
+  of a full-block cocycle.
+* `AlgebraicGeometry.Proj.module_finite_cechCohomology_intTwist`: `Hⁿ⁺¹` of an integer twist is
+  finite-dimensional on the Čech side.
+* `AlgebraicGeometry.Proj.module_finite_linearCoherentH_projectiveSpaceTwist`: `Hⁿ⁺¹(Pⁿ, O(d))`
+  is a finite-dimensional `k`-vector space.
+
+## Implementation notes
+
+### The argument
 
 `intCechBlockCocycles` is the space of full-block cocycles of a degree — a submodule of the
 finite-dimensional space of full-block cochains, hence finite-dimensional. `intCechBlockClass`
@@ -25,34 +46,43 @@ sends such a cocycle to its cohomology class, and the two halves are:
   a sheaf endomorphism induces, so this is `homologyπ` naturality once the cycle map is known to
   intertwine the actions, which is `intCechCochainsDegreewiseAddEquiv_smul` from the file below;
 * `intCechBlockClass_surjective` — it is onto. `exists_fullBlock_add_coboundary` splits a cocycle
-  into its full block and a coboundary; the full block is again a cocycle and lands in
+  into its full block and a coboundary; the full block is again a cocycle and lies in
   `cechBlockSpan`, and the coboundary dies in homology by `toCycles_comp_homologyπ`.
 
 `Module.Finite.of_surjective` then gives finiteness on the Čech side, and
 `module_finite_linearCoherentH_of_cech` carries it to the group the interface names.
 
-## Two spellings that have to be pinned
+### Two spellings that have to be pinned
 
 `cechCohomologyFunctor` takes its space as an *implicit* argument, and `cechCohomologyModule`
 supplies the module instance at whatever spelling its `U` was elaborated with. Writing the chart
 family as `polynomialVariableChart ι k` fixes that space to `ProjectiveSpectrum.top _`, while the
-finiteness interface asks for `Y`; the two are definitionally equal, so the instance is
+finiteness interface is stated at `Y`; the two are definitionally equal, so the instance is
 inhabited, and *not* reducibly so, so instance search never finds it. `intChart` and
 `intTwistModules` are the same objects presented at the variety, and they exist only to make the
-one instance search meets be the one that is there. This is the transparency rule of
-`.claude/references/instance-transparency.md`, technique 5.
+one instance search meets be the one that is there.
 
 The same effect appears twice more, and is handled the same way: the `AddCommGroup`, `Module` and
 `Module.Finite` instances on `intCechBlockCocycles` are named rather than searched for, because it
 is a submodule of a product of submodules and search will not assemble that on its own.
 
-## Scope
+### Scope
 
 **Positive degrees only.** `exists_fullBlock_add_coboundary` splits a cocycle in degree `n + 1`,
 and the splitting is useful because the remainder is a coboundary — which needs a degree below.
 Degree `0` has none, and `H⁰` is not a subquotient but the module of global sections outright; its
 finiteness is the finite-dimensionality of a graded piece of the polynomial ring and is a separate
 argument. So `Hⁿ(Pⁿ, O(d))` is covered for every `n ≥ 1`, at either sign of `d`, and `P⁰` is not.
+
+## References
+
+The file cites no literature. It builds on `AlgebraicGeometry.Proj.exists_fullBlock_add_coboundary`,
+`AlgebraicGeometry.Proj.intCechCochainsDegreewiseAddEquiv_smul` and
+`AlgebraicGeometry.Cohomology.module_finite_linearCoherentH_of_cech`.
+
+## Tags
+
+Čech cohomology, projective space, twisting sheaf, finite-dimensional, top degree
 -/
 
 universe u
@@ -225,7 +255,6 @@ theorem intCechBlockSmul_comp_cocycleHom (d : ℤ) (n : ℕ) (r : k) :
 
 /-- The cycle a full-block cocycle determines intertwines the two scalar actions.
 
-set_option maxHeartbeats 1000000 in
 Reduced to `iCycles` by monomorphism, where it is `intCechBlockSmul_comp_cocycleHom`. -/
 theorem intCechBlockSmul_comp_cycle (d : ℤ) (n : ℕ) (r : k) :
     intCechBlockSmul ι k d n r ≫ intCechBlockCycle ι k d n =
@@ -238,7 +267,6 @@ theorem intCechBlockSmul_comp_cycle (d : ℤ) (n : ℕ) (r : k) :
 
 /-- **The class map is `k`-linear.**
 
-set_option maxHeartbeats 1000000 in
 The action on cohomology is the map the sheaf endomorphism induces, so this is `homologyπ`
 naturality once the cycle map is known to intertwine the actions. -/
 theorem intCechBlockSmul_comp_class (d : ℤ) (n : ℕ) (r : k) :
@@ -330,8 +358,8 @@ theorem intCechBlockClass_surjective [Fintype ι] (d : ℤ) (n : ℕ) :
 
 /-- The twist `O(d)` as a sheaf of modules on projective space *as a variety*.
 
-The type ascription is the point: `associatedSheaf` lands in `(Proj 𝒜).Modules`, and the finiteness
-interface asks for `Y.Modules`. Those are the same term,
+The type ascription is the point: `associatedSheaf` takes values in `(Proj 𝒜).Modules`, and the
+finiteness interface is stated for `Y.Modules`. Those are the same term,
 but only the second spelling lets `cechCohomologyModule`'s instance be found. -/
 noncomputable abbrev intTwistModules (d : ℤ) :
     (Proj (polynomialGrading ι k)).Modules :=
@@ -386,7 +414,6 @@ The interface group is `linearCoherentH`, and the finite spanning set lives on t
 `module_finite_linearCoherentH_of_cech` carries it across, and it is the `k`-linearity of the
 comparison that makes the transfer legitimate.
 
-set_option maxHeartbeats 1000000 in
 The injective resolution is chosen rather than supplied: the site of opens is small, so
 `canonicalInjectiveResolution` produces one. The `HasExt` witness is instantiated at
 `HasExt.standard _`, which is the reconciliation `module_finite_linearCoherentH_of_cech`'s

@@ -15,11 +15,34 @@ On `Spec R`, a bounded object `M` of `D(X.Modules)` with quasi-coherent cohomolo
 zero vanishes. This is `DerivedCategory.hom_eq_zero_of_isGE_of_isLE_neg_of_cohomologyIn` with
 the affine vanishing `Ext^k(𝒪_X, F) ≃ H^k(F) = 0` for quasi-coherent `F` and `k ≥ 1`.
 
+## Main definitions
+
+This file introduces no new definitions.
+
+## Main results
+
+* `AlgebraicGeometry.Cohomology.subsingleton_ext_unit_of_isQuasicoherent`:
+  `Ext^(k+1)(𝒪_X, F) = 0` for quasi-coherent `F` on `Spec R`.
+* `AlgebraicGeometry.Cohomology.hom_unit_eq_zero_of_isGE_of_isLE_neg`: no nonzero map from
+  `𝒪_X[0]` into a bounded object of `D^{≤ -1}(X.Modules)` with quasi-coherent cohomology.
+
+## Implementation notes
+
 Together with `Ext^0(𝒪_X, F) = Γ(F)` this is the bounded half of the compactness of `𝒪_X` in
-`Dqc(Spec R)` (#723, slice 723b). The unbounded half, that `Hom(𝒪_X, M) = 0` for every
-`M ∈ D_qc^{≤ -1}` and not only the bounded ones, needs `M ≅ holim τ≥-n M` in `D(X.Modules)`
-and a Milnor sequence; neither is available at this Mathlib pin, and this file does not
-claim it.
+`Dqc(Spec R)`. The unbounded half, that `Hom(𝒪_X, M) = 0` for every `M ∈ D_qc^{≤ -1}` and not
+only the bounded ones, needs `M ≅ holim τ≥-n M` in `D(X.Modules)` and a Milnor sequence; neither
+is available at this Mathlib pin, and this file does not claim it.
+
+## References
+
+The file cites no literature. It builds on
+`DerivedCategory.hom_eq_zero_of_isGE_of_isLE_neg_of_cohomologyIn`,
+`AlgebraicGeometry.Scheme.Modules.extUnitAddEquivDerivedH` and the affine vanishing
+`AlgebraicGeometry.Cohomology.modules_H_subsingleton_of_isQuasicoherent`.
+
+## Tags
+
+derived category, quasi-coherent sheaf, affine scheme, structure sheaf, Hom vanishing
 -/
 
 universe u

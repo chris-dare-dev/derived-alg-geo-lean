@@ -10,10 +10,37 @@ import DerivedAlgGeo.AlgebraicGeometry.Variety.Projective
 # Serre finiteness for projective varieties
 
 **A projective variety over `k` has finite-dimensional coherent cohomology in every degree**, and
-its `FiniteDimensionalCohomology` package is a theorem: step 3 of `#332`, closing it for every
-variety with a projective presentation into a projective space with at least two coordinates.
+its `FiniteDimensionalCohomology` package is a theorem, for every variety with a projective
+presentation into a projective space with at least two coordinates.
 
-## The transport, and why it has to be linear
+## Main definitions
+
+* `AlgebraicGeometry.Cohomology.coherentHPushforwardAddEquiv`: `Hⁱ(X, F) ≃+ Hⁱ(Y, g_* F)` for a
+  closed immersion `g`, at the `HasExt` witness `coherentH` uses.
+* `AlgebraicGeometry.Cohomology.coherentHPushforwardLinearEquiv`: the same comparison as a
+  `k`-linear equivalence, for `g` over `Spec k`.
+* `AlgebraicGeometry.ProjectivePresentation.finiteDimensionalCohomology`: the finite-dimensional
+  cohomology package of a projective variety, proved from a presentation.
+* `AlgebraicGeometry.ProjectivePresentation.finiteCohomology`: the same package with the
+  finite-affine-cover vanishing bound.
+
+## Main results
+
+* `AlgebraicGeometry.Cohomology.pushforward_varietyScalarAction`: pushforward carries the scalar
+  action to the scalar action.
+* `AlgebraicGeometry.Cohomology.coherentHPushforwardAddEquiv_naturality` and
+  `AlgebraicGeometry.Cohomology.coherentHPushforwardAddEquiv_smul`: the comparison is natural in
+  the coherent sheaf and base-field linear.
+* `AlgebraicGeometry.Cohomology.module_finite_linearCoherentH_of_isClosedImmersion`:
+  finite-dimensionality descends along a closed immersion over `Spec k`.
+* `AlgebraicGeometry.projectiveSpaceToSpec_eq`: the two structure morphisms of polynomial
+  projective space agree.
+* `AlgebraicGeometry.ProjectivePresentation.module_finite_linearCoherentH`: Serre finiteness for
+  a projective variety.
+
+## Implementation notes
+
+### The transport, and why it has to be linear
 
 The closed-immersion comparison identifies `Hⁱ(X, F)` with `Hⁱ(Pⁿ, ι_* F)` as abelian groups.
 An additive isomorphism onto a finite-dimensional `k`-space bounds nothing over an infinite field,
@@ -25,7 +52,7 @@ function to multiplication by the original (`pushforward_varietyScalarAction`). 
 natural in the sheaf (`coherentHPushforwardAddEquiv_naturality`, from `extAdjunctionMap_comp_mk₀`
 and associativity of `Ext`), so it commutes with the scalar endomorphisms, which is linearity.
 
-## The `HasExt` witness
+### The `HasExt` witness
 
 `coherentH` names its groups at `HasExt.standard`, in universe `u + 1`;
 `cohCohomologyPushforwardAddEquiv` lets instance search find the Grothendieck-category witness in
@@ -33,7 +60,7 @@ universe `u`, so it compares different groups. `coherentHPushforwardAddEquiv` is
 comparison instantiated at the standard witness (`cohomologyPushforwardAddEquivAt`), which is what
 lets it be stated against `coherentH` at all.
 
-## Two coordinates
+### Two coordinates
 
 The projective-space theorem takes `Nontrivial ι`: on `P⁰`, a point, a negative twist is the
 structure sheaf and its degree-zero cohomology is `k`, not `0`, so the dévissage's degree-zero
@@ -41,12 +68,23 @@ step needs a different argument there. A presentation into `P⁰` or into the em
 a point or the empty scheme, whose cohomology is the affine case; it is excluded here by the
 `Nontrivial P.index` hypothesis rather than treated.
 
-## Two spellings of the structure morphism
+### Two spellings of the structure morphism
 
 `ProjectivePresentation` states its compatibility against `AlgebraicGeometry.projectiveSpaceToSpec`,
 built from `homogeneousZeroRingEquiv`; the `Over` instance on `Pⁿ` uses
 `Proj.projectiveSpaceToSpec`, built from the algebra map. `projectiveSpaceToSpec_eq` says they are
 the same morphism, because both ring maps send `r` to the constant polynomial `r`.
+
+## References
+
+The file cites no literature. It builds on
+`DerivedAlgGeo.Topology.cohomologyPushforwardAddEquivAt`,
+`AlgebraicGeometry.Proj.module_finite_linearCoherentH_projectiveSpace` and
+`AlgebraicGeometry.Cohomology.FiniteDimensionalCohomology.toFiniteCohomology`.
+
+## Tags
+
+Serre finiteness, projective variety, closed immersion, sheaf cohomology, base field action
 -/
 
 universe u
