@@ -496,7 +496,7 @@ items:
     kind: task
     parent: stacks-and-moduli-stk2
     title: "STK2.8: Descent data along one morphism are comonad coalgebras, and descent survives pullback-preserving reindexing"
-    status: planned
+    status: done
     priority: must
     size: M
     summary: "Two changes of presentation for descent data along a single morphism f : X ⟶ S. Both are needed to turn Mathlib's comonadicity of extension of scalars into effective descent."
