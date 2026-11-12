@@ -8,27 +8,48 @@ import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.FracSection
 /-!
 # The chart's scalar, read on `Proj`
 
-`#585`'s two halves speak different languages. `ChartExtension.lean` produces sections of a
-degree-one chart and clears the chart ring's element `f / g`
-(`HomogeneousLocalization.Away.isLocalizationElem`); `TwistApp.lean` compares twists of sections of
-`F` on `Proj 𝒜` and scales by the structure-sheaf section `fracPowSection`. This file is the
-dictionary, and it is the last genuinely open step of the issue.
+The two halves of the section-extension lemma `exists_globalSection_twistBy` speak different
+languages. `ChartExtension.lean` produces sections of a chart and clears the chart ring's element
+`f / g` (`HomogeneousLocalization.Away.isLocalizationElem`); `FracSection.lean` compares twists of
+sections of `F` on `Proj 𝒜` and scales by structure-sheaf sections `fracSection`. This file is the
+dictionary.
 
-## What has to be identified
+## Main definitions
+
+* `AlgebraicGeometry.Proj.isLocalizationFrac`: the `n`-th power of the chart's distinguished
+  element, as a section of the structure sheaf over an open inside `D₊(g)`.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.awayToSection_isLocalizationElem_pow`: `awayToSection` sends the `n`-th
+  power of the chart's distinguished element to `isLocalizationFrac`.
+* `AlgebraicGeometry.Proj.awayι_image_top`, `AlgebraicGeometry.Proj.awayι_image_basicOpen`: a
+  chart of any positive degree covers exactly its basic open, and meets another basic open in the
+  intersection of the two.
+* `AlgebraicGeometry.Proj.ΓSpecIso_inv_appIso_inv` and
+  `AlgebraicGeometry.Proj.ΓSpecIso_inv_res_appIso_inv`: the chart's ring map is Mathlib's
+  `awayToSection`, over the whole chart and over every open of it.
+* `AlgebraicGeometry.Proj.chart_smul_eq`: the chart's scalar action, rewritten on `Proj 𝒜`.
+* `AlgebraicGeometry.Proj.isLocalizationElem_pow_smul_eq`: the chart's distinguished scalar acts as
+  `isLocalizationFrac` on `Proj 𝒜`.
+
+## Implementation notes
+
+### What has to be identified
 
 Nothing has to move on the module side: `Scheme.Modules.restrictAppIso` is `Iso.refl`, so
-`Γ(chartRestrict 𝒜 F hg, U)` **is** `Γ(F, awayι 𝒜 g hg hd ''ᵁ U)`. What differs is the ring
+`Γ(awayRestrict 𝒜 F hg hd, U)` **is** `Γ(F, awayι 𝒜 g hg hd ''ᵁ U)`. What differs is the ring
 acting. The chart's sections are a module over the away ring `A_{(g)}`; the same elements as
 sections on `Proj` are a module over `Γ(Proj 𝒜, D₊(g))`. The comparison map between those two rings
 is Mathlib's `Proj.awayToSection`, and `awayToSection_isLocalizationElem_pow` says it sends
-`(f / g)ⁿ` to `fracPowSection`.
+the `n`-th power of the chart's distinguished element to `isLocalizationFrac`.
 
-## Two independent facts, and why the second one is the hard one
+### Two independent facts, and why the second one is the hard one
 
-`awayToSection_isLocalizationElem_pow` is elementary once the shapes line up: the degree-one case is
-`rfl`, `awayToSection` is a ring hom so it commutes with `^ n`, and the structure sheaf's ring
-operations are pointwise, so the whole statement reduces to
-`(fⁿ / gⁿ) = (f / g)ⁿ` inside one homogeneous localization.
+`awayToSection_isLocalizationElem_pow` is elementary once the shapes line up: the base case
+`awayToSection_isLocalizationElem_apply` is `rfl`, `awayToSection` is a ring hom so it commutes
+with `^ n`, and the structure sheaf's ring operations are pointwise, so the whole statement reduces
+to `frac_pow`, a power of a fraction inside one homogeneous localization.
 
 `ΓSpecIso_inv_appIso_inv` is the one that costs something. The scalar action on the chart's sections
 runs `A_{(g)} → Γ(Spec A_{(g)}, ⊤) → Γ(Proj 𝒜, D₊(g))` through `Scheme.ΓSpecIso` and the open
@@ -37,7 +58,7 @@ is proved here by unfolding `awayι` into `basicOpenIsoSpec.inv ≫ ι` and usin
 `basicOpenToSpec_app_top`, which is the only place Mathlib pins `awayToSection` against the scheme
 structure.
 
-## Elaboration notes
+### Elaboration notes
 
 `ΓSpecIso_inv_appIso_inv` needs `backward.isDefEq.respectTransparency false`, as Mathlib's own
 `basicOpenIsoAway` does. Without it the goal is reported as "not type-correct under the `instances`
@@ -49,10 +70,19 @@ Transports between opens of `Proj 𝒜` are collapsed by `Subsingleton.elim`: `O
 parallel morphisms are equal and `congrArg presheaf.map` closes what `rw [← Functor.map_comp]`
 cannot see through.
 
-## Scope
+### Scope
 
 The dictionary only. The Proj-side restatements of the chart lemmas, the cover, the single
 exponent, and the gluing are not here.
+
+## References
+
+Mathlib's `AlgebraicGeometry.Proj.awayToSection`, `AlgebraicGeometry.Proj.basicOpenIsoSpec` and
+`AlgebraicGeometry.Proj.basicOpenToSpec_app_top`.
+
+## Tags
+
+projective spectrum, affine chart, homogeneous localization, structure sheaf
 -/
 
 noncomputable section
@@ -111,8 +141,9 @@ set_option backward.isDefEq.respectTransparency false in
 set_option backward.defeqAttrib.useBackward true in
 /-- **`awayToSection` carries `(f ^ d / g ^ e) ^ n` to the section of the same name.**
 
-This is the dictionary entry `#585` needs: the chart lemmas clear the away-ring element
-`isLocalizationElem hg hf`, and every statement on `Proj 𝒜` is scaled by a `fracSection`. -/
+This is the dictionary entry the section-extension lemma needs: the chart lemmas clear the
+away-ring element `isLocalizationElem hg hf`, and every statement on `Proj 𝒜` is scaled by a
+`fracSection`. -/
 theorem awayToSection_isLocalizationElem_pow {d e : ℕ} {f g : A} (hf : f ∈ 𝒜 e) (hg : g ∈ 𝒜 d)
     (n : ℕ) :
     (awayToSection 𝒜 g).hom (HomogeneousLocalization.Away.isLocalizationElem hg hf ^ n)
@@ -125,8 +156,8 @@ theorem awayToSection_isLocalizationElem_pow {d e : ℕ} {f g : A} (hf : f ∈ �
 
 /-- **A chart of any positive degree covers exactly its own basic open.**
 
-`degreeOneChart_image_top` is the case `d = 1`; `#585`'s pairwise overlaps are cut out by a product
-of two degree-one elements, so the degree-two case is needed as well. -/
+The cover's charts are the case `d = 1`; the pairwise overlaps of that cover are cut out by a
+product of two degree-one elements, so the degree-two case is needed as well. -/
 theorem awayι_image_top {d : ℕ} {g : A} (hg : g ∈ 𝒜 d) (hd : 0 < d) :
     awayι 𝒜 g hg hd ''ᵁ ⊤ = basicOpen 𝒜 g := by
   rw [show (⊤ : (Spec (.of <| HomogeneousLocalization.Away 𝒜 g)).Opens) =
@@ -135,8 +166,8 @@ theorem awayι_image_top {d : ℕ} {g : A} (hg : g ∈ 𝒜 d) (hd : 0 < d) :
 
 /-- **A chart meets another basic open in the intersection of the two.**
 
-`degreeOneChart_image_basicOpen` at arbitrary positive degrees, which is what `#585` needs on a
-pairwise overlap: the chart is that of `gᵢ gⱼ` and the second element is `f`. -/
+Stated at arbitrary positive degrees, which is what the gluing in `exists_globalSection_twistBy`
+needs on a pairwise overlap: the chart is that of `gᵢ gⱼ` and the second element is `f`. -/
 theorem awayι_image_basicOpen {d e : ℕ} {a b : A} (hb : b ∈ 𝒜 d) (hd : 0 < d)
     (ha : a ∈ 𝒜 e) (he : 0 < e) :
     awayι 𝒜 b hb hd ''ᵁ
@@ -156,7 +187,7 @@ set_option backward.isDefEq.respectTransparency false in
 
 The scalar acting on a chart section reaches `Γ(Proj 𝒜, D₊(g))` through `Scheme.ΓSpecIso` and the
 open immersion's `Scheme.Hom.appIso`; this says that composite is `awayToSection`, transported
-along `degreeOneChart_image_top`.
+along `awayι_image_top`.
 
 Proved by unfolding `awayι` into `basicOpenIsoSpec.inv ≫ (basicOpen 𝒜 g).ι` and quoting
 `basicOpenToSpec_app_top`, the single place Mathlib pins `awayToSection` against the scheme

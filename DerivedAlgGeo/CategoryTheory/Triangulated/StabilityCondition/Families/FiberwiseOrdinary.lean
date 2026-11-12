@@ -59,7 +59,7 @@ structure OrdinaryFiberStabilityInFamiliesData
     (boundedness : BoundednessProblem M) : Prop where
   /-- Definition 20.5(1)--(3), still expressed through explicit client
   probes. -/
-  definition20_5 : OrdinaryDefinition20_5Conditions charge stable dedekind
+  familyConditions : OrdinaryFamilyConditions charge stable dedekind
   /-- The one real-linear charge on the common class space realizes the
   central charge of every fiber pre-stability condition. -/
   charge_compatible : ∀ i (x : V), Z x = (σ i).Z x
@@ -84,7 +84,7 @@ theorem OrdinaryFiberStabilityInFamiliesData.toOrdinaryStabilityInFamiliesData
       V₀ Z hV₀ σ boundedness) :
     OrdinaryStabilityInFamiliesData charge stable dedekind V₀ Z hV₀
       (ordinaryFiberSemistableClasses σ) boundedness :=
-  ⟨h.definition20_5, h.uniformSupport, h.bounded⟩
+  ⟨h.familyConditions, h.uniformSupport, h.bounded⟩
 
 /-- Project the geometric and numerical conditions used by deformation
 arguments.  This does not produce a geometric or analytic conclusion. -/
@@ -99,8 +99,8 @@ theorem OrdinaryFiberStabilityInFamiliesData.toDeformationInputConditions
       V₀ Z hV₀ σ boundedness) :
     OrdinaryDeformationInputConditions stable dedekind V₀ Z hV₀
       (ordinaryFiberSemistableClasses σ) boundedness :=
-  ⟨h.definition20_5.opennessOfGeometricStability,
-    h.definition20_5.dedekindHN, h.uniformSupport, h.bounded⟩
+  ⟨h.familyConditions.opennessOfGeometricStability,
+    h.familyConditions.dedekindHN, h.uniformSupport, h.bounded⟩
 
 /-- The quotient-uniform support field specializes to genuine quadratic
 support for the actual semistable locus of each fiber. -/

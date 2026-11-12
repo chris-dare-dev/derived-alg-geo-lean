@@ -13,7 +13,24 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement.Basic
 Bondal--Kapranov and Lunts--Orlov mean something stronger by "enhancement": `T`
 is triangulated and the comparison is *exact*. This file is that refinement.
 
-## What the refinement carries, and what it does not prove
+## Main definitions
+
+* `CategoryTheory.Enhancement.Exact` — the compatibility data refining an H⁰
+  presentation of a triangulated `T` to an exact enhancement: a `CommShift` on
+  the comparison and a proof that it is triangulated.
+* `CategoryTheory.Enhancement.Exact.mapTriangle` — the comparison's action on
+  triangles, using the `CommShift` the refinement carries.
+
+## Main results
+
+* `Enhancement.Exact.mapTriangle_obj_mem_distTriang` — an exact enhancement
+  carries distinguished triangles of `H⁰` to distinguished triangles.
+* `Enhancement.Exact.mapTriangle_obj_mem_distTriang_iff` — it also detects them,
+  because the comparison is an equivalence.
+
+## Implementation notes
+
+### What the refinement carries, and what it does not prove
 
 `Enhancement.Exact E` is **data supplied about `E`**, in two fields:
 
@@ -33,10 +50,9 @@ inhabitant is `Cdg.enhancementExact` in
 fields come from theorems about the complexes model (`Cdg.h0FunctorCommShift`
 and `Cdg.h0FunctorIsTriangulated`) rather than from a hypothesis.
 
-The seam and exactness obligations themselves belong to `#854` and `#855`. This
-file packages the comparison truthfully; it discharges nothing on their behalf.
+This file packages the comparison; it discharges no exactness obligation.
 
-## Why a carrier rather than two loose hypotheses
+### Why a carrier rather than two loose hypotheses
 
 The two classes already travel together wherever exactness is needed:
 `Enhancement.coneTriangleFunctor_obj_distinguished` in
@@ -46,15 +62,15 @@ spelling out the same pair by hand. The named consumer of the bundle is
 `Enhancement.Exact.coneTriangle_mem_distTriang`, in the first of those files.
 
 Naming the pair is what lets a statement say "exact enhancement" and mean it,
-which is the distinction `dg-enhancements-e15` will need: uniqueness of
+which is the distinction a uniqueness statement needs: uniqueness of
 enhancements is false over bare `Enhancement`, and is **not** asserted here or
 anywhere else in this repository, in either strength.
 
 Consumers that need only the shift comparison keep taking
 `[e.equiv.functor.CommShift ℤ]` alone. Requiring the bundle where only half of it
-is used would strengthen those hypotheses, which a placement change may not do.
+is used would strengthen those hypotheses needlessly.
 
-## The fields are not instances
+### The fields are not instances
 
 `Exact` is a structure, not a class, and neither field is registered as an
 instance. As instances they would be tried against every `Functor.CommShift` and
@@ -63,6 +79,17 @@ instance. As instances they would be tried against every `Functor.CommShift` and
 makes typeclass search expensive everywhere. `Exact.mapTriangle` below is the
 bundled form consumers reach for; a proof that needs the raw classes writes
 `letI := h.commShift` and `letI := h.isTriangulated`.
+
+## References
+
+The notion of enhancement is Bondal--Kapranov's, in the exact form Lunts--Orlov
+use. The file builds on Mathlib's `CategoryTheory.Functor.CommShift`,
+`CategoryTheory.Functor.IsTriangulated` and `CategoryTheory.Functor.mapTriangle`.
+
+## Tags
+
+dg enhancement, exact enhancement, triangulated functor, H⁰ presentation,
+distinguished triangle
 -/
 
 set_option autoImplicit false

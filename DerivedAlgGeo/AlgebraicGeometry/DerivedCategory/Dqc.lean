@@ -18,33 +18,85 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Coherent
 The ambient `SchemeDerivedCategory X` is the derived category of **all**
 `𝒪_X`-module sheaves.  The category conventionally denoted `Dqc(X)` is the
 full subcategory whose cohomology sheaves are quasi-coherent.  This file makes
-that distinction part of the Lean type.
+that distinction part of the Lean type, proves that `Dqc(X)` is a triangulated
+subcategory closed under coproducts, and maps the coherent, bounded-coherent and
+perfect derived categories into it.
 
-`Dqc(X)` **is** a triangulated subcategory, and this file proves it rather than
-assuming it (#721).  The route does not need quasi-coherent sheaves to be an
-abelian subcategory of `X.Modules` — an earlier version of this docstring named
-that as the blocker.  What is needed is only the **weak Serre** property:
-closure under kernels, cokernels and extensions, which
+## Main definitions
+
+* `AlgebraicGeometry.DerivedCategory.Dqc.schemeQuasicoherentCohomology` — the
+  object property of having quasi-coherent cohomology in every degree.
+* `AlgebraicGeometry.DerivedCategory.Dqc.SchemeQuasicoherentDerivedCategory` —
+  `Dqc(X)`, its full subcategory, with inclusion `ι` and canonical zero `zero`.
+* `AlgebraicGeometry.DerivedCategory.Dqc.coherentDerivedInclusion` and
+  `coherentDerivedToDqc` — the derived coherent-sheaf inclusion and its lift
+  into `Dqc(X)`.
+* `AlgebraicGeometry.DerivedCategory.Dqc.SchemeBoundedQuasicoherentDerivedCategory`
+  and `SchemeBoundedCoherentDqcCategory` — the bounded and the bounded-coherent
+  loci in `Dqc(X)`.
+* `AlgebraicGeometry.DerivedCategory.Dqc.boundedCoherentDerivedToDqc`,
+  `perfectDerivedToDqc` and `schemePerfectInDqc` — the bounded-coherent and
+  perfect comparisons into `Dqc(X)`.
+* `AlgebraicGeometry.DerivedCategory.Dqc.BoundedCoherentDqcIdentification`,
+  `HasBoundedCoherentDqcIdentification` and `PerfectObjectsAreCompactInDqc` —
+  the unproved geometric identifications, stated as data and propositions.
+
+## Main results
+
+* The instance `(schemeQuasicoherentCohomology X).IsTriangulated` and
+  `SchemeQuasicoherentDerivedCategory.ι_isTriangulated`: `Dqc(X)` is a
+  triangulated subcategory on an arbitrary scheme.
+* `SchemeQuasicoherentDerivedCategory.sigma_mem`,
+  `isClosedUnderColimitsOfShape_discrete`, `ι_preservesCoproductsOfShape` and
+  `ι_reflectsCoproductsOfShape`: `Dqc(X)` is closed under coproducts, and its
+  inclusion preserves and reflects them.
+* `AlgebraicGeometry.DerivedCategory.Dqc.coherentDerivedInclusion_mem_dqc`: the
+  derived coherent-sheaf inclusion takes values in `Dqc(X)`.
+* `AlgebraicGeometry.DerivedCategory.Dqc.perfectDerivedToDqc_obj_mem_schemePerfectInDqc`:
+  every coherent-derived perfect object lies in the perfect locus of `Dqc(X)`.
+
+## Implementation notes
+
+### Triangulatedness without an abelian subcategory
+
+The proof that `Dqc(X)` is triangulated does not need quasi-coherent sheaves to
+be an abelian subcategory of `X.Modules`.  What is needed is only the **weak
+Serre** property: closure under kernels, cokernels and extensions, which
 `Modules/Quasicoherent/Kernels.lean` and
-`Cohomology/Quasicoherent/Extensions.lean` supply on an arbitrary scheme
-(#720).  `DerivedCategory.cohomologyIn` turns that into closure under cones via
-the five-term long exact homology sequence, so `Pretriangulated` on the locus
-and triangulatedness of the inclusion both follow from Mathlib.
+`Cohomology/Quasicoherent/Extensions.lean` supply on an arbitrary scheme.
+`DerivedCategory.cohomologyIn` turns that into closure under cones via the
+five-term long exact homology sequence, so `Pretriangulated` on the locus and
+triangulatedness of the inclusion both follow from Mathlib.
 
-Comparison statements a later geometric realization must still prove — the
-bounded-coherent identification and the compact/perfect comparison — remain
+### Comparisons kept as propositions
+
+The bounded-coherent identification and the compact/perfect comparison remain
 propositions with no unsupported inhabitant. `Dqc/Comparison.lean` turns them
 into representatives and membership theorems only when a consumer passes the
-evidence explicitly, so unsupported geometric cases are still not silently
-identified with the all-sheaf derived category.
+evidence explicitly, so unsupported geometric cases are not silently identified
+with the all-sheaf derived category.
 
 The canonical zero object is different: it follows from the triangulated full
-subcategory structure already proved here, so this root constructs it for an
-arbitrary scheme. Moduli consumers reuse that object and add their own locus
-membership proofs.
+subcategory structure proved here, so this file constructs it for an arbitrary
+scheme. Moduli consumers reuse that object and add their own locus membership
+proofs.
 
 Declarations in this file and the affine realization subtree use the
 geometry-owned namespace `AlgebraicGeometry.DerivedCategory.Dqc`.
+
+## References
+
+* Neeman's theorem identifying the compact objects of `Dqc(X)` with the perfect
+  complexes, for `X` quasi-compact and separated, is cited at
+  `PerfectObjectsAreCompactInDqc`; it is not formalized here.
+* Mathlib's `DerivedCategory`, `ObjectProperty.FullSubcategory` and
+  `ObjectProperty.IsTriangulated`, and the repository's
+  `DerivedCategory.cohomologyIn`.
+
+## Tags
+
+quasi-coherent cohomology, derived category of a scheme, Dqc, triangulated
+subcategory, coproducts
 -/
 
 attribute [local instance] HasDerivedCategory.standard
@@ -79,12 +131,12 @@ instance (X : Scheme.{u}) :
       ((DerivedCategory.homologyFunctor X.Modules n).mapIso e) (hE n)
 
 /-- **`Dqc(X)` is a triangulated subcategory of the all-sheaf derived
-category** (#721).
+category.**
 
 Quasi-coherence is a weak Serre subcategory of `X.Modules` — closed under
 kernels, cokernels and extensions, and containing zero — on an arbitrary
 scheme, with no noetherian or quasi-compactness hypothesis.  That is exactly
-the input `DerivedCategory.cohomologyIn_isTriangulated` asks for, and it is why
+the input `DerivedCategory.cohomologyIn_isTriangulated` requires, and it is why
 closure under cones holds without quasi-coherent sheaves forming an abelian
 subcategory: the five-term homology sequence pays for the missing subobject and
 quotient closure.
@@ -113,9 +165,9 @@ abbrev ι : SchemeQuasicoherentDerivedCategory X ⥤ SchemeDerivedCategory X :=
 
 /-- **The inclusion `Dqc(X) ⥤ D(X.Modules)` is a triangulated functor.**  This
 is a Mathlib instance once the object property is a triangulated subcategory; it
-is recorded here because it is what `Dqc(X)` has to have for "compact object in `Dqc(X)`" to be a statement one
-may make.  (`Pretriangulated` is data, not a proposition, so it is left as the
-Mathlib instance rather than restated here.) -/
+is recorded here because it is what `Dqc(X)` has to have for "compact object in
+`Dqc(X)`" to be a statement one may make.  (`Pretriangulated` is data, not a
+proposition, so it is left as the Mathlib instance rather than restated here.) -/
 theorem ι_isTriangulated : (SchemeQuasicoherentDerivedCategory.ι X).IsTriangulated :=
   inferInstance
 
@@ -133,8 +185,7 @@ still gives a zero object. -/
 theorem zero_obj_isZero : IsZero (zero X).obj :=
   (ι X).map_isZero (zero_isZero X)
 
-/-- **The abelian-side inputs to `Dqc(X)`'s coproduct structure** (#721, third
-bullet).
+/-- **The abelian-side inputs to `Dqc(X)`'s coproduct structure.**
 
 Quasi-coherence is closed under `ι`-indexed coproducts on an arbitrary scheme
 (`Modules/Quasicoherent/Coproducts.lean`), and `X.Modules` has those coproducts.
@@ -152,16 +203,16 @@ theorem quasicoherent_isClosedUnderCoproducts (ι : Type u) :
       (Discrete ι) :=
   inferInstance
 
-/-- **`Dqc(X)` is closed under coproducts** (#721, third bullet, closure clause).
+/-- **`Dqc(X)` is closed under coproducts.**
 
 `SchemeDerivedCategory X` has coproducts indexed by any type in the universe of
 `X`, and every `Hⁿ` preserves them, because coproducts in `X.Modules` are exact;
 both are found by instance search, so closure needs no hypothesis beyond
 membership of the summands.
 
-One piece of plumbing here is deliberate and cost real time to find. The `@`
-and the named `quasicoherent_isClosedUnderCoproducts` are needed because
-Instance search cannot find that instance through this application even though
+One piece of plumbing here is deliberate. The `@` and the named
+`quasicoherent_isClosedUnderCoproducts` are needed because
+instance search cannot find that instance through this application even though
 `quasicoherent_isClosedUnderCoproducts` two declarations above finds it by
 `inferInstance`: unifying `A := X.Modules` routes the category through
 `Scheme.Modules.instCategory`, and the goal it then poses no longer matches the
@@ -183,9 +234,9 @@ instance isClosedUnderColimitsOfShape_discrete (ι : Type u) :
     (quasicoherent_isClosedUnderCoproducts X ι) (quasicoherent_isClosedUnderIsomorphisms X) _
     (fun _ => inferInstance)
 
-/-- **The inclusion `Dqc(X) ⥤ D(X.Modules)` preserves coproducts** (#721, third bullet, second
-clause).  A Mathlib instance once the object property is closed under them; recorded here, as
-`ι_isTriangulated` is, because it is the acceptance criterion of #721. -/
+/-- **The inclusion `Dqc(X) ⥤ D(X.Modules)` preserves coproducts.**  A Mathlib instance once
+the object property is closed under them; recorded here, as `ι_isTriangulated` is, because it
+says that coproducts in `Dqc(X)` are computed in the all-sheaf derived category. -/
 theorem ι_preservesCoproductsOfShape (ι : Type u) :
     PreservesColimitsOfShape (Discrete ι) (SchemeQuasicoherentDerivedCategory.ι X) :=
   inferInstance
@@ -407,9 +458,10 @@ def HasBoundedCoherentDqcIdentification
   Nonempty (BoundedCoherentDqcIdentification X)
 
 /-- The exact compact/perfect comparison still required by the scheme-level
-A.14 realization. This file supplies no unsupported inhabitant; `Dqc(X)` now
-has its coproducts, and what remains is compact generation by perfect
-complexes (`RΓ` commuting with coproducts), a separate obligation.
+A.14 realization. This file supplies no unsupported inhabitant. `Dqc(X)` has coproducts
+(`SchemeQuasicoherentDerivedCategory.isClosedUnderColimitsOfShape_discrete`); the
+remaining input is compact generation by perfect complexes (`RΓ` commuting with
+coproducts), a separate obligation.
 
 **This is not Neeman's compact-equals-perfect theorem, and `IsLocallyNoetherian`
 is not enough to inhabit it.** Two gaps, both about the left-hand side. Neeman's

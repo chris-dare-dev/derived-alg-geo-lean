@@ -9,32 +9,67 @@ import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.BasicOpenLemmas
 /-!
 # Degree-zero fractions with an arbitrary numerator, and the twist comparison they give
 
-`TwistBridge.lean` and `TwistApp.lean` carry the fraction `fⁿ / gⁿ` for `f` and `g` of degree one.
-`#585`'s glue needs the same statements for an arbitrary pair of homogeneous elements of the same
-degree -- `fᵐ gᵢⁿ / gᵢ^{n+m}` appears the moment the extension exponent and the agreement exponent
-are allowed to differ, and no power of a single element has that shape.
+`TwistBridge.lean` and `ChartUnitTwist.lean` carry the fraction `fⁿ / gⁿ` for `f` and `g` of
+degree one. The gluing in the section-extension lemma `exists_globalSection_twistBy` needs the same
+statements for an arbitrary pair of homogeneous elements of the same degree --
+`fᵐ gᵢⁿ / gᵢ^{n+m}` appears the moment the extension exponent and the agreement exponent are
+allowed to differ, and no power of a single element has that shape.
 
-## What is here
+## Main definitions
+
+This file introduces no new definitions; `frac` and `fracSection` are in `Frac.lean`.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.pow_mem_smul`, `AlgebraicGeometry.Proj.pow_mem_mul`: a power lands in
+  the degree its exponent multiplies, in the two spellings the glue compares.
+* `AlgebraicGeometry.Proj.frac_eq`, `AlgebraicGeometry.Proj.fracSection_eq`: two fractions with the
+  same value are equal, whatever degrees they are written in.
+* `AlgebraicGeometry.Proj.frac_pow`, `AlgebraicGeometry.Proj.fracSection_mul`: powers and products
+  of fractions.
+* `AlgebraicGeometry.Proj.fracSection_mul_fracSection_symm`: `a / b` and `b / a` are inverse.
+* `AlgebraicGeometry.Proj.frac_smul_sectionOfMem`,
+  `AlgebraicGeometry.Proj.fracSection_smul_sectionOfMem`: rescaling the section `b` of `O(k)` by
+  `a / b` gives the section `a`.
+* `AlgebraicGeometry.Proj.twistBy_app_eq_smul'`: over an open inside `D₊(b)`, twisting a section by
+  `a` is twisting it by `b` and scaling by `a / b`.
+
+## Notation
+
+`X` is local notation for the underlying space `ProjectiveSpectrum.top 𝒜`.
+
+## Implementation notes
+
+### The fractions and the comparison
 
 `frac` is `a / b` at a point of `D₊(b)`, for `a b ∈ 𝒜 k`; `fracSection` is the section of the
 structure sheaf it defines over any open inside `D₊(b)`. `fracPow` and `fracPowSection` are the
-special case `a = fⁿ`, `b = gⁿ`, and the two `..._eq_fracPow...` lemmas record that -- by `rfl`,
-so nothing has to be transported between the two spellings.
+special case `a = fⁿ`, `b = gⁿ`, defined from them, so nothing has to be transported between the
+two spellings.
 
 `twistBy_app_eq_smul'` is the comparison the glue consumes: over an open inside `D₊(b)`, twisting a
-section by `a` is twisting it by `b` and scaling by `a / b`. The degree-one case was its
-`a = fⁿ`, `b = gⁿ` case.
+section by `a` is twisting it by `b` and scaling by `a / b`. Its case `a = fⁿ`, `b = gⁿ` is the
+degree-one comparison.
 
-## Why this is not just a generalisation for its own sake
+### Why this is not just a generalisation for its own sake
 
-The two exponents `#585` carries are independent: `n` extends a section across each chart, `m`
-forces agreement on the pairwise overlaps, and the section that finally glues is
-`twistBy (fᵐ gᵢⁿ)` of the chart extension. Comparing two such across an overlap needs `a / b` with
-`a = fᵐ gⱼⁿ` and `b = gᵢ^{n+m}`, which is a genuine two-element fraction.
+The two exponents the section-extension lemma carries are independent: `n` extends a section
+across each chart, `m` forces agreement on the pairwise overlaps, and the section that finally
+glues is `twistBy (fᵐ gᵢⁿ)` of the chart extension. Comparing two such across an overlap needs
+`a / b` with `a = fᵐ gⱼⁿ` and `b = gᵢ^{n+m}`, which is a genuine two-element fraction.
 
-## Scope
+### Scope
 
 Fractions and the twist comparison. No chart, no cover, no gluing.
+
+## References
+
+Mathlib's `SetLike.pow_mem_graded` and `Localization.r_iff_exists`, and
+`AlgebraicGeometry.Scheme.Modules.smul_tmulSection`.
+
+## Tags
+
+projective spectrum, homogeneous localization, twisting sheaf, fraction
 -/
 
 noncomputable section
@@ -54,7 +89,7 @@ local notation3 "X" => ProjectiveSpectrum.top 𝒜
 
 /-- **A power lands in the degree its exponent multiplies.**
 
-`SetLike.pow_mem_graded` states the degree as `d • e`; `#585` meets it as `e • d`, because the
+`SetLike.pow_mem_graded` states the degree as `d • e`; the gluing meets it as `e • d`, because the
 numerator of `HomogeneousLocalization.Away.isLocalizationElem hg hf` is a power of `f` sitting in
 the degree that `g`'s exponent produces. -/
 theorem pow_mem_smul {a : A} {e : ℕ} (ha : a ∈ 𝒜 e) (d : ℕ) : a ^ d ∈ 𝒜 (e • d) := by
@@ -63,7 +98,7 @@ theorem pow_mem_smul {a : A} {e : ℕ} (ha : a ∈ 𝒜 e) (d : ℕ) : a ^ d ∈
 /-- **The same, with the degree written as a product.**
 
 `pow_mem_smul` is the spelling the localization elements produce; this is the spelling a twist
-degree is stated in, and `#823` needs both because the glue compares one against the other. The
+degree is stated in, and the glue needs both because it compares one against the other. The
 degree-one case is `Frac.pow_mem_deg`. -/
 theorem pow_mem_mul {a : A} {e : ℕ} (ha : a ∈ 𝒜 e) (d : ℕ) : a ^ d ∈ 𝒜 (e * d) := by
   simpa [smul_eq_mul] using pow_mem_smul 𝒜 ha d
@@ -71,7 +106,7 @@ theorem pow_mem_mul {a : A} {e : ℕ} (ha : a ∈ 𝒜 e) (d : ℕ) : a ^ d ∈ 
 /-- **Two fractions with the same value are the same element**, whatever degrees they are written
 in.
 
-The workhorse for `#585`'s bookkeeping: the exponents that reach the glue are built by different
+The workhorse for the gluing's bookkeeping: the exponents that reach the glue are built by different
 routes -- `(f ^ d) ^ n` from a chart's distinguished element, `f ^ (d * n)` from a twist -- and this
 identifies them without transporting a degree. -/
 theorem frac_eq {a b a' b' : A} {k k' : ℕ} (ha : a ∈ 𝒜 k) (hb : b ∈ 𝒜 k)
@@ -158,12 +193,10 @@ set_option backward.defeqAttrib.useBackward true in
 /-- **The overlap comparison for two homogeneous elements of the same degree.**
 
 Over an open inside `D₊(b)`, twisting a section by `a` is twisting it by `b` and scaling by
-`a / b`. The case `a = fⁿ`, `b = gⁿ` was stated separately in `TwistApp.lean` until `#825`; it had
-no consumer once this one existed.
+`a / b`.
 
-The scalar is ascribed at `Γ(Proj 𝒜, U)` for the reason recorded there: written bare it elaborates
-at the structure sheaf's own section type, where the action on the twist's sections does not
-synthesize. -/
+The scalar is ascribed at `Γ(Proj 𝒜, U)`: written bare it elaborates at the structure sheaf's own
+section type, where the action on the twist's sections does not synthesize. -/
 theorem twistBy_app_eq_smul' {a b : A} {k : ℕ} (ha : a ∈ 𝒜 k) (hb : b ∈ 𝒜 k)
     (F : (Proj 𝒜).Modules) {U : Opens X}
     (hU : U ≤ ProjectiveSpectrum.basicOpen 𝒜 b) (t : Γ(F, U)) :

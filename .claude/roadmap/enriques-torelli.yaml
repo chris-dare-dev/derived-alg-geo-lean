@@ -94,7 +94,7 @@ source:
 evidence:
   - "arXiv:1912.04332v2 §3.1, especially Definition 3.2 and equation (3.2), for the isotropic 10-sequence, Fano normalization, semi-canonical collection, and semiorthogonal decomposition; arXiv:2104.13610v2 for the non-generic extension."
   - "The 2026-08-31 derived-category binding audit (ag-lean-handoff/derived-category-binding-audit/) and its landed remediation: the Coherent.lean owner (#982), the Duality rebind (#993), and the Dqc identification consumer API (#995)."
-  - "The semiorthogonal reconnaissance note (.claude/notes/2026-08-28-semiorthogonal-reconnaissance.md) deferring exceptionality to the first consuming theorem."
+  - "The semiorthogonal reconnaissance note (https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/notes/2026-08-28-semiorthogonal-reconnaissance.md) deferring exceptionality to the first consuming theorem."
   - "Issue drafts and dependency graph: ag-lean-handoff/enriques-torelli-lane/ISSUES.md."
 wont:
   - "No claim that any Enriques surface, canonical-sheaf package, or isotropic collection has been constructed; every foundation is conditional data in the repository's ledger idiom."

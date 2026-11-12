@@ -118,11 +118,11 @@ lemma shortExact_map_toSheaf {S : ShortComplex X.Modules} (hS : S.ShortExact) :
     (S.map (toSheaf X)).ShortExact :=
   hS.map_of_exact (toSheaf X)
 
-/-! ### The acceptance test
+/-! ### Epimorphisms by instance search
 
-Issue #59 asked for exactly this goal to close by instance search. It does, through
-`epi_sheafOfModules` — recorded here so a regression is a build failure rather than a
-rediscovery. -/
+The image under `SheafOfModules.toSheaf` of an epimorphism of `𝒪ₓ`-modules is an epimorphism by
+instance search, through `epi_sheafOfModules`. The example below records this, so a regression is
+a build failure. -/
 
 set_option backward.isDefEq.respectTransparency false in
 set_option backward.defeqAttrib.useBackward true in

@@ -39,8 +39,8 @@ variable {k : Type w} [Field k] {C : Type u} [Category.{v} C]
   [Preadditive C] [Linear k C] [HasShift C ℤ]
 
 /-- The Serre functor commutes with each shift, by conjugation with the
-corresponding shift equivalence. This is the orientation used in #898;
-Mathlib's `CommShift` stores the inverse orientation. -/
+corresponding shift equivalence. The comparison is oriented
+`S ⋙ [n] ≅ [n] ⋙ S`; Mathlib's `CommShift` stores the inverse orientation. -/
 noncomputable def commShiftIso (D : SerreFunctorData k C) (n : ℤ)
     [(shiftFunctor C n).Additive] [(shiftFunctor C n).Linear k] :
     D.S ⋙ shiftFunctor C n ≅ shiftFunctor C n ⋙ D.S := by

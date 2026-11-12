@@ -15,7 +15,24 @@ inclusion is monoidal. The payoff is that the `MonoidalCategory` parent of
 nothing and becomes something a named constructor produces from a strictly
 weaker, strictly ambient input.
 
-## The identification that makes this cheap
+## Main definitions
+
+* `AlgebraicGeometry.DerivedCategory.boundedProperty` — the bounded object
+  property on `D(Coh X)`.
+* `AlgebraicGeometry.DerivedCategory.boundedMonoidalCategory` — the restricted
+  monoidal structure on `Dᵇ(Coh X)`.
+* `AlgebraicGeometry.DerivedCategory.boundedTensorι` and `boundedTensorιMonoidal`
+  — the inclusion `Dᵇ(Coh X) ⥤ D(Coh X)` and its monoidal structure.
+
+## Main results
+
+* `AlgebraicGeometry.DerivedCategory.schemeBoundedCoherentDerivedCategory_eq` —
+  the bounded coherent derived category is the full subcategory on
+  `boundedProperty`, by `rfl`.
+
+## Implementation notes
+
+### The identification that makes this cheap
 
 `SchemeBoundedCoherentDerivedCategory X` is `DerivedCategory.Bounded (Coh X)`,
 and that is an `abbrev` for
@@ -26,7 +43,7 @@ Mathlib's `fullMonoidalSubcategory` and `monoidalι`
 (`Mathlib/CategoryTheory/Monoidal/Subcategory.lean:93`, `:101`) apply to it
 directly. A reader who misses this will rebuild the associator by hand.
 
-## The hypothesis is an input, and what it means
+### The hypothesis is an input, and what it means
 
 The closure condition is Mathlib's own class,
 `ObjectProperty.IsMonoidal t.bounded`, not a bespoke structure: it is
@@ -43,56 +60,55 @@ is **supplied here, not proved**. There is no scheme-level regularity predicate
 in this tree, which is why the restriction is carried by this class rather than
 by an `[IsRegular X]` binder.
 
-## Why a `def` and not an `instance`
+### Why a `def` and not an `instance`
 
 `fullMonoidalSubcategory` is already a **global** instance on
 `FullSubcategory P`, and `SchemeBoundedCoherentDerivedCategory X` is an
 `abbrev` for exactly such a subcategory. `HasCoherentDerivedTensor` extends
 `MonoidalCategory (SchemeBoundedCoherentDerivedCategory Z.left)`
-(`Tensor/Coherent.lean:78`) and is bound at 68 sites across this library, of
-which 15 are in `FourierMukai/KernelAssociativity.lean`. A repo-level instance
-producing the same `MonoidalCategory` would therefore be a **third** synthesis
-route on one `abbrev`, not a second — the diamond shape that has bitten this
-repository before.
+(`Tensor/Coherent.lean`) and is bound at many sites across this library, among
+them `FourierMukai/KernelAssociativity.lean`. A repo-level instance producing the
+same `MonoidalCategory` would therefore be a **third** synthesis route on one
+`abbrev`, not a second — a diamond.
 
-The two routes do not collide today, because the inputs below are not in scope
-at those binder sites. That is a fact about the current call sites, not a
-property of the instance, so it is not a reason to rely on it. Everything here
-is a named `def`; a caller that wants the structure names it.
+The two routes do not collide at the existing call sites, because the inputs
+below are not in scope at those binder sites. That is a fact about the call
+sites, not a property of the instance, so it is not a reason to rely on it.
+Everything here is a named `def`; a caller that wants the structure names it.
 
-## Placement
+### Placement and namespace
 
-`dt-1` (#892) proposed this under
-`CategoryTheory.Triangulated.StabilityCondition.Families`. MO1.10 (#1321,
-merged as #1363) makes that impossible: rule 17 of `scripts/check_layering.py`
+The construction belongs to the `Tensor/` owner: `scripts/check_layering.py`
 requires every module under `AlgebraicGeometry/DerivedCategory/Tensor` to reach
-neither the Fourier--Mukai subtree nor the stability tree, **transitively**,
-and the consumer this feeds — `HasCoherentDerivedTensor` — now lives in
-`Tensor/Coherent.lean`. So the construction belongs to the `Tensor/` owner, and
-the issue's own integration note directs exactly this: coordinate the
-path-specific contract with the cutover rather than create a second root.
+neither the Fourier--Mukai subtree nor the stability tree, **transitively**, and
+the consumer this feeds — `HasCoherentDerivedTensor` — lives in
+`Tensor/Coherent.lean`.
 
-The namespace is `AlgebraicGeometry.DerivedCategory`. The umbrella's rule is
-that *moved* declarations keep the namespace they were introduced with; these
-are new, so there is nothing to preserve, and filing them under `FourierMukai`
-would assert the coupling MO1.10 removed.
+The namespace is `AlgebraicGeometry.DerivedCategory`; filing these declarations
+under `FourierMukai` would assert a coupling to Fourier--Mukai that does not
+exist.
 
 This module sits **below** `Tensor/Coherent.lean` and must not import it: the
 point is to feed `HasCoherentDerivedTensor`, not to consume it.
 
-## Not in scope
+### Not in scope
 
 The three exactness obligations of `HasCoherentDerivedTensor` — `additive`,
-`commShift`, `isTriangulated`, now packaged as its `exact` field — belong to
-`dt-2`. Where `MonoidalCategory (D(Coh X))` itself comes from belongs to
-`dt-3`. Nothing here touches `AlgebraicGeometry/Modules/**` or
-`AlgebraicGeometry/CoherentSheaf/**`.
+`commShift`, `isTriangulated`, packaged as its `exact` field — are not addressed
+here, and neither is the source of `MonoidalCategory (D(Coh X))` itself.
 
 ## References
 
-* `Mathlib/CategoryTheory/Monoidal/Subcategory.lean` — the prior art adapted.
-* `Mathlib/Algebra/Homology/DerivedCategory/TStructure.lean:207` — the `abbrev`.
-* `docs/architecture/cutover-ledger.md`, row 10 (#1321).
+* Mathlib's `ObjectProperty.fullMonoidalSubcategory` and
+  `ObjectProperty.monoidalι` (`Mathlib/CategoryTheory/Monoidal/Subcategory.lean`),
+  adapted here.
+* Mathlib's `DerivedCategory.Bounded`
+  (`Mathlib/Algebra/Homology/DerivedCategory/TStructure.lean:207`), the `abbrev`.
+
+## Tags
+
+monoidal category, bounded derived category, coherent sheaves, full subcategory,
+finite Tor-dimension
 -/
 
 universe u
@@ -150,10 +166,10 @@ full subcategory it is about. -/
     (boundedTensorι X).Monoidal :=
   ObjectProperty.monoidalι (boundedProperty X)
 
-/-! ### Acceptance
+/-! ### Reachability by name
 
 The construction is reachable **by name**, without class synthesis. That is the
-point of shipping `def`s: an `example` that said `inferInstance` here would pass
+point of providing `def`s: an `example` that said `inferInstance` here would pass
 on Mathlib's global `fullMonoidalSubcategory` alone and would prove nothing
 about this file. -/
 

@@ -13,32 +13,50 @@ The Harder--Narasimhan reading of the neutral perimeter comparison in
 subobject charges, the edges are semistable-factor charges, and the path length
 is the mass.
 
-## Main declarations
+## Main definitions
 
-* `polygonLength_le_of_vertexHull_subset`, for applications that already have
-  containment of the two closed finite vertex polygons.
-* `polygonLength_le_add_norm_charge_sub_of_mono`, the boundary-cut comparison
-  along a monomorphism, and its `mass_le_add_norm_cokernel_of_mono` and
-  `mass_le_add_norm_of_shortExact` mass forms.
-* `mass_eq_mass`, independence of the mass of the chosen HN filtration.
+This file introduces no new definitions; it proves facts about
+`CategoryTheory.Triangulated.AbelianHNFiltration.polygonLength` and
+`CategoryTheory.Triangulated.AbelianHNFiltration.mass`.
 
-## Source
+## Main results
 
-Ikeda, *A phase limit formula and the space of stability conditions*,
-Lemmas 3.7 and 3.8, at `t = 0`. Lemma 3.8 is strengthened at that parameter by
-not requiring the cokernel to have phase one: that hypothesis controls the
-exponential weight for general `t` and disappears when `t = 0`. No claim that
-the full ambient HN polygon is the closed HN vertex hull is used -- it is false
-in general; positive-angle support maxima of the ambient polygon come from
-`HNPolygon` instead.
+* `AbelianHNFiltration.polygonLength_le_of_vertexHull_subset`, for applications
+  that already have containment of the two closed finite vertex polygons.
+* `AbelianHNFiltration.polygonLength_le_add_norm_charge_sub_of_mono`, the
+  boundary-cut comparison along a monomorphism, and its
+  `AbelianHNFiltration.mass_le_add_norm_cokernel_of_mono` and
+  `AbelianHNFiltration.mass_le_add_norm_of_shortExact` mass forms.
+* `AbelianHNFiltration.mass_eq_mass`, independence of the mass of the chosen
+  HN filtration.
 
-## Placement
+## Implementation notes
 
-This file is the stability adapter half of what was
-`StabilityCondition/Metric/Mass/Subadditivity/PolygonPerimeter.lean`. MO1.13
-(#1324) sent the Euclidean half to its neutral owner and gave what stayed a
-name for its subject -- the HN polygon comparison -- rather than for the shape
-of its proof. The citation above travels with it unchanged.
+### Source
+
+The comparison is Ikeda's Lemmas 3.7 and 3.8 at `t = 0`. Lemma 3.8 is
+strengthened at that parameter by not requiring the cokernel to have phase one:
+that hypothesis controls the exponential weight for general `t` and disappears
+when `t = 0`. No claim that the full ambient HN polygon is the closed HN vertex
+hull is used -- it is false in general; positive-angle support maxima of the
+ambient polygon come from `HNPolygon` instead.
+
+### Placement
+
+This file is the stability adapter half of the perimeter comparison. The
+Euclidean half lives with its neutral owner,
+`Analysis/Convex/ComplexPolygonalPath/Perimeter.lean`, and this file is named
+for its subject -- the HN polygon comparison -- rather than for the shape of
+its proof.
+
+## References
+
+* Ikeda, *A phase limit formula and the space of stability conditions*,
+  Lemmas 3.7 and 3.8.
+
+## Tags
+
+stability function, Harder--Narasimhan polygon, mass, perimeter comparison
 -/
 
 namespace CategoryTheory.Triangulated

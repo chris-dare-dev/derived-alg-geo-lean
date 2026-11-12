@@ -40,7 +40,7 @@ goal:
       validation: "PARTIALLY FALSIFIED. Survives preamble-class rotation (which changes preamble_text, leaving body_text alone). Does NOT survive a chunker bump, which changes chunk boundaries and therefore body_text. Mitigation is the quote_containment resolution rung; see contract-v1-e6."
     - tier: must
       text: "Human faithfulness review can keep pace with minting at a rate that makes the served surface worth querying."
-      validation: "LIKELY FALSE at one operator. ~2h/review, ~30min/mint, against 146 papers / 15,280 chunks gives a ~0.07% hit rate at ten entries. Gated on the owner decision in .claude/open-questions.md Q4; the fallback is a zero-axis `sketch` lane plus a dated coverage census."
+      validation: "LIKELY FALSE at one operator. ~2h/review, ~30min/mint, against 146 papers / 15,280 chunks gives a ~0.07% hit rate at ten entries. Gated on the owner decision in https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/open-questions.md Q4; the fallback is a zero-axis `sketch` lane plus a dated coverage census."
     - tier: should
       text: "arXMCP can record which arXiv version a statement came from."
       validation: "FALSE TODAY. `arxiv_version` is '' for every row in both live notebooks (8/8 sampled each). Requires an ingest backfill — a third arXMCP change, not the two budgeted. See contract-v1-e7."
@@ -53,10 +53,10 @@ goal:
     - "No geometric-lane work inside this contract track. Derived categories, Serre duality, Chern characters, and Fourier–Mukai content are owned by their mathematical roadmaps under DerivedAlgGeo."
     - "No `sorry`, including as a contract-development convenience. CLAUDE.md §2 is unconditional."
   evidence:
-    - ".claude/notes/2026-08-04-arxmcp-lean-integration-audit.md — 8 areas surveyed, each independently re-verified by a second agent instructed to default to REFUTED."
-    - ".claude/notes/2026-08-04-contract-architecture.md — 4 competing designs, 8 adversarial judgements, the winner with runners-up's ideas grafted in."
-    - ".claude/notes/2026-08-04-contract-schemas.md — the 7 artifacts as copy-pasteable schemas with a worked end-to-end trace."
-    - ".claude/notes/2026-08-04-contract-red-team.md — 18 ranked gaps in the above. Read before implementing."
+    - "https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/notes/2026-08-04-arxmcp-lean-integration-audit.md — 8 areas surveyed, each independently re-verified by a second agent instructed to default to REFUTED."
+    - "https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/notes/2026-08-04-contract-architecture.md — 4 competing designs, 8 adversarial judgements, the winner with runners-up's ideas grafted in."
+    - "https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/notes/2026-08-04-contract-schemas.md — the 7 artifacts as copy-pasteable schemas with a worked end-to-end trace."
+    - "https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/notes/2026-08-04-contract-red-team.md — 18 ranked gaps in the above. Read before implementing."
     - "arXMCP/server/handlers/lean_verify.py:397-399 — AXIOM_ALLOWLIST is byte-identical to this repo's formalization.yaml:82-90. The one pre-existing semantic touchpoint."
     - "arXMCP/server/handlers/lean_verify.py:445-456 — _DECL_SITE_RE/_DECL_NAME_RE fail open on `set_option ... in theorem` and `open ... in theorem`; regexes executed and reproduced."
     - "arXMCP/ingest/chunker.py:1277-1301 — chunk_id = arxiv:<paper>:<sha256(preamble + NFC(body))[:16]>, content-addressed and determinism-tested."
@@ -126,7 +126,7 @@ items:
     size: S
     tags: [value, trust, governance]
     links:
-      note: [".claude/notes/2026-08-04-arxmcp-lean-integration-audit.md"]
+      note: ["https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/notes/2026-08-04-arxmcp-lean-integration-audit.md"]
 
   - id: contract-v1-e2
     gh_issue: 129

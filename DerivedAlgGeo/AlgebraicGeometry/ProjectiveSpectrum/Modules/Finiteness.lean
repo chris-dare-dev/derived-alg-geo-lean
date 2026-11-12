@@ -23,9 +23,48 @@ canonical map
 
 `(M_f)₀ ⟶ Γ(D₊(f), M̃)`.
 
+## Main definitions
+
+* `AlgebraicGeometry.Proj.AffineComparisonData`: affine `tilde` comparison on every standard Proj
+  chart;
+* `AlgebraicGeometry.Proj.AffineComparisonDataOn`: the same comparison on a covering sub-family
+  of charts;
+* `AlgebraicGeometry.Proj.affineComparisonDataSelf`: the constructed comparison for the structure
+  module;
+* `AlgebraicGeometry.Proj.localizedNatShiftDegreeOneIso`: the explicit rank-one trivialization of
+  `A(d)` on a degree-one chart;
+* `AlgebraicGeometry.Proj.BasicOpenSectionData`: bijectivity of the canonical basic-open section
+  map;
+* `AlgebraicGeometry.Proj.TwistingSectionRange`: a degree-bounded global-section comparison for
+  `O(d)`.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.AffineComparisonData.associatedSheaf_isQuasicoherent`: quasi-coherence
+  from those comparisons;
+* `AlgebraicGeometry.Proj.natShift_isQuasicoherent`,
+  `AlgebraicGeometry.Proj.intShift_isQuasicoherent`: quasi-coherence of the twists when degree-one
+  elements generate;
+* `AlgebraicGeometry.Proj.associatedSheaf_isCoherent_of_finitePresentation`: coherence from
+  explicit finite presentation of every localized module;
+* `AlgebraicGeometry.Proj.associatedSheaf_isCoherent_of_noetherian_finite`: the common
+  noetherian + finite-generation specialization;
+* `AlgebraicGeometry.Proj.basicOpenSectionDataSelf`: constructed basic-open certificates for the
+  structure module;
+* `AlgebraicGeometry.Proj.projectiveSpace_variableSection_bijective`: the constructed basic-open
+  section comparison on every variable chart of projective space, for every nonnegative twist;
+* `AlgebraicGeometry.Proj.projectiveSpace_globalSections_finite`: finite generation for the
+  polynomial-ring specialization in every certified degree.
+
+## Notation
+
+`𝒪` is local notation for the structure sheaf of `Proj 𝒜` in the global-section part of the file.
+
+## Implementation notes
+
 The general affine comparison is deliberately represented by `AffineComparisonData`: it is an
 isomorphism between the restriction of `M̃` to each standard affine chart and Mathlib's affine
-`tilde` construction.  For the graded ring considered as a module over itself, this file now
+`tilde` construction.  For the graded ring considered as a module over itself, this file
 constructs the comparison canonically from `associatedSheafSelfIso`; no certificate input is
 needed in that case.  Once comparison data is present, quasi-coherence follows by gluing the
 affine presentations, and coherence follows from explicit finite-presentation hypotheses on the
@@ -36,24 +75,14 @@ degrees in which a chosen algebraic module is known to compute `Γ(Proj A, O(d))
 Serre correspondence is asserted.  The projective-space corollary uses Mathlib's finite generation
 of homogeneous multivariate polynomials and therefore has no hidden noetherianity assumption.
 
-## Main declarations
+## References
 
-* `AffineComparisonData`: affine `tilde` comparison on every standard Proj chart;
-* `affineComparisonDataSelf`: the constructed comparison for the structure module;
-* `localizedNatShiftDegreeOneIso`: the explicit rank-one trivialization of `A(d)` on a
-  degree-one chart;
-* `moduleAwayToSection_natShift_degreeOne_bijective`: the corresponding constructed
-  basic-open section comparison for every nonnegative twist;
-* `associatedSheaf_isQuasicoherent`: quasi-coherence from those comparisons;
-* `associatedSheaf_isCoherent_of_finitePresentation`: coherence from explicit finite
-  presentation of every localized module;
-* `associatedSheaf_isCoherent_of_noetherian_finite`: the common noetherian + finite-generation
-  specialization;
-* `BasicOpenSectionData`: bijectivity of the canonical basic-open section map;
-* `basicOpenSectionDataSelf`: constructed basic-open certificates for the structure module;
-* `TwistingSectionRange`: a degree-bounded global-section comparison for `O(d)`;
-* `projectiveSpace_globalSections_finite`: finite generation for the polynomial-ring
-  specialization in every certified degree.
+Mathlib's `AlgebraicGeometry.Proj.affineOpenCover` and `AlgebraicGeometry.tilde`, and
+`SheafOfModules.QuasicoherentData.bind`.
+
+## Tags
+
+projective spectrum, quasi-coherent sheaf, coherent sheaf, twisting sheaf, global sections
 -/
 
 noncomputable section
@@ -381,9 +410,9 @@ noncomputable def intShiftOverIso {f : A} (hf : f ∈ 𝒜 1) (d : ℤ)
 /-! ### The same, for a graded module
 
 `intShiftOverIso` and the chart trivializations under it are stated for `𝒜` as a module over
-itself, which is all quasi-coherence and coherence of `O(d)` ever need. `#584`'s tensor comparison
-`F ⊗ O(d) ≅ F(d)` needs an arbitrary graded module, and the port is direct now that
-`intShiftModuleSectionLinearEquivOn` exists: the same three steps, at `𝓜` instead of `𝒜`. -/
+itself, which is all quasi-coherence and coherence of `O(d)` ever need. The tensor comparison
+`F ⊗ O(d) ≅ F(d)` (`tensorTwistIso`) needs an arbitrary graded module, and the port is direct
+through `intShiftModuleSectionLinearEquivOn`: the same three steps, at `𝓜` instead of `𝒜`. -/
 
 /-- Trivializing an integer twist of a graded module over an open inside a degree-one chart. -/
 noncomputable def intShiftModuleOverIso {f : A} (hf : f ∈ 𝒜 1) (d : ℤ)

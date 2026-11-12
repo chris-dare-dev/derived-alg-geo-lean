@@ -10,6 +10,24 @@ import DerivedAlgGeo.Algebra.Homology.DGCategory.Basic
 For a preadditive category `A`, the cochain complexes over `A` form a dg
 category whose Hom-complexes are Mathlib's `CochainComplex.HomComplex`.
 
+## Main definitions
+
+* `CategoryTheory.Cdg` — a type synonym for `CochainComplex A ℤ`, so the dg
+  structure does not attach itself to the cochain complexes globally;
+  `CategoryTheory.Cdg.of` is the underlying cochain complex.
+* `CategoryTheory.Cdg.struct` — the `DGCategoryStruct` on `Cdg A`, with
+  Hom-complexes `CochainComplex.HomComplex` and composition `Cochain.comp`.
+
+## Main results
+
+* The `DGCategory` instance on `CategoryTheory.Cdg A`: every axiom is a Mathlib
+  lemma about `Cochain`.
+* `CategoryTheory.Cdg.dgHom_eq`, `CategoryTheory.Cdg.dgId_eq` and
+  `CategoryTheory.Cdg.dgComp_eq` — the computation rules unfolding the
+  instance.
+
+## Implementation notes
+
 Every field and every axiom is Mathlib's, not this repository's:
 
 | `DGCategoryStruct` | supplied by |
@@ -23,11 +41,19 @@ Every field and every axiom is Mathlib's, not this repository's:
 | `dgComp_leibniz` | `δ_comp` |
 
 That the last row is a single lemma application rather than a sign argument is
-the payoff of ADR-0011 and of the convention correction that followed it. An
-earlier draft of `DGCategoryStruct` was `ModuleCat k`-valued, which did not
-typecheck against `HomComplex` at all; the draft after it stated the mirror
-Leibniz rule, which typechecked and was false here. Both were found by trying
-to write this file.
+why `DGCategory` has `AddCommGrpCat`-valued Hom-complexes and uses Mathlib's
+sign convention for the Leibniz rule. A `ModuleCat k`-valued `dgHom` would not
+typecheck against `HomComplex` at all, and the mirror Leibniz rule
+`(δf) · g + (-1)^p · f · (δg)` typechecks but is false here.
+
+## References
+
+Mathlib's `CochainComplex.HomComplex`, `CochainComplex.HomComplex.Cochain.comp`
+and `CochainComplex.HomComplex.δ_comp`.
+
+## Tags
+
+dg category, cochain complex, Hom complex, Leibniz rule
 -/
 
 set_option autoImplicit false

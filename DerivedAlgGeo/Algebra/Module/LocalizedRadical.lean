@@ -9,27 +9,32 @@ import Mathlib.RingTheory.LocalProperties.Exactness
 
 `Submodule.exists_pow_smul_mem_of_isLocalized_radical` is the commutative-algebra step behind
 "a section over a basic open extends after multiplying by a power of the defining element".
-If an element lands in a submodule after localizing at every member of a family `s`, then some
+If an element is in a submodule after localizing at every member of a family `s`, then some
 power of any element of `(span s).radical` carries it into the submodule on the nose.
+
+## Main definitions
+
+This file introduces no new definitions.
+
+## Main results
+
+* `Submodule.exists_pow_smul_mem_of_isLocalized_radical` — if `m` is in `N` after localizing
+  away from every element of `s`, then `d ^ n • m ∈ N` for some `n`, for every `d` in the
+  radical of `Ideal.span s`.
+
+## Implementation notes
 
 The proof is a single observation: the set of ring elements carrying `m` into `N` is the ideal
 `N.comap (toSpanSingleton R M m)`, localizing at `r` says exactly that some power of `r` lies in
 that ideal, and radical membership then transports the conclusion from `span s` to `d`.
 
-## Provenance
+The statement is pure commutative algebra with no Čech content, so it is stated here rather than
+beside its consumer, the Čech affine-vanishing argument. It is not in Mathlib at the current pin
+under this or any neighbouring name, and is a candidate for upstreaming.
 
-This statement was proved as a `private` lemma inside the Čech affine-vanishing file, where it
-was needed once. It is stated here instead because it is pure commutative algebra with no Čech
-content, and because the projective-space section-extension argument (#585) was expected to need it
-without wanting the cohomology stack it was buried in. Nothing about the proof changed in the move.
+## References
 
-That expectation did not hold: `#585` closed without using this lemma at all — the overlap step it
-was meant for is settled by separatedness on the degree-two chart of `gᵢ gⱼ` instead. The Čech
-affine-vanishing argument remains its live consumer, and the statement is still worth having on its
-own terms.
-
-It is not in Mathlib at the current pin under this or any neighbouring name, and it is
-`upstream-candidate` material.
+Mathlib's `IsLocalizedModule.Away`, `Submodule.localized₀` and `Ideal.radical`.
 
 ## Tags
 

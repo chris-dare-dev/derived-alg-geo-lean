@@ -12,24 +12,57 @@ import DerivedAlgGeo.CategoryTheory.Abelian.Stability.SlopeThreshold
 `hnTors Z β` and `hnFree Z β` are defined by the Harder–Narasimhan *extrema*
 `φ⁻` and `φ⁺`.  Every consumer that wants to read a cutoff against a charge
 needs the object's own phase instead, and the step between them is the
-statement that `Z.phase E` lies between `φ⁻` and `φ⁺`.
+statement that `Z.phase E` lies between `φ⁻` and `φ⁺`.  This file names that
+statement in the `φ±` vocabulary and draws the two cutoff corollaries, in phase
+and in slope form.
 
-That statement is already proved.  `HNPolygon.lean` has it as
-`AbelianHNFiltration.phase_le_first` and `AbelianHNFiltration.last_le_phase`,
-stated with the extremal indices written out rather than as `φ⁺` and `φ⁻` — the
-HN polygon's first and last edges — which is why it does not surface when one
-greps `HarderNarasimhan.lean` for a bound on `Z.phase E`.  This file names them
-in the `φ±` vocabulary and draws the two cutoff corollaries.
+## Main definitions
 
-## Why this matters for Bridgeland's Lemma 6.2
+This file introduces no new definitions; it proves facts about
+`CategoryTheory.Triangulated.StabilityFunction.hnTors` and
+`CategoryTheory.Triangulated.StabilityFunction.hnFree`.
 
-Cases 1--3 of #740 conclude `Im Z(β,ω) > 0` from an object being in the torsion
-class at the cutoff.  `Im Z` is a statement about the object, so "all HN phases
-exceed `β`" has to become "*this object's* phase exceeds `β`" first.
-`lt_phase_of_mem_hnTors` is that step, and it is the whole categorical content
-of it — what remains after this is the translation from a phase inequality to a
-slope inequality, which is `Slope.lean`'s `phase_le_iff_slope_le` and is not
-here.
+## Main results
+
+* `AbelianHNFiltration.phiMinus_le_phase`, `AbelianHNFiltration.phase_le_phiPlus`
+  — the object's own phase lies between its lowest and highest HN phases.
+* `StabilityFunction.lt_phase_of_mem_hnTors`,
+  `StabilityFunction.phase_le_of_mem_hnFree` — a nonzero object of the torsion
+  class has phase strictly above the cutoff, and one of the torsion-free class
+  has phase at most the cutoff.
+* `SlopeData.slopeOfPhase_lt_of_mem_hnTors`,
+  `SlopeData.slope_le_slopeOfPhase_of_mem_hnFree` — the same cutoffs read as
+  slope bounds for objects of positive rank.
+
+## Implementation notes
+
+### The bound is already proved
+
+`HNPolygon.lean` has the phase bound as `AbelianHNFiltration.phase_le_first`
+and `AbelianHNFiltration.last_le_phase`, stated with the extremal indices
+written out rather than as `φ⁺` and `φ⁻` — the HN polygon's first and last
+edges — which is why it does not surface when one greps
+`HarderNarasimhan.lean` for a bound on `Z.phase E`.
+
+### Why this matters for Bridgeland's Lemma 6.2
+
+Cases 1--3 of Bridgeland's Lemma 6.2 conclude `Im Z(β,ω) > 0` from an object
+being in the torsion class at the cutoff.  `Im Z` is a statement about the
+object, so "all HN phases exceed `β`" has to become "*this object's* phase
+exceeds `β`" first.  `lt_phase_of_mem_hnTors` is that step, and it is the whole
+categorical content of it — what remains after this is the translation from a
+phase inequality to a slope inequality, which is
+`SlopeThreshold.lean`'s `lt_phase_iff_slopeOfPhase_lt`, composed with it below
+in `SlopeData.slopeOfPhase_lt_of_mem_hnTors`.
+
+## References
+
+* Bridgeland, *Stability conditions on K3 surfaces*, arXiv:math/0307164,
+  Lemma 6.2.
+
+## Tags
+
+stability function, Harder--Narasimhan filtration, phase, torsion pair, cutoff
 -/
 
 noncomputable section

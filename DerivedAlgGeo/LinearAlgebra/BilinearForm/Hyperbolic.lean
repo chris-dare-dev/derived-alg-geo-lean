@@ -20,7 +20,20 @@ Mathlib's `LinearMap.BilinMap` API, so by definition site it lives beside that
 API rather than with any application of it, and it is importable without the
 Mukai lattice, without stability and without schemes.
 
-## This file owns the definition; it does not own the interpretation
+## Main definitions
+
+* `Mukai.pairing` — the pairing on `R × M × R` built from `b` on the middle summand.
+* `Mukai.selfPairing` — its diagonal `⟪v, v⟫`.
+
+## Main results
+
+* `Mukai.pairing_comm` — the extension is symmetric when `b` is.
+* `Mukai.selfPairing_mk` — the discriminant `Δ(r, c, s) = b c c - 2 r s`, which every
+  discriminant in the repository projects to.
+
+## Implementation notes
+
+### This file owns the definition; it does not own the interpretation
 
 `Lattice/Mukai/Basic.lean` takes `R = ℤ` and calls the result the Mukai
 extension, because `N = NS(X)` with the intersection form recovers the
@@ -33,19 +46,27 @@ words sitting on this carrier, and they stay with the application.
 `Mukai/RealForm.lean` takes `R = ℝ` and bundles the result as a quadratic form
 for the signature theory; `realPairing` is an `abbrev` for `pairing` there.
 
-## The generalisation is over the coefficient ring, never over the dimension
+### The generalisation is over the coefficient ring, never over the dimension
 
 The arity is fixed at three. A dimension-indexed self-pairing vanishes
-identically in odd degree, so the threefold discriminant could not reach it;
-that is recorded as a negative result in
-`docs/architecture/abstraction-tree.md`. The reason the ring has to be
-arbitrary at all is that three of the seven discriminant leaves this parents
-are `ℚ`- or `A`-valued rather than `ℝ`-valued.
+identically in odd degree, so the threefold discriminant could not reach it.
+The reason the ring has to be arbitrary at all is that three of the seven
+discriminant leaves this parents are `ℚ`- or `A`-valued rather than
+`ℝ`-valued.
 
-The declaration names are unchanged by the move to this file, and so is the
-`Mukai` namespace. A namespace cutover would invalidate the immutable review
-payloads that `exe/RestateHistoricalNames.lean` exists to protect, and this
-file is a change of owner, not of vocabulary.
+### The namespace
+
+The declarations live in the `Mukai` namespace, named for the principal
+application rather than the owner; renaming the namespace would change every
+fully qualified name, so the declarations keep it.
+
+## References
+
+Mathlib's `LinearMap.BilinMap`.
+
+## Tags
+
+bilinear form, hyperbolic plane, Mukai pairing, discriminant
 -/
 
 namespace Mukai

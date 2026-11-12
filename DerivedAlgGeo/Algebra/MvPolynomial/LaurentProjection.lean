@@ -350,7 +350,7 @@ theorem monomial_mem_add_degree {γ γ' : ι →₀ ℕ} {i₀ : ι} {c : ℕ}
 
 /-- The face inclusion `(A(d)_{Xᵞ'})₀ → (A(d)_{Xᵞ})₀`, in the shape the sign projection
 retracts. This is `DegreeZeroLocalization.faceMap` at `g₁ * h = g₂` with `h = X_{i₀}^c`, which is
-exactly the Čech face of #340's complex. -/
+exactly the Čech face of the variable Čech complex of `O(d)`. -/
 noncomputable def laurentFace (𝓜 : ℕ → σM) [SetLike.GradedSMul (polynomialGrading ι R) 𝓜]
     {γ γ' : ι →₀ ℕ} {i₀ : ι} {c : ℕ} (hγ : γ = Finsupp.single i₀ c + γ') :
     DegreeZeroLocalization (polynomialGrading ι R)
@@ -382,11 +382,11 @@ theorem laurentFace_awayMk {γ γ' : ι →₀ ℕ} {i₀ : ι} {c : ℕ}
 set_option maxHeartbeats 1200000 in
 /-- **The sign projection retracts the face inclusion**: `π ∘ ι = id`.
 
-This is the first of the two properties #340's homotopy consumes. On a representative the face
-multiplies the numerator by `X_{i₀}^{m·c}` and the projection divides it straight back out
-(`divMonomial_monomial_mul`), so nothing survives to check — the content is all in the degree
-bookkeeping, and in `awayMk_deg_congr` reconciling the two names `γ.degree` and `c + γ'.degree`
-for the same natural number. -/
+This is the first of the two properties the Čech contracting homotopy consumes. On a
+representative the face multiplies the numerator by `X_{i₀}^{m·c}` and the projection divides it
+straight back out (`divMonomial_monomial_mul`), so nothing survives to check — the content is all
+in the degree bookkeeping, and in `awayMk_deg_congr` reconciling the two names `γ.degree` and
+`c + γ'.degree` for the same natural number. -/
 theorem signProjection_laurentFace [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d)
     {γ γ' : ι →₀ ℕ} {i₀ : ι} {c : ℕ}
     (hγ : γ = Finsupp.single i₀ c + γ') (hγ' : γ' i₀ = 0)
@@ -493,14 +493,14 @@ theorem signProjectionHom_apply [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d)
 `signProjection_laurentFace` handles the face that reinserts `X_{i₀}` itself — the `j = 0` face
 of the homotopy, which the projection retracts. Every other face of the Čech complex multiplies
 the denominator by a variable `X_e` that is **not** `X_{i₀}`, and for those the projection and
-the face commute. That square is the second and last property #340's contracting homotopy
+the face commute. That square is the second and last property the Čech contracting homotopy
 consumes.
 
-The restriction of §1 of the proof plan — the square only holds on the summands with
-`i₀ ∉ N α` — enters here as the hypothesis `δ' i₀ = 0`: the target denominator of the
-projection on the face side must not invert `X_{i₀}`, which encodes both `e ≠ i₀` (or the face
-is the retracted one) and the well-definedness hypothesis of each projection. The unrestricted
-square with `e = i₀` is false, and no statement of it appears. -/
+The square only holds on the summands with `i₀ ∉ N α`, and that restriction enters here as the
+hypothesis `δ' i₀ = 0`: the target denominator of the projection on the face side must not
+invert `X_{i₀}`, which encodes both `e ≠ i₀` (or the face is the retracted one) and the
+well-definedness hypothesis of each projection. The unrestricted square with `e = i₀` is false,
+and no statement of it appears. -/
 
 omit [AddSubgroupClass σM (MvPolynomial ι R)]
   [SetLike.GradedSMul (polynomialGrading ι R) 𝓜] in
@@ -526,8 +526,8 @@ restricting after.
 
 The four denominators are supplied as separate splittings because the caller — a Čech
 differential — produces each of them separately and never has to take one apart. `hδ'₀`
-(`δ' i₀ = 0`) is the restriction of §1 of #340's proof plan in hypothesis form: with `hγ'` it
-forces `X_e ≠ X_{i₀}` unless `c' = 0`, which is exactly the disjointness
+(`δ' i₀ = 0`) is the restriction to the summands with `i₀ ∉ N α`, in hypothesis form: with
+`hγ'` it forces `X_e ≠ X_{i₀}` unless `c' = 0`, which is exactly the disjointness
 `divMonomial_monomial_mul_comm` needs to pull the face's monomial through the projection's
 division. The unrestricted square at `e = i₀` is false — that face is the retraction
 `signProjection_laurentFace`, not this square. -/

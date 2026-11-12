@@ -18,20 +18,51 @@ by Mathlib:
 * the natural `k`-vector-space structure on coherent sheaf cohomology, functorial in `F`;
 * finite-dimensionality and eventual vanishing.
 
+## Main definitions
+
+* `AlgebraicGeometry.Cohomology.FiniteCohomology`: finite-dimensional coherent cohomology
+  together with a sheaf-dependent vanishing bound.
+* `AlgebraicGeometry.Cohomology.FiniteCohomology.gradedModule`: the cohomology of `F` as a graded
+  family of `k`-modules.
+* `AlgebraicGeometry.Cohomology.FiniteCohomology.dimension`: the dimension of degree-`i`
+  cohomology.
+* `AlgebraicGeometry.Cohomology.FiniteCohomology.eulerCharacteristic`: the geometric Euler
+  characteristic `χ(X, F)`.
+
+## Main results
+
+* `AlgebraicGeometry.Cohomology.FiniteCohomology.eulerCharacteristic_eq_sum`: `χ(X, F)` is the
+  finite alternating sum through the supplied vanishing bound.
+* `AlgebraicGeometry.Cohomology.FiniteCohomology.eulerCharacteristic_eq_sum_of_bound`: the same
+  sum through any larger bound.
+* `AlgebraicGeometry.Cohomology.FiniteCohomology.eulerCharacteristic_iso`: `χ` is invariant under
+  isomorphism of coherent sheaves.
+
+## Implementation notes
+
 The first input and degreewise finite-dimensionality are packaged independently in
-`FiniteDimensionalCohomology`, the output interface for issue #29. `FiniteCohomology` extends
-that interface only with the eventual-vanishing data tracked separately in issue #30. All
-fields are hypotheses, never axioms. The projective finiteness and boundedness theorems can
-later construct them without changing the definition of `χ`.
+`FiniteDimensionalCohomology`. `FiniteCohomology` extends that interface only with the
+eventual-vanishing data. All fields are hypotheses, never axioms. A theorem that constructs them,
+such as projective finiteness and boundedness, supplies them without changing the definition of
+`χ`.
 
 The alternating sum reuses `GradedObject.eulerChar` from Mathlib. The support theorem below
 removes its possible infinite-support junk value, and `eulerCharacteristic_eq_sum` exposes the
 usual finite formula. Functoriality gives invariance under isomorphism of coherent sheaves.
 
-Additivity in short exact sequences is the next layer, implemented in
+Additivity in short exact sequences is implemented in
 `DerivedAlgGeo.AlgebraicGeometry.Cohomology.EulerCharacteristic.Additivity`: it uses Mathlib's
-additive `Ext` sequence
-and requests precisely the scalar-linearity of its connecting maps.
+additive `Ext` sequence and requests precisely the scalar-linearity of its connecting maps.
+
+## References
+
+The file cites no literature. It builds on Mathlib's `GradedObject.eulerChar` and
+`GradedObject.eulerChar_eq_sum_finSet_of_finrankSupport_subset`, and on
+`AlgebraicGeometry.Cohomology.FiniteDimensionalCohomology`.
+
+## Tags
+
+Euler characteristic, coherent sheaf, sheaf cohomology, variety
 -/
 
 universe u
@@ -47,9 +78,9 @@ variable {k : Type u} [Field k]
 variable (k) in
 /-- Finite-dimensional coherent cohomology together with eventual vanishing.
 
-The inherited data is exactly the linear comparison and degreewise finiteness output of #29.
-The two fields added here are the separate #30 boundedness input needed to make the Euler sum
-finite. -/
+The inherited data is exactly the linear comparison and degreewise finiteness of
+`FiniteDimensionalCohomology`. The two fields added here are the separate boundedness input
+needed to make the Euler sum finite. -/
 structure FiniteCohomology (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] extends FiniteDimensionalCohomology k X where
   /-- A sheaf-dependent bound above which its cohomology vanishes. -/
   bound : Coh X → ℕ

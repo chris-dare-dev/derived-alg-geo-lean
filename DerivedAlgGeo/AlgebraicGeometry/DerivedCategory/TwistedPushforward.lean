@@ -13,14 +13,28 @@ capabilities and from nothing else: a derived tensor on the source
 (`Tensor/BoundedCoherent.lean`) and a derived pushforward along `f`
 (`Families/DerivedPushforward.lean`).
 
-## Why this file exists
+## Main definitions
 
-It is the independent consumer that MO1.10 (#1321) owes the extracted owners, and the
+* `AlgebraicGeometry.DerivedCategory.twistedPushforward` — the functor
+  `Rf_*(K ⊗^L -) : Dᵇ(Coh Z) ⥤ Dᵇ(Coh U)`.
+* `AlgebraicGeometry.DerivedCategory.twistedPushforwardMap` — the natural
+  transformation induced by a map of twisting objects.
+
+## Main results
+
+* `AlgebraicGeometry.DerivedCategory.twistedPushforward_isTriangulated` and
+  `twistedPushforward_additive` — the twisted pushforward is triangulated and
+  additive.
+* `twistedPushforward_obj` and `twistedPushforwardMap_app` — the simp forms.
+
+## Implementation notes
+
+### Why this file exists
+
+It is an independent consumer of the tensor and pushforward capabilities, and the
 demonstration that they are usable on their own.  **Its import list is the point**: two
-imports, neither of them `FourierMukai` nor anything in the stability tree.  Before the
-extraction the same operation could not be stated without importing kernels,
-correspondences and convolution, because the two capabilities lived inside the
-Fourier--Mukai subtree.
+imports, neither of them `FourierMukai` nor anything in the stability tree, so the
+operation can be stated without importing kernels, correspondences or convolution.
 
 The operation itself is ordinary and older than Fourier--Mukai theory: a relative family
 twisted by a fixed object and pushed to the base.  A caller with a correspondence gets
@@ -28,7 +42,7 @@ the Fourier--Mukai transform by precomposing with a derived pullback, and
 `FourierMukai/KernelCorrespondence.lean` does exactly that -- but the converse is not
 needed, and nothing here mentions a kernel, a product, a projection or a transform.
 
-## What this file does not assert
+### What this file does not assert
 
 Nothing constructs either capability, so nothing here exhibits a single instance of
 `twistedPushforward` on an actual scheme.  Both hypotheses travel unchanged: `f` carries
@@ -38,7 +52,12 @@ the closure of `Dᵇ(Coh Z)` under derived tensor, which is false for a general 
 
 ## References
 
-* `docs/architecture/cutover-ledger.md`, row 10.
+The repository's `AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor` and
+`AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedPushforward`.
+
+## Tags
+
+derived pushforward, derived tensor product, twist, bounded derived category
 -/
 
 universe u
@@ -87,7 +106,7 @@ theorem twistedPushforward_obj (f : Z ⟶ U)
 
 /-- **The twisted pushforward is triangulated.**
 
-The general statement the two capabilities were extracted to make reachable: exactness of
+The general statement the two standalone capabilities make reachable: exactness of
 `Rf_*(K ⊗^L -)` follows from exactness of the tensor twist and of the pushforward, with
 no correspondence, no kernel and no product in sight. -/
 theorem twistedPushforward_isTriangulated (f : Z ⟶ U)

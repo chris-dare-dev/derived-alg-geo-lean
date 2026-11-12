@@ -15,17 +15,45 @@ the same three subcategory instances (`ContainsZero`, `IsStableUnderShift`,
 `IsTriangulated`) proved the same way, so Mathlib's generic machinery makes
 it pretriangulated.
 
-## ForMathlib
+## Main definitions
+
+* `CochainComplex.bounded` — cochain complexes strictly bounded on both sides.
+* `HomotopyCategory.bounded` — the corresponding property of objects of
+  `HomotopyCategory C (.up ℤ)`.
+* `HomotopyCategory.Bounded` — the homotopy category of bounded cochain
+  complexes, with its fully faithful inclusion `HomotopyCategory.Bounded.ι`.
+
+## Main results
+
+* `CochainComplex.isStrictlyLE_mappingCone` — the mapping cone of a map of
+  strictly bounded-above complexes is strictly bounded above.
+* `HomotopyCategory.bounded_containsZero`,
+  `HomotopyCategory.bounded_isStableUnderShift` and
+  `HomotopyCategory.bounded_isTriangulated` — the subcategory contains zero, is
+  stable under shifts, and is triangulated.
+
+## Implementation notes
+
+### ForMathlib
 
 Everything here is stated for a general preadditive `C` with binary
 biproducts and mirrors `Mathlib.Algebra.Homology.HomotopyCategory.Plus`
 declaration by declaration; it is upstreamable as written. Filed in place,
 following the repository's `ForMathlib` pattern.
 
-The repository's use is as substrate for a `HomFiniteBounded` witness
-(#543): `Kᵇ` of a Hom-finite linear category is Hom-finite with finite
-Ext-amplitude by inspection of components, with no localization Homs to
-compute. Nothing here mentions that; this file is category plumbing only.
+The repository uses `Kᵇ` as the substrate for a `HomFiniteBounded` instance:
+`Kᵇ` of a Hom-finite linear category is Hom-finite with finite Ext-amplitude by
+inspection of components, with no localization Homs to compute. Nothing here
+mentions that; this file is category plumbing only.
+
+## References
+
+Mathlib's `HomotopyCategory.Plus` and `HomotopyCategory.plus`, which this file
+mirrors.
+
+## Tags
+
+homotopy category, bounded complex, triangulated subcategory
 -/
 
 universe w v u

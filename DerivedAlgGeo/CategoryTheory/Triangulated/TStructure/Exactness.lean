@@ -10,10 +10,10 @@ import Mathlib.CategoryTheory.Adjunction.Additive
 /-!
 # Bounded t-structures and t-exact functors
 
-Both 2026 target papers state their central hypotheses in this vocabulary.
 Polishchuk's inducing theorem (arXiv:2601.22994 Prop 3.4, arXiv:2607.28411
-Thm A.17) asks for a *bounded* t-structure and for `Φ Φᴸ` to be *right t-exact*;
-without those as definitions the hypothesis cannot be written down at all.
+Thm A.17) states its central hypotheses in this vocabulary: it asks for a
+*bounded* t-structure and for `Φ Φᴸ` to be *right t-exact*; without those as
+definitions the hypothesis cannot be written down at all.
 
 ## Main definitions
 
@@ -26,6 +26,8 @@ without those as definitions the hypothesis cannot be written down at all.
 
 ## Main results
 
+* `TStructure.isNondegenerate_of_isBounded`: a bounded t-structure is
+  nondegenerate.
 * `Functor.isRightTExact_of_isLE_zero` / `Functor.isLeftTExact_of_isGE_zero`:
   for a shift-commuting functor, degree `0` suffices.
 * `Functor.isTExact_of`: assemble `IsTExact` from its two halves.
@@ -35,14 +37,16 @@ without those as definitions the hypothesis cannot be written down at all.
 * `Functor.isRightTExact_comp` / `isLeftTExact_comp` / `isTExact_comp`, and the
   identity functor.
 
-## Namespacing
+## Implementation notes
+
+### Namespacing
 
 The t-structure notions live in `CategoryTheory.Triangulated.TStructure`, and
 the functorial notions in `CategoryTheory.Functor`, matching their mathematical
 owners. The slicing construction connects this interface to the canonical
 t-structure through repository-owned bridge theorems.
 
-## Conventions
+### Conventions
 
 Mathlib writes the t-structure as `t.IsLE X n` (`X ∈ Dᵗ≤ⁿ`) and `t.IsGE X n`
 (`X ∈ Dᵗ≥ⁿ`), and already supplies `t.plus`, `t.minus` and `t.bounded` as
@@ -54,17 +58,26 @@ the *connective* half (`IsGE`). This is the convention under which the derived
 functor `Lf*` is right t-exact and `Rf_*` is left t-exact, and it is the one
 both papers use.
 
-## A correction to the issue that requested this file
+### Bounded and nondegenerate
 
-Issue #146 asked for "the nondegenerate ⟺ bounded equivalence". Only one
-direction is a theorem: **bounded implies nondegenerate** (`isNondegenerate_of_isBounded`).
+Of "nondegenerate ⟺ bounded", only one direction is a theorem: **bounded
+implies nondegenerate** (`isNondegenerate_of_isBounded`).
 The converse is false. A nondegenerate t-structure can have objects that are
 bounded in neither direction — nondegeneracy only forbids an object from being
 coconnective in *every* degree, which says nothing about an object that is
 coconnective in no degree at all. The unbounded derived category of a nonzero
 abelian category with its standard t-structure is nondegenerate and not bounded.
-So the equivalence is not stated here, and #146's acceptance criterion should be
-read as the implication.
+So the equivalence is not stated here; only the implication is.
+
+## References
+
+* arXiv:2601.22994, Proposition 3.4.
+* arXiv:2607.28411, Theorem A.17.
+
+## Tags
+
+t-structure, bounded t-structure, nondegenerate t-structure, t-exact functor,
+adjunction
 -/
 
 universe v v' u u'

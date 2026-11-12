@@ -17,16 +17,51 @@ over *one morphism*.  Their objects live in the honest
 quasi-coherent-cohomology locus `SchemeQuasicoherentDerivedCategory X`, not in
 the derived category of all module sheaves under a different name.
 
-They are needed before a moduli functor exists -- base change and derived
-operations ask for them -- so they are owned here, beside the derived category
-they are predicates on, and the moduli problem in `Moduli/PerfectComplex/`
+## Main definitions
+
+* `AlgebraicGeometry.schemePseudoCoherent` — the locally Noetherian cohomological
+  criterion for pseudo-coherence.
+* `AlgebraicGeometry.LocalFiniteTorAmplitudeChart` and
+  `AlgebraicGeometry.schemeLocallyFiniteTorAmplitudeOver` — bounded stalkwise-flat
+  local models, and local finite Tor amplitude over a base witnessed by them.
+* `AlgebraicGeometry.schemeRelativePerfect` and
+  `AlgebraicGeometry.SchemeRelativePerfectCategory` — relative perfection and its
+  full subcategory.
+* `AlgebraicGeometry.GeometricFiberModel` and its `fiberComplex`, `fiberObject` —
+  a global flat model and the geometric fiber computed from it.
+* `AlgebraicGeometry.UniversallyGluableData`,
+  `AlgebraicGeometry.schemeUniversallyGluableRelativePerfect` and
+  `AlgebraicGeometry.SchemeUniversallyGluableCategory` — fiberwise negative-Ext
+  vanishing and the universally-gluable locus.
+* `AlgebraicGeometry.relativeOpenBaseChange` and `relativeOpenTo` — restriction
+  of a family to an open subscheme.
+
+## Main results
+
+* `SchemeRelativePerfectCategory.exists_boundedCoherentRepresentative` — a
+  relative-perfect object with bounded coherent cohomology has a `Dᵇ(Coh X)`
+  representative, given the bounded-coherent `Dqc` identification.
+* `SchemeRelativePerfectCategory.perfect_iff_compact` — given the
+  compact/perfect comparison, perfection is compactness in `Dqc(X)`.
+* `schemePseudoCoherent_zero`, `schemeLocallyFiniteTorAmplitudeOver_zero`,
+  `schemeRelativePerfect_zero` and `schemeUniversallyGluableRelativePerfect_zero` —
+  the zero object lies in every locus.
+
+## Implementation notes
+
+### Ownership
+
+These predicates are needed before a moduli functor exists -- base change and
+derived operations require them -- so they are owned here, beside the derived
+category they are predicates on, and the moduli problem in `Moduli/PerfectComplex/`
 consumes them.  That subtree keeps the presheaf, restriction stability,
 boundedness, openness, atlas and algebraicity layer, none of which is
-mentioned here.  This file was `Moduli/PerfectComplex/Relative.lean` until
-2026-09-13; see `docs/architecture/cutover-ledger.md`, finding 11.
+mentioned here.
 
 Stalkwise flatness of a module sheaf over a morphism is a further step down
 and lives with the module sheaves, in `Modules/Flat.lean`.
+
+### Local models instead of a derived tensor product
 
 At the current Mathlib pin there is no general derived tensor product for
 module sheaves.  Finite Tor amplitude is therefore expressed by the standard
@@ -36,12 +71,22 @@ are flat over the base.  The bounds and the representing isomorphism are data,
 not an arbitrary proposition supplied by a caller.
 
 For the same reason, a geometric fiber is computed only from an explicit
-globally flat model. The repository now has an interface characterizing
-arbitrary pullback by its left-derived universal property, but it does not yet
-construct that interface along arbitrary fiber inclusions. This is enough to
-define and inhabit the zero model and to state fiberwise negative-Ext
-vanishing honestly; comparison with a future K-flat construction remains a
-separate theorem.
+globally flat model. The repository has an interface characterizing arbitrary
+pullback by its left-derived universal property, but does not construct that
+interface along arbitrary fiber inclusions. This is enough to define and inhabit
+the zero model and to state fiberwise negative-Ext vanishing honestly;
+comparison with a K-flat construction is a separate theorem.
+
+## References
+
+Mathlib's `AlgebraicGeometry.Scheme.Hom.fiber` and `Module.Flat`, and the
+repository's `SchemeQuasicoherentDerivedCategory` and
+`Scheme.Modules.IsFlatOver`.
+
+## Tags
+
+perfect complex, pseudo-coherence, Tor amplitude, relative perfection,
+universally gluable
 -/
 
 namespace AlgebraicGeometry
@@ -63,14 +108,13 @@ attribute [local instance] HasDerivedCategory.standard
 /-- The locally Noetherian cohomological criterion for pseudo-coherence:
 bounded above with finitely presented cohomology in every degree.
 
-SCOPE (2026-08-18 review, P2-12): on a locally Noetherian scheme this
-criterion is pseudo-coherence; on a general scheme the two notions diverge
-in both directions, and the affine family pseudofunctor instantiates this
-predicate over arbitrary test algebras. Any theorem that quantifies over
-non-Noetherian bases is therefore about THIS predicate, not about standard
-pseudo-coherence; the #554 preservation program must either restrict its
-index to the Noetherian locus or prove preservation for this criterion and
-say which. -/
+Scope: on a locally Noetherian scheme this criterion is pseudo-coherence;
+on a general scheme the two notions diverge in both directions, and the affine
+family pseudofunctor instantiates this predicate over arbitrary test algebras.
+Any theorem that quantifies over non-Noetherian bases is therefore about THIS
+predicate, not about standard pseudo-coherence; a preservation theorem over such
+bases must either restrict its index to the Noetherian locus or prove
+preservation for this criterion, and say which. -/
 def schemePseudoCoherent (X : Scheme.{u}) :
     ObjectProperty (SchemeQuasicoherentDerivedCategory X) :=
   fun E ↦
@@ -221,7 +265,7 @@ theorem perfect_iff_compact {X S : Scheme.{u}} [IsLocallyNoetherian X]
 
 end SchemeRelativePerfectCategory
 
-/-- A global stalkwise-flat model used to compute one geometric fiber. This
+/-- A global stalkwise-flat model computing one geometric fiber. This
 does not inhabit the arbitrary left-derived pullback interface: it records the
 precise model from which the displayed fiber object is computed. -/
 structure GeometricFiberModel {X S : Scheme.{u}} (p : X ⟶ S)

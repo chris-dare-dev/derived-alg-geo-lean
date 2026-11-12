@@ -108,7 +108,7 @@ def WeakSemistabilityProbe.toGenericProbe {t : TStructure C}
   semistableLocus := {x | (W (P.fiber x)).IsSemistable (P.object x)}
 
 /-- Definition 20.5(0), bound to actual weak stability functions. -/
-structure WeakDefinition20_5ClauseZero {t : TStructure C}
+structure WeakFamilyChargeConditions {t : TStructure C}
     (W : I → WeakStabilityFunction t) : Prop where
   /-- Every fiber charge is defined over `ℚ[i]`. -/
   gaussianRationalCharge : ∀ i, HasGaussianRationalValues (W i).Z
@@ -118,10 +118,10 @@ structure WeakDefinition20_5ClauseZero {t : TStructure C}
 
 omit [IsTriangulated C] in
 /-- Clause (0) is preserved by reindexing. -/
-theorem WeakDefinition20_5ClauseZero.reindex {J : Type*}
+theorem WeakFamilyChargeConditions.reindex {J : Type*}
     {t : TStructure C} {W : I → WeakStabilityFunction t}
-    (h : WeakDefinition20_5ClauseZero W) (f : J → I) :
-    WeakDefinition20_5ClauseZero (fun j ↦ W (f j)) :=
+    (h : WeakFamilyChargeConditions W) (f : J → I) :
+    WeakFamilyChargeConditions (fun j ↦ W (f j)) :=
   ⟨fun j ↦ h.gaussianRationalCharge (f j),
     fun j ↦ h.zeroChargeNoetherian (f j)⟩
 
@@ -160,12 +160,13 @@ theorem quotientUniformQuadraticSupportData_reindex {J : Type*}
     fun j ↦ h.zero_class_mem (f j), h.quadratic.reindex f⟩
 
 /-- The separable clauses of weak stability in families which can be stated
-in the current abstract library.  Every source clause is a named projection.
+in this abstract library.  Every source clause is a named projection.
 
 The `charge` and `semistable` probes are bound to actual weak functions via
 `toChargeProbe` and `toGenericProbe`; the support field is the actual
-quotient-uniform support package from issue #82.  Relative HN and boundedness
-remain explicit geometric inputs. -/
+quotient-uniform support package
+`WeakStabilityFunction.QuotientUniformQuadraticSupportData`.  Relative HN and
+boundedness remain explicit geometric inputs. -/
 structure WeakStabilityInFamiliesData
     {JCharge JGeneric D M : Type u} {t : TStructure C}
     (W : I → WeakStabilityFunction t)
@@ -176,9 +177,9 @@ structure WeakStabilityInFamiliesData
     (hV₀ : V₀ ≤ LinearMap.ker Zlin)
     (boundedness : BoundednessProblem M) : Prop where
   /-- Definition 20.5(0). -/
-  clauseZero : WeakDefinition20_5ClauseZero W
+  clauseZero : WeakFamilyChargeConditions W
   /-- Definition 20.5(1), (2'), and (3'). -/
-  definition20_5 : WeakDefinition20_5Conditions
+  familyConditions : WeakFamilyConditions
     (fun j ↦ (charge j).toChargeProbe W)
     (fun j ↦ (semistable j).toGenericProbe W) dedekind
   /-- Definition 21.15(4). -/

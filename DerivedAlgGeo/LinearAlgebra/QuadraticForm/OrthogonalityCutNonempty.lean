@@ -9,13 +9,31 @@ import Mathlib.Topology.Baire.CompleteMetrizable
 /-!
 # Positive planes avoiding countably many orthogonality loci exist
 
-#700 fixed `positivePlanesAway` to take its cutting classes from a set, after the
-reading that cut by *every* real class of square `-2` turned out to be empty.
-That leaves the obvious question, and this file answers it: for a **countable**
-set of nonzero classes — the spherical classes of a lattice, countable because
-the lattice is finitely generated and free — the cut domain is nonempty.
+`positivePlanesAway` takes its cutting classes from a set: cutting by *every*
+real class of square `-2` leaves nothing. This file shows that for a
+**countable** set of nonzero classes — the spherical classes of a lattice,
+countable because the lattice is finitely generated and free — the cut domain
+is nonempty.
 
-## The argument
+## Main definitions
+
+* `PeriodDomain.orthogonalityPairs` — the pairs both of whose entries are
+  orthogonal to `δ`, as a subspace of `M × M`.
+
+## Main results
+
+* `PeriodDomain.exists_isPositiveFrame` — a form of signature two has a positive
+  frame, obtained by spanning a positive plane.
+* `PeriodDomain.orthogonalityPairs_ne_top` and
+  `PeriodDomain.dense_compl_orthogonalityPairs` — for a nonzero class under a
+  nondegenerate form the orthogonal pairs form a proper subspace, with dense
+  complement.
+* `PeriodDomain.nonempty_positivePlanesAway` — the positive-plane locus avoiding
+  a countable set of nonzero classes is nonempty.
+
+## Implementation notes
+
+### The argument
 
 Genericity, over pairs rather than planes, since `M × M` carries the topology.
 
@@ -29,15 +47,23 @@ Genericity, over pairs rather than planes, since `M × M` carries the topology.
   meets every nonempty open set.
 
 Density of the cut locus in the positive frames is what the argument actually
-gives; nonemptiness is the corollary that was asked for.
+gives; nonemptiness is the corollary stated here.
 
-## The cheap route does not work
+### The cheap route does not work
 
 Along a ray `ω_t = t • ω₀` in the exponential chart, the orthogonalityLocus condition for a
 rank-zero spherical class is `b ω₀ c = 0` together with `b c c = -2`, and neither
 depends on `t`: such a class blocks the whole ray. Nonemptiness needs genericity,
 not a scaling trick — which is also why Bridgeland works with an ample class
 rather than a merely positive one.
+
+## References
+
+* Bridgeland, *Stability conditions on K3 surfaces*, arXiv:math/0307164.
+
+## Tags
+
+period domain, positive plane, Baire category, orthogonality locus, spherical class
 -/
 
 open QuadraticMap

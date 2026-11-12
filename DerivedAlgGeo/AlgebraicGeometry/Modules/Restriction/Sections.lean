@@ -11,23 +11,44 @@ Four facts about `M.presheaf.map` on a scheme, each one or two lines and each st
 generality it actually has: any scheme, any `X.Modules`. Nothing here mentions `Proj`, a grading,
 or quasi-coherence.
 
-## Why they are named at all
+## Main definitions
+
+This file introduces no new definitions.
+
+## Main results
+
+* `AlgebraicGeometry.Scheme.Modules.resSection_trans` — restriction composes.
+* `AlgebraicGeometry.Scheme.Modules.resSection_smul` — restriction is semilinear over restriction
+  of scalars.
+* `AlgebraicGeometry.Scheme.Modules.homApp_res` — a morphism of module sheaves commutes with
+  restriction.
+* `AlgebraicGeometry.Scheme.Modules.presheaf_map_square_eq` — any two ways round a square of
+  restrictions agree.
+
+## Implementation notes
+
+### Why they are named at all
 
 They are the kind of step a proof takes without comment until it takes it forty times. The
-`#585` glue composes restrictions constantly, and `rw` cannot be used on goals carrying
-`show`-ascription residue, so each composition has to be available as a term. `presheaf_map_square_eq`
-has the same origin on the coherence side: in a clean context its rewrites fire, while at the use
-site the goal carries a transparency defect and only `exact` works.
+gluing of sections on `Proj` composes restrictions constantly, and `rw` cannot be used on goals
+carrying `show`-ascription residue, so each composition has to be available as a term.
+`presheaf_map_square_eq` serves the same purpose on the coherence side: in a clean context its
+rewrites fire, while at the use site the goal carries a transparency defect and only `exact`
+works.
 
-## Why they are here rather than where they were first needed
+### Why they are stated over an arbitrary scheme
 
-`#824`. `resSection_trans`, `resSection_smul` and `homApp_res` were stated inside
-`Proj/Modules/Glue.lean`; `presheaf_map_square_eq` was in the former
-`Modules/Coherent/Pushforward/BaseChange.lean`. Each was placed with its first consumer.
-The open-square comparison now lives in `Modules/Pushforward/BaseChange.lean`. Three of
-the four were then stated over `Proj 𝒜` despite the proofs never using the grading —
-`resSection_smul` is `Scheme.Modules.map_smul` verbatim — so another lane would have
-re-proved them rather than found them.
+None of the proofs uses a grading — `resSection_smul` is `Scheme.Modules.map_smul` verbatim — so
+stating them over `Proj 𝒜` would hide them from every other consumer of `X.Modules`.
+
+## References
+
+The file cites no literature. It builds on Mathlib's `Scheme.Modules.map_smul` and
+`NatTrans.naturality_apply`.
+
+## Tags
+
+module sheaf, restriction, sections, presheaf
 -/
 
 universe u

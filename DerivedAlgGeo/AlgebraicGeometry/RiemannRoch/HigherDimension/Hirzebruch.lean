@@ -12,8 +12,8 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.Lattice
 /-!
 # Reconstructed Hirzebruch--Riemann--Roch through dimension four
 
-This file implements the higher-dimensional route selected in issue #45.  The route is
-numerical rather than cycle-valued:
+This file proves Hirzebruch--Riemann--Roch for coherent sheaves on a variety of positive
+dimension at most four. The route is numerical rather than cycle-valued:
 
 * Snapper polynomiality supplies the Picard Euler polynomial of every coherent sheaf;
 * `PairingContext.ReconstructionData` represents its homogeneous coefficients as the
@@ -27,7 +27,31 @@ scheme-derived `NumericalVarietyData` bridges in dimensions three and four and m
 Layer A display formulas unconditional once the explicit reconstruction packages below are
 supplied.
 
-## Trust and scope boundary
+## Main definitions
+
+* `reconstructedToddComponent` — the Todd components reconstructed from the structure sheaf,
+  normalized to `td₀ = 1`.
+* `totalChernCharacterHom`, `riemannRochHom`, `rationalEulerHom` — the total reconstructed
+  Chern character, the right side of HRR and the rational Euler characteristic, as additive
+  maps on `K₀(Coh X)`.
+* `toNumericalVariety` — the scheme-derived `NumericalVarietyData` on `K₀(Coh X)`, with
+  `toThreefoldNumericalVariety` and `toFourfoldNumericalVariety` its dimension-three and
+  dimension-four instances.
+* `numericalClass` — the class of a coherent sheaf in the Euler-radical quotient.
+
+## Main results
+
+* `degree_tauComponent_top_eq_eulerCharacteristic` — `degree (tau_d(F)) = chi(F)`.
+* `sheaf_hirzebruch_riemannRoch` — HRR for every coherent sheaf in every positive dimension
+  at most four.
+* `hirzebruch_riemannRoch` — HRR descended to every virtual class in `K₀(Coh X)`.
+* `toNumericalVariety_satisfiesHRR` — the reconstructed numerical presentation satisfies HRR.
+* `threefold_eulerCharacteristic_eq`, `fourfold_eulerCharacteristic_eq` — the Layer A
+  threefold and fourfold displays, evaluated on a coherent sheaf.
+
+## Implementation notes
+
+### Trust and scope boundary
 
 `PairingContext` keeps representability and separation by divisor products explicit.  This is
 necessary: products of divisors need not separate all middle-codimension classes on an arbitrary
@@ -40,6 +64,17 @@ these representatives with Chern-polynomial expressions in a geometrically const
 bundle.  The upper bound four is exactly the current bound of the triangular Chern-character
 implementation; arbitrary dimension requires extending that universal recursion, not adding a
 new HRR axiom.
+
+## References
+
+This file builds on `PairingContext.ReconstructionData` and its triangular Chern-character
+identities, on `ReconstructionSystem`, and on the numerical displays `Threefold.chi_eq` and
+`Fourfold.chi_eq`.
+
+## Tags
+
+Hirzebruch--Riemann--Roch, Todd class, Chern character, Snapper polynomial,
+Euler characteristic, numerical variety
 -/
 
 universe u v
@@ -119,11 +154,6 @@ theorem degree_tauComponent_top_eq_eulerCharacteristic
         (Q.twists.eulerPic 1 : ℚ) := h
     _ = (D.eulerCharacteristic F : ℚ) := by
       exact_mod_cast reconstruction_eulerPic_one Q
-
-/- `ReconstructionSystem` and its eleven declarations moved to
-`RiemannRoch/Reconstruction.lean`: nothing in them mentions a dimension, and
-`Surface/NumericalVariety.lean` had declared them a second time at `d = 2`. -/
-
 
 /-! ## Reconstructed Todd components and the top convolution -/
 
@@ -331,7 +361,7 @@ noncomputable def numericalClass
 
 /-! ### Explicit threefold and fourfold constructors -/
 
-/-- The scheme-derived dimension-three bridge requested by issue #45. -/
+/-- The scheme-derived dimension-three bridge: `toNumericalVariety` at `d = 3`. -/
 @[reducible]
 noncomputable def toThreefoldNumericalVariety
     {A : Type v} [CommRing A] [Algebra ℚ A]
@@ -340,7 +370,7 @@ noncomputable def toThreefoldNumericalVariety
     NumericalVarietyData 3 A (K₀Ab (Coh X)) :=
   toNumericalVariety RO R
 
-/-- The scheme-derived dimension-four bridge requested by issue #45. -/
+/-- The scheme-derived dimension-four bridge: `toNumericalVariety` at `d = 4`. -/
 @[reducible]
 noncomputable def toFourfoldNumericalVariety
     {A : Type v} [CommRing A] [Algebra ℚ A]

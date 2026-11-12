@@ -12,19 +12,43 @@ set_option backward.isDefEq.respectTransparency false
 /-!
 # Compatibility, restated on the complex rays
 
-A central charge is `Z : Λ →+ ℂ` -- it lands in `ℂ`. `GLTilde.mat` acts on
-`Fin 2 → ℝ`. These do not compose directly, so the two coordinate conventions
-must agree.
+A central charge is `Z : Λ →+ ℂ` -- it takes values in `ℂ`. `GLTilde.mat` acts
+on `Fin 2 → ℝ`. These do not compose directly, so the two coordinate
+conventions must agree.
 
 They do, and `cplxCoord_exp` is the proof: under `Complex.basisOneI` (whose
 `repr` is `![z.re, z.im]`), the canonical ray `exp (i π φ)` has coordinates
 `![cos (π φ), sin (π φ)]`, which is exactly `rayVec φ`.
 
+## Main definitions
+
+This file introduces no new definitions.
+
+## Main results
+
+* `cplxCoord_exp` — the ray `exp (i π φ)` has `basisOneI` coordinates `rayVec φ`.
+* `compat_exp` — `Compatible T f` restated on the rays `exp (i π φ)`.
+* `actC_exp` — `Compatible T f` as a statement about `actC`: `T` carries the charge ray at phase
+  `φ` to a positive multiple of the charge ray at phase `f φ`.
+
+All three are in the namespace
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction`.
+
+## Implementation notes
+
 The neutral half of the bridge -- `cplxCoord`, `actC` and the two action laws,
 whose public types mention the general-linear group and not its cover -- is in
 `LinearAlgebra/Complex/Coordinates.lean`. The three statements here are the
 ones that mention `rayVec`, `Compatible` and `NormalizedShift`, so they are
-comparisons and stay with the cover (MO1.12, #1323; cutover-ledger row 08).
+comparisons and stay with the cover.
+
+## References
+
+Mathlib's `Complex.basisOneI` and `Complex.exp`.
+
+## Tags
+
+complex numbers, central charge, phase, universal cover, coordinates
 -/
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

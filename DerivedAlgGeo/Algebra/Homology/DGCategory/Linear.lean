@@ -13,14 +13,44 @@ exactly the complexes `CochainComplex.HomComplex` produces. Linearity over a
 commutative ring is layered on top, the way `CategoryTheory.Linear` layers over
 `Preadditive` in Mathlib.
 
-`DGLinear.homComplex` exposes those same graded groups and differentials as a
+## Main definitions
+
+* `CategoryTheory.DGLinear` — given `k`-module structures on the graded pieces
+  of the Hom-complexes, the differential and composition are `k`-linear.
+* `CategoryTheory.DGLinear.homComplex` — the Hom-complex regarded as a
+  `ModuleCat k`-valued cochain complex.
+* `CategoryTheory.DGLinear.postcompCochain` — right composition by a
+  degree-`p` dg morphism, as a degree-`p` linear cochain between Hom-complexes
+  with a fixed source.
+* `CategoryTheory.DGFunctor.Linear` — a dg functor between `k`-linear dg
+  categories that preserves scalar multiplication in every degree.
+
+## Main results
+
+* `CategoryTheory.DGLinear.postcompCochain_d` — right composition intertwines
+  the Hom-complex differential with the dg differential.
+* `CategoryTheory.DGFunctor.idLinear` and `CategoryTheory.DGFunctor.compLinear`
+  — the identity dg functor and composites of linear dg functors are linear.
+
+## Implementation notes
+
+`DGLinear.homComplex` exposes the same graded groups and differentials as a
 `ModuleCat k`-valued cochain complex.  It is an abbreviation rather than a
 second Hom-complex: only the already supplied module structures and
 `DGLinear.d_smul` are added.
 
-`ADR-0011` records why this is a refinement rather than part of the definition:
-a first draft that baked `ModuleCat k` into `dgHom` collided with the
-`AddCommGrpCat`-valued `HomComplex` three separate times.
+Linearity is a refinement rather than part of the definition because a
+`ModuleCat k`-valued `dgHom` would not match the `AddCommGrpCat`-valued
+`CochainComplex.HomComplex`, which the complexes model instantiates directly.
+
+## References
+
+This file refines `CategoryTheory.DGCategory`, parallel to Mathlib's
+`CategoryTheory.Linear` and `CategoryTheory.Functor.Linear`.
+
+## Tags
+
+dg category, linear category, Hom complex, module
 -/
 
 set_option autoImplicit false

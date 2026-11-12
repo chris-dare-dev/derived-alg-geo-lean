@@ -15,19 +15,33 @@ This file supplies that: `exists_globalSection_twistBy_forall_ge` upgrades the e
 "every sufficiently large `N` works", and `exists_globalSection_twistBy_uniform` takes the maximum
 over a finite family.
 
-## Where the raising happens, and why not at the sheaf level
+## Main definitions
+
+This file introduces no new definitions.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.fracSection_pow_mul_isLocalizationFrac`,
+  `AlgebraicGeometry.Proj.fracSection_pow_mul_comm`: the two fraction identities raising costs.
+* `AlgebraicGeometry.Proj.exists_globalSection_twistBy_forall_ge`: every sufficiently large twist
+  exponent works for one section.
+* `AlgebraicGeometry.Proj.exists_globalSection_twistBy_uniform_ge`: one twist exponent for a finite
+  family of sections, above any prescribed threshold.
+* `AlgebraicGeometry.Proj.exists_globalSection_twistBy_uniform`: one twist exponent for a finite
+  family of sections.
+
+## Implementation notes
+
+### Where the raising happens, and why not at the sheaf level
 
 The obvious way to raise a global section of `F(N)` to one of `F(N')` is to multiply by
-`f ^ (N' - N)` and then transport along `F(N)(N' - N) ≅ F(N')`. That isomorphism **does not exist
-for an arbitrary `F`**, and `TensorTwist.lean`'s "What is not here, and why it cannot be got the
-easy way" is where the repository already records it: `tensorAssocIso` requires *both* outer
-factors invertible, and no rearrangement of `(F ⊗ O(d)) ⊗ O(e)` under `tensorCommIso` gets the
-non-invertible `F` off an outer slot. `TwistComparison.lean`'s `tensorTwistAddIso` supplies the
-composition only for `F` an associated sheaf, which is not the hypothesis here.
+`f ^ (N' - N)` and then transport along an isomorphism `F(N)(N' - N) ≅ F(N')`.
+`TwistComparison.lean`'s `tensorTwistAddIso` states that composition only for `F` an associated
+sheaf, which is not the hypothesis here.
 
 Even granting the isomorphism the argument would still have to compute what it does to a *section*,
-and these witnesses are built by "sheafification inverts `W`" — which is exactly what `#585`
-established they cannot do.
+and such witnesses are built by "sheafification inverts `W`": they are property witnesses, not
+computations, and say nothing about what the isomorphism does to a given section.
 
 Raising is done one level down instead, on the **chart extensions**, where it is plain algebra.
 `exists_globalSection_twistBy`'s recipe has two exponents: `n` extends `s` across each chart and
@@ -51,7 +65,7 @@ holding one overlap exponent `m` fixed needs the raised family to be the origina
 unit. Discard that relation and `m` has to be re-derived at each `n`, which puts `N = 2m(n) + n`
 back out of reach.
 
-## The multiplier is `(f / gᵢ)ᵏ`, not a fixed monomial
+### The multiplier is `(f / gᵢ)ᵏ`, not a fixed monomial
 
 `gᵢ` is inverted on `D₊(gᵢ)` and nowhere else, and `D₊(gᵢ)` is the only open where the extension
 `tᵢ` is asked to say anything. Raising by a fraction with a *different* denominator would produce
@@ -59,10 +73,20 @@ a statement that still typechecks — the fraction is a legitimate section where
 is invertible — but that vanishes somewhere on `D₊(gᵢ)`, and the raised family would no longer
 extend `s`. The denominator here is fixed by the chart, not chosen.
 
-## Scope
+### Scope
 
 The exponent only. Nothing here mentions generation, local surjectivity, or `free I`; those need
 the chart-local half of Serre's theorem, which is not in this file.
+
+## References
+
+`AlgebraicGeometry.Proj.exists_globalSection_twistBy_of_data` and
+`AlgebraicGeometry.Proj.exists_overlap_exponent`, the two halves of the section-extension lemma
+this file re-runs at prescribed exponents.
+
+## Tags
+
+projective spectrum, twisting sheaf, uniform exponent, global generation
 -/
 
 noncomputable section
@@ -132,7 +156,8 @@ set_option backward.defeqAttrib.useBackward true in
 
 `exists_globalSection_twistBy` with the existential over `N` replaced by "every `N` from some
 point on". This is the form a family of sections can be given a *common* exponent in, and it is
-the missing ingredient between `#585` and Serre's global generation.
+what connects the section-extension lemma `exists_globalSection_twistBy` to Serre's global
+generation.
 
 The proof holds the overlap exponent `m` fixed and raises the chart extensions: the family
 `(f / gᵢ)ᵏ · tᵢ` extends `s` with exponent `n + k`, and the overlap agreement survives because

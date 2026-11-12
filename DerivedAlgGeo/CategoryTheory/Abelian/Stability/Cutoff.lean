@@ -7,14 +7,24 @@ import DerivedAlgGeo.CategoryTheory.Abelian.Stability.PhaseMonotone
 /-!
 # The two classes at a phase cutoff
 
-Bridgeland's torsion pair is cut from `Coh X` by a slope, and #709 turned the
-slope order into the phase order, so the cut is by a phase. This file defines
-the two classes and proves what follows from the Harder–Narasimhan machinery
-already in `Uniqueness/`:
+Bridgeland's torsion pair is cut from `Coh X` by a slope, and on objects of
+positive rank the slope order is the phase order
+(`SlopeData.phase_le_iff_slope_le` in `Slope.lean`), so the cut is by a phase.
+This file defines the two classes and proves what follows from the
+Harder–Narasimhan machinery already in `Uniqueness/`:
 
 ```
 T β = {E | every HN phase of E exceeds β}      F β = {E | every HN phase is at most β}
 ```
+
+## Main definitions
+
+* `CategoryTheory.Triangulated.StabilityFunction.hnTors` — the zero object and
+  the objects whose Harder–Narasimhan phases all exceed `β`.
+* `CategoryTheory.Triangulated.StabilityFunction.hnFree` — the zero object and
+  the objects whose Harder–Narasimhan phases are all at most `β`.
+
+## Main results
 
 * `mem_hnTors_iff_forall`, `mem_hnFree_iff_forall` — the classes are
   well defined: `φ⁻` and `φ⁺` are intrinsic (`phiMinus_eq`, `phiPlus_eq`), so
@@ -31,18 +41,33 @@ T β = {E | every HN phase of E exceeds β}      F β = {E | every HN phase is a
   subobject of the target, so the monotonicity of `PhaseMonotone.lean` traps it:
   `β < φ⁻(image) ≤ φ⁺(image) ≤ β`, which leaves the image zero.
 
-## What is deliberately not here
+## Implementation notes
 
-One step still stands between this and a torsion pair, and it is not implied by
+### What is deliberately not here
+
+One step stands between this and a torsion pair, and it is not implied by
 anything below.
 
 * **The splitting.** Every object sitting in a short exact sequence with a
   torsion sub and a torsion-free quotient, obtained by cutting the HN chain at
-  the crossing index. `Uniqueness/Tail.lean` removes one factor at a time and is
-  the machinery this would induct over.
+  the crossing index. `Uniqueness/Tail.lean` supplies `tailAt`, the quotient
+  filtration above a cut; the splitting is proved in `Splitting.lean`, which
+  imports this file.
 
-Until it exists, these are two classes with a Hom-vanishing property, not a
-torsion pair, and nothing here calls them one.
+Without it, these are two classes with a Hom-vanishing property, not a torsion
+pair, and nothing here calls them one.
+
+## References
+
+The file builds on `CategoryTheory.Triangulated.StabilityFunction`,
+`CategoryTheory.Triangulated.AbelianHNFiltration` and its phase bounds
+`AbelianHNFiltration.phiMinus_le_of_epi` and
+`AbelianHNFiltration.phiPlus_le_of_mono`.
+
+## Tags
+
+stability function, Harder--Narasimhan filtration, phase cutoff, torsion class,
+torsion-free class, Hom-vanishing
 -/
 
 noncomputable section

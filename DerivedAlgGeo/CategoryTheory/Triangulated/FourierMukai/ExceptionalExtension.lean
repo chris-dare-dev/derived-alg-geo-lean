@@ -26,6 +26,35 @@ There are three layers.
   ambient kernel equivalence extending the residual equivalence and matching
   every object of every exceptional block, with one common shift per block.
 
+## Main definitions
+
+* `CategoryTheory.Triangulated.FourierMukai.KernelEquivalence` — an equivalence
+  presented by a Fourier--Mukai kernel; `KernelEquivalence.ofRightAdjointKernel`
+  builds one from a kernel-presented right adjoint with invertible unit and
+  counit.
+* `FourierMukai.ResidualKernelEquivalence` — a kernel whose transform restricts
+  to a given equivalence of residual components.
+* `FourierMukai.OneStepExtensionData`, `FourierMukai.OneStepExtensionCriterion`
+  — the conclusion of one extension step, and the criterion that derives the
+  enlarged equivalence from full faithfulness and essential surjectivity.
+* `FourierMukai.ExceptionalBlockExtensionData` — the conclusion of the finite
+  blockwise extension.
+
+## Main results
+
+* `KernelEquivalence.transform_isEquivalence` — the transform of a kernel
+  equivalence is an equivalence.
+* `OneStepExtensionCriterion.toExtensionData` — the criterion yields the
+  one-step result consumed by finite extension induction.
+* `OneStepExtensionData.restrictedFunctor_isEquivalence` and
+  `RightAdjunctionData.restrictedRightAdjoint_isEquivalence` — the restricted
+  functors of a one-step extension are equivalences.
+* `ExceptionalBlockExtensionData.toKernelEquivalence` and
+  `ExceptionalBlockExtensionData.transform_isEquivalence` — the ambient
+  equivalence is derived from the stored adjunction data.
+
+## Implementation notes
+
 The kernel constructed in the papers is a cone of a morphism of kernels.  The
 abstract functorial dg-cone construction is rooted at
 `DGFunctor.HomogeneousNatTrans.ConeData`; `FourierMukai.KernelCone` maps such
@@ -34,10 +63,20 @@ cones pointwise through a correspondence, and
 kernel morphism realizes an adjunction counit.  The geometric identification
 of the kernel category with an `H⁰`, the ordinary kernel morphism with its
 exact counit-transform equation, an enhancement, and exactness of kernel
-evaluation remain the #853--#855 realization boundary.  Accordingly the two
-extension structures are still explicitly *result data*.  Once their
-adjunction fields are supplied, however, the ambient equivalence itself is
-derived through `Adjunction.toEquivalence`.
+evaluation lie outside this file, at the geometric realization boundary.
+Accordingly the two extension structures are explicitly *result data*.  Once
+their adjunction fields are supplied, however, the ambient equivalence itself
+is derived through `Adjunction.toEquivalence`.
+
+## References
+
+* arXiv:1912.04332v2 (Paper I), Propositions 2.4--2.5 and Theorem 5.1.
+* arXiv:2104.13610v2 (Paper II), Proposition 3.2 and Theorem 3.3.
+
+## Tags
+
+Fourier--Mukai transform, kernel equivalence, exceptional collection,
+semiorthogonal decomposition, mutation, extension
 -/
 
 open CategoryTheory
@@ -147,8 +186,8 @@ structure ResidualKernelEquivalence
 proposition across a single exceptional object.
 
 The fields are intentionally conclusions rather than assumptions disguised as
-a theorem: constructing `newKernel` requires the functorial cone of kernels
-which the dg lane has not yet delivered. -/
+a theorem: constructing `newKernel` requires the geometric realization of the
+functorial cone of kernels, which this file does not supply. -/
 structure OneStepExtensionData
     (P : ObjectProperty X) (Q : ObjectProperty Y) (E : X) (F : Y)
     (base : P.FullSubcategory ≌ Q.FullSubcategory)

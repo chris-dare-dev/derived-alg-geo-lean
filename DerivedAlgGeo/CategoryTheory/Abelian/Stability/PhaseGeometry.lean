@@ -13,12 +13,40 @@ import Mathlib.CategoryTheory.Subobject.Limits
 The phase see-saw for a short exact sequence in an abelian category, read off
 the neutral half-plane argument bounds in `Analysis/Complex/PhaseGeometry.lean`.
 
-Those bounds -- `phaseCross`, `arg_add_le_max`, `min_arg_le_arg_add`,
-`arg_add_lt_max` and the half-plane closure facts under them -- used to be
-declared here. They say nothing about categories, and MO1.13 (#1324) moved them
-to their neutral owner so that the Euclidean core of the mass-subadditivity
-proof could reach them without reaching stability. This file keeps the
-`StabilityFunction` statements, which genuinely need an abelian category.
+## Main definitions
+
+This file introduces no new definitions; it proves facts about
+`CategoryTheory.Triangulated.StabilityFunction.phase`.
+
+## Main results
+
+* `StabilityFunction.phase_le_max_of_shortExact`,
+  `StabilityFunction.min_phase_le_of_shortExact` — the upper and lower phase
+  see-saw for a short exact sequence with nonzero ends.
+* `StabilityFunction.phase_le_of_epi` — a nonzero quotient of a semistable
+  object has phase at least the source phase.
+* `StabilityFunction.hom_eq_zero_of_semistable_phase_gt` — Hom-vanishing
+  between semistable objects of decreasing phase.
+
+## Implementation notes
+
+The argument bounds -- `phaseCross`, `arg_add_le_max`, `min_arg_le_arg_add`,
+`arg_add_lt_max` and the half-plane closure facts under them -- say nothing
+about categories, so they live at their neutral owner, where the Euclidean core
+of the mass-subadditivity proof can reach them without reaching stability. This
+file keeps the `StabilityFunction` statements, which genuinely need an abelian
+category.
+
+## References
+
+The file builds on `arg_add_le_max`, `min_arg_le_arg_add` and `arg_add_lt_max`
+from `Analysis/Complex/PhaseGeometry.lean`, and on Mathlib's
+`CategoryTheory.ShortComplex.ShortExact`.
+
+## Tags
+
+phase, see-saw, stability function, short exact sequence, semistable,
+Hom-vanishing
 -/
 
 noncomputable section

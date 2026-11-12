@@ -18,6 +18,11 @@ it.  This is the rotation Bayer--Lahoz--Macrì--Stellari apply to the tilt
 charge of a cubic threefold, written there as division by `i`; at `beta = 1/2`
 the scalar is `-i = 1/i`.
 
+## Main definitions
+
+* `ChargeFamily.phaseRotate` — every charge of the family multiplied by
+  `exp (-π β i)`, through `ChargeFamily.smul`.
+
 ## Main results
 
 * `phaseRotate_charge` — the rotated value **is** `phaseTiltRotation beta` of
@@ -39,7 +44,7 @@ the scalar is `-i = 1/i`.
   therefore wrong about semistability even where it is right about walls,
   which is exactly why the rotation is applied in the first place.
 
-## Placement
+## Implementation notes
 
 This file is deliberately **not** merged into `CentralCharge/Family.lean`.
 That module owns `ChargeFamily` and imports only Mathlib; giving it a
@@ -48,12 +53,14 @@ breach the layering contract that keeps charge construction upstream of walls.
 `Walls/Alignment.lean` stays free of the tilt for the same reason, so the
 rotation lives here, downstream of both.
 
-The abstraction-audit remediation
-(`docs/reviews/2026-09-12-abstraction-audit-remediation.md`, §3.5 and §7 PR-8)
-names these statements `phaseRotate_wall` and `phaseRotate_wallValue`.  MO1.03
-(#1314) renamed the wall locus and its defining expression to `alignmentLocus`
-and `alignmentValue`; the statements below are the ones that remediation
-proved, under the current names.
+## References
+
+* Bayer, Lahoz, Macrì, Stellari, *Stability conditions on Kuznetsov components*,
+  arXiv:1703.10839.
+
+## Tags
+
+central charge, phase rotation, tilt stability, wall
 -/
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall

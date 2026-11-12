@@ -16,31 +16,54 @@ For `L ⊣ R` between abelian categories with `L` and `R` exact, there is a comp
 `Ext^n (L A) B  →  Ext^n A (R B)`
 
 pushing a class along `R` and precomposing with the unit. This file constructs it, proves it is
-additive, and settles the two ends of the intended induction: degree zero, and positive degree on
-an injective.
+additive, settles the two ends of the induction — degree zero, and positive degree on an
+injective — and proves it is an isomorphism in every degree when the target has enough
+injectives.
 
-## Why this file exists
+## Main definitions
+
+* `CategoryTheory.extAdjunctionMap` — the comparison, and
+  `CategoryTheory.extAdjunctionAddHom` packaging its additivity.
+* `CategoryTheory.extAdjunctionAddEquiv` — the comparison as an additive equivalence.
+* `CategoryTheory.extAdjunctionLinearMap`, `CategoryTheory.extAdjunctionLinearEquiv` — its
+  linear form when the right adjoint is linear.
+* `CategoryTheory.Abelian.Ext.precompAddEquiv`, `CategoryTheory.Abelian.Ext.precompLinearEquiv`
+  — transport along an isomorphism in the first variable, which a consumer needs whenever the
+  comparison identifies that variable only up to isomorphism.
+
+## Main results
+
+* `CategoryTheory.extAdjunctionMap_mk₀` — degree zero is the adjunction.
+* `CategoryTheory.extAdjunctionMap_comp`, `CategoryTheory.extAdjunctionMap_comp_mk₀`,
+  `CategoryTheory.extAdjunctionMap_comp_extClass` — the comparison is a morphism of the two
+  long exact sequences.
+* `CategoryTheory.preservesInjectiveObjects_of_adj` — `R` preserves injectives.
+* `CategoryTheory.bijective_extAdjunctionMap_of_injective` — positive degree on an injective.
+* `CategoryTheory.surjective_extAdjunctionMap`, `CategoryTheory.injective_extAdjunctionMap` —
+  the comparison is bijective in every degree.
+
+## Implementation notes
+
+### Why this file exists
 
 `Sheaf.H n F` is `Ext` out of the constant sheaf — the *derived-category* `Ext` of
 `Algebra/Homology/DerivedCategory/Ext/`, not the injective-resolution `Ext R C n` of
-`CategoryTheory/Abelian/Ext.lean`. So the cohomology comparison `#572` step 3 asks for,
-`Hⁱ(X, F) ≅ Hⁱ(Pⁿ, ι_* F)` along a closed immersion, is an `Ext` transport along `ι⁻¹ ⊣ ι_*`
-and not a Čech computation. `Sites/Sheaves/ConstantPullback.lean` moved the constant sheaf across
-that
-adjunction; this file is the other half.
+`CategoryTheory/Abelian/Ext.lean`. So the cohomology comparison
+`Hⁱ(X, F) ≅ Hⁱ(Pⁿ, ι_* F)` along a closed immersion is an `Ext` transport along `ι⁻¹ ⊣ ι_*`
+and not a Čech computation. `Sites/Sheaves/ConstantPullback.lean` carries the constant sheaf
+across that adjunction; this file is the other half.
 
-**Nothing at the pin relates `Ext` to an adjunction.** Grepping `Algebra/Homology/` and
-`CategoryTheory/Abelian/` returns nothing under any spelling, so the statement here is new to the
-tree and is not specific to sheaves — it is stated for arbitrary abelian categories.
+**Nothing at the pin relates `Ext` to an adjunction.** The statement here is not specific to
+sheaves — it is stated for arbitrary abelian categories.
 
-## Exactness of `R` is a real hypothesis
+### Exactness of `R` is a real hypothesis
 
 `Ext.mapExactFunctor` requires its functor exact, so `R` is assumed exact and not merely left
 exact. That is legitimate for the intended application — `ι_*` along a closed immersion is exact —
 but it is not the general shape of an adjunction, and a caller who has only a left-exact right
 adjoint gets nothing from this file.
 
-## The theorem
+### The theorem
 
 `extAdjunctionAddEquiv` — the comparison is an isomorphism of additive groups in every degree.
 `EnoughInjectives D` is what the proof needs and the only hypothesis beyond exactness.
@@ -68,28 +91,21 @@ hom-equivalence, which is bijective because `Adjunction.homEquiv` is an `Equiv`.
 is the statement that makes the shape *plausible* before the induction is written, and because it
 is the cheap sanity check on the setup: if the comparison were wrong, it would already fail there.
 
-## A `rw`/`simp` trap worth recording
+### A `rw`/`simp` trap
 
 `Ext.mk₀_comp_mk₀` is `@[simp]`, its statement matches `extAdjunctionMap`'s composite at degree
 zero syntactically, and **neither `rw` nor `simp` closes the goal** — the degree-addition proof
 term does not unify. `exact Ext.mk₀_comp_mk₀ _ _` does. The same shape will recur anywhere
 `Ext.comp` is unfolded at a specific degree.
 
-## Main results
+## References
 
-* `extAdjunctionMap` — the comparison, and `extAdjunctionAddHom` packaging its additivity.
-* `extAdjunctionMap_mk₀` — degree zero is the adjunction.
-* `extAdjunctionMap_comp`, `extAdjunctionMap_comp_mk₀`, `extAdjunctionMap_comp_extClass` — the
-  comparison is a morphism of the two long exact sequences.
-* `preservesInjectiveObjects_of_adj` — `R` preserves injectives.
-* `bijective_extAdjunctionMap_of_injective` — positive degree on an injective.
-* `surjective_extAdjunctionMap`, `injective_extAdjunctionMap`, `extAdjunctionAddEquiv` — the
-  additive theorem;
-* `extAdjunctionLinearMap`, `extAdjunctionLinearEquiv` — its linear form when the right adjoint
-  is linear.
-* `Abelian.Ext.precompAddEquiv`, `Abelian.Ext.precompLinearEquiv` — transport along an
-  isomorphism in the first variable, which a consumer needs whenever the comparison identifies
-  that variable only up to isomorphism.
+Mathlib's `CategoryTheory.Abelian.Ext`, `CategoryTheory.Abelian.Ext.mapExactFunctor` and
+`CategoryTheory.Adjunction.homEquiv`.
+
+## Tags
+
+Ext, adjunction, exact functor, injective object, long exact sequence
 -/
 
 universe w v v' u u' t
@@ -269,8 +285,8 @@ theorem injective_extAdjunctionMap (n : ℕ) (A : C) (B : D) :
 
 /-- **Ext along an adjunction with exact left adjoint.**
 
-`Ext^n (L A) B ≃+ Ext^n A (R B)`, for every `n`. This is the statement the cohomology comparison
-of `#572` step 3 instantiates at `L = ι⁻¹`, `R = ι_*` for a closed immersion. -/
+`Ext^n (L A) B ≃+ Ext^n A (R B)`, for every `n`. The cohomology comparison
+`Hⁱ(X, F) ≅ Hⁱ(Pⁿ, ι_* F)` instantiates it at `L = ι⁻¹`, `R = ι_*` for a closed immersion. -/
 noncomputable def extAdjunctionAddEquiv (A : C) (B : D) (n : ℕ) :
     Ext.{w} (L.obj A) B n ≃+ Ext.{w} A (R.obj B) n :=
   AddEquiv.ofBijective (extAdjunctionAddHom adj A B n)

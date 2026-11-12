@@ -578,7 +578,7 @@ theorem StabilityCondition.WithClassMap.eq_of_same_Z_near
     (hd : slicingDist C σ.slicing τ.slicing < ENNReal.ofReal 1) :
     σ = τ := by
   have hP : σ.slicing.P = τ.slicing.P := by
-    funext φ; ext E; exact bridgeland_lemma_6_4 C σ τ hZ hd φ E
+    funext φ; ext E; exact slicing_P_iff_of_Z_eq_of_dist_lt_one C σ τ hZ hd φ E
   apply StabilityCondition.WithClassMap.ext
   · exact Slicing.ext (C := C) hP
   · exact hZ

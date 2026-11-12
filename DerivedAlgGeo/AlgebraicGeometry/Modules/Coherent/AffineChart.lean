@@ -9,27 +9,38 @@ import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.GeneratingSections
 /-!
 # Sections of a coherent sheaf over an affine open
 
-Step 2 of `#586` — Serre's global generation — needs, for each chart of a finite affine cover,
-*finitely many* sections of a coherent `F` generating it there. This file supplies the module-level
-half: over an affine open, the sections of a coherent sheaf form a finite module over the chart's
-coordinate ring.
+Over an affine open, the sections of a coherent sheaf form a finite module over the chart's
+coordinate ring. Serre's global generation needs, for each chart of a finite affine cover,
+*finitely many* sections of a coherent `F` generating it there; this file supplies the
+module-level half of that.
 
-## No Noetherian hypothesis, and that is the point
+## Main definitions
+
+This file introduces no new definitions. Its import supplies the categorical reduction
+`SheafOfModules.GeneratingSections.ofFreeEpi` described below.
+
+## Main results
+
+* `AlgebraicGeometry.moduleFinite_sections_restrict_of_isCoherent` — sections of a coherent sheaf
+  over an affine open form a finite module.
+
+## Implementation notes
+
+### No Noetherian hypothesis, and that is the point
 
 The natural guess is that this needs the chart's ring to be Noetherian, and it does not.
 `moduleFinite_globalSections` concludes `Module.Finite R Γ(M)` from finite presentation alone —
 the affine comparison does all the work and there is nothing left for a chain condition to do.
-An `[IsLocallyNoetherian X]` hypothesis here is dead weight, which is how the `unusedArguments`
-linter found it in the first version of this file.
+An `[IsLocallyNoetherian X]` hypothesis here would be dead weight, and the `unusedArguments`
+linter flags it.
 
-Noetherianity is still on the road to `#586`, but it enters strictly later and for a different
-reason: `Coh.affineEquivalence` requires `[IsNoetherianRing R]` because it identifies the
-*category* `Coh (Spec R)` with `FGModuleCat R`, and that needs coherence to be preserved under
-kernels. Finite generation of one module's sections needs none of it. Keeping the two apart is
-worth the sentence, because `Pⁿ` satisfies both and a reader who sees them arrive together will
-assume the wrong dependency.
+Where Noetherianity does enter, it is for a different reason: `Coh.affineEquivalence` requires
+`[IsNoetherianRing R]` because it identifies the *category* `Coh (Spec R)` with `FGModuleCat R`,
+and that needs coherence to be preserved under kernels. Finite generation of one module's sections
+needs none of it. Keeping the two apart is worth the sentence, because `Pⁿ` satisfies both and a
+reader who sees them arrive together will assume the wrong dependency.
 
-## The two inputs, neither of them new
+### The two inputs
 
 * **Coherence restricts along an open immersion.**
   `Scheme.Modules.IsCoherent.restrict_of_isOpenImmersion` carries coherence along `hU.fromSpec`,
@@ -40,7 +51,7 @@ assume the wrong dependency.
   comparison's finiteness consequence, stated for `Spec R` — which is why the restriction has to
   happen first.
 
-## Why the statement is about `F.restrict hU.fromSpec`
+### Why the statement is about `F.restrict hU.fromSpec`
 
 `Γ(F, U)` and the sections of the restricted sheaf on the affine model are the same module, but
 only the latter is what `moduleFinite_globalSections` is stated about, and restating it against
@@ -48,41 +59,42 @@ only the latter is what `moduleFinite_globalSections` is stated about, and resta
 and it belongs with the `GeneratingSections` half, so this file says what it can prove directly
 and no more.
 
-## The categorical reduction: generating sections ARE an epi from a free sheaf
+### The categorical reduction: generating sections ARE an epi from a free sheaf
 
 The categorical owner
 `Algebra/Category/ModuleCat/Sheaf/GeneratingSections.lean` supplies
 `GeneratingSections.ofFreeEpi`: a `SheafOfModules.GeneratingSections` carries no information
 beyond an epimorphism `free I ⟶ M`. Mathlib has the other three directions — `ofEpi` along a map
-out of `M`, `equivOfIso`, `map` along a functor — but not this one, and without it every attempt at
-`#586` step 2 has to open the structure by hand.
+out of `M`, `equivOfIso`, `map` along a functor — but not this one, and without it producing
+generating sections means opening the structure by hand.
 
 It is stated at full site generality in that categorical module rather than here, because nothing
 in it is about schemes. This affine-chart consumer imports the owner directly.
 
-What it buys is a sharper remaining goal. Step 2 is no longer "produce generating sections",
-which invites building the structure field by field; it is exactly
+With it, producing finitely many generating sections over `U` is exactly producing
 
 > an epimorphism `free I ⟶ F.over U` with `I` finite,
 
-and `ofFreeEpi` closes the gap the moment one exists.
+and `ofFreeEpi` does the rest.
 
-## What this file does not do
+### What this file does not do
 
 **It produces no such epimorphism.** `Module.Finite` gives a finite generating *set* of the module
 of sections, and turning a spanning set into an epi of *sheaves* is the real content: on `Spec R`
 it means checking surjectivity on each basic open, where quasi-coherence identifies the sections
-with a localization and a spanning set stays spanning. `epi_of_isLocallySurjective`
-(`Modules/Affine/Exactness.lean`) and `isLocallySurjective_of_coversTop`
-(`Modules/Tensor/Basic.lean`)
-are the two ends of that chain and both are in the tree; what is missing is the middle, and
-Mathlib has no "locally surjective from surjectivity on a basis" lemma to shorten it. This is
-also where `Coh.affineEquivalence`, and hence Noetherianity, would enter.
+with a localization and a spanning set stays spanning. On a degree-one chart of `Proj`, the local
+generation this requires is `Proj.exists_finite_generators_of_isCoherent`.
 
-## Main results
+## References
 
-* `moduleFinite_sections_restrict_of_isCoherent` — the finite-module statement.
-* `SheafOfModules.GeneratingSections.ofFreeEpi` — the imported categorical reduction above.
+The file cites no literature. It builds on
+`AlgebraicGeometry.Scheme.Modules.moduleFinite_globalSections`,
+`AlgebraicGeometry.Scheme.Modules.IsCoherent.restrict_of_isOpenImmersion` and
+`SheafOfModules.GeneratingSections.ofFreeEpi`.
+
+## Tags
+
+coherent sheaf, affine open, finite module, global sections, generating sections
 -/
 
 universe u

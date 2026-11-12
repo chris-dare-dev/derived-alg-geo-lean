@@ -9,30 +9,63 @@ import DerivedAlgGeo.Algebra.MvPolynomial.LaurentFinite
 /-!
 # The base field acting on sections of a twist
 
-`FiniteDimensionalCohomology` asks for `Module.Finite k`, and the `k`-action it means is
+`FiniteDimensionalCohomology` requires `Module.Finite k`, and the `k`-action it means is
 `coherentScalarAction`: multiplication by the global function a scalar becomes under the
-structure morphism. The Čech lane, by contrast, computes in graded localizations, where `k` acts
-through the constants (`polynomialToHomogeneousLocalization`). Nothing so far says these are the
-same action, and #666's finiteness statement is meaningless until they are.
+structure morphism. The Čech computation, by contrast, works in graded localizations, where `k`
+acts through the constants (`polynomialToHomogeneousLocalization`). A finiteness statement about
+the cohomology of a twist is meaningful only once these are the same action, and this file shows
+that they are, at the level of sections.
 
-This file closes that gap at the level of sections.
+## Main definitions
 
-* `openToLocalization_baseFieldToGlobalSections` — the global function a scalar becomes has value
-  `r / 1` at every point. This is `openToLocalization_toSpecZero_appTop` composed with the
-  surjection `k → 𝒜 0`, since the structure morphism of `Pⁿ` is `Proj.toSpecZero` followed by the
-  spectrum of that surjection.
-* `varietyScalarAction_apply_fiber` — hence the action on sections of an associated sheaf is
-  plain scalar multiplication in each fiber. The structure-sheaf action on those sections is
-  pointwise by construction (`sectionsSubmodule`), so this is the previous lemma plus
-  `globalSectionSmul_app` and nothing else.
+* `AlgebraicGeometry.Proj.constSectionOn`: the constant `r` restricted to an open, at the type
+  the sections module wants.
+* `AlgebraicGeometry.Proj.constSection`: the same constant restricted to a chart.
 
-## What is still missing
+## Main results
 
-The comparison `intCechTermSectionAddEquiv` between a Čech term and these sections is five steps,
-and none has been shown `k`-linear yet. Two of them are already `LinearEquiv`s over
-`HomogeneousLocalization`, two are pointwise linear, and one is a `RingEquiv`; the content of this
-file is what makes each of those statements true rather than merely plausible. Until that is done,
-`module_finite_linearCoherentH_of_cech` cannot be fed and #666 is not closed.
+* `AlgebraicGeometry.Proj.openToLocalization_baseFieldToGlobalSections`: the global function a
+  scalar becomes has value `r / 1` at every point.
+* `AlgebraicGeometry.Proj.varietyScalarAction_apply_fiber`: the base-field action on sections of
+  an associated sheaf is scalar multiplication in each fiber.
+* `AlgebraicGeometry.Proj.varietyScalarAction_app_eq`: the sheaf endomorphism is multiplication
+  by the restricted constant, on any open.
+* `AlgebraicGeometry.Proj.moduleAwayToSection_smul`: the canonical fraction-to-section map is
+  `k`-linear.
+* `AlgebraicGeometry.Proj.intCechTermSectionAddEquiv_smul`: the comparison between a Čech term
+  and its sections is `k`-linear.
+
+## Implementation notes
+
+### The two actions on sections
+
+* `openToLocalization_baseFieldToGlobalSections` is `openToLocalization_toSpecZero_appTop`
+  composed with the surjection `k → 𝒜 0`, since the structure morphism of `Pⁿ` is
+  `Proj.toSpecZero` followed by the spectrum of that surjection.
+* `varietyScalarAction_apply_fiber` follows: the structure-sheaf action on sections of an
+  associated sheaf is pointwise by construction (`sectionsSubmodule`), so this is the previous
+  lemma plus `globalSectionSmul_app` and nothing else.
+
+### The Čech comparison
+
+The comparison `intCechTermSectionAddEquiv` between a Čech term and these sections is five steps.
+Two of them are `LinearEquiv`s over `HomogeneousLocalization`, two are pointwise linear, and one
+is a `RingEquiv`; the content of this file is what makes each of those statements true rather
+than merely plausible. The composite never has to be taken apart:
+`intCechTermSectionAddEquiv_apply_mk` identifies it with `moduleAwayToSection` on every `mk`, and
+`mk` is surjective, so its linearity is the linearity of one pointwise `mapOfLE`. This is the
+linearity `module_finite_linearCoherentH_of_cech` needs.
+
+## References
+
+The file cites no literature. It builds on
+`AlgebraicGeometry.Cohomology.globalSectionSmul_app`,
+`AlgebraicGeometry.Cohomology.baseFieldToGlobalSections` and
+`AlgebraicGeometry.Cohomology.varietyScalarAction`.
+
+## Tags
+
+projective space, twisting sheaf, base field action, graded localization, Čech cohomology
 -/
 
 universe u
@@ -76,7 +109,8 @@ set_option backward.defeqAttrib.useBackward true in
 `varietyScalarAction` is multiplication by the global function attached to the scalar, and the
 structure-sheaf action on an associated sheaf is pointwise on fibers by construction. Combining
 those with the previous lemma leaves plain scalar multiplication in each fiber — which is what
-lets the Čech lane's `k`-action be compared against the one the finiteness interface consumes. -/
+lets the Čech computation's `k`-action be compared against the one the finiteness interface
+consumes. -/
 theorem varietyScalarAction_apply_fiber (r : k)
     (U : Opens (ProjectiveSpectrum.top (polynomialGrading ι k)))
     (m : (associatedSheafInType (polynomialGrading ι k) 𝓜).1.obj (op U))

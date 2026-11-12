@@ -8,28 +8,46 @@ import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.Basic
 /-!
 # The chart of a positive-degree element, as seen by the affine extension lemma
 
-`#585`'s chart step. A section of a quasi-coherent `F` over `D₊(g) ⊓ D₊(f)` extends to a section
-over `D₊(g)` after clearing a power of `f / g`. `Modules/Affine/Extension.lean` supplies the
-algebra; what is here is the geometry that lets it be applied, and the naming that lets it
-elaborate.
+A section of a quasi-coherent `F` over `D₊(g) ⊓ D₊(f)` extends to a section over `D₊(g)` after
+clearing a power of `f / g`. `Modules/Affine/Extension.lean` supplies the algebra; what is here is
+the geometry that lets it be applied, and the naming that lets it elaborate. This is the chart step
+of the section-extension lemma `exists_globalSection_twistBy`.
 
-## The geometry is two rewrites
+## Main definitions
+
+* `AlgebraicGeometry.Proj.chartRing`: the degree-zero away ring `A_{(g)}` of a chart, bundled.
+* `AlgebraicGeometry.Proj.awayRestrict`: the restriction of `F` to the chart of a homogeneous
+  element of positive degree, named at its result type. The instances
+  `awayRestrict_isQuasicoherent` and `isIso_fromTildeΓ_awayRestrict` record that it is
+  quasi-coherent and is the `tilde` of its global sections.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.exists_pow_smul_eq_res_chart`: the affine extension lemma over the
+  chart of a positive-degree element.
+* `AlgebraicGeometry.Proj.exists_pow_smul_eq_res_chart_of_le`: the exponent can be raised.
+* `AlgebraicGeometry.Proj.exists_pow_smul_eq_res_chart_uniform`: one exponent for a finite family
+  of charts.
+
+## Implementation notes
+
+### The geometry is two rewrites
 
 `ChartScalar.lean`'s `awayι_image_top` and `awayι_image_basicOpen` say the chart covers exactly
 `D₊(g)` and meets `D₊(f)` in `D₊(g) ⊓ D₊(f)`. They are stated there, one layer up, because that is
 where the scalar comparison needs them; this file only needs the chart itself. Translating sections
 across the chart is free, because `Scheme.Modules.restrictAppIso` is `Iso.refl`.
 
-## The naming is not cosmetic
+### The naming is not cosmetic
 
 Stated inline, `IsIso (F.restrict (awayι 𝒜 g hg hd)).fromTildeΓ` **does not elaborate**: it
-runs `isDefEq` past 1.6M heartbeats and gives up, and pinning the arguments explicitly
-(`references/instance-transparency.md` technique 7) does not rescue it. This is the
-`Scheme.Modules` wrapper that `Modules/Affine/Equivalence.lean` documents.
+runs `isDefEq` past 1.6M heartbeats and gives up, and pinning the arguments explicitly does not
+rescue it. This is the `Scheme.Modules` wrapper that `Modules/Affine/Equivalence.lean` documents.
 
-Technique 5 fixes it, in two steps, and the second is the one that is easy to miss:
+Naming the value at an explicit result type fixes it, in two steps, and the second is the one that
+is easy to miss:
 
-* `chartRestrict` names the restriction at an explicit result type, so the wrapper is crossed once
+* `awayRestrict` names the restriction at an explicit result type, so the wrapper is crossed once
   here rather than at every use site;
 * that alone is not enough — but it converts the timeout into a *fast, precise* mismatch, which is
   itself the argument for the technique. `fromTildeΓ` quantifies over `(Spec (.of ↑R)).Modules`
@@ -39,28 +57,28 @@ Technique 5 fixes it, in two steps, and the second is the one that is easy to mi
 
 With that, the instance and the theorem each elaborate in seconds.
 
-## Choosing one exponent
+### Choosing one exponent
 
 `exists_pow_smul_eq_res_chart_of_le` raises the exponent — the extension times `(f/g)^(m-n)` works
 for any `m ≥ n`, because the restriction map is linear over the chart ring. With that,
 `exists_pow_smul_eq_res_chart_uniform` gives a **single** `n` for a finite family of charts: each
 supplies its own, finiteness bounds the range, and raising does the rest.
 
-## The same three, for *agreement* rather than extension
+### The same three, for *agreement* rather than extension
 
-`exists_pow_smul_eq_of_res_eq_chart`, `..._of_le` and `..._uniform` mirror the three above with
-`exists_pow_smul_eq_of_res_eq_of_isQuasicoherent` in place of the extension lemma, and are needed
-for a reason the obvious reading of `#585` misses.
+`exists_pow_smul_eq_of_res_eq_away`, `..._of_le` and `..._uniform` in `AwayChart.lean` mirror the
+three here with `exists_pow_smul_eq_of_res_eq_of_isQuasicoherent` in place of the extension lemma.
 
 Two charts' twisted sections are only visibly equal where `D₊(f)` reaches: there each restricts to
 the same `twistBy fⁿ` of `s`. But `TopCat.Sheaf.IsCompatible` demands agreement on the whole
 pairwise overlap `D₊(gᵢ) ⊓ D₊(gⱼ)`, which is **not** contained in `D₊(f)`. Closing that distance
-costs a second exponent, and these raise and unify it exactly as the first three do.
+costs a second exponent, and the agreement statements raise and unify it exactly as the three here
+do the first.
 
-The uniform version's index is deliberately arbitrary rather than the chart index: agreement has to
-be forced on every *pair* at once, so a pair type is what gets passed.
+The uniform agreement statement's index is deliberately arbitrary rather than the chart index:
+agreement has to be forced on every *pair* at once, so a pair type is what gets passed.
 
-## Scope
+### Scope
 
 One chart, in the chart's own coordinates. Everything after the exponent is elsewhere:
 
@@ -71,12 +89,21 @@ One chart, in the chart's own coordinates. Everything after the exponent is else
   because the overlap is a degree-*two* chart;
 * the gluing itself, to a section over `⊤` of `Proj 𝒜` rather than over one chart.
 
-`ChartProj.lean` restates the six theorems here on `Proj 𝒜`, and `Glue.lean` assembles them into
-`exists_globalSection_twistBy`, which is `#585`'s deliverable.
+`ChartProj.lean` restates these extension and agreement theorems on `Proj 𝒜`, and `Glue.lean`
+assembles them into the section-extension lemma `exists_globalSection_twistBy`.
 
 Note also that the cover is an input here, not a construction: `degreeOneCharts_coversTop`
 (`Proj/Modules/Finiteness.lean`) supplies it from `Algebra.adjoin (𝒜 0) (range g) = ⊤`, and the
 finiteness of the index is a separate hypothesis.
+
+## References
+
+`AlgebraicGeometry.Scheme.Modules.exists_pow_smul_eq_res_of_top_of_isQuasicoherent`, the affine
+extension lemma this file reads on the chart, and Mathlib's `AlgebraicGeometry.Proj.awayι`.
+
+## Tags
+
+projective spectrum, affine chart, quasi-coherent sheaf, extension of sections
 -/
 
 universe u
@@ -90,10 +117,9 @@ variable (𝒜 : ℕ → σA) [GradedRing 𝒜]
 
 /-! ### Naming the restriction
 
-`references/instance-transparency.md` technique 5: naming the value with an explicit result type
-stops the `Scheme.Modules` wrapper being crossed at every use site. Stating the restriction inline
-makes instance search solve for the chart ring *and* peel the wrapper at once, which does not
-terminate. -/
+Naming the value with an explicit result type stops the `Scheme.Modules` wrapper being crossed at
+every use site. Stating the restriction inline makes instance search solve for the chart ring
+*and* peel the wrapper at once, which does not terminate. -/
 
 /-- The chart's degree-zero away ring, bundled.
 
@@ -106,9 +132,10 @@ noncomputable abbrev chartRing (g : A) : CommRingCat.{u} :=
 /-- **The restriction of `F` to the chart of a homogeneous element of positive degree**, named at
 its result type so that `fromTildeΓ`'s bundled ring is matched syntactically.
 
-There is no separate degree-one spelling. `#585`'s cover is made of degree-one charts and its
-pairwise overlaps are not -- `D₊(gᵢ) ⊓ D₊(gⱼ) = D₊(gᵢ gⱼ)` has degree two -- so both degrees were
-needed from the start, and the two names for one definition were a `rfl` apart. -/
+There is no separate degree-one spelling. The cover used by `exists_globalSection_twistBy` is made
+of degree-one charts and its pairwise overlaps are not -- `D₊(gᵢ) ⊓ D₊(gⱼ) = D₊(gᵢ gⱼ)` has degree
+two -- so both degrees are needed, and a degree-one name would be the same definition a `rfl`
+apart. -/
 noncomputable def awayRestrict (F : (Proj 𝒜).Modules) {d : ℕ} {g : A} (hg : g ∈ 𝒜 d)
     (hd : 0 < d) : (Spec (.of ↑(chartRing 𝒜 g))).Modules :=
   F.restrict (awayι 𝒜 g hg hd)
@@ -131,9 +158,10 @@ instance isIso_fromTildeΓ_awayRestrict (F : (Proj 𝒜).Modules)
 element carries it to a section over the whole chart, i.e. over `D₊(g)`.
 
 The degrees of `f` and `g` are unconstrained apart from `0 < deg g`, which is what the chart itself
-needs. `#585` calls this at degree one; the pairwise overlaps of that cover are degree-two charts,
-and the agreement statements in `AwayChart.lean` were general from the start for exactly that
-reason. There is no mathematical asymmetry between the two, so there is none here either. -/
+needs. The section-extension lemma `exists_globalSection_twistBy` calls this at degree one; the
+pairwise overlaps of its cover are degree-two charts, which is why the agreement statements in
+`AwayChart.lean` are general in the degree. There is no mathematical asymmetry between extension
+and agreement, so there is none here either. -/
 theorem exists_pow_smul_eq_res_chart (F : (Proj 𝒜).Modules)
     [SheafOfModules.IsQuasicoherent.{u, u, u}
       (show SheafOfModules (Proj 𝒜).ringCatSheaf from F)]
@@ -181,11 +209,11 @@ Each chart supplies its own `nᵢ` from `exists_pow_smul_eq_res_chart`; finitene
 the range of exponents bounded, and `exists_pow_smul_eq_res_chart_of_le` raises every chart to the
 bound.
 
-This is the first of the three things `#585`'s glue needs. The other two — that the resulting local
-sections agree on overlaps once carried into `F(n)`, and that they therefore glue to a section over
-`⊤` of `Proj 𝒜` — are not here. Note in particular that the sections produced below still live on
-*different* sheaves, one per chart; `twistBy` is what makes them comparable, and it is not applied
-yet. -/
+This is the first of the three things the gluing in `exists_globalSection_twistBy` needs. The
+other two — that the resulting local sections agree on overlaps once carried into `F(n)`, and that
+they therefore glue to a section over `⊤` of `Proj 𝒜` — are not here. Note in particular that the
+sections produced below still live on *different* sheaves, one per chart; `twistBy` is what makes
+them comparable, and it is not applied yet. -/
 theorem exists_pow_smul_eq_res_chart_uniform (F : (Proj 𝒜).Modules)
     [SheafOfModules.IsQuasicoherent.{u, u, u}
       (show SheafOfModules (Proj 𝒜).ringCatSheaf from F)]
