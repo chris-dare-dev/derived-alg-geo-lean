@@ -9,11 +9,27 @@ import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.ChartScalar
 
 `ChartExtension.lean` and `AwayChart.lean` state extension and agreement in the chart's own
 coordinates: sections of `modulesSpecToSheaf.obj (awayRestrict …)` over opens of
-`Spec A_{(g)}`, scaled by the away ring's element `isLocalizationElem`. `#585`'s glue consumes them
-on `Proj 𝒜`: sections of `F` over opens of `Proj 𝒜`, scaled by a structure-sheaf section. This file
-is that restatement, and it is the last step before the cover.
+`Spec A_{(g)}`, scaled by the away ring's element `isLocalizationElem`. The gluing in the
+section-extension lemma `exists_globalSection_twistBy` consumes them on `Proj 𝒜`: sections of `F`
+over opens of `Proj 𝒜`, scaled by a structure-sheaf section. This file is that restatement, and it
+is the last step before the cover.
 
-## The transport is a substitution, not a transport
+## Main definitions
+
+This file introduces no new definitions.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.exists_pow_smul_eq_res_image`: extension across the chart of a
+  positive-degree element, on `Proj 𝒜`.
+* `AlgebraicGeometry.Proj.exists_pow_smul_eq_res_image_uniform`: one extension exponent for a
+  finite family of charts, on `Proj 𝒜`.
+* `AlgebraicGeometry.Proj.exists_pow_smul_eq_of_res_eq_image_uniform`: one exponent forcing a
+  finite family of agreements, on `Proj 𝒜`.
+
+## Implementation notes
+
+### The transport is a substitution, not a transport
 
 `Scheme.Modules.restrictAppIso` is `Iso.refl`, so `Γ(awayRestrict 𝒜 F hg hd, U)` **is**
 `Γ(F, awayι 𝒜 g hg hd ''ᵁ U)` — nothing has to move. What is left is that the glue wants the
@@ -30,10 +46,19 @@ proof-carrying data in a poset, so proof irrelevance identifies `homOfLE hVW` wi
 That is why the hypotheses are oriented `chart image = W` and not `W = chart image`: `subst`
 eliminates the variable, and the variable has to be the one that disappears.
 
-## Scope
+### Scope
 
 Extension and agreement, on `Proj 𝒜`, for a finite family. The cover itself, the twist that puts
 the family into one sheaf, and the gluing are not here.
+
+## References
+
+`AlgebraicGeometry.Proj.isLocalizationElem_pow_smul_eq`, which converts the chart's scalar into a
+structure-sheaf section, and Mathlib's `AlgebraicGeometry.Scheme.Modules.restrictAppIso`.
+
+## Tags
+
+projective spectrum, affine chart, quasi-coherent sheaf, extension of sections
 -/
 
 universe u
@@ -90,8 +115,8 @@ theorem exists_pow_smul_eq_res_image_uniform (F : (Proj 𝒜).Modules)
 
 /-- **One exponent forcing a finite family of agreements, on `Proj 𝒜`.**
 
-The charts here are of arbitrary positive degree because `#585` calls this on the *pairwise
-overlaps* of a degree-one cover, and those are the charts of products `gᵢ gⱼ`. -/
+The charts here are of arbitrary positive degree because `exists_globalSection_twistBy` calls this
+on the *pairwise overlaps* of a degree-one cover, and those are the charts of products `gᵢ gⱼ`. -/
 theorem exists_pow_smul_eq_of_res_eq_image_uniform (F : (Proj 𝒜).Modules)
     [SheafOfModules.IsQuasicoherent.{u, u, u}
       (show SheafOfModules (Proj 𝒜).ringCatSheaf from F)]

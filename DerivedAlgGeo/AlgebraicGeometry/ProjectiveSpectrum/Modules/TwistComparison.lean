@@ -10,12 +10,46 @@ import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.CoversTop
 /-!
 # The comparison `F ⊗ O(d) ≅ F(d)`, and what follows from it
 
-`#584`'s remaining structural piece. `TwistMultiplication.lean` built the map
-`M̃ ⊗ A(d)~ ⟶ M(d)~` and showed what it looks like on a degree-one chart; this file shows the map
-is inverted by sheafification, and reads off the two deliverables that were waiting on it —
-`F(d)(e) ≅ F(d + e)` and preservation of coherence.
+`TwistMultiplication.lean` builds the map `M̃ ⊗ A(d)~ ⟶ M(d)~` and shows what it looks like on a
+degree-one chart; this file shows the map is inverted by sheafification, and reads off the two
+consequences that need it — `F(d)(e) ≅ F(d + e)` and preservation of coherence — for `F` an
+associated sheaf.
 
-## The route, and why it is not `Divisors/AssociatedSheaf/Construction.lean`'s
+## Main definitions
+
+* `AlgebraicGeometry.Proj.sectionLinearEquivOfMemIff`: sections of `M̃` depend only on the
+  membership predicates of the graded pieces.
+* `AlgebraicGeometry.Proj.chartRingTwistSectionEquiv`,
+  `AlgebraicGeometry.Proj.chartModuleTwistSectionEquiv`, `AlgebraicGeometry.Proj.chartTensorEquiv`:
+  over a degree-one chart, `A(d)` is the structure sheaf, `M(d)` is `M̃`, and the tensor of sections
+  is the twisted sections.
+* `AlgebraicGeometry.Proj.tensorTwistIso`, `AlgebraicGeometry.Proj.associatedTensorTwistIso`: the
+  comparison `M̃ ⊗ O(d) ≅ M(d)~`, in the `tensorObj` and `tensorTwist` spellings.
+* `AlgebraicGeometry.Proj.tensorTwistAddIso`, `AlgebraicGeometry.Proj.associatedTensorTwistAddIso`:
+  `F(d)(e) ≅ F(d + e)` for `F` an associated sheaf, in both spellings.
+* `AlgebraicGeometry.Proj.twistingSheafTensorAddIso`: `O(d) ⊗ O(e) ≅ O(d + e)` on the tensor side.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.chartModuleTwistSectionEquiv_sectionTwistMul`: over a degree-one chart
+  the twisted multiplication is the scalar action, conjugated by the chart trivializations.
+* `AlgebraicGeometry.Proj.twistMultiplicationHom_mem_W`: the twisted multiplication is a local weak
+  equivalence when degree-one elements generate `A` over `𝒜 0`.
+* `AlgebraicGeometry.Proj.isIso_sheafification_map_twistMultiplicationHom`: it is inverted by
+  sheafification.
+* `AlgebraicGeometry.Proj.intShiftModule_isCoherent`,
+  `AlgebraicGeometry.Proj.tensorObj_twistingSheaf_isCoherent`,
+  `AlgebraicGeometry.Proj.tensorTwist_isCoherent`: twisting preserves coherence of an associated
+  sheaf.
+
+## Notation
+
+`X` and `𝒪` are local notation for the underlying space `ProjectiveSpectrum.top 𝒜` and its structure
+sheaf.
+
+## Implementation notes
+
+### The route, and why it is not `Divisors/AssociatedSheaf/Construction.lean`'s
 
 That file proves the corresponding Cartier statement by exhibiting a generator of the tensor on a
 chart and finishing by 2-out-of-3. **The generator route is unavailable here**: it works because
@@ -37,25 +71,23 @@ with `ψ` and `φ` the two chart trivializations. The content of that factorizat
 `intShiftZeroModuleLinearEquiv_twistMul`: both trivializations are multiplication by the same
 scalar, so what is left is associativity of that action.
 
-## Deliverables
+### What the comparison gives
 
-* `tensorTwistIso` — the comparison, and `associatedTensorTwistIso` in `tensorTwist` spelling
-  (2a);
-* `tensorTwistAddIso` / `associatedTensorTwistAddIso` — `F(d)(e) ≅ F(d + e)` (2b). With the
-  comparison this is `sheafTwistAddIso` and needs no associator; `TensorTwist.lean` records why
-  the monoidal structure cannot deliver it directly;
-* `tensorObj_twistingSheaf_isCoherent` / `tensorTwist_isCoherent` — coherence preservation (3),
+* `tensorTwistIso` — the comparison, and `associatedTensorTwistIso` in `tensorTwist` spelling;
+* `tensorTwistAddIso` / `associatedTensorTwistAddIso` — `F(d)(e) ≅ F(d + e)`. With the
+  comparison this is `sheafTwistAddIso` and needs no associator;
+* `tensorObj_twistingSheaf_isCoherent` / `tensorTwist_isCoherent` — coherence preservation,
   through the graded side, where `intShiftModuleOverSelfIso` trivializes the twist on a chart.
-  It is not visible through the tensor, which is why it waited on the comparison.
+  It is not visible through the tensor, which is why it goes through the comparison.
 
-## Scope
+### Scope
 
 `F` is an **associated sheaf**. That is the honest statement: identifying an arbitrary coherent
 sheaf on `Proj` with an associated one is Serre's theorem, which is downstream —
-`TwistInvertible.lean` records the same boundary, and it is why `O(d)` was proved invertible
-rather than the tensor avoided.
+`TwistInvertible.lean` records the same boundary, and it is why the twist of an arbitrary module
+sheaf is the tensor product with an invertible `O(d)` rather than a graded shift.
 
-## Two things the section level needs that the fibre level did not
+### Two things the section level needs that the fibre level did not
 
 `sectionLinearEquivOfMemIff` is the section-level counterpart of
 `DegreeZeroLocalization.linearEquivOfMemIff`: `intShift 𝓜 0` and `𝓜` have the same members, so the
@@ -65,8 +97,16 @@ trivializations land at the `(0)`-twist rather than at the module, so this is wh
 `associatedIsoOfPiecewiseIff`.
 
 The monoidal structure is `TwistMultiplication.lean`'s local instance, re-enabled here with
-`attribute [local instance]` rather than redeclared — a second instance over the same spelling is
-the mistake `references/instance-transparency.md` names.
+`attribute [local instance]` rather than redeclared, so that one instance, not two, sits over the
+same spelling.
+
+## References
+
+`CategoryTheory.Presheaf.W_of_coversTop` and Mathlib's `PresheafOfModules.sheafification`.
+
+## Tags
+
+projective spectrum, twisting sheaf, Serre twist, tensor product, coherent sheaf
 -/
 
 noncomputable section
@@ -276,7 +316,7 @@ noncomputable def tensorTwistIso {I : Type u} (g : I → 𝒜 1) (d : ℤ)
     (asIso (PresheafOfModules.sheafificationAdjunction
       (𝟙 (AlgebraicGeometry.Proj 𝒜).ringCatSheaf.obj)).counit).app (sheafTwist 𝒜 𝓜 d)
 
-/-- **`F(d)(e) ≅ F(d + e)`** for `F` an associated sheaf, deliverable 2b of `#584`. -/
+/-- **`F(d)(e) ≅ F(d + e)`** for `F` an associated sheaf. -/
 noncomputable def tensorTwistAddIso {I : Type u} (g : I → 𝒜 1) (d e : ℤ)
     (hg : Algebra.adjoin (𝒜 0) (Set.range fun j => (g j : A)) = ⊤) :
     AlgebraicGeometry.Scheme.Modules.tensorObj
@@ -310,7 +350,7 @@ theorem intShiftModule_isCoherent {I : Type u} (g : I → 𝒜 1) (d : ℤ)
       (standardAway_degreeOne_opensRange_le 𝒜 (g i))).symm
     (SheafOfModules.IsFinitePresentation.over hM _)
 
-/-- **The twist of a coherent associated sheaf is coherent**, deliverable 3 of `#584`. -/
+/-- **The twist of a coherent associated sheaf is coherent.** -/
 theorem tensorObj_twistingSheaf_isCoherent {I : Type u} (g : I → 𝒜 1) (d : ℤ)
     (hg : Algebra.adjoin (𝒜 0) (Set.range fun j => (g j : A)) = ⊤)
     (hM : AlgebraicGeometry.Scheme.Modules.IsCoherent
@@ -323,29 +363,28 @@ theorem tensorObj_twistingSheaf_isCoherent {I : Type u} (g : I → 𝒜 1) (d : 
 
 /-! ## The `tensorTwist` spelling
 
-The same three results in the names `#584` uses. `tensorTwist F d` is by definition
+The same three results in the `tensorTwist` spelling. `tensorTwist F d` is by definition
 `tensorObj F (twistingSheaf 𝒜 d)`, so each is its counterpart above under a different name and in
-the same graded setting — they are kept only because `#584`'s deliverables are stated in the
-`tensorTwist` spelling.
+the same graded setting.
 
-Both spellings live in the general graded setting. `Modules/Tensor/Basic.lean`'s machinery needs a
-locally free rank-one factor, which `TwistInvertible.lean` supplies for `O(d)`; it does not need
-`A` to be an algebra over a base ring, and nothing in the twist API uses such a structure. -/
+Both spellings live in the general graded setting: the sheafified tensor product of
+`Modules/Tensor/Basic.lean` does not need `A` to be an algebra over a base ring, and nothing in
+the twist API uses such a structure. -/
 
-/-- **`F ⊗ O(d) ≅ F(d)` for `F = M̃`**, deliverable 2a of `#584`. -/
+/-- **`F ⊗ O(d) ≅ F(d)` for `F = M̃`**, in the `tensorTwist` spelling. -/
 noncomputable def associatedTensorTwistIso {I : Type u} (g : I → 𝒜 1) (d : ℤ)
     (hg : Algebra.adjoin (𝒜 0) (Set.range fun j => (g j : A)) = ⊤) :
     tensorTwist 𝒜 (associatedSheaf 𝒜 𝓜) d ≅ sheafTwist 𝒜 𝓜 d :=
   tensorTwistIso 𝒜 𝓜 g d hg
 
-/-- **`F(d)(e) ≅ F(d + e)` for `F = M̃`**, deliverable 2b of `#584`. -/
+/-- **`F(d)(e) ≅ F(d + e)` for `F = M̃`**, in the `tensorTwist` spelling. -/
 noncomputable def associatedTensorTwistAddIso {I : Type u} (g : I → 𝒜 1) (d e : ℤ)
     (hg : Algebra.adjoin (𝒜 0) (Set.range fun j => (g j : A)) = ⊤) :
     tensorTwist 𝒜 (tensorTwist 𝒜 (associatedSheaf 𝒜 𝓜) d) e ≅
       tensorTwist 𝒜 (associatedSheaf 𝒜 𝓜) (d + e) :=
   tensorTwistAddIso 𝒜 𝓜 g d e hg
 
-/-- **The twist preserves coherence**, deliverable 3 of `#584`. -/
+/-- **The twist preserves coherence**, in the `tensorTwist` spelling. -/
 theorem tensorTwist_isCoherent {I : Type u} (g : I → 𝒜 1) (d : ℤ)
     (hg : Algebra.adjoin (𝒜 0) (Set.range fun j => (g j : A)) = ⊤)
     (hM : AlgebraicGeometry.Scheme.Modules.IsCoherent
@@ -357,16 +396,15 @@ theorem tensorTwist_isCoherent {I : Type u} (g : I → 𝒜 1) (d : ℤ)
 /-- **`O(d) ⊗ O(e) ≅ O(d + e)`, on the tensor side.**
 
 `twistingSheafAddIso` is the graded-shift form, `sheafTwist 𝒜 (intShift 𝒜 d) e ≅ O(d + e)`. This is
-the same statement written through `tensorObj`, which is the form `#806` needs in order to hand
-`O(-N)` to `IsInvertible` as a tensor inverse of `O(N)`.
+the same statement written through `tensorObj`, which is the form `twistingSheafTensorNegIso`
+needs in order to exhibit `O(-N)` as a tensor inverse of `O(N)`.
 
 It is four lines because the graded ring as a module over itself is the unit: recognise each
 `O(·)` as `(Ã)(·)` with `associatedSelfTensorTwistIso`, apply the comparison at `𝓜 = 𝒜`, and
 recognise the result back.
 
-Both factors are `O(·)` rather than an arbitrary `F`, so this does not contradict what
-`TensorTwist.lean` records about `F(d)(e) ≅ F(d + e)`: there the obstruction is a non-invertible
-outer factor, and here there is none. -/
+Both factors are `O(·)` rather than an arbitrary `F`, so the comparison at `𝓜 = 𝒜` applies
+directly. -/
 noncomputable def twistingSheafTensorAddIso {I : Type u} (g : I → 𝒜 1) (d e : ℤ)
     (hg : Algebra.adjoin (𝒜 0) (Set.range fun j => (g j : A)) = ⊤) :
     AlgebraicGeometry.Scheme.Modules.tensorObj (twistingSheaf 𝒜 d) (twistingSheaf 𝒜 e) ≅

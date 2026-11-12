@@ -137,7 +137,7 @@ def WeakIntegratesAfterDedekindBaseChange {D : Type u}
 
 /-- The three ordinary clauses of Definition 20.5, kept as separately named
 fields so a review can inspect their quantifier boundaries independently. -/
-structure OrdinaryDefinition20_5Conditions
+structure OrdinaryFamilyConditions
     {JCharge : Type u₁} {JOpen : Type u₂} {D : Type u₃}
     (charge : JCharge → ChargeProbe ℂ)
     (stable : JOpen → OpenLocusProbe)
@@ -152,7 +152,7 @@ structure OrdinaryDefinition20_5Conditions
 /-- The topological and relative-HN parts of the weak variant of Definition
 20.5.  Clause (0), which refers to an actual weak stability function, is
 bound to the repository's weak API in `Families.Weak`. -/
-structure WeakDefinition20_5Conditions
+structure WeakFamilyConditions
     {JCharge : Type u₁} {JGeneric : Type u₂} {D : Type u₃}
     (charge : JCharge → ChargeProbe ℂ)
     (semistable : JGeneric → GenericSemistabilityProbe)

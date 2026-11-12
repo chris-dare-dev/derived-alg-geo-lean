@@ -13,16 +13,29 @@ linear equivalence, and `actC` transports a real `2 × 2` matrix of positive
 determinant across it, so that a map defined on `Fin 2 → ℝ` can be applied to a
 `ℂ`-valued quantity.
 
-## Placement
+## Main definitions
 
-MO1.12 (#1323), cutover-ledger row 08, comparison-owner column: a
-complex-coordinate linear-map adapter moves near the complex linear-algebra
-owner **once its public type is independent of the cover**. These five
-declarations meet that condition -- `cplxCoord` mentions only `ℂ` and
-`Fin 2 → ℝ`, and `actC` takes a `Matrix.GLPos (Fin 2) ℝ`, which is the
-general-linear group and not its cover. The three declarations that do not meet
-it -- `cplxCoord_exp`, `compat_exp` and `actC_exp`, whose statements mention
-`rayVec`, `Compatible` and `NormalizedShift` -- stay with the cover in
+* `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.cplxCoord`
+  — `ℂ` as a real coordinate plane, via the basis `1, I`.
+* `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.actC` — a
+  matrix of `Matrix.GLPos (Fin 2) ℝ` acting `ℝ`-linearly on `ℂ` through `cplxCoord`.
+
+## Main results
+
+* `cplxCoord_apply` — the coordinates of `z` are `![z.re, z.im]`.
+* `actC_one` and `actC_mul` — `actC` is an action of `Matrix.GLPos (Fin 2) ℝ`.
+
+## Implementation notes
+
+### Placement
+
+The public types here are independent of the universal cover of `GL⁺(2, ℝ)`:
+`cplxCoord` mentions only `ℂ` and `Fin 2 → ℝ`, and `actC` takes a
+`Matrix.GLPos (Fin 2) ℝ`, which is the general-linear group and not its cover.
+So this complex-coordinate adapter lives with the complex linear algebra. The
+three companion statements whose statements do mention the cover --
+`cplxCoord_exp`, `compat_exp` and `actC_exp`, which mention `rayVec`,
+`Compatible` and `NormalizedShift` -- are with the cover in
 `LinearAlgebra/Matrix/GeneralLinearGroup/UniversalCover/ComplexRepresentation.lean`.
 
 Independent consumers: the cover's own complex restatements and its
@@ -31,8 +44,19 @@ linear map `actCCLM` under
 `CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Action/` on the
 other.
 
-Declaration names are unchanged by the move, so the namespace is the one they
-were introduced in; see the ledger's first standing decision.
+### The namespace
+
+The declarations live in the namespace of their stability-action consumer,
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction`,
+which keeps their names fixed.
+
+## References
+
+Mathlib's `Complex.basisOneI` and `Matrix.GLPos`.
+
+## Tags
+
+complex numbers, real coordinates, linear equivalence, general linear group
 -/
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

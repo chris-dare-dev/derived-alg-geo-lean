@@ -23,8 +23,8 @@ A subcanonical topology makes every Yoneda presheaf a sheaf and hence a discrete
 ## Implementation notes
 
 The construction reuses `CategoryTheory.stackInGroupoidsOfSheaf`: subcanonicity supplies its
-sheaf proof, rather than an additional descent hypothesis. Fibres currently lie in `Cat.{v, v}`,
-the universe of the Yoneda presheaf; #1637 will generalize this in place after #1631.
+sheaf proof, rather than an additional descent hypothesis. Fibres lie in `Cat.{v, v}`, the
+universe of the Yoneda presheaf.
 
 ## References
 
@@ -52,10 +52,7 @@ variable {C : Type u} [Category.{v} C] (J : GrothendieckTopology C) [J.Subcanoni
 /-- The stack represented by `X` on a subcanonical site is the discrete stack
 of `yoneda.obj X`, constructed by `CategoryTheory.stackInGroupoidsOfSheaf`.
 
-Its fibres belong to `Cat.{v, v}` because `yoneda.obj X` is `Type v`-valued.
-After #1631, #1637 generalizes this construction in place to independent fibre
-universes, preserving the names `CategoryTheory.StackInGroupoids.representable` and
-`CategoryTheory.StackInGroupoids.representableMap`. -/
+Its fibres belong to `Cat.{v, v}` because `yoneda.obj X` is `Type v`-valued. -/
 def representable (X : C) : StackInGroupoids C J :=
   stackInGroupoidsOfSheaf J (yoneda.obj X)
     (GrothendieckTopology.Subcanonical.isSheaf_of_isRepresentable (yoneda.obj X))

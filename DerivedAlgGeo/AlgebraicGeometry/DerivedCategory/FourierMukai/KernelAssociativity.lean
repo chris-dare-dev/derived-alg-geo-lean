@@ -7,11 +7,11 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai.KernelConvol
 /-!
 # Associativity of the geometric convolution: the quadruple product
 
-#542 split associativity of convolution into a free transform-level theorem
-and a supplied kernel-level layer (`ConvolutionAssocData`), and recorded that
-the geometric route to the latter runs through the quadruple product. This
-file is that route: `geometricConvolutionAssoc` **derives** the kernel-level
-isomorphism
+Associativity of convolution splits into a transform-level theorem,
+`convolutionTransformAssoc`, which holds for any convolution data, and a supplied
+kernel-level layer, `ConvolutionAssocData`. The geometric route to the latter
+runs through the quadruple product, and this file is that route:
+`geometricConvolutionAssoc` **derives** the kernel-level isomorphism
 
 `(P ∗ Q) ∗ R ≅ P ∗ (Q ∗ R)`
 
@@ -21,7 +21,28 @@ product, and `geometricConvolutionAssocData` assembles a genuine
 `ConvolutionAssocData` for the geometric convolution data with **zero
 supplied fields**.
 
-## What is consumed
+## Main definitions
+
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.HasPullbackFactorization` and
+  `HasPushforwardFactorization` — derived pullback and pushforward along a
+  commuting triangle `π ≫ p = r`, supplied.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.QuadrupleProductGeometry` — the
+  quadruple product with its projections onto the pairwise and triple products,
+  supplied as data.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.quadKernel` — the common value
+  both bracketings are compared with.
+* `leftAssocIso`, `rightAssocIso` and `geometricConvolutionAssoc` — the two
+  comparisons with `quadKernel` and the derived associator.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.geometricConvolutionAssocData` —
+  the assembled `ConvolutionAssocData`.
+
+## Main results
+
+The isomorphisms above are the results; the file states no separate theorem.
+
+## Implementation notes
+
+### What is consumed
 
 Almost everything is an *existing* class at new instance sites — the same
 seven-input vocabulary as `geometricCompIso`, evaluated at objects rather
@@ -39,13 +60,14 @@ Two classes are new, because no existing shape covers a one-step route:
   two *two-step* routes, and degenerating one leg to an identity would drag
   in a pullback-along-identity input plus unitor transport for every use.
   (Conversely a common route is two factorizations glued; the route classes
-  are left as they are because #540 already consumes them in that form.)
+  are left as they are because `geometricConvolutionData` consumes them in that
+  form.)
 * `HasPushforwardFactorization π q r` — the pushforward companion.
 
 Each factorization carries its triangle identity as a `comm` **guard**, not
 consumed by the derivation, in the pattern of the route classes.
 
-## What this file does not assert
+### What this file does not assert
 
 * **Nothing constructs an instance of any class here**, new or old, and no
   scheme is shown to admit one. `QuadrupleProductGeometry` carries the
@@ -55,6 +77,15 @@ consumed by the derivation, in the pattern of the route classes.
   `CoherentConvolutionData`; that requires functoriality of `convKernel` on
   kernel morphisms and comparison of the geometric associator/unitors with
   the coherent root. The tensor and pullback inputs themselves are coherent.
+
+## References
+
+The repository's `CategoryTheory.Triangulated.FourierMukai.ConvolutionAssocData`,
+`convolutionTransformAssoc`, `convKernel` and `geometricConvolutionData`.
+
+## Tags
+
+Fourier--Mukai kernel, convolution, associativity, quadruple product
 -/
 
 universe u
@@ -295,7 +326,7 @@ the extra one is the associator from `HasCoherentDerivedTensor` — the convolve
 twist slot on this side, so after base change, the *right*-slot projection
 formula at `σ₁₂₄`, and the factorizations, the tensors arrive bracketed the
 other way and associativity of the derived tensor is what reconciles them.
-This is the consumption site #542 promised that class. -/
+This is where `HasCoherentDerivedTensor`'s associator is consumed. -/
 noncomputable def rightAssocIso :
     convKernel G₁₂₄ P (convKernel G₂₃₄ Q R) ≅ quadKernel Q4 P Q R :=
   let a := (boundedCoherentDerivedPullback Q4.ρ₁₂).obj P
@@ -401,9 +432,9 @@ variable {X Y Z W : SchemeBaseChange S}
 supplied fields.**
 
 A `ConvolutionAssocData` for the four geometric convolution data, with
-`assocIso` the derived `geometricConvolutionAssoc`. Together with #542's
+`assocIso` the derived `geometricConvolutionAssoc`. Together with
 `convolutionTransformAssoc` this closes the associativity layer: the
-transform level was free, the kernel level is now derived, and what is
+transform level is free, the kernel level is derived, and what is
 supplied is the quadruple-product geometry with its named classical
 isomorphisms. -/
 noncomputable def geometricConvolutionAssocData
@@ -484,15 +515,15 @@ noncomputable def geometricConvolutionAssocData
 
 end Assembly
 
-/-! ## Where the associativity layer now stands
+/-! ## The associativity layer
 
 At the transform level associativity is a theorem for any convolution data
-(#542). At the kernel level it is now *derived* for the geometric convolution
-from the quadruple-product inputs above. What remains supplied is exactly
-those inputs. The abstract `CoherentConvolutionData` root states the pentagon
-and triangle; this geometric file has not yet promoted `convKernel` to that
-functorial root, so it deliberately exports only the derived three-kernel
-comparison.
+(`convolutionTransformAssoc`). At the kernel level it is *derived* for the
+geometric convolution from the quadruple-product inputs above. What remains
+supplied is exactly those inputs. The abstract `CoherentConvolutionData` root
+states the pentagon and triangle; this geometric file does not promote
+`convKernel` to that functorial root, so it deliberately exports only the
+derived three-kernel comparison.
 -/
 
 end AlgebraicGeometry.DerivedCategory.FourierMukai

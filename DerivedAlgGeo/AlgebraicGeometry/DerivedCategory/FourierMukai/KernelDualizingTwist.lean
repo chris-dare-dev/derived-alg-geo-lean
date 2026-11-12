@@ -13,9 +13,9 @@ correspondence, so the geometric transform is left adjoint to the composite
 
 `q^! ⋙ (− ⊗ K^∨) ⋙ Rp_*`.
 
-It stops there, deliberately: nothing said that composite is again a
-*transform*, and `HasTwistedInversePullback` was kept opaque about the shape of
-`q^!` precisely so the two obligations would stay apart.
+It stops there, deliberately: it does not say that composite is again a
+*transform*, and `HasTwistedInversePullback` is kept opaque about the shape of
+`q^!` precisely so the two obligations stay apart.
 
 This file supplies the missing shape and closes the gap. One new class says
 `q^!` is a twisted pullback; the tensor associator — from the **existing** coherent
@@ -25,38 +25,59 @@ classical kernel
 
 `Q = K^∨ ⊗ ω_q`.
 
-## The one new contract
+## Main definitions
+
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.HasDualizingTwist` — a supplied
+  object `ω_f` with `f^! ≅ Lf^*(−) ⊗ ω_f`; `dualizingTwist` and
+  `dualizingTwistIso` name its fields.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.geometricAdjointKernel` — the
+  kernel `K^∨ ⊗ ω_q`.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.geometricRightAdjointIso` — the
+  composite right adjoint is the reversed transform with that kernel.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.geometricRightAdjointKernelData`
+  — the assembled `RightAdjointKernelData`.
+
+## Main results
+
+* `geometricRightAdjointKernelData_adjKernel` — its kernel is
+  `geometricAdjointKernel q K`.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.geometricRightAdjoint_isKernelFunctor`
+  — the composite right adjoint is a kernel functor for the reversed
+  correspondence.
+
+## Implementation notes
+
+### The one new contract
 
 `HasDualizingTwist q` supplies an object `ω_q` and
 `q^! ≅ Lq^*(−) ⊗ ω_q`. Two things about its shape are deliberate.
 
 **No shift index.** Classically the twist is `ω_q[dim q]`. The relative
-dimension appears nowhere here, because nothing consumes it: `ω_q` is asked for
-as the object already carrying whatever shift it carries. Asking for a
-dimension and a shift separately would add a hypothesis the derivation never
-uses, which is the shape this lane's reviews have attacked twice.
+dimension appears nowhere here, because nothing consumes it: `ω_q` is the object
+already carrying whatever shift it carries. Requiring a dimension and a shift
+separately would add a hypothesis the derivation never uses.
 
 **A new contract at `q`.** The class needs `HasCoherentPullback q` — pullback
-along the *pushforward's* morphism — which `geometricCorrespondence` never asks
-for. That is the mirror of `KernelAdjunction.lean` needing
+along the *pushforward's* morphism — which `geometricCorrespondence` never
+requires. That is the mirror of `KernelAdjunction.lean` needing
 `HasDerivedPushforward p`, and it is not an accident: the two extra contracts
 are exactly what makes the reversed correspondence
 `geometricCorrespondence Y X Z q p` expressible, and the adjoint kernel lives
 there.
 
-## What comes out
+### What comes out
 
 `geometricRightAdjointKernelData` is a genuine
 `FourierMukai.RightAdjointKernelData` for the geometric correspondence, with
 the reversed correspondence as its opposite and `Q = K^∨ ⊗ ω_q` as its kernel.
-Everything #768 proves about a right adjoint kernel then applies: uniqueness of
-the adjoint, that the adjoint is itself a kernel functor, and the transport
-lemmas.
+Everything `FourierMukai/Adjunction.lean` proves about a right adjoint kernel then
+applies: uniqueness of the adjoint, that the adjoint is itself a kernel functor,
+and the transport lemmas.
 
-## What does *not* come out, and why
+### What does *not* come out, and why
 
 **Not a `DualKernel`, and not for want of one more isomorphism.**
-`KernelAutoequivalence.DualKernel` asks for the quasi-inverse to be a transform
+`KernelAutoequivalence.DualKernel` requires the quasi-inverse to be a transform
 of the **same** correspondence — its field is
 `A.equiv.inverse ≅ A.corr.transform dual`, one `corr`. What this file produces
 is a transform of the **reversed** correspondence
@@ -67,10 +88,10 @@ So `DualKernel.ofRightAdjointKernel` does not apply here, and nothing in this
 file pretends otherwise. Bridging the two needs an identification of the two
 correspondences' transforms — classically pullback along the swap
 `σ : X × X → X × X`. That is a further ledger, named in the closing section;
-`KernelSwap.lean` is it, and it lands `Rσ_* Q` rather than `σ^* Q` — the two
+`KernelSwap.lean` is it, and it produces `Rσ_* Q` rather than `σ^* Q` — the two
 agree for an involution isomorphism, which that file does not need to assume.
 
-## What this file does not assert
+### What this file does not assert
 
 * **Nothing constructs a `HasDualizingTwist`**, and no morphism is shown to
   admit one. Inhabitant-free, like every ledger it builds on.
@@ -80,6 +101,17 @@ agree for an involution isomorphism, which that file does not need to assume.
 * Nothing relates `HasDualizingTwist q` to `HasDualizingTwist p`, and no
   compatibility between the two directions is stated.
 * No claim that any geometric transform is an equivalence.
+
+## References
+
+The repository's `CategoryTheory.Triangulated.FourierMukai.RightAdjointKernelData`,
+`RightAdjointKernelData.isKernelFunctor_of_adj` and
+`KernelAutoequivalence.DualKernel.ofRightAdjointKernel`.
+
+## Tags
+
+Fourier--Mukai transform, dualizing complex, twisted inverse image, adjoint
+kernel
 -/
 
 universe u
@@ -178,7 +210,7 @@ correspondence.
 
 The associator is `coherentDerivedTensorAssoc`, from the existing
 `HasCoherentDerivedTensor` root, consumed here at a further site.  The root
-rather than the legacy associator-only class: `scripts/check_coherent_families.py`
+rather than the associator-only class: `scripts/check_coherent_families.py`
 requires it, and it also removes a diamond — `HasCoherentDerivedTensor` supplies
 `HasDerivedTensor` through `hasDerivedTensorOfCoherent`, so the correspondence,
 the kernel dual and the associator all read the *same* tensor instance. -/
@@ -198,7 +230,7 @@ noncomputable def geometricRightAdjointIso :
 The payoff: a genuine `RightAdjointKernelData` for the geometric
 correspondence, whose opposite is the reversed correspondence and whose kernel
 is the constructed `K^∨ ⊗ ω_q`. Everything `FourierMukai/Adjunction.lean`
-proves about a right adjoint kernel now applies geometrically, conditional on
+proves about a right adjoint kernel applies geometrically, conditional on
 the ledger.
 
 It is **not** a `DualKernel`: that needs the opposite correspondence to be the
@@ -219,7 +251,7 @@ correspondence.**
 
 `RightAdjointKernelData.isKernelFunctor_of_adj` at the assembled datum. Stated
 because "the adjoint exists" and "the adjoint is again of Fourier--Mukai type"
-are different claims, and the second is the one the lane is about. -/
+are different claims, and the second is the one Fourier--Mukai theory is about. -/
 theorem geometricRightAdjoint_isKernelFunctor :
     (geometricCorrespondence Y X Z q p).IsKernelFunctor
       (geometricConstituentRightAdjoints X Y Z p q K).rightAdjoint :=
@@ -230,7 +262,7 @@ end Assembly
 /-! ## The next ledger, and what is in it
 
 What stands between this file and a geometric `DualKernel` is not another
-adjunction. It is that `DualKernel` asks for the quasi-inverse as a transform
+adjunction. It is that `DualKernel` requires the quasi-inverse as a transform
 of the **same** correspondence, while an adjoint is naturally a transform of
 the **reversed** one.
 

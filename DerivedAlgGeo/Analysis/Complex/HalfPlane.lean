@@ -11,22 +11,47 @@ Two subsets of `ℂ` and the three facts about them that every consumer needs.
 Nothing here is categorical, algebraic or stability-theoretic: the statements
 quantify over complex numbers and use `Complex.arg` alone.
 
-## Placement
+## Main definitions
 
-These declarations were introduced beside their first consumer, the central
-charge conditions in `StabilityCondition/Weak/Charge.lean`, and that file's own
-docstring recorded them as an upstream candidate for
-`Mathlib/Analysis/Complex/UpperHalfPlane/`. MO1.13 (#1324) acted on that: the
-Euclidean core of the mass-subadditivity proof must be importable without
-categories and without stability, and it cannot be while a half-plane
-membership predicate lives inside the stability tree. The nearest owner at the
-pinned Mathlib revision is `Analysis/Complex/`, so that is the path.
+* `CategoryTheory.semiClosedUpperHalfPlane` — positive imaginary part together
+  with the negative real axis; the half-plane used for central charges.
+* `CategoryTheory.closedUpperHalfPlane` — the closed upper half-plane, which
+  unlike the semi-closed one contains `0`.
 
-The namespace is deliberately **not** changed. `CategoryTheory` reads oddly over
-an analysis file and the oddity is accepted rather than repaired: a namespace
-cutover would rename declarations and invalidate the immutable review payloads
-that `exe/RestateHistoricalNames.lean` exists to protect. This is standing
-decision 1 of the cutover ledger.
+## Main results
+
+* `CategoryTheory.semiClosedUpperHalfPlane_ne_zero` — the semi-closed half-plane
+  omits `0`.
+* `CategoryTheory.semiClosedUpperHalfPlane_subset_closed` — it lies in the closed
+  half-plane.
+* `CategoryTheory.arg_pos_of_mem_semiClosedUpperHalfPlane` — its points have
+  positive argument.
+
+## Implementation notes
+
+### Placement
+
+The first consumers are the central charge conditions in
+`StabilityCondition/Weak/Charge.lean`, but the Euclidean core of the
+mass-subadditivity proof must be importable without categories and without
+stability, and it cannot be while a half-plane membership predicate lives
+inside the stability tree. The nearest owner at the pinned Mathlib revision is
+`Analysis/Complex/`, so that is the path. The declarations are upstream
+candidates for `Mathlib/Analysis/Complex/UpperHalfPlane/`.
+
+### The namespace
+
+`CategoryTheory` reads oddly over an analysis file and the oddity is accepted
+rather than repaired: renaming the namespace would change every fully qualified
+name, so the declarations keep it.
+
+## References
+
+Mathlib's `Complex.arg` and `UpperHalfPlane`.
+
+## Tags
+
+upper half-plane, complex argument, central charge
 -/
 
 noncomputable section

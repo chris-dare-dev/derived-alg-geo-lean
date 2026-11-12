@@ -9,24 +9,38 @@ import DerivedAlgGeo.Algebra.Module.GradedModule.PowersCongr
 /-!
 # The block homotopy on the variable Čech cover
 
-The block projections and the contracting homotopy of #340 live at monomial denominators
-`Xᵞ`, while the Čech complex of the variable cover names its denominators as products
-`∏ₐ X_{x a}`. The two are equal ring elements, and this file carries the whole toolkit across
-that equality: `tupleExponent` is the exponent vector of a Čech tuple,
-`DegreeZeroLocalization.powersCongr` transports a degree-zero localization along an equality of
-denominators, and the Čech-level `cechBlockProj` and `cechHomotopy` are the monomial-level maps
-conjugated by that transport.
+The block projections `blockProj` and the contracting homotopy `laurentHomotopy` of the Čech
+vanishing computation for `O(d)` live at monomial denominators `Xᵞ`, while the Čech complex of
+the variable cover names its denominators as products `∏ₐ X_{x a}`. The two are equal ring
+elements, and this file carries the whole toolkit across that equality: `tupleExponent` is the
+exponent vector of a Čech tuple, `DegreeZeroLocalization.powersCongr` transports a degree-zero
+localization along an equality of denominators, and the Čech-level `cechBlockProj` and
+`cechHomotopy` are the monomial-level maps conjugated by that transport.
 
-The payoff is the three identities the vanishing computation runs on, now stated against
+## Main definitions
+
+* `MvPolynomial.tupleExponent` — the exponent vector of the Čech denominator of a tuple.
+* `MvPolynomial.cechTermEquiv` — the Čech term of a tuple, presented at the monomial
+  denominator.
+* `MvPolynomial.cechBlockProj` — the block projection of a Čech term.
+* `MvPolynomial.cechHomotopy` — the homotopy map on Čech terms, from the cone tuple
+  `i₀ :: y` to `y`.
+* `MvPolynomial.cechTermCongr` — transport of a Čech term along an equality of tuples.
+
+## Main results
+
+The three identities the vanishing computation runs on, stated against
 `polynomialVariableCechFace` itself:
 
-* `cechFace_cechBlockProj` — the Čech faces commute with the block projections;
-* `cechHomotopy_cechFace_zero` — the homotopy retracts the cone face on a block (`i₀ ∉ F`);
-* `cechHomotopy_cechFace_succ` — the homotopy commutes with every other face, unrestricted.
+* `MvPolynomial.cechFace_cechBlockProj` — the Čech faces commute with the block projections;
+* `MvPolynomial.cechHomotopy_cechFace_zero` — the homotopy retracts the cone face on a block
+  (`i₀ ∉ F`);
+* `MvPolynomial.cechHomotopy_cechFace_succ` — the homotopy commutes with every other face,
+  unrestricted;
 
-together with `sum_cechBlockProj` (the finitely many blocks of a tuple exhaust its term) and
-`cechBlockProj_eq_zero_of_not_subset` (a block off the tuple's support is zero), which are what
-the reassembly of per-block primitives sums over.
+together with `MvPolynomial.sum_cechBlockProj` (the finitely many blocks of a tuple exhaust its
+term) and `MvPolynomial.cechBlockProj_eq_zero_of_not_subset` (a block off the tuple's support is
+zero), which are what the reassembly of per-block primitives sums over.
 
 ## Implementation notes
 
@@ -40,6 +54,11 @@ lets one lemma serve every instantiation.
 The `Fin.cons` combinatorics is isolated in two lemmas — the `0`-face of a cone tuple is the
 base tuple, and the `j.succ`-face of a cone tuple is the cone over the `j`-face — so the
 vanishing computation never touches `succAbove` directly.
+
+## References
+
+This file conjugates `MvPolynomial.blockProj` and `MvPolynomial.laurentHomotopy` by
+`GradedModule.DegreeZeroLocalization.powersCongr`.
 
 ## Tags
 

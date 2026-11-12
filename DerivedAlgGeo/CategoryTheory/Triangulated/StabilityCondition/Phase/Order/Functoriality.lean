@@ -9,18 +9,45 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Phase.Order.
 
 Remark 3.14(3) of arXiv:2607.28411v1 says the strict and weak orders are
 preserved by the paper's pullback and pushforward constructions, when those
-constructions are slicings.  This repository does not yet have the geometric
-functors or the adjoint-pair API needed to define either construction.
+constructions are slicings.  This file constructs neither; it proves the order
+transport from an explicit objectwise interface that either construction can
+instantiate.
+
+## Main definitions
+
+* `CategoryTheory.Triangulated.SlicingOrderPreimageData` — objectwise preimage
+  data for an operation on slicings: phase-slice membership and the strict and
+  weak upper phase windows are reflected along one map `obj`.
+
+## Main results
+
+* `CategoryTheory.Triangulated.SlicingOrderPreimageData.precedes`,
+  `CategoryTheory.Triangulated.SlicingOrderPreimageData.precedesWeak` — an
+  operation with preimage data preserves the strict and the weak order.
+* `Slicing.Precedes.pushforward_of_preimage`,
+  `Slicing.PrecedesWeak.pushforward_of_preimage`,
+  `Slicing.Precedes.pullback_of_preimage`,
+  `Slicing.PrecedesWeak.pullback_of_preimage` — source-facing pushforward and
+  pullback wrappers of the same two statements.
+
+## Implementation notes
 
 `SlicingOrderPreimageData` isolates the exact categorical interface consumed
-by that observation.  An operation on slicings is described objectwise by a
-map `obj`; membership in a phase slice and in the strict/weak upper phase
-windows is reflected along that same map.  The two order-transport theorems
-then follow without importing schemes or manufacturing a fake pullback.
+by the remark.  An operation on slicings is described objectwise by a map
+`obj`; membership in a phase slice and in the strict/weak upper phase windows
+is reflected along that same map.  The two order-transport theorems then follow
+without importing schemes or manufacturing a fake pullback.
 
-The future `f_sharp` and `f^sharp` constructions can instantiate this data;
-until then the result remains explicitly hypothesis-carrying, as required by
-destination issue #211 (transferred from source issue #141).
+Constructions of `f_sharp` and `f^sharp` can instantiate this data; the result
+itself stays explicitly hypothesis-carrying.
+
+## References
+
+* arXiv:2607.28411v1, Remark 3.14(3).
+
+## Tags
+
+slicing, phase order, pullback, pushforward, functoriality
 -/
 
 noncomputable section
@@ -41,7 +68,7 @@ variable {D : Type u₂} [Category.{v₂} D] [HasZeroObject D] [HasShift D ℤ]
 /-- Objectwise preimage data sufficient to transport both slicing orders.
 
 This is intentionally not a functor or a geometric pullback: it is the exact
-hypothesis package that a future pullback or pushforward construction must
+hypothesis package that a pullback or pushforward construction must
 discharge. -/
 structure SlicingOrderPreimageData (op : Slicing C → Slicing D)
     (obj : D → C) : Prop where
@@ -94,7 +121,7 @@ theorem Slicing.PrecedesWeak.pushforward_of_preimage
 
 /-- Source-facing strict pullback wrapper.  It is deliberately a second name
 for the same abstract interface: which geometric adjoint computes `obj` is a
-fact for the future pullback construction, not for the slicing-order layer. -/
+fact for the pullback construction, not for the slicing-order layer. -/
 theorem Slicing.Precedes.pullback_of_preimage
     (op : Slicing C → Slicing D) (obj : D → C)
     (h : SlicingOrderPreimageData op obj) {s t : Slicing C}

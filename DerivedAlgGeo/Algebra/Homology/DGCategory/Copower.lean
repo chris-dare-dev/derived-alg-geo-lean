@@ -14,7 +14,7 @@ The evaluation functor `RHom(E,-) ⊗ E` needs an object `K ⊗ X` for a complex
 with: at the pinned Mathlib revision `HomologicalComplex.HasTensor` does not
 synthesize for the `ℤ`-indexed shape, which is the whole reason `DGCategory`
 encodes composition as a family of biadditive maps rather than a chain map out
-of a tensor product (ADR-0010, ADR-0011).
+of a tensor product.
 
 So the tensoring is stated the way `IsShiftBy` states the shift: by its
 universal property, as data plus a bijectivity condition, with no construction
@@ -22,7 +22,44 @@ of the object.  `IsCopowerOf K X Z` says `Z` *is* `K ⊗ X`, in the only sense
 that matters — degree-`p` morphisms out of `Z` are degree-`p` cochains out of
 `K` into the Hom-complex of `X`.
 
-## Why cochains are spelled out
+## Main definitions
+
+* `CategoryTheory.IsCopowerOf` — `Z` is the copower of `X` by `K`: a chain map
+  `K ⟶ dgHom X Z` through which degree-`p` morphisms out of `Z` correspond
+  bijectively to degree-`p` cochains out of `K`.
+* `CategoryTheory.IsCopowerOf.lift` and `CategoryTheory.IsCopowerOf.compare` —
+  the inverse of that bijection, and the degree-zero comparison between two
+  copowers of the same data.
+* `CategoryTheory.CopowerData`, `CategoryTheory.HasCopower` and
+  `CategoryTheory.HasCopowers` — a witnessed copower, and mere existence of one
+  or of all of them; `CategoryTheory.copowerObj` selects one noncomputably.
+* `CategoryTheory.EvaluationData` and `CategoryTheory.HasEvaluationData` — a
+  choice, or mere existence, of `RHom(E,X) ⊗ E` for every `X`;
+  `CategoryTheory.chosenEvaluationData` selects one.
+* `CategoryTheory.EvaluationData.functor` and
+  `CategoryTheory.EvaluationData.evaluation` — the dg functor `RHom(E,-) ⊗ E`
+  and its evaluation transformation to the identity.
+* `CategoryTheory.EvaluationData.compareIso` — the canonical isomorphism, in the
+  closed degree-zero dg-functor category, between two choices of evaluation
+  data.
+
+## Main results
+
+* `CategoryTheory.IsCopowerOf.lift_unique` — a morphism out of a copower is
+  determined by the cochain it induces.
+* `CategoryTheory.IsCopowerOf.compare_mem_cocycles`,
+  `CategoryTheory.IsCopowerOf.compare_comp_compare` and
+  `CategoryTheory.IsCopowerOf.compare_trans` — the comparisons are closed,
+  mutually inverse and transitive, so any two copowers of the same data are
+  canonically isomorphic in `Z⁰`.
+* `CategoryTheory.EvaluationData.evaluation_isClosed` — the evaluation
+  transformation is closed.
+* `CategoryTheory.EvaluationData.compare_comp_evaluation` — the comparison
+  between two choices of evaluation data commutes strictly with evaluation.
+
+## Implementation notes
+
+### Why cochains are spelled out
 
 A degree-`p` cochain `K ⟶ dgHom X W` is an additive map `K i ⟶ (dgHom X W) j`
 for every `i + p = j`.  Mathlib's `CochainComplex.HomComplex.Cochain` packages
@@ -30,7 +67,7 @@ exactly that, but naming it here would drag in the `Triplet` encoding and the
 `δ` API for no gain: the two conditions below are stated directly on the
 families, in the same vocabulary as the rest of this directory.
 
-## What the bijectivity is for
+### What the bijectivity is for
 
 Everything.  `IsShiftBy` gets its inverse, its uniqueness and its transport
 from one bijectivity assumption, and the same three follow here:
@@ -41,10 +78,10 @@ copowers of the same data canonically isomorphic in `Z⁰`.
 `HasCopower K X` and `HasCopowers C` package mere existence in the same style
 as Mathlib's `HasLimit` and `HasLimitsOfShape`: the classes store no selected
 object, and the noncomputable `copowerData` API makes a choice only when a
-consumer asks for one.  `HasEvaluationData E` is the narrower existence
+consumer needs one.  `HasEvaluationData E` is the narrower existence
 interface consumed by the object-twist construction; all copowers imply it.
 
-## The evaluation functor
+### The evaluation functor
 
 `EvaluationData E` is a choice of copower of `E` by `dgHom E X` for every `X`,
 in the same shape as `ConeData`: objectwise data, assembled into a dg functor.
@@ -59,7 +96,7 @@ Every one of the functor's four laws is `lift_unique` applied to the cochain
 each side induces; only `map_d` needs anything beyond associativity, and there
 it is the Leibniz rule twice, once in `C` and once in the Hom-complex.
 
-## What this does not give
+### What this does not give
 
 Concrete existence.  Nothing here proves that a particular dg category has
 copowers.  Once a category supplies the `HasCopowers` capability, however,
@@ -67,6 +104,16 @@ copowers.  Once a category supplies the `HasCopowers` capability, however,
 without adding compatibility fields or a second choice mechanism.  Nothing
 here relates this functor to a spherical object: that comparison needs
 `Perf(k)` as a dg category, which the repository does not have.
+
+## References
+
+This file builds on `CategoryTheory.DGCategory` and follows the pattern of
+`CategoryTheory.IsShiftBy`; its existence classes are modelled on Mathlib's
+`CategoryTheory.Limits.HasLimit`.
+
+## Tags
+
+dg category, copower, tensoring, evaluation functor, universal property
 -/
 
 set_option autoImplicit false

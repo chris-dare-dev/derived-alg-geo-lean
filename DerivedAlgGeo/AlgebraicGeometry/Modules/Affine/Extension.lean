@@ -8,11 +8,31 @@ import Mathlib.AlgebraicGeometry.Modules.Tilde
 # Clearing a denominator on an affine
 
 A section of a quasi-coherent sheaf over a basic open `D(r)`, multiplied by a high enough power of
-`r`, is the restriction of a **global** section. This is the chart-local engine of `#585`: on
-`Proj 𝒜` a degree-one chart is `Spec (A_{(g)})`, `D₊(f)` meets it in the basic open of `f / g`
-(`Proj.awayι_preimage_basicOpen`), and this is what clears that denominator.
+`r`, is the restriction of a **global** section. This is the chart-local engine of
+`exists_globalSection_twistBy`, which makes a twisted section over `D₊(f)` on `Proj 𝒜` the
+restriction of a global section: a degree-one chart is `Spec (A_{(g)})`, `D₊(f)` meets it in the
+basic open of `f / g` (`Proj.awayι_preimage_basicOpen`), and this is what clears that denominator.
 
-## Why it is six lines, and what that changes
+## Main definitions
+
+* `AlgebraicGeometry.Scheme.Modules.tildeΓSectionEquiv`: the quasi-coherence isomorphism on the
+  sections over one open, as a linear equivalence.
+
+## Main results
+
+* `AlgebraicGeometry.tilde.exists_pow_smul_eq_res_of_top`: a power of `r` times a section of `M~`
+  over `D(r)` is the restriction of a global section.
+* `AlgebraicGeometry.tilde.exists_pow_smul_res_eq_zero`: a global section restricting to `0` on
+  `D(r)` is killed by a power of `r`.
+* `AlgebraicGeometry.Scheme.Modules.exists_pow_smul_eq_res_of_top_of_isQuasicoherent` and
+  `AlgebraicGeometry.Scheme.Modules.exists_pow_smul_res_eq_zero_of_isQuasicoherent`: the same two
+  statements for any quasi-coherent module sheaf on `Spec R`.
+* `AlgebraicGeometry.Scheme.Modules.exists_pow_smul_eq_of_res_eq_of_isQuasicoherent`: two sections
+  agreeing on `D(r)` agree after clearing a power of `r`.
+
+## Implementation notes
+
+### Why it is short
 
 Not by an argument but by an instance. Mathlib carries
 
@@ -23,15 +43,13 @@ so `Γ(D(r), M~)` **is** the localization `M_r`, and clearing the denominator is
 by a theorem about it. The passage from "comes from `M`" to "restricts from a *global* section" is
 then `tilde.toOpen_res`, which is `rfl`.
 
-Worth recording against the plan `#585` was written to.
-`Submodule.exists_pow_smul_mem_of_isLocalized_radical` — extracted into
-`Algebra/Module/LocalizedRadical.lean` for this very issue — is **not** needed here, and in the end
-`#585` did not reach for it anywhere. The plan expected it to reconcile two charts on their overlap;
-what closed that step instead was separatedness on the overlap, which is the chart of `gᵢ gⱼ` and so
-of degree two (`Proj/Modules/AwayChart.lean`). The lemma's live consumer is the Čech
-affine-vanishing argument it was extracted from.
+`Submodule.exists_pow_smul_mem_of_isLocalized_radical` (`Algebra/Module/LocalizedRadical.lean`)
+is **not** needed here, nor in the gluing on `Proj`: two charts are reconciled on their overlap by
+separatedness, the overlap being the chart of `gᵢ gⱼ` and so of degree two
+(`ProjectiveSpectrum/Modules/AwayChart.lean`). That lemma is consumed by the Čech
+affine-vanishing argument.
 
-## Both halves, and dropping the tilde hypothesis
+### Both halves, and dropping the tilde hypothesis
 
 Extension makes a local section global; `exists_pow_smul_res_eq_zero` is its injectivity
 companion — a global section restricting to `0` on `D(r)` is killed by a power of `r` — and the two
@@ -39,12 +57,12 @@ together are what a gluing argument over a cover needs. The second rests on Math
 `isIso_toOpen_top`, so every section over `⊤` is `toOpen M ⊤ m` and the elementwise statement
 applies directly.
 
-Both are stated for a tilde, and `#585` needs them for an arbitrary quasi-coherent sheaf. The
-transport is the same both times, so it is done **once**, as a linear equivalence on sections
-(`tildeΓSectionEquiv`) with its two restriction laws, rather than twice by hand.
+Both are stated for a tilde, and the gluing on `Proj` needs them for an arbitrary quasi-coherent
+sheaf. The transport is the same both times, so it is done **once**, as a linear equivalence on
+sections (`tildeΓSectionEquiv`) with its two restriction laws, rather than twice by hand.
 
-That is not a stylistic preference; the by-hand version does not scale, and the second attempt at
-it did not go through at all. Two hazards, both worth knowing before writing in this file:
+That is not a stylistic preference; the by-hand version does not scale. Hazards worth knowing
+before writing in this file:
 
 * **`rw` does not find `map_sub` through `ConcreteCategory.hom`.**
   `rw [LinearMap.map_sub]` on a goal of the form
@@ -62,16 +80,24 @@ it did not go through at all. Two hazards, both worth knowing before writing in 
   confines this to one place.
 * **`_root_` shadowing.** Inside `AlgebraicGeometry.tilde` and `AlgebraicGeometry.Scheme.Modules`,
   the bare names `map_smul` and `map_zero` resolve to *other* lemmas — about `presheaf.map` and
-  about `tilde.map`. Both must be written `_root_.map_smul` / `_root_.map_zero`. This cost four
-  cycles across the file. Same class of hazard as `references/instance-transparency.md`: a name
-  that silently resolves to the wrong thing.
+  about `tilde.map`. Both must be written `_root_.map_smul` / `_root_.map_zero`: a name that
+  silently resolves to the wrong thing.
 
-## Scope
+### Scope
 
 One affine, one basic open. The `Proj` chart application, the choice of one `n` across a finite
 cover, and the passage from `(f / g)ⁿ ·` to multiplication into the twist `F(n)` are not here; they
-are `Proj/Modules/ChartExtension.lean` and `Proj/Modules/Glue.lean`, where `#585` is closed by
-`exists_globalSection_twistBy`.
+are `ProjectiveSpectrum/Modules/ChartExtension.lean` and `ProjectiveSpectrum/Modules/Glue.lean`,
+which conclude with `exists_globalSection_twistBy`.
+
+## References
+
+The file cites no literature. It builds on Mathlib's `IsLocalizedModule.surj` and on Mathlib's
+`tilde` API, in particular `tilde.toOpen_res` and `isIso_toOpen_top`.
+
+## Tags
+
+quasi-coherent sheaf, affine scheme, basic open, localization, extension of sections
 -/
 
 universe u
@@ -136,9 +162,9 @@ variable {R : CommRingCat.{u}}
 
 /-! ### Transporting across quasi-coherence
 
-Both statements above are about a tilde, and `#585` needs them for an arbitrary quasi-coherent
-sheaf. The transport is the same both times, so it is done once here as a **linear equivalence on
-sections** rather than twice by hand as natural-transformation rewriting.
+Both statements above are about a tilde, and the gluing on `Proj` needs them for an arbitrary
+quasi-coherent sheaf. The transport is the same both times, so it is done once here as a
+**linear equivalence on sections** rather than twice by hand as natural-transformation rewriting.
 
 That is not a stylistic preference. Written inline, the transport is three `rw`s against a natural
 transformation, and they refuse to fire on patterns that *print identically* to the goal — the

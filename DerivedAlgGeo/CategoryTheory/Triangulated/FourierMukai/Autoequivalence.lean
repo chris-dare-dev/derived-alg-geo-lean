@@ -14,7 +14,36 @@ autoequivalence. It contains the presentation by a correspondence and kernel,
 dual and unit kernels, convolution of kernel autoequivalences, and the induced
 automorphism of `K₀`.
 
-## Direction of dependence
+## Main definitions
+
+* `CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence` — an
+  autoequivalence presented as a Fourier--Mukai transform, all data supplied.
+* `KernelAutoequivalence.DualKernel` — a kernel presenting the quasi-inverse as
+  a transform of the same correspondence; `DualKernel.ofLeftAdjointKernel` and
+  `DualKernel.ofRightAdjointKernel` build one from an adjoint kernel.
+* `KernelAutoequivalence.DualKernel.transformK₀AddEquiv` — the kernel's class
+  map as an automorphism of `K₀ C`, given a dual kernel.
+* `KernelAutoequivalence.trans`, `FourierMukai.UnitKernelData`,
+  `KernelAutoequivalence.id` — composition from supplied convolution data, and
+  the unit from a supplied unit kernel.
+* `KernelAutoequivalence.ofRightAdjointKernel`,
+  `KernelAutoequivalence.ofFullyFaithful` — a kernel autoequivalence from an
+  adjoint kernel whose unit and counit are invertible.
+
+## Main results
+
+* `KernelAutoequivalence.map_eq_transformK₀` — the action on classes is computed
+  by the kernel.
+* `KernelAutoequivalence.DualKernel.transformK₀_dual_comp` and
+  `KernelAutoequivalence.DualKernel.transformK₀_comp_dual` — the two kernels'
+  class maps are mutually inverse.
+* `KernelAutoequivalence.isIso_unit`, `KernelAutoequivalence.isIso_counit` —
+  given the equivalence, any right adjoint kernel has invertible unit and
+  counit, so `ofRightAdjointKernel` does not weaken the hypothesis.
+
+## Implementation notes
+
+### Direction of dependence
 
 The Bridgeland action is deliberately absent. It is a consumer in
 `WeakStabilityCondition/StabilityCondition/Symmetry/Autoequivalence/`
@@ -22,7 +51,7 @@ which imports this module. Algebraic-geometric constructions of these generic
 objects, and the action of geometric kernels on stability conditions, live
 with the geometric objects under `AlgebraicGeometry/DerivedCategory/`.
 
-## What this file does not assert
+### What this file does not assert
 
 * **Nothing constructs a `KernelAutoequivalence`.** The equivalence and the
   isomorphism to a transform are both supplied. That a Fourier--Mukai transform
@@ -35,7 +64,7 @@ with the geometric objects under `AlgebraicGeometry/DerivedCategory/`.
   that the two kernels' class maps are mutually inverse
   (`transformK₀_dual_comp`).
 
-  Since #559's adjunction stage there is one *abstract* constructor:
+  There is one *abstract* constructor:
   `DualKernel.ofLeftAdjointKernel` builds a dual kernel from a
   `LeftAdjointKernelData`, by uniqueness of adjoints, and
   `ofRightAdjointKernel` does the same on the other side. That moves the
@@ -57,6 +86,18 @@ with the geometric objects under `AlgebraicGeometry/DerivedCategory/`.
   general `Φ_P` has kernel-presented adjoints is Grothendieck duality.
 * Nothing about stability conditions, Bridgeland's `Stab(X)` as a manifold,
   or continuity of an induced action.
+
+## References
+
+The file builds on `FourierMukai.Correspondence.transform`,
+`FourierMukai.Correspondence.transformK₀` and
+`FourierMukai.Correspondence.K₀_map_eq_transformK₀`, and on Mathlib's
+`CategoryTheory.Adjunction.toEquivalence`.
+
+## Tags
+
+Fourier--Mukai transform, kernel, autoequivalence, dual kernel, Grothendieck group,
+adjunction
 -/
 
 universe w u x t x₁ x₂ x₃ t₁ t₂ t₃
@@ -121,12 +162,7 @@ omit [IsTriangulated C] in
 
 Exactly `Correspondence.K₀_map_eq_transformK₀` at the supplied isomorphism. It
 is what makes the kernel, rather than the functor's construction, the thing
-that determines the transported charge.
-
-Until #487 this proof had a step in it: the stability track carried its own
-endofunctor-only `K₀.mapF`, definitionally equal to `K₀.map` but a different
-constant, and the theorem had to cross that identification. `mapF` is retired
-and the crossing is gone. -/
+that determines the transported charge. -/
 theorem map_eq_transformK₀ :
     K₀.map A.equiv.functor = A.corr.transformK₀ A.kernel :=
   A.corr.K₀_map_eq_transformK₀ A.kernel A.equiv.functor A.iso
@@ -556,8 +592,8 @@ full faithfulness and essential surjectivity — which is the form the
 Bondal--Orlov criterion actually takes. `ofFullyFaithful` below is that split,
 using Mathlib's `unit_isIso_of_L_fully_faithful`.
 
-Nothing here supplies the invertibility. That is the second half of the layer-3
-work and it needs geometry this repository does not have. -/
+Nothing here supplies the invertibility. That needs geometry this repository
+does not have. -/
 
 variable (corr : Correspondence C C 𝒲) (K : 𝒲)
 

@@ -8,11 +8,40 @@ import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.TwistBridge
 /-!
 # The two charts' multiplications differ by a morphism, not a scalar
 
-`#585`'s glue has to compare `fⁿ` and `gⁿ` as multiplications into `O(n)`. They differ by the
-function `fⁿ/gⁿ`, which exists only on `D₊(g)`, so the comparison is a statement about the
-restriction of `unitToTwist` to that open — and this file proves it.
+Gluing chart sections into a twist compares `fⁿ` and `gⁿ` as multiplications into `O(n)`. They
+differ by the function `fⁿ/gⁿ`, which exists only on `D₊(g)`, so the comparison is a statement
+about the restriction of `unitToTwist` to that open — and this file proves it.
 
-## Why the scalar form is unreachable, and this one is not
+## Main definitions
+
+* `AlgebraicGeometry.Proj.fracPowSection`: the function `fⁿ / gⁿ` as a section of the structure
+  sheaf over an open inside `D₊(g)`.
+* `AlgebraicGeometry.Proj.chartOpen`, `AlgebraicGeometry.Proj.chartRestrictFunctor`: the basic open
+  `D₊(g)` as an open subscheme, and restriction of module sheaves to it.
+* `AlgebraicGeometry.Proj.chartUnitToTwist`: `unitToTwist` restricted to `D₊(g)`.
+* `AlgebraicGeometry.Proj.chartFracPowAt`, `AlgebraicGeometry.Proj.chartFracPowSections`:
+  `fⁿ / gⁿ` over one open of `D₊(g)`, and as a global section of the unit there.
+* `AlgebraicGeometry.Proj.chartFracPowMul`: multiplication by `fⁿ / gⁿ` as an endomorphism of the
+  unit on `D₊(g)`.
+* `AlgebraicGeometry.Proj.chartTwistBy`: `twistBy` for a module sheaf on `D₊(g)`.
+* `AlgebraicGeometry.Proj.chartFracPowOn`: multiplication by `fⁿ / gⁿ`, carried onto `F`.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.chartUnitToTwist_app_one`: the restricted map still sends `1` to
+  `aᵐ / 1`.
+* `AlgebraicGeometry.Proj.chartUnitToTwist_eq`: over `D₊(g)`, multiplying by `fⁿ` is multiplying by
+  `fⁿ / gⁿ` and then by `gⁿ`.
+* `AlgebraicGeometry.Proj.chartTwistBy_eq`: the same factorisation on an arbitrary `F` over the
+  chart.
+
+## Notation
+
+`X` is local notation for the underlying space `ProjectiveSpectrum.top 𝒜`.
+
+## Implementation notes
+
+### Why the scalar form is unreachable, and this one is not
 
 The statement one first writes is `c • unitToTwist gⁿ = unitToTwist fⁿ`. That needs the scalar to
 cross `tensorHom` at the next step, and it cannot: `Linear Γ(X, ⊤) X.PresheafOfModules` does not
@@ -24,17 +53,16 @@ as an endomorphism of the unit on `D₊(g)`, and `chartUnitToTwist_eq` is a fact
 `tensorHom (𝟙 F) −` then only has to be *functorial* (`Scheme.Modules.tensorHom_id_comp`), which it
 is, rather than linear, which it is not.
 
-## The open subscheme, not the affine chart
+### The open subscheme, not the affine chart
 
 `D₊(g)` is used here as an open subscheme of `Proj 𝒜`, not through `awayι`. The reason is
 `Scheme.Opens.ι_image_top`: sections of the subscheme over `⊤` are *definitionally* sections of
 `𝒪_Proj` over `D₊(g)`, so `fracPowSection` is already a global function there and no `ΓSpecIso` and
 no degree-zero away ring appear anywhere in this file.
 
-## Two separate reasons things are spelled out here
+### Two separate reasons things are spelled out here
 
-`chartFracPowAt` is named at an explicit result type, per
-`references/instance-transparency.md` technique 5: written inline the value elaborates at the
+`chartFracPowAt` is named at an explicit result type: written inline the value elaborates at the
 `⋙ forget Ab` type of the unit's sections, where the scalar action does not synthesize at all.
 
 `chartUnitToTwist_app_one` is not that technique. It is the analogue of `unitToTwist_app_one` one
@@ -47,7 +75,7 @@ function down from `⊤`. Restricting downward puts its values at points of the 
 then do not compare with `fracPow` at points of `Proj`; built openwise the compatibility is `rfl`
 and the comparison is `fracPow_smul_sectionOfMem` unchanged.
 
-## Carrying it up to `F`
+### Carrying it up to `F`
 
 `chartTwistBy` is `twistBy` for a module sheaf on `D₊(g)`, and `chartTwistBy_eq` is the same
 factorisation there, with the correction now an endomorphism of `F` itself (`chartFracPowOn`).
@@ -57,13 +85,23 @@ lands in `F ⊗ 𝟙`, so `ρ.inv ≫ tensorHom (𝟙 F) −` cannot simply be p
 `chartFracPowOn` is `ρ.inv ≫ tensorHom (𝟙 F) − ≫ ρ.hom`, and the two unitors cancel against each
 other in the middle of the proof. Nothing else is needed beyond `tensorHom_id_comp`.
 
-## Scope
+### Scope
 
 The factorisation, on the unit and on an arbitrary `F` over the chart. Two things are **not** here:
 identifying `chartFracPowOn` with multiplication by the section `fⁿ/gⁿ` on `F` (which needs the
 right unitor's action on sections), and comparing `chartTwistBy (F.restrict ι)` with the
 restriction of `twistBy F` (which needs restriction to commute with the tensor product). Gluing
 the charts is not here either.
+
+## References
+
+`AlgebraicGeometry.Scheme.Modules.tensorHom_id_comp`,
+`AlgebraicGeometry.Scheme.Modules.restrict_smul_eq` and Mathlib's
+`SheafOfModules.unitHomEquiv`.
+
+## Tags
+
+projective spectrum, twisting sheaf, open subscheme, tensor product
 -/
 
 noncomputable section
@@ -81,8 +119,8 @@ local notation3 "X" => ProjectiveSpectrum.top 𝒜
 
 /-- **The function `fⁿ / gⁿ`, as a section of the structure sheaf over an open inside `D₊(g)`.**
 
-`fracSection` at `a = fⁿ`, `b = gⁿ`. `#825` made this a definition rather than a second copy of the
-same construction with a `rfl` lemma bridging the two. -/
+`fracSection` at `a = fⁿ`, `b = gⁿ`, defined from it rather than as a second copy of the same
+construction. -/
 def fracPowSection {f g : A} (hf : f ∈ 𝒜 1) (hg : g ∈ 𝒜 1) (n : ℕ)
     {U : Opens X} (hU : U ≤ ProjectiveSpectrum.basicOpen 𝒜 g) :
     (ProjectiveSpectrum.Proj.structureSheaf 𝒜).1.obj (op U) :=
@@ -163,14 +201,14 @@ set_option backward.isDefEq.respectTransparency false in
 set_option backward.defeqAttrib.useBackward true in
 /-- **Over `D₊(g)`, multiplying by `fⁿ` is multiplying by `fⁿ/gⁿ` and then by `gⁿ`.**
 
-The comparison `#585` needs between two charts, with the correction carried as a morphism out of
-the unit rather than as a scalar. Applying `tensorHom (𝟙 F) −` to it — which preserves composition
-by `Scheme.Modules.tensorHom_id_comp` — is what carries it to `F(n)`.
+The comparison the gluing needs between two charts, with the correction carried as a morphism out
+of the unit rather than as a scalar. Applying `tensorHom (𝟙 F) −` to it — which preserves
+composition by `Scheme.Modules.tensorHom_id_comp` — is what carries it to `F(n)`.
 
-The proof is step A (`fracPow_smul_sectionOfMem`) read through `unitHomEquiv`, plus one change of
-shape: `Scheme.Modules.restrict_smul_eq` moves the equation from the restricted scalar action to
-the `Proj` one, which is where the pointwise lemma of step A lives. That lemma is `rfl` — the two
-actions *are* definitionally equal — so this is bookkeeping, not a defeq barrier. It is
+The proof is the pointwise identity `fracPow_smul_sectionOfMem` read through `unitHomEquiv`, plus
+one change of shape: `Scheme.Modules.restrict_smul_eq` moves the equation from the restricted
+scalar action to the `Proj` one, which is where that pointwise lemma lives. That lemma is `rfl` —
+the two actions *are* definitionally equal — so this is bookkeeping, not a defeq barrier. It is
 instantiated as a `have` rather than rewritten with, because the goal at that point carries
 `show`-ascription residue that `rw` will not match against. -/
 theorem chartUnitToTwist_eq :

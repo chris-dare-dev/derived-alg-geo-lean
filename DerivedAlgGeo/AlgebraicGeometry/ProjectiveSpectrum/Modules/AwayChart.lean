@@ -8,21 +8,44 @@ import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.ChartExtension
 # Agreement on the chart of a homogeneous element of any positive degree
 
 `ChartExtension.lean` supplies the chart, its restriction `awayRestrict`, and the *extension* half
-of `Modules/Affine/Extension.lean` read on it. This file supplies the *separatedness* half.
+of `Modules/Affine/Extension.lean` read on it. This file supplies the *separatedness* half: two
+sections of the chart that agree on a basic open of it agree after multiplying by a power of the
+chart's distinguished element.
 
-## Why it is a separate file rather than a separate degree
+## Main definitions
 
-It used to be both. `ChartExtension.lean` was degree-one only and this file repeated the same three
-statements one degree up, because `#585`'s cover is made of degree-one charts while its pairwise
-overlaps are not: `D₊(gᵢ) ⊓ D₊(gⱼ) = D₊(gᵢ gⱼ)` has degree two. The stated reason for the split --
-"`#585` extends only across degree-one charts" -- was true of `#585` and false as a design
-principle, and the two trios were the same theorem with one lemma swapped. `#822` collapsed that:
-`ChartExtension.lean` is now general in the degree, and what remains here is only the half it does
-not state.
+This file introduces no new definitions.
 
-## Scope
+## Main results
+
+* `AlgebraicGeometry.Proj.exists_pow_smul_eq_of_res_eq_away`: two sections of the chart of `g`
+  that agree on the basic open of `f / g` agree after multiplying by a power of `f / g`.
+* `AlgebraicGeometry.Proj.exists_pow_smul_eq_of_res_eq_away_of_le`: that exponent can be raised.
+* `AlgebraicGeometry.Proj.exists_pow_smul_eq_of_res_eq_away_uniform`: one exponent for a finite
+  family of agreements.
+
+## Implementation notes
+
+### A separate file per half, not per degree
+
+Both halves are general in the degree of the chart, and both degrees are needed: the cover used by
+the section-extension lemma `exists_globalSection_twistBy` is made of degree-one charts, while its
+pairwise overlaps are not, since `D₊(gᵢ) ⊓ D₊(gⱼ) = D₊(gᵢ gⱼ)` has degree two. Extension and
+agreement are the same theorem with one lemma swapped, so what is here is only the half
+`ChartExtension.lean` does not state.
+
+### Scope
 
 One chart, one basic open of it. No cover, no gluing.
+
+## References
+
+`AlgebraicGeometry.Scheme.Modules.exists_pow_smul_eq_of_res_eq_of_isQuasicoherent`, the affine
+separatedness lemma this file reads on the chart.
+
+## Tags
+
+projective spectrum, affine chart, quasi-coherent sheaf, separatedness
 -/
 universe u
 
@@ -35,8 +58,9 @@ variable (𝒜 : ℕ → σA) [GradedRing 𝒜]
 
 /-- **Two sections of a chart agreeing on a basic open agree after clearing a power.**
 
-`exists_pow_smul_eq_of_res_eq_chart` one degree up, and the reason it is needed: `#585`'s pairwise
-overlap `D₊(gᵢ) ⊓ D₊(gⱼ)` is the chart of `gᵢ gⱼ`, which has degree two. -/
+`Scheme.Modules.exists_pow_smul_eq_of_res_eq_of_isQuasicoherent` read on the chart of `g`. It is
+needed beyond degree one because the pairwise overlap `D₊(gᵢ) ⊓ D₊(gⱼ)` of a degree-one cover is
+the chart of `gᵢ gⱼ`, which has degree two. -/
 theorem exists_pow_smul_eq_of_res_eq_away (F : (Proj 𝒜).Modules)
     [SheafOfModules.IsQuasicoherent.{u, u, u}
       (show SheafOfModules (Proj 𝒜).ringCatSheaf from F)]
@@ -65,8 +89,9 @@ theorem exists_pow_smul_eq_of_res_eq_away_of_le (F : (Proj 𝒜).Modules)
   have hm : m = (m - n) + n := by omega
   rw [hm, pow_add, mul_smul, mul_smul, h]
 
-/-- **One exponent for a finite family of agreements**, the shape `#585`'s glue calls: agreement
-has to be forced on every pairwise overlap at once, so the family is indexed by pairs. -/
+/-- **One exponent for a finite family of agreements**, the shape the gluing in
+`exists_globalSection_twistBy` needs: agreement has to be forced on every pairwise overlap at once,
+so the family is indexed by pairs. -/
 theorem exists_pow_smul_eq_of_res_eq_away_uniform (F : (Proj 𝒜).Modules)
     [SheafOfModules.IsQuasicoherent.{u, u, u}
       (show SheafOfModules (Proj 𝒜).ringCatSheaf from F)]

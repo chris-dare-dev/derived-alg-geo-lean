@@ -13,36 +13,55 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.ExactFunctorFamily
 construction**: this file inhabits nothing, and no scheme in this repository is shown
 to admit one.
 
-## What this file does not assert
+## Main definitions
+
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedTensor` — a derived tensor
+  bifunctor on `Dᵇ(Coh Z)` with an `ExactBifunctor` witness.
+* `HasDerivedTensor.exactBifunctor`, `firstFamily`, `secondFamily`, `commShift` and
+  `flipCommShift` — the exactness data of the two partial tensor functors.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.derivedTensor` and
+  `derivedTensorExactBifunctor` — the bifunctor, named, with its exactness exposed.
+
+## Main results
+
+* `HasDerivedTensor.isTriangulated`, `additive`, `flipIsTriangulated` and
+  `flipAdditive` — each partial tensor functor is triangulated and additive.
+* The instances `derivedTensor_additive`, `derivedTensor_isTriangulated` and
+  `derivedTensorFlip_isTriangulated` expose this on `derivedTensor`.
+
+## Implementation notes
+
+### What this file does not assert
 
 `Dᵇ(Coh Z)` is **not** automatically closed under arbitrary derived tensor.  On a
 singular scheme the derived tensor of two bounded coherent complexes need not be
 bounded, and nothing here asserts otherwise.  A caller instantiating `HasDerivedTensor`
-is asserting exactly that closure in whatever generality it supplies the class;
-relocating the class to this owner established it nowhere.
+is asserting exactly that closure in whatever generality it supplies the class.
 
 Neither is this class obtained by restricting the unbounded K-flat tensor product of
 `Tensor/Unbounded.lean`.  That restriction is a missing theorem, not a definition.
 
-No monoidal structure is asked for: not associativity, not symmetry, not a unit.  A
+No monoidal structure is required: not associativity, not symmetry, not a unit.  A
 consumer that rebrackets or unitalizes derived tensor products wants
 `Tensor/Coherent.lean` instead, whose `HasCoherentDerivedTensor` packages the coherence
 as one `MonoidalCategory` and maps into this class one way only.
 
-## Placement
+### Placement and namespace
 
-MO1.10 (#1321) extracted this capability from
-`DerivedCategory/FourierMukai/KernelCorrespondence.lean`.  Fourier--Mukai is a
-*consumer*: a transform needs a tensor, but a tensor is not about transforms, and a
-caller wanting a general derived tensor should not have to import kernels, convolution
-or correspondences to get one.  Per the cutover ledger's standing decision that paths
-move and namespaces do not, the declarations keep the
-`AlgebraicGeometry.DerivedCategory.FourierMukai` namespace they were introduced with;
-the path, not the namespace, records what they are about.
+Fourier--Mukai is a *consumer*: a transform needs a tensor, but a tensor is not about
+transforms, and a caller wanting a general derived tensor should not have to import
+kernels, convolution or correspondences to get one.  The declarations are in the
+`AlgebraicGeometry.DerivedCategory.FourierMukai` namespace; the path, not the
+namespace, records what they are about.
 
 ## References
 
-* `docs/architecture/cutover-ledger.md`, row 10.
+Mathlib's `Functor.CommShift` and `Functor.IsTriangulated`, and the repository's
+`Functor.ExactBifunctor` and `SchemeBoundedCoherentDerivedCategory`.
+
+## Tags
+
+derived tensor product, bounded derived category, coherent sheaves, exact bifunctor
 -/
 
 universe u
@@ -75,7 +94,7 @@ transform consumes exactness in the second tensor variable, whereas varying the 
 and taking its cone consumes exactness in the first.  Independent one-slot witnesses
 would not supply the required global naturality.
 
-No monoidal structure is asked for: not associativity, not symmetry, not a unit.
+No monoidal structure is required: not associativity, not symmetry, not a unit.
 `Correspondence` uses none of them, and `FourierMukai/Basic.lean`'s own docstring is
 explicit that it assumes none.
 

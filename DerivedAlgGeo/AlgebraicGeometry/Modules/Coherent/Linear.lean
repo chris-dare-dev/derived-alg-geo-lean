@@ -15,13 +15,33 @@ ring map `k → Γ(X, O_X)` supplied by the structure morphism makes every
 `Hom`-group a `k`-module, compatibly with composition — that is, it makes
 `X.Modules` a `k`-linear category, and `Coh X` with it.
 
-Every ingredient was already here. `Cohomology.globalSectionSmul`,
-`globalSectionAction`, `baseFieldToGlobalSections`, `varietyScalarAction` and
-`varietyScalarAction_naturality` were built to give coherent cohomology its
-`k`-structure; this file observes that the same action makes the *category*
-linear, which is a strictly stronger statement and one nothing had recorded.
+## Main definitions
 
-## Why this is worth its own file
+* `AlgebraicGeometry.Scheme.homModuleGlobal` and
+  `AlgebraicGeometry.Scheme.modulesLinearGlobal` — module sheaves on any scheme form a
+  `Γ(X, ⊤)`-linear category.
+* `AlgebraicGeometry.Variety.homModule` and `AlgebraicGeometry.Variety.modulesLinear` —
+  `X.Modules` is `k`-linear.
+* `AlgebraicGeometry.Variety.cohLinear` — `Coh X` is `k`-linear, inherited as a full
+  subcategory.
+* `AlgebraicGeometry.Variety.derivedLinear` — `Dᵇ(Coh X)` is `k`-linear, so `Hom(E, F⟦i⟧)` is a
+  `k`-vector space.
+
+## Main results
+
+* `AlgebraicGeometry.Variety.smul_eq_action_comp` — the scalar action unfolds to precomposition
+  with multiplication by the corresponding global function, which is the only
+  fact a caller needs in order to compute with it.
+
+## Implementation notes
+
+Every ingredient is upstream. `Cohomology.globalSectionSmul`,
+`globalSectionAction`, `baseFieldToGlobalSections`, `varietyScalarAction` and
+`varietyScalarAction_naturality` give coherent cohomology its
+`k`-structure; this file observes that the same action makes the *category*
+linear, which is a strictly stronger statement.
+
+### Why this is worth its own file
 
 Because of what it unlocks rather than what it says. Mathlib's
 `DerivedCategory.Linear` gives `Linear R (DerivedCategory C)` from
@@ -30,32 +50,30 @@ Because of what it unlocks rather than what it says. Mathlib's
 instance below is the whole distance between "`Hom` in `Dᵇ(Coh X)` is an abelian
 group" and "`Hom` in `Dᵇ(Coh X)` is a `k`-vector space".
 
-That was the one obstruction to *stating* what a spherical object is:
-`Hom(E, E⟦i⟧) ≅ k` is not expressible against an `AddCommGrp`, and
-`Numerical/GrothendieckGroup/MukaiVector.lean`'s docstring names exactly this
-gap when it says sphericity of an object needs an `Ext` that layer does not
-have.
+That is what it takes to *state* what a spherical object is:
+`Hom(E, E⟦i⟧) ≅ k` is not expressible against an `AddCommGrp`.
 
-## What this does not give
+### What this does not give
 
 Finite-dimensionality. `Linear k` says the `Hom`-groups are `k`-modules, not
 that they are finite-dimensional, and nothing here bounds them.
-`FiniteDimensionalCohomology` remains supplied data, and the projective case is
-issue #332. A `Hom`-group being a `k`-vector space of unknown dimension is
-exactly enough to *state* sphericity and not enough to prove anything about it.
+`FiniteDimensionalCohomology` is separate data; for a projective variety it is
+constructed from a presentation by
+`ProjectivePresentation.finiteDimensionalCohomology`. A `Hom`-group being a
+`k`-vector space of unknown dimension is exactly enough to *state* sphericity
+and not enough to prove anything about it.
 
 Nor does it give a trace, a Serre functor, or any duality. Those need the
 finiteness this file does not supply.
 
-## Main results
+## References
 
-* `Variety.modulesLinear` — `X.Modules` is `k`-linear.
-* `Variety.cohLinear` — `Coh X` is `k`-linear, inherited as a full subcategory.
-* `Variety.smul_eq_action_comp` — the scalar action unfolds to precomposition
-  with multiplication by the corresponding global function, which is the only
-  fact a caller needs in order to compute with it.
-* `Variety.derivedLinear` — `Dᵇ(Coh X)` is `k`-linear, so `Hom(E, F⟦i⟧)` is a
-  `k`-vector space.
+The file cites no literature. It builds on Mathlib's `DerivedCategory.Linear` and
+`Linear.fullSubcategory`, and on `AlgebraicGeometry.Cohomology.varietyScalarAction`.
+
+## Tags
+
+linear category, module sheaf, coherent sheaf, variety, derived category
 -/
 
 universe u
@@ -204,14 +222,14 @@ noncomputable instance cohLinear : Linear k (Coh Y) :=
 /-! ### Propagation to the derived category
 
 Mathlib's `DerivedCategory.instLinear` fires on its own, and the `inferInstance`
-below is the whole of it. That was not always true: `Coh.abelian` used to obtain
-its `toPreadditive` from the full subcategory's `Abelian` instance rather than
-from `Coh.preadditive`, and search could not cross the gap, so this term had to
-supply `cohLinear` by hand. Issue #662 closed that by pinning the field in
-`CoherentSheaf/Abelian/Basic.lean`; see the docstring there for why the two are
-not interchangeable and what keeps them pinned. -/
+below is the whole of it. This relies on `Coh.abelian` taking its `toPreadditive`
+from `Coh.preadditive` rather than from the full subcategory's `Abelian` instance:
+otherwise search cannot cross the gap, and this term would have to supply
+`cohLinear` by hand. The field is pinned in `Modules/Coherent/Abelian/Basic.lean`;
+see the docstring there for why the two are not interchangeable and what keeps
+them pinned. -/
 
-/-- Regression test for #662, in the shape that found it: search must reach
+/-- Regression test for the `Preadditive` diamond on `Coh X`: search must reach
 `cohLinear` from a `Preadditive` argument that arrived via `Abelian`. -/
 noncomputable example :
     @Linear k _ (Coh Y) _ (Coh.abelian Y).toPreadditive :=

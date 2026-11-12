@@ -11,40 +11,27 @@ import Mathlib.Algebra.Homology.DerivedCategory.Linear
 import Mathlib.CategoryTheory.Triangulated.Subcategory
 
 /-!
-# A concrete `HomFiniteBounded` category (#543)
+# A concrete `HomFiniteBounded` category
 
-`EulerForm.lean` introduced `HomFiniteBounded` as supplied data and its own
-docstring recorded that no concrete `k`-linear pretriangulated category
-existed in this repository for it to be proved about. This file removes that
-caveat: the **bounded homotopy category** `Kᵇ(C)` of any Hom-finite `k`-linear
-additive category `C` satisfies it, and `Kᵇ(FGModuleCat k)` — bounded
-complexes of finite-dimensional vector spaces up to homotopy — is the named
-concrete witness.
+`HomFiniteBounded` (`EulerForm.lean`) is supplied data. This file gives it
+concrete models: the **bounded homotopy category** `Kᵇ(C)` of any Hom-finite
+`k`-linear additive category `C` satisfies it, and `Kᵇ(FGModuleCat k)` —
+bounded complexes of finite-dimensional vector spaces up to homotopy — is the
+named concrete witness. A full subcategory of the derived category
+`DerivedCategory (FGModuleCat k)` is a second witness.
 
-## Why the homotopy category and not the derived category
+## Main definitions
 
-For `Dᵇ` the finiteness of Hom-spaces is a theorem *about the localization*.
-For `Kᵇ` every statement is elementary: a chain map out of a complex supported
-in a finite window is determined by finitely many components, each in a
-Hom-finite Hom-space, and homotopy classes are a quotient of that. So `Kᵇ` is
-where the witness is built, and it stands on its own as an honest `k`-linear
-pretriangulated category.
+* `CategoryTheory.Triangulated.HomFiniteWitness.homRestrict` — restriction of a
+  chain map to its components in a finite window, as a linear map.
+* `CategoryTheory.Triangulated.boundedQh` — the functor
+  `Kᵇ(FGModuleCat k) ⥤ D(FGModuleCat k)`.
+* `CategoryTheory.Triangulated.boundedLift` — the same functor, corestricted to
+  its essential image.
 
-The route to `Dᵇ` does **not** need the semisimplicity argument
-(`Dᵇ(k‑vect) ≃ ℤ`-graded vector spaces) that an earlier reading of #543 took to
-be the only option. Over a field every bounded complex is K-projective, and
-`CochainComplex.IsKProjective.Qh_map_bijective` then says Hom in `Dᵇ` *is* Hom
-in `Kᵇ`. The `Derived` section below carries that out: `boundedQh` is fully
-faithful, its essential image is a triangulated subcategory of
-`D(FGModuleCat k)` and so `k`-linear pretriangulated, and
-`HomFiniteBounded.of_essSurj` moves the `Kᵇ` instance across.
+## Main results
 
-So `HomFiniteBounded` now has a model on a genuine derived category, and no
-equivalence `Dᵇ(k-vect) ≃ ℤ`-graded vector spaces is constructed anywhere.
-
-## What this file proves and what it does not
-
-* `CochainComplex.module_finite_hom`: a chain-map space out of a strictly
+* `HomFiniteWitness.module_finite_hom`: a chain-map space out of a strictly
   bounded complex is a finite `k`-module when `C` is Hom-finite. No bound on
   the target is needed.
 * `subsingleton_hom_of_le_lt_ge` / `..of_ge_lt_le`: chain maps between
@@ -61,13 +48,50 @@ equivalence `Dᵇ(k-vect) ≃ ℤ`-graded vector spaces is constructed anywhere.
   the bound.
 * `homFiniteBounded_boundedDerived`: `HomFiniteBounded k` on the essential
   image of `boundedQh` — a full subcategory of `DerivedCategory (FGModuleCat k)`,
-  `k`-linear pretriangulated. This is the honest `Dᵇ` witness #543 asked for.
-* **Not** proved: that this essential image is all of the bounded derived
-  category — it is defined as an image, and no t-structure characterisation of
-  it is given. Nor any comparison of `chiHom` with an Euler characteristic of
-  homology, nor `IsRiemannRoch` for anything.
-  The obligation #513 named is discharged in the satisfiability sense only:
-  the class has a genuine model, so the Euler-form chain is not vacuous.
+  `k`-linear pretriangulated. This is the `Dᵇ` witness.
+
+## Implementation notes
+
+### Why the homotopy category and not the derived category
+
+For `Dᵇ` the finiteness of Hom-spaces is a theorem *about the localization*.
+For `Kᵇ` every statement is elementary: a chain map out of a complex supported
+in a finite window is determined by finitely many components, each in a
+Hom-finite Hom-space, and homotopy classes are a quotient of that. So `Kᵇ` is
+where the witness is built, and it stands on its own as an honest `k`-linear
+pretriangulated category.
+
+The route to `Dᵇ` does **not** need the semisimplicity argument
+(`Dᵇ(k‑vect) ≃ ℤ`-graded vector spaces). Over a field every bounded complex is
+K-projective, and `CochainComplex.IsKProjective.Qh_map_bijective` then says Hom
+in `Dᵇ` *is* Hom in `Kᵇ`. The `Derived` section below carries that out:
+`boundedQh` is fully faithful, its essential image is a triangulated
+subcategory of `D(FGModuleCat k)` and so `k`-linear pretriangulated, and
+`HomFiniteBounded.of_essSurj` moves the `Kᵇ` instance across.
+
+So `HomFiniteBounded` has a model on a genuine derived category, and no
+equivalence `Dᵇ(k-vect) ≃ ℤ`-graded vector spaces is constructed anywhere.
+
+### What this file does not prove
+
+That this essential image is all of the bounded derived category — it is
+defined as an image, and no t-structure characterisation of it is given. Nor
+any comparison of `chiHom` with an Euler characteristic of homology, nor
+`IsRiemannRoch` for anything. The models discharge `HomFiniteBounded` in the
+satisfiability sense only: the class has a genuine model, so the Euler-form
+chain is not vacuous.
+
+## References
+
+The file builds on Mathlib's `CochainComplex.isKProjective_of_projective`,
+`CochainComplex.IsKProjective.Qh_map_bijective` and
+`Functor.projective_of_map_projective`, and on
+`CategoryTheory.Triangulated.HomFiniteBounded.of_essSurj`.
+
+## Tags
+
+Hom-finite, bounded homotopy category, derived category, K-projective,
+finite-dimensional vector space, Euler form
 -/
 
 universe w v u
@@ -206,7 +230,7 @@ instance fgModuleCat_hom_finite (V W : FGModuleCat k) : Module.Finite k (V ⟶ W
     ((ModuleCat.homLinearEquiv (M := V.obj) (N := W.obj) (S := k)).symm.trans
       (InducedCategory.homLinearEquiv (R := k)).symm)
 
-/-- **The named concrete witness for #543**: bounded complexes of
+/-- **The named concrete witness for `HomFiniteBounded`**: bounded complexes of
 finite-dimensional `k`-vector spaces up to homotopy form a `k`-linear
 pretriangulated category with finite-dimensional Hom-spaces and finite
 Ext-amplitude. The Euler-form chain of `EulerForm.lean` is therefore not
@@ -240,8 +264,8 @@ degreewise projectivity; over a field the second hypothesis is free by
 `FGModuleCat.instProjective`, so only the bound survives.
 
 This is the input to `CochainComplex.IsKProjective.Qh_map_bijective`, which is
-what would carry `instHomFiniteBoundedBounded` across to a derived category.
-That transport is not performed here. -/
+what carries `instHomFiniteBoundedBounded` across to a derived category in the
+`Derived` section below. -/
 theorem isKProjective_of_isStrictlyLE (K : CochainComplex (FGModuleCat.{u} k) ℤ)
     (d : ℤ) [K.IsStrictlyLE d] : K.IsKProjective :=
   CochainComplex.isKProjective_of_projective K d
@@ -306,7 +330,7 @@ noncomputable instance boundedLift_essSurj : (boundedLift k).EssSurj where
     obtain ⟨X, ⟨e⟩⟩ := Y.property
     exact ⟨X, ⟨ObjectProperty.isoMk _ e⟩⟩
 
-/-- **The `Dᵇ` witness for #543.**
+/-- **The `Dᵇ` witness for `HomFiniteBounded`.**
 
 `HomFiniteBounded` holds on a full subcategory of a genuine **derived**
 category, not merely on a homotopy category. The route is the one

@@ -26,20 +26,46 @@ zero-charge object is not excluded from the subobject quantifier. Everything
 here is a variant of a neighbour one level up, which is why it is a child and
 not a sibling -- `MetricSpace/Pseudo/` in Mathlib names the same relationship.
 
-The dependency runs the other way, as it does there. `Stability/Slope.lean`
-imports `Weak/Slope.lean` and adds the strict positivity that rules `⊤` out;
-`Stability/PhaseMonotone.lean` and the `Uniqueness/` files are shared by both.
-Directory nesting names the variant, not the import direction.
+## Main definitions
 
-## Why this is not below `Triangulated/`
+None; this module re-exports its children. The central ones are
+`CategoryTheory.Triangulated.WeakSlopeData` in `Weak/Slope.lean` and
+`CategoryTheory.Triangulated.AbelianWeakHNFiltration` in
+`Weak/HarderNarasimhan.lean`.
+
+## Main results
+
+None; this module re-exports its children.
+
+## Implementation notes
+
+### Dependency direction
+
+The dependency runs the other way, as it does in Mathlib's `MetricSpace/Pseudo/`.
+`Stability/Slope.lean` imports `Weak/Slope.lean` and adds the strict positivity
+that rules `⊤` out; `Stability/PhaseMonotone.lean` and the `Uniqueness/` files
+are shared by both. Directory nesting names the variant, not the import
+direction.
+
+### Why this is not below `Triangulated/`
 
 Nothing in this subtree mentions a shift, a distinguished triangle, a
-t-structure or a heart. It asks for an abelian category, an additive charge out
-of its Grothendieck group, and a half-plane. Until MO1.08 (#1319) it lived
-below `Triangulated/StabilityCondition/Weak/Foundation/`, where the subject it
-is a foundation *for* owned it; the triangulated weak theory now consumes it
-across the `CategoryTheory/Abelian/` boundary like any other client.
+t-structure or a heart. It needs an abelian category, an additive charge out
+of its Grothendieck group, and a half-plane. The triangulated weak theory
+consumes it across the `CategoryTheory/Abelian/` boundary like any other
+client.
 
-Declaration namespaces are unchanged and remain `CategoryTheory.Triangulated`;
-see decision 1 of the MO1 owner map in `docs/architecture/cutover-ledger.md`.
+Declaration namespaces remain `CategoryTheory.Triangulated`, which differs from
+the path, so that the fully qualified names stay stable for the external
+references that use them.
+
+## References
+
+The subtree builds on `CategoryTheory.Triangulated.WeakStabilityFunctionOn`
+and `CategoryTheory.Triangulated.abelianDatum` from `Stability/Basic.lean`.
+
+## Tags
+
+weak stability function, slope, abelian category, Harder--Narasimhan filtration,
+torsion pair
 -/

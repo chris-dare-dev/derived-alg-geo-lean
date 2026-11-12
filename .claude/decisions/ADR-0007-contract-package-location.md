@@ -116,7 +116,7 @@ the contract says, and none about where the schemas are committed.
 
 **Unaffected.** The `@[cites]` attribute and the Lean emitter library are a
 *Lean* dependency, not a Python one, so §5.4 rule 7 does not reach them. Where
-that Lake package lives is a separate question — see `open-questions.md` Q3,
+that Lake package lives is a separate question — see [`open-questions.md`](https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/open-questions.md) Q3,
 still open.
 
 ## When this reverses
@@ -222,4 +222,4 @@ withdrawal rather than a migration.
 ### What this does not decide
 
 Where the schemas go instead. That is Q2 reopened, and it is an owner call —
-see `open-questions.md`.
+see [`open-questions.md`](https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/open-questions.md).

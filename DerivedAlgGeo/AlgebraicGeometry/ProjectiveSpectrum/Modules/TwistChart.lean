@@ -14,8 +14,53 @@ then identifies the canonical map
 
 `(A(d)₍f₎)₀ ⟶ Γ(D₊(f), A(d)̃)`
 
-as an equivalence.  Thus the degree-one charts used by polynomial projective space no longer
+as an equivalence.  Thus the degree-one charts used by polynomial projective space do not
 require a `BasicOpenSectionData` certificate.
+
+## Main definitions
+
+* `AlgebraicGeometry.Proj.natShiftFiberLinearEquiv`,
+  `AlgebraicGeometry.Proj.intShiftFiberLinearEquiv`, and their `OfMem` forms: the pointwise
+  trivialization of a nonnegative or integer twist at a point of `D₊(f)`.
+* `AlgebraicGeometry.Proj.intShiftSectionLinearEquivOn`: an integer twist `A(d)` is `A(0)` on
+  sections over any open inside `D₊(f)`, linearly over the structure sheaf.
+* `AlgebraicGeometry.Proj.natShiftSectionLinearEquivOn`,
+  `AlgebraicGeometry.Proj.natShiftSectionLinearEquiv`: a nonnegative twist `A(d)` is `A` on sections
+  over any open inside `D₊(f)`, and over `D₊(f)` itself.
+* `AlgebraicGeometry.Proj.natShiftBasicOpenSectionAddEquiv`: the localized shift identified with
+  the sections of `A(d)̃` on `D₊(f)`.
+* `AlgebraicGeometry.Proj.intShiftModuleFiberLinearEquiv`,
+  `AlgebraicGeometry.Proj.intShiftModuleSectionLinearEquivOn`: the same trivializations for an
+  integer twist of a graded module.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.natShiftBasicOpenSectionAddEquiv_apply_mk`: the chart equivalence is the
+  canonical homogeneous-fraction section map.
+* `AlgebraicGeometry.Proj.moduleAwayToSection_natShift_degreeOne_bijective`: for a nonnegative
+  twist, the canonical basic-open section map is bijective on every degree-one chart.
+
+## Notation
+
+`X` and `𝒪` are local notation for the underlying space `ProjectiveSpectrum.top 𝒜` and its structure
+sheaf.
+
+## Implementation notes
+
+Every trivialization is pointwise, so only membership in `D₊(f)` is used and one equivalence serves
+every open contained in `D₊(f)`. The integer trivializations land at `A(0)` rather than at `A`;
+the identification of `A(0)` with `A` is the separate zero-normalization. The section notes below
+record the details of each step.
+
+## References
+
+`GradedModule.DegreeZeroLocalization.natShiftLinearEquivOfMem` and
+`GradedModule.DegreeZeroLocalization.intShiftZeroLinearEquiv`, the localization equivalences this
+file lifts to sheaves.
+
+## Tags
+
+projective spectrum, twisting sheaf, affine chart, homogeneous localization
 -/
 
 noncomputable section
@@ -474,8 +519,8 @@ is such a localization, so the pointwise statement costs nothing beyond naming i
 `intShiftFiberLinearEquivOfMem` costs nothing over `intShiftZeroLinearEquiv`.
 
 Everything above this section is `𝒜` as a module over itself, which is all the twisting sheaf
-needs. `#584`'s tensor comparison `F ⊗ O(d) ≅ F(d)` needs the module case, and this is the fiber
-half of it. The section and `.over` halves are not here.
+needs. The tensor comparison `F ⊗ O(d) ≅ F(d)` (`tensorTwistIso`) needs the module case, and this
+is the fiber half of it. The section and `.over` halves are not here.
 -/
 
 section GradedModule

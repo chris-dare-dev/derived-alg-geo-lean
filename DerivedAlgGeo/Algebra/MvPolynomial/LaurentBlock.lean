@@ -8,7 +8,7 @@ import Mathlib.Data.Int.Interval
 /-!
 # The block decomposition of an away localization
 
-Step 2 of #340's proof plan decomposes the Čech complex of `O(d)` by the **negative support**
+The Čech vanishing computation for `O(d)` decomposes the Čech complex by the **negative support**
 `N α = {j | α j < 0}` of the Laurent exponent: the differential preserves `N α`, each block with
 a cone point contracts, and for `d ≥ 0` every block has a cone point. This file supplies the
 decomposition at the level of one away localization `(A(d)_{Xᵞ})₀`, in the form the vanishing
@@ -16,22 +16,30 @@ argument consumes.
 
 The decomposition is deliberately **not** packaged as a direct-sum isomorphism or a
 `∏_F`-indexed complex. The consumer — "every positive-degree cocycle is a coboundary" — needs
-exactly a family of additive projections `blockProj γ F d` with
-
-* `sum_blockProj` — they sum to the identity over the *finite* index `γ.support.powerset`,
-  which is the step that keeps an infinite variable set harmless: each single localization only
-  ever meets finitely many blocks, and no infinite product is exchanged with an infinite sum;
-* `blockProj_blockProj_self` / `blockProj_blockProj_of_ne` — they are orthogonal idempotents;
-* `laurentFace_blockProj` — **the faces of the Čech complex commute with them**, because a face
-  moves the numerator and the denominator together and the Laurent exponent never changes.
+exactly a family of additive projections `blockProj γ F d` with the properties listed under the
+main results.
 
 ## Main definitions
 
-* `intNegSupport` — the negative support of an integer exponent vector;
-* `laurentFilter` — keep the monomials of a numerator whose Laurent exponent has a given
-  negative support;
-* `AwayRep.blockFilter` — the same operation on a representative;
-* `blockProj` — the block projection on the localization, pinned by `blockProj_awayMk`.
+* `MvPolynomial.intNegSupport` — the negative support of an integer exponent vector;
+* `MvPolynomial.laurentFilter` — keep the monomials of a numerator whose Laurent exponent has a
+  given negative support;
+* `MvPolynomial.AwayRep.blockFilter` — the same operation on a representative;
+* `MvPolynomial.blockProj` — the block projection on the localization, pinned by
+  `blockProj_awayMk`.
+
+## Main results
+
+* `MvPolynomial.sum_blockProj` — the projections sum to the identity over the *finite* index
+  `γ.support.powerset`, which is the step that keeps an infinite variable set harmless: each
+  single localization only ever meets finitely many blocks, and no infinite product is exchanged
+  with an infinite sum;
+* `MvPolynomial.blockProj_blockProj_self` / `MvPolynomial.blockProj_blockProj_of_ne` — they are
+  orthogonal idempotents;
+* `MvPolynomial.blockProj_eq_zero_of_not_subset` — a block off the denominator's support is zero;
+* `MvPolynomial.laurentFace_blockProj` — **the faces of the Čech complex commute with them**,
+  because a face moves the numerator and the denominator together and the Laurent exponent never
+  changes.
 
 ## Implementation notes
 
@@ -44,12 +52,17 @@ decidability instance it needs — out of every statement.
 face square. Multiplying the numerator by `Xᵟ` and moving the denominator data from `(γ, m)` to
 `(γ', m')` fixes every Laurent exponent as soon as `σ + m • γ = m' • γ'`; raising a
 representative (`σ = t • γ`) and applying a Čech face (`σ = m • single e c`) are the two
-instances, so one lemma serves where #526 needed `divMonomial_pow_mul` and #539 needed
-`divMonomial_monomial_mul_comm` separately.
+instances, so one lemma serves where the sign projection needs `divMonomial_pow_mul` for
+well-definedness and `divMonomial_monomial_mul_comm` for its face square.
 
 `blockProj` descends to the localization through `Exists.choose` exactly as `signProjection`
 does, and everything must go through `blockProj_awayMk`; the definition itself has no useful
 `rfl` behaviour.
+
+## References
+
+This file builds on `Finsupp.laurentExponent` and `GradedModule.DegreeZeroLocalization.awayMk`,
+and follows `MvPolynomial.signProjection`.
 
 ## Tags
 
@@ -67,8 +80,8 @@ variable {ι R : Type u} [CommRing R]
 /-! ## The negative support of a Laurent exponent -/
 
 /-- The negative support of an integer exponent vector: the variables that occur with a negative
-exponent. This is the `N α` of #340's proof plan; the block of a Laurent monomial is its
-negative support, and the Čech differential preserves it. -/
+exponent. This is the `N α` of the Čech vanishing computation; the block of a Laurent monomial
+is its negative support, and the Čech differential preserves it. -/
 noncomputable def intNegSupport (α : ι →₀ ℤ) : Finset ι :=
   α.support.filter fun j => α j < 0
 
@@ -298,7 +311,7 @@ theorem laurentFilter_monomial_mul {γ γ' σ : ι →₀ ℕ} {m m' : ℕ}
 
 /-! ## The block projection on the localization
 
-The filter descends to the away localization exactly as the sign projection did in #526: a
+The filter descends to the away localization exactly as the sign projection does: a
 representative is filtered, well-definedness is the shift identity plus cross-multiplication,
 and the resulting map is pinned by its `awayMk` equation. -/
 
@@ -546,8 +559,8 @@ theorem blockProj_eq_zero_of_not_subset [IsDomain R] (h𝓜 : IsPolynomialTwist 
 /-! ## The faces commute with the block projections
 
 A Čech face multiplies numerator and denominator together, so the Laurent exponent of every
-monomial — and with it the block — never moves. This is the statement "the differential
-preserves `N α`" of #340's proof plan, one face and one localization at a time. -/
+monomial — and with it the block — never moves. This is the statement "the Čech differential
+preserves `N α`", one face and one localization at a time. -/
 
 set_option maxHeartbeats 1200000 in
 /-- **The faces commute with the block projections.** Restricting along `X_e` and then taking

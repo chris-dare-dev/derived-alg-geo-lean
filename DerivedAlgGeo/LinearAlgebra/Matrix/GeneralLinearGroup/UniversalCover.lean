@@ -19,7 +19,20 @@ its deck transformations, surjectivity of the matrix projection, the global
 chart that makes the source contractible and simply connected, the
 covering-map property, and the topological-group instance.
 
-## What the name does and does not assert
+## Main definitions
+
+None: this umbrella re-exports its children. The group itself is `GLTilde`, in
+the namespace
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction`.
+
+## Main results
+
+None of its own; it re-exports `GLTilde.universalCoverData` and
+`exact_deckHom_toMatHom`, described below.
+
+## Implementation notes
+
+### What the name does and does not assert
 
 `GLTilde` is a *name*; the universal-cover statement is a *theorem*, and the
 two are kept apart deliberately. The statement this development proves is the
@@ -34,17 +47,26 @@ Mathlib has no bundled universal-cover predicate at the pinned revision, so
 there is nothing upstream to instantiate and no covering theorem may be read
 off the identifier. Cite those two declarations.
 
-## Placement
+### Placement
 
-MO1.12 (#1323), cutover-ledger row 08. This development is independent of
-stability conditions: nothing here mentions a category, a slicing, a heart or
-a central charge, and no module below this directory imports the stability
-tree or `AlgebraicGeometry/`. The action on slicings, charges and stability
-conditions -- and the π phase convention as it is consumed there -- stays
-below `CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Action/`.
+This development is independent of stability conditions: nothing here
+mentions a category, a slicing, a heart or a central charge, and no module
+below this directory imports the stability tree or `AlgebraicGeometry/`. The
+action on slicings, charges and stability conditions -- and the π phase
+convention as it is consumed there -- is below
+`CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Action/`.
 
-Declaration names are unchanged by the move, so they keep the
+The declarations live in the
 `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction`
-namespace they were introduced in. That divergence between path and namespace
-is the cutover ledger's first standing decision, not an oversight.
+namespace of that action, which keeps their names fixed; the divergence
+between path and namespace is deliberate, not an oversight.
+
+## References
+
+* Bridgeland, *Stability conditions on triangulated categories*, Ann. of Math.
+  (2007), §8.
+
+## Tags
+
+universal cover, general linear group, covering map, simply connected, deck transformation
 -/

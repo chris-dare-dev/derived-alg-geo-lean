@@ -64,11 +64,11 @@ CategoryTheory	CategoryTheory.Triangulated.TStructure.GeneratorApproximationMap	
 CategoryTheory	CategoryTheory.Triangulated.TStructure.IsNondegenerate	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.WeakSlopeData.SameSlopeOrder	a relation between two slope data, proved so far only at the K3 tilt slope normalization [adoption pending, tracked in the single-instantiation follow-up]
 CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.DedekindHNProblem	recorded before the reason column existed; reason not yet written
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.OrdinaryDefinition20_5Conditions	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.OrdinaryFamilyConditions	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakChargeProbe	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakDedekindHNProblem	recorded before the reason column existed; reason not yet written
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakDefinition20_5ClauseZero	recorded before the reason column existed; reason not yet written
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakDefinition20_5Conditions	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakFamilyChargeConditions	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakFamilyConditions	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakQuotientQuadraticSupportData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakSemistabilityProbe	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakStabilityInFamiliesData	recorded before the reason column existed; reason not yet written

@@ -14,7 +14,7 @@ import Mathlib.CategoryTheory.Abelian.Opposite
 
 Mathlib develops extra degeneracies, and the homotopy equivalence they induce, on the
 **simplicial** side: `SimplicialObject.Augmented.ExtraDegeneracy.homotopyEquiv` is stated
-against `alternatingFaceMapComplex` and lands in `ChainComplex`. Čech cohomology, in
+against `alternatingFaceMapComplex` and takes values in `ChainComplex`. Čech cohomology, in
 `Mathlib/CategoryTheory/Sites/SheafCohomology/Cech.lean`, is built from
 `alternatingCofaceMapComplex` and is **cosimplicial**. Nothing upstream connects the two, so
 no Čech vanishing argument can reach the machinery that would prove it.
@@ -30,7 +30,21 @@ Both sides are `Y.obj ⦋n⦌` in degree `n` — that much is `rfl` — and both
 sum and the `zsmul`; that is the content, such as it is, and `op_sum` and `op_zsmul` supply
 it.
 
-## Why this is the useful direction
+## Main definitions
+
+* `AlgebraicTopology.AlternatingCofaceMapComplex.opIso` — the isomorphism above.
+
+## Main results
+
+* `AlgebraicTopology.exactAt_succ_of_extraDegeneracy` — an extra degeneracy on an augmented
+  simplicial object in `Aᵒᵖ` whose underlying object is `Y.op` forces the alternating coface
+  complex of `Y` to be exact in every positive degree.
+* `AlgebraicTopology.exactAt_succ_of_extraDegeneracy_map` — the same, with the contravariant
+  transport folded in.
+
+## Implementation notes
+
+### Why this is the useful direction
 
 The alternative is to define an extra *co*degeneracy structure on augmented cosimplicial
 objects and redo the homotopy from scratch, roughly duplicating
@@ -41,11 +55,9 @@ particular `CategoryTheory.Limits.FormalCoproduct.extraDegeneracyCech` — the �
 family has an extra degeneracy once the terminal object maps into one of its members — is
 already upstream and can be used as it stands.
 
-## The payoff
+### The payoff
 
-`exactAt_succ_of_extraDegeneracy` is what #13 consumes: an extra degeneracy on an augmented
-simplicial object in `Aᵒᵖ` whose underlying object is `Y.op` forces the alternating coface
-complex of `Y` to be exact in every positive degree. The chain is
+`exactAt_succ_of_extraDegeneracy` is what the Čech vanishing arguments consume. The chain is
 `ExtraDegeneracy.homotopyEquiv` (upstream) → quasi-isomorphism → `exactAt_iff_of_quasiIsoAt`
 → `ChainComplex.exactAt_succ_single_obj`, carried across `opIso`.
 
@@ -54,17 +66,16 @@ takes a covariant functor, while Čech cohomology applies `FormalCoproduct.evalO
 presheaf, which is contravariant on the site; `Functor.rightOp` turns one into the other, and
 this lemma is the composite in the form the caller wants.
 
-## Not done here
+### Not done here
 
-An augmentation `ε` for `alternatingCofaceMapComplex`, dual to `AlternatingFaceMapComplex.ε`,
-was expected to be needed and **is not**. The augmentation is handled on the simplicial side
-by `homotopyEquiv`, and the coface complex only ever appears unaugmented, so adding one would
-be dead weight. Recorded because the issue asked for it.
+There is no augmentation `ε` for `alternatingCofaceMapComplex`, dual to
+`AlternatingFaceMapComplex.ε`, and none is needed: the augmentation is handled on the
+simplicial side by `homotopyEquiv`, and the coface complex only ever appears unaugmented, so
+adding one would be dead weight.
 
-`DerivedAlgGeo/AlgebraicGeometry/Cohomology/Cech/Affine.lean` now supplies the remaining affine
-argument: it identifies
-the restriction maps degreewise as localizations and descends exactness from a finite
-distinguished-open cover whose defining elements span the unit ideal.
+`DerivedAlgGeo/AlgebraicGeometry/Cohomology/Cech/Affine.lean` supplies the remaining affine
+argument: it identifies the restriction maps degreewise as localizations and descends
+exactness from a finite distinguished-open cover whose defining elements span the unit ideal.
 
 The `Abelian A` hypothesis is stronger than the argument needs — `Preadditive`, a zero object
 and homology would do — but the two `HasZeroMorphisms Aᵒᵖ` instances (`Preadditive`'s and
@@ -77,6 +88,10 @@ caller is abelian.
 * `Mathlib/AlgebraicTopology/ExtraDegeneracy.lean` — the simplicial theory this reaches
 * `Mathlib/CategoryTheory/Limits/FormalCoproducts/ExtraDegeneracy.lean` — the Čech object's
   extra degeneracy, already upstream
+
+## Tags
+
+cosimplicial object, alternating coface complex, extra degeneracy, Čech cohomology, opposite
 -/
 
 universe v u

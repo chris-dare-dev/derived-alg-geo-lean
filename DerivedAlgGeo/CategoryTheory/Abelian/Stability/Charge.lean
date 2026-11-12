@@ -19,33 +19,54 @@ two structures carry a `G →+ ℂ` and a positivity proof. The instantiations l
 with the settings they instantiate at -- `abelianDatum` beside `K₀Ab`,
 `heartDatum` beside `K₀`.
 
-## Placement
+## Main definitions
 
-This is the **neutral core** of the MO1.08 owner map: the class datum and the
-additive charge, which an abelian category is enough to use and which nothing
-triangulated is needed to state. It has two independent consumers, which is
-what earns it a file of its own rather than a block inside one of them --
-`Abelian/Stability/Basic.lean` instantiates it at `abelianDatum`, and
+* `CategoryTheory.ClassDatum` — the objects a positivity condition speaks
+  about, and their classes in an abelian group.
+* `CategoryTheory.IsPositive` — every relevant object's class has charge in a
+  given subset of `ℂ`.
+* `CategoryTheory.IsStabilityCharge`, `CategoryTheory.IsWeakStabilityCharge` —
+  positivity into `semiClosedUpperHalfPlane`, respectively
+  `closedUpperHalfPlane`.
+
+## Main results
+
+* `CategoryTheory.IsStabilityCharge.weak` — strict positivity implies weak
+  positivity, for every class datum.
+
+## Implementation notes
+
+### Placement
+
+This is the **neutral core** of the abelian stability subtree: the class datum
+and the additive charge, which an abelian category is enough to use and which
+nothing triangulated is needed to state. It has two independent consumers,
+which is what earns it a file of its own rather than a block inside one of
+them -- `Abelian/Stability/Basic.lean` instantiates it at `abelianDatum`, and
 `Triangulated/StabilityCondition/Weak/Foundation/HeartDatum.lean` instantiates
-it at the heart of a t-structure.
+it at the heart of a t-structure. Placing it beside either consumer would make
+the other reach for it through the wrong tree.
 
-It sat at the root of `CategoryTheory/` from #760 until 2026-09-02 -- the
-review of the Mathlib-mesh restructure observed that this promoted
-stability-specific support to a subject root it does not own -- and then below
-`Triangulated/StabilityCondition/Weak/` until MO1.08 (#1319). What the second
-move repaired is that the file was placed beside one of its two consumers, so
-the other had to reach for it through the triangulated tree.
+### The half-plane facts
 
 The five upper-half-plane facts (`semiClosedUpperHalfPlane`,
-`closedUpperHalfPlane`, and their three lemmas) left this file in MO1.13
-(#1324) and now live at `DerivedAlgGeo/Analysis/Complex/HalfPlane.lean`, which
-this file imports. They had to move: the Euclidean core of the
-mass-subadditivity proof states half-plane memberships, and that core is
-required to be importable with no category theory and no stability. Their
-declaration names and their `CategoryTheory` namespace are unchanged, because a
-namespace change would rename declarations and the immutable review payloads
-the `exe/RestateHistoricalNames.lean` bridge protects must keep resolving. They
-remain an upstream candidate for `Mathlib/Analysis/Complex/UpperHalfPlane/`.
+`closedUpperHalfPlane`, and their three lemmas) live at
+`DerivedAlgGeo/Analysis/Complex/HalfPlane.lean`, which this file imports. They
+belong there because the Euclidean core of the mass-subadditivity proof states
+half-plane memberships, and that core is required to be importable with no
+category theory and no stability. Their declarations keep the `CategoryTheory`
+namespace so that their fully qualified names stay stable. They remain an
+upstream candidate for `Mathlib/Analysis/Complex/UpperHalfPlane/`.
+
+## References
+
+The charges are Mathlib's additive homomorphisms `AddMonoidHom` into `ℂ`; the
+half-planes are `CategoryTheory.semiClosedUpperHalfPlane` and
+`CategoryTheory.closedUpperHalfPlane`.
+
+## Tags
+
+central charge, class datum, positivity, upper half-plane, stability function
 -/
 
 noncomputable section

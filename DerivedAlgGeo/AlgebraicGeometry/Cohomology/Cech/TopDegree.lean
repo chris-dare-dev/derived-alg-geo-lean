@@ -15,7 +15,21 @@ tuple of length `n + 2` supports at most `n + 2` variables and so cannot contain
 At the top degree that counting argument runs out: a tuple *can* meet every variable, and the full
 block is exactly what survives. This file separates the surviving block from the rest.
 
-## The splitting
+## Main definitions
+
+* `AlgebraicGeometry.Proj.intCechFullBlock`: the full-block part of a Čech cochain of the
+  integer twist, index by index.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.intCechFullBlock_cocycle`: the full-block part of a cocycle is a
+  cocycle.
+* `AlgebraicGeometry.Proj.exists_fullBlock_add_coboundary`: every positive-degree cocycle is its
+  full-block part plus a coboundary.
+
+## Implementation notes
+
+### The splitting
 
 `cechFace_cechBlockProj` says the differential preserves every block, so a cocycle splits into its
 full-block part and the remainder, each again a cocycle. The remainder carries no full block at
@@ -26,19 +40,29 @@ to it, rather than every term — contracts it. So the two differ by a coboundar
 Nothing here is about the top degree specifically; the statement holds in every degree, and it is
 only at the top that it says anything the vanishing theorem does not already say better.
 
-## What is not here
+### What is not here
 
 Finiteness. The full block of one term is spanned by the monomial fractions whose Laurent exponent
 is negative in every variable and has total degree `d`, a finite set by
 `finite_setOf_degree_eq_of_neg` — but turning that into `Module.Finite k` needs the base-field
 action, and the interface it has to meet is `cechCohomologyModule` through
-`module_finite_linearCoherentH_of_cech`. That is #666's remaining half, and none of it is claimed
-here.
+`module_finite_linearCoherentH_of_cech`. That half is
+`module_finite_linearCoherentH_projectiveSpaceTwist`, and none of it is claimed here.
 
-## Scope
+### Scope
 
-`Fintype ι` is genuine here — `Finset.univ` is the full block — and this is the statement in the
-lane the issue means when it says finiteness of the variable set enters at the top.
+`Fintype ι` is genuine here — `Finset.univ` is the full block — and this is where finiteness of
+the variable set enters the computation: at the top degree.
+
+## References
+
+The file cites no literature. It builds on the block projections `MvPolynomial.cechBlockProj` and
+`MvPolynomial.cechFace_cechBlockProj` and the contracting primitive
+`MvPolynomial.cechPrimitive_isPrimitive`.
+
+## Tags
+
+Čech cohomology, projective space, twisting sheaf, top degree, Laurent block
 -/
 
 universe u

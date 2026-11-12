@@ -7,8 +7,8 @@ phase: sequenced
 brief: 'Structural companion to charge-abstraction CA1–CA3 (milestones 49–51), based on the 2026-09-13
   repository-wide ownership review at 9edfb9d6. It preserves the existing single charge kernel, separates
   foundations from comparisons/applications, and repairs the non-charge owners without duplicating SRF1,
-  DG3, DT1 or SF8 theorem work. Source review: docs/reviews/2026-09-13-mathematical-ownership-review.md.
-  Execution plan: docs/reviews/2026-09-13-mathematical-ownership-plan.md.'
+  DG3, DT1 or SF8 theorem work. Source review: https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/docs/reviews/2026-09-13-mathematical-ownership-review.md.
+  Execution plan: https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/docs/reviews/2026-09-13-mathematical-ownership-plan.md.'
 goal:
   objective: Place independently reusable mathematics at its proper owner, retain canonical roots and
     explicit specialization/realization maps, and prevent foundations importing their applications.

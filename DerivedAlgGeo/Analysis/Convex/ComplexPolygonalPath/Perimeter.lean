@@ -25,14 +25,23 @@ second. The proof is finite-dimensional -- supporting functionals select a
 monotone subsequence of the outer boundary, and discrete integration by parts
 reduces the perimeter comparison to the triangle inequality.
 
-## Main declarations
+## Main definitions
 
-* `chainLength` and `closedLength`, the open and closed perimeters, with
-  `closedLength_eq_sum_turning`: a closed perimeter is its discrete support sum.
+All in the namespace `CategoryTheory.Triangulated.ComplexPolygonalPath`:
+
+* `chainLength` and `closedLength`, the open and closed perimeters.
+* `dotFunctional r`, the Euclidean scalar product with `r` as a continuous
+  real-linear functional, and `unitDirection z`, the direction of a vector.
+
+## Main results
+
+* `closedLength_eq_sum_turning`: a closed perimeter is its discrete support sum.
 * `closedLength_le_of_monotone_support`, the finite support-fan comparison.
 * `length_le_of_convexHull_subset`, the comparison itself.
 
-## Source
+## Implementation notes
+
+### Source
 
 This is the `t = 0` case of Ikeda, *A phase limit formula and the space of
 stability conditions*, Lemma 3.7, slightly strengthened: no decreasing-turn
@@ -42,15 +51,21 @@ can only increase the outer length. The Harder--Narasimhan reading of the
 comparison, and Ikeda's Lemma 3.8 built on it, are the stability adapter
 `StabilityCondition/Mass/Subadditivity/HNPolygonComparison.lean`.
 
-## Placement
+### Placement
 
 Neutral planar geometry: this file imports no category theory and no stability,
-and every statement quantifies over vertices in `ℂ`. It was the first
-two-thirds of
-`StabilityCondition/Metric/Mass/Subadditivity/PolygonPerimeter.lean` -- a
-Euclidean perimeter argument living inside a mass-subadditivity proof directory
--- until MO1.13 (#1324). See `ComplexPolygonalPath/Basic.lean` for why
-`Analysis/` is the subject and why the namespace did not move with the path.
+and every statement quantifies over vertices in `ℂ`. See
+`ComplexPolygonalPath/Basic.lean` for why `Analysis/` is the subject and why the
+namespace differs from the path.
+
+## References
+
+* Ikeda, *A phase limit formula and the space of stability conditions*,
+  Lemma 3.7.
+
+## Tags
+
+polygon, perimeter, convex hull, supporting functional, complex plane
 -/
 
 open CategoryTheory.Triangulated

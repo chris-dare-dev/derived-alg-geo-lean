@@ -12,23 +12,40 @@ set_option backward.isDefEq.respectTransparency false
 /-!
 # Transporting stability conditions by autoequivalences
 
-The assembly step. `G̃L⁺(2, ℝ)` moves phases and fixes objects; an
-autoequivalence does the opposite, and this file carries it all the way to
-`StabilityCondition.WithClassMap`.
+`G̃L⁺(2, ℝ)` moves phases and fixes objects; a triangulated autoequivalence `Φ`
+does the opposite. This file carries `Φ` from slicings to
+`StabilityCondition.WithClassMap`, and each step is dual to the corresponding
+step for `G̃L⁺(2, ℝ)`:
 
-Three things had to line up, and each is the *dual* of the corresponding step
-in the `G̃L⁺(2, ℝ)` track:
-
-* **Slicing** — `Slicing.mapEquiv` (`WeakStabilityCondition/StabilityCondition/Symmetry/Autoequivalence/Slicing/Transport.lean`), dual to `relabel`.
-* **Local finiteness** — `mapEquiv_isLocallyFinite` below. Dual to
+* **Slicing** — `Slicing.mapEquiv`, dual to `relabel`.
+* **Local finiteness** — `mapEquiv_isLocallyFinite`. Dual to
   `relabel_isLocallyFinite`, but *easier*: the interval endpoints do not move
   (`mapEquiv_intervalProp_iff`), so the **same `η` works** and no
   uniform-continuity argument is needed. What is needed instead is that `Φ⁻¹`
   restricts to a full faithful strict-mono-preserving functor between the two
   interval categories.
-* **Central charge** — `actStabAut` below, via a class-lattice datum `lam`.
+* **Central charge** — `actStabAut`, via a class-lattice datum `lam`.
 
-## How strict monos survive `Φ⁻¹`
+## Main definitions
+
+* `autIntervalFunctor` — `Φ⁻¹` restricted to the interval categories of a
+  slicing and of its transport, with the same endpoints.
+* `actStabAut` — the stability condition `Φ · σ`, for a class-lattice datum
+  `lam : Λ →+ Λ` compatible with `Φ⁻¹` on `K₀`.
+
+## Main results
+
+* `autFunctor_strictMono` — `Φ⁻¹` preserves strict monomorphisms between
+  interval categories.
+* `autFunctor_isAdmissibleSubobject` — it preserves intrinsic admissible
+  subobjects.
+* `mapEquiv_isLocallyFinite` — transport by `Φ` preserves local finiteness.
+* `actStabAut_slicing`, `actStabAut_Z` — the slicing of `Φ · σ` is
+  `Slicing.mapEquiv`, and its charge is `σ.Z ∘ lam`.
+
+## Implementation notes
+
+### How strict monos survive `Φ⁻¹`
 
 `autFunctor_strictMono` uses the **cone route**, not the heart route: take a
 strict mono's cokernel triangle
@@ -36,15 +53,14 @@ strict mono's cokernel triangle
 `exists_distTriang_of_strictShortExact`), push it through `Φ⁻¹` — which is
 triangulated, so the triangle stays distinguished and all three vertices stay
 in the *same* window — then read the strict mono back off with
-`strictMono_strictEpi_of_distTriang`. This is exactly how
-`intervalInclusion_map_strictMono`
-(`WeakStabilityCondition/StabilityCondition/Foundation/Slicing/IntervalFiniteTransfer.lean`) works.
+`strictMono_strictEpi_of_distTriang`. `intervalInclusion_map_strictMono` works
+the same way.
 
-The heart route would not have worked: `toRightHeart` lands in the heart of
+The heart route does not work: `toRightHeart` lands in the heart of
 `phaseShift C (b - 1)`, and the two slicings' hearts are different
 subcategories of `C`.
 
-## The class-lattice datum
+### The class-lattice datum
 
 An autoequivalence acts on `WithClassMap C v` only *together with* a
 `lam : Λ →+ Λ` satisfying `v ∘ K₀.map Φ⁻¹ = lam ∘ v`. That is not a
@@ -56,21 +72,27 @@ With it, `compat'` costs nothing: the witness `m` is *unchanged*, because `Φ`
 moves the object but not its phase. Contrast the `G̃L⁺(2, ℝ)` case, where the
 matrix rescales the ray and `m` becomes `m * r`.
 
-## What this is NOT — and what became of that
+### A map, not a group action
 
 This file gives the action as a well-defined **map** plus its defining
 property, not a group action. The acting object is a *pair* `(Φ, lam)`, and
 `AutQuot` groups the `Φ`s alone — enough for slicings, not once a class lattice
 is in play.
 
-`WeakStabilityCondition/StabilityCondition/Symmetry/Autoequivalence/Stability/ClassMap.lean` bundles the pair and supplies the `MulAction`. **Nothing
-here is superseded by it**, and the split is worth keeping: that file needs
-`lam : Λ ≃+ Λ`, because a group needs `lam⁻¹` and nothing produces one, while
-`actStabAut` below asks only for `lam : Λ →+ Λ`. A non-invertible compatible
+The `MulAction` on such pairs lives in `Autoequivalence/Stability/ClassMap.lean`
+and needs `lam : Λ ≃+ Λ`, because a group needs `lam⁻¹` and nothing produces
+one. `actStabAut` asks only for `lam : Λ →+ Λ`: a non-invertible compatible
 datum still acts as a map and is simply not a member of that group, so this
 statement is strictly the more general of the two.
 
-See the stability-foundation ownership record in `notes/dependencies/`.
+## References
+
+* Bridgeland, *Stability conditions on triangulated categories*, Ann. of Math.
+  (2007), Lemma 8.2.
+
+## Tags
+
+stability condition, autoequivalence, slicing, local finiteness
 -/
 
 open CategoryTheory.Triangulated

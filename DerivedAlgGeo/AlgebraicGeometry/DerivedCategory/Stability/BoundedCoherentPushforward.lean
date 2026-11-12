@@ -46,8 +46,7 @@ simplifier at the geometric layer.
 The declarations stay in `CategoryTheory.Triangulated.{Pre,}StabilityCondition.WithClassMap`
 rather than in the geometric namespace of `BoundedCoherentBaseChange.lean`,
 so that `σ.boundedCoherentPushforward f h` is dot notation on the categorical
-carrier; this is the geometric-realization row of Tier 2 in
-`docs/architecture/placement.md`, which lets a realization keep the
+carrier: a geometric realization of a categorical interface keeps the
 interface's namespace.
 
 The pullback `f^♯σ` of Definition 3.1(3), computed through the direct image
@@ -58,6 +57,11 @@ coherent pushforward.
 ## References
 
 * arXiv:2607.28411v1, Definition 3.6, Remark 3.7, Proposition 3.8.
+
+## Tags
+
+stability condition, pushforward, inverse image, bounded derived category,
+slicing
 -/
 
 attribute [local instance] HasDerivedCategory.standard

@@ -26,11 +26,34 @@ Slicings and their generic consequences, interval categories, and the heart
 class datum, all needed before imposing the stronger open-ray and
 local-finiteness conditions.
 
+## Main definitions
+
+None in this module. Its children define `CategoryTheory.Triangulated.Slicing`
+(`Foundation/Slicing.lean`), the interval categories
+`CategoryTheory.Triangulated.Slicing.IntervalCat`
+(`Foundation/IntervalCategory.lean`) and the heart class datum
+`CategoryTheory.Triangulated.heartDatum` (`Foundation/HeartDatum.lean`).
+
+## Main results
+
+None; this module re-exports its children under `Foundation/` and the abelian
+stability theory of `CategoryTheory/Abelian/Stability.lean`.
+
+## Implementation notes
+
 The stability functions themselves are not owned here. They are abelian, and
-MO1.08 (#1319) moved them to `CategoryTheory/Abelian/Stability/`; this umbrella
-re-exports that owner so the triangulated weak theory keeps one import surface.
+live in `CategoryTheory/Abelian/Stability/`; this umbrella re-exports that
+owner so the triangulated weak theory keeps one import surface.
 `HeartDatum.lean` is the adapter that instantiates the abelian `ClassDatum` at
-the heart of a t-structure, and is the only part of the old
-`Foundation/StabilityFunction/` directory that mentions a triangulated
-category at all.
+the heart of a t-structure, and is the only part of the stability-function
+foundations that mentions a triangulated category at all.
+
+## References
+
+This module cites no literature. It builds on Mathlib's
+`CategoryTheory.Triangulated.TStructure` and the abelian `ClassDatum`.
+
+## Tags
+
+slicing, interval category, heart, class datum, stability function
 -/

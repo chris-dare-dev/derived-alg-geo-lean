@@ -68,7 +68,7 @@ preadditive field of the subcategory's instance, and reaching `Coh.preadditive`
 from it needs `Coh` — a `def` — unfolded. Instance search does not do that, so
 every Mathlib instance asking for `[Abelian C]` alongside a second
 `Preadditive`-parameterised class silently fails to fire on `Coh X`;
-`Variety.derivedLinear` is the case that found it.
+`Variety.derivedLinear` is one such consumer.
 
 The spread pins `toPreadditive` to `preadditive X` syntactically. `Abelian`'s
 other parents, `IsNormalMonoCategory` and `IsNormalEpiCategory`, are `Prop`s, so
@@ -77,7 +77,7 @@ noncomputable instance abelian [IsLocallyNoetherian X] : Abelian (Coh X) :=
   letI src : Abelian (Scheme.coherent X).FullSubcategory := inferInstance
   { preadditive X, src with }
 
-/-- Regression test for #662: `abelian.toPreadditive` must be `preadditive` at
+/-- Regression test for the `Preadditive` diamond: `abelian.toPreadditive` must be `preadditive` at
 `.instances` transparency, which is the transparency instance search runs at.
 Note that `with_reducible` is *not* the right check here — `abelian` is an
 instance, so it does not unfold at `.reducible`, and the check fails whether or

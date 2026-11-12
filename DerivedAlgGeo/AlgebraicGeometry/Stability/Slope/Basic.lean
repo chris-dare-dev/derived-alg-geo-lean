@@ -8,7 +8,7 @@ import DerivedAlgGeo.CategoryTheory.Abelian.Stability.Weak.SlopeGeometry
 import DerivedAlgGeo.CategoryTheory.Abelian.Stability.Weak.SlopeTop
 
 /-!
-# μ-slope stability on `Coh X`, the first geometric slope datum
+# μ-slope stability on `Coh X` as a geometric slope datum
 
 `WeakSlopeData` asks for a rank, a degree, and two positivity facts. The Hilbert multiplicity and
 degree coefficient of `Coefficients.lean` are already homomorphisms out of `K₀Ab (Coh X)`, so
@@ -18,7 +18,27 @@ theory by supplying only the two positivity facts. Everything downstream — the
 `phase_le_iff_slope_le`, weak semistability, and the whole `WeakStabilityFunctionOn` interface —
 then arrives rather than being rebuilt.
 
-## What is supplied
+## Main definitions
+
+* `MuPositivityData` — the two positivity facts a polarization supplies, as geometric input.
+* `MuCurvePositivityData` — the curve form of that input, with the strict inequality.
+* `PolarizedVarietyData.weakSlopeData` — coherent sheaves on a polarized variety as a
+  `WeakSlopeData`: rank is the Hilbert multiplicity, degree the Hilbert degree coefficient.
+* `PolarizedVarietyData.slopeData` — the curve form, as a `SlopeData`.
+
+## Main results
+
+* `PolarizedVarietyData.weakSlopeData_slope` — the weak slope is the ratio of Hilbert
+  coefficients.
+* `PolarizedVarietyData.weakSlopeData_topSlope_of_multiplicity_pos` and
+  `PolarizedVarietyData.weakSlopeData_topSlope_of_multiplicity_zero` — the slope in
+  `WithTop ℝ` is that ratio at positive multiplicity and `⊤` at multiplicity zero.
+* `PolarizedVarietyData.toWeakSlopeData_slopeData` — forgetting the curve condition recovers
+  `weakSlopeData`, definitionally.
+
+## Implementation notes
+
+### What is supplied
 
 `MuPositivityData` carries exactly the two facts `WeakSlopeData` needs and this pin cannot prove,
 because both are consequences of ampleness of the polarization, which does not exist here:
@@ -28,34 +48,43 @@ coefficient. These are geometric input, not proof holes.
 fields are geometric input there too, and that both hold on a polarised surface; the strict form
 of the second is false on a surface, which is why the curve case below is a separate datum.
 
-## Rank stays integral, degree does not
+### Rank stays integral, degree does not
 
 `WeakSlopeData.degreeHom` is real-valued, so the integral degree coefficient is composed with
 `Int.castAddHom ℝ` here. The rank stays integral, and that is not incidental: integrality of the
-rank is what the boundary arguments of the Mukai lane use. The multiplicity homomorphism is
-therefore handed over unchanged.
+rank is what the boundary arguments for Mukai central charges use. The multiplicity homomorphism
+is therefore handed over unchanged.
 
-## What this file is not
+### What this file is not
 
 It is not the Gieseker theory, and it does not import it. μ-stability orders sheaves by one
 ratio of Hilbert coefficients; Gieseker stability orders them by the whole reduced Hilbert
 polynomial at infinity. The two are compared — in one direction, for pure sheaves — by
 `Stability/Comparison.lean`, which imports both siblings and is imported by neither.
 
-Until MO1.08 (#1319) this file was `Gieseker/MuStability.lean`, a child of the Gieseker
-directory, and the μ-Harder–Narasimhan existence theorem sat below `Gieseker/HarderNarasimhan/`.
-Nothing in either mentions the Gieseker order. Their new home is `Slope/`, a sibling of
-`Gieseker/` over the shared `HilbertPolynomial.lean`, `Coefficients.lean` and `Purity.lean`. The
-directory name is the only thing that changed: `Slope/HarderNarasimhan/Existence.lean` proves
-HN existence for the **μ-slope**, and must not be read as proving it for Gieseker stability.
+Nothing in this file or in the μ-Harder–Narasimhan existence theorem mentions the Gieseker
+order, so both live in `Slope/`, a sibling of `Gieseker/` over the shared
+`HilbertPolynomial.lean`, `Coefficients.lean` and `Purity.lean`.
+`Slope/HarderNarasimhan/Existence.lean` proves HN existence for the **μ-slope**, and must not be
+read as proving it for Gieseker stability.
 
-## Placement
+### Placement
 
 `Slope/` reaches `CategoryTheory/Abelian/Stability/` and stops there. It needs no t-structure, no
 heart and no triangulated category, which is what the abelian owner of the slope theory buys:
 the geometric instantiation of a slope datum is independent of the derived category the
 Bridgeland theory is stated in. `Slope/HarderNarasimhan/HeartTransport.lean` is the one module
 that crosses into the derived category, and it is deliberately a leaf.
+
+## References
+
+This file instantiates the abstract `WeakSlopeData` and `SlopeData` with the Hilbert
+coefficient homomorphisms `PolarizedVarietyData.multiplicityHom` and
+`PolarizedVarietyData.degreeHom`.
+
+## Tags
+
+slope stability, μ-stability, Hilbert polynomial, coherent sheaf, weak stability function
 -/
 
 universe u
@@ -157,7 +186,7 @@ theorem weakSlopeData_topSlope_of_multiplicity_pos (h : MuPositivityData P) {F :
   rw [(P.weakSlopeData h).topSlope_of_rank_pos hrank, weakSlopeData_slope]
 
 /-- **The honest slope at multiplicity zero is `⊤`.** This is not a corner case: it is what makes
-the comparison theorem below false without purity. -/
+the comparison theorem of `Stability/Comparison.lean` false without purity. -/
 theorem weakSlopeData_topSlope_of_multiplicity_zero (h : MuPositivityData P) {F : Coh X}
     (hF : P.multiplicity F = 0) : (P.weakSlopeData h).topSlope F = ⊤ := by
   have hrank : (P.weakSlopeData h).rank F = 0 := by

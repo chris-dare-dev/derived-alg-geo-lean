@@ -7,13 +7,30 @@ import DerivedAlgGeo.Algebra.MvPolynomial.LaurentBlock
 /-!
 # The contracting homotopy of a block, one localization at a time
 
-Step 3 of #340's proof plan contracts each block `C_F` of the Čech complex through a cone point
-`i₀ ∉ F`: the homotopy sends a cochain `s` to `y ↦ Π (s (i₀ :: y))`, where `Π` restricts a
-fraction from the denominator of `i₀ :: y` back to the denominator of `y`. This file supplies
-`Π` — here `laurentHomotopy` — and the two identities the homotopy computation
+The Čech vanishing computation for `O(d)` contracts each block `C_F` of the Čech complex through
+a cone point `i₀ ∉ F`: the homotopy sends a cochain `s` to `y ↦ Π (s (i₀ :: y))`, where `Π`
+restricts a fraction from the denominator of `i₀ :: y` back to the denominator of `y`. This file
+supplies `Π` — here `laurentHomotopy` — and the two identities the homotopy computation
 `d ∘ h + h ∘ d = id` consumes, at the level of one localization.
 
-## The definition, and why it is a composite
+## Main definitions
+
+* `MvPolynomial.laurentHomotopy` — the homotopy map `Π`, from the localization at
+  `X_{i₀} · Xᵞ` to the localization at `Xᵞ`.
+
+## Main results
+
+* `MvPolynomial.laurentHomotopy_awayMk` — the defining equation of `Π` on `awayMk`
+  representatives.
+* `MvPolynomial.laurentHomotopy_laurentFace_comm` — **`Π` commutes with every face**, with no
+  restriction.
+* `MvPolynomial.laurentHomotopy_laurentFace_blockProj` — **`Π` retracts the cone face on the
+  block**: for `i₀ ∉ F`, applying the front face `X_{i₀}` and then `Π` is the identity on
+  block-`F` elements.
+
+## Implementation notes
+
+### The definition, and why it is a composite
 
 The denominator of `i₀ :: y` is `X_{i₀} · Xᵞ` with `γ` the denominator exponent of `y` — but
 `γ` may itself contain `i₀` (the tuple `y` may mention the cone point), and the sign
@@ -29,13 +46,14 @@ equations, so `Π` is well defined and additive with no new descent argument, an
 `laurentHomotopy_awayMk` is the equation everything else runs on. When `t = 0` the reinserted
 face is multiplication by `X_{i₀}^0 = 1` and `Π` is the plain sign projection.
 
-## The two identities
+### The two identities
 
 * `laurentHomotopy_laurentFace_comm` — **`Π` commutes with every face**, with no restriction:
-  not only the faces in a variable `e ≠ i₀` (where it reduces to the projection square of
-  #539), but also the faces in `i₀` itself, where the surplus exponent `t` shifts by one and
-  the reinserted power rebalances exactly. This unrestricted square is what the composite
-  definition buys; the bare sign projection satisfies no such identity.
+  not only the faces in a variable `e ≠ i₀` (where it reduces to the projection square
+  `signProjection_laurentFace_comm`), but also the faces in `i₀` itself, where the surplus
+  exponent `t` shifts by one and the reinserted power rebalances exactly. This unrestricted
+  square is what the composite definition buys; the bare sign projection satisfies no such
+  identity.
 * `laurentHomotopy_laurentFace_blockProj` — **`Π` retracts the cone face on the block**: for
   `i₀ ∉ F`, applying the front face `X_{i₀}` and then `Π` is the identity on block-`F`
   elements. This is the only place the block hypothesis enters, and it is genuinely needed:
@@ -45,6 +63,11 @@ face is multiplication by `X_{i₀}^0 = 1` and `Π` is the plain sign projection
 In the homotopy computation these two are the whole story: the `j = 0` face of `i₀ :: y`
 produces the identity through the retraction, and every other face cancels between
 `d (h s)` and `h (d s)` through the square.
+
+## References
+
+This file composes `MvPolynomial.signProjection` and `MvPolynomial.laurentFace`, and uses the
+block projection `MvPolynomial.blockProj`.
 
 ## Tags
 
@@ -250,13 +273,13 @@ theorem laurentHomotopy_laurentFace_blockProj [IsDomain R] (h𝓜 : IsPolynomial
 
 set_option maxHeartbeats 1600000 in
 /-- **`Π` commutes with every face — no restriction.** For a face in a variable `e ≠ i₀` this
-is the projection square of #539 conjugated by the reinsertion; for `e = i₀` the surplus
-exponent shifts by one on the left and the reinserted power grows to match on the right, and
-the two sides agree exactly. The composite definition of `Π` is what makes the `e = i₀` case
-true — the bare sign projection satisfies no unrestricted square.
+is the projection square `signProjection_laurentFace_comm` conjugated by the reinsertion; for
+`e = i₀` the surplus exponent shifts by one on the left and the reinserted power grows to match
+on the right, and the two sides agree exactly. The composite definition of `Π` is what makes the
+`e = i₀` case true — the bare sign projection satisfies no unrestricted square.
 
-The two splittings are hypotheses in the lane's usual style; both are associativity-and-
-commutativity rearrangements the Čech caller has in hand. -/
+The two splittings are hypotheses, as elsewhere in this computation; both are
+associativity-and-commutativity rearrangements the Čech caller has in hand. -/
 theorem laurentHomotopy_laurentFace_comm [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d)
     (i₀ e : ι) (γ₀ : ι →₀ ℕ)
     (htop : Finsupp.single i₀ 1 + (γ₀ + Finsupp.single e 1) =
@@ -322,7 +345,7 @@ theorem laurentHomotopy_laurentFace_comm [IsDomain R] (h𝓜 : IsPolynomialTwist
       rw [hsplit, divMonomial_monomial_mul_add, ← mul_assoc,
         MvPolynomial.monomial_mul_monomial, ← Finsupp.single_add, one_mul,
         show m + m * γ₀ e = m * (γ₀ e + 1) from by ring]
-    · -- The face is in another variable: the #539 disjointness pulls it through.
+    · -- The face is in another variable: the projection square's disjointness pulls it through.
       have happ : (γ₀ + Finsupp.single e 1 : ι →₀ ℕ) i₀ = γ₀ i₀ := by
         simp [he]
       rw [happ]

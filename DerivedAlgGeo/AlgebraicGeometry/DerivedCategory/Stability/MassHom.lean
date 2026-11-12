@@ -87,16 +87,15 @@ theorem hasPerfectMassHomBound_of_stable_generators
 geometric inputs explicit.**
 
 For a finite morphism, `boundedCoherentDerivedPushforward f` is the actual
-exact direct image used to construct `f^♯σ`.  Any linear left adjoint `pull`
+exact direct image through which `f^♯σ` is constructed.  Any linear left adjoint `pull`
 transfers the mass--Hom bound provided its perfect images classically generate
 the source perfect test class.
 
-The repository does not yet construct the required bounded coherent derived
+The repository does not construct the required bounded coherent derived
 pullback for an arbitrary finite morphism: `perfectDerivedPullback` is defined
 only under the exact coherent-pullback contract and has domain `Perf`, whereas
 the adjunction here is against all of `Dᵇ(Coh)`.  Accordingly `pull`, `adj`, and
-the generation containment are parameters rather than manufactured instances.
-The future geometric discharges are tracked by #1033 and #723. -/
+the generation containment are parameters rather than manufactured instances. -/
 theorem hasPerfectMassHomBound_finitePullback
     {S : Scheme.{u}} {T U : SchemeBaseChange S} (f : T ⟶ U)
     [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
@@ -146,9 +145,10 @@ to one of `Perf U`.  Both jobs are discharged into explicit parameters here --
 repository owns neither construction.  A `Surjective f.left` binder would
 therefore be inert: it is the hypothesis of results this statement assumes
 rather than proves, and carrying it would claim a geometric input the proof
-never consumes.  Those two constructions are the precise remaining #1033 and
-#723 interfaces; discharging them is what earns back the faithfully flat
-hypothesis, and the name, on a downstream theorem. -/
+never consumes.  Those two constructions -- `f_!` with its adjunction, and the
+generation statement -- are the remaining geometric inputs; discharging them is
+what earns back the faithfully flat hypothesis, and the name, on a downstream
+theorem. -/
 theorem hasPerfectMassHomBound_flatPushforward
     {S : Scheme.{u}} {T U : SchemeBaseChange S} (f : T ⟶ U)
     [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]

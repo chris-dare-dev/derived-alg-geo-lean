@@ -60,9 +60,9 @@ result is the transfer along `f ≫ g`.
 
 The declarations stay in
 `CategoryTheory.Triangulated.{Pre,}StabilityCondition.WithClassMap` so that
-`σ.boundedCoherentPullback f h` is dot notation on the categorical carrier;
-this is the geometric-realization row of Tier 2 in
-`docs/architecture/placement.md`.
+`σ.boundedCoherentPullback f h` is dot notation on the categorical carrier: a
+geometric realization of a categorical interface keeps the interface's
+namespace.
 
 Proposition 3.3 itself, which produces the witness from condition (3.1) on
 `f_* 𝒪_X ⊗ −`, is not proved here: its inputs are the Ind-extensions of the
@@ -73,6 +73,10 @@ same open geometric inputs as Proposition 3.8.
 
 * arXiv:2607.28411v1, Definition 3.1, Remark 3.2, Proposition 3.3, Lemma 3.5.
 * arXiv:2601.22994, Definition 3.1.
+
+## Tags
+
+stability condition, pullback, direct image, bounded derived category, slicing
 -/
 
 attribute [local instance] HasDerivedCategory.standard

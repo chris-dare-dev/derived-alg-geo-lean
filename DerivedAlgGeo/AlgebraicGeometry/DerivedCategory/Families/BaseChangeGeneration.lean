@@ -13,15 +13,47 @@ generator property on the compact carrier. A K-flat resolution is only one
 producer of the bundle; if the resulting objects classically generate, the
 perfect base-change sequence is full.
 
+## Main definitions
+
+* `DerivedBaseChangeData.perfectCategoryExternalProductGenerators` — the bundled
+  derived external products, as an object property of the compact carrier of
+  `Dqc(X_T)`.
+* `DerivedBaseChangeData.QuasicoherentFullnessPropagationData` — compact
+  generation of the target, the perfect-to-quasicoherent filtration comparison,
+  and coproduct closure of the quasicoherent envelope.
+
+## Main results
+
+* `DerivedBaseChangeData.perfectCategoryExternalProductGenerators_le_total` —
+  every external-product generator lies in the total property of the perfect
+  base-change sequence.
+* `DerivedBaseChangeData.perfectCategorySequence_isFull_of_externalProducts` —
+  classical generation by external products makes the perfect sequence full.
+* `DerivedBaseChangeData.QuasicoherentFullnessPropagationData.quasicoherentSequence_isFull`
+  — perfect fullness propagates to quasicoherent fullness.
+
+All names are in the namespace
+`AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange`.
+
+## Implementation notes
+
 For `Dqc`, compact generation reduces fullness to two formal compatibility
 facts: perfect filtrations remain quasicoherent filtrations after forgetting
 compactness, and the resulting total envelope is closed under coproducts.
 Neither fact is replaced by a prepackaged fullness assumption.
 
-The SF11.1 follow-up keeps these facts as geometry-owner inputs: the formal
-theorem below propagates them to `Dqc` fullness, but the structure fields are
-not themselves proofs that compact generation or filtration compatibility
-holds for every scheme base change.
+These facts are geometric inputs: the formal theorem below propagates them to
+`Dqc` fullness, but the structure fields are not themselves proofs that compact
+generation or filtration compatibility holds for every scheme base change.
+
+## References
+
+* arXiv:1902.08184v4, Proposition 3.15.
+
+## Tags
+
+base change, semiorthogonal decomposition, compact generation, external product,
+fullness
 -/
 
 noncomputable section

@@ -14,34 +14,45 @@ is `stChargeFamily` -- the existing three-coordinate surface family owned by
 `CentralCharge/Numerical/SurfaceFamily.lean` -- reindexed by `Prod.swap` and
 pulled back along the four-to-three coordinate drop.
 
-## What is actually new here
+## Main definitions
+
+All in the namespace
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Tilt`.
+
+* `threefoldTruncate` -- the additive map that forgets the fourth compressed
+  degree.
+* `tiltFamily` -- the tilt charge family, definitionally the surface family.
+* `rotatedTiltFamily` -- `tiltFamily.phaseRotate (1/2)`, the charge
+  Bayer--Lahoz--Macri--Stellari actually induce from.
+
+## Main results
+
+* `nu_eq_tilt_slope`, `chargeSlope_tilt` -- the tilt slope is `alpha` times the
+  charge slope, tying the family to the existing `Threefold.nu`.
+* `rotatedTiltFamily_alignmentLocus_eq_preimage` -- every rotated tilt wall is a
+  `Prod.swap` preimage of an `stChargeFamily` alignment locus.  This is what
+  lets `walls_nested_of_discr_nonneg`, `wall_circle_eq` and `wall_eq_of_meet`
+  apply to tilt walls.
+* `exists_tilt_alignmentValue_ne_threefold` -- the tilt family is **not** a
+  chart change of `Threefold.chargeFamily`.
+* `exists_chargeSlope_rotatedTiltFamily_ne` -- the rotation is not cosmetic.
+
+## Implementation notes
+
+### What is actually new here
 
 `threefoldTruncate` is the only new construction: the additive map that forgets
 the fourth compressed degree.  Without it the surface nested-semicircle theorems
 cannot be applied to tilt walls at all, because they speak about
 `stChargeFamily` and tilt walls do not.
 
-## The chart transposition
+### The chart transposition
 
 The surface family is indexed `(s, t)` and the threefold half plane is indexed
 `(alpha, beta)`, with `s = beta` and `t = alpha`.  That transposition lives in
 exactly one `reindex Prod.swap` and nowhere else.
 
-## Main results
-
-* `tiltFamily` -- the tilt charge family, definitionally the surface family.
-* `rotatedTiltFamily` -- `tiltFamily.phaseRotate (1/2)`, the charge
-  Bayer--Lahoz--Macri--Stellari actually induce from.
-* `nu_eq_tilt_slope`, `chargeSlope_tilt` -- the tilt slope is `alpha` times the
-  charge slope, tying the family to the existing `Threefold.nu`.
-* `rotatedTiltFamily_alignmentLocus_eq_preimage` -- every rotated tilt wall is a
-  `Prod.swap` preimage of an `stChargeFamily` alignment locus.  This is what
-  lets `walls_nested_of_discr_nonneg`, `wall_circle_eq` and `wall_eq_of_meet`
-  apply to tilt walls.  The abstraction-audit remediation names this statement
-  `rotatedTiltFamily_wall_eq_preimage`; MO1.03 (#1314) renamed the wall locus to
-  `alignmentLocus`, and the name here follows the current spelling.
-
-## Two negative results, recorded rather than dropped
+### Two negative results, recorded rather than dropped
 
 * `exists_tilt_alignmentValue_ne_threefold` -- the tilt family is **not** a
   chart change of `Threefold.chargeFamily`.  Their alignment loci genuinely
@@ -53,8 +64,19 @@ exactly one `reindex Prod.swap` and nowhere else.
   rotation is right about the wall locus and wrong about which objects are
   semistable.
 
+### What is not here
+
 The tilt-stability *categorical* content -- a heart, a slicing, or the BMT
 inequality -- is asserted nowhere in this file.  This is numerical data only.
+
+## References
+
+* Bayer, Lahoz, Macrì, Stellari, *Stability conditions on Kuznetsov components*,
+  arXiv:1703.10839.
+
+## Tags
+
+tilt stability, charge family, wall, threefold, truncation
 -/
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall

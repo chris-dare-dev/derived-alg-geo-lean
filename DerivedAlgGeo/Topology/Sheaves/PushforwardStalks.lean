@@ -23,14 +23,37 @@ import Mathlib.Topology.Sheaves.Abelian
 # Stalks of a pushforward off a closed range
 
 `subsingleton_stalk_pushforward` — for `f : X ⟶ Y` with closed range and `y ∉ Set.range f`, the
-stalk `(f _* F) y` of the pushforward of a sheaf of abelian groups is a subsingleton.
+stalk `(f _* F) y` of the pushforward of a sheaf of abelian groups is a subsingleton. With
+Mathlib's computation on the range, this makes the pushforward along a closed embedding exact.
 
-## Where this sits
+## Main definitions
 
-Exactness of `ι_*` along a closed immersion is the last input `#572` step 3 needs in order to be
-instantiated geometrically (`CategoryTheory/Sites/Sheaves/CohomologyPushforward.lean` proves the
-abstract
-statement). The standard proof is stalkwise, and it has two halves:
+All in the namespace `DerivedAlgGeo.Topology`:
+
+* `offRange` — the open complement of the closed range.
+* `additive_pushforward` — the sheaf pushforward is additive.
+
+## Main results
+
+* `preimage_eq_bot_of_le` — an open inside `offRange` pulls back to nothing.
+* `subsingleton_of_isTerminal` — terminal objects of `AddCommGrpCat` have subsingleton carriers.
+* `subsingleton_stalk_pushforward` — the vanishing.
+* `stalkPushforward_naturality` — naturality in the presheaf, which Mathlib does not have.
+* `surjective_stalk_map_pushforward` and `isLocallySurjective_pushforward` — the two stalk facts
+  assembled: pushforward along a closed embedding preserves local surjectivity, hence (with
+  `isLocallySurjective_iff_epi`) epimorphisms.
+* `preservesEpimorphisms_pushforward` — that, as a statement about the sheaf-level functor, which
+  is the same functor the site-level cohomology comparison quantifies over.
+* `preservesFiniteColimits_pushforward` — hence exactness, with limits free from the adjunction.
+* `opensMap_obj_top` — `Opens.map` sends the whole space to the whole space.
+
+## Implementation notes
+
+### Where this sits
+
+Exactness of `ι_*` along a closed immersion is the one non-formal input the abstract cohomology
+comparison of `CategoryTheory/Sites/Sheaves/CohomologyPushforward.lean` needs in order to be
+instantiated geometrically. The standard proof is stalkwise, and it has two halves:
 
 * **on the range**, `(f _* F)_{f x} ≅ F_x`. This is **already in Mathlib**, as
   `TopCat.Presheaf.stalkPushforward.stalkPushforward_iso_of_isInducing`, and it needs only
@@ -38,7 +61,7 @@ statement). The standard proof is stalkwise, and it has two halves:
   `X` around `x` are exactly the preimages of opens of `Y` around `f x`;
 * **off the range**, the stalk vanishes. That is this file, and it is where closedness is spent.
 
-## The proof, and why closedness is the whole of it
+### The proof, and why closedness is the whole of it
 
 `Set.range f` closed makes its complement an open `offRange` containing every `y` outside the
 range, and every open `U ≤ offRange` pulls back to `⊥`. So `(f _* F)(U) = F(⊥)`, which is terminal
@@ -50,26 +73,20 @@ computation: it produces, for any element of the stalk, a representing section o
 section of a terminal object. Two such germs agree because both equal the germ of `0` over
 `offRange` itself, via `germ_res_apply`.
 
-## Scope
+### Scope
 
-This says nothing about exactness yet. It is one of the two stalk computations that a stalkwise
-exactness proof consumes, and the other one is Mathlib's. Bridging from the topological `f _*` to
-the site-level `Functor.sheafPushforwardContinuous` that `#572` step 3 actually quantifies over is
-further work again, and is not begun here.
+The two stalk computations — Mathlib's on the range and this file's off it — are what the
+stalkwise exactness proof consumes. The topological `f _*` is, by definition, the site-level
+`Functor.sheafPushforwardContinuous`, so no bridge between them is needed.
 
-## Main results
+## References
 
-* `offRange` and `preimage_eq_bot_of_le` — the open, and that it pulls back to nothing.
-* `subsingleton_of_isTerminal` — terminal objects of `AddCommGrpCat` have subsingleton carriers.
-* `subsingleton_stalk_pushforward` — the vanishing.
-* `stalkPushforward_naturality` — naturality in the presheaf, which Mathlib does not have.
-* `surjective_stalk_map_pushforward` and `isLocallySurjective_pushforward` — the two stalk facts
-  assembled: pushforward along a closed embedding preserves local surjectivity, hence (with
-  `isLocallySurjective_iff_epi`) epimorphisms.
-* `preservesEpimorphisms_pushforward` — that, as a statement about the sheaf-level functor, which
-  is the same functor the site-level `#572` machinery quantifies over.
-* `preservesFiniteColimits_pushforward` — hence exactness, with limits free from the adjunction.
-* `additive_pushforward`, `opensMap_obj_top` — the two small pieces the instantiation also needs.
+Mathlib's `TopCat.Presheaf.stalkPushforward`, `TopCat.Sheaf.isTerminalOfEmpty` and
+`TopCat.Sheaf.isLocallySurjective_iff_epi`.
+
+## Tags
+
+sheaf, stalk, pushforward, closed embedding, exactness
 -/
 
 universe u
@@ -230,20 +247,20 @@ theorem isLocallySurjective_pushforward (hemb : Topology.IsInducing f)
 
 /-- **Pushforward along a closed embedding preserves epimorphisms.**
 
-Together with `ι_*` being a right adjoint — hence left exact for free — this is exactness, and it
-is the last mathematical input `#572` step 3 needs.
+Together with `ι_*` being a right adjoint — hence left exact for free — this is exactness, the
+one non-formal input of the cohomology comparison along a closed embedding.
 
 ## The site bridge costs nothing, and that is worth stating
 
-This is phrased about `TopCat.Sheaf.pushforward`, while `#572` step 3 quantifies over
-`Functor.sheafPushforwardContinuous`. **They are the same functor by definition**:
+This is phrased about `TopCat.Sheaf.pushforward`, while the abstract cohomology comparison
+quantifies over `Functor.sheafPushforwardContinuous`. **They are the same functor by definition**:
 `TopCat.Sheaf.pushforward C f` is *defined* as `(Opens.map f).sheafPushforwardContinuous _ _ _`,
 and `Sheaf.pushforward_map` and `Sheaf.pushforward_obj_val` are both `rfl`. No comparison
 isomorphism is needed anywhere, and none is built.
 
 ## The instances are all imports, not obligations
 
-`TopCat.Sheaf.isLocallySurjective_iff_epi` asks for `Balanced` on both sheaf categories and
+`TopCat.Sheaf.isLocallySurjective_iff_epi` requires `Balanced` on both sheaf categories and
 `ConcreteCategory.HasFunctorialSurjectiveInjectiveFactorization AddCommGrpCat`. Every one of them
 exists; they arrive with `Sites.Abelian`, `Grp.Abelian`, `Grp.EpiMono` and
 `ConcreteCategory.EpiMono`, and a missing import presents as a bare "failed to synthesize", which
@@ -276,8 +293,9 @@ epimorphisms and kernels gives `PreservesHomology`
 (`Functor.preservesHomology_of_preservesEpis_and_kernels`), and that gives finite colimits. The
 epimorphisms are `preservesEpimorphisms_pushforward`; the kernels come with the right adjoint.
 
-This is the input `#572` step 3 needs in order to instantiate the abstract cohomology comparison
-of `CategoryTheory/Sites/Sheaves/CohomologyPushforward.lean` at a closed immersion. -/
+This is the input the abstract cohomology comparison of
+`CategoryTheory/Sites/Sheaves/CohomologyPushforward.lean` needs in order to be instantiated at a
+closed immersion. -/
 theorem preservesFiniteColimits_pushforward (hemb : Topology.IsInducing f)
     (hcl : IsClosed (Set.range f)) :
     PreservesFiniteColimits (TopCat.Sheaf.pushforward AddCommGrpCat.{u} f) := by

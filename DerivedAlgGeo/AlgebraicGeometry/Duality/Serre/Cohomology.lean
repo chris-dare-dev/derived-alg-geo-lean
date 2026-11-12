@@ -304,9 +304,9 @@ end LocallyFreeSpecialization
 
 /-- Picard-level Euler symmetry supplied by locally free Serre duality on a surface.
 
-This small interface is the exact #40 output used by geometric surface Riemann--Roch.  Its field
-is a theorem produced by the locally free specialization once line-bundle representatives and
-their dual canonical twists are identified in the Picard group. -/
+This small interface is exactly the output of locally free Serre duality that geometric surface
+Riemann--Roch uses.  Its field is a theorem produced by the locally free specialization once
+line-bundle representatives and their dual canonical twists are identified in the Picard group. -/
 structure SurfacePicardSymmetry
     {C : D.LinearConnectingSystem}
     (I : AlgebraicGeometry.IntersectionTheory.Number.IntersectionContext D C 2)

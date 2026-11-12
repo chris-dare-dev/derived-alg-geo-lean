@@ -11,7 +11,7 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.FourierMukai.KernelConvol
 `KernelSwap.lean` gives a geometric kernel autoequivalence and shows it
 transports a stability condition. `KernelConvolution.lean` gives the geometric
 convolution of two kernels, with **no supplied fields** — its `conv` and
-`compIso` are both derived. This file is the one statement that needs both:
+`compIso` are both derived. This file joins the two, for the statement
 
 > transporting along two geometric Fourier--Mukai transforms is transporting
 > along the transform of their convolved kernel.
@@ -21,20 +21,34 @@ convolution of two kernels, with **no supplied fields** — its `conv` and
 Here the convolution data is `geometricConvolutionData` — assembled from the
 geometric ledger — so nothing in this file is supplied at all.
 
-## No new contracts
+## Main definitions
+
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.geometricTransKernelAutoequivalence`
+  — the composite of two geometric kernel autoequivalences, with the geometric
+  convolution data.
+
+## Main results
+
+None in this file. The transport statement for the composite,
+`geometricActStabTrans`, is in `Stability/FourierMukaiAction.lean`.
+
+## Implementation notes
+
+### No new contracts
 
 Every hypothesis below already exists: the two autoequivalences' own ledgers,
 and the seven classical inputs `geometricConvolutionData` names (flat base
 change, the two projection formulas, the monoidal pullback, and the two route
-classes). **This file introduces no class and asks for no datum.** It is
+classes). **This file introduces no class and requires no datum.** It is
 composition of what the two ledgers already produce.
 
-That is also why it is short. The mathematics was done in #466 abstractly and
-in `KernelConvolution.lean` geometrically; what was missing was that the two
-could be joined, which needed the geometric autoequivalence to exist at all
-(`KernelSwap.lean`) and its exactness to be reachable by instance search.
+That is also why it is short. The mathematics is done abstractly in
+`Symmetry/Autoequivalence/FourierMukai` and geometrically in
+`KernelConvolution.lean`; joining the two needs the geometric autoequivalence to
+exist at all (`KernelSwap.lean`) and its exactness to be reachable by instance
+search.
 
-## What this file does not assert
+### What this file does not assert
 
 * **Nothing is constructed that was not already constructible.** Every input is
   a hypothesis, and the whole ledger below it remains uninhabited: no scheme is
@@ -46,6 +60,15 @@ could be joined, which needed the geometric autoequivalence to exist at all
 * Nothing about `toAutPair` or `AutPairQuot` for the geometric composite.
 * No claim that any geometric transform is an equivalence; the invertibility of
   each assembled adjunction's unit and counit is assumed, as in `KernelSwap`.
+
+## References
+
+The repository's `CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.trans`,
+`KernelAutoequivalence.actStab_trans` and `geometricConvolutionData`.
+
+## Tags
+
+Fourier--Mukai transform, kernel convolution, autoequivalence, composition
 -/
 
 universe u

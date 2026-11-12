@@ -12,18 +12,37 @@ import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.Boundedness
 
 For polynomial projective space over a field, the standard cover by the variable charts
 `D₊(Xᵢ)` is Čech-acyclic for every quasi-coherent associated sheaf, and in particular for every
-nonnegative twist.  This is the hypothesis that the
+twist `O(d)`, of either sign.  This is the hypothesis that the
 Čech-to-derived comparison of
 `DerivedAlgGeo.Topology.Sheaves.Cech.GlobalComparison` consumes, so with it
 `Hⁱ(Pⁿ, O(d))` is the cohomology of an explicit complex of degree-zero homogeneous
 localizations.
 
-Three inputs meet here, and none of them is new:
+## Main definitions
+
+This file introduces no new definitions; it proves Čech-acyclicity of the variable cover of
+polynomial projective space and the resulting comparison with the algebraic Čech complexes.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.polynomialVariable_isCechAcyclicCover_of_isQuasicoherent`: the variable
+  cover is Čech-acyclic for any quasi-coherent associated sheaf.
+* `AlgebraicGeometry.Proj.polynomialVariable_isCechAcyclicCover` and
+  `AlgebraicGeometry.Proj.polynomialVariableIntShift_isCechAcyclicCover`: the same for a
+  nonnegative twist and for an integer twist.
+* `AlgebraicGeometry.Proj.polynomialVariableCechComplex_computesCohomology`: for a nonnegative
+  twist, `Hⁿ(Pⁿ, O(d))` is the degree-`n` homology of `polynomialVariableCechComplex`.
+* `AlgebraicGeometry.Proj.polynomialVariableIntCechComplex_computesCohomology`: the same for a
+  twist of either sign and `polynomialVariableIntCechComplex`.
+
+## Implementation notes
+
+Three inputs meet here, each proved elsewhere:
 
 * quasi-coherence of the sheaf — the only place a twist enters at all, which is why the results
-  are stated with it as a hypothesis and the `O(d)` case is a corollary supplying
-  `polynomialNatShift_isQuasicoherent`. A negative twist becomes acyclic here the moment its
-  quasi-coherence is available, with no change to this argument (see issue #439);
+  are stated with it as a hypothesis and the `O(d)` cases are corollaries supplying
+  `polynomialNatShift_isQuasicoherent` or `polynomialIntShift_isQuasicoherent`; a negative twist
+  is acyclic by the same argument, with no change to it;
 * `AlgebraicGeometry.Proj.isAffineOpen_basicOpen` — a basic open of a positive-degree
   homogeneous element is affine, which covers the `(n+1)`-fold Čech intersections because their
   denominator `∏ₐ X_{x a}` is homogeneous of degree `n + 1`;
@@ -31,10 +50,21 @@ Three inputs meet here, and none of them is new:
   cohomology of a quasi-coherent module vanishes on an affine open, against the ambient
   `Sheaf.H'` rather than a model.
 
-The `HasExt` witness is passed positionally throughout.  `Sheaf.H'` lands in the `HasExt`
+The `HasExt` witness is passed positionally throughout.  `Sheaf.H'` takes values in the `HasExt`
 universe, and the affine-vanishing result is stated at `HasExt.{u + 1}`; leaving the instance to
 be found would let the small-site `HasExt.{u}` be selected instead, giving a statement about
 different groups.
+
+## References
+
+The file cites no literature. It builds on
+`CategoryTheory.Sheaf.isCechAcyclicCover_cechComputesDerivedCohomologyAt_opens`,
+`AlgebraicGeometry.Proj.polynomialVariableCechComplexIso` and
+`AlgebraicGeometry.Proj.polynomialVariableIntCechComplexIso`.
+
+## Tags
+
+Čech cohomology, projective space, twisting sheaf, acyclic cover, quasi-coherent sheaf
 -/
 
 universe u
@@ -198,17 +228,17 @@ In every degree `n` and for every nonnegative twist `d`, the derived cohomology
 product of degree-zero homogeneous localizations whose differential is the alternating sum of
 `polynomialVariableCechFace`.
 
-Three inputs meet, and each is already proved elsewhere:
+Three inputs meet, and each is proved elsewhere:
 
-* `polynomialVariable_isCechAcyclicCover` (#338) — the variable cover is Čech-acyclic for
+* `polynomialVariable_isCechAcyclicCover` — the variable cover is Čech-acyclic for
   `O(d)`, which is what makes the Čech cohomology the derived cohomology at all;
 * `isCechAcyclicCover_cechComputesDerivedCohomologyAt_opens` — the Čech-to-derived comparison,
   whose terminal object is `⊤` and whose injective resolution is chosen for the small site;
-* `polynomialVariableCechComplexIso` (#339) — Mathlib's Čech complex of the cover *is* the
+* `polynomialVariableCechComplexIso` — Mathlib's Čech complex of the cover *is* the
   explicit algebraic complex.
 
 The `HasExt` witness is passed positionally, for the reason recorded on
-`isCechAcyclicCover_cechComputesDerivedCohomology_opens`: `Sheaf.H` lands in the `HasExt`
+`isCechAcyclicCover_cechComputesDerivedCohomology_opens`: `Sheaf.H` takes values in the `HasExt`
 universe, so `HasExt.{u}` and `HasExt.{u + 1}` name different groups and instance search must
 not be allowed to pick.
 
@@ -264,8 +294,9 @@ set_option synthInstance.maxHeartbeats 400000 in
 /-- The variable cover is Čech-acyclic for every integer twist, so `Hⁱ(Pⁿ, O(d))` is the Čech
 cohomology of that cover in every degree and for either sign of `d`.
 
-This is the input `#332`'s dévissage needs: it surjects a finite sum of `O(-d)` onto a coherent
-sheaf and does descending induction, which requires the comparison at negative twists. -/
+This is the input the dévissage proof of Serre finiteness needs: it surjects a finite sum of
+`O(-d)` onto a coherent sheaf and does descending induction, which requires the comparison at
+negative twists. -/
 theorem polynomialVariableIntShift_isCechAcyclicCover (ι k : Type u) [Field k] (d : ℤ)
     [hExt : HasExt.{u + 1} (TopCat.Sheaf AddCommGrpCat.{u}
       (_root_.AlgebraicGeometry.Proj (polynomialGrading ι k)))] :
@@ -289,7 +320,7 @@ set_option synthInstance.maxHeartbeats 400000 in
 /-- **The explicit Čech complex computes the cohomology of `O(d)` for a twist of either sign.**
 
 This is `polynomialVariableCechComplex_computesCohomology` with `natShift` replaced by
-`intShift` throughout, and it is assembled from the same three inputs, each already proved:
+`intShift` throughout, and it is assembled from the same three inputs:
 
 * `polynomialVariableIntShift_isCechAcyclicCover` — the variable cover is Čech-acyclic for an
   integer twist, which is what makes the Čech cohomology the derived cohomology at all;
@@ -299,16 +330,17 @@ This is `polynomialVariableCechComplex_computesCohomology` with `natShift` repla
 
 The nonnegative statement is not a corollary of this one and is not restated in terms of it:
 `natShift` and `intShift` are different graded families, so the two complexes are related by
-transport rather than by definitional equality, and `#340`'s vanishing theorem reads the
-nonnegative one directly.
+transport rather than by definitional equality, and the vanishing theorem
+`polynomialTwisting_H_subsingleton` reads the nonnegative one directly.
 
-The `HasExt` witness is passed positionally, for the reason recorded throughout this lane:
-`Sheaf.H` lands in the `HasExt` universe, so `HasExt.{u}` and `HasExt.{u + 1}` name different
-groups and instance search must not be allowed to pick.
+The `HasExt` witness is passed positionally, for the reason recorded throughout this file:
+`Sheaf.H` takes values in the `HasExt` universe, so `HasExt.{u}` and `HasExt.{u + 1}` name
+different groups and instance search must not be allowed to pick.
 
-This is the input `#332`'s dévissage consumes. It surjects a finite sum of `O(-d)` onto a
-coherent sheaf and does descending induction on the degree, which needs `Hⁱ(Pⁿ, O(d))` presented
-as the cohomology of an explicit complex at negative `d`, not only at nonnegative `d`. -/
+This is the input the dévissage proof of Serre finiteness consumes. It surjects a finite sum of
+`O(-d)` onto a coherent sheaf and does descending induction on the degree, which needs
+`Hⁱ(Pⁿ, O(d))` presented as the cohomology of an explicit complex at negative `d`, not only at
+nonnegative `d`. -/
 theorem polynomialVariableIntCechComplex_computesCohomology (ι k : Type u) [Field k]
     (d : ℤ) (n : ℕ)
     [hExt : HasExt.{u + 1} (TopCat.Sheaf AddCommGrpCat.{u}

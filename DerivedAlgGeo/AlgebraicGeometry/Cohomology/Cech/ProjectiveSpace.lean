@@ -357,9 +357,10 @@ therefore reused verbatim rather than restated. The only twist-dependent inputs 
 comparison `intCechTermSectionAddEquiv` and its face compatibility
 `intCechTermSectionAddEquiv_res_face`, and both are already proved with the sign absorbed.
 
-This is the layer `#332`'s dévissage consumes. The nonnegative layer above is not a special case
-of it — `natShift` and `intShift` are different graded families, related only by transport — so
-it is kept as it stands and `#340`'s vanishing theorem continues to read it. -/
+This is the layer the dévissage proof of Serre finiteness on `Pⁿ` consumes. The nonnegative
+layer above is not a special case of it — `natShift` and `intShift` are different graded
+families, related only by transport — so it is kept as it stands, and the vanishing of
+`Hⁿ(Pⁿ, O(d))` for `n ≥ 1` and `d ≥ 0` is proved against it. -/
 
 /-- The `AddCommGrpCat`-valued presheaf of `O(d)` for an integer twist. -/
 abbrev intTwistPresheaf (d : ℤ) :=

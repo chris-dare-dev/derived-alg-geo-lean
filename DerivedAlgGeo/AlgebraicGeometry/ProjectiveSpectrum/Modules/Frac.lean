@@ -12,7 +12,24 @@ Two definitions and the degree fact they need. `frac` is the degree-zero fractio
 `D₊(b)`, which is well defined because the fraction is *fixed* — the `IsFraction` witness is the
 open itself and restriction does not move it.
 
-## Why they are named rather than written inline
+## Main definitions
+
+* `AlgebraicGeometry.Proj.frac`: the degree-zero fraction `a / b` at a point of `D₊(b)`, for `a`
+  and `b` of the same degree.
+* `AlgebraicGeometry.Proj.fracSection`: `a / b` as a section of the structure sheaf over an open
+  inside `D₊(b)`.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.pow_mem_deg`: a degree-one element raised to `n` has degree `n`.
+
+## Notation
+
+`X` is local notation for the underlying space `ProjectiveSpectrum.top 𝒜`.
+
+## Implementation notes
+
+### Why they are named rather than written inline
 
 As an anonymous `HomogeneousLocalization.mk` the denominator submonoid is a metavariable when the
 term appears under a `•`, and `Submonoid.pow_mem _ hx n` will not elaborate. Naming the fraction
@@ -20,14 +37,21 @@ pins the submonoid. The section-level one has the matching problem one level up:
 value elaborates at the `⋙ forget Ab` type of the unit's sections, where the scalar action does not
 synthesize.
 
-## Why this file sits so early
+### Why this file sits so early
 
-`#825`. `fracPow` and `fracPowSection` — the case `a = fⁿ`, `b = gⁿ` — were written first, in
-`TwistBridge.lean` and `ChartUnitTwist.lean`, and the general `frac` and `fracSection` came later
-in `FracSection.lean`, which imports both. So the general definitions sat *downstream* of their own
-special cases, and the two were bridged by `rfl` lemmas instead of one being defined from the
-other. Hoisting the general pair above the special ones is what lets the special ones be
-definitions rather than duplicates.
+`fracPow` and `fracPowSection` — the case `a = fⁿ`, `b = gⁿ`, in `TwistBridge.lean` and
+`ChartUnitTwist.lean` — are defined from `frac` and `fracSection`. The general pair therefore sits
+upstream of its special cases, so that the special ones are definitions in terms of it rather than
+duplicates bridged by `rfl` lemmas.
+
+## References
+
+Mathlib's `HomogeneousLocalization.mk` and
+`AlgebraicGeometry.ProjectiveSpectrum.Proj.structureSheaf`.
+
+## Tags
+
+projective spectrum, homogeneous localization, structure sheaf, fraction
 -/
 
 open CategoryTheory Opposite TopologicalSpace

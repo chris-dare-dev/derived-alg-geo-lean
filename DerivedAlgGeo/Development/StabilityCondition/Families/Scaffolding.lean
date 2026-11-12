@@ -10,18 +10,42 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Familie
 
 This module records that the abstract condition structures are logically
 inhabitable by constant functions, full loci, `PUnit` witnesses, and a
-constant-true boundedness predicate.  Those inhabitants are useful for API
+constant-true boundedness predicate. Those inhabitants are useful for API
 reconnaissance, but they are not mathematical families and therefore expose
 no public declarations.
 
+## Main definitions
+
+None public. The private probes `constantChargeProbe`, `fullOpenLocusProbe`,
+`fullGenericSemistabilityProbe`, `constantDedekindHNProblem`,
+`constantWeakDedekindHNProblem`, `trueBoundednessProblem`,
+`constantWeakChargeProbe` and `constantWeakSemistabilityProbe` are the
+vacuous inhabitants.
+
+## Main results
+
+None public. The anonymous examples check that `OrdinaryStabilityInFamiliesData`,
+`CategoricalOrdinaryFiberStabilityInFamiliesData` and
+`WeakStabilityInFamiliesData` are inhabited by those probes.
+
+## Implementation notes
+
 The stable family modules deliberately provide no such vacuous-probe
 constructors: nothing in stable discharges a field with a constant-true
-predicate, a full-locus probe, or an arbitrary-`Prop` ledger.  Stable modules
+predicate, a full-locus probe, or an arbitrary-`Prop` ledger. Stable modules
 do still export constant-family reindexings (`_constant`/`_punit` witnesses
 in `FiberwiseSupport`, `PreStabilityBaseChange.constant`, and the scheme and
 relative-HN constant models); each of those requires a genuine support or
-pre-stability input and asserts nothing vacuously (2026-08-18 adversarial
-review, finding P2-10).
+pre-stability input and asserts nothing vacuously.
+
+## References
+
+The condition structures of `Families.Ordinary`, `Families.CategoricalOrdinary`
+and `Weak.Families.Weak`.
+
+## Tags
+
+stability conditions in families, compile-only probe, vacuous inhabitant
 -/
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.Development
@@ -125,7 +149,7 @@ private theorem ordinaryPUnit
       (constantDedekindHNProblem PUnit.{1} PUnit.{1})
       V₀ Z hV₀ (fun _ : PUnit.{1} ↦ S)
       (trueBoundednessProblem PUnit.{1}) where
-  definition20_5 :=
+  familyConditions :=
     { locallyConstantCharge := fun _ ↦
         constantChargeProbe_isLocallyConstant PUnit.{1} a
       opennessOfGeometricStability := fun _ ↦
@@ -168,7 +192,7 @@ private theorem ordinaryFiberPUnit
       (constantDedekindHNProblem PUnit.{1} PUnit.{1})
       V₀ Z hV₀ (fun _ ↦ sigma₀)
       (trueBoundednessProblem PUnit.{1}) where
-  definition20_5 :=
+  familyConditions :=
     { locallyConstantCharge := fun _ ↦
         constantChargeProbe_isLocallyConstant PUnit.{1} a
       opennessOfGeometricStability := fun _ ↦
@@ -236,7 +260,7 @@ private theorem weakClauseZeroConstant
     {t : TStructure C} (W : WeakStabilityFunction t)
     (hZ : HasGaussianRationalValues W.Z)
     (hN : IsNoetherianTorsionSubcategory t W.zeroCharge) :
-    WeakDefinition20_5ClauseZero (fun _ : PUnit.{1} ↦ W) :=
+    WeakFamilyChargeConditions (fun _ : PUnit.{1} ↦ W) :=
   ⟨fun _ ↦ hZ, fun _ ↦ hN⟩
 
 omit [IsTriangulated C] in
@@ -268,7 +292,7 @@ example
       (constantWeakDedekindHNProblem PUnit.{1} PUnit.{1})
       V₀ Zlin hV₀ (trueBoundednessProblem PUnit.{1}) where
   clauseZero := weakClauseZeroConstant W hZ hN
-  definition20_5 :=
+  familyConditions :=
     { locallyConstantCharge := fun _ ↦
         constantWeakChargeProbe_isLocallyConstant W k
       genericOpennessOfSemistability := fun _ ↦

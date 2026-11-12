@@ -41,10 +41,7 @@ emitter cover it; the stable `DerivedAlgGeo` root does not import it.
 
 ## References
 
-- Mathlib v4.32.1, pinned at commit
-  `520045ab14e26149ee970e2e617ca04b09bde5d6`:
-  `Mathlib/AlgebraicGeometry/Modules/Tilde.lean`.
-- Issue #1608.
+- Mathlib's `Mathlib/AlgebraicGeometry/Modules/Tilde.lean` at the pinned revision.
 
 ## Tags
 

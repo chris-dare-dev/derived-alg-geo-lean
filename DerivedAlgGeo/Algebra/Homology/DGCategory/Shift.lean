@@ -14,10 +14,29 @@ using Mathlib's shift on `CochainComplex`. This file records what survives that
 shift: the differential picks up `(-1) ^ m`, and composition still satisfies
 Leibniz, associativity, and the unit laws — provided it picks up a Koszul sign.
 
-This is the shift `dg-enhancements-e2`'s summary claimed to deliver and did not;
-`dg-enhancements-e5` (#376) owns it, and the roadmap is corrected alongside.
+## Main definitions
 
-## The sign is derived, not chosen
+* `CategoryTheory.DGCategory.shiftD` — the differential of the `m`-shifted
+  hom-complex, at raw degrees.
+* `CategoryTheory.DGCategory.shiftComp` — composition of shifted hom-complexes:
+  `dgComp` with the Koszul sign the Leibniz rule forces.
+
+## Main results
+
+* `CategoryTheory.DGCategory.shiftFunctor_dgHom_d` — `shiftD` is the
+  differential of Mathlib's shifted hom-complex, by `rfl`.
+* `CategoryTheory.DGCategory.shiftComp_leibniz` — the Leibniz rule survives the
+  shift.
+* `CategoryTheory.DGCategory.shiftComp_assoc`,
+  `CategoryTheory.DGCategory.shiftComp_dgId_left` and
+  `CategoryTheory.DGCategory.shiftComp_dgId_right` — associativity and the unit
+  laws survive with no further sign condition.
+* `CategoryTheory.DGCategory.shiftD_shiftD` — the shifted differential squares
+  to zero.
+
+## Implementation notes
+
+### The sign is derived, not chosen
 
 Mathlib's `CochainComplex.shiftFunctor m` sends `K` to the complex that is
 `K.X (i + m)` in degree `i`, with differential `m.negOnePow • K.d _ _`
@@ -38,7 +57,7 @@ conditions rather than as an appeal to that rule.
 Associativity and the unit laws are then automatic rather than further
 constraints; `shiftComp_assoc` and the two `dgId` lemmas below confirm this.
 
-## Raw degrees, not shifted ones
+### Raw degrees, not shifted ones
 
 Every degree argument below is the degree in the *underlying* hom-complex, and
 the shift enters only through the sign. Writing `shiftComp` on shifted degrees
@@ -47,6 +66,15 @@ instead — with hom-types like `(dgHom X Y).X (p + m)` — costs a rewrite betw
 `HomologicalComplex.X` breaks the motive. On raw degrees the statement has the
 same shape as `dgComp` itself: three degrees and one equation. The shifted
 degree is recovered as `b - n`, which is where the sign's `b - n` comes from.
+
+## References
+
+Mathlib's `CochainComplex.shiftFunctor`, `CochainComplex.shiftFunctor_obj_X'`
+and `CochainComplex.shiftFunctor_obj_d'`.
+
+## Tags
+
+dg category, shift, Koszul sign, Leibniz rule, Hom complex
 -/
 
 set_option autoImplicit false

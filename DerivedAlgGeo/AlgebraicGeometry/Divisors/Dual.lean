@@ -2,9 +2,9 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
--- Narrowed from `Divisors.Determinant` (2026-08-15). Everything below needs only
--- `Modules.Tensor.Basic`; the single declaration that needed `Determinant` moved to
--- `Divisors.LineBundleDual`, which took `Dual` off `ExteriorPower`'s critical path.
+-- Everything below needs only `Modules.Tensor.Basic`, not `Divisors.Determinant`; the bridge
+-- to `LineBundleData` lives in `Divisors.LineBundleDual`, which keeps `Dual` off
+-- `ExteriorPower`'s critical path.
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Basic
 import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.CoversTop
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Invertible

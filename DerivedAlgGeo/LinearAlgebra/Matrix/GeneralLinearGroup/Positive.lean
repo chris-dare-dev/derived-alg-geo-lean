@@ -12,14 +12,32 @@ import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
 reading off the matrix takes two coercions. `toMat` is that composite, together
 with the two lemmas saying it is a monoid map.
 
+## Main definitions
+
+* `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.toMat` —
+  the matrix underlying an element of `GL⁺(2, ℝ)`.
+
+## Main results
+
+* `toMat_mul` and `toMat_one` — `toMat` is multiplicative and unital, both by `rfl`.
+
+## Implementation notes
+
 Neutral general-linear-group API: it mentions no cover, no phase and no
 stability condition, and it is consumed independently by the universal cover of
 `GL⁺(2, ℝ)` under `UniversalCover/`, by the complex-coordinate adapter in
 `LinearAlgebra/Complex/Coordinates.lean`, and by the stability action under
 `CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Action/`.
-Extracted by MO1.12 (#1323) from the cover's `Basic.lean`, where it was
-declared; the fully qualified names are unchanged, per the cutover ledger's
-first standing decision.
+The declarations live in the namespace of the stability action, which keeps
+their fully qualified names fixed.
+
+## References
+
+Mathlib's `Matrix.GLPos` and `Matrix.GeneralLinearGroup`.
+
+## Tags
+
+general linear group, positive determinant, matrix
 -/
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

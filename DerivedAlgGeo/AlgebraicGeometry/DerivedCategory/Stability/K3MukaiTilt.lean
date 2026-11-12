@@ -19,12 +19,58 @@ transfers its HN property from the Hilbert-coefficient slope, transports it to
 the standard heart of `Dᵇ(Coh X)`, and extends the coherent Mukai class
 canonically to `K₀(Dᵇ(Coh X))` through the cohomological Euler equivalence.
 
+## Main definitions
+
+All names are in `AlgebraicGeometry.DerivedCategory.Stability.K3MukaiTilt`, several
+of them under its `SlopeNormalization` namespace.
+
+* `SlopeBoundedness` — Grothendieck's boundedness lemma in the form needed for
+  μ-HN filtrations.
+* `SlopeNormalization` — the affine normalization relating the leading Hilbert
+  coefficients to numerical rank and `ω · ch₁`.
+* `mukaiSlopeData` and `boundedMukaiSlopeData` — the numerical Mukai slope on
+  coherent sheaves and on the standard heart `boundedCohHeart` of `Dᵇ(Coh X)`.
+* `coherentMukaiClass`, `boundedHeartMukaiClass`, `IsAmbientMukaiClass` and
+  `derivedMukaiClass` — the Mukai class on coherent sheaves, on the heart, and
+  its canonical extension to `K₀(Dᵇ(Coh X))`.
+* `HasDimensionZeroMukaiClasses` — the dimension-zero Mukai-class statement.
+* `tiltStabilityFunction` and `canonicalTiltStabilityFunction` — the exponential
+  Mukai charge as a stability function on the tilted standard heart.
+
+## Main results
+
+* `muHNInput` — on a Noetherian scheme, slope boundedness discharges
+  `MuHNInput`.
+* `hilbertSlope_eq` and `sameSlopeOrder` — the Hilbert slope and the Mukai slope
+  induce the same order.
+* `mukaiSlopeData_hasHNProperty` and `boundedMukaiSlopeData_hasHNProperty` — the
+  HN property of the Mukai slope, on sheaves and on the heart.
+* `derivedMukaiClass_isAmbient`, `mukaiWeakSlopeCompat` and
+  `derivedMukaiWeakSlopeCompat` — the canonical derived class realizes the
+  coherent one and computes the normalized slope.
+* `hasDimensionZeroTorsionClasses` and `hasDimensionZeroTorsionClasses_derived` —
+  the dimension-zero classification supplies the torsion-class input.
+* `tiltStabilityFunction_Z` and `canonicalTiltStabilityFunction_Z` — the charge of
+  the assembled stability function.
+
+## Implementation notes
+
 Two genuinely geometric seams remain explicit: the dimension-zero sheaf
 classification and the boundary Jordan--Hölder/Mukai-square decomposition.
-The latter is exactly the existing abstract boundary hypothesis: issue #332
-supplies finite-dimensional Hom spaces but not yet the stable-simple,
-Jordan--Hölder, and Serre-duality argument needed to prove that decomposition.
+The latter is exactly the existing abstract boundary hypothesis: the repository
+has finite-dimensional Hom spaces but not the stable-simple, Jordan--Hölder, and
+Serre-duality argument needed to prove that decomposition.
 No topology and no full stability condition are introduced here.
+
+## References
+
+The repository's `MuHNInput.ofSlopeBoundedness`,
+`MukaiTilt.HasBoundaryMukaiDecomposition`, `MukaiChargeData.ambientChargeHom` and
+`WeakStabilityCondition.StabilityFunction`.
+
+## Tags
+
+K3 surface, Mukai vector, tilt stability, stability function, Harder--Narasimhan
 -/
 
 noncomputable section
@@ -67,8 +113,8 @@ theorem muHNInput [IsNoetherian X] {P : PolarizedVarietyData k X}
 coefficients to numerical rank and `ω · ch₁` on a surface.
 
 For the usual Hilbert polynomial of a polarized K3, `scale` is `H²` and
-`shift` is `H² / 2`.  They remain explicit because the current geometric
-reconstruction and Gieseker packages do not yet prove that comparison. -/
+`shift` is `H² / 2`.  They remain explicit because the geometric
+reconstruction and Gieseker packages do not prove that comparison. -/
 structure SlopeNormalization
     (P : PolarizedVarietyData k X)
     (R : Numerical.Surface.NumericalRealization V.ring (D := W))
@@ -347,7 +393,7 @@ end SlopeNormalization
 
 /-- The dimension-zero Mukai-class statement at the coherent-sheaf level.
 
-This is the honest geometric gap: the repository does not yet have a theory
+This is the honest geometric gap: the repository does not have a theory
 of support dimension and length from which to prove it.  Naming it here avoids
 replacing that missing theorem by a manufactured heart-level witness. -/
 def HasDimensionZeroMukaiClasses (ω : W) : Prop :=
@@ -419,7 +465,8 @@ standard heart of `Dᵇ(Coh X)`.
 All formal inputs are discharged here.  The ambient realization equality,
 dimension-zero classification, and K3 boundary decomposition remain visible
 geometric hypotheses.  The last is the named gap whose missing categorical
-ingredients are tracked from issue #332.  The conclusion is only a stability
+ingredients are the stable-simple, Jordan--Hölder and Serre-duality arguments.
+The conclusion is only a stability
 function; it does not assert the HN property on the tilted heart or package a
 full stability condition. -/
 def tiltStabilityFunction

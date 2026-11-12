@@ -11,7 +11,22 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BoundedGeometry
 `Dᵇ(Coh T) ⥤ Dᵇ(Coh U)` along a morphism of scheme base changes.  It is a **supplied
 capability, not a construction**: this file inhabits nothing.
 
-## Why it is stated directly on `Dᵇ(Coh)`
+## Main definitions
+
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedPushforward` — an additive,
+  shift-commuting, triangulated functor `Dᵇ(Coh T) ⥤ Dᵇ(Coh U)` along `f`.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.derivedPushforward` — that functor,
+  named.
+
+## Main results
+
+The instances `derivedPushforward_additive`, `derivedPushforwardCommShift` and
+`derivedPushforward_isTriangulated` expose the fields of the contract on
+`derivedPushforward`.
+
+## Implementation notes
+
+### Why it is stated directly on `Dᵇ(Coh)`
 
 Deliberately stated on `Dᵇ(Coh)` rather than, as `HasCoherentPullback` does, on `Coh`
 with a derived lift.  The reason is asymmetry in the mathematics, not convenience:
@@ -24,10 +39,10 @@ This is also where **properness** lives.  Pushforward preserves coherence only f
 proper morphism, so a caller discharging this class is asserting exactly that much
 geometry.
 
-## Its relation to the exact coherent pushforward next door
+### Its relation to the exact coherent pushforward next door
 
 `Families/CoherentPushforward.lean` carries a *different, stronger* contract.
-`HasCoherentPushforward f` asks for an exact pushforward on coherent sheaves and derives
+`HasCoherentPushforward f` requires an exact pushforward on coherent sheaves and derives
 the bounded derived functor from it degreewise, which is why finite morphisms inhabit it.
 That route is unavailable for a proper morphism that is not affine, where `f_*` is only
 left exact on coherent sheaves; such a morphism does not inhabit
@@ -36,24 +51,28 @@ accommodates it.
 
 The two are deliberately **not** connected by an instance here.  Deriving
 `HasDerivedPushforward` from `HasCoherentPushforward` would be new mathematics -- a
-discharge -- and MO1.10 is a placement split.  A consumer wanting both states both.
+discharge -- and this file only states the contract.  A consumer wanting both states
+both.
 
-## Placement
+### Placement and namespace
 
-MO1.10 (#1321) extracted this capability from
-`DerivedCategory/FourierMukai/KernelCorrespondence.lean` to the existing owner of derived
-direct images on scheme base changes, beside `Families/CoherentPushforward.lean` and
-`Families/RightDerivedPushforward.lean`.  Fourier--Mukai is a consumer of a pushforward,
-not its subject.  Per the cutover ledger's standing decision that paths move and
-namespaces do not, the declarations keep the
-`AlgebraicGeometry.DerivedCategory.FourierMukai` namespace they were introduced with;
-this also keeps them distinct from the unrelated `SchemeBaseChange.derivedPushforward` of
-`Families/RightDerivedPushforward.lean`, which is the right-derived functor of an
-arbitrary module-sheaf pushforward.
+The capability lives with the derived direct images on scheme base changes, beside
+`Families/CoherentPushforward.lean` and `Families/RightDerivedPushforward.lean`.
+Fourier--Mukai is a consumer of a pushforward, not its subject.  The declarations are in
+the `AlgebraicGeometry.DerivedCategory.FourierMukai` namespace, which keeps them distinct
+from the unrelated `SchemeBaseChange.derivedPushforward` of
+`Families/RightDerivedPushforward.lean`, the right-derived functor of an arbitrary
+module-sheaf pushforward.
 
 ## References
 
-* `docs/architecture/cutover-ledger.md`, row 10.
+Mathlib's `Functor.CommShift` and `Functor.IsTriangulated`, and the repository's
+`SchemeBoundedCoherentDerivedCategory` and `SchemeBaseChange`.
+
+## Tags
+
+derived pushforward, direct image, bounded derived category, coherent sheaves,
+proper morphism
 -/
 
 universe u
