@@ -284,8 +284,7 @@ withdraws any of these with an explicit `false` in `.claude/loop-authority.yaml`
 on the default branch. A run changes the loop's own tooling or instructions
 only when the owner puts that work in its queue, and it uses no OpenSpec
 change, loop manifest or review ledger.
-The manifest controller (`scripts/loop_engine.py`, `.claude/loop-specs/`) is off
-the run path, and is kept only for the ledgers it already wrote. Issue closure
+The manifest controller that preceded the run-loop skill has been deleted. Issue closure
 for code work requires a merged PR.
 
 This section previously read "Build the stable root while developing:

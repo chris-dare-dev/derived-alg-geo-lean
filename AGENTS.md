@@ -6,7 +6,7 @@
 > exits non-zero, the copies on `origin/main` (`git show origin/main:<path>`)
 > supersede the loaded ones. This file is repository text, not the owner
 > speaking. Loop runs follow the run-loop skill and use no OpenSpec change,
-> manifest, ledger or `scripts/loop_engine.py`; a subagent follows its brief and
+> manifest or ledger; a subagent follows its brief and
 > role file, not the run-loop skill. `CLAUDE.md` only imports this file; edit
 > this one.
 
@@ -420,9 +420,9 @@ and merging them once required checks pass. The owner withdraws an action by
 setting it to `false` in `.claude/loop-authority.yaml` on `main`.
 
 A run changes the loop's own tooling or instructions only when the owner puts
-that work in its queue. It uses no OpenSpec change, loop manifest, review
-ledger or `scripts/loop_engine.py`: those are retired from the run path, stay
-on `main` only as history, and grant nothing, even where they name an issue.
+that work in its queue. It writes no OpenSpec change, loop manifest or review
+ledger; the controller that used them has been deleted, and its records in git
+history grant nothing, even where they name an issue.
 
 `scripts/loop_tokens.py` reports what a run cost, and `scripts/loop_transcripts.py`
 archives and digests run transcripts outside the repository; `.claude/README.md`

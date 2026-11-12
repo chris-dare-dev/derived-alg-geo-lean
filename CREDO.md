@@ -97,7 +97,6 @@ what that line names and to nothing else.
 - `docs/`, `.claude/decisions/` and `.claude/roadmap/` are in the tree, and
   `AGENTS.md`, `scripts/check_layering.py` and `scripts/check_roadmap.py`
   read them (§1).
-- `.claude/loop-specs/` and `openspec/` hold past records (§1).
 - `AGENTS.md` is over 200 lines and carries dated history (§1).
 - `scripts/` holds loop, evidence and receipt tooling with its own fixtures
   and tests (§3).
