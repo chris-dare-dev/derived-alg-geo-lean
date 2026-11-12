@@ -125,7 +125,7 @@ private theorem ordinaryPUnit
       (constantDedekindHNProblem PUnit.{1} PUnit.{1})
       V₀ Z hV₀ (fun _ : PUnit.{1} ↦ S)
       (trueBoundednessProblem PUnit.{1}) where
-  definition20_5 :=
+  familyConditions :=
     { locallyConstantCharge := fun _ ↦
         constantChargeProbe_isLocallyConstant PUnit.{1} a
       opennessOfGeometricStability := fun _ ↦
@@ -168,7 +168,7 @@ private theorem ordinaryFiberPUnit
       (constantDedekindHNProblem PUnit.{1} PUnit.{1})
       V₀ Z hV₀ (fun _ ↦ sigma₀)
       (trueBoundednessProblem PUnit.{1}) where
-  definition20_5 :=
+  familyConditions :=
     { locallyConstantCharge := fun _ ↦
         constantChargeProbe_isLocallyConstant PUnit.{1} a
       opennessOfGeometricStability := fun _ ↦
@@ -236,7 +236,7 @@ private theorem weakClauseZeroConstant
     {t : TStructure C} (W : WeakStabilityFunction t)
     (hZ : HasGaussianRationalValues W.Z)
     (hN : IsNoetherianTorsionSubcategory t W.zeroCharge) :
-    WeakDefinition20_5ClauseZero (fun _ : PUnit.{1} ↦ W) :=
+    WeakFamilyChargeConditions (fun _ : PUnit.{1} ↦ W) :=
   ⟨fun _ ↦ hZ, fun _ ↦ hN⟩
 
 omit [IsTriangulated C] in
@@ -268,7 +268,7 @@ example
       (constantWeakDedekindHNProblem PUnit.{1} PUnit.{1})
       V₀ Zlin hV₀ (trueBoundednessProblem PUnit.{1}) where
   clauseZero := weakClauseZeroConstant W hZ hN
-  definition20_5 :=
+  familyConditions :=
     { locallyConstantCharge := fun _ ↦
         constantWeakChargeProbe_isLocallyConstant W k
       genericOpennessOfSemistability := fun _ ↦

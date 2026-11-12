@@ -108,7 +108,7 @@ def WeakSemistabilityProbe.toGenericProbe {t : TStructure C}
   semistableLocus := {x | (W (P.fiber x)).IsSemistable (P.object x)}
 
 /-- Definition 20.5(0), bound to actual weak stability functions. -/
-structure WeakDefinition20_5ClauseZero {t : TStructure C}
+structure WeakFamilyChargeConditions {t : TStructure C}
     (W : I → WeakStabilityFunction t) : Prop where
   /-- Every fiber charge is defined over `ℚ[i]`. -/
   gaussianRationalCharge : ∀ i, HasGaussianRationalValues (W i).Z
@@ -118,10 +118,10 @@ structure WeakDefinition20_5ClauseZero {t : TStructure C}
 
 omit [IsTriangulated C] in
 /-- Clause (0) is preserved by reindexing. -/
-theorem WeakDefinition20_5ClauseZero.reindex {J : Type*}
+theorem WeakFamilyChargeConditions.reindex {J : Type*}
     {t : TStructure C} {W : I → WeakStabilityFunction t}
-    (h : WeakDefinition20_5ClauseZero W) (f : J → I) :
-    WeakDefinition20_5ClauseZero (fun j ↦ W (f j)) :=
+    (h : WeakFamilyChargeConditions W) (f : J → I) :
+    WeakFamilyChargeConditions (fun j ↦ W (f j)) :=
   ⟨fun j ↦ h.gaussianRationalCharge (f j),
     fun j ↦ h.zeroChargeNoetherian (f j)⟩
 
@@ -176,9 +176,9 @@ structure WeakStabilityInFamiliesData
     (hV₀ : V₀ ≤ LinearMap.ker Zlin)
     (boundedness : BoundednessProblem M) : Prop where
   /-- Definition 20.5(0). -/
-  clauseZero : WeakDefinition20_5ClauseZero W
+  clauseZero : WeakFamilyChargeConditions W
   /-- Definition 20.5(1), (2'), and (3'). -/
-  definition20_5 : WeakDefinition20_5Conditions
+  familyConditions : WeakFamilyConditions
     (fun j ↦ (charge j).toChargeProbe W)
     (fun j ↦ (semistable j).toGenericProbe W) dedekind
   /-- Definition 21.15(4). -/

@@ -8,25 +8,51 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeGenera
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeProjection
 
 /-!
-# Proposition 3.15 assembly for scheme base change
+# Base change of a semiorthogonal decomposition
 
-This file assembles the formal core of Proposition 3.15 of
-arXiv:1902.08184 from the independent geometric inputs isolated by the
-base-change API.
+The formal core of Proposition 3.15 of arXiv:1902.08184: a semiorthogonal
+decomposition of the source base-changes to one of the target, assembled from
+the independent geometric inputs that the base-change API isolates.
 
-The first package combines presentable `S`-linearity with the explicit
-K-flat fibre-coefficient comparison and faithful derived base change. The
-second adds external-product generation and propagation from perfect objects
-to `Dqc`. Thus it produces semiorthogonality and fullness for both the perfect
-and quasicoherent sequences.
+## Main definitions
 
-The projection layer constructs the `Dqc` projectors from componentwise
-compact-generator approximations and obtains the perfect projectors by
-restriction to compact objects. `Proposition315ProjectionConstructionData`
-records the remaining geometric inputs: cocontinuity of the corresponding
-truncations, preservation of compact objects, and the compact-intersection
-identification. It produces `Proposition315ProjectionData`, which in turn
-converts the core package to `DecompositionData`.
+* `KFlatBaseChangeData.DecompositionSemiorthogonalityData` — presentable
+  `S`-linearity, the K-flat fibre-coefficient comparison and faithful derived
+  base change.
+* `KFlatBaseChangeData.DecompositionCoreData` — that package with
+  external-product generation and propagation from perfect objects to `Dqc`.
+* `KFlatBaseChangeData.DecompositionProjectionData` — the chosen perfect and
+  quasicoherent projections.
+* `KFlatBaseChangeData.DecompositionProjectionHypotheses` — the geometric
+  inputs the projections are built from: cocontinuity of the truncations,
+  preservation of compact objects, and the compact-intersection identification.
+
+## Main results
+
+* `DecompositionSemiorthogonalityData.ofKFlatTensorCoefficientComparison` —
+  semiorthogonality from the atomic K-flat tensor comparisons.
+* `DecompositionSemiorthogonalityData.toCoreData` — semiorthogonality and
+  fullness for both the perfect and the quasicoherent sequences.
+* `DecompositionProjectionHypotheses.toProjectionData` — the `Dqc` projectors
+  from componentwise compact-generator approximations, and the perfect ones by
+  restriction to compact objects.
+* `DecompositionCoreData.toDecompositionData` and
+  `DecompositionCoreData.toDecompositionDataOfProjectionConstruction` — the
+  existing `DecompositionData`.
+
+## Implementation notes
+
+The structures name inputs; none of them is constructed from scheme geometry
+in this file. Each conversion consumes exactly the inputs it names.
+
+## References
+
+* Bayer, Lahoz, Macrì, Nuer, Perry, Stellari, *Stability conditions in
+  families*, arXiv:1902.08184, Proposition 3.15.
+
+## Tags
+
+semiorthogonal decomposition, base change, K-flat, compact generation
 -/
 
 noncomputable section
@@ -48,7 +74,7 @@ variable {S : Scheme.{u}} {X T : SchemeBaseChange S}
 /-- The semiorthogonality part of Proposition 3.15, with the source
 triangulatedness and the presentably extended base-linearity retained for
 later construction steps. -/
-structure Proposition315SemiorthogonalityData
+structure DecompositionSemiorthogonalityData
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (Q : D.SourceTensorData)
     (B : KFlatBasePullbackData X) where
@@ -61,7 +87,7 @@ structure Proposition315SemiorthogonalityData
   perfectSemiorthogonal :
     D.toDerivedBaseChangeData.PerfectComponentsSemiorthogonal A
 
-namespace Proposition315SemiorthogonalityData
+namespace DecompositionSemiorthogonalityData
 
 /-- Assemble semiorthogonality from the atomic K-flat tensor comparisons.
 
@@ -90,7 +116,7 @@ theorem ofKFlatTensorCoefficientComparison
     (C : CompactFiberProjectionFormula.KFlatTensorCoefficientComparison
       (D := D) P K V)
     (hS : SourceTensorData.KFlatSLinearComponents (D := D) Q B A) :
-    D.Proposition315SemiorthogonalityData A Q B := by
+    D.DecompositionSemiorthogonalityData A Q B := by
   let hDqcS : SourceTensorData.KFlatDqcSLinearComponents
       (D := D) Q B A :=
     SourceTensorData.PresentableBaseActionData.dqcSLinearComponents
@@ -102,18 +128,18 @@ theorem ofKFlatTensorCoefficientComparison
         D.perfectComponentsSemiorthogonal_of_kFlatTensorCoefficientComparison
           A hA hIso H Q B K V pushBase pushFst adj P faithful C hDqcS }
 
-end Proposition315SemiorthogonalityData
+end DecompositionSemiorthogonalityData
 
 /-- The formal core of Proposition 3.15: the perfect and quasicoherent
 base-change sequences are semiorthogonal and full, and the source linearity
 used in the construction is available at the `Dqc(S)` level. -/
-structure Proposition315CoreData
+structure DecompositionCoreData
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (Q : D.SourceTensorData)
     (B : KFlatBasePullbackData X)
     (hcompact : D.PreservesCompactObjects) where
   /-- Semiorthogonality and presentable source linearity. -/
-  semiorthogonality : D.Proposition315SemiorthogonalityData A Q B
+  semiorthogonality : D.DecompositionSemiorthogonalityData A Q B
   /-- External products generate the perfect base-change category. -/
   perfectFull :
     (D.toDerivedBaseChangeData.perfectCategorySequence A
@@ -124,13 +150,13 @@ structure Proposition315CoreData
       (D.toDerivedPreservesCompactObjects hcompact)
       semiorthogonality.perfectSemiorthogonal).IsFull
 
-namespace Proposition315SemiorthogonalityData
+namespace DecompositionSemiorthogonalityData
 
 variable {D : KFlatBaseChangeData X T}
   {A : SemiorthogonalSequence (SourceDqc X) ι}
   {Q : D.SourceTensorData}
   {B : KFlatBasePullbackData X}
-  (C : D.Proposition315SemiorthogonalityData A Q B)
+  (C : D.DecompositionSemiorthogonalityData A Q B)
 
 /-- Add the two generation inputs to the semiorthogonality package.
 
@@ -144,7 +170,7 @@ theorem toCoreData
     (G : D.toDerivedBaseChangeData.QuasicoherentFullnessPropagationData A
       (D.toDerivedPreservesCompactObjects hcompact)
       C.perfectSemiorthogonal) :
-    D.Proposition315CoreData A Q B hcompact := by
+    D.DecompositionCoreData A Q B hcompact := by
   let hperfect := D.toDerivedBaseChangeData.perfectCategorySequence_isFull_of_externalProducts
     A C.perfectSemiorthogonal hgen
   exact
@@ -152,17 +178,17 @@ theorem toCoreData
       perfectFull := hperfect
       quasicoherentFull := G.quasicoherentSequence_isFull hperfect }
 
-end Proposition315SemiorthogonalityData
+end DecompositionSemiorthogonalityData
 
 /-- The exact remaining projection boundary after the Proposition 3.15 core
 has been assembled. No existence or cocontinuity theorem for these projectors
 is inferred from semiorthogonality or generation. -/
-structure Proposition315ProjectionData
+structure DecompositionProjectionData
     {A : SemiorthogonalSequence (SourceDqc X) ι}
     {Q : D.SourceTensorData}
     {B : KFlatBasePullbackData X}
     {hcompact : D.PreservesCompactObjects}
-    (C : D.Proposition315CoreData A Q B hcompact) where
+    (C : D.DecompositionCoreData A Q B hcompact) where
   /-- Chosen right projections onto the perfect components. -/
   perfectProjections :
     (D.toDerivedBaseChangeData.perfectCategorySequence A
@@ -178,12 +204,12 @@ structure Proposition315ProjectionData
 
 /-- Geometric inputs from which all chosen projections in Proposition 3.15
 are constructed. -/
-structure Proposition315ProjectionConstructionData
+structure DecompositionProjectionHypotheses
     {A : SemiorthogonalSequence (SourceDqc X) ι}
     {Q : D.SourceTensorData}
     {B : KFlatBasePullbackData X}
     {hcompact : D.PreservesCompactObjects}
-    (C : D.Proposition315CoreData A Q B hcompact) : Prop where
+    (C : D.DecompositionCoreData A Q B hcompact) : Prop where
   /-- Compact-generator approximations for the perfect envelopes. -/
   approximation : D.toDerivedBaseChangeData.QuasicoherentProjectionApproximationData A
   /-- The zero truncation attached to each approximation preserves
@@ -201,19 +227,19 @@ structure Proposition315ProjectionConstructionData
         (D.toDerivedPreservesCompactObjects hcompact)
         C.semiorthogonality.perfectSemiorthogonal)
 
-namespace Proposition315ProjectionConstructionData
+namespace DecompositionProjectionHypotheses
 
 variable {D : KFlatBaseChangeData X T}
   {A : SemiorthogonalSequence (SourceDqc X) ι}
   {Q : D.SourceTensorData}
   {B : KFlatBasePullbackData X}
   {hcompact : D.PreservesCompactObjects}
-  {C : D.Proposition315CoreData A Q B hcompact}
-  (P : D.Proposition315ProjectionConstructionData C)
+  {C : D.DecompositionCoreData A Q B hcompact}
+  (P : D.DecompositionProjectionHypotheses C)
 
 /-- Construct all perfect and quasicoherent projection data required by the
 Proposition 3.15 core. -/
-noncomputable def toProjectionData : D.Proposition315ProjectionData C where
+noncomputable def toProjectionData : D.DecompositionProjectionData C where
   perfectProjections := P.compactRestriction.perfectProjections
   quasicoherentProjections :=
     P.approximation.quasicoherentProjections
@@ -224,21 +250,21 @@ noncomputable def toProjectionData : D.Proposition315ProjectionData C where
       (D.toDerivedPreservesCompactObjects hcompact)
       C.semiorthogonality.perfectSemiorthogonal P.truncationCocontinuous
 
-end Proposition315ProjectionConstructionData
+end DecompositionProjectionHypotheses
 
-namespace Proposition315CoreData
+namespace DecompositionCoreData
 
 variable {D : KFlatBaseChangeData X T}
   {A : SemiorthogonalSequence (SourceDqc X) ι}
   {Q : D.SourceTensorData}
   {B : KFlatBasePullbackData X}
   {hcompact : D.PreservesCompactObjects}
-  (C : D.Proposition315CoreData A Q B hcompact)
+  (C : D.DecompositionCoreData A Q B hcompact)
 
 /-- Supply the remaining projection data to obtain the existing
 paper-strength decomposition package. -/
 def toDecompositionData
-    (P : D.Proposition315ProjectionData C) :
+    (P : D.DecompositionProjectionData C) :
     D.toDerivedBaseChangeData.DecompositionData A
       (D.toDerivedPreservesCompactObjects hcompact)
       C.semiorthogonality.perfectSemiorthogonal where
@@ -254,13 +280,13 @@ def toDecompositionData
 /-- Construct the projectors from compact-generator approximations and pass
 directly to the paper-strength decomposition package. -/
 noncomputable def toDecompositionDataOfProjectionConstruction
-    (P : D.Proposition315ProjectionConstructionData C) :
+    (P : D.DecompositionProjectionHypotheses C) :
     D.toDerivedBaseChangeData.DecompositionData A
       (D.toDerivedPreservesCompactObjects hcompact)
       C.semiorthogonality.perfectSemiorthogonal :=
   C.toDecompositionData P.toProjectionData
 
-end Proposition315CoreData
+end DecompositionCoreData
 
 end KFlatBaseChangeData
 

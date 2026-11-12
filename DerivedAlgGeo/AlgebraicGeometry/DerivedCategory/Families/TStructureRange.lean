@@ -43,7 +43,7 @@ t-structure API.
 
 ## Tags
 
-`Theorem53`, `base-change`, `t-structure`, `filtered-colimit`, `owner-boundary`
+`base-change`, `t-structure`, `filtered-colimit`, `owner-boundary`
 -/
 
 noncomputable section
@@ -55,7 +55,7 @@ universe w v u w' v' u'
 
 namespace AlgebraicGeometry.DerivedCategory.Families
 
-namespace Theorem53
+namespace TStructureRange
 
 variable {C : Type u} [Category.{v} C] [HasZeroObject C] [HasShift C ℤ]
   [Preadditive C] [∀ n : ℤ, (shiftFunctor C n).Additive]
@@ -195,6 +195,6 @@ theorem local_inRange_iff_of_components
     · rintro ⟨hGE, hLE⟩
       exact ⟨(isGE_iff X a).2 hGE, (isLE_iff X b).2 hLE⟩
 
-end Theorem53
+end TStructureRange
 
 end AlgebraicGeometry.DerivedCategory.Families

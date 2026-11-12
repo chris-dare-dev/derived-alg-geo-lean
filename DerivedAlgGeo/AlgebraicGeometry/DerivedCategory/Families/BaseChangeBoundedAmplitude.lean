@@ -3,7 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.BoundedCoherent
-import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeProposition315
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeDecompositionAssembly
 import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition.Amplitude
 
 /-!
@@ -152,10 +152,10 @@ variable {X T : SchemeBaseChange S} {D : KFlatBaseChangeData X T}
   {hcompact : D.PreservesCompactObjects}
   {horth : D.toDerivedBaseChangeData.PerfectComponentsSemiorthogonal A}
 
-namespace Proposition315CoreData
+namespace DecompositionCoreData
 
 variable {P : D.SourceTensorData} {BP : KFlatBasePullbackData X}
-  (C : D.Proposition315CoreData A P BP hcompact)
+  (C : D.DecompositionCoreData A P BP hcompact)
 
 /-- The bounded-coherent restriction of the Proposition 3.15 decomposition
 whose projectors were constructed from compact-generator approximations.
@@ -168,7 +168,7 @@ t-structure, finite amplitude against it, coherence preservation, and
 generation of the bounded locus. -/
 theorem toBoundedData
     [(Dqc.schemeBoundedCoherentCohomology (X ⨯ T).left).IsTriangulated]
-    (R : D.Proposition315ProjectionConstructionData C)
+    (R : D.DecompositionProjectionHypotheses C)
     {τ : TargetBoundedTStructure X T}
     (h : (C.toDecompositionDataOfProjectionConstruction R).HasFiniteAmplitude τ)
     (hcoh :
@@ -183,7 +183,7 @@ theorem toBoundedData
 sequence is a strong semiorthogonal sequence. -/
 theorem boundedSequence_isStrong
     [(Dqc.schemeBoundedCoherentCohomology (X ⨯ T).left).IsTriangulated]
-    (R : D.Proposition315ProjectionConstructionData C)
+    (R : D.DecompositionProjectionHypotheses C)
     {τ : TargetBoundedTStructure X T}
     (h : (C.toDecompositionDataOfProjectionConstruction R).HasFiniteAmplitude τ)
     (hcoh :
@@ -196,7 +196,7 @@ theorem boundedSequence_isStrong
       C.semiorthogonality.perfectSemiorthogonal).IsStrong :=
   DerivedBaseChangeData.DecompositionData.boundedSequence_isStrong _ h hcoh hfull
 
-end Proposition315CoreData
+end DecompositionCoreData
 
 end KFlatBaseChangeData
 

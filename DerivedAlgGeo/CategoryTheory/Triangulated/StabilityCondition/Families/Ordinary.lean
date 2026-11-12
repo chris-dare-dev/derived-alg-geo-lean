@@ -48,7 +48,7 @@ structure OrdinaryStabilityInFamiliesData
     (hV₀ : V₀ ≤ LinearMap.ker Z) (semistableClasses : I → Set V)
     (boundedness : BoundednessProblem M) : Prop where
   /-- Definition 20.5(1)--(3). -/
-  definition20_5 : OrdinaryDefinition20_5Conditions charge stable dedekind
+  familyConditions : OrdinaryFamilyConditions charge stable dedekind
   /-- Definition 21.15(4). -/
   uniformSupport : HasUniformQuadraticSupportPropertyModulo
     V₀ Z hV₀ semistableClasses

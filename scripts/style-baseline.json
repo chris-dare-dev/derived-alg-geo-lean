@@ -708,36 +708,6 @@
   1
  ],
  [
-  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/BaseChangeProposition315.lean",
-  "NAMENUM",
-  "/-",
-  1
- ],
- [
-  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/BaseChangeProposition315.lean",
-  "NAMENUM",
-  "structure Proposition315CoreData",
-  1
- ],
- [
-  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/BaseChangeProposition315.lean",
-  "NAMENUM",
-  "structure Proposition315ProjectionConstructionData",
-  1
- ],
- [
-  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/BaseChangeProposition315.lean",
-  "NAMENUM",
-  "structure Proposition315ProjectionData",
-  1
- ],
- [
-  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/BaseChangeProposition315.lean",
-  "NAMENUM",
-  "structure Proposition315SemiorthogonalityData",
-  1
- ],
- [
   "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/CoherentPushforward.lean",
   "PROV",
   "`.claude/references/instance-transparency.md`), and the triangulated instance below needs this",
@@ -765,30 +735,6 @@
   "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/KProjectivePullback.lean",
   "PROV",
   "SF8.5, and on a general scheme the category of all `𝒪_X`-modules does not have",
-  1
- ],
- [
-  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/SLocal.lean",
-  "NAMENUM",
-  "structure Lemma416Part3Data (L : SLocalData R t) where",
-  1
- ],
- [
-  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/SLocal.lean",
-  "NAMENUM",
-  "theorem lemma_4_15 (H : NoetherianLocalityData R t) :",
-  1
- ],
- [
-  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/SLocal.lean",
-  "NAMENUM",
-  "theorem lemma_4_16_3 (L : SLocalData R t) (H : Lemma416Part3Data L) (U : S.Opens)",
-  1
- ],
- [
-  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/Theorem53.lean",
-  "NAMENUM",
-  "/-",
   1
  ],
  [
@@ -915,24 +861,6 @@
   "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Stability/MassHom.lean",
   "PROV",
   "never consumes.  Those two constructions are the precise remaining #1033 and",
-  1
- ],
- [
-  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Stability/MassHomTheorem75.lean",
-  "NAMENUM",
-  "/-",
-  1
- ],
- [
-  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Stability/MassHomTheorem75.lean",
-  "NAMENUM",
-  "theorem remark14_autoequivalence_iff",
-  1
- ],
- [
-  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Stability/MassHomTheorem75.lean",
-  "NAMENUM",
-  "theorem theorem75",
   1
  ],
  [
@@ -2616,72 +2544,6 @@
   1
  ],
  [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Families/StabilityOverField.lean",
-  "NAMENUM",
-  "abbrev Definition817Conditions",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Families/StabilityOverField.lean",
-  "NAMENUM",
-  "abbrev Lemma822SemistableConditions",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Families/StabilityOverField.lean",
-  "NAMENUM",
-  "def BLMNPSTheorem2124",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Families/StabilityOverField.lean",
-  "NAMENUM",
-  "def HLRProposition238",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Families/StabilityOverField.lean",
-  "NAMENUM",
-  "def HLRProposition241",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Families/StabilityOverField.lean",
-  "NAMENUM",
-  "def HLRTheorem235OneToTwo {J : Type*}",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Families/StabilityOverField.lean",
-  "NAMENUM",
-  "def PF4Lemma822",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Families/StabilityOverField.lean",
-  "NAMENUM",
-  "theorem lemma822SemistableConditions_of_massHom",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Families/StabilityOverField.lean",
-  "NAMENUM",
-  "theorem theorem823_definition817",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Families/StabilityOverField.lean",
-  "NAMENUM",
-  "theorem theorem823_properGoodModuli",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/Deformation/LocalInjectivity.lean",
-  "NAMENUM",
-  "theorem bridgeland_lemma_6_4 (σ τ : StabilityCondition.WithClassMap C v) (hZ : σ.Z = τ.Z)",
-  1
- ],
- [
   "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Mass.lean",
   "PROV",
   "MO1.13 (#1324).",
@@ -3057,24 +2919,6 @@
   "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Basic/Definitions.lean",
   "PROV",
   "  `target` is a separate, evidence-gated act (#111).",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Families/Basic.lean",
-  "NAMENUM",
-  "structure OrdinaryDefinition20_5Conditions",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Families/Basic.lean",
-  "NAMENUM",
-  "structure WeakDefinition20_5Conditions",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Families/Weak.lean",
-  "NAMENUM",
-  "structure WeakDefinition20_5ClauseZero {t : TStructure C}",
   1
  ],
  [

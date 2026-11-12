@@ -7,24 +7,46 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.Alge
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.FiniteDistance
 
 /-!
-# Theorem 7.5: mass--Hom bounds on the distinguished component
+# Mass--Hom bounds on the distinguished component
 
-This file assembles the already formalized algebraic base case, pushforward
-and pullback transfers, and connected-component invariance into the statement
-layer of Theorem 7.5 of arXiv:2607.28411v1.
+The statement layer of Theorem 7.5 of arXiv:2607.28411v1: a stability
+condition in the distinguished connected component of `Stab(Dᵇ(Coh X))` has a
+perfect mass--Hom bound. The algebraic base case, the pushforward and pullback
+transfers, and connected-component invariance are proved elsewhere; this file
+assembles them.
 
-The absolute projective-family construction (PF3) has not yet produced the
-distinguished stability condition on every projective scheme.  Its exact
-current output is therefore isolated as `DistinguishedComponentInhabitant`:
-one stability condition with a perfect mass--Hom bound, together with
-membership of the target in its connected component.  Theorem 7.5 is then
-formal, and `ofAlgebraicTransferChain` below constructs this inhabitant from
-the algebraic seed and the two transfers once their geometric data are
-provided.
+## Main definitions
 
-No projectivity, ampleness, adjunction, or generation assertion is
-manufactured here.  In particular, the lower-shriek and finite-pullback
-functors remain the explicit PF3 inputs already documented by Lemma 7.4.
+* `DistinguishedComponentInhabitant` — a stability condition with a perfect
+  mass--Hom bound, together with membership of the target in its connected
+  component.
+* `DistinguishedComponentInhabitant.ofAlgebraicTransferChain` — that
+  inhabitant, from the algebraic seed and the two transfers once their
+  geometric data are provided.
+
+## Main results
+
+* `hasPerfectMassHomBound_of_distinguishedComponentInhabitant` — Theorem 7.5,
+  given an inhabitant.
+* `hasPerfectMassHomBound_autPair_act_iff` — Remark 1.4: the bound is
+  invariant under a compatible derived autoequivalence that preserves the
+  perfect test class.
+
+## Implementation notes
+
+The distinguished stability condition on an arbitrary projective scheme is not
+constructed here, so its existence enters as `DistinguishedComponentInhabitant`
+and Theorem 7.5 is formal given one. No projectivity, ampleness, adjunction, or
+generation assertion is manufactured: the lower-shriek and finite-pullback
+functors remain explicit inputs, as in Lemma 7.4.
+
+## References
+
+* arXiv:2607.28411v1, Remark 1.4, Lemma 7.4 and Theorem 7.5.
+
+## Tags
+
+stability condition, mass--Hom bound, connected component, autoequivalence
 -/
 
 attribute [local instance] HasDerivedCategory.standard
@@ -41,9 +63,8 @@ noncomputable section
 
 universe w u u'
 
-/-- The exact PF3 inhabitant needed by Theorem 7.5 before the absolute
-projective-family construction is available: a bounded point in the
-distinguished connected component. -/
+/-- A point of the distinguished connected component with a perfect mass--Hom
+bound: the input from which Theorem 7.5 is formal. -/
 structure DistinguishedComponentInhabitant
     (k : Type w) [Field k]
     (X : Scheme.{u}) [IsLocallyNoetherian X]
@@ -63,7 +84,7 @@ structure DistinguishedComponentInhabitant
   point. -/
   target_mem_connectedComponent : σ ∈ connectedComponent base
 
-/-- Assemble the PF3 inhabitant from the proof chain of Theorem 7.5:
+/-- Assemble the inhabitant from the proof chain of Theorem 7.5:
 an algebraic seed, the flat pushforward step, the finite pullback step, and
 membership in the resulting connected component.
 
@@ -124,9 +145,9 @@ noncomputable def DistinguishedComponentInhabitant.ofAlgebraicTransferChain
       pull pullAdjunction hpullGenerates
   exact ⟨_, hXperfect, hcomponent⟩
 
-/-- Theorem 7.5, conditional only on the named PF3 inhabitant until the
-absolute projective-family construction lands. -/
-theorem theorem75
+/-- Theorem 7.5: a stability condition in the distinguished component has a
+perfect mass--Hom bound, given an inhabitant of that component. -/
+theorem hasPerfectMassHomBound_of_distinguishedComponentInhabitant
     {k : Type w} [Field k]
     (X : Scheme.{u}) [IsLocallyNoetherian X]
     [Linear k (SchemeBoundedCoherentDerivedCategory X)]
@@ -143,7 +164,7 @@ theorem theorem75
 open WeakStabilityCondition.StabilityCondition.GroupAction in
 /-- Remark 1.4: the perfect mass--Hom bound is invariant under a compatible
 derived autoequivalence which preserves the perfect test class. -/
-theorem remark14_autoequivalence_iff
+theorem hasPerfectMassHomBound_autPair_act_iff
     {k : Type w} [Field k]
     (X : Scheme.{u}) [IsLocallyNoetherian X]
     [Linear k (SchemeBoundedCoherentDerivedCategory X)]

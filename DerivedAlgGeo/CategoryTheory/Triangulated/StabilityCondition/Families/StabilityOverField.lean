@@ -9,18 +9,50 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.Fiel
 /-!
 # Stability over a field and the good-moduli input chain
 
-This file records Definition 8.17 and the implication chain used in Theorem
-8.23 of arXiv:2607.28411v1.  `Definition817Conditions` specializes the
-existing canonical `OrdinaryDeformationInputConditions` root to the actual
-semistable classes of the fiber slicings.  Its four conditions are uniform
-quotient support, openness, relative HN structures after the specified
-Dedekind base changes, and boundedness.
+Definition 8.17 of arXiv:2607.28411v1 and the implication chain of its Theorem
+8.23. `StabilityOverFieldConditions` specializes the canonical
+`OrdinaryDeformationInputConditions` root to the actual semistable classes of
+the fiber slicings. Its four conditions are uniform quotient support,
+openness, relative HN structures after the specified Dedekind base changes,
+and boundedness.
 
-The external HLR and BLMNPS results used by the paper are named proposition
-types.  Assembly theorems consume them as hypotheses; no structure carries a
-good-moduli conclusion, and this file does not manufacture a moduli space.
-The semistable variant used by Lemma 8.22 is a second abbreviation of the same
-root with semistable probes substituted for stable probes.
+## Main definitions
+
+* `StabilityOverFieldConditions` — Definition 8.17, as a specialization of the
+  canonical deformation-input root.
+* `SemistableOverFieldConditions` — the same root with semistable openness and
+  boundedness probes, as in Lemma 8.22.
+* `BoundedMassPhaseOfMassHomBound`, `OpennessOfBoundedMassPhase`,
+  `DedekindHNOfBoundedMassPhase`, `BoundednessOfBoundedMassPhase` — the
+  external implications the paper takes from HLR and BLMNPS, as propositions.
+* `StableOfSemistableOverField` — Lemma 8.22 as an implication.
+* `ProperGoodModuliOfOverField` — BLMNPS Theorem 21.24 in characteristic zero,
+  as an implication to a caller-supplied good-moduli proposition.
+
+## Main results
+
+* `semistableOverFieldConditions_of_massHom` — the mass--Hom estimate and the
+  external implications give the semistable conditions.
+* `stabilityOverFieldConditions_of_massHom` — Theorem 8.23 up to
+  Definition 8.17.
+* `properGoodModuli_of_massHom` — the characteristic-zero good-moduli
+  conclusion of Theorem 8.23.
+
+## Implementation notes
+
+The external results are named proposition types. The assembly theorems
+consume them as hypotheses; no structure carries a good-moduli conclusion, and
+this file does not construct a moduli space.
+
+## References
+
+* arXiv:2607.28411v1, Definition 8.17, Lemma 8.22 and Theorem 8.23.
+* Bayer, Lahoz, Macrì, Nuer, Perry, Stellari, *Stability conditions in
+  families*, arXiv:1902.08184, Theorems 5.7, 18.7 and 21.24.
+
+## Tags
+
+stability condition, family, good moduli space, mass--Hom bound
 -/
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families
@@ -43,12 +75,12 @@ variable {I JOpen D M V : Type*} {C : I → Type u}
   [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
   {v : ∀ i, K₀ (C i) →+ V}
 
-/-- The four clauses of PF4 Definition 8.17 as a specialization of the
+/-- The four clauses of Definition 8.17 as a specialization of the
 canonical deformation-input root.  The support locus is definitionally the
 set of classes of actual nonzero semistable objects in each fiber.  The
 zero-charge subspace and its containment proof stay explicit, as required by
 the repository's quotient-support interface. -/
-abbrev Definition817Conditions
+abbrev StabilityOverFieldConditions
     (σ : ∀ i, PreStabilityCondition.WithClassMap (C i) (v i))
     (V₀ : Submodule ℝ V)
     (Zlin : V →ₗ[ℝ] ℂ)
@@ -59,10 +91,10 @@ abbrev Definition817Conditions
   OrdinaryDeformationInputConditions openLoci dedekind V₀ Zlin hV₀
     (ordinaryFiberSemistableClasses σ) boundedness
 
-/-- The `(ii')`/`(iv')` semistable variant used in PF4 Lemma 8.22.  It is the
+/-- The `(ii')`/`(iv')` semistable variant used in Lemma 8.22.  It is the
 same canonical four-condition interface; only the caller's openness and
 boundedness probes now describe semistable objects. -/
-abbrev Lemma822SemistableConditions
+abbrev SemistableOverFieldConditions
     (σ : ∀ i, PreStabilityCondition.WithClassMap (C i) (v i))
     (V₀ : Submodule ℝ V)
     (Zlin : V →ₗ[ℝ] ℂ)
@@ -70,39 +102,39 @@ abbrev Lemma822SemistableConditions
     (semistableLoci : JOpen → OpenLocusProbe)
     (dedekind : DedekindHNProblem D)
     (semistableBoundedness : BoundednessProblem M) : Prop :=
-  Definition817Conditions σ V₀ Zlin hV₀ semistableLoci dedekind
+  StabilityOverFieldConditions σ V₀ Zlin hV₀ semistableLoci dedekind
     semistableBoundedness
 
 /-- HLR Theorem 2.35, implication `(1) → (2)`, in the exact direction used
-in PF4 Theorem 8.23. -/
-def HLRTheorem235OneToTwo {J : Type*}
+in Theorem 8.23. -/
+def BoundedMassPhaseOfMassHomBound {J : Type*}
     (dimension : J → ℕ) (mass : J → ℝ)
     (boundedMassAndPhase : Prop) : Prop :=
   UniformMassHomBound dimension mass → boundedMassAndPhase
 
 /-- HLR Proposition 2.38 as used to obtain semistable openness from the
 bounded-mass-and-phase condition. -/
-def HLRProposition238
+def OpennessOfBoundedMassPhase
     (boundedMassAndPhase : Prop)
     (semistableLoci : JOpen → OpenLocusProbe) : Prop :=
   boundedMassAndPhase → UniversalOpenness semistableLoci
 
 /-- BLMNPS Theorems 18.7 and 5.7, together with HLR Proposition 2.38, in the
 direction used to construct relative HN structures. -/
-def BLMNPSTheorems187And57
+def DedekindHNOfBoundedMassPhase
     (boundedMassAndPhase : Prop) (dedekind : DedekindHNProblem D) : Prop :=
   boundedMassAndPhase → IntegratesAfterDedekindBaseChange dedekind
 
 /-- The boundedness implication extracted from the proof of HLR Proposition
 2.41, producing the semistable form of clause `(iv')`. -/
-def HLRProposition241
+def BoundednessOfBoundedMassPhase
     (boundedMassAndPhase : Prop)
     (semistableBoundedness : BoundednessProblem M) : Prop :=
   boundedMassAndPhase → UniversalBoundedness semistableBoundedness
 
-/-- PF4 Lemma 8.22, kept as an explicit implication from its semistable
+/-- Lemma 8.22, kept as an explicit implication from its semistable
 hypotheses to Definition 8.17. -/
-def PF4Lemma822
+def StableOfSemistableOverField
     {σ : ∀ i, PreStabilityCondition.WithClassMap (C i) (v i)}
     (V₀ : Submodule ℝ V)
     {Zlin : V →ₗ[ℝ] ℂ}
@@ -111,15 +143,15 @@ def PF4Lemma822
     (stableLoci : JOpen → OpenLocusProbe)
     (dedekind : DedekindHNProblem D)
     (semistableBoundedness stableBoundedness : BoundednessProblem M) : Prop :=
-  Lemma822SemistableConditions σ V₀ Zlin hV₀ semistableLoci dedekind
+  SemistableOverFieldConditions σ V₀ Zlin hV₀ semistableLoci dedekind
       semistableBoundedness →
-    Definition817Conditions σ V₀ Zlin hV₀ stableLoci dedekind
+    StabilityOverFieldConditions σ V₀ Zlin hV₀ stableLoci dedekind
       stableBoundedness
 
-/-- BLMNPS Theorem 21.24 in the characteristic-zero direction used in PF4
+/-- BLMNPS Theorem 21.24 in the characteristic-zero direction used in
 Theorem 8.23.  `ProperGoodModuli` is a caller-supplied proposition because the
 repository does not yet define good moduli spaces. -/
-def BLMNPSTheorem2124
+def ProperGoodModuliOfOverField
     (k : Type*) [Field k]
     {σ : ∀ i, PreStabilityCondition.WithClassMap (C i) (v i)}
     (V₀ : Submodule ℝ V)
@@ -130,12 +162,12 @@ def BLMNPSTheorem2124
     (stableBoundedness : BoundednessProblem M)
     (ProperGoodModuli : Prop) : Prop :=
   CharZero k →
-    Definition817Conditions σ V₀ Zlin hV₀ stableLoci dedekind
+    StabilityOverFieldConditions σ V₀ Zlin hV₀ stableLoci dedekind
         stableBoundedness → ProperGoodModuli
 
-/-- Assemble the semistable four-condition input of PF4 Lemma 8.22 from the
+/-- Assemble the semistable four-condition input of Lemma 8.22 from the
 mass--Hom estimate and the named HLR/BLMNPS implications. -/
-theorem lemma822SemistableConditions_of_massHom
+theorem semistableOverFieldConditions_of_massHom
     {J : Type*} {dimension : J → ℕ} {mass : J → ℝ}
     {boundedMassAndPhase : Prop}
     {σ : ∀ i, PreStabilityCondition.WithClassMap (C i) (v i)}
@@ -147,19 +179,19 @@ theorem lemma822SemistableConditions_of_massHom
     {semistableBoundedness : BoundednessProblem M}
     (hSupport : HasUniformQuadraticSupportPropertyModulo
       V₀ Zlin hV₀ (ordinaryFiberSemistableClasses σ))
-    (h84 : UniformMassHomBound dimension mass)
-    (h235 : HLRTheorem235OneToTwo dimension mass boundedMassAndPhase)
-    (h238 : HLRProposition238 boundedMassAndPhase semistableLoci)
-    (hHN : BLMNPSTheorems187And57 boundedMassAndPhase dedekind)
-    (h241 : HLRProposition241 boundedMassAndPhase semistableBoundedness) :
-    Lemma822SemistableConditions σ V₀ Zlin hV₀ semistableLoci dedekind
+    (hMassHom : UniformMassHomBound dimension mass)
+    (hMassPhase : BoundedMassPhaseOfMassHomBound dimension mass boundedMassAndPhase)
+    (hOpen : OpennessOfBoundedMassPhase boundedMassAndPhase semistableLoci)
+    (hHN : DedekindHNOfBoundedMassPhase boundedMassAndPhase dedekind)
+    (hBounded : BoundednessOfBoundedMassPhase boundedMassAndPhase semistableBoundedness) :
+    SemistableOverFieldConditions σ V₀ Zlin hV₀ semistableLoci dedekind
       semistableBoundedness := by
-  have hbounded : boundedMassAndPhase := h235 h84
-  exact ⟨h238 hbounded, hHN hbounded, hSupport, h241 hbounded⟩
+  have hbounded : boundedMassAndPhase := hMassPhase hMassHom
+  exact ⟨hOpen hbounded, hHN hbounded, hSupport, hBounded hbounded⟩
 
-/-- PF4 Theorem 8.23 up to Definition 8.17: the mass--Hom estimate feeds the
-named HLR/BLMNPS chain, and PF4 Lemma 8.22 upgrades the semistable clauses. -/
-theorem theorem823_definition817
+/-- Theorem 8.23 up to Definition 8.17: the mass--Hom estimate feeds the
+named HLR/BLMNPS chain, and Lemma 8.22 upgrades the semistable clauses. -/
+theorem stabilityOverFieldConditions_of_massHom
     {J : Type*} {dimension : J → ℕ} {mass : J → ℝ}
     {boundedMassAndPhase : Prop}
     {σ : ∀ i, PreStabilityCondition.WithClassMap (C i) (v i)}
@@ -171,23 +203,23 @@ theorem theorem823_definition817
     {semistableBoundedness stableBoundedness : BoundednessProblem M}
     (hSupport : HasUniformQuadraticSupportPropertyModulo
       V₀ Zlin hV₀ (ordinaryFiberSemistableClasses σ))
-    (h84 : UniformMassHomBound dimension mass)
-    (h235 : HLRTheorem235OneToTwo dimension mass boundedMassAndPhase)
-    (h238 : HLRProposition238 boundedMassAndPhase semistableLoci)
-    (hHN : BLMNPSTheorems187And57 boundedMassAndPhase dedekind)
-    (h241 : HLRProposition241 boundedMassAndPhase semistableBoundedness)
-    (h822 : PF4Lemma822 (σ := σ) V₀ hV₀
+    (hMassHom : UniformMassHomBound dimension mass)
+    (hMassPhase : BoundedMassPhaseOfMassHomBound dimension mass boundedMassAndPhase)
+    (hOpen : OpennessOfBoundedMassPhase boundedMassAndPhase semistableLoci)
+    (hHN : DedekindHNOfBoundedMassPhase boundedMassAndPhase dedekind)
+    (hBounded : BoundednessOfBoundedMassPhase boundedMassAndPhase semistableBoundedness)
+    (hStable : StableOfSemistableOverField (σ := σ) V₀ hV₀
       semistableLoci stableLoci dedekind
       semistableBoundedness stableBoundedness) :
-    Definition817Conditions σ V₀ Zlin hV₀ stableLoci dedekind
+    StabilityOverFieldConditions σ V₀ Zlin hV₀ stableLoci dedekind
       stableBoundedness :=
-  h822 (lemma822SemistableConditions_of_massHom
-    (C := C) (v := v) hSupport h84 h235 h238 hHN h241)
+  hStable (semistableOverFieldConditions_of_massHom
+    (C := C) (v := v) hSupport hMassHom hMassPhase hOpen hHN hBounded)
 
-/-- The final characteristic-zero good-moduli conclusion of PF4 Theorem
+/-- The final characteristic-zero good-moduli conclusion of Theorem
 8.23, conditional on the named BLMNPS Theorem 21.24 implication.  The field
 and its characteristic-zero instance remain explicit. -/
-theorem theorem823_properGoodModuli
+theorem properGoodModuli_of_massHom
     (k : Type*) [Field k] [CharZero k]
     {J : Type*} {dimension : J → ℕ} {mass : J → ℝ}
     {boundedMassAndPhase ProperGoodModuli : Prop}
@@ -200,19 +232,19 @@ theorem theorem823_properGoodModuli
     {semistableBoundedness stableBoundedness : BoundednessProblem M}
     (hSupport : HasUniformQuadraticSupportPropertyModulo
       V₀ Zlin hV₀ (ordinaryFiberSemistableClasses σ))
-    (h84 : UniformMassHomBound dimension mass)
-    (h235 : HLRTheorem235OneToTwo dimension mass boundedMassAndPhase)
-    (h238 : HLRProposition238 boundedMassAndPhase semistableLoci)
-    (hHN : BLMNPSTheorems187And57 boundedMassAndPhase dedekind)
-    (h241 : HLRProposition241 boundedMassAndPhase semistableBoundedness)
-    (h822 : PF4Lemma822 (σ := σ) V₀ hV₀
+    (hMassHom : UniformMassHomBound dimension mass)
+    (hMassPhase : BoundedMassPhaseOfMassHomBound dimension mass boundedMassAndPhase)
+    (hOpen : OpennessOfBoundedMassPhase boundedMassAndPhase semistableLoci)
+    (hHN : DedekindHNOfBoundedMassPhase boundedMassAndPhase dedekind)
+    (hBounded : BoundednessOfBoundedMassPhase boundedMassAndPhase semistableBoundedness)
+    (hStable : StableOfSemistableOverField (σ := σ) V₀ hV₀
       semistableLoci stableLoci dedekind
       semistableBoundedness stableBoundedness)
-    (h2124 : BLMNPSTheorem2124 (C := C) (v := v) (σ := σ) (Zlin := Zlin) k
+    (hGoodModuli : ProperGoodModuliOfOverField (C := C) (v := v) (σ := σ) (Zlin := Zlin) k
       V₀ hV₀ stableLoci dedekind stableBoundedness ProperGoodModuli) :
     ProperGoodModuli :=
-  h2124 inferInstance (theorem823_definition817
-    (C := C) (v := v) hSupport h84 h235 h238 hHN h241 h822)
+  hGoodModuli inferInstance (stabilityOverFieldConditions_of_massHom
+    (C := C) (v := v) hSupport hMassHom hMassPhase hOpen hHN hBounded hStable)
 
 end
 

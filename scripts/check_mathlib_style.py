@@ -128,14 +128,16 @@ PROVENANCE_RES = (
 # Invariant for `NAMENUM`: no declaration or file name carries a source's
 # numbering. A source is cited in the docstring ("Proposition 3.15 of
 # arXiv:1902.08184") and the name says what the statement is (CREDO.md, Lean
-# rules). Matches `Proposition315Data`, `theorem75`, `lemma_4_15` and
-# `Definition20_5`. An underscore counts only between two digits, and a digit
-# only after a numbered-statement word, so `pow_two` and `Ext2` are untouched.
+# rules). Matches `Proposition315Data`, `Theorems187And57`, `theorem75`,
+# `lemma_4_15` and `Definition20_5`, in a declaration, a namespace or a file
+# name. An underscore counts only between two digits, and a digit only after a
+# numbered-statement word, so `pow_two` and `Ext2` are untouched.
 PAPER_NUMBERING_RE = re.compile(
-    r"(?:Proposition|Lemma|Theorem|Corollary|Remark|Definition|Example|Section|Tag|Prop|Thm|Cor)_?\d"
-    r"|(?:^|_)(?:proposition|lemma|theorem|corollary|remark|definition|example|section|tag)_?\d"
+    r"(?:Proposition|Lemma|Theorem|Corollary|Remark|Definition|Example|Section|Tag|Prop|Thm|Cor)s?_?\d"
+    r"|(?:^|_)(?:proposition|lemma|theorem|corollary|remark|definition|example|section|tag)s?_?\d"
     r"|\d_\d"
 )
+NAMESPACE_RE = re.compile(r"^\s*namespace\s+(\S+)")
 
 
 class Finding:
@@ -426,6 +428,20 @@ def check_text(raw: str, path: Path) -> list[Finding]:
                     )
                 )
                 break
+
+    for idx, c in enumerate(code, start=1):
+        if (ns := NAMESPACE_RE.match(c)) and any(
+            PAPER_NUMBERING_RE.search(part) for part in ns.group(1).split(".")
+        ):
+            out.append(
+                Finding(
+                    "ERROR",
+                    idx,
+                    "NAMENUM",
+                    f"The namespace `{ns.group(1)}` carries a source's numbering. Name it by its "
+                    "content and cite the source in the docstring (CREDO.md, Lean rules).",
+                )
+            )
 
     # --- declarations ---------------------------------------------------------
     for idx, line in enumerate(lines, start=1):

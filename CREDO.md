@@ -101,6 +101,6 @@ what that line names and to nothing else.
 - `AGENTS.md` is over 200 lines and carries dated history (§1).
 - `scripts/` holds loop, evidence and receipt tooling with its own fixtures
   and tests (§3).
-- Issue numbers and dates remain in Lean comments; some names carry a paper's
-  numbering or pass 60 characters (§4).
+- Issue numbers and dates remain in Lean comments; some names pass 60
+  characters (§4).
 - Structures that package unproved inputs are named `Data` (Lean rules).
