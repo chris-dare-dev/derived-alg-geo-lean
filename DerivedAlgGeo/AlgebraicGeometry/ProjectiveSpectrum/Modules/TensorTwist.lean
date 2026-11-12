@@ -8,32 +8,49 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.Monoidal
 /-!
 # The twist `F(d) = F ⊗ O(d)` of a module sheaf on `Proj`
 
-`#584` asks for the twist of an arbitrary module sheaf, its two coherence isomorphisms, coherence
-preservation, and the comparison with `twistingSheaf`. This file supplies the definition, the
-normalization at zero, and the comparison — the three that need nothing beyond the tensor product
-`TwistInvertible.lean` made applicable by proving `O(d)` invertible.
+The twist of an arbitrary module sheaf `F` on `Proj 𝒜` is the sheafified tensor product with the
+twisting sheaf `O(d)`. This file supplies the definition, the normalization at zero, and the
+comparison with `twistingSheaf` on the structure module.
 
-## What is here, and what each costs
+## Main definitions
 
-* `tensorTwist F d` — the definition. `Modules/Tensor/Basic.lean`'s machinery is stated for a locally
-  free rank-one factor, so this is well-behaved only because `twistingSheaf_isInvertible` holds;
+* `AlgebraicGeometry.Proj.tensorTwist`: the twist `F(d) = F ⊗ O(d)` of a module sheaf on `Proj`.
+* `AlgebraicGeometry.Proj.tensorTwistZeroIso`: `F(0) ≅ F`.
+* `AlgebraicGeometry.Proj.associatedSelfTensorTwistIso`: `(Ã)(d) ≅ O(d)`, so the tensor twist
+  agrees with `twistingSheaf` on the structure module.
+
+## Main results
+
+This file proves no theorems; its content is the definition and the two isomorphisms above.
+
+## Implementation notes
+
+### What is here, and what each costs
+
+* `tensorTwist F d` — the definition, `Scheme.Modules.tensorObj F (twistingSheaf 𝒜 d)`;
+  `TwistInvertible.lean` proves `O(d)` invertible (`twistingSheaf_isInvertible`) when degree-one
+  elements generate `A` over `𝒜 0`;
 * `tensorTwistZeroIso` — `F(0) ≅ F`, which is `twistingSheafZeroIso` and `associatedSheafSelfIso`
   transported through the tensor and then `tensorUnitRightIso`;
-* `associatedSelfTensorTwistIso` — `(Ã)(d) ≅ O(d)`, deliverable 4, which is `tensorUnitLeftIso`
-  once `Ã` is recognised as the unit.
+* `associatedSelfTensorTwistIso` — `(Ã)(d) ≅ O(d)`, which is `tensorUnitLeftIso` once `Ã` is
+  recognised as the unit.
 
-## What is not here, and why it cannot be got the easy way
+### What is not here
 
-`F(d)(e) ≅ F(d + e)` is **not** here, and it is not an oversight. `tensorAssocIso` requires *both*
-outer factors to be invertible, and `F` is an arbitrary module sheaf; commuting the factors with
-`tensorCommIso` does not help, because every rearrangement of `(F ⊗ O(d)) ⊗ O(e)` still leaves a
-non-invertible factor on an outer slot. So the monoidal structure cannot deliver it.
+`F(d)(e) ≅ F(d + e)` and preservation of coherence are **not** here. Both are read off the
+comparison identifying `F ⊗ O(d)` with the *graded shift* `sheafTwist 𝒜 𝓜 d`: after it the
+composition is `sheafTwistAddIso` and needs no associator at all, and coherence of `F(d)` is
+visible on the graded side and not through the tensor. `TwistComparison.lean` proves that
+comparison for `F` an associated sheaf and reads both off it.
 
-What can is the comparison identifying `F ⊗ O(d)` with the *graded shift* `sheafTwist 𝒜 𝓜 d`,
-after which the composition is `sheafTwistAddIso` and needs no associator at all. Coherence
-preservation waits on it for the same reason, since coherence of `F(d)` is visible on the graded
-side and not through the tensor. `TwistComparison.lean` proves that comparison for `F` an
-associated sheaf and reads both off it.
+## References
+
+`AlgebraicGeometry.Scheme.Modules.tensorObj`, `AlgebraicGeometry.Scheme.Modules.tensorUnitLeftIso`
+and `AlgebraicGeometry.Scheme.Modules.tensorUnitRightIso`.
+
+## Tags
+
+projective spectrum, twisting sheaf, Serre twist, tensor product
 -/
 
 universe u
@@ -62,8 +79,7 @@ noncomputable def tensorTwistZeroIso (F : (AlgebraicGeometry.Proj 𝒜).Modules)
 
 /-- **`(Ã)(d) ≅ O(d)`**, so the tensor twist agrees with `twistingSheaf` on the structure module.
 
-Deliverable 4 of `#584`. The graded ring as a module over itself is the unit, so this is
-`tensorUnitLeftIso`. -/
+The graded ring as a module over itself is the unit, so this is `tensorUnitLeftIso`. -/
 noncomputable def associatedSelfTensorTwistIso (d : ℤ) :
     tensorTwist 𝒜 (associatedSheaf 𝒜 𝒜) d ≅ twistingSheaf 𝒜 d :=
   AlgebraicGeometry.Scheme.Modules.tensorObjIso (associatedSheafSelfIso 𝒜) (Iso.refl _) ≪≫

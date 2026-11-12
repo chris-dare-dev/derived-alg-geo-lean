@@ -17,15 +17,30 @@ import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.GeneratingSections
 that `F(N) = F ⊗ O(N)` is a quotient of a finite free sheaf: `free I ↠ F(N)`, equivalently `F(N)`
 has finitely many generating sections.
 
-This closes `#586`, and it is the first place in the tree where Serre's theorem itself is proved,
-as opposed to the section-extension lemma (`Glue.lean`, Hartshorne II.5.14(a)) that
-`exists_globalSection_twistBy` is. Nothing here assumes global generation, a resolution property,
-or an instance supplying the surjection: the inputs are coherence of `F`, finiteness of the
-degree-one generating set, and nothing else.
+This is Serre's theorem itself, as opposed to the section-extension lemma (`Glue.lean`,
+Hartshorne II.5.14(a)) that `exists_globalSection_twistBy` is. Nothing here assumes global
+generation, a resolution property, or an instance supplying the surjection: the inputs are
+coherence of `F`, finiteness of the degree-one generating set, and nothing else.
 
-## The argument
+## Main definitions
 
-Three layers, each already in the tree, joined here:
+This file introduces no new definitions.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.exists_res_tmulSection_eq_sum`: a pure tensor of `F ⊗ O(N)` is locally a
+  combination of the twisted chart generators.
+* `AlgebraicGeometry.Proj.exists_epi_free_tensorTwist_ge`: Serre's theorem in the global-generation
+  form, `free I ↠ F ⊗ O(N)`, with `N` above any prescribed bound.
+* `AlgebraicGeometry.Proj.exists_epi_free_tensorTwist`: the same with the exponent unconstrained.
+* `AlgebraicGeometry.Proj.exists_generatingSections_tensorTwist`: `F(N)` has finitely many
+  generating sections for `N` large.
+
+## Implementation notes
+
+### The argument
+
+Three layers, each proved in its own file, joined here:
 
 1. **Chart generators** (`ChartGeneration.lean`). On each chart `D₊(gᵢ)`, coherence gives finitely
    many sections `sᵢ,ₐ` of `F` over the chart that generate `F` locally there.
@@ -41,20 +56,28 @@ A section of the sheafified tensor product is locally a finite sum of pure tenso
 (`exists_eq_sum_tmulSection`), so `IsLocalCombination` closes the sum, and its epimorphism
 criterion closes the theorem.
 
-## `F(N)` here, `⊕ O(-N) ↠ F` in `TwistInverse.lean`
+### `F(N)` here, `⊕ O(-N) ↠ F` in `TwistInverse.lean`
 
 The statement proved here is the one Hartshorne II.5.17 states first. The passage to
 `⊕ O(-N) ↠ F` is one tensor with `O(-N)` and the untwisting `(F ⊗ O(N)) ⊗ O(-N) ≅ F`, which
-`TwistInverse.lean` supplies from the tensor inverse of `O(N)` (the `L = O(N)` case of `#806`);
-`exists_epi_coproduct_twistingSheaf` there is the coproduct form.
+`TwistInverse.lean` supplies from the tensor inverse `O(-N)` of `O(N)`
+(`twistingSheafTensorNegIso`); `exists_epi_coproduct_twistingSheaf` there is the coproduct form.
 
-## The exponent is `1 * N`
+### The exponent is `1 * N`
 
 `exists_globalSection_twistBy_uniform` twists by `f ^ N` at degree `e * N` for generators of
 degree `e`; here `e = 1`, and `1 * N` is not definitionally `N`. The theorem is therefore stated
 with an existential `N` and instantiated at `1 * N₀`, and the two spellings `gᵢ ^ N₀` and
 `gᵢ ^ (1 * N₀)` of the twisting element are reconciled by `twistBy_congr` rather than by rewriting
 inside a dependent type.
+
+## References
+
+Hartshorne, *Algebraic Geometry*, II.5.17 and II.5.14(a); EGA II 2.7.9.
+
+## Tags
+
+Serre's theorem, projective spectrum, coherent sheaf, global generation, twisting sheaf
 -/
 
 noncomputable section

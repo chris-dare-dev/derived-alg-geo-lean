@@ -11,41 +11,66 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Tensor.LineBundle
 /-!
 # `O(-N)` is the tensor inverse of `O(N)`, and Serre's surjection `⊕ O(-N) ↠ F`
 
-The `L = O(N)` case of `#806`, and with it the literal deliverable of `#586`.
+The twisting sheaf `O(-N)` is a tensor inverse of `O(N)` when degree-one elements generate `A` over
+`𝒜 0`. With it, the global-generation form `free I ↠ F(N)` of Serre's theorem untwists to a
+surjection `⊕ O(-N) ↠ F` onto an arbitrary coherent `F`.
 
-## The inverse is four isomorphisms
+## Main definitions
+
+* `AlgebraicGeometry.Proj.twistingSheafTensorNegIso`: `O(N) ⊗ O(-N) ≅ O`.
+* `AlgebraicGeometry.Proj.twistingSheafLineBundleData`: `O(N)` with `O(-N)` as a chosen tensor
+  inverse.
+* `AlgebraicGeometry.Proj.twistingSheafHomTopEquiv`: `Hom(O(N), F) ≃ Γ(O(-N) ⊗ F)`.
+* `AlgebraicGeometry.Proj.tensorTwistNegIso`: untwisting, `(F ⊗ O(N)) ⊗ O(-N) ≅ F`, for an
+  arbitrary module sheaf `F`.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.exists_epi_coproduct_twistingSheaf_ge`: Serre's theorem, a coherent sheaf
+  on `Proj 𝒜` is a quotient of a finite direct sum of copies of `O(-N)`, with `N` above any
+  prescribed bound.
+* `AlgebraicGeometry.Proj.exists_epi_coproduct_twistingSheaf`: the same with the exponent
+  unconstrained.
+
+## Implementation notes
+
+### The inverse is four isomorphisms
 
 `twistingSheafTensorAddIso` gives `O(N) ⊗ O(-N) ≅ O(N + -N)`; the index is `0`; `O(0)` is the
 associated sheaf of `𝒜` over itself (`twistingSheafZeroIso`); and that is the unit
-(`associatedSheafSelfIso`). `twistingSheafTensorNegIso` is the composite. As `#806` records, this
-composite did not typecheck before `#821` put both factors in one graded setting; it does now, and
-nothing about it is specific to the sign of `N`.
+(`associatedSheafSelfIso`). `twistingSheafTensorNegIso` is the composite. It typechecks because
+both factors live in one graded setting, and nothing about it is specific to the sign of `N`.
 
-## Untwisting an arbitrary `F`
+### Untwisting an arbitrary `F`
 
 `tensorTwistNegIso : (F ⊗ O(N)) ⊗ O(-N) ≅ F` is the associator, the inverse above under `F ⊗ -`,
-and the right unitor. `F` is **arbitrary** -- `TensorTwist.lean`'s warning about `F(d)(e) ≅ F(d+e)`
-concerned an associator that then carried invertibility hypotheses; `tensorAssocIso` no longer
-does, so the only invertible factors needed are the two twists, and they are invertible.
+and the right unitor. `F` is **arbitrary**: `tensorAssocIso` carries no invertibility hypotheses,
+so the only invertible factors needed are the two twists, and they are invertible.
 
-## From `free I ↠ F(N)` to `⊕ O(-N) ↠ F`
+### From `free I ↠ F(N)` to `⊕ O(-N) ↠ F`
 
 `exists_epi_free_tensorTwist` produces `p : free I ↠ F ⊗ O(N)`. Tensoring by `O(-N)` on the left
 keeps it an epimorphism (`epi_tensorHom_id_of_invertible`), the symmetry and `tensorTwistNegIso`
 carry the target to `F`, and `tensorLeftFreeIso` identifies the source with `∐ O(-N)`. That is
-Hartshorne II.5.17 in the form `#586` states: every coherent `F` on `Proj 𝒜` is a quotient of a
+Hartshorne II.5.17 in its coproduct form: every coherent `F` on `Proj 𝒜` is a quotient of a
 finite direct sum of copies of one `O(-N)`.
 Its specialization to projective space and lift to a coherent short exact sequence is
-`exists_shortExact_coproduct_twist` in `Cohomology/Finiteness/Projective.lean`, completing the
-parent issue `#570`.
+`exists_shortExact_coproduct_twist` in `Cohomology/Finiteness/Projective.lean`.
 
-## What is not here
+### What is not here
 
-The general `IsInvertible L → ∃ L', L ⊗ L' ≅ unit`, which still needs the per-chart
-trivializations glued. For an explicit `LineBundleData`, the formerly blocked hom-equivalence
-`Hom(L ⊗ M, N) ≃ Hom(M, L⁻¹ ⊗ N)` now lives at `LineBundleData.tensorLeftHomEquiv`:
-associator naturality is available from the monoidal structure. Its scalar-linear refinement
-lives downstream at `LineBundleData.tensorLeftHomLinearEquiv`.
+The general `IsInvertible L → ∃ L', L ⊗ L' ≅ unit`, which needs the per-chart trivializations
+glued. For an explicit `LineBundleData`, the hom-equivalence `Hom(L ⊗ M, N) ≃ Hom(M, L⁻¹ ⊗ N)` is
+`LineBundleData.tensorLeftHomEquiv`, from associator naturality in the monoidal structure. Its
+scalar-linear refinement is downstream at `LineBundleData.tensorLeftHomLinearEquiv`.
+
+## References
+
+Hartshorne, *Algebraic Geometry*, II.5.17; EGA II 2.7.9.
+
+## Tags
+
+Serre's theorem, projective spectrum, twisting sheaf, invertible sheaf, coherent sheaf
 -/
 
 noncomputable section
@@ -110,7 +135,7 @@ end Inverse
 /-- **Serre's theorem: a coherent sheaf on `Proj 𝒜` is a quotient of a finite direct sum of
 copies of `O(-N)`**, for `𝒜` generated over `𝒜 0` by finitely many degree-one elements.
 
-Hartshorne II.5.17 / EGA II 2.7.9 in the form `#586` states. The surjection is
+Hartshorne II.5.17 / EGA II 2.7.9 in its coproduct form. The surjection is
 `exists_epi_free_tensorTwist`'s `free I ↠ F ⊗ O(N)` tensored by `O(-N)`, untwisted by
 `tensorTwistNegIso`, and read on `∐ O(-N)` through `tensorLeftFreeIso`. No global-generation or
 resolution hypothesis, and no instance supplies the surjection. The exponent can be pushed above

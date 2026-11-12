@@ -9,18 +9,35 @@ import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.FracSection
 
 `exists_smul_sectionOfMem_eq` says that near every point of `D₊(g)`, every section of `O(N)` is a
 structure-sheaf multiple of the single section `gᴺ / 1`. This is the chart-local half of Serre's
-global generation: `#586` needs the twisted generators to generate `F(N)` on each chart, and the
-`O(N)` factor of that is exactly this statement.
+global generation: `exists_epi_free_tensorTwist` needs the twisted generators to generate `F(N)` on
+each chart, and the `O(N)` factor of that is exactly this statement.
 
-## Why this is not a triviality about invertible sheaves
+## Main definitions
+
+This file introduces no new definitions.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.exists_smul_sectionOfMem_eq`: near every point of `D₊(g)`, a section of
+  `O(N)` is a structure-sheaf multiple of `gᴺ / 1`, compared pointwise.
+* `AlgebraicGeometry.Proj.exists_smul_sectionOfMem_eq_res`: the same, as an equation of sections
+  of `O(N)`.
+
+## Notation
+
+`X` is local notation for the underlying space `ProjectiveSpectrum.top 𝒜`.
+
+## Implementation notes
+
+### Why this is not a triviality about invertible sheaves
 
 `O(N)` is invertible (`twistingSheaf_isInvertible`) and trivial on a degree-one chart
 (`twistingSheafOverUnitIso`), so it is tempting to read the statement off those. That does not
-work, and the reason is `#585`'s: those isomorphisms are **property witnesses, not computations**.
-They say a trivialization exists; they do not say that *this* section, `gᴺ / 1`, is one. A
-generator has to be exhibited, and the argument has to be made on fractions.
+work: those isomorphisms are **property witnesses, not computations**. They say a trivialization
+exists; they do not say that *this* section, `gᴺ / 1`, is one. A generator has to be exhibited, and
+the argument has to be made on fractions.
 
-## The argument
+### The argument
 
 `isLocallyFraction` hands over, near the point, a single fraction: `w = r / s` on some `V'`, with
 `s ∈ 𝒜 i` invertible there and `r` in the shifted piece — which, because the shift `N` is a
@@ -35,7 +52,7 @@ because both `s` and `g` are invertible on that open. Multiplying `gᴺ / 1` by 
 `r · gᴺ / (s · gᴺ · 1)`, which is `r / s` after cancelling `gᴺ` — one `LocalizedModule.mk_eq` with
 witness `1`, the same last step as `frac_smul_sectionOfMem`.
 
-## Shrinking is not optional
+### Shrinking is not optional
 
 The neighbourhood is cut down twice, and both cuts are forced. `isLocallyFraction` only offers a
 fraction on *some* neighbourhood, and the denominator `s · gᴺ` is invertible only where `g` is —
@@ -43,10 +60,19 @@ which is why the conclusion carries `W` and a proof `W ≤ V` rather than assert
 itself. On the chart this costs nothing: the caller is choosing an open around a point it was
 already handed.
 
-## Scope
+### Scope
 
 The `O(N)` factor alone. Nothing here mentions `F`, `twistBy`, or surjectivity; the passage from
 this to `F(N)` is the tensor step and is not in this file.
+
+## References
+
+`GradedModule.mem_intShift_ofNat_iff`, `AlgebraicGeometry.Proj.frac_smul_sectionOfMem` and
+Mathlib's `LocalizedModule.mk_eq`.
+
+## Tags
+
+projective spectrum, twisting sheaf, local generation, affine chart
 -/
 
 noncomputable section

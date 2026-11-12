@@ -7,11 +7,25 @@ import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.Scheme
 /-!
 # Basic opens on a projective spectrum: two inclusions
 
-Both are statements about `ProjectiveSpectrum.basicOpen` alone. Neither mentions a module sheaf, a
-twist, or a fraction, and neither is about `#585`'s glue — which is where both were first written,
-and where `#824` found them.
+A basic open `D₊(b)` lies inside `D₊(bⁿ)` for every `n`, and an open inside `D₊(a)` and `D₊(b)`
+lies inside `D₊(a b)`. Both are statements about `ProjectiveSpectrum.basicOpen` alone. Neither
+mentions a module sheaf, a twist, or a fraction.
 
-## `basicOpen_le_basicOpen_pow` is upstream-shaped
+## Main definitions
+
+This file introduces no new definitions; it proves facts about Mathlib's
+`ProjectiveSpectrum.basicOpen`.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.basicOpen_le_basicOpen_pow`: `D₊(b) ≤ D₊(bⁿ)` for every `n`, including
+  `n = 0`.
+* `AlgebraicGeometry.Proj.le_basicOpen_mul`: an open inside `D₊(a)` and `D₊(b)` is inside
+  `D₊(a b)`.
+
+## Implementation notes
+
+### `basicOpen_le_basicOpen_pow` is upstream-shaped
 
 Mathlib has `ProjectiveSpectrum.basicOpen_pow`, an *equality* `D₊(bⁿ) = D₊(b)` requiring `0 < n`.
 The inclusion `D₊(b) ≤ D₊(bⁿ)` needs no hypothesis on `n` at all: at `n = 0` the right-hand side is
@@ -21,6 +35,14 @@ bookkeeping costs more than the strengthening saves.
 
 That makes it a candidate to propose upstream rather than a local convenience, which is why it is
 here under its own name instead of inlined at its forty call sites.
+
+## References
+
+Mathlib's `ProjectiveSpectrum.basicOpen_pow` and `ProjectiveSpectrum.basicOpen_mul`.
+
+## Tags
+
+projective spectrum, basic open, graded ring
 -/
 
 open TopologicalSpace
