@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.KInjective.Criterion
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.KInjective.Factorization
 
 /-!
 # K-injective complexes in Grothendieck abelian categories
@@ -19,7 +20,8 @@ None: this umbrella re-exports its children.
 
 None; this module re-exports its children, among them
 `CochainComplex.isKInjective_of_injective_of_homotopy_zero`, the criterion of
-Stacks, Tag 079L.
+Stacks, Tag 079L, and `CochainComplex.injectiveReplacement`, the functorial replacement
+of Stacks, Tags 079M and 079N.
 
 ## Implementation notes
 
