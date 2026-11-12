@@ -8,16 +8,32 @@ import DerivedAlgGeo.CategoryTheory.Abelian.Stability.Weak.Truncation
 /-!
 # Truncating a weak HN filtration above an index
 
-`WeakTruncation.lean` ported `restrict`, the truncation **below** an index, and recorded that
-`tailAt` — the truncation **above** it, pushed down to the quotient — did not port, because its
-two supporting lemmas were proved from `semiClosedUpperHalfPlane_ne_zero`.
+`Weak/Truncation.lean` has `restrict`, the truncation **below** an index.  This file supplies
+`tailAt` — the truncation **above** it, pushed down to the quotient — for a weak HN filtration.
+The strict `tailAt` reads two supporting lemmas proved from `semiClosedUpperHalfPlane_ne_zero`
+(a nonzero object has nonzero charge), which is precisely the implication weak stability drops;
+`CategoryTheory/SubobjectCorrespondence.lean` proves both without any charge, and this file
+builds on those charge-free versions.
 
-`CategoryTheory/SubobjectCorrespondence.lean` removed that obstruction by proving both without
-any charge.  This file is the port those lemmas unblock.
+## Main definitions
 
-## What changed, and what did not
+* `CategoryTheory.Triangulated.AbelianWeakHNFiltration.tailAt` — push the chain of a weak HN
+  filtration from index `k` onward down to the quotient by the `k`-th term.
 
-The strict `tailAt` (`Uniqueness/Tail.lean:35`) reads four charge-dependent facts.  Two of them
+## Main results
+
+* `WeakStabilityFunctionOn.slope_cokernel_pullback_eq`,
+  `WeakStabilityFunctionOn.isSemistable_cokernel_pullback_iff` — consecutive pulled-back
+  quotient subobjects have the slope, and the semistability, of the corresponding quotient
+  factor.
+* `AbelianWeakHNFiltration.tailAt_μPlus`, `AbelianWeakHNFiltration.tailAt_μMinus` — a tail
+  starts at the slope of the index it was cut at and ends where the original filtration ends.
+
+## Implementation notes
+
+### Comparison with the strict truncation
+
+The strict `tailAt` (`Uniqueness/Tail.lean`) reads four charge-dependent facts.  Two of them
 are replaced here by their charge-free counterparts:
 
 | strict | here |
@@ -25,7 +41,7 @@ are replaced here by their charge-free counterparts:
 | `pullback_imageSubobject_eq Z` | `Abelian.pullback_imageSubobject_eq` |
 | `cokernelPullbackIso Z` | `Abelian.cokernelPullbackIso` |
 | `phase_cokernel_pullback_eq Z` | `slope_cokernel_pullback_eq`, below |
-| `Z.phase_cokernel_ofLE_congr` | `W.slope_cokernel_ofLE_congr` (#789) |
+| `Z.phase_cokernel_ofLE_congr` | `W.slope_cokernel_ofLE_congr` |
 
 `slope_cokernel_pullback_eq` is *shorter* than the phase version it replaces.  The strict proof
 computes both charges and cancels with `linear_combination`; here the correspondence already
@@ -33,8 +49,17 @@ supplies an isomorphism of the two quotients, so the slopes agree by
 `slope_eq_of_iso` and additivity is never mentioned.
 
 Everything else — the chain, its strictness, its endpoints, the index arithmetic — is the strict
-proof with `phase` renamed to `μ`, and is order-generic exactly as the rest of this development
-turned out to be.
+proof with `phase` renamed to `μ`, and is order-generic, like the rest of this development.
+
+## References
+
+The file builds on `CategoryTheory.Abelian.pullback_imageSubobject_eq` and
+`CategoryTheory.Abelian.cokernelPullbackIso`, and mirrors
+`CategoryTheory.Triangulated.AbelianHNFiltration.tailAt`.
+
+## Tags
+
+weak stability function, Harder--Narasimhan filtration, truncation, quotient, slope
 -/
 
 noncomputable section

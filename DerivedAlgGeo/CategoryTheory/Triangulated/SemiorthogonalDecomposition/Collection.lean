@@ -11,39 +11,9 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition.Ori
 
 An **exceptional collection** is a family of exceptional objects, indexed by
 a preorder, whose cross-member maps vanish in the CLASSICAL direction: maps
-from a LATER member into any shift of an EARLIER one are zero. The theorem
-this lane exists for is proved here: the triangulated envelopes of the
-shift-closures of the members form a semiorthogonal sequence.
-
-## The classical direction, deliberately
-
-The field `hom_shift_eq_zero` is the definition of the literature (this
-structure is an upstream candidate), and it is the OPPOSITE of the repository
-root's convention — the root vanishes Hom(earlier, later). The two are NOT
-definitionally aligned; the bridge to the root is `Orientation.lean`'s
-order-reversing adapter, applied in `toSemiorthogonalSequence`. No file
-should restate the flip.
-
-## One meaning of generation
-
-`component i` is the triangulated envelope of the shift closure of the
-singleton at `obj i`, and that is the ONLY component convention: Mathlib's
-`shiftClosure` already closes under isomorphism, and defining a second
-generator-level component would create two meanings of generation. The
-repository's `Triangulated.ExtensionClosure` is not used, for the reason the
-projective-families reconnaissance rejected it: it proves neither shift
-stability nor retract closure.
-
-## What is deliberately out of scope
-
-Admissibility of `component i` needs finite-dimensional Hom-spaces
-(`AlgebraicGeometry/Modules/Coherent/Linear.lean`, issue #332) and is not
-claimed. Mutation is not filed in this milestone. Beilinson's collection
-`O, O(1), …, O(n)` on `P^n`, its fullness, and the decomposition of
-`D^b(P^n)` land in `AlgebraicGeometry/ProjectiveSpectrum/**` (issues #570, #586, #571,
-#332, #806, #833, #824–#828) and are deliberately NOT touched here; the
-concrete inhabitant of this structure is the `D^b(field)` example of the next
-issue in this lane.
+from a LATER member into any shift of an EARLIER one are zero. The main
+theorem is proved here: the triangulated envelopes of the shift-closures of
+the members form a semiorthogonal sequence.
 
 ## Main definitions
 
@@ -67,6 +37,36 @@ issue in this lane.
   dual — two short lemmas absent from the pinned Mathlib (the only files
   mentioning `rightOrthogonal` there prove no retract stability); flagged
   as upstream candidates.
+
+## Implementation notes
+
+### The classical direction, deliberately
+
+The field `hom_shift_eq_zero` is the definition of the literature (this
+structure is an upstream candidate), and it is the OPPOSITE of the repository
+root's convention — the root vanishes Hom(earlier, later). The two are NOT
+definitionally aligned; the bridge to the root is `Orientation.lean`'s
+order-reversing adapter, applied in `toSemiorthogonalSequence`. No file
+should restate the flip.
+
+### One meaning of generation
+
+`component i` is the triangulated envelope of the shift closure of the
+singleton at `obj i`, and that is the ONLY component convention: Mathlib's
+`shiftClosure` already closes under isomorphism, and defining a second
+generator-level component would create two meanings of generation. The
+repository's `Triangulated.ExtensionClosure` is not used, because it proves
+neither shift stability nor retract closure.
+
+### What is deliberately out of scope
+
+Admissibility of `component i` needs finite-dimensional Hom-spaces
+(`AlgebraicGeometry/Modules/Coherent/Linear.lean`) and is not claimed.
+Mutation is not treated in this file. Beilinson's collection
+`O, O(1), …, O(n)` on `P^n`, its fullness, and the decomposition of
+`D^b(P^n)` belong to `AlgebraicGeometry/ProjectiveSpectrum/**` and are
+deliberately NOT touched here; the concrete inhabitant of this structure is the
+`D^b(field)` example in `DerivedField.lean`.
 
 ## References
 

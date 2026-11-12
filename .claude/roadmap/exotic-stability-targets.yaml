@@ -145,8 +145,8 @@ source:
   arxiv: "none — this roadmap is not scoped to one paper"
 
 evidence:
-  - "Scoping workflow run 2026-09-19: six parallel literature-and-substrate scouts plus one deconfliction critic, 7 agents, 0 errors. Raw specs and the deconfliction report are the workflow transcript; the human-readable digest is .claude/notes/2026-09-19-exotic-stability-targets-scoping.md."
-  - "Predecessor notes: .claude/notes/2026-09-19-net-new-results-scoping.md (the Enriques / Serre-invariance thread, including the Theorem A parity obstruction that exotic-e5 consumes) and .claude/notes/2026-09-19-exotic-stability-targets-scoping.md (the CORRECTION block withdrawing the original E1 framing)."
+  - "Scoping workflow run 2026-09-19: six parallel literature-and-substrate scouts plus one deconfliction critic, 7 agents, 0 errors. Raw specs and the deconfliction report are the workflow transcript; the human-readable digest is https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/notes/2026-09-19-exotic-stability-targets-scoping.md."
+  - "Predecessor notes: https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/notes/2026-09-19-net-new-results-scoping.md (the Enriques / Serre-invariance thread, including the Theorem A parity obstruction that exotic-e5 consumes) and https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/notes/2026-09-19-exotic-stability-targets-scoping.md (the CORRECTION block withdrawing the original E1 framing)."
   - "Repository facts verified during scoping: Walls/Spherical/Finiteness.lean:103,116,133,167,252 carry 0 < delta.1; Walls/Spherical/Basic.lean:259 defines IsSpherical as selfPairing = -2; Examples/Surface/BlowUpPlane.lean:627 proves hodgeDefinite by a three-variable nlinarith; GLTilde/Covering/Fibre.lean:97-102,225,239 give deckShift n = phi + 2n, range_deckHom_eq_ker and kerEquiv; grep for serreinvariant over DerivedAlgGeo/ returns nothing."
   - "Mathlib facts verified at the pin (leanprover/lean4:v4.32.1): Analysis/Convex/Contractible.lean:34 Convex.contractibleSpace and :25 StarConvex.contractibleSpace exist; LinearAlgebra/RootSystem/OfBilinear.lean:49 IsReflective.of_dvd_two exists; there is no braid group."
 
@@ -233,7 +233,7 @@ items:
       seven Bagnera-de Franchis types, and a hand computation of
       DivisorSpace.HodgeDefinite on the hyperbolic plane in the exact shape
       HodgeIndex.lean demands, transcribable line by line.
-      Consumes Theorem A from .claude/notes/2026-09-19-net-new-results-scoping.md.
+      Consumes Theorem A from https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/notes/2026-09-19-net-new-results-scoping.md.
     acceptance:
       - "A proof, at most three pages, of the sigma_{omega,beta} invariance, with the heart-preservation step spelled out at the level of the torsion pair."
       - "An explicit citation for the observation, OR a written list of the sources searched and read IN FULL — at minimum Macri-Mehrotra-Stellari, Nuer, Tochitani."

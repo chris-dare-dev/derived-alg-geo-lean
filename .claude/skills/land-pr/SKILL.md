@@ -14,9 +14,8 @@ This standalone skill performs **one** iteration against an eligible open PR
 and **halts** before the merge. Read the issue tracker and native blockers
 before selecting a PR; an open PR is not by itself admission-ready.
 
-The manifest controller (`scripts/loop_engine.py`), its OpenSpec changes and
-its review ledgers are retired from every run path; none of them scopes this
-skill.
+No loop manifest, OpenSpec change or review ledger scopes this skill; the
+controller that used them has been deleted.
 
 ## What the queue actually is
 

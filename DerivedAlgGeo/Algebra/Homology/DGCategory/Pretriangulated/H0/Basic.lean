@@ -7,30 +7,52 @@ import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.Basic
 /-!
 # The zero object of `H⁰`
 
-`dg-enhancements-e6`. The first clause of a `Pretriangulated` structure on `H⁰`
-of a pretriangulated dg category, stated before any external category is chosen.
+The first clause of a `Pretriangulated` structure on `H⁰` of a pretriangulated
+dg category, stated before any external category is chosen.
 
-`IsPretriangulated` asks for an object with `dgId Z = 0`, and in a preadditive
+`IsPretriangulated` requires an object with `dgId Z = 0`, and in a preadditive
 category that is exactly `IsZero Z`. So `HasZeroObject (H0 C)` is immediate.
 
-## Why this is here and not with the enhancement
+## Main definitions
+
+This file introduces no new definitions; it proves facts about `H0 C` for a
+dg category `C`.
+
+## Main results
+
+* `CategoryTheory.H0.isZero_of_dgId_eq_zero` — an object with zero dg identity
+  is a zero object of `H⁰`.
+* `CategoryTheory.H0.hasZeroObject` — `H⁰` of a pretriangulated dg category has
+  a zero object.
+
+## Implementation notes
+
+### Why this is here and not with the enhancement
 
 Nothing below mentions an ordinary category, an equivalence, or a triangulated
 target: the statements are about `H⁰ C` for a pretriangulated dg category `C`
-alone. Under the owner map of `docs/architecture/cutover-ledger.md` row 15 that
-makes `Algebra/Homology/DGCategory/` their definition owner, and
+alone. That makes `Algebra/Homology/DGCategory/` their definition owner, and
 `CategoryTheory/Triangulated/DGEnhancement/Basic.lean` -- which consumes
 `H0.hasZeroObject` to give an enhanced category a zero object -- their consumer.
 The dependency runs one way, and the intrinsic side imports no enhancement
 module.
 
-## The shift is not here
+### The shift is not here
 
 `IsPretriangulated.exists_shift` gives, for each `X` and `n`, *some* `Y` with
 *some* witness -- an existential, not a choice -- and `HasShift (H0 C) ℤ` needs a
 functor together with `shiftFunctorZero` and `shiftFunctorAdd` coherence. Getting
 from one to the other is a construction with real content, not a repackaging; it
 is `H0/Shift.lean`, and it is not smuggled in behind a `Nonempty.some`.
+
+## References
+
+This file builds on `CategoryTheory.IsPretriangulated` and Mathlib's
+`CategoryTheory.Limits.HasZeroObject`.
+
+## Tags
+
+dg category, pretriangulated, zero object, homotopy category
 -/
 
 set_option autoImplicit false

@@ -28,7 +28,7 @@ if __package__:
     from . import ci_contract
     from . import ci_publication
     from . import ci_security_scan
-else:  # Imported by the standalone loop_engine.py entry point.
+else:  # Imported as a top-level module, with scripts/ on sys.path.
     import ci_contract
     import ci_publication
     import ci_security_scan

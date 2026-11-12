@@ -3,6 +3,8 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.RingTheory.GradedAlgebra
+import DerivedAlgGeo.RingTheory.LocalRing
+import DerivedAlgGeo.RingTheory.Nagata
 import DerivedAlgGeo.RingTheory.Spectrum
 
 /-!

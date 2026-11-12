@@ -32,13 +32,44 @@ with the identity on the remaining three coordinates.  The first map is the
 standard exponential covering; the product and coordinate homeomorphisms
 therefore give the required covering map.
 
+## Main definitions
+
+All in the namespace
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction`:
+
+* `circleMatrix` and `circleGLPos` — the rotation whose first column is a point of the unit
+  circle.
+* `glPosCoordinates`, `glPosOfCoordinates` and `glPosCoordinateHomeomorph` — global coordinates
+  `S¹ × (0, ∞) × ℝ × (0, ∞)` on `GL⁺(2, ℝ)`.
+* `phaseCircle` — the direction on the unit circle represented by a lifted phase.
+* `coordinateProjection` — the standard product covering in the global coordinates.
+
+## Main results
+
+* `phaseCircle_isCoveringMap` and `coordinateProjection_isCoveringMap` — the coordinate
+  projections are covering maps.
+* `GLTilde.isCoveringMap_toMat` — the matrix projection is a covering map for the
+  global-coordinate topology.
+* `GLTilde.universalCoverData` — the matrix projection is a surjective covering map and its
+  source is simply connected.
+
+## Implementation notes
+
 `UniversalCover/TopologicalGroup.lean`
 supplies the final compatibility layer by proving that the transported topology
 makes `GLTilde` a topological group.
 
 The product-of-a-covering-with-an-identity step is the general lemma
 `isCoveringMap_prodMap_id`, which quantifies over arbitrary spaces and lives
-with the topology owner in `Topology/Covering/Basic.lean` (MO1.12, #1323).
+with the topology owner in `Topology/Covering/Basic.lean`.
+
+## References
+
+Mathlib's `IsCoveringMap`, `Circle.exp` and `Circle.isCoveringMap_exp`.
+
+## Tags
+
+covering map, universal cover, general linear group, circle, global coordinates
 -/
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

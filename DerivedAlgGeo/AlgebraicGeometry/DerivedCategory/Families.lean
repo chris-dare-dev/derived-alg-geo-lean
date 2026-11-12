@@ -16,7 +16,7 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeSequen
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeSourceSequence
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeGeneration
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeProjection
-import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeProposition315
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeDecompositionAssembly
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeBoundedAmplitude
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeTStructureRestriction
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeSequenceFunctoriality
@@ -61,7 +61,7 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.PerfectPullback
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.DerivedPullbackCoherence
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.DerivedPullbackLaws
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.DerivedPullbackShift
-import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.Theorem53
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.TStructureRange
 
 /-!
 # Scheme-derived categories in families

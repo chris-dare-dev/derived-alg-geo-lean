@@ -17,9 +17,47 @@ the Serre isomorphism to recover `IsSphericalObject` and
 The second part proves the equivalence-transport step used in both refined
 Torelli arguments.  A `SerreCompatibleEquivalence` is an equivalence equipped
 with the linear, additive, shift, and Serre comparison data that the proof
-actually consumes.  These fields are explicit because the general Serre
-uniqueness/conjugation lane (#896--#898) has not yet produced them
-automatically.
+actually consumes.
+
+## Main definitions
+
+* `CategoryTheory.SerreFunctor.SphericalExtProfile`,
+  `CategoryTheory.SerreFunctor.PseudoprojectiveExtProfile` — the shifted
+  self-Hom computation of a spherical, respectively pseudoprojective, object,
+  without the Serre-action statement.
+* `CategoryTheory.SerreFunctor.SerreCompatibleEquivalence` — an equivalence
+  with its linear, additive, shift and Serre comparison data;
+  `SerreCompatibleEquivalence.symm` reverses it.
+
+## Main results
+
+* `SphericalExtProfile.toIsSphericalObject`,
+  `PseudoprojectiveExtProfile.toIsPseudoprojectiveObject` — adding the
+  Serre-shift identification recovers the object predicates.
+* `SphericalExtProfile.map`, `PseudoprojectiveExtProfile.map` — the profiles
+  transport through a fully faithful linear shift-compatible functor.
+* `SerreCompatibleEquivalence.spherical_iff`,
+  `SerreCompatibleEquivalence.pseudoprojective_iff`,
+  `SerreCompatibleEquivalence.isShiftOf_iff`,
+  `SerreCompatibleEquivalence.isGradedOrthogonal_iff` — a Serre-compatible
+  equivalence preserves and reflects these properties.
+
+## Implementation notes
+
+The fields of `SerreCompatibleEquivalence` are explicit, supplied data rather
+than consequences derived from the general Serre uniqueness and conjugation
+results.
+
+## References
+
+The file builds on `CategoryTheory.SerreFunctor.SerreFunctorData`,
+`CategoryTheory.SerreFunctor.IsSphericalObject` and
+`CategoryTheory.SerreFunctor.IsPseudoprojectiveObject`.
+
+## Tags
+
+Serre functor, spherical object, pseudoprojective object, equivalence, Ext,
+transport
 -/
 
 universe w v v' u u'

@@ -1,3 +1,4 @@
+import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.BaseChange
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.BasicOpenLemmas
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Integral
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules
@@ -28,11 +29,14 @@ pinned owners and the concrete connection to the affine module API.
 * `AlgebraicGeometry.Proj.toSpecZero` and
   `AlgebraicGeometry.Proj.awayι_toSpecZero` record the structure map and its restriction to a
   chart.
+* `AlgebraicGeometry.Proj.isPullback_map_baseChange` shows that `Proj` commutes with base change
+  of the graded ring.
 
 ## Implementation notes
 
-This umbrella re-exports `BasicOpenLemmas`, `Integral`, `Modules`, `ProjectiveSpaceProperties`,
-`ProjectiveSpaceVariety`, and `StructureSections`. The local module-chart path is
+This umbrella re-exports `BaseChange`, `BasicOpenLemmas`, `Integral`, `Modules`,
+`ProjectiveSpaceProperties`, `ProjectiveSpaceVariety`, and `StructureSections`. The local
+module-chart path is
 `ProjectiveSpectrum/Modules/ChartExtension.lean` →
 `AlgebraicGeometry/Modules/Affine/Extension.lean` → Mathlib's
 `AlgebraicGeometry/Modules/Tilde.lean`. Its chart ring is

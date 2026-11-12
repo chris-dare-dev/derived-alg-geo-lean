@@ -11,16 +11,34 @@ import Mathlib.Topology.Homeomorph.Lemmas
 Covering-map lemmas that hold for arbitrary topological spaces and extend
 `Mathlib.Topology.Covering.Basic` at the pinned revision.
 
-`isCoveringMap_prodMap_id` was extracted here by MO1.12 (#1323) from the
-`GL⁺(2, ℝ)` cover's coordinate argument, where it was stated and proved. Its
-statement quantifies over three arbitrary topological spaces and mentions no
-matrix, no phase and no stability condition, so the ledger's row 08 places
-general covering lemmas with the topology owner rather than beside the group
-they were first needed for.
+## Main definitions
 
-The declaration keeps the fully qualified name it was introduced under, per the
-cutover ledger's first standing decision: paths move, namespaces do not. The
-namespace therefore reads oddly here, and that is recorded rather than repaired.
+This file introduces no new definitions.
+
+## Main results
+
+* `isCoveringMap_prodMap_id` — a covering map remains a covering map after taking its product
+  with an identity map. It is in the namespace
+  `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction`.
+
+## Implementation notes
+
+The statement of `isCoveringMap_prodMap_id` quantifies over three arbitrary
+topological spaces and mentions no matrix, no phase and no stability
+condition, so it lives with the topology owner rather than beside the
+`GL⁺(2, ℝ)` cover whose coordinate argument uses it.
+
+The declaration lives in the namespace of that cover's stability-action
+consumer, which keeps its fully qualified name fixed. The namespace therefore
+reads oddly here; the divergence between path and namespace is deliberate.
+
+## References
+
+Mathlib's `IsCoveringMap` and `IsEvenlyCovered`.
+
+## Tags
+
+covering map, product, topology
 -/
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

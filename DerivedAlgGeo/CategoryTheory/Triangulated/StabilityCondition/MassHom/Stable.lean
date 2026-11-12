@@ -14,19 +14,50 @@ A stable object of phase `φ` is a nonzero simple object of the exact slice
 `𝒫(φ)`, expressed intrinsically by distinguished triangles whose three terms
 lie in that slice.  The one missing categorical input is isolated as
 `Slicing.HasJordanHolderFiltrations`: every semistable object is a finite
-extension of stable objects of the same phase.
+extension of stable objects of the same phase.  Under this hypothesis, a bound
+on stable targets extends first across a same-phase Jordan--Hölder filtration
+and then across the existing HN filtration.  This is the stable-object half of
+Halpern--Leistner--Robotis, arXiv:2501.00710v2, Lemma 2.8.
+
+## Main definitions
+
+* `CategoryTheory.Triangulated.Slicing.IsStableAt` — a nonzero simple object of
+  the phase slice `𝒫(φ)`, stated through distinguished triangles.
+* `CategoryTheory.Triangulated.Slicing.HasJordanHolderFiltrations` — every
+  semistable object is a finite extension of stable objects of its own phase.
+* `StabilityCondition.WithClassMap.HasStableMassHomBoundFor`,
+  `StabilityCondition.WithClassMap.HasStableMassHomBound` — mass--Hom bounds
+  tested only on stable targets, for one source and for a class of sources.
+
+## Main results
+
+* `StabilityCondition.WithClassMap.HasStableMassHomBoundFor.massHom` — a
+  stable-target bound extends to the full mass--Hom bound under the
+  Jordan--Hölder hypothesis.
+* `StabilityCondition.WithClassMap.HasMassHomBoundFor.stable`,
+  `StabilityCondition.WithClassMap.HasMassHomBoundFor.stable_iff` — a full
+  bound restricts to stable targets, and under Jordan--Hölder the two are
+  equivalent.
+* `StabilityCondition.WithClassMap.HasStableMassHomBound.massHom`,
+  `StabilityCondition.WithClassMap.HasStableMassHomBound.triangEnvelope` — the
+  same on a test class, and the extension to its thick triangulated envelope.
+
+## Implementation notes
 
 The repository's local-finiteness field controls admissible subobjects in
-thin interval categories, but the pinned libraries do not yet turn that
+thin interval categories, but the pinned libraries do not turn that
 well-foundedness into a categorical Jordan--Hölder filtration.  Consequently
-the named hypothesis below is explicit; it is not a field of a stability
-condition and is not silently inferred from local finiteness.
-The missing bridge is tracked by GitHub issue #1203.
+the named hypothesis `Slicing.HasJordanHolderFiltrations` is explicit; it is
+not a field of a stability condition and is not silently inferred from local
+finiteness.
 
-Under this hypothesis, a bound on stable targets extends first across a
-same-phase Jordan--Hölder filtration and then across the existing HN
-filtration.  This is the stable-object half of Halpern--Leistner--Robotis,
-arXiv:2501.00710v2, Lemma 2.8.
+## References
+
+* Halpern--Leistner, Robotis, arXiv:2501.00710v2, Lemma 2.8.
+
+## Tags
+
+stability condition, stable object, Jordan--Hölder filtration, mass--Hom bound
 -/
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated

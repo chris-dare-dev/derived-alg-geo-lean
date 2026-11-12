@@ -15,16 +15,50 @@ connects the two and constructs the objectwise counit triangle
 
 `i i⁽!⁾ X ⟶ X ⟶ L_P(X)`.
 
-The third vertex is in `P.rightOrthogonal`.  This is the objectwise mutation
-triangle available in every triangulated category.  It deliberately does not
-claim a mutation *functor*: making the cone functorial is enhancement-level
-data and is one of the jobs of the dg lane (#855, #853, #854).
-
 The second half is the formal engine behind Paper II, Remark 2.3(ii).  If
 successive members of a block are joined by distinguished triangles whose
 third vertices are killed by the residual projection, then the projected
 successive map is an isomorphism.  Iterating gives the same residual
 projection for every member of the block, not only its first member.
+
+## Main definitions
+
+* `CategoryTheory.ObjectProperty.RightProjectionData.CounitTriangle` — the
+  objectwise counit triangle of a chosen right projection, with its third
+  vertex in the right orthogonal; `RightProjectionData.counitTriangle`
+  constructs it.
+* `RightProjectionData.projectMapIsoOfDistinguished` — the isomorphism of
+  projections induced by a distinguished triangle whose third vertex is killed
+  by the projection.
+* `CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData`
+  — distinguished triangles comparing consecutive members of every exceptional
+  block, with cones killed by the residual projection.
+* `ProjectionChainData.projectionIso` — the residual projection of every member
+  of a block is isomorphic to that of its first member.
+
+## Main results
+
+* `RightProjectionData.projectMap_isIso_of_distinguished` — a morphism whose
+  cone is right orthogonal to `P` becomes an isomorphism after the right
+  projection onto `P`.
+
+## Implementation notes
+
+The third vertex of the counit triangle is in `P.rightOrthogonal`.  This is the
+objectwise mutation triangle available in every triangulated category.  It
+deliberately does not claim a mutation *functor*: making the cone functorial is
+enhancement-level data, supplied by a dg enhancement rather than by the
+triangulated structure.
+
+## References
+
+The file builds on Mathlib's `CategoryTheory.ObjectProperty.rightOrthogonal`
+and on `CategoryTheory.ObjectProperty.RightProjectionData`.
+
+## Tags
+
+mutation, semiorthogonal decomposition, right admissible, projection, exceptional
+block
 -/
 
 open CategoryTheory

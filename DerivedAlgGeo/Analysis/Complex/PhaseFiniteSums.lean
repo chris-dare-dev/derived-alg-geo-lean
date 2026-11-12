@@ -12,13 +12,37 @@ This file extends the neutral phase-geometry API in
 `Analysis/Complex/PhaseGeometry.lean` from binary sums to nonempty finite sums,
 and records the determinant formulations the HN-polygon proofs use.
 
-Nothing here is categorical or stability-theoretic -- which is exactly why it
-is not under `CategoryTheory/Abelian/Stability/`, where MO1.08 (#1319) placed
-the rest of that directory. It sat under
-`StabilityCondition/Weak/Foundation/StabilityFunction/` until MO1.13 (#1324),
-which moved it so that the Euclidean core of the mass-subadditivity proof could
-reach these bounds without reaching stability. Declaration names and the
-`CategoryTheory.Triangulated` namespace are unchanged.
+## Main definitions
+
+This file introduces no new definitions; it proves facts about
+`CategoryTheory.semiClosedUpperHalfPlane`.
+
+## Main results
+
+All in the namespace `CategoryTheory.Triangulated`:
+
+* `sum_mem_semiClosedUpperHalfPlane` — a nonempty finite sum of vectors in the
+  semi-closed upper half-plane stays there.
+* `arg_sum_le_sup_of_semiClosedUpperHalfPlane` and
+  `inf_le_arg_sum_of_semiClosedUpperHalfPlane` — the argument of such a sum lies
+  between the smallest and largest summand arguments.
+* `cross_nonneg_of_arg_le`, `arg_le_of_cross_nonneg` and `cross_pos_of_arg_lt` —
+  the argument order as the sign of the planar cross product.
+
+## Implementation notes
+
+Nothing here is categorical or stability-theoretic, which is why it is not under
+`CategoryTheory/Abelian/Stability/`: the Euclidean core of the
+mass-subadditivity proof reaches these bounds without reaching stability. The
+declarations keep their names in the `CategoryTheory.Triangulated` namespace.
+
+## References
+
+Mathlib's `Complex.arg` and `Finset.sup'`.
+
+## Tags
+
+complex argument, upper half-plane, finite sum, cross product
 -/
 
 noncomputable section

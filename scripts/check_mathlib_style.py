@@ -107,6 +107,38 @@ MATHLIB_PRIMED = {
 CONFLICT_ANCHOR_RE = re.compile(r"^(?:<{7}|>{7})(?: |$)")
 CONFLICT_INNER_RE = re.compile(r"^(?:={7}$|\|{7}(?: |$))")
 
+# Invariant for `PROV`: no comment or docstring in the library records how it
+# came to be written. Provenance goes in the commit message (CREDO.md §4), so a
+# comment carries none of these: an issue or pull-request number, a milestone
+# code such as `MO1.08`, a decision-record number, a calendar date, a review tag
+# such as `P2-12`, a path into the process records, or the name of an agent.
+# `&#` is excluded so an HTML character reference in a docstring is not a hit.
+PROVENANCE_RES = (
+    ("an issue or pull-request number",
+     re.compile(r"(?<![\w&#])#\d+\b|\b(?:issue|PR|pull request)s? \d+\b", re.I)),
+    ("a milestone code", re.compile(r"\b[A-Z]{2,4}\d+(?:\.\d+)+[a-z]?\b")),
+    ("a decision-record number", re.compile(r"\bADR-?\d+\b")),
+    ("a date", re.compile(r"\b20\d\d-[01]\d-[0-3]\d\b")),
+    ("a review tag", re.compile(r"\bP[0-3]-\d+\b|\bfinding \d+\b")),
+    ("a path into the process records",
+     re.compile(r"(?<![\w/.])(?:docs|openspec|notes)/[\w.-]|\.claude/")),
+    ("the name of an agent", re.compile(r"\b(?:Claude|Codex|ChatGPT|Copilot)\b")),
+)
+
+# Invariant for `NAMENUM`: no declaration or file name carries a source's
+# numbering. A source is cited in the docstring ("Proposition 3.15 of
+# arXiv:1902.08184") and the name says what the statement is (CREDO.md, Lean
+# rules). Matches `Proposition315Data`, `Theorems187And57`, `theorem75`,
+# `lemma_4_15` and `Definition20_5`, in a declaration, a namespace or a file
+# name. An underscore counts only between two digits, and a digit only after a
+# numbered-statement word, so `pow_two` and `Ext2` are untouched.
+PAPER_NUMBERING_RE = re.compile(
+    r"(?:Proposition|Lemma|Theorem|Corollary|Remark|Definition|Example|Section|Tag|Prop|Thm|Cor)s?_?\d"
+    r"|(?:^|_)(?:proposition|lemma|theorem|corollary|remark|definition|example|section|tag)s?_?\d"
+    r"|\d_\d"
+)
+NAMESPACE_RE = re.compile(r"^\s*namespace\s+(\S+)")
+
 
 class Finding:
     def __init__(self, severity: str, line: int, code: str, message: str) -> None:
@@ -188,6 +220,37 @@ def code_only(lines: list[str]) -> list[str]:
     return out
 
 
+def comments_only(lines: list[str]) -> list[str]:
+    """The complement of `code_only`: each line's comment and docstring text.
+
+    The nesting is read from the string-blanked line, as `code_only` reads it,
+    so a `--` inside a string literal opens nothing; the text kept is the raw
+    line's, so a quotation inside a docstring is still judged.
+    """
+    out: list[str] = []
+    depth = 0
+    for line in lines:
+        buf = []
+        i = 0
+        s = strip_string_literals(line)
+        while i < len(s):
+            if s.startswith("/-", i):
+                depth += 1
+                i += 2
+                continue
+            if s.startswith("-/", i) and depth:
+                depth -= 1
+                i += 2
+                continue
+            if not depth and s.startswith("--", i):
+                buf.append(line[i + 2:])
+                break
+            buf.append(line[i] if depth else " ")
+            i += 1
+        out.append("".join(buf))
+    return out
+
+
 def conflict_markers(raw: str, lines: list[str]) -> list[Finding]:
     """Findings for git merge-conflict markers committed into the file.
 
@@ -247,6 +310,16 @@ def check_text(raw: str, path: Path) -> list[Finding]:
     # --- whole-file structure -------------------------------------------------
     if has_decls and not raw.startswith("/-\nCopyright "):
         out.append(Finding("ERROR", 1, "HDR", "File must open with a `/-\\nCopyright ...` header block."))
+    if PAPER_NUMBERING_RE.search(path.stem):
+        out.append(
+            Finding(
+                "ERROR",
+                1,
+                "NAMENUM",
+                f"The file name `{path.name}` carries a source's numbering; name the module by "
+                "its content (CREDO.md, Lean rules).",
+            )
+        )
 
     # The module docstring must be the first command after the imports.
     first_cmd = None
@@ -342,6 +415,34 @@ def check_text(raw: str, path: Path) -> list[Finding]:
                 Finding("ERROR", idx, "HEART", "`set_option ... maxHeartbeats` must be scoped with `... in`.")
             )
 
+    for idx, comment in enumerate(comments_only(lines), start=1):
+        for what, rx in PROVENANCE_RES:
+            if m := rx.search(comment):
+                out.append(
+                    Finding(
+                        "ERROR",
+                        idx,
+                        "PROV",
+                        f"The comment carries {what} (`{m.group(0)}`). State the mathematics; "
+                        "provenance goes in the commit message (CREDO.md §4).",
+                    )
+                )
+                break
+
+    for idx, c in enumerate(code, start=1):
+        if (ns := NAMESPACE_RE.match(c)) and any(
+            PAPER_NUMBERING_RE.search(part) for part in ns.group(1).split(".")
+        ):
+            out.append(
+                Finding(
+                    "ERROR",
+                    idx,
+                    "NAMENUM",
+                    f"The namespace `{ns.group(1)}` carries a source's numbering. Name it by its "
+                    "content and cite the source in the docstring (CREDO.md, Lean rules).",
+                )
+            )
+
     # --- declarations ---------------------------------------------------------
     for idx, line in enumerate(lines, start=1):
         m = DECL_RE.match(code[idx - 1])
@@ -398,6 +499,16 @@ def check_text(raw: str, path: Path) -> list[Finding]:
         if kw == "def" and "_" in name.split(".")[-1]:
             out.append(
                 Finding("WARN", idx, "DEFNAME", f"`def {name}` should be `lowerCamelCase`, not snake_case.")
+            )
+        if PAPER_NUMBERING_RE.search(name.split(".")[-1]):
+            out.append(
+                Finding(
+                    "ERROR",
+                    idx,
+                    "NAMENUM",
+                    f"`{name}` carries a source's numbering. Name the statement by its content and "
+                    "cite the source in the docstring (CREDO.md, Lean rules).",
+                )
             )
 
     return out

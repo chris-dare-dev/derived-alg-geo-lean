@@ -761,7 +761,7 @@ identifying `Coh X` with the heart of the standard t-structure on its derived ca
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.P_of_Q_of_P_semistable
 #print axioms CategoryTheory.Triangulated.eq_of_pos_mul_exp_eq
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.false_of_all_hn_phases_above
-#print axioms CategoryTheory.Triangulated.bridgeland_lemma_6_4
+#print axioms CategoryTheory.Triangulated.slicing_P_iff_of_Z_eq_of_dist_lt_one
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.false_of_gt_and_le_phases
 #print axioms CategoryTheory.Triangulated.StabilityCondition.WithClassMap.false_of_hn_phases_le_with_lt
 #print axioms CategoryTheory.Triangulated.basisNhd_mono

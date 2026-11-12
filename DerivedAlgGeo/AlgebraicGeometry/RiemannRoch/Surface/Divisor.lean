@@ -19,13 +19,47 @@ Serre duality. It does not import or invoke the Layer A Hirzebruch--Riemann--Roc
 The proof is first carried out intrinsically on `Pic X`.  The numerator is shown to be even over
 `ℤ`, before division by two in `ℚ`.  It is then specialized to Cartier divisors, where
 principal-equivalence invariance is formal.  Finally, `EffectiveSequenceRealization` connects the
-formula to #25's genuine coherent short exact sequence
+formula to the coherent twisted fundamental sequence `EffectiveCartierDivisor.cohTwistSequence`
 
 `0 → O_X(E-D) → O_X(E) → O_X(E) ⊗ i_*O_D → 0`.
+
+## Main definitions
+
+* `correctionNumerator` — the integral numerator `L · L - L · K` of the surface formula.
+* `cartierEulerCharacteristic`, `cartierCorrectionNumerator` — the Euler characteristic of
+  `O_X(E)` and the numerator `E · (E - K)` for a Cartier divisor `E`.
+* `EffectiveSequenceRealization` — coherence and comparison data connecting the twisted
+  fundamental sequence of an effective divisor to the intrinsic Picard Euler function.
+* `EffectiveSequenceRealization.QuotientIntersectionComparison` — the curve/intersection
+  comparison computing the quotient term of that sequence.
+
+## Main results
+
+* `correctionNumerator_even` — the intersection numerator is even.
+* `eulerPic_eq` — intrinsic Picard-group surface Riemann--Roch.
+* `cartier_eulerCharacteristic_eq` — surface Riemann--Roch for an arbitrary Cartier divisor.
+* `EffectiveSequenceRealization.effective_divisor_formula_from_sequence` — the formula for an
+  effective divisor, obtained from its fundamental sequence.
+* `EffectiveSequenceRealization.quotient_eulerCharacteristic_eq_half_correction` — the
+  quotient Euler characteristic is half the intersection numerator.
+* `k3_eulerPic_eq`, `k3_eulerPic_eq_two` — the K3 specialization `χ(L) = 2 + L²/2`.
+
+## Implementation notes
 
 Coherence and the comparison between chosen Picard representatives and the displayed associated
 sheaves remain explicit because those closure/comparison constructors are not yet automatic in
 the current geometric layer.
+
+## References
+
+This file builds on the Serre-duality symmetry `Serre.Data.SurfacePicardSymmetry`, on the
+surface intersection pairing of `IntersectionContext`, and on the effective-divisor sequence
+`EffectiveCartierDivisor.cohTwistSequence_shortExact`.
+
+## Tags
+
+Riemann--Roch, surface, Cartier divisor, Picard group, Serre duality, intersection pairing,
+K3 surface
 -/
 
 universe u
@@ -174,9 +208,10 @@ theorem cartier_formula_eq_of_principalEquivalent
 
 /-! ## Effective divisors and the fundamental exact sequence -/
 
-/-- Realization data connecting #25's twisted fundamental sequence to the intrinsic Picard
-Euler function.  The quotient term needs no additional comparison: it is the actual coherent
-third object of that sequence. -/
+/-- Realization data connecting the twisted fundamental sequence
+`EffectiveCartierDivisor.cohTwistSequence` to the intrinsic Picard Euler function.  The
+quotient term needs no additional comparison: it is the actual coherent third object of that
+sequence. -/
 structure EffectiveSequenceRealization
     (A : EffectiveCartierDivisor (X := X))
     (E : CartierDivisor X) where
@@ -242,8 +277,8 @@ structure QuotientIntersectionComparison
     (D.eulerCharacteristic R.quotient : ℚ) =
       (cartierCorrectionNumerator I K A.divisor : ℚ) / 2
 
-/-- Surface Riemann--Roch for an effective divisor, obtained directly from #25's coherent
-fundamental sequence and the geometric intersection computation on its quotient. -/
+/-- Surface Riemann--Roch for an effective divisor, obtained directly from its coherent
+twisted fundamental sequence and the geometric intersection computation on its quotient. -/
 theorem effective_divisor_formula_from_sequence
     (hself : E = A.divisor)
     {K : Pic X}

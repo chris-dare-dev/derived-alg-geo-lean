@@ -90,10 +90,9 @@ variable {V : NumericalVarietyData 2 A N}
 
 This is a **definition, not supplied data**: on a K3 the existing
 `chi_eq_rank_add_mukaiS` already proves `χ(E) = r(E) + mukaiS E`, so the
-integrality of `mukaiS` is a theorem rather than a hypothesis. An earlier draft
-of `IntegralMukaiData` carried `s` and its specification as fields; that
-overstated the trust boundary, and the review that caught it is the reason this
-is a `def`. -/
+integrality of `mukaiS` is a theorem rather than a hypothesis. Carrying `s` and
+its specification as fields of `IntegralMukaiData` would overstate the trust
+boundary, which is why this is a `def`. -/
 noncomputable def mukaiSInt (V : NumericalVarietyData 2 A N) (E : N) : ℤ :=
   V.chi E - V.rank E
 
@@ -124,9 +123,7 @@ extends this structure with additivity of `c₁` when a caller can supply it;
 Symmetry is **not** a field. On the image of `c₁` it is already a theorem —
 `b_spec` and commutativity of `A` force it, see `b_comm_on_realized` — and
 off the image it would be exactly the kind of global demand on `Λ` this
-structure otherwise avoids; nothing downstream consumes it. An earlier draft
-carried a `b_comm` field; the review that measured its use count (zero) is the
-reason it is gone. -/
+structure otherwise avoids; nothing downstream consumes it. -/
 structure IntegralMukaiData (V : NumericalVarietyData 2 A N) (Λ : Type w)
     [AddCommGroup Λ] where
   /-- The first Chern class, valued in the supplied lattice. -/
@@ -251,9 +248,7 @@ Why the inequality is not available here, recorded so the next reader does not r
 * The classical argument is `χ(E,E) = hom − ext¹ + ext² = 2 − ext¹`, using simplicity of a
   stable sheaf and Serre duality on a K3. Neither exists in this repository: there is no
   `SerreDuality` and no "stable implies simple", and the stability here is numerical and is not
-  tied to `Hom` at all.
-
-See #332. -/
+  tied to `Hom` at all. -/
 theorem neg_two_le_selfPairing_mukaiVector_iff
     (hHRR : V.SatisfiesHRR) (hK3 : IsK3 V) (E : N) :
     -2 ≤ Mukai.selfPairing D.b (D.mukaiVector E) ↔ V.chi₂ E E ≤ 2 := by
@@ -303,8 +298,7 @@ end IntegralMukaiData
 Everything above treats `c₁` as a bare function, and that ceiling is real: with
 `mukaiVector` a bare function, `(E, F) ↦ ⟪v E, v F⟫` is a function of two
 arguments and nothing more. It is not a bilinear form, so no map can be an
-isometry of it, and the review record's "no map of Mukai lattices exists here"
-was a statement about this data level.
+isometry of it, and no map of Mukai lattices exists at this data level.
 
 Adding one field lifts the ceiling. `AdditiveMukaiData` demands that `c₁` be
 additive on the nose; `IntegralMukaiData.b_c₁_add` shows why that is a genuine
@@ -313,9 +307,9 @@ demand and not a repackaging. From it, `mukaiVector` becomes an
 `Realization`'s pairing results become isometry statements in Mathlib's sense
 of the word.
 
-The bare layer stays exactly as it was. It asks for less, it is what everything
-downstream currently consumes, and nothing here is required to use the stronger
-structure. -/
+The bare layer does not depend on the additive one. It asks for less, it is what
+everything downstream currently consumes, and nothing here is required to use the
+stronger structure. -/
 
 /-- `IntegralMukaiData` with **additive** first Chern class.
 

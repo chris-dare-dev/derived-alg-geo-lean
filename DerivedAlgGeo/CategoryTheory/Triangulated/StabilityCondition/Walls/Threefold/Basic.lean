@@ -53,9 +53,8 @@ slots, at coefficient ring `ℝ` with the multiplication of `ℝ` as the form.
 
 The fourth slot `∫ch₃` is not in the triple and is not meant to be: the arity of
 the root is fixed at three. Generalising the root over the DIMENSION instead
-would make this leaf unreachable — a dimension-indexed self-pairing vanishes
-identically in odd degree — which is recorded as a negative result in
-`docs/architecture/abstraction-tree.md`. -/
+would make this leaf unreachable: a dimension-indexed self-pairing vanishes
+identically in odd degree. -/
 theorem discr_eq_selfPairing (v : NumClass) :
     discr v = Mukai.selfPairing (LinearMap.mul ℝ ℝ) (v.deg0, v.deg1, v.deg2) := by
   rw [Mukai.selfPairing_mk]

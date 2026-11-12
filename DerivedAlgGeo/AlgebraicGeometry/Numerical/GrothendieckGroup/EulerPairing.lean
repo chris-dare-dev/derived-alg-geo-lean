@@ -12,14 +12,11 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.RiemannRoch.K3
 are defined against: the central charge factors through `N(X)` modulo the radical of this
 pairing.
 
-## What `chi₂` is and is not
+## Main definitions
 
-`chi₂` is a **definition**, not a theorem. At this layer there is no `Ext`, so there is
-nothing to prove `chi₂ E F = Σᵢ (-1)ⁱ dim Extⁱ(E,F)` against; that identity is the bilinear
-Hirzebruch–Riemann–Roch and it is Layer B's job, exactly as `hirzebruch_riemannRoch` is for
-the one-variable `chi`. What *is* proved here is that `chi₂` is consistent with the `chi`
-already in `NumericalVarietyData`: `chi₂_eq_chi_of_isStructureSheafLike` says that pairing
-against a rank-one class with vanishing higher Chern components returns `chi`.
+* `NumericalVarietyData.chi₂` — the Euler pairing `∫_X ch(E)^∨ · ch(F) · td(X)`.
+* `K3.mukaiPairing` — the Mukai pairing `⟨v(E), v(F)⟩`, whose diagonal is
+  `K3.mukaiSelfPairing`.
 
 ## Main results
 
@@ -28,10 +25,21 @@ against a rank-one class with vanishing higher Chern components returns `chi`.
 * `Surface.chi₂_sub_chi₂_swap` — the **failure** of symmetry, measured exactly.
 * `K3.chi₂_eq_neg_mukaiPairing` — `χ(E,F) = −⟨v(E), v(F)⟩` on a K3.
 
-## The symmetry claim in issue #6 is false
+## Implementation notes
 
-Issue #6 asks for `chi₂ E F = chi₂ F E` in even dimension. That does not hold, and it is not
-a convention problem. `chi₂_sub_chi₂_swap` computes the obstruction on a surface:
+### What `chi₂` is and is not
+
+`chi₂` is a **definition**, not a theorem. At this layer there is no `Ext`, so there is
+nothing to prove `chi₂ E F = Σᵢ (-1)ⁱ dim Extⁱ(E,F)` against; that identity is the bilinear
+Hirzebruch–Riemann–Roch and it is Layer B's job, exactly as `hirzebruch_riemannRoch` is for
+the one-variable `chi`. What *is* proved here is that `chi₂` is consistent with the `chi`
+already in `NumericalVarietyData`: `chi₂_eq_chi_of_isStructureSheafLike` says that pairing
+against a rank-one class with vanishing higher Chern components returns `chi`.
+
+### The Euler pairing is not symmetric in even dimension
+
+`chi₂ E F = chi₂ F E` does not hold in even dimension, and it is not a convention problem.
+`chi₂_sub_chi₂_swap` computes the obstruction on a surface:
 
 `χ(E,F) − χ(F,E) = 2·(r_E·∫c₁(F)·td₁ − r_F·∫c₁(E)·td₁)`,
 
@@ -43,7 +51,7 @@ these integrals — so it is not asserted here. The `ω_X` is not decoration: dr
 read, at `n = 2`, as exactly the symmetry disproved above, and it disappears only when
 `ω_X ≅ O_X`, which is the same Calabi–Yau hypothesis as `td₁ = 0`.
 
-## Continued in the lattice module
+### Continued in the lattice module
 
 This file proves that `chi₂` is additive in each argument (`chi₂_add_left`,
 `chi₂_add_right`). `DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.Lattice` packages
@@ -51,6 +59,15 @@ that biadditivity,
 constructs the radical quotient and descends the pairing.  Keeping the construction there
 separates the `ℚ`-valued Euler form from the explicit finite-generation and torsion-freeness
 hypotheses needed for its underlying `ℤ`-lattice.
+
+## References
+
+This file builds on `NumericalVarietyData`, the dual involution `NumericalRingDualData`, and
+the K3 self-pairing `K3.mukaiSelfPairing` with its formula `K3.mukaiSelfPairing_eq`.
+
+## Tags
+
+Euler pairing, Euler characteristic, Mukai pairing, Riemann–Roch, Todd class, K3 surface
 -/
 
 universe u v
@@ -222,8 +239,8 @@ theorem chi₂_eq_chi_of_isStructureSheafLike (hV : V.SatisfiesHRR) (E F : N)
 
 `χ(E,F) − χ(F,E) = 2·(r_E·∫c₁(F)·td₁ − r_F·∫c₁(E)·td₁)`.
 
-Issue #6 asked for symmetry in even dimension. It is false: on `ℙ²`, `td₁ = (3/2)H ≠ 0`, so
-the right-hand side is nonzero for suitable `E`, `F`. Symmetry needs `td₁ = 0`. -/
+Symmetry fails in even dimension: on `ℙ²`, `td₁ = (3/2)H ≠ 0`, so the right-hand side is
+nonzero for suitable `E`, `F`. Symmetry needs `td₁ = 0`. -/
 theorem chi₂_sub_chi₂_swap (E F : N) :
     V.chi₂ E F - V.chi₂ F E
       = 2 * ((V.rank E : ℚ) * V.ring.degree (V.chComp F 1 * V.toddComp 1)
@@ -232,8 +249,8 @@ theorem chi₂_sub_chi₂_swap (E F : N) :
   ring
 
 /-- The Euler pairing is symmetric once `td₁(X) = 0` — in particular on every K3 and every
-Calabi–Yau surface. This is the correct form of the claim issue #6 made for all even
-dimensions. -/
+Calabi–Yau surface. Without that hypothesis symmetry fails, already on `ℙ²`; see
+`chi₂_sub_chi₂_swap`. -/
 theorem chi₂_symm_of_toddComp_one_eq_zero (htd : V.toddComp 1 = 0) (E F : N) :
     V.chi₂ E F = V.chi₂ F E := by
   rw [chi₂_eq V, chi₂_eq V, htd, mul_comm (V.chComp F 1) (V.chComp E 1)]
@@ -271,10 +288,9 @@ theorem mukaiPairing_comm (E F : N) :
 
 /-- **The Euler pairing is minus the Mukai pairing on a K3**: `χ(E,F) = −⟨v(E), v(F)⟩`.
 
-This is the identity issue #6 named as the check that matters, and it is what fixes the sign
-convention of the dual involution: with `chᵢ(E^∨) = (-1)ⁱchᵢ(E)` the sign comes out, and with
-the opposite convention it does not. The self-pairing case recovers
-`K3.mukaiSelfPairing_eq`. -/
+This is the identity that fixes the sign convention of the dual involution: with
+`chᵢ(E^∨) = (-1)ⁱchᵢ(E)` the sign comes out, and with the opposite convention it does not.
+The self-pairing case recovers `K3.mukaiSelfPairing_eq`. -/
 theorem chi₂_eq_neg_mukaiPairing (hK3 : IsK3 V) (E F : N) :
     V.chi₂ E F = -mukaiPairing V E F := by
   rw [Surface.chi₂_eq V, mukaiPairing, mukaiS, mukaiS, hK3.toddComp_one,

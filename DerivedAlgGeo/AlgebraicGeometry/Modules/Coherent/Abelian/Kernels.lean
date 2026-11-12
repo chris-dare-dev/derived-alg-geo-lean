@@ -225,8 +225,8 @@ Everything downstream states its geometry over `(Spec R).Modules`, so it wants
 this one. `Modules/Affine/Equivalence.lean` records the same wrapper problem for
 `Scheme.Modules` itself.
 
-Public rather than private since #720: the quasi-coherent extension argument
-needs `ShortComplex.map` through it, which means the instances below have to be
+Public rather than private: the quasi-coherent extension argument needs
+`ShortComplex.map` through it, which means the instances below have to be
 reachable from another file. -/
 noncomputable def moduleSpecSectionsFunctor (R : CommRingCat.{u})
     (U : (Spec R).Opens) : (Spec R).Modules ⥤ ModuleCat.{u} R :=

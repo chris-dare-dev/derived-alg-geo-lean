@@ -11,26 +11,36 @@ import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor.Bounded
 `Dqc.lean` states the identification `Dᵇ(Coh X) ≌ Dᵇ_coh(Dqc X)` as the explicit
 proposition `BoundedCoherentDqcIdentification X`, whose `comparison` field pins
 the equivalence to the concrete derived inclusion `boundedCoherentDerivedToDqc X`.
-This file reduces that proposition to a single statement about the abelian
-categories themselves:
-
-`CoherentExtComparison X`: for coherent sheaves `F G` on `X` and every `n`, the
-map `Ext^n_{Coh X}(F, G) → Ext^n_{X.Modules}(F, G)` induced by `Coh.ι X` is a
+This file reduces that proposition, on any locally noetherian scheme, to a single
+statement about the abelian categories themselves: `CoherentExtComparison X`, for
+coherent sheaves `F G` on `X` and every `n`, the map
+`Ext^n_{Coh X}(F, G) → Ext^n_{X.Modules}(F, G)` induced by `Coh.ι X` is a
 bijection.
 
-Everything else is formal and is proved here, on any locally noetherian scheme:
+## Main definitions
 
-* `boundedCoherentDerivedToDqc_full_of_coherentExtComparison`, `boundedCoherentDerivedToDqc_faithful_of_coherentExtComparison`:
-  full faithfulness of the derived inclusion on `Dᵇ(Coh X)`, by the amplitude
-  dévissage `Functor.mapDerivedCategory_map_bijective_of_bounded`;
-* `boundedCoherentDerivedToDqc_essSurj_of_coherentExtComparison`: essential surjectivity onto the
-  intrinsic bounded-coherent locus, by the cone argument
-  `Functor.exists_bounded_iso_mapDerivedCategory_obj` — the coherent
-  approximation of quasi-coherent sheaves is **not** needed for this step;
-* `boundedCoherentDqcIdentificationOfCoherentExtComparison`: the inhabitant of
-  `BoundedCoherentDqcIdentification X`, with `comparison := Iso.refl _`.
+* `AlgebraicGeometry.DerivedCategory.Dqc.CoherentExtComparison` — the coherent
+  `Ext` comparison.
+* `AlgebraicGeometry.DerivedCategory.Dqc.boundedCoherentDqcIdentificationOfCoherentExtComparison`
+  — the inhabitant of `BoundedCoherentDqcIdentification X`, with
+  `comparison := Iso.refl _`.
 
-## What remains open
+## Main results
+
+* `boundedCoherentDerivedToDqc_full_of_coherentExtComparison` and
+  `boundedCoherentDerivedToDqc_faithful_of_coherentExtComparison` — full
+  faithfulness of the derived inclusion on `Dᵇ(Coh X)`, by the amplitude
+  dévissage `Functor.mapDerivedCategory_map_bijective_of_bounded`.
+* `boundedCoherentDerivedToDqc_essSurj_of_coherentExtComparison` — essential
+  surjectivity onto the intrinsic bounded-coherent locus, by the cone argument
+  `Functor.exists_bounded_iso_mapDerivedCategory_obj`; the coherent
+  approximation of quasi-coherent sheaves is **not** needed for this step.
+* `hasBoundedCoherentDqcIdentification_of_coherentExtComparison` — the existence
+  proposition consumed by `Dqc/Comparison.lean`.
+
+## Implementation notes
+
+### What remains open
 
 `CoherentExtComparison X` itself. Its target is `Ext` in *all* `𝒪_X`-modules,
 not in quasi-coherent ones, and that is what makes it the genuine geometric
@@ -39,11 +49,21 @@ does not apply to `Coh X ⊆ X.Modules` (a coherent sheaf need not map onto a
 coherent quotient of an arbitrary module sheaf), so the classical route runs
 through `D(QCoh X) ≌ D_qc(X)` (Stacks 08DB) or the injectivity of quasi-coherent
 injectives in `X.Modules` (Hartshorne, *Residues and Duality* II.7.18). Neither
-is available at this Mathlib pin, and the affine case is not a shortcut: see the
-2026-09-10 entry of `docs/architecture/cutover-ledger.md`.
+is available at this Mathlib pin, and the affine case does not give the general
+one.
 
 Nothing here inhabits `CoherentExtComparison`; affine noetherian schemes satisfy it by
 `Dqc/AffineIdentification.lean`, through the `Ext` comparison from acyclic generators.
+
+## References
+
+* Stacks Project, Tags 0FCL and 08DB.
+* Hartshorne, *Residues and Duality*, II.7.18.
+
+## Tags
+
+bounded derived category, coherent sheaves, quasi-coherent cohomology, Ext
+comparison, full faithfulness
 -/
 
 attribute [local instance] HasDerivedCategory.standard
@@ -101,7 +121,7 @@ theorem boundedToDqc_faithful (h : CoherentExtComparison X) :
 
 set_option backward.isDefEq.respectTransparency false in
 set_option backward.defeqAttrib.useBackward true in
-/-- **Full faithfulness (#1070).** Under the `Ext` comparison, the concrete functor
+/-- **Full faithfulness.** Under the `Ext` comparison, the concrete functor
 `Dᵇ(Coh X) ⥤ Dᵇ_coh(Dqc X)` is full. -/
 theorem boundedCoherentDerivedToDqc_full_of_coherentExtComparison (h : CoherentExtComparison X) :
     (boundedCoherentDerivedToDqc X).Full := by
@@ -112,7 +132,7 @@ theorem boundedCoherentDerivedToDqc_full_of_coherentExtComparison (h : CoherentE
 
 set_option backward.isDefEq.respectTransparency false in
 set_option backward.defeqAttrib.useBackward true in
-/-- **Full faithfulness (#1070).** Under the `Ext` comparison, the concrete functor
+/-- **Full faithfulness.** Under the `Ext` comparison, the concrete functor
 `Dᵇ(Coh X) ⥤ Dᵇ_coh(Dqc X)` is faithful. -/
 theorem boundedCoherentDerivedToDqc_faithful_of_coherentExtComparison (h : CoherentExtComparison X) :
     (boundedCoherentDerivedToDqc X).Faithful := by
@@ -121,7 +141,7 @@ theorem boundedCoherentDerivedToDqc_faithful_of_coherentExtComparison (h : Coher
     (DerivedCategory.Bounded.ι ⋙ coherentDerivedToDqc X) _).Faithful
   infer_instance
 
-/-- **Essential surjectivity (#1071).** Under the `Ext` comparison, every object of the
+/-- **Essential surjectivity.** Under the `Ext` comparison, every object of the
 intrinsic bounded-coherent locus in `Dqc(X)` is isomorphic to the image of a bounded
 complex of coherent sheaves. The cohomology sheaves of such an object are coherent, so
 they lie in the essential image of `Coh.ι X`, and the generic cone argument applies. -/
@@ -132,7 +152,7 @@ theorem boundedCoherentDerivedToDqc_essSurj_of_coherentExtComparison (h : Cohere
       (fun n ↦ ⟨⟨_, E.property.2 n⟩, ⟨Iso.refl _⟩⟩)
     exact ⟨⟨K, hK⟩, ⟨ObjectProperty.isoMk _ (ObjectProperty.isoMk _ e)⟩⟩
 
-/-- **The bounded-coherent identification (#722), from the `Ext` comparison.** The
+/-- **The bounded-coherent identification, from the `Ext` comparison.** The
 equivalence is `boundedCoherentDerivedToDqc X` itself, so the `comparison` field is the
 identity isomorphism: nothing but the concrete derived inclusion is used. -/
 def boundedCoherentDqcIdentificationOfCoherentExtComparison (h : CoherentExtComparison X) :

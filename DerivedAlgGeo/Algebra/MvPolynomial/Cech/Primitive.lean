@@ -7,27 +7,48 @@ import DerivedAlgGeo.Algebra.MvPolynomial.Cech.Homotopy
 /-!
 # The primitive of a polynomial variable Čech cocycle in nonnegative degree
 
-The vanishing computation of #340, in cochain form. Given a degree-`(n+1)` cochain `s` of the
-variable Čech cover whose differential vanishes, `cechPrimitive` is the cochain `t` with
+The Čech vanishing computation for `O(d)`, in cochain form. Given a degree-`(n+1)` cochain `s`
+of the variable Čech cover whose differential vanishes, `cechPrimitive` is the cochain `t` with
 `d t = s`: per block `F`, a cone point `i₀ ∉ F` is chosen and the block component of `s` is
 contracted through the homotopy `y ↦ Π (s_F (i₀ :: y))`; the finitely many blocks of each
 tuple then reassemble by `sum_cechBlockProj`.
 
-* `cechBlockPrimitive` — the per-block candidate primitive. For a block with no cone point —
-  only possible when the block is all of a finite variable set — it is `0`, and
-  `cechBlockProj_eq_zero_of_forall_mem` says the block component of *everything* vanishes
-  there: such a block would need every variable's exponent negative, while the twist `d ≥ 0`
-  fixes the total at `d`. This is where nonnegativity of the twist is spent, and the only
-  place.
-* `cechPrimitive_isPrimitive` — **the homotopy computation** `d (h s) + h (d s) = s`,
-  elementwise. The `j = 0` face of the cone tuple returns the block component through the
-  retraction (`cechHomotopy_cechFace_zero`); every other face cancels between the two sides
-  through the square (`cechHomotopy_cechFace_succ`); and the per-block identities sum over
-  `(tupleExponent x).support.powerset` to `s x`.
+## Main definitions
+
+* `MvPolynomial.cechBlockPrimitive` — the per-block candidate primitive. For a block with no
+  cone point — only possible when the block is all of a finite variable set — it is `0`.
+* `MvPolynomial.cechPrimitive` — the candidate primitive: the finitely many blocks of the tuple,
+  contracted and summed.
+
+## Main results
+
+* `MvPolynomial.cechBlockProj_eq_zero_of_forall_mem` — for a nonnegative twist the block
+  component of *everything* vanishes on a block with no cone point: such a block would need
+  every variable's exponent negative, while the twist `d ≥ 0` fixes the total at `d`.
+* `MvPolynomial.cechBlockProj_eq_zero_of_card_lt` — a tuple too short to meet every variable
+  kills the full block, whatever the twist.
+* `MvPolynomial.cechBlockPrimitive_faces` — the per-block homotopy identity, for every block.
+* `MvPolynomial.cechPrimitive_isPrimitive` — **the homotopy computation**
+  `d (h s) + h (d s) = s`, elementwise.
+
+## Implementation notes
+
+In `cechPrimitive_isPrimitive` the `j = 0` face of the cone tuple returns the block component
+through the retraction (`cechHomotopy_cechFace_zero`); every other face cancels between the two
+sides through the square (`cechHomotopy_cechFace_succ`); and the per-block identities sum over
+`(tupleExponent x).support.powerset` to `s x`.
+
+The sign of the twist enters only through the hypothesis `hfull` that the cochain has no
+full-block component; `cechBlockProj_eq_zero_of_forall_mem` discharges it for a nonnegative
+twist.
 
 The statement is against the face maps directly, not against the complex; the complex-level
 exactness and the `Hⁿ(Pⁿ, O(d)) = 0` statement are derived downstream, where
 `polynomialVariableCechComplex_d_apply` converts between the two forms.
+
+## References
+
+This file assembles `MvPolynomial.cechBlockProj` and `MvPolynomial.cechHomotopy`.
 
 ## Tags
 
@@ -146,7 +167,7 @@ behind `cechBlockProj_eq_zero_of_forall_mem` is unavailable: a block containing 
 larger variable set the block cannot sit inside the tuple's support and
 `cechBlockProj_eq_zero_of_not_subset` applies. The twist plays no part.
 
-This is the first statement in the lane that needs the variable set finite. -/
+It is the first statement of this computation that needs the variable set finite. -/
 theorem cechBlockProj_eq_zero_of_card_lt [Fintype ι] (h𝓜 : IsPolynomialTwist 𝓜 d)
     {n : ℕ} (hcard : n + 2 < Fintype.card ι) (y : Fin (n + 2) → ι)
     {G : Finset ι} (hG : ∀ j : ι, j ∈ G) (z : cechTerm ι k 𝓜 y) :
@@ -320,7 +341,7 @@ different reasons:
   is the top-degree use, where neither of the first two is available.
 
 The second is what carries the negative case below the top, and it is why finiteness of the
-variable set enters the lane here and nowhere earlier. -/
+variable set enters the computation here and nowhere earlier. -/
 theorem cechBlockPrimitive_faces (h𝓜 : IsPolynomialTwist 𝓜 d) {n : ℕ}
     (s : ∀ x : Fin (n + 2) → ι, cechTerm ι k 𝓜 x)
     (hs : ∀ x : Fin (n + 3) → ι,

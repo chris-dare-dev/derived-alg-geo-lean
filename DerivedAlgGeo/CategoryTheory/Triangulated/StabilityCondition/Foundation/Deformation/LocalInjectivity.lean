@@ -501,7 +501,7 @@ end
 
 /-- **Auxiliary for Lemma 6.4**: one direction of the biconditional. If `E ∈ Q(φ)` then
 `E ∈ P(φ)`, using the cross-slicing imaginary part argument and hom-vanishing. -/
-private theorem bridgeland_6_4_one_dir
+private theorem slicing_P_of_Z_eq_of_dist_lt_one
     (σ τ : StabilityCondition.WithClassMap C v) (hZ : σ.Z = τ.Z)
     (hd : slicingDist C σ.slicing τ.slicing < ENNReal.ofReal 1)
     (φ : ℝ) (E : C) (hτ : (τ.slicing.P φ) E) : (σ.slicing.P φ) E := by
@@ -704,14 +704,15 @@ The proof proceeds as follows. Given `E ∈ Q(φ)`, we show `E ∈ P(φ)`:
    part argument (`false_of_gt_and_le_phases`) gives `X = 0`.
 4. So `E ≅ Y` has all σ-phases `≤ φ`. The imaginary part argument then forces
    all phases `= φ`, making `E` σ-semistable at `φ`. -/
-theorem bridgeland_lemma_6_4 (σ τ : StabilityCondition.WithClassMap C v) (hZ : σ.Z = τ.Z)
+theorem slicing_P_iff_of_Z_eq_of_dist_lt_one (σ τ : StabilityCondition.WithClassMap C v)
+    (hZ : σ.Z = τ.Z)
     (hd : slicingDist C σ.slicing τ.slicing < ENNReal.ofReal 1)
     (φ : ℝ) (E : C) : (σ.slicing.P φ) E ↔ (τ.slicing.P φ) E := by
   constructor
   · intro hσ
-    exact bridgeland_6_4_one_dir C τ σ hZ.symm
+    exact slicing_P_of_Z_eq_of_dist_lt_one C τ σ hZ.symm
       (by rwa [slicingDist_symm]) φ E hσ
-  · exact bridgeland_6_4_one_dir C σ τ hZ hd φ E
+  · exact slicing_P_of_Z_eq_of_dist_lt_one C σ τ hZ hd φ E
 
 end
 

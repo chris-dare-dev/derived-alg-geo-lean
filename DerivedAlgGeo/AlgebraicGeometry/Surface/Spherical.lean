@@ -20,7 +20,29 @@ This is the `n = 2` case of `CategoryTheory.SerreFunctor.SphericalExtProfile`,
 restated for a scheme-derived category where no Serre functor is available. The
 name matches that one deliberately.
 
-## What this is, and what it is not
+## Main definitions
+
+* `K3Surface.DerivedCat` — `Dᵇ(Coh X)` for a smooth proper `X`, as an abbreviation.
+* `K3Surface.SphericalExtProfile` — the spherical Ext profile of an object.
+* `K3Surface.selfEuler` — `χ(E, E)` in the three degrees `0, 1, 2`.
+* `K3Surface.EulerRealization` — supplied data identifying `selfEuler` with the
+  numerical Euler pairing.
+
+## Main results
+
+* `SphericalExtProfile.not_isZero` — an object with the profile is nonzero. The
+  one thing that follows from `end_one` with no further input, and the reason
+  the definition is not vacuous on the zero object.
+* `SphericalExtProfile.finrank_end` — `dimₖ End(E) = 1`.
+* `SphericalExtProfile.of_iso` — the profile is invariant under isomorphism.
+* `SphericalExtProfile.selfEuler_eq_two` — `χ(E,E) = 1 - 0 + 1 = 2`, computed
+  from the definition rather than assumed.
+* `SphericalExtProfile.isSpherical_mukaiVector` — an object with the profile has
+  a spherical Mukai vector, given an `EulerRealization`.
+
+## Implementation notes
+
+### What this is, and what it is not
 
 **It is not sphericity in general.** Huybrechts, *Fourier--Mukai Transforms in
 Algebraic Geometry*, Definition 8.1 — equivalently Seidel--Thomas, *Braid group
@@ -48,55 +70,40 @@ autoequivalence. Do not read a `SphericalExtProfile` on an arbitrary smooth
 proper variety as a spherical object.
 
 Dropping clause 1 is also what lets this file avoid a derived tensor product
-entirely. Formalizing clause 1 for a general `X` waits on `⊗ᴸ`.
+entirely. Formalizing clause 1 for a general `X` needs `⊗ᴸ`.
 
-## Why it is expressible at all
+### Why it is expressible at all
 
-`Hom(E, E⟦i⟧) ≅ k` is not a statement about an abelian group. Until
-`CoherentSheaf/Linear.lean` constructed the `k`-linear structure on `Coh X` — and
-Mathlib carried it to `Dᵇ(Coh X)` — the right-hand side had no meaning here, and
-`Numerical/GrothendieckGroup/MukaiVector.lean` said as much in its docstring:
-the Ext profile of an *object* needs an `Ext` that layer does not have. This
-file is that docstring's target.
+`Hom(E, E⟦i⟧) ≅ k` is not a statement about an abelian group. It has a meaning
+here because `Modules/Coherent/Linear.lean` constructs the `k`-linear structure on
+`Coh X`, which Mathlib carries to `Dᵇ(Coh X)`. The numerical layer has no such
+`Ext`: `Numerical/GrothendieckGroup/MukaiVector.lean` notes that the Ext profile of
+an *object* cannot be stated there, and this file states it.
 
-## What is a hypothesis, and what that costs
+### What is a hypothesis, and what that costs
 
 `end_one` and `ext_two` are **fields, not theorems**. Nothing here proves that
 any particular object has one-dimensional endomorphisms; finite-dimensionality
-of `Hom` in `Dᵇ(Coh X)` is not available (issue #332, behind the S1--S4
-Serre-finiteness chain), so a `Hom`-group is a `k`-vector space of unknown
-dimension until someone supplies otherwise.
+of `Hom` in `Dᵇ(Coh X)` is not available, so a `Hom`-group is a `k`-vector space
+of unknown dimension until someone supplies otherwise.
 
 The consequence is worth stating plainly: this file **defines** the profile and
 proves the handful of things that follow from the definition alone. It does not
 exhibit an object satisfying it, and it cannot, because exhibiting one means
 computing a `Hom`-group.
 
-## What is deliberately absent
+### What is deliberately absent
 
 * **No spherical twist.** `T_E` needs the evaluation triangle and a functorial
-  cone; cones are not functorial in a triangulated category. See the scope notes
-  on the dg-enhancement route (issue #378).
+  cone; cones are not functorial in a triangulated category, and this file uses
+  no dg enhancement to supply one.
 * **No Serre duality.** On a K3, `Hom(E, E⟦2⟧) ≅ Hom(E, E)ᵛ` would make
   `ext_two` follow from `end_one`, which is exactly how the literature states
   sphericity as "simple and rigid". `Duality/Serre/` carries duality as
   realization data, not as a theorem, so the two clauses stay independent here.
-* **No K3 hypothesis, and so no claim of sphericity.** See the opening section.
+* **No K3 hypothesis, and so no claim of sphericity.** See the first subsection above.
 
-## Main results
-
-* `SphericalExtProfile` — the definition.
-* `SphericalExtProfile.not_isZero` — an object with the profile is nonzero. The
-  one thing that follows from `end_one` with no further input, and the reason
-  the definition is not vacuous on the zero object.
-* `SphericalExtProfile.finrank_end` — `dimₖ End(E) = 1`.
-* `SphericalExtProfile.of_iso` — the profile is invariant under isomorphism.
-* `SphericalExtProfile.selfEuler_eq_two` — `χ(E,E) = 1 - 0 + 1 = 2`, computed
-  from the definition rather than assumed.
-* `SphericalExtProfile.isSpherical_mukaiVector` — an object with the profile has
-  a spherical Mukai vector, given an `EulerRealization`.
-
-## A trap worth recording
+### A trap worth recording
 
 The vanishing clause says `∀ f : E ⟶ E⟦i⟧, f = 0`, and **not**
 `IsZero (E ⟶ E⟦i⟧)`. The second is well-typed and always false: `E ⟶ E⟦i⟧` is a
@@ -108,6 +115,16 @@ about the profile becomes vacuously true.
 `IsK3Surface.h1_vanishing` *does* use `IsZero`, correctly, because
 `Cohomology.coherentH` lands in `AddCommGrpCat`, which has a zero object. The
 difference is the target category, not the mathematics.
+
+## References
+
+* Huybrechts, *Fourier--Mukai Transforms in Algebraic Geometry*, Definition 8.1.
+* Seidel, Thomas, *Braid group actions on derived categories of coherent sheaves*,
+  Definition 1.1.
+
+## Tags
+
+spherical object, Ext, derived category, coherent sheaf, K3 surface, Mukai vector
 -/
 
 universe u

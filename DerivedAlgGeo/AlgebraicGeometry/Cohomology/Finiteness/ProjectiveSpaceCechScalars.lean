@@ -14,13 +14,27 @@ transport, because a Čech index names sections over a categorical product of ch
 term comparison is stated over a basic open, and `piObj_polynomialVariableChart` only says those
 two opens are *equal*. This file carries the linearity across that transport.
 
-## The transport is the whole content
+## Main definitions
+
+This file introduces no new definitions.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.eqToIso_transport_varietyScalarAction`: transport along an equality of
+  opens commutes with the endomorphism a scalar induces.
+* `AlgebraicGeometry.Proj.intCechTermSectionAddEquiv_symm_varietyScalarAction`: the inverse
+  term-level comparison, against the sheaf endomorphism.
+* `AlgebraicGeometry.Proj.intCechIndexEquiv_smul`: the per-index comparison is `k`-linear.
+
+## Implementation notes
+
+### The transport is the whole content
 
 `eqToIso_transport_varietyScalarAction` is `subst h; rfl` — moving sections along an equality of
 opens cannot fail to commute with anything. All the difficulty is in getting the statement to
 elaborate, and that difficulty has a single diagnosed cause.
 
-## The scalar-type rule, and why it is not a diamond to be fixed
+### The scalar-type rule, and why it is not a diamond to be fixed
 
 `Γ(Proj 𝒜, U)` and `(ProjectiveSpectrum.Proj.structureSheaf 𝒜).1.obj (op U)` are **definitionally
 equal at default transparency and not at reducible transparency**. Instance search runs at
@@ -28,10 +42,10 @@ reducible. The `Module` instance on associated-sheaf sections is stated over the
 whose left factor is written as the first leaves `HSMul` unsolved — even though the two are the
 same type.
 
-That is the same shape as #662, where `Coh X` carries two `Preadditive` instances defeq at default
-but not at reducible. So the obvious repair — adding a second `Module` instance over
-`(Proj 𝒜).presheaf.obj` — would **reproduce that bug** rather than fix this one: lemmas stated
-against one instance would stop applying to goals carrying the other.
+That is the same shape as the `Preadditive` diamond on `Coh X`, whose two instances are defeq at
+default but not at reducible transparency (see `Coh.abelian`). So the obvious repair — adding a
+second `Module` instance over `(Proj 𝒜).presheaf.obj` — would **reproduce that bug** rather than
+fix this one: lemmas stated against one instance would stop applying to goals carrying the other.
 
 The rule instead is a convention, and it costs nothing:
 
@@ -40,15 +54,27 @@ The rule instead is a convention, and it costs nothing:
 * **convert** to `•` with `varietyScalarAction_app_eq` only inside a proof, where the expected
   type is already fixed and search has what it needs;
 * when a scalar genuinely has to be named, give it a definition with an explicit result type —
-  `constSectionOn` is that, and it is the only such definition needed so far.
+  `constSectionOn` is that, and it is the only such definition this computation needs.
 
-Occurrences before the rule was written down: `cechBlockSpan` (#670), `constSection` and
-`constSectionOn` (#674), and the transport here.
+The same elaboration issue arises at `cechBlockSpan`, `constSection` and `constSectionOn`, and
+at the transport here.
 
-## Next
+### Downstream
 
 Degreewise linearity of `intCechCochainsDegreewiseAddEquiv` is a product of this over the tuple
-index; the homology statement `r • [s] = [r • s]` is then `homologyπ` naturality. Neither is here.
+index; the homology statement `r • [s] = [r • s]` is then `homologyπ` naturality. Neither is
+proved here.
+
+## References
+
+The file cites no literature. It builds on
+`AlgebraicGeometry.Proj.intCechTermSectionAddEquiv_smul`,
+`AlgebraicGeometry.Proj.varietyScalarAction_app_eq` and
+`AlgebraicGeometry.Proj.piObj_polynomialVariableChart`.
+
+## Tags
+
+Čech cohomology, projective space, base field action, linearity, transport
 -/
 
 universe u

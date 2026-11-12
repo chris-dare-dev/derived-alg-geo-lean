@@ -40,8 +40,9 @@ private abbrev affineQuasicoherentProperty (R : CommRingCat.{u}) :=
 /-- On an affine spectrum, an ambient kernel of a morphism between
 quasi-coherent module sheaves is quasi-coherent.
 
-The proof moved to `CoherentSheaf/Quasicoherent/Kernels.lean` when #720 needed it
-for an arbitrary scheme; this name survives as the moduli lane's entry point. -/
+The proof is `Scheme.Modules.isQuasicoherent_kernel_affine` in
+`Modules/Quasicoherent/Kernels.lean`, which the arbitrary-scheme kernel closure
+also uses; this name is the entry point for affine consumers. -/
 theorem affineQuasicoherent_kernel {R : CommRingCat.{u}}
     {M N : (Spec R).Modules} (g : M ⟶ N)
     (hM : M.IsQuasicoherent) (hN : N.IsQuasicoherent) :

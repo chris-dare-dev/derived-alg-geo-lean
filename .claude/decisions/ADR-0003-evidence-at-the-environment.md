@@ -3,7 +3,7 @@
 - **Status:** accepted
 - **Date:** 2026-08-04
 - **Deciders:** Chris Dare
-- **Evidence:** `.claude/notes/2026-08-04-arxmcp-lean-integration-audit.md` §2
+- **Evidence:** https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/notes/2026-08-04-arxmcp-lean-integration-audit.md §2
 
 ## Context
 

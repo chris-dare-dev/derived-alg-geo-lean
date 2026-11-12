@@ -12,8 +12,26 @@ import Mathlib.Algebra.Homology.DerivedCategory.Ext.EnoughProjectives
 /-!
 # The bounded-coherent identification on affine noetherian schemes
 
-`CoherentExtComparison (Spec R)` for a noetherian ring `R`, hence
+This file proves `CoherentExtComparison (Spec R)` for a noetherian ring `R`, hence
 `HasBoundedCoherentDqcIdentification (Spec R)` through `Dqc/Identification.lean`.
+
+## Main definitions
+
+This file introduces no new definitions; it proves facts about
+`AlgebraicGeometry.DerivedCategory.Dqc.CoherentExtComparison` and
+`AlgebraicGeometry.DerivedCategory.Dqc.HasBoundedCoherentDqcIdentification`.
+
+## Main results
+
+* `AlgebraicGeometry.DerivedCategory.Dqc.subsingleton_ext_ι_affineFree` — higher
+  `Ext` out of a free sheaf `𝒪^k` into a coherent sheaf vanishes in all module
+  sheaves on `Spec R`.
+* `AlgebraicGeometry.DerivedCategory.Dqc.coherentExtComparison_spec` — the coherent
+  `Ext` comparison holds on `Spec R`.
+* `AlgebraicGeometry.DerivedCategory.Dqc.hasBoundedCoherentDqcIdentification_spec` —
+  the bounded-coherent identification holds on `Spec R`.
+
+## Implementation notes
 
 The `Ext` comparison is `Functor.bijective_mapExtAddHom_of_generators` applied to
 `Coh.ι (Spec R)` with the free sheaves `𝒪^k` as generators:
@@ -27,8 +45,18 @@ The `Ext` comparison is `Functor.bijective_mapExtAddHom_of_generators` applied t
   (`modules_H_subsingleton_of_isQuasicoherent`);
 * `Coh.ι` is fully faithful, so bijective on `Ext⁰`.
 
-This is the first scheme marked as satisfying `CoherentExtComparison`. The general case
-remains open; see `docs/architecture/cutover-ledger.md`.
+The comparison for a general locally noetherian scheme is not proved here.
+
+## References
+
+The repository's `Functor.bijective_mapExtAddHom_of_generators`,
+`Scheme.Modules.extUnitAddEquivDerivedH` and
+`Cohomology.modules_H_subsingleton_of_isQuasicoherent`, and Mathlib's
+`Ext.eq_zero_of_projective`.
+
+## Tags
+
+bounded derived category, coherent sheaves, affine scheme, Ext comparison
 -/
 
 universe u

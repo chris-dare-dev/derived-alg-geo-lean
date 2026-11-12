@@ -3,6 +3,8 @@ Projective-variety slice of the AlgebraicGeometry audit, split out so concurrent
 branches append to different files (#480). See the umbrella file for the contract.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward
+import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpace
+import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.MapPullback
 import DerivedAlgGeo.AlgebraicGeometry.Variety.Projective
 open AlgebraicGeometry
 
@@ -78,3 +80,81 @@ affine-pushforward exactness on quasi-coherent sheaves.
 #print axioms AlgebraicGeometry.Coh.pushforward_additive
 #print axioms AlgebraicGeometry.Coh.pushforward_preservesEpimorphisms
 #print axioms AlgebraicGeometry.Coh.pushforward_preservesFiniteColimits
+
+/-! ## Base change of graded algebras and of `Proj`
+
+The graded inclusion `a ↦ 1 ⊗ a` into the base change, the irrelevant-ideal hypotheses `Proj.map`
+asks of it and of a bijective graded map, and homogeneous localization commuting with base change
+without flatness. On `Proj`, the base-change square is cartesian (Stacks 01N2).
+-/
+
+#print axioms GradedRingHom.includeRight
+#print axioms GradedRingHom.includeRight_apply
+#print axioms GradedRingHom.irrelevant_baseChange_le_map
+#print axioms GradedRingHom.symmOfBijective
+#print axioms GradedRingHom.symmOfBijective_apply_apply
+#print axioms GradedRingHom.apply_symmOfBijective_apply
+#print axioms GradedRingHom.bijective_symmOfBijective
+#print axioms GradedRingHom.irrelevant_le_map_of_bijective
+#print axioms HomogeneousLocalization.Away.isPushout_baseChange
+#print axioms AlgebraicGeometry.Proj.map_toSpecZero
+#print axioms AlgebraicGeometry.Proj.map_toSpecZero_assoc
+#print axioms AlgebraicGeometry.Proj.isIso_map_of_bijective
+#print axioms AlgebraicGeometry.Proj.isPullback_map_baseChange
+
+/-! ## Projective space over a base scheme
+
+`ℙ(n; S) := S ×_ℤ Proj ℤ[n]` (Stacks 01NF), its structure morphism, properness for finite `n`,
+base change in `S`, the comparison `ℙ(n; Spec R) ≅ Proj R[n]` with the field-level model, and the
+twisting sheaves pulled back from `Proj ℤ[n]`.
+-/
+
+#print axioms AlgebraicGeometry.ProjectiveSpace
+#print axioms AlgebraicGeometry.«termℙ(_;_)»
+#print axioms AlgebraicGeometry.ProjectiveSpace.over
+#print axioms AlgebraicGeometry.ProjectiveSpace.over_over
+#print axioms AlgebraicGeometry.ProjectiveSpace.toProj
+#print axioms AlgebraicGeometry.ProjectiveSpace.isProper
+#print axioms AlgebraicGeometry.ProjectiveSpace.map
+#print axioms AlgebraicGeometry.ProjectiveSpace.map_over
+#print axioms AlgebraicGeometry.ProjectiveSpace.map_over_assoc
+#print axioms AlgebraicGeometry.ProjectiveSpace.map_toProj
+#print axioms AlgebraicGeometry.ProjectiveSpace.map_toProj_assoc
+#print axioms AlgebraicGeometry.ProjectiveSpace.isPullback_map
+#print axioms AlgebraicGeometry.ProjectiveSpace.SpecIso
+#print axioms AlgebraicGeometry.ProjectiveSpace.SpecIso_hom_toSpecZero
+#print axioms AlgebraicGeometry.ProjectiveSpace.SpecIso_hom_toSpecZero_assoc
+#print axioms AlgebraicGeometry.ProjectiveSpace.SpecIso_hom_comp_projectiveSpaceToSpec
+#print axioms AlgebraicGeometry.ProjectiveSpace.twistingSheaf
+#print axioms AlgebraicGeometry.ProjectiveSpace.isInvertible_twistingSheaf
+#print axioms AlgebraicGeometry.ProjectiveSpace.twistingSheafTensorIso
+#print axioms AlgebraicGeometry.ProjectiveSpace.twistingSheafSpecIso
+
+/-! ## Twisting sheaves along `Proj.map`
+
+Degree-zero localizations along a graded ring map, the map `M̃ ⟶ (Proj.map ψ)_* Ñ` it induces, and
+the adjoint comparison `θ : (Proj.map ψ)^* 𝒪(d) ⟶ 𝒪(d)` (Stacks 01MY), an isomorphism once the
+source is generated in degree one.
+-/
+
+#print axioms GradedModule.localizedMapOfRingHom
+#print axioms GradedModule.localizedMapOfRingHom_mk
+#print axioms GradedModule.NumDenSameDeg.mapOfRingHom
+#print axioms GradedModule.DegreeZeroLocalization.mapOfRingHom
+#print axioms GradedModule.DegreeZeroLocalization.coe_mapOfRingHom
+#print axioms GradedModule.DegreeZeroLocalization.mapOfRingHom_mk
+#print axioms GradedModule.DegreeZeroLocalization.mapOfRingHom_smul
+#print axioms AlgebraicGeometry.Proj.primeCompl_comap_le
+#print axioms AlgebraicGeometry.Proj.fiberMapOfRingHom
+#print axioms AlgebraicGeometry.Proj.sectionMapOfRingHom
+#print axioms AlgebraicGeometry.Proj.sectionMapOfRingHom_apply
+#print axioms AlgebraicGeometry.Proj.associatedPresheafMapOfRingHom
+#print axioms AlgebraicGeometry.Proj.associatedSheafMapOfRingHom
+#print axioms AlgebraicGeometry.Proj.associatedSheafMapOfRingHom_app
+#print axioms AlgebraicGeometry.Proj.map_mem_intShift
+#print axioms AlgebraicGeometry.Proj.twistingSheafMapOfRingHom
+#print axioms AlgebraicGeometry.Proj.mapPullbackTwistingSheaf
+#print axioms AlgebraicGeometry.Proj.mapPullbackTwistingSheaf_app_unit
+#print axioms AlgebraicGeometry.Proj.isIso_mapPullbackTwistingSheaf
+#print axioms AlgebraicGeometry.Proj.mapPullbackTwistingSheafIso
+#print axioms AlgebraicGeometry.Proj.mapPullbackTwistingSheafIso_hom

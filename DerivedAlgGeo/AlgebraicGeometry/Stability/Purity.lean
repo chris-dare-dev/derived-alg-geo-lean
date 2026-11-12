@@ -11,7 +11,19 @@ A coherent sheaf is *pure* for a polarization when every nonzero subsheaf has po
 multiplicity. The condition mentions the multiplicity and nothing else: no order on Hilbert
 polynomials, no slope, and no semistability notion.
 
-## Why it has its own file
+## Main definitions
+
+* `PolarizedVarietyData.IsPure` — Hilbert purity: the sheaf is nonzero and every nonzero
+  subsheaf has positive multiplicity.
+
+## Main results
+
+* `PolarizedVarietyData.IsPure.multiplicity_pos` — a pure sheaf has positive multiplicity.
+* `PolarizedVarietyData.IsPure.of_iso` — purity is invariant under isomorphism.
+
+## Implementation notes
+
+### Why it has its own file
 
 Purity has two consumers that do not depend on one another, which is what earns it an owner
 rather than a block inside either. `Gieseker/Basic.lean` carries it as a conjunct of Gieseker
@@ -21,18 +33,26 @@ and never mentions the Gieseker order: purity is exactly the condition under whi
 destabilizing subobject has finite slope rather than `⊤`, which is what makes the
 Harder–Narasimhan recursion descend on multiplicity.
 
-Before MO1.08 (#1319) it was declared in `Gieseker/Basic.lean`, so the μ-slope theory reached it
-only by importing the Gieseker order it does not use. That import was the whole of the μ-lane's
-dependence on Gieseker stability, and removing it is what makes `Slope/` a sibling of `Gieseker/`
-rather than a child.
+Declaring it in `Gieseker/Basic.lean` would make the μ-slope theory import a Gieseker order it
+does not use. Keeping it here is what makes `Slope/` a sibling of `Gieseker/` rather than a
+child.
 
-## What is not claimed
+### What is not claimed
 
 The geometric characterisation of purity — no associated point of support dimension below
 `P.dim` — is **not** proved here and is not equivalent to this definition at this pin, because no
 dimension-of-support theory exists. This is purity in the Hilbert-multiplicity sense, and
 `Gieseker/Basic.lean`'s docstring says the same about the classical definition it is a conjunct
 of.
+
+## References
+
+This file builds on the Hilbert multiplicity `PolarizedVarietyData.multiplicity` of
+`Stability/Coefficients.lean`.
+
+## Tags
+
+pure sheaf, Hilbert polynomial, multiplicity, coherent sheaf, polarization
 -/
 
 universe u

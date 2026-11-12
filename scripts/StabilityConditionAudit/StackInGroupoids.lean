@@ -73,3 +73,26 @@ The module, declarations, and audit ownership are neutral category theory.
 #print axioms CategoryTheory.StackInGroupoids.representable_ofLE
 #print axioms CategoryTheory.stackInGroupoidsOfSheaf_ofLE
 #print axioms CategoryTheory.StackInGroupoids.discreteMap_app_obj
+
+#print axioms CategoryTheory.Pseudofunctor.DescentData.map
+#print axioms CategoryTheory.Pseudofunctor.DescentData.map_obj_obj
+#print axioms CategoryTheory.Pseudofunctor.DescentData.map_obj_hom
+#print axioms CategoryTheory.Pseudofunctor.DescentData.map_map_hom
+#print axioms CategoryTheory.Pseudofunctor.toDescentDataCompMapIso
+#print axioms CategoryTheory.Pseudofunctor.toDescentDataCompMapIso_hom_app_hom
+#print axioms CategoryTheory.Pseudofunctor.toDescentDataCompMapIso_inv_app_hom
+#print axioms CategoryTheory.Pseudofunctor.DescentData.mapId
+#print axioms CategoryTheory.Pseudofunctor.DescentData.mapId_hom_app_hom
+#print axioms CategoryTheory.Pseudofunctor.DescentData.mapId_inv_app_hom
+#print axioms CategoryTheory.Pseudofunctor.DescentData.mapComp
+#print axioms CategoryTheory.Pseudofunctor.DescentData.mapComp_hom_app_hom
+#print axioms CategoryTheory.Pseudofunctor.DescentData.mapComp_inv_app_hom
+#print axioms CategoryTheory.Pseudofunctor.DescentData.mapIso
+#print axioms CategoryTheory.Pseudofunctor.DescentData.mapIso_hom_app_hom
+#print axioms CategoryTheory.Pseudofunctor.DescentData.mapIso_inv_app_hom
+#print axioms CategoryTheory.Pseudofunctor.DescentData.faithful_map
+#print axioms CategoryTheory.Pseudofunctor.DescentData.full_map
+#print axioms CategoryTheory.Pseudofunctor.DescentData.isEquivalence_map
+#print axioms CategoryTheory.Pseudofunctor.isPrestack_iff_of_isEquivalence
+#print axioms CategoryTheory.Pseudofunctor.isStack_iff_of_isEquivalence
+#print axioms CategoryTheory.Pseudofunctor.isStack_iff_of_equivalence

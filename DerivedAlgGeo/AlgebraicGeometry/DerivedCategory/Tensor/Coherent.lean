@@ -20,34 +20,59 @@ fields of one structure rather than unrelated theorem-specific capabilities.  It
 `ExactBifunctor` field retains the complete two-slot exactness and Koszul shift coherence
 used by Fourier--Mukai transforms and kernel variation.
 
-The instance below is the one-way migration adapter
+## Main definitions
 
-`HasCoherentDerivedTensor -> HasDerivedTensor`.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.HasCoherentDerivedTensor` — a
+  `MonoidalCategory` on `Dᵇ(Coh Z)` whose tensor is an exact bifunctor.
+* `HasCoherentDerivedTensor.exactBifunctor` and `HasCoherentDerivedTensor.commShift`
+  — its exactness data.
+* `coherentDerivedTensorAssoc`, `coherentDerivedTensorUnit`,
+  `coherentDerivedTensorLeftUnitor` and `coherentDerivedTensorRightUnitor` — the
+  associator, unit and unitors as isomorphisms of twist functors.
+* The instance `hasDerivedTensorOfCoherent` — the one-way adapter
+  `HasCoherentDerivedTensor -> HasDerivedTensor`.
+* The instance `hasCoherentDerivedTensorIsCompatibleWithTriangulation` — the
+  realization of `MonoidalCategory.IsCompatibleWithTriangulation`.
+
+## Main results
+
+* `HasCoherentDerivedTensor.additive` and `HasCoherentDerivedTensor.isTriangulated`
+  — each left tensor twist is additive and triangulated.
+* `coherentDerivedTensor_pentagon` and `coherentDerivedTensor_triangle` — the
+  pentagon and triangle laws at the derived-tensor root.
+
+## Implementation notes
+
+### One-way adapter
 
 There is intentionally no adapter in the other direction: a raw bifunctor is not promoted
 to coherent data.  Raw instances remain useful for intermediate realizations that only
 construct a single transform, but public convolution, associativity, and unit APIs
 require this coherent root.
 
-## Still a supplied capability
+### Still a supplied capability
 
 Coherence is *more* to supply, not less.  Nothing here inhabits either class, and
 extending `MonoidalCategory` does not make `Dᵇ(Coh Z)` closed under derived tensor; on a
 singular `Z` it is not.  A caller instantiating `HasCoherentDerivedTensor` asserts the
 closure and the coherence together.
 
-## Placement
+### Placement and namespace
 
-MO1.10 (#1321) extracted this file's contents from
-`DerivedCategory/FourierMukai/DerivedTensorCoherence.lean`, splitting the relative tier --
-strong monoidality of derived pullback along a morphism -- into `Tensor/Relative.lean`.
-Per the cutover ledger's standing decision that paths move and namespaces do not, the
-declarations keep the `AlgebraicGeometry.DerivedCategory.FourierMukai` namespace they
-were introduced with.
+The relative tier -- strong monoidality of derived pullback along a morphism -- is in
+`Tensor/Relative.lean`.  The declarations here are in the
+`AlgebraicGeometry.DerivedCategory.FourierMukai` namespace.
 
 ## References
 
-* `docs/architecture/cutover-ledger.md`, row 10.
+Mathlib's `CategoryTheory.MonoidalCategory` and `MonoidalCategory.curriedTensor`, and
+the repository's `Functor.ExactBifunctor` and
+`MonoidalCategory.IsCompatibleWithTriangulation`.
+
+## Tags
+
+derived tensor product, monoidal category, pentagon, bounded derived category,
+coherent sheaves
 -/
 
 universe u
@@ -90,7 +115,7 @@ def exactBifunctor : Functor.ExactBifunctor
     (curriedTensor (SchemeBoundedCoherentDerivedCategory Z.left)) :=
   HasCoherentDerivedTensor.exact
 
-/-- Legacy projection: additivity of each left tensor twist. -/
+/-- Projection of `exactBifunctor`: additivity of each left tensor twist. -/
 theorem additive (K : SchemeBoundedCoherentDerivedCategory Z.left) :
     ((curriedTensor
       (SchemeBoundedCoherentDerivedCategory Z.left)).obj K).Additive := by
@@ -98,14 +123,14 @@ theorem additive (K : SchemeBoundedCoherentDerivedCategory Z.left) :
   letI := exactBifunctor |>.secondTriangulated K
   infer_instance
 
-/-- Legacy projection: shift coherence of each left tensor twist. -/
+/-- Projection of `exactBifunctor`: shift coherence of each left tensor twist. -/
 @[reducible] def commShift
     (K : SchemeBoundedCoherentDerivedCategory Z.left) :
     ((curriedTensor
       (SchemeBoundedCoherentDerivedCategory Z.left)).obj K).CommShift ℤ :=
   exactBifunctor |>.secondCommShift K
 
-/-- Legacy projection: triangulatedness of each left tensor twist. -/
+/-- Projection of `exactBifunctor`: triangulatedness of each left tensor twist. -/
 theorem isTriangulated (K : SchemeBoundedCoherentDerivedCategory Z.left) :
     letI := commShift K
     ((curriedTensor

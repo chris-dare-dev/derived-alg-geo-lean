@@ -35,7 +35,8 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated
 import DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated.IndFilteredColimits
 import DerivedAlgGeo.CategoryTheory.Triangulated.Opposite
 
-/-! # Triangulated categories
+/-!
+# Triangulated categories
 
 The compatibility interface for monoidal tensor products, the
 pretriangulated axioms with rotation only forward, sign-correct exactness of
@@ -47,10 +48,27 @@ extension closures, envelope composition, generation time, the Grothendieck grou
 twist on `K₀`, Fourier--Mukai kernel functors, dg enhancements, and stability conditions on
 triangulated categories.
 
+## Main definitions
+
+None; this module re-exports its children.
+
+## Main results
+
+None; this module re-exports its children.
+
+## Implementation notes
+
 Everything above `StabilityCondition` in this list is generic: it mentions no
 stability condition, and a module that needs it does not have to import the
-stability track to get it. `QuasiAbelian` and `ExtensionClosure` joined that
-group in #488, on the same ground as `PostnikovTower` and `GrothendieckGroup`
-in #454 — their namespace was already `CategoryTheory.Triangulated` while their
-path said `StabilityCondition/Foundation/`.
+stability tree to get it.
+
+## References
+
+The subtree extends Mathlib's `CategoryTheory.Pretriangulated` and
+`CategoryTheory.IsTriangulated`.
+
+## Tags
+
+triangulated category, t-structure, semiorthogonal decomposition, Grothendieck group,
+dg enhancement, stability condition
 -/

@@ -9,32 +9,59 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.Stability.ThreefoldWallTranspor
 
 `ThreefoldWallTransport.lean` transports a polarised threefold class to the
 four-coordinate `(α, β)` model and proves `nu_toNumClass`: the model's
-`Wall.Threefold.nu` is the `BMT.nu` this directory already had. `Walls/Threefold/
+`Wall.Threefold.nu` is the `Threefold.nu` that `BMT.lean` defines. `Walls/Threefold/
 Tilt.lean` proves `nu_eq_tilt_slope`: that same model slope is `α` times the
 charge slope of the tilt family.
 
-This file composes the two, which is what #1228 asked for and what neither half
-could state alone. The result is the geometric reading of the tilt charge:
+This file composes the two, which neither half could state alone. The result is
+the geometric reading of the tilt charge:
 
 > the Bayer--Macrì--Toda slope of a class on a polarised numerical threefold is
 > `α` times the charge slope of `Tilt.tiltFamily` at its transported class.
 
-## No new carrier
+## Main definitions
 
-There is deliberately no `tiltWallChargeFamily` here. The sketch had one, and
-`Walls/Threefold/TiltComparison.lean` records why it is not reinstated: the
-implemented transport pulls back the **untilted** `Threefold.chargeFamily`, the
-two families genuinely differ, and `Tilt.exists_tilt_alignmentValue_ne_threefold`
-proves it with a computed witness. A family here would need the two independent
-consumers the abstraction tree requires before a root is minted, and it has
-none: the statements below need `Tilt.tiltFamily` applied at a transported
-class, which is not the same thing as a new family.
+This file introduces no new definitions; it proves facts about
+`Wall.Tilt.tiltFamily` evaluated at the transported class `Threefold.toNumClass`.
 
-## No third slope
+## Main results
 
-`nu` (this directory) and `Wall.Threefold.nu` (the model) are the two the
-adjudication kept, and both appear below in the same equation rather than a
-third being defined.
+* `Threefold.tiltFamily_im_toNumClass` — the imaginary part of the tilt charge at a
+  transported class is `α·∫H²·ch₁^β`.
+* `Threefold.tiltFamily_re_toNumClass` — its real part is the negated
+  Bayer--Macrì--Toda numerator `−(∫H·ch₂^β − (α²/2)·∫H³·ch₀)`.
+* `Threefold.nu_eq_tiltFamily_slope` — the Bayer--Macrì--Toda slope `Threefold.nu` is
+  `α` times the tilt family's charge slope.
+* `Threefold.chargeSlope_tiltFamily_toNumClass` — the same statement as a
+  `chargeSlope`.
+
+## Implementation notes
+
+### No new carrier
+
+There is deliberately no separate tilt wall charge family here. The geometric
+transport `wallChargeFamily` pulls back the **untilted** `Threefold.chargeFamily`,
+the two families genuinely differ, and `Tilt.exists_tilt_alignmentValue_ne_threefold`
+proves it with a computed witness; `Walls/Threefold/TiltComparison.lean` records the
+comparison. A family here would need the two independent consumers the abstraction
+tree requires before a root is minted, and it has none: the statements below need
+`Tilt.tiltFamily` applied at a transported class, which is not the same thing as a
+new family.
+
+### No third slope
+
+`Threefold.nu` (the numerical threefold) and `Wall.Threefold.nu` (the
+four-coordinate model) are the two slopes, and both appear below in the same
+equation rather than a third being defined.
+
+## References
+
+* Bayer, Macrì, Toda, *Bridgeland stability conditions on threefolds I:
+  Bogomolov–Gieseker type inequalities*, J. Algebraic Geom. 23 (2014) 117–163.
+
+## Tags
+
+tilt stability, Bayer–Macrì–Toda slope, threefold, charge family, central charge
 -/
 
 open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition

@@ -13,12 +13,31 @@ import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.TwistInverse
 **Every coherent sheaf on `Pⁿ_k` has finite-dimensional cohomology in every degree**, and
 `FiniteDimensionalCohomology k Pⁿ` is inhabited by a theorem rather than a supplied field.
 
-This is S3 of `#332` (`#571`). The two inputs are:
+## Main definitions
+
+* `AlgebraicGeometry.Proj.projectiveSpaceFiniteDimensionalCohomology`: the finite-dimensional
+  cohomology package of projective space, with the canonical linear realization.
+* `AlgebraicGeometry.Proj.projectiveSpaceFiniteCohomology`: the same package together with the
+  finite-affine-cover vanishing bound.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.module_finite_linearCoherentH_projectiveSpaceTwist_of_neg`:
+  `Hⁱ(Pⁿ, O(d))` is finite-dimensional in every degree for `d < 0`.
+* `AlgebraicGeometry.Proj.exists_shortExact_coproduct_twist`: every coherent sheaf on `Pⁿ` is
+  the quotient, in `Coh Pⁿ`, of a finite coproduct of copies of a negative twist, with coherent
+  kernel.
+* `AlgebraicGeometry.Proj.module_finite_linearCoherentH_projectiveSpace`: Serre finiteness on
+  projective space.
+
+## Implementation notes
+
+### The inputs
 
 * **Serre's theorem** (`exists_epi_coproduct_twistingSheaf_ge`): every coherent `F` is a quotient
   of `∐ O(-N)`, with `N ≥ 1` chosen so that the twist is negative.
 * **Cohomology of the twists**: `Hⁿ⁺¹(Pⁿ, O(d))` is finite-dimensional for every `d`
-  (`module_finite_linearCoherentH_projectiveSpaceTwist`, S1), and `H⁰(Pⁿ, O(d)) = 0` for `d < 0`
+  (`module_finite_linearCoherentH_projectiveSpaceTwist`), and `H⁰(Pⁿ, O(d)) = 0` for `d < 0`
   (`polynomialIntTwisting_H_zero_subsingleton`). Taking `N ≥ 1` is what makes the second
   statement the one needed: the degree-zero group of a *nonnegative* twist is the space of
   homogeneous polynomials, whose finiteness is a separate computation that never has to be made.
@@ -26,7 +45,7 @@ This is S3 of `#332` (`#571`). The two inputs are:
 The dévissage itself is `module_finite_linearCoherentH_of_devissage`: descending induction from
 the finite-cover vanishing bound along the linear exact sequence `Hⁱ(∐ O(-N)) → Hⁱ(F) → Hⁱ⁺¹(K)`.
 
-## The surjection, read in `Coh`
+### The surjection, read in `Coh`
 
 Serre's surjection lives in `Pⁿ.Modules`; the long exact sequence wants a short exact sequence
 in `Coh Pⁿ`. `Coh.ι` is fully faithful and preserves finite colimits, so the coproduct of the
@@ -34,10 +53,20 @@ twists in `Coh` maps to the coproduct in `Modules` and the surjection lifts alon
 `preimage`; faithfulness reflects the epimorphism, and the kernel in `Coh` completes the
 sequence.
 
-## Not here
+### Not here
 
 Closed subvarieties of `Pⁿ`. `ProjectiveVariety.lean` transports finiteness along the closed
-immersion of a `ProjectivePresentation`, once the comparison is shown `k`-linear.
+immersion of a `ProjectivePresentation`, using that the comparison is `k`-linear.
+
+## References
+
+The file cites no literature. It builds on
+`AlgebraicGeometry.Proj.exists_epi_coproduct_twistingSheaf_ge` and
+`AlgebraicGeometry.Cohomology.module_finite_linearCoherentH_of_devissage`.
+
+## Tags
+
+Serre finiteness, projective space, coherent sheaf, sheaf cohomology, dévissage
 -/
 
 universe u
@@ -56,8 +85,8 @@ variable [Nontrivial ι]
 
 /-- **`Hⁱ(Pⁿ, O(d))` is finite-dimensional in every degree for a negative twist.**
 
-Degree zero vanishes (`polynomialIntTwisting_H_zero_subsingleton`); positive degrees are S1
-(`module_finite_linearCoherentH_projectiveSpaceTwist`). -/
+Degree zero vanishes (`polynomialIntTwisting_H_zero_subsingleton`); positive degrees are
+`module_finite_linearCoherentH_projectiveSpaceTwist`. -/
 theorem module_finite_linearCoherentH_projectiveSpaceTwist_of_neg (d : ℤ) (hd : d < 0) (i : ℕ) :
     Module.Finite k ((Cohomology.linearCoherentH k (Proj (polynomialGrading ι k)) i).obj
       (projectiveSpaceTwist ι k d)) := by
@@ -127,7 +156,7 @@ noncomputable def projectiveSpaceFiniteDimensionalCohomology :
   finite := fun i F => module_finite_linearCoherentH_projectiveSpace ι k i F
 
 /-- **The finite cohomology package of projective space**: Serre finiteness together with the
-finite-affine-cover vanishing bound. Every Euler characteristic on `Pⁿ` now rests on theorems
+finite-affine-cover vanishing bound. Every Euler characteristic on `Pⁿ` rests on theorems
 alone. -/
 noncomputable def projectiveSpaceFiniteCohomology :
     Cohomology.FiniteCohomology k (Proj (polynomialGrading ι k)) :=

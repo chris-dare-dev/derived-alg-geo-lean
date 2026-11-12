@@ -318,8 +318,8 @@ namespace FiniteDimensionalCohomology
 variable {k : Type u} [Field k] {Y : Scheme.{u}} [Y.Over (Spec (CommRingCat.of k))] [IsVariety k Y]
 
 /-- Add the independent finite-affine-cover vanishing theorem to degreewise finite-dimensional
-cohomology.  This is the constructor which turns the output of #29 into the `FiniteCohomology`
-package consumed by Euler characteristics. -/
+cohomology.  This is the constructor which turns a `FiniteDimensionalCohomology` into the
+`FiniteCohomology` package consumed by Euler characteristics. -/
 noncomputable def toFiniteCohomology (D : FiniteDimensionalCohomology k Y)
     [IsNoetherian Y]
     [IsAffineHom (pullback.diagonal (terminal.from Y))] : FiniteCohomology k Y where

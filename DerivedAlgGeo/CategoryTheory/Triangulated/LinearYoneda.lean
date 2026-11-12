@@ -22,7 +22,24 @@ and `finrank k` is not statable in `AddCommGrpCat` — the objects carry no
 not the dimension count `χ` needs). `preadditiveYoneda` therefore cannot feed
 that construction and `linearYoneda` can.
 
-## Why the proof is short
+## Main definitions
+
+* `CategoryTheory.Triangulated.linearYonedaShiftSequence` — the
+  `ShiftSequence ℤ` instance assembling the shifted Hom-modules `Hom(E, F⟦i⟧)`.
+
+## Main results
+
+* `CategoryTheory.Triangulated.linearYoneda_isHomological` — the `k`-linear
+  Yoneda functor is homological.
+* `CategoryTheory.Triangulated.linearYoneda_map_distinguished` — the short
+  complex of a distinguished triangle stays exact after applying it.
+* `linearYoneda_homologySequence_exact₁`, `linearYoneda_homologySequence_exact₂`,
+  `linearYoneda_homologySequence_exact₃` — the long exact sequence of shifted
+  Hom-modules.
+
+## Implementation notes
+
+### Why the proof is short
 
 The argument never mentions the target category. `Triangle.yoneda_exact₂` is a
 statement about morphisms in `C`, and `ShortComplex.moduleCat_exact_iff` has the
@@ -30,31 +47,31 @@ statement about morphisms in `C`, and `ShortComplex.moduleCat_exact_iff` has the
 
 `S.Exact ↔ ∀ x₂, S.g x₂ = 0 → ∃ x₁, S.f x₁ = x₂`.
 
-So Mathlib's proof transplants with one lemma name changed. An earlier draft
-reflected exactness along `forget₂ (ModuleCat k) Ab` instead; that works, but it
-is strictly more plumbing for the same result.
+So Mathlib's proof transplants with one lemma name changed. Reflecting
+exactness along `forget₂ (ModuleCat k) Ab` would also work, but it is strictly
+more plumbing for the same result.
 
-## The shift sequence, and what it cost
+### The shift sequence
 
-`ShiftSequence ℤ` **is** here now (#469), so the shifted Hom-groups
-`Hom(E, F⟦i⟧)` are assembled and the long exact sequence below is available.
-Three Mathlib-level gaps blocked it and all three are closed:
+`ShiftSequence ℤ` assembles the shifted Hom-groups `Hom(E, F⟦i⟧)`, so the long
+exact sequence below is available. It needs three facts Mathlib lacks:
 
-* `Linear R Cᵒᵖ` did not exist in Mathlib. `Preadditive Cᵒᵖ` does, by
-  transporting `AddCommGroup` along `opEquiv`, but there was no `k`-linear
-  counterpart — and morphisms in `Cᵒᵖ` are `Opposite`-wrapped
-  (`(X ⟶ Y)` is `(unop Y ⟶ unop X)ᵒᵖ`), so nothing was definitionally available.
-* `ShiftedHom.opEquiv_symm_smul` and `opEquiv'_symm_smul` did not exist, though
-  the additive versions did.
+* `Linear R Cᵒᵖ`. `Preadditive Cᵒᵖ` exists, by transporting `AddCommGroup`
+  along `opEquiv`, but has no `k`-linear counterpart — and morphisms in `Cᵒᵖ`
+  are `Opposite`-wrapped (`(X ⟶ Y)` is `(unop Y ⟶ unop X)ᵒᵖ`), so nothing is
+  definitionally available.
+* `ShiftedHom.opEquiv_symm_smul` and `opEquiv'_symm_smul`, the scalar
+  counterparts of the additive versions.
 * The instance itself, mirroring Mathlib's `preadditiveYoneda` version with
   `LinearEquiv.toModuleIso` in place of `AddEquiv.toAddCommGrpIso`.
 
 The first two are general-purpose and belong upstream, so they live next door
-in `CategoryTheory/Triangulated/LinearOpposite.lean`, written in the
+in `CategoryTheory/Linear/Opposite.lean` and
+`CategoryTheory/Triangulated/Opposite/Linear.lean`, written in the
 `ForMathlib` pattern this repository uses for Mathlib gaps. Only the third is
 here.
 
-## What this file still does not provide
+### What this file does not provide
 
 **No Euler form here.** Having the long exact sequence is not having
 `Σᵢ (-1)ⁱ dim_k Hom(E, F⟦i⟧)`: that needs each term finite-dimensional and the
@@ -71,8 +88,19 @@ interact — `Triangulated/Basic.lean`, `Shift/ShiftedHom.lean`,
 `Shift/Linear.lean` all carry it verbatim — and Mathlib discharges it only for
 concrete categories, `CochainComplex` directly and their localizations through
 `Shift.linear_of_localization`. The *opposite* shift is a different matter and
-is not assumed: `LinearOpposite.shiftFunctorOppositeLinear` derives
+is not assumed: `shiftFunctorOppositeLinear` (`Opposite/Linear.lean`) derives
 `(shiftFunctor Cᵒᵖ n).Linear k` from the hypothesis on `C`.
+
+## References
+
+The file builds on Mathlib's `CategoryTheory.linearYoneda`,
+`CategoryTheory.Functor.IsHomological`, `CategoryTheory.Functor.ShiftSequence`
+and `CategoryTheory.Pretriangulated.Triangle.yoneda_exact₂`.
+
+## Tags
+
+linear Yoneda functor, homological functor, shift sequence, long exact sequence,
+triangulated category
 -/
 
 namespace CategoryTheory.Triangulated
@@ -127,8 +155,8 @@ it there is no sequence `i ↦ Hom(E, F⟦i⟧)` for an alternating sum to run o
 
 The construction is Mathlib's with two substitutions — `LinearEquiv.toModuleIso`
 for `AddEquiv.toAddCommGrpIso`, and the `smul` half supplied alongside the
-`map_add'` half. The `map_smul'` field is `LinearOpposite`'s
-`ShiftedHom.opEquiv'_symm_smul`, which is why that file exists.
+`map_add'` half. The `map_smul'` field is `ShiftedHom.opEquiv'_symm_smul`
+from `Opposite/Linear.lean`.
 
 `(shiftFunctor C n).Linear k` is the one hypothesis this needs beyond the
 additive version, and it is not decorative: `opEquiv'_symm_smul` needs the

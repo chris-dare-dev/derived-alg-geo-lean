@@ -69,8 +69,8 @@ noncomputable section
 cross the import boundary into this file. Without it the elaborator does not report a missing
 instance: it tries to synthesize `HasSmallLocalizedHom` for the quasi-isomorphism localization
 from scratch and exhausts the `synthInstance` budget, and the timeout surfaces as an ordinary
-"failed to synthesize" on `extComparison`. `references/instance-transparency.md` names that
-failure mode; raising `synthInstance.maxHeartbeats` treats the symptom.
+"failed to synthesize" on `extComparison`. Raising `synthInstance.maxHeartbeats` treats the
+symptom.
 
 `HasExt.standard` is the sanctioned route, and it is the one the sibling file takes. -/
 local instance hasExtCoh : HasExt.{u + 1} (Coh X) :=
@@ -85,10 +85,9 @@ local instance hasExtCoh : HasExt.{u + 1} (Coh X) :=
 -- 800000), which is why no heartbeat option belongs here.
 --
 -- It stays `local`, deliberately, and must not be promoted to a global instance.
--- `Cohomology/Cech/Vanishing.lean` and `Development/Cohomology/Strategy.lean` both record
--- why: `HasExt` is passed explicitly everywhere in this lane, because letting instance
--- search pick would allow the small-site `HasExt.{u}` to name different groups than the
--- `HasExt.{u + 1}` these statements mean.
+-- `Cohomology/Cech/Vanishing.lean` records why: `HasExt` is passed explicitly everywhere
+-- in these files, because letting instance search pick would allow the small-site
+-- `HasExt.{u}` to name different groups than the `HasExt.{u + 1}` these statements mean.
 -- Named rather than anonymous: an unnamed `local instance` here is auto-disambiguated
 -- against `Cohomology.lean`'s into `instHasExtCohToSchemeToVariety_1`, a generated name
 -- that then has to be audited under a number nobody chose. A chosen name is stable and

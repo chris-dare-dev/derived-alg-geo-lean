@@ -22,14 +22,16 @@ open DerivedAlgGeo.Topology
 namespace DerivedAlgGeo.AlgebraicGeometry
 
 set_option maxHeartbeats 1000000 in
-/-- **`#572` step 3 at a closed immersion of schemes.**
+/-- **Cohomology is unchanged by pushforward along a closed immersion of schemes.**
 
 `Hⁿ(X, F) ≃+ Hⁿ(Y, ι_* F)`. A closed immersion is a closed embedding on underlying spaces
 (`IsClosedImmersion.isClosedEmbedding`), which supplies both hypotheses of the topological
 statement directly.
 
-This is an isomorphism for each abelian sheaf `F`; naturality in `F`, a universe-parametric
-`HasExt`, and the passage from coherent sheaves to abelian sheaves remain separate work. -/
+This is an isomorphism for each abelian sheaf `F`, at the `HasExt` witnesses instance search
+finds. The witness-explicit form and its naturality in `F` are
+`cohomologyPushforwardAddEquivAt` and `cohomologyPushforwardAddEquivAt_naturality`; the passage
+to coherent sheaves is `cohCohomologyPushforwardAddEquiv`. -/
 noncomputable def schemeCohomologyPushforwardAddEquiv
     {X Y : _root_.AlgebraicGeometry.Scheme.{u}} (g : X ⟶ Y)
     [_root_.AlgebraicGeometry.IsClosedImmersion g]

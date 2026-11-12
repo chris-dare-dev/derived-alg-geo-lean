@@ -7,13 +7,38 @@ import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.TwistCompariso
 /-!
 # Homogeneous elements as sections of the twist, and multiplication `F ⟶ F(n)`
 
-`#585` asks that `fⁿ · s` extend to a global section of `F(n)`, for `F` quasi-coherent on
-`Proj 𝒜` and `s` a section over a degree-one chart. **That statement cannot be written against the
-tree as it stands**: multiplying a section of an arbitrary `F` by a homogeneous element needs a map
-`F ⟶ F(n)`, and no such map exists. `#584` supplied the twist itself; this file supplies the
-multiplication into it.
+The section-extension lemma asks that `fⁿ · s` extend to a global section of `F(n)`, for `F`
+quasi-coherent on `Proj 𝒜` and `s` a section over a degree-one chart. Multiplying a section of an
+arbitrary `F` by a homogeneous element needs a map `F ⟶ F(n)` into the twist `F(n) = F ⊗ O(n)`;
+this file supplies that multiplication.
 
-## The observation that makes it short
+## Main definitions
+
+* `AlgebraicGeometry.Proj.sectionOfMem`: a degree-`n` element `m` of `𝓜` as the section `m / 1`
+  of `M(n)~` over any open.
+* `AlgebraicGeometry.Proj.sectionsOfMem`: the compatible family the fractions `m / 1` form.
+* `AlgebraicGeometry.Proj.unitToTwist`: multiplication by a degree-`n` element, as a map out of the
+  structure sheaf.
+* `AlgebraicGeometry.Proj.twistBy`: multiplication by a degree-`n` element of `𝒜` on an arbitrary
+  module sheaf, `F ⟶ F(n)`.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.mem_intShift_zero_of_mem`: a degree-`n` element of `𝓜` sits in degree
+  `0` of the shifted grading.
+* `AlgebraicGeometry.Proj.res_sectionOfMem`: the section `m / 1` restricts to the section `m / 1`.
+* `AlgebraicGeometry.Proj.unitToTwist_app_one`: `unitToTwist` sends `1` to `m / 1`.
+* `AlgebraicGeometry.Proj.sectionOfMem_congr`, `AlgebraicGeometry.Proj.twistBy_congr`: two
+  spellings of the same element give the same section and the same map.
+
+## Notation
+
+`X` and `𝒪` are local notation for the underlying space `ProjectiveSpectrum.top 𝒜` and its structure
+sheaf.
+
+## Implementation notes
+
+### The observation that makes it short
 
 A degree-`n` element `m` of `𝓜` is a **global** section of `M(n)~`, not merely a section over a
 basic open. The fraction is `m / 1`: a local fraction asks for numerator and denominator in the
@@ -22,7 +47,7 @@ lies in degree `0` of the shifted grading. Nothing is inverted, so the same frac
 every point of every open and restriction does not move it — which is why `sectionsOfMem`'s
 compatibility is `rfl`, and why no `basicOpen_one` transport is needed anywhere.
 
-## From there to an arbitrary `F`
+### From there to an arbitrary `F`
 
 `unitToTwist` is that compatible family read through `SheafOfModules.unitHomEquiv` — a global
 section *is* a map out of the unit. `twistBy` then tensors it with `F` and cancels the unit:
@@ -30,17 +55,15 @@ section *is* a map out of the unit. `twistBy` then tensors it with `F` and cance
     F ≅ F ⊗ 𝟙 --(𝟙 ⊗ ·fⁿ)--> F ⊗ O(n) = F(n)
 
 `F` is an arbitrary module sheaf. It is **not** assumed to be an associated sheaf, which is the
-point: `#584`'s comparison stops at associated sheaves, and `#585` may not inherit that limit —
-its acceptance criteria forbid exactly that hypothesis. Nothing here needs the comparison.
+point: the comparison `tensorTwistIso` stops at associated sheaves, and the section-extension
+lemma `exists_globalSection_twistBy` does not inherit that limit. Nothing here needs the
+comparison.
 
-The original `#570` issue sketch proposed using these maps to build `Γ_*(F)` as a graded module,
-with the `A`-action supplied by twist multiplication. That route is now historical: the completed
-proof takes the direct chart-generation route instead. `GlobalGeneration.lean` consumes these maps
-alongside the uniform extension theorem to obtain `free I ↠ F ⊗ O(N)`, and `TwistInverse.lean`
-then untwists it to the finite coproduct epimorphism. No graded Serre correspondence is asserted
-here.
+`GlobalGeneration.lean` consumes these maps alongside the uniform extension theorem to obtain
+`free I ↠ F ⊗ O(N)`, and `TwistInverse.lean` then untwists it to the finite coproduct epimorphism.
+No graded Serre correspondence, and no graded module `Γ_*(F)`, is asserted here.
 
-## Why `unitToTwist_app_one` is not decoration
+### Why `unitToTwist_app_one` is not decoration
 
 `unitHomEquiv.symm` is an equivalence's inverse, so the morphism it produces is opaque at every use
 site: a wrong `sectionsOfMem` would typecheck and nothing downstream would notice. That lemma pins
@@ -49,15 +72,24 @@ nothing.
 
 Its `1` is ascribed at the ring, `(1 : ringCatSheaf.obj.obj (op U))`, rather than written bare. The
 unit sheaf's sections are the ring's sections by a `def` that does not unfold at reducible
-transparency, so `OfNat` is not found on the bare numeral. `references/instance-transparency.md`
-is the general case; Mathlib's own `unitHomEquiv_apply_coe` ascribes it for the same reason.
+transparency, so `OfNat` is not found on the bare numeral. Mathlib's own `unitHomEquiv_apply_coe`
+ascribes it for the same reason.
 
-## Scope
+### Scope
 
-The maps, and what they do to `1`. **The extension theorem of `#585` is not here** — it needs the
+The maps, and what they do to `1`. **The section-extension lemma is not here** — it needs the
 degree-one chart cover, quasi-coherence to make each chart a module, and an affine clearing lemma
-for the denominator. With this API its statement elaborates, which is what it was blocked on; it is
-proved in `Proj/Modules/Glue.lean` as `exists_globalSection_twistBy`.
+for the denominator. With this API its statement elaborates; it is proved in
+`Proj/Modules/Glue.lean` as `exists_globalSection_twistBy`.
+
+## References
+
+Mathlib's `SheafOfModules.unitHomEquiv` and `PresheafOfModules.sectionsMk`, and
+`AlgebraicGeometry.Scheme.Modules.tensorUnitRightIso`.
+
+## Tags
+
+projective spectrum, twisting sheaf, Serre twist, homogeneous element, sections
 -/
 noncomputable section
 
@@ -147,8 +179,8 @@ def sectionsOfMem (n : ℕ) {m : M} (hm : m ∈ 𝓜 n) :
 
 /-- **Multiplication by a degree-`n` element of `𝒜`, as a map out of the structure sheaf.**
 
-`#584` gave the twist; this gives the *sections* of it that a homogeneous element supplies, which
-is what `#585` multiplies by. -/
+This gives the *sections* of the twist that a homogeneous element supplies, which is what the
+section-extension lemma multiplies by. -/
 def unitToTwist (n : ℕ) {m : M} (hm : m ∈ 𝓜 n) :
     SheafOfModules.unit (AlgebraicGeometry.Proj 𝒜).ringCatSheaf ⟶
       (show SheafOfModules (AlgebraicGeometry.Proj 𝒜).ringCatSheaf from
@@ -169,9 +201,9 @@ theorem unitToTwist_app_one (n : ℕ) {m : M} (hm : m ∈ 𝓜 n) (U : Opens X) 
 
 /-- **Multiplication by a degree-`n` element of `𝒜`, on an arbitrary module sheaf: `F ⟶ F(n)`.**
 
-`F` is not assumed to be an associated sheaf, which is the whole point — `#585` multiplies a
-section of an arbitrary quasi-coherent `F`, and until this map exists the statement cannot even be
-written. It is the map out of the unit, tensored with `F` and read through the right unitor. -/
+`F` is not assumed to be an associated sheaf, which is the whole point — the section-extension
+lemma multiplies a section of an arbitrary quasi-coherent `F`, and its statement is written with
+this map. It is the map out of the unit, tensored with `F` and read through the right unitor. -/
 def twistBy (n : ℕ) {f : A} (hf : f ∈ 𝒜 n) (F : (AlgebraicGeometry.Proj 𝒜).Modules) :
     F ⟶ AlgebraicGeometry.Scheme.Modules.tensorObj F (twistingSheaf 𝒜 (n : ℤ)) :=
   (AlgebraicGeometry.Scheme.Modules.tensorUnitRightIso F).inv ≫

@@ -15,11 +15,40 @@ constructs the degree-zero homogeneous localization ring `HomogeneousLocalizatio
 the ordinary localized module `LocalizedModule S M`. We isolate inside the latter the fractions
 whose module numerator and ring denominator lie in matching graded pieces.
 
+## Main definitions
+
+* `GradedModule.NumDenSameDeg` — a module fraction whose numerator and denominator lie in
+  matching graded pieces.
+* `GradedModule.DegreeZeroLocalization` — the degree-zero homogeneous localization of the graded
+  module, as the submodule `GradedModule.degreeZeroSubmodule` of `LocalizedModule S M`, with
+  constructor `GradedModule.DegreeZeroLocalization.mk`.
+* `GradedModule.DegreeZeroLocalization.mapOfLE` — enlarging the denominator submonoid.
+* `GradedModule.DegreeZeroLocalization.faceMap` — the Čech face map from the localization away
+  from `g₁` to the localization away from `g₂ = g₁ * h`.
+* `GradedModule.DegreeZeroLocalization.awayMk` — the degree-zero fraction `m / fⁿ`.
+* `GradedModule.GradedLinearMap` and `GradedModule.GradedLinearMap.map` — a
+  grading-preserving linear map and its action on degree-zero localizations.
+* `GradedModule.DegreeZeroLocalization.selfLinearEquiv` — the degree-zero localization of the
+  graded ring as a module over itself is Mathlib's homogeneous localization ring.
+
+## Main results
+
+* `GradedModule.DegreeZeroLocalization.mk_eq_mk_iff` — equality of certified fractions.
+* `GradedModule.DegreeZeroLocalization.exists_awayMk` — every degree-zero fraction away from `f`
+  is an `awayMk`.
+* `GradedModule.DegreeZeroLocalization.awayMk_eq_awayMk_iff` and
+  `GradedModule.DegreeZeroLocalization.awayMk_eq_zero_iff` — two such fractions agree exactly
+  when they cross-multiply.
+* `GradedModule.DegreeZeroLocalization.exists_awayMk_pair` — any two degree-zero fractions away
+  from `f` have representatives over one common power of `f`.
+
+## Implementation notes
+
 The construction is intentionally indexed by the same additive grading monoid on the ring and
 the module. Integer shifts, which reconcile a natural grading on the ring with an integer-indexed
 family of module twists, belong to the separate graded-shift layer.
 
-## Localizing away from one element
+### Localizing away from one element
 
 `awayMk` writes the fraction `m / fⁿ`, and two statements make it a usable normal form:
 
@@ -34,7 +63,8 @@ family of module twists, belong to the separate graded-shift layer.
 
 Together these turn `DegreeZeroLocalization 𝒜 𝓜 (.powers f)` into fractions with an explicit
 representative and a computable equality test, which is what any basis for it has to start from
-(see the Laurent monomial basis of #491).
+(see the Laurent monomial spanning and independence statements
+`MvPolynomial.exists_sum_awayMk_monomial` and `MvPolynomial.sum_awayMk_monomial_eq_zero_iff`).
 
 `awayMk_eq_zero_iff` specialises the equality test to the zero fraction, which is what makes the
 numerator a faithful record: any independence statement about fractions reduces to one about
@@ -45,6 +75,15 @@ the normal form: the first three are additivity in the numerator at a fixed deno
 last puts two fractions over a common denominator. Spanning arguments need exactly this pair —
 decompose a numerator into a sum, then align denominators — and none of the four costs a
 cancellation hypothesis.
+
+## References
+
+Mathlib's `HomogeneousLocalization`, `HomogeneousLocalization.NumDenSameDeg` and
+`LocalizedModule`.
+
+## Tags
+
+graded module, homogeneous localization, localized module, Proj
 -/
 
 noncomputable section
@@ -690,7 +729,7 @@ theorem awayMk_shift {f : A} {e : ι} (hf : f ∈ 𝒜 e) (n t : ℕ) (p : M)
 This is `exists_awayMk` on each fraction followed by `awayMk_shift` to align the two exponents
 at their sum. It is the move every statement about a *sum* of fractions opens with — additivity
 of `awayMk` exists only at a fixed denominator — and it is what the additivity of the sign
-projection (#340's contracting homotopy) reduces to. Like `exists_awayMk`, it costs no domain
+projection `MvPolynomial.signProjection_add` reduces to. Like `exists_awayMk`, it costs no domain
 or torsion-freeness hypothesis: no cancellation is performed. -/
 theorem exists_awayMk_pair {f : A} {e : ι} (hf : f ∈ 𝒜 e) (hf0 : ∀ n : ℕ, f ^ n ≠ 0)
     (z₁ z₂ : DegreeZeroLocalization 𝒜 𝓜 (.powers f)) :
