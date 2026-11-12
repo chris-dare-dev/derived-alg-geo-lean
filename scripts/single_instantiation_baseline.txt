@@ -23,7 +23,6 @@ CategoryTheory	CategoryTheory.SerreFunctor.PseudoprojectiveExtProfile	recorded b
 CategoryTheory	CategoryTheory.SerreFunctor.SerreCompatibleEquivalence	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.SerreFunctor.SphericalClassificationData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.SerreFunctor.SphericalExtProfile	recorded before the reason column existed; reason not yet written
-CategoryTheory	CategoryTheory.StackEquivalence	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.AdjacentExtProfile	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.BidirectionalPrefixBlockEmbeddingData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.CofiltrationData	recorded before the reason column existed; reason not yet written

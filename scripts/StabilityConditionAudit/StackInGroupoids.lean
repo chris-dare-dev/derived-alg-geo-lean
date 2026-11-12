@@ -10,13 +10,6 @@ Audit records for the generic stack-in-groupoids root.
 The module, declarations, and audit ownership are neutral category theory.
 -/
 
-#print axioms CategoryTheory.StackEquivalence
-#print axioms CategoryTheory.StackEquivalence.comparison
-#print axioms CategoryTheory.StackEquivalence.descent
-#print axioms CategoryTheory.StackEquivalence.fiber
-#print axioms CategoryTheory.StackEquivalence.isStack_iff
-#print axioms CategoryTheory.StackEquivalence.mk.inj
-#print axioms CategoryTheory.StackEquivalence.mk.sizeOf_spec
 #print axioms CategoryTheory.StackInGroupoids
 #print axioms CategoryTheory.StackInGroupoids.CechDescent
 #print axioms CategoryTheory.StackInGroupoids.Cover
