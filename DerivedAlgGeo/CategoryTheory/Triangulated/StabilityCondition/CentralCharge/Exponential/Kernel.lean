@@ -9,35 +9,56 @@ import Mathlib.Analysis.SpecialFunctions.Complex.Circle
 # The exponential charge, indexed by truncation degree
 
 One polynomial. `CentralCharge/Numerical/` carries the surface charge on three
-real coordinates and the Bayer--Macrì--Toda charge on four, and
-the threefold file's own docstring records that they are the same expansion of
-`-∫exp(-(β + iα)H)ch` at two codimensions. They are nevertheless two unrelated
-roots, and no fourfold charge exists. This file is the shared parent, and
-`CentralCharge/Exponential/Comparison.lean` proves both existing families are instances of it.
+real coordinates and the Bayer--Macrì--Toda charge on four, and the threefold
+file's own docstring records that they are the same expansion of
+`-∫exp(-(β + iα)H)ch` at two codimensions. Those two families are defined
+independently, and `CentralCharge/Numerical/` defines no fourfold charge. This
+file is the shared parent, and `CentralCharge/Exponential/Comparison.lean`
+proves both existing families are instances of it. Its declarations live in
+the namespace
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Exp`.
 
-## The index is the truncation degree, never the dimension
+## Main definitions
+
+* `Exp.coeff` — the exponential coefficient `(-1)^j / j!`, written once.
+* `Exp.ofMoments` — the charge `-∑_{j ≤ m} (-1)^j/j! · μ j` of an arbitrary
+  moment sequence `μ` at truncation degree `m`.
+* `Exp.HDeg` — compressed `H`-degree vectors at truncation degree `m`.
+* `Exp.moments` — the scalar moments `μ j = w^j · d_{m-j}` of a compressed
+  degree vector.
+* `Exp.charge` — the polarised charge at truncation degree `m`, as an additive
+  map `HDeg m →+ ℂ`.
+* `Exp.chargeFamily` — the scalar charge family, with parameter space `ℂ`.
+* `Exp.stChart`, `Exp.alphaBetaChart` — the two real charts `(s, t) ↦ s + tI`
+  and `(α, β) ↦ β + αI`, transposed against each other.
+
+## Main results
+
+* `Exp.coeff_zero`, `Exp.coeff_one`, `Exp.coeff_two`, `Exp.coeff_three` — the
+  coefficients `1`, `-1`, `1/2`, `-(1/6)`.
+* `Exp.ofMoments_add`, `Exp.moments_add` — the charge is additive in the
+  moments, and the scalar moments are additive in the degree vector.
+* `Exp.charge_apply`, `Exp.chargeFamily_charge` — the charge and the family
+  unfold to `ofMoments` of the scalar moments.
+
+## Implementation notes
+
+### The index is the truncation degree, never the dimension
 
 `m` counts how many codimensions survive, not how many the variety has. The two
 are equal for the untilted charge of an `n`-fold, and that coincidence is what
-made the wrong index look right: a family indexed by dimension covers the
+makes the wrong index look right: a family indexed by dimension covers the
 surface at `m = n = 2` and the threefold at `m = n = 3`, and then fails at the
 first example where they differ. The cubic-threefold Kuznetsov charge is one,
 at `(n, m) = (3, 2)`, and `Walls/Threefold/Tilt.lean`'s `Tilt.tiltFamily` is the
 truncation that produces it.
 
-That sentence used to promise an `Exp.tiltChargeFamily` in a later slice. The
-slice never happened and the declaration does not exist; what landed instead was
-`Tilt.tiltFamily`, built from the surface family. It is the same object, and
-`Walls/Threefold/TiltComparison.lean` proves it -- `tiltFamily_eq_exp` is this
-kernel at `m = 2`, reindexed and pulled back. The adjudication that settled
-which spelling survives is #1228.
+`Tilt.tiltFamily` is built from the surface family, and it is the same object
+as this kernel at `m = 2`: `Walls/Threefold/TiltComparison.lean` proves
+`tiltFamily_eq_exp`, which identifies it with `Exp.chargeFamily 2`, reindexed
+and pulled back.
 
-This is also why `numerical-k-theory-e5` is parked. That track assumed one type
-indexed by dimension would cover the surface, threefold and fourfold numerical
-formulas, recorded the assumption FALSIFIED on 2026-08-27, and parked the epic.
-The falsification stands; the index was the defect.
-
-## What the moments are for
+### What the moments are for
 
 `ofMoments` takes an arbitrary moment sequence rather than a vector of degrees,
 so that the two genuinely different sources of moments share it:
@@ -45,20 +66,29 @@ so that the two genuinely different sources of moments share it:
 * scalar moments `μ j = w^j · d_{m-j}` on compressed `H`-degrees, below, which
   is the polarised case of Picard rank one;
 * intersection-form moments `μ₀ = ch₂`, `μ₁ = ⟨w, ch₁⟩`, `μ₂ = ⟨w, w⟩·rk`, which
-  is the divisorial case of arbitrary Picard rank, in a later slice.
+  is the divisorial case of arbitrary Picard rank, supplied by
+  `CentralCharge/Exponential/Divisorial.lean`.
 
 The second does not factor through the first: the `H`-compression is not
 injective once the Picard rank exceeds one. So the two are siblings under
 `ofMoments` rather than one being a specialization of the other, and a kernel
-indexed by compressed degrees alone would have excluded the divisorial charge —
-which two of the three independent designs of this tree wrongly concluded.
+indexed by compressed degrees alone would have excluded the divisorial charge.
 
-## What is not here
+### What is not here
 
 The exponential action and charge translation identity are in `Twist.lean`.
 This primitive kernel imports `CentralCharge/Family.lean` and Mathlib, so it
 imports no leaf; comparisons with the existing families live downstream in
 `Comparison.lean` and `Divisorial.lean`.
+
+## References
+
+The charge-family root `Wall.ChargeFamily` of `CentralCharge/Family.lean`, and
+Mathlib's `Finset.sum` and `Nat.factorial`.
+
+## Tags
+
+central charge, exponential charge, truncation degree, moments, Chern character
 -/
 
 open Complex Finset
@@ -86,7 +116,7 @@ theorem coeff_three : coeff 3 = -(1 / 6) := by norm_num [coeff, Nat.factorial]
 /-- **The charge.** `Z = -∑_{j ≤ m} (-1)^j/j! · μ j`.
 
 The moment sequence is arbitrary; `moments` below supplies the scalar one and
-the divisorial lane supplies the intersection-form one. The leading sign is the
+the divisorial case supplies the intersection-form one. The leading sign is the
 convention of `-∫exp(-(B + iω))ch`, which is what both existing families use. -/
 def ofMoments (m : ℕ) (mu : ℕ → ℂ) : ℂ := -∑ j ∈ range (m + 1), coeff j * mu j
 
@@ -107,8 +137,8 @@ abbrev HDeg (m : ℕ) : Type := Fin (m + 1) → ℝ
 
 /-- The scalar moments `μ j = w^j · d_{m-j}` of a compressed degree vector.
 
-`w` is the single complex parameter `B + iω` of the polarised lane; the two
-lanes disagree about which of its parts comes first, and `stChart` and
+`w` is the single complex parameter `B + iω` of the polarised case; the
+surface and threefold families disagree about which of its parts comes first, and `stChart` and
 `alphaBetaChart` below are where that disagreement is written down. -/
 def moments (m : ℕ) (w : ℂ) (d : HDeg m) (j : ℕ) : ℂ :=
   if h : j ≤ m then w ^ j * ((d ⟨m - j, by omega⟩ : ℝ) : ℂ) else 0
@@ -141,14 +171,15 @@ def chargeFamily (m : ℕ) : ChargeFamily ℂ (HDeg m) := ⟨charge m⟩
 
 /-! ### The two real charts
 
-The surface lane parameterizes by `(s, t)` and the threefold lane by `(α, β)`,
-and the two orders are transposed. Writing both here means the transposition is
-recorded once instead of at every consumer that moves between the lanes. -/
+The surface family parameterizes by `(s, t)` and the threefold family by
+`(α, β)`, and the two orders are transposed. Writing both here means the
+transposition is recorded once instead of at every consumer that moves between
+the two families. -/
 
-/-- The surface lane's chart: `(s, t) ↦ s + tI`. -/
+/-- The surface family's chart: `(s, t) ↦ s + tI`. -/
 abbrev stChart (p : ℝ × ℝ) : ℂ := (p.1 : ℂ) + (p.2 : ℂ) * I
 
-/-- The threefold lane's chart: `(α, β) ↦ β + αI`.
+/-- The threefold family's chart: `(α, β) ↦ β + αI`.
 
 Note the transposition against `stChart`. The threefold family's parameter pair
 is `(α, β)` with `α` the ample coefficient, where the surface family's is

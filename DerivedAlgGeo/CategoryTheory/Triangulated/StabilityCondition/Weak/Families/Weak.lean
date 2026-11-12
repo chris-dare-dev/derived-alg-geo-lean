@@ -160,12 +160,13 @@ theorem quotientUniformQuadraticSupportData_reindex {J : Type*}
     fun j ↦ h.zero_class_mem (f j), h.quadratic.reindex f⟩
 
 /-- The separable clauses of weak stability in families which can be stated
-in the current abstract library.  Every source clause is a named projection.
+in this abstract library.  Every source clause is a named projection.
 
 The `charge` and `semistable` probes are bound to actual weak functions via
 `toChargeProbe` and `toGenericProbe`; the support field is the actual
-quotient-uniform support package from issue #82.  Relative HN and boundedness
-remain explicit geometric inputs. -/
+quotient-uniform support package
+`WeakStabilityFunction.QuotientUniformQuadraticSupportData`.  Relative HN and
+boundedness remain explicit geometric inputs. -/
 structure WeakStabilityInFamiliesData
     {JCharge JGeneric D M : Type u} {t : TStructure C}
     (W : I → WeakStabilityFunction t)

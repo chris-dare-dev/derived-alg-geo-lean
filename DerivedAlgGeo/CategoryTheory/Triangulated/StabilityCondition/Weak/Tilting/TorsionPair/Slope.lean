@@ -20,9 +20,30 @@ T = P((β, 1]),      F = P((0, β]),
 ```
 
 constructed here as a `HeartTorsionPair` on `s.toTStructure` — so the
-reviewed Happel–Reiten–Smalø tilt applies to it, and with `tilt_heart_iff`
-(#106) its tilted heart is identified with the extensions of `P((β, 1])` by
-`P((0, β])⟦1⟧`, the single-step form of `A^{♯β} = ⟨F^β[1], T^β⟩`.
+Happel–Reiten–Smalø tilt applies to it, and with `tilt_heart_iff` its tilted
+heart is identified with the extensions of `P((β, 1])` by `P((0, β])⟦1⟧`, the
+single-step form of `A^{♯β} = ⟨F^β[1], T^β⟩`.
+
+## Main definitions
+
+All in the namespace `CategoryTheory.Triangulated.WeakStabilityCondition`.
+
+* `phaseTors`, `phaseFree` — the torsion class `P((β, 1])` and the torsion-free
+  class `P((0, β])` at a cutoff `β`.
+* `slicingTorsionPair` — the torsion pair `(P((β, 1]), P((0, β]))` on the
+  heart of the slicing-induced t-structure.
+
+## Main results
+
+* `leProp_of_iso`, `gtProp_of_iso` — the phase-bound predicates are closed
+  under isomorphisms.
+* `mem_heart_of_bounds` — an object of `P((0, 1])` lies in the heart.
+* `slicingTorsionPair_tors`, `slicingTorsionPair_free` — the two classes of
+  the pair.
+* `slicingTilt_heart_iff` — the tilted heart at the cutoff is
+  `⟨P((0, β])⟦1⟧, P((β, 1])⟩` in single-step form.
+
+## Implementation notes
 
 Everything is unconditional: the Hom-vanishing is the slicing's own
 phase-ordered vanishing (`zero_of_gtProp_leProp_general`), and the
@@ -31,14 +52,21 @@ decomposition is the Harder–Narasimhan filtration cut at `β`
 not hand over recovered by rotating the split triangle into the extension
 closures of the aisle and co-aisle.
 
-## Relation to display (14.1), stated for the reviewer
+### Relation to display (14.1)
 
 The paper's (14.1) is written in slope language on the heart of a weak
 stability condition: `T^β = {μ⁻ > β}`, `F^β = {μ⁺ ≤ β}`. This file's pair is
 the same construction in **phase** language on the slicing heart.  The exact
 finite-slope reparametrisation and equality of the two pairs are formalized
-downstream in `TorsionPair/SourceSlope.lean`.  The coverage map remains
-`mapped` pending its separate source-review protocol.
+downstream in `TorsionPair/SourceSlope.lean`.
+
+## References
+
+* arXiv:1902.08184v4, display (14.1).
+
+## Tags
+
+torsion pair, slicing, phase cutoff, tilting, heart
 -/
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition
@@ -156,9 +184,9 @@ theorem slicingTorsionPair_free {β : ℝ} (h0 : 0 ≤ β) (h1 : β ≤ 1) :
 /-- **The tilted heart at the cutoff is `⟨P((0, β])⟦1⟧, P((β, 1])⟩`** in the
 single-step form: an object lies in the heart of the tilt of the slicing
 heart at `β` iff it is an extension of a `P((β, 1])`-object by a shifted
-`P((0, β])`-object. Direct from `tilt_heart_iff` (#106). This is the
-`A^{♯β}` of display (14.1), up to the unformalized slope–phase
-reparametrisation. -/
+`P((0, β])`-object. Direct from `tilt_heart_iff`. This is the
+`A^{♯β}` of display (14.1), up to the slope–phase reparametrisation of
+`TorsionPair/SourceSlope.lean`. -/
 theorem slicingTilt_heart_iff {β : ℝ} (h0 : 0 ≤ β) (h1 : β ≤ 1) (X : C) :
     ((slicingTorsionPair s h0 h1).tilt).heart X ↔
       ∃ (F₀ T₀ : C) (_ : phaseFree s β F₀) (_ : phaseTors s β T₀)

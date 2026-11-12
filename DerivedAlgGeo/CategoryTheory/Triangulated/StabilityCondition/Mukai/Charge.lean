@@ -10,46 +10,80 @@ import DerivedAlgGeo.CategoryTheory.GrothendieckGroup.Abelian
 # The exponential charge `Z(β,ω)` carried by a Mukai class map
 
 Bridgeland's Lemma 6.2 (`math/0307164`, §6) says that `Z(β,ω)` is a stability
-function on the tilted heart `𝒜(β,ω)`.  `CentralCharge/Mukai/Positivity.lean` (#742) proved
-the numerical core of the one hard case, with no category in sight.  This file
-is the bridge: it carries a Mukai class map from an abelian category into the
-real Mukai extension, so that `Z(β,ω)` becomes a charge on objects.
+function on the tilted heart `𝒜(β,ω)`.  `CentralCharge/Mukai/Positivity.lean`
+proves the numerical core of the one hard case, with no category in sight.  This
+file is the bridge: it carries a Mukai class map from an abelian category into
+the real Mukai extension, so that `Z(β,ω)` becomes a charge on objects.
 
-## What this file is, and what it is deliberately not
+## Main definitions
 
-It is the mechanical half of #740 step 2 — `map_zero`, `map_iso` and
-`additive`, all of which follow from additivity of the charge in the class
-together with the corresponding property of the class map.
+* `CategoryTheory.Triangulated.MukaiChargeData` — a Mukai class map, as a
+  single additive hom `K₀Ab A →+ Mukai.RealExtension V`.
+* `CategoryTheory.Triangulated.MukaiChargeData.chargeHom` — `Z(β,ω)` as an
+  additive homomorphism on the Grothendieck group.
+* `CategoryTheory.Triangulated.MukaiChargeData.charge` — `Z(β,ω)` as a charge
+  on objects.
 
-It is **not** the case analysis.  `MukaiChargeData` carries *only* the class map
-and its three formal properties; it has no field asserting anything about
-torsion, rank, slope, or the Mukai square.  That is deliberate.  Bundling the
-case discriminants as hypotheses would make `nonzero_mem` a one-line case split
-over invented assumptions — it would compile, pass every gate, and prove
-nothing.  The four cases of Lemma 6.2 have to be *proved* from the tilted
-heart's own description (`hnTilt_heart_iff`, `mem_hnTors_of_rank_zero`,
-`degree_pos_of_rank_zero`), and that work is not in this file.
+## Main results
+
+* `CategoryTheory.Triangulated.MukaiChargeData.charge_zero`,
+  `CategoryTheory.Triangulated.MukaiChargeData.charge_iso`,
+  `CategoryTheory.Triangulated.MukaiChargeData.charge_additive` — the charge
+  vanishes on zero objects, is invariant under isomorphism, and is additive on
+  short exact sequences.
+* `CategoryTheory.Triangulated.expCharge_zero`,
+  `CategoryTheory.Triangulated.expCharge_add`,
+  `CategoryTheory.Triangulated.expCharge_neg` — the categorical-namespace names
+  of the numerical additivity of `Mukai.expCharge`.
+
+## Implementation notes
+
+### What this file is, and what it is deliberately not
+
+It is the mechanical half of the passage from the numerical charge to a
+stability function: `charge_zero`, `charge_iso` and `charge_additive`, all of
+which follow from additivity of the charge in the class together with the
+corresponding property of the class map.
+
+It is **not** the case analysis.  `MukaiChargeData` carries *only* the class
+map; it has no field asserting anything about torsion, rank, slope, or the
+Mukai square.  That is deliberate.  Bundling the case discriminants as
+hypotheses would make `nonzero_mem` a one-line case split over invented
+assumptions — it would compile, pass every gate, and prove nothing.  The four
+cases of Lemma 6.2 have to be *proved* from the tilted heart's own description
+(`hnTilt_heart_iff`, `mem_hnTors_of_rank_zero`, `degree_pos_of_rank_zero`), and
+that work is not in this file.
 
 So there is no `toStabilityFunction` here.  `SlopeData.toStabilityFunction`
 exists because `SlopeData`'s geometric fields genuinely discharge
-`nonzero_mem`; the analogous step for `Z(β,ω)` is the open part of #740.
+`nonzero_mem`; the analogous step for `Z(β,ω)` is taken downstream, in
+`Mukai/Assembly.lean`, from the geometric contracts of
+`Mukai/GeometricInput.lean`.
 
-## The sign convention, which no gate catches
+### The sign convention, which no gate catches
 
 Bridgeland's §6 states every sign for the **sheaf**, not for the object of the
 heart.  In the boundary case `E` is torsion-free with `μ_ω(E) = β·ω`, so
 `E ∈ F(β)` and the object of the tilted heart is `E⟦1⟧`, with
-`Z(E⟦1⟧) = -Z(E)`.  `CentralCharge/Mukai/Positivity.lean` concludes `Re Z(E) > 0` for the
-sheaf; the heart object therefore has `Im = 0` and `Re < 0`, which is the
-`{z | z.im = 0 ∧ z.re < 0}` half of `semiClosedUpperHalfPlane`.  The two
-apparent sign reversals cancel, and getting this backwards yields a false
-statement that compiles.
+`Z(E⟦1⟧) = -Z(E)`.  `CentralCharge/Mukai/Positivity.lean` concludes
+`Re Z(E) > 0` for the sheaf; the heart object therefore has `Im = 0` and
+`Re < 0`, which is the `{z | z.im = 0 ∧ z.re < 0}` half of
+`semiClosedUpperHalfPlane`.  The two apparent sign reversals cancel, and
+getting this backwards yields a false statement that compiles.
 
-## Additivity of the charge
+### Additivity of the charge
 
 `Mukai.expChargeHom` owns additivity at the numerical layer.  This file only
 composes that homomorphism with a Mukai class map and then evaluates it on
 Grothendieck classes of objects.
+
+## References
+
+* Bridgeland, <https://arxiv.org/abs/math/0307164>, Lemma 6.2 and §6.
+
+## Tags
+
+Mukai vector, central charge, Grothendieck group, tilted heart, K3 surface
 -/
 
 noncomputable section
@@ -64,8 +98,8 @@ variable {V : Type*} [AddCommGroup V] [Module ℝ V]
 variable (b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (β ω : V)
 
 /-!
-The following historical names remain in the categorical namespace for API
-stability.  Their canonical numerical owners are now `Mukai.expCharge_zero`,
+The following names in the categorical namespace are kept for API stability.
+Their canonical numerical owners are `Mukai.expCharge_zero`,
 `Mukai.expCharge_add`, and `Mukai.expCharge_neg`.
 -/
 
@@ -88,14 +122,14 @@ variable {A : Type u} [Category.{v} A] [Abelian A]
 
 /-- **A Mukai class map**, as a single hom out of the Grothendieck group.
 
-This was three fields — `mukai_zero`, `mukai_iso`, `mukai_additive` — carried as
-data.  They are the universal property of `K₀Ab`, so they are gone: one field
-remains, and the three formal properties come from `AddMonoidHom` and
-`K₀Ab.of_isZero` / `of_iso` / `of_shortExact`.
+Vanishing on zero objects, invariance under isomorphism and additivity on
+short exact sequences are the universal property of `K₀Ab`, so they are not
+fields: the one field is the hom, and the three formal properties come from
+`AddMonoidHom` and `K₀Ab.of_isZero` / `of_iso` / `of_shortExact`.
 
 This generic carrier deliberately accepts any such hom.  Concrete geometric
 consumers must construct it from their numerical class map; the K3 numerical
-lane does so in
+model does so in
 `AlgebraicGeometry/Numerical/GrothendieckGroup/CategoricalChargeK3.lean`, where
 the resulting charge is proved definitionally equal to `numericalCharge`. -/
 structure MukaiChargeData (A : Type u) [Category.{v} A] [Abelian A]

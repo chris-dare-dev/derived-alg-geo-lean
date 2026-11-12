@@ -19,7 +19,39 @@ class by the shifted torsion-free class.
 **The tilt is constructed here**, as `HeartTorsionPair.tilt`, with every field
 proved and nothing declared with `sorry`.
 
-## The one design decision worth explaining
+## Main definitions
+
+All in the namespace `CategoryTheory.Triangulated.Tilting`.
+
+* `HeartTorsionPair` — a torsion pair on the heart of a t-structure, phrased
+  inside the ambient category.
+* `HeartTorsionPair.tiltLE`, `HeartTorsionPair.tiltGE` — the tilted aisles
+  `D^{≤0}_†` and `D^{≥1}_†`, by Hom-orthogonality.
+* `HeartTorsionPair.torsOrth`, `HeartTorsionPair.freeOrth` — objects with no
+  nonzero map to a torsion-free object, respectively from a torsion object.
+* `HeartTorsionPair.tiltLEAt`, `HeartTorsionPair.tiltGEAt` — the tilted aisles
+  at every integer level.
+* `HeartTorsionPair.tilt` — the tilted t-structure.
+
+## Main results
+
+* `HeartTorsionPair.exists_factor_truncGE`,
+  `HeartTorsionPair.exists_factor_truncLE` and their uniqueness companions —
+  the factorisation lemmas standing in for the two counit isomorphisms.
+* `HeartTorsionPair.tors_of_orthogonal`, `HeartTorsionPair.free_of_orthogonal`
+  — the orthogonality characterisations of both classes.
+* `HeartTorsionPair.hom_eq_zero_of_tiltLE_of_tiltGE`,
+  `HeartTorsionPair.exists_tilt_triangle` — the Hom-vanishing axiom and the
+  truncation triangle of the tilt.
+* `HeartTorsionPair.tiltLE_iff_tors_truncGE`,
+  `HeartTorsionPair.tiltGE_iff_free_truncLE` — agreement of both aisles with
+  the textbook `H⁰` formulation.
+* `HeartTorsionPair.tilt_heart_iff` — the tilted heart is the extensions of
+  `T` by `F⟦1⟧`.
+
+## Implementation notes
+
+### The one design decision worth explaining
 
 The tilted aisles are normally written with cohomology functors:
 
@@ -29,11 +61,11 @@ D^{≤0}_† = {X ∈ D^{≤0} : H⁰(X) ∈ T},   D^{≥0}_† = {X ∈ D^{≥-
 
 **Mathlib has no `Hⁿ` for a t-structure at the pin** — `TStructure/` carries
 `truncLE`, `truncGE` and the truncation triangle, but no cohomology functor
-into the heart. This project now constructs that functor and proves it
-homological in `WeakStabilityCondition/Tilting/Cohomology/Homological.lean`;
-`WeakStabilityCondition/StabilityCondition/Metric/Mass/Subadditivity/CohomologyExactness.lean`
-transports the result to the stability-condition API. The aisle construction
-here predates that bridge and does not depend on it.
+into the heart. This library constructs that functor and proves it
+homological in `Weak/Tilting/Cohomology/Homological.lean`, and
+`StabilityCondition/Mass/Subadditivity/CohomologyExactness.lean` exposes the
+result to the stability-condition API. The aisle construction here does not
+depend on it.
 
 So the aisles here are defined by **Hom-orthogonality instead**, which needs no
 cohomology functor at all. For `X ∈ D^{≤0}` and `F` in the heart the counit
@@ -51,13 +83,13 @@ here, where the usual one is not. That equivalence is not only prose: with
 `tiltLE_iff_tors_truncGE` and `tiltGE_iff_free_truncLE` at the end of this
 file.
 
-## Status
+### What is established
 
-Established here: the datum, the aisles at every integer level with their
-isomorphism-closure, both factorisation lemmas standing in for the two counit
-isomorphisms, the orthogonality characterisations of both classes, the
-agreement of both aisles with the textbook `H⁰` formulation, and the
-identification of the tilted heart with the extensions of `T` by `F⟦1⟧`.
+The datum, the aisles at every integer level with their isomorphism-closure,
+both factorisation lemmas standing in for the two counit isomorphisms, the
+orthogonality characterisations of both classes, the agreement of both aisles
+with the textbook `H⁰` formulation, and the identification of the tilted heart
+with the extensions of `T` by `F⟦1⟧`.
 
 All six non-trivial `TStructure` fields are proved, and `tilt` assembles them.
 `exists_triangle_zero_one` — the last and hardest — is `exists_tilt_triangle`,
@@ -67,6 +99,17 @@ built from two octahedra and no cohomology functor.
 axiom is what makes `τ^{≥0}` preserve `D^{≤0}`, which is what puts `H⁰` in the
 heart, and it is also what supplies the two octahedra. It is carried
 explicitly rather than assumed globally.
+
+## References
+
+* Happel, Reiten, Smalø: the tilt of a heart along a torsion pair, which this
+  file formalises. No specific statement is cited.
+* Mathlib's `CategoryTheory.Triangulated.TStructure`, with its truncations
+  `TStructure.truncLE` and `TStructure.truncGE`.
+
+## Tags
+
+t-structure, heart, torsion pair, tilting, Happel–Reiten–Smalø
 -/
 
 namespace CategoryTheory.Triangulated.Tilting
@@ -786,42 +829,39 @@ resulting t-structure:
 Neither inclusion uses the orthogonality hypothesis it is handed — both are
 pure degree counts against `t.zero`.
 
-### What is still not here
+### The aisle side of the textbook agreement
 
-`free_of_orthogonal` is no longer on this list: the independent review of the
-tilt (#86, finding F1) observed that the textbook-agreement claim above was
-prose-only on the aisle side, and the dual pair — `exists_factor_truncLE` /
-`factor_truncLE_unique` and `free_of_orthogonal` — now exists, together with
-the four agreement theorems. Its inverse-rotation bookkeeping turned out to
-cost nothing: `coyoneda_exact₂` on the inverse rotation never inspects a
-rotated map, so no sign appears.
+The dual factorisation pair — `exists_factor_truncLE` /
+`factor_truncLE_unique` — and `free_of_orthogonal` make the textbook-agreement
+claim above a theorem on the aisle side as well, together with the four
+agreement theorems. Its inverse-rotation bookkeeping costs nothing:
+`coyoneda_exact₂` on the inverse rotation never inspects a rotated map, so no
+sign appears.
+
+### The tilted heart
+
+`tilt_heart_iff` identifies the tilted heart: it is exactly the extensions of
+`T` by `F⟦1⟧`, the single-step form of the extension closure `⟨F⟦1⟧, T⟩`,
+exact here because `(T, F)` is a torsion pair.
+
+### What is not here
 
 * **Any connection to a stability condition.** `tilt` is a t-structure on a
   triangulated category. That the tilted heart is the heart of a stability
   condition, or that tilting is how stability conditions on surfaces are
   built, is *motivation* for this file and is not formalised in it.
 
-The identification of the tilted heart, formerly on this list, is
-`tilt_heart_iff` (#106): the heart is exactly the extensions of `T` by
-`F⟦1⟧`, the single-step form of the extension closure `⟨F⟦1⟧, T⟩`, exact
-here because `(T, F)` is a torsion pair.
+### Why the truncation triangle needs no cohomology
 
-### The correction that made this possible
-
-Kept because the wrong turn is what a reader would otherwise repeat. Earlier
-revisions of this file asserted that `exists_triangle_zero_one` needs the long
-exact cohomology sequence of `H⁰`, and treated it as blocked on machinery
-Mathlib does not have.
-
-That was inferred from the **textbook construction**, which cuts `X` as the
-fibre of `τ^{≤0}A ⟶ F₀`. **That shape genuinely does need cohomology**:
-`IsLE X 0` then depends on `H⁰(A) ⟶ F₀` being epi, and formally `Hom(X, Z)`
-only injects into `Hom(F₀⟦-1⟧, Z)`, which does not vanish for degree reasons.
+The **textbook construction** cuts `X` as the fibre of `τ^{≤0}A ⟶ F₀`.
+**That shape genuinely does need cohomology**: `IsLE X 0` then depends on
+`H⁰(A) ⟶ F₀` being epi, and formally `Hom(X, Z)` only injects into
+`Hom(F₀⟦-1⟧, Z)`, which does not vanish for degree reasons.
 
 The shape used here builds `X` as an **extension of `T₀` by `τ^{≤-1}A`**, whose
 two ends are already in `D^{≤0}`, so `isLE₂` closes the degree half and one
-factorisation closes the orthogonality half. The obstruction was in the chosen
-construction, not in the theorem.
+factorisation closes the orthogonality half. The obstruction lies in the
+textbook construction, not in the theorem.
 
 The same substitution runs throughout: `τ^{≥0}X` plays the role of `H⁰(X)`,
 `exists_factor_truncGE` plays the role of the counit isomorphism, and

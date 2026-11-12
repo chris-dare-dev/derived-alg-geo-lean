@@ -12,9 +12,34 @@ This file isolates the Hodge-index calculation governing the real part of
 (`math/0307164`, §6) is one specialization; the core and its exact-margin
 interface contain no K3 normalization and are isolated from every sheaf.
 
-## The boundary
+## Main definitions
 
-`charge_im` reads the imaginary part of `Z(β,ω)` off `expCharge_apply`:
+This file introduces no new definitions; it proves facts about `Mukai.expCharge`
+and `Mukai.realForm`.
+
+## Main results
+
+* `Mukai.im_expCharge`, `Mukai.im_expCharge_eq_apply_sub_smul` — the imaginary
+  part of `Z(β,ω)` on `(r, c, s)` is `b ω (c - r•β)`.
+* `Mukai.apply_sub_smul_eq_zero_of_im_eq_zero`, `Mukai.im_expCharge_pos`,
+  `Mukai.im_expCharge_nonneg` — the boundary `Im Z = 0` as an orthogonality,
+  and the strict and non-strict positive cases.
+* `Mukai.two_mul_re_expCharge` — the algebraic identity expressing `2 * r * Re Z`
+  as a Hodge-index term plus the Mukai square plus `r^2 * ω^2`.
+* `Mukai.two_mul_re_expCharge_ge` — the Hodge-index bound on the boundary.
+* `Mukai.re_expCharge_pos_of_boundary_margin` — the sharp boundary-margin
+  criterion for `Re Z > 0`.
+* `Mukai.re_expCharge_pos_of_lower_bound`,
+  `Mukai.re_expCharge_pos_of_lower_bound_of_one_le_rank` — positivity from an
+  arbitrary lower bound `realForm b v ≥ -δ`, rank-sensitive and for `1 ≤ r`.
+* `Mukai.re_expCharge_pos_of_nonneg`, `Mukai.re_expCharge_pos_of_neg_one` —
+  the non-spherical and spherical cases of Bridgeland's Lemma 6.2.
+
+## Implementation notes
+
+### The boundary
+
+`im_expCharge` reads the imaginary part of `Z(β,ω)` off `expCharge_apply`:
 
 ```
 Im Z (r, c, s) = b ω c - r * b β ω = (c - r•β) · ω
@@ -24,7 +49,7 @@ so `Im Z = 0` says exactly that `c - r•β` is orthogonal to `ω`. That is the
 case Lemma 6.2 has to work for; every other object of the tilted heart has
 `Im Z > 0`, or is torsion, and needs none of this file.
 
-## The identity
+### The identity
 
 Everything then rests on one algebraic identity, `two_mul_re_expCharge`:
 
@@ -42,30 +67,31 @@ complement of `ω` is negative semi-definite, which is
 2 * r * Re Z ≥ 2 * realForm b v + r^2 * b ω ω.
 ```
 
-## Why there are two conclusions, and where `1 ≤ r` comes from
+### Why there are two conclusions, and where `1 ≤ r` comes from
 
 `re_expCharge_pos_of_nonneg` is the non-spherical case: `realForm b v ≥ 0`
 makes the bound positive using only `b ω ω > 0`.
 
 `re_expCharge_pos_of_neg_one` admits spherical classes: its hypothesis is only
 `realForm b v ≥ -1` — the paper's `v(E)² ≥ -2`, halved by this repository's
-convention (see `Mukai/RealForm.lean`). At `realForm b v = -1` the bound is
-`r^2 * b ω ω - 2`, so positivity needs `r^2 * b ω ω > 2`.
+convention (see `LinearAlgebra/Lattice/Mukai/RealForm.lean`). At
+`realForm b v = -1` the bound is `r^2 * b ω ω - 2`, so positivity needs
+`r^2 * b ω ω > 2`.
 
 Bridgeland states the hypothesis as `ω² > 2`. That is sufficient **only because
 `r` is an integer rank**, so `1 ≤ r`: over the reals `0 < r` leaves
 `r^2 * b ω ω` arbitrarily small. The hypothesis is stated as `1 ≤ r` here
 rather than left implicit.
 
-## What is not here
+### What is not here
 
 No sheaf, no heart, no stability function. In particular the input
 `-1 ≤ realForm b v` is a hypothesis: for the Mukai vector of a `μ`-stable sheaf
 it is the paper's Lemma 5.1, which runs through Serre duality and
 Riemann–Roch and hence through finite-dimensional `Hom`, and is not in this
-repository. See #740 and #332.
+repository.
 
-## General lower bounds
+### General lower bounds
 
 Bridgeland's K3 argument uses the uniform bound `realForm b v ≥ -1` and the
 rank-independent sufficient hypothesis `ω² > 2`; see Lemmas 5.1 and 6.2 of
@@ -95,6 +121,16 @@ The arbitrary-`δ` and exact-margin statements are formal consequences of the
 displayed Hodge-index estimate. They do **not** assert that every surface has a
 uniform bound; a geometric child must prove whichever margin or lower-bound
 hypothesis it supplies.
+
+## References
+
+* Bridgeland, <https://arxiv.org/abs/math/0307164>, Lemmas 5.1 and 6.2 and §15.
+* Arcara, Miles, <https://arxiv.org/abs/1401.6149>.
+* Arcara, Bertram, <https://arxiv.org/abs/0708.2247>.
+
+## Tags
+
+Mukai vector, central charge, Hodge index theorem, K3 surface, spherical class
 -/
 
 open QuadraticMap
