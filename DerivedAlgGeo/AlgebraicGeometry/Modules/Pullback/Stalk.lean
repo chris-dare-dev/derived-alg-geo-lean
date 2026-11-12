@@ -1222,7 +1222,8 @@ private theorem skyscraperAdjunction_unit_app_apply (X : Scheme.{u}) (x : X)
 set_option backward.isDefEq.respectTransparency false in
 set_option backward.defeqAttrib.useBackward true in
 /-- The presheaf pullback-to-stalk comparison sends the germ of the pullback unit applied to a
-section `s` near `f x` to `1 ⊗ s`. -/
+section `s` near `f x` to `1 ⊗ s`. The comparison is assembled from the skyscraper adjunction at
+`x`, so the proof evaluates that adjunction's unit on germs. -/
 theorem presheafModulePullbackStalkIso_hom_app_germ_unit {X Y : Scheme.{u}} (f : X ⟶ Y)
     (x : X) (P : Y.PresheafOfModules) (V : Y.Opens) (hV : f x ∈ V) (s : P.obj (op V)) :
     (presheafModulePullbackStalkIso f x).hom.app P
@@ -1282,14 +1283,16 @@ theorem presheafModulePullbackStalkIso_hom_app_germ_unit {X Y : Scheme.{u}} (f :
       (skyscraperAdjunction_unit_app_apply X x _ (op (f ⁻¹ᵁ V)) hV _)
   exact hR.symm.trans (h2.symm.trans hL)
 
-/-- A module-sheaf morphism acts on germs through its sections. -/
+/-- A module-sheaf morphism acts on germs through its sections: the stalk functor on module
+sheaves is the stalk functor of the underlying presheaf of abelian groups. -/
 theorem moduleStalkFunctor_map_germ {X : Scheme.{u}} (x : X) {M N : X.Modules} (g : M ⟶ N)
     (U : X.Opens) (hx : x ∈ U) (z : Γ(M, U)) :
     (moduleStalkFunctor X x).map g (TopCat.Presheaf.germ M.presheaf U x hx z) =
       TopCat.Presheaf.germ N.presheaf U x hx (g.app U z) :=
   TopCat.Presheaf.stalkFunctor_map_germ_apply U x hx g.mapPresheaf z
 
-/-- A presheaf-of-modules morphism acts on germs through its sections. -/
+/-- A presheaf-of-modules morphism acts on germs through its sections: the stalk functor on
+presheaves of modules is the stalk functor of the underlying presheaf of abelian groups. -/
 theorem presheafModuleStalkFunctor_map_germ {X : Scheme.{u}} (x : X)
     {M N : X.PresheafOfModules} (g : M ⟶ N) (U : X.Opens) (hx : x ∈ U) (z : M.obj (op U)) :
     (presheafModuleStalkFunctor X x).map g (TopCat.Presheaf.germ M.presheaf U x hx z) =
@@ -1300,7 +1303,9 @@ theorem presheafModuleStalkFunctor_map_germ {X : Scheme.{u}} (x : X)
 set_option backward.isDefEq.respectTransparency false in
 set_option backward.defeqAttrib.useBackward true in
 /-- The comparison `pullbackStalkIso` sends the germ of the pullback unit applied to a section
-`s` near `f x` to `1 ⊗ s`. -/
+`s` near `f x` to `1 ⊗ s`. Sheafification does not change stalks, so this reduces to the presheaf
+statement. It is the step that computes the stalks of the tensor comparison of a pullback
+(Stacks, Tag 01CD). -/
 theorem pullbackStalkIso_hom_app_germ_unit {X Y : Scheme.{u}} (f : X ⟶ Y) (x : X)
     (P : Y.Modules) (V : Y.Opens) (hV : f x ∈ V) (s : Γ(P, V)) :
     (pullbackStalkIso f x).hom.app P
