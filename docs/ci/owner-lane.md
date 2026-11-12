@@ -24,10 +24,6 @@ provider-enforced runner boundary the cutover requires. Outside contributors
 are unaffected: their pull requests here run on hosted runners, which are free
 for a public repository, and forks run on their own hosted runners.
 
-`scripts/host_pickup.py runner-once` registers to the mirror, and
-`scripts/tests/test_host_pickup.py` refuses the public repository as its
-target.
-
 ## Routing
 
 `build`, `roadmap` and `ci` in `ci.yml` take their runner from the repository

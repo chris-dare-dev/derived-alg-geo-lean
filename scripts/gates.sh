@@ -260,8 +260,7 @@ gate workflows scripts/check_workflows.sh
 # helper actually survives a cp1252 console.
 gate output-encoding python3 scripts/_output.py
 gate codex-entrypoint python3 scripts/check_codex_entrypoint.py
-gate loop-spec bash scripts/validate_loop_specs.sh
-gate loop-engine-tests python3 -m unittest discover -s scripts/tests -p "test_*.py"
+gate script-tests python3 -m unittest discover -s scripts/tests -p "test_*.py"
 # Next to it for the same reason: `check_local_build.py` is a PreToolUse hook,
 # and a hook that has stopped refusing is indistinguishable from a hook with
 # nothing to catch. #837 found it silently allowing `lake build DerivedAlgGeo`

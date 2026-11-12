@@ -283,10 +283,8 @@ The request that starts a run authorizes its pushes, PRs and merges. The owner
 withdraws any of these with an explicit `false` in `.claude/loop-authority.yaml`
 on the default branch. A run changes the loop's own tooling or instructions
 only when the owner puts that work in its queue, and it uses no OpenSpec
-change, loop manifest or review ledger.
-The manifest controller (`scripts/loop_engine.py`, `.claude/loop-specs/`) is off
-the run path, and is kept only for the ledgers it already wrote. Issue closure
-for code work requires a merged PR.
+change, loop manifest or review ledger. Issue closure for code work requires a
+merged PR.
 
 This section previously read "Build the stable root while developing:
 `lake build`", and told you to run the fast gate before review and the full gate

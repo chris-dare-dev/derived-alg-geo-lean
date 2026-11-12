@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """Provider-neutral token accounting for bounded loop runs.
 
-WHY THIS EXISTS. A bounded run under `.claude/loop-specs/` spends most of its
-budget on things nobody watches while they happen: four independent reviewers
-per frozen chunk, up to five review/improve rounds, and a re-read of the same
-diff in each one. The review ledger records *verdicts*; nothing recorded what
+WHY THIS EXISTS. A bounded loop run spends most of its budget on things
+nobody watches while they happen: four independent reviewers per frozen chunk,
+up to five review/improve rounds, and a re-read of the same diff in each one. The review ledger records *verdicts*; nothing recorded what
 those verdicts cost. This reads the cost back out of the transcripts both
 agent runtimes already write, so a finished run can say what it spent without
 either runtime having been instrumented in advance.
