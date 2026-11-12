@@ -3,6 +3,8 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.DescentData
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.DescentDataAsCoalgebra
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.DescentDataPrime
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.IsStack
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Discrete
@@ -20,6 +22,9 @@ its directory, so this umbrella imports the children directly.
 
 * `DescentData.lean`: functoriality of descent data along strong
   transformations.
+* `DescentDataAsCoalgebra.lean`: the base change morphism of a chosen pullback,
+  and descent data along one morphism as coalgebras for the comonad of
+  `f^* ⊣ f_*` when two base change morphisms are isomorphisms.
 * `StackInGroupoids.lean` and its children: stacks in groupoids, discrete
   stacks from sheaves, stack morphisms, and site-object representability.
 
@@ -27,6 +32,10 @@ its directory, so this umbrella imports the children directly.
 
 * `IsStack.lean`: the prestack and stack conditions are invariant under strong
   transformations whose components are equivalences of categories.
+* `DescentDataAsCoalgebra.lean`: effective descent along one morphism is
+  comonadicity of its pullback functor, under the base change hypotheses.
+* `DescentDataPrime.lean`: effective descent along one morphism is unchanged by
+  reindexing along a functor that preserves the pullbacks involved.
 
 ## Implementation notes
 

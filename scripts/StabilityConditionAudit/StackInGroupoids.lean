@@ -96,3 +96,10 @@ The module, declarations, and audit ownership are neutral category theory.
 #print axioms CategoryTheory.Pseudofunctor.isPrestack_iff_of_isEquivalence
 #print axioms CategoryTheory.Pseudofunctor.isStack_iff_of_isEquivalence
 #print axioms CategoryTheory.Pseudofunctor.isStack_iff_of_equivalence
+
+#print axioms CategoryTheory.Pseudofunctor.baseChange
+#print axioms CategoryTheory.Pseudofunctor.descentDataCoalgebraEquivalence
+#print axioms CategoryTheory.Pseudofunctor.toDescentDataCompDescentDataCoalgebraEquivalenceIso
+#print axioms CategoryTheory.Pseudofunctor.isStackFor_singleton_iff_isEquivalence_comparison
+#print axioms CategoryTheory.Pseudofunctor.descentDataAsCoalgebraEquivalence
+#print axioms CategoryTheory.Pseudofunctor.isStackFor_singleton_comp_toPseudofunctor_iff
