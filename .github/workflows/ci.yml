@@ -100,7 +100,83 @@ concurrency:
     ${{ github.ref != 'refs/heads/main' && github.event_name != 'merge_group' }}
 
 jobs:
+  # Decides whether a change needs the Lean build, and judges it here when it
+  # does not.
+  #
+  # FAIL-OPEN, like "What changed" in `build`: `build=false` is written only
+  # once this job has positively established that every changed path is prose.
+  # No usable diff base, an empty diff, a merge-queue entry, a manual dispatch
+  # or one path outside the list all leave `build=true`.
+  #
+  # The prose list is the set of paths that no step in `build` reads, apart
+  # from the two gates repeated at the end of this job. `scripts/`, `.github/`,
+  # `registry/`, `attest/` and every Lean file stay out of it on purpose.
+  # `.claude/roadmap/` is in it because its only judge is the `roadmap` job,
+  # which always runs. cache-warm.yml ignores the same paths; change the two
+  # together.
+  changes:
+    runs-on: ${{ vars.OWNER_CI_RUNS_ON && fromJSON(vars.OWNER_CI_RUNS_ON) || 'ubuntu-latest' }}
+    timeout-minutes: 10
+    outputs:
+      build: ${{ steps.classify.outputs.build }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The classifier diffs from a merge base.
+          fetch-depth: 0
+          # Keeps `.lake` on the self-hosted lane; see checkout in `build`.
+          clean: false
+
+      - name: Does this change need the Lean build
+        id: classify
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          prose='^((docs|notes|openspec|\.claude/roadmap)/.*|([^/]+|\.claude/.*)\.md)$'
+          base=""
+          case "$EVENT_NAME" in
+            pull_request) base="$PR_BASE" ;;
+            push) base="$PUSH_BEFORE" ;;
+          esac
+          build=true
+          if [ -n "$base" ] && [ "$base" != "0000000000000000000000000000000000000000" ] \
+             && git cat-file -e "$base^{commit}" 2>/dev/null; then
+            # --no-renames: a Lean file renamed to a prose path must still
+            # show its old name.
+            files=$(git diff --no-renames --name-only "$base...HEAD") || files=""
+            printf '%s\n' "$files" | sed 's/^/  /'
+            # grep -v exits 1 only when it selected nothing, that is, when no
+            # path fell outside the list. Read its status, not its output: an
+            # error (2) must not look like "all prose". No pipe into grep -q
+            # either, since under pipefail an early exit there reads as a miss.
+            rc=0
+            grep -vE "$prose" <<<"$files" >/dev/null || rc=$?
+            if [ -n "$files" ] && [ "$rc" -eq 1 ]; then
+              build=false
+            fi
+          fi
+          echo "build=$build" >> "$GITHUB_OUTPUT"
+          echo "build=$build"
+
+      # The two gates in `build` that read prose. Neither needs Lean.
+      - name: Codex loop entrypoint
+        if: steps.classify.outputs.build == 'false'
+        run: python3 scripts/check_codex_entrypoint.py
+
+      - name: Changed documentation
+        if: steps.classify.outputs.build == 'false'
+        env:
+          REVIEW_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: python3 scripts/check_review_evidence.py docs --base "$REVIEW_BASE"
+
   build:
+    needs: changes
+    # Skipped only on the classifier's positive `false`. An empty output runs
+    # the build.
+    if: ${{ needs.changes.outputs.build != 'false' }}
     # Every event in this public repository uses hosted Ubuntu. The owner's
     # self-hosted runners are registered ONLY to the private mirror
     # chris-dare-dev/derived-alg-geo-lean-ci, which sets the repository
@@ -1452,7 +1528,7 @@ jobs:
   # read as a failure below, and it gates nothing by design -- `build` on the
   # same commit makes the correctness claim.
   ci:
-    needs: [build, roadmap]
+    needs: [changes, build, roadmap]
     # This job must still run when `build` FAILED -- without that, a failed
     # build would leave `ci` skipped, and a skipped required check does not
     # block a merge. That is the whole mechanism, and it is why the obvious
@@ -1520,7 +1596,10 @@ jobs:
         # nested-quoting that caused it, and is the standard way to avoid script
         # injection from expression output besides.
         env:
-          RESULTS: ${{ join(needs.*.result, ' ') }}
+          CHANGES: ${{ needs.changes.result }}
+          BUILD_NEEDED: ${{ needs.changes.outputs.build }}
+          BUILD: ${{ needs.build.result }}
+          ROADMAP: ${{ needs.roadmap.result }}
         run: |
           set -euo pipefail
           # Enumerate rather than pattern-match. `contains(needs.*.result,
@@ -1528,12 +1607,26 @@ jobs:
           # passes a cancelled job, and it passes a SKIPPED one. A job that
           # never ran has not proved anything, so anything other than `success`
           # fails here.
-          echo "upstream results: ${RESULTS}"
+          #
+          # One exception, and it is narrow: a skipped `build` is accepted when
+          # `changes` succeeded AND wrote `build=false`. That job then ran the
+          # gates that judge prose, so the skip is a verdict that nothing in
+          # the change is the build's to check, not a job that never ran.
+          echo "changes=${CHANGES} build_needed=${BUILD_NEEDED} build=${BUILD} roadmap=${ROADMAP}"
           rc=0
-          for r in ${RESULTS}; do
-            if [ "$r" != "success" ]; then
-              echo "::error::a required job did not succeed (result: ${r})"
+          for pair in "changes=${CHANGES}" "roadmap=${ROADMAP}"; do
+            if [ "${pair#*=}" != "success" ]; then
+              echo "::error::${pair%%=*} did not succeed (result: ${pair#*=})"
               rc=1
             fi
           done
+          if [ "$BUILD" = "success" ]; then
+            :
+          elif [ "$BUILD" = "skipped" ] && [ "$CHANGES" = "success" ] \
+               && [ "$BUILD_NEEDED" = "false" ]; then
+            echo "build skipped: every changed path is prose"
+          else
+            echo "::error::build did not succeed (result: ${BUILD})"
+            rc=1
+          fi
           exit "$rc"
