@@ -9,3 +9,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Flat
 #print axioms AlgebraicGeometry.Scheme.Modules.IsFlatOver
 #print axioms AlgebraicGeometry.Scheme.Modules.isFlatOverId_iff_stalkwiseFlat
 #print axioms AlgebraicGeometry.Scheme.Modules.isFlatOverId_coprod
+#print axioms AlgebraicGeometry.Scheme.Modules.IsFlatOver.of_iso
+#print axioms AlgebraicGeometry.Scheme.Modules.isFlatOver_of_affine
+#print axioms AlgebraicGeometry.Scheme.Modules.isFlatOver_iff_affine
+#print axioms AlgebraicGeometry.Scheme.Modules.isFlatOver_pullback
