@@ -41,6 +41,10 @@ is needed.
 The stack condition of the result is a theorem, `Pseudofunctor.isStack_core` and
 `Pseudofunctor.ObjectProperty.isStack_fullsubcategory`, not a hypothesis.
 
+The fibres of `F` lie in `Cat.{v', u'}` with independent universes, and those of
+`ofStack F` and `ofObjectProperty F P` lie in the same `Cat.{v', u'}`: passing to cores and
+full subcategories changes neither universe.
+
 ## References
 
 * [Stacks, Tag 04TU](https://stacks.math.columbia.edu/tag/04TU), Lemma 8.4.3.
@@ -51,7 +55,7 @@ The stack condition of the result is a theorem, `Pseudofunctor.isStack_core` and
 moduli of objects, stack in groupoids, substack
 -/
 
-universe v w u
+universe v v' u u'
 
 namespace CategoryTheory.StackInGroupoids
 
@@ -62,7 +66,7 @@ variable {C : Type u} [Category.{v} C] {J : GrothendieckTopology C}
 /-- The stack in groupoids of objects of a stack `F` and their isomorphisms: the core `F.core`
 ([Stacks, Tag 03YI](https://stacks.math.columbia.edu/tag/03YI)). -/
 @[simps presheaf]
-def ofStack (F : LocallyDiscrete Cᵒᵖ ⥤ᵖ Cat.{w, w}) [F.IsStack J] : StackInGroupoids C J where
+def ofStack (F : LocallyDiscrete Cᵒᵖ ⥤ᵖ Cat.{v', u'}) [F.IsStack J] : StackInGroupoids C J where
   presheaf := F.core
   fiberIsGroupoid _ := inferInstance
   isStack := isStack_core
@@ -84,7 +88,7 @@ claim:
 * anything for pseudofunctors that are only prestacks, such as derived categories, to which
   it does not apply. -/
 @[simps presheaf]
-def ofObjectProperty (F : LocallyDiscrete Cᵒᵖ ⥤ᵖ Cat.{w, w}) [F.IsStack J]
+def ofObjectProperty (F : LocallyDiscrete Cᵒᵖ ⥤ᵖ Cat.{v', u'}) [F.IsStack J]
     (P : F.ObjectProperty) [P.IsLocal J] [P.IsClosedUnderIsomorphisms] :
     StackInGroupoids C J where
   presheaf := P.core.fullsubcategory
@@ -96,14 +100,14 @@ def ofObjectProperty (F : LocallyDiscrete Cᵒᵖ ⥤ᵖ Cat.{w, w}) [F.IsStack 
     P.core.isStack_fullsubcategory
 
 /-- The inclusion of the moduli of objects satisfying `P` into the moduli of all objects. -/
-def ofObjectPropertyι (F : LocallyDiscrete Cᵒᵖ ⥤ᵖ Cat.{w, w}) [F.IsStack J]
+def ofObjectPropertyι (F : LocallyDiscrete Cᵒᵖ ⥤ᵖ Cat.{v', u'}) [F.IsStack J]
     (P : F.ObjectProperty) [P.IsLocal J] [P.IsClosedUnderIsomorphisms] :
     StackMorphism (ofObjectProperty (J := J) F P) (ofStack F) :=
   P.core.ι
 
 /-- If `Q` implies `P`, the moduli of objects satisfying `Q` includes into the moduli of
 objects satisfying `P`. -/
-def ofObjectPropertyMap (F : LocallyDiscrete Cᵒᵖ ⥤ᵖ Cat.{w, w}) [F.IsStack J]
+def ofObjectPropertyMap (F : LocallyDiscrete Cᵒᵖ ⥤ᵖ Cat.{v', u'}) [F.IsStack J]
     {P Q : F.ObjectProperty} [P.IsLocal J] [P.IsClosedUnderIsomorphisms] [Q.IsLocal J]
     [Q.IsClosedUnderIsomorphisms] (h : ∀ X, Q.prop X ≤ P.prop X) :
     StackMorphism (ofObjectProperty (J := J) F Q) (ofObjectProperty F P) :=
