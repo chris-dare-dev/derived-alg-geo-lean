@@ -1812,7 +1812,7 @@ items:
     kind: task
     parent: stacks-and-moduli-sf13
     title: "SF13.0a: Finitely many classes under the support property, and local finiteness from support (BLMNPS Remark 12.3)"
-    status: planned
+    status: done
     priority: must
     size: M
     summary: "Two absolute facts about the support property that the repository has not stated, and that Parts III–IV use constantly: Remark 12.3, first sentence. If a quadratic form Q is negative definite on ker Z, then for every c > 0 only finitely many lattice classes v satisfy |Z(v)| < c and Q(v) ≥ 0. Remark 12.3, second paragraph. A pre-stability condition with the support property is locally finite (Slicing.IsLocallyFinite), hence a Bridgeland StabilityCondition.WithClassMap."
