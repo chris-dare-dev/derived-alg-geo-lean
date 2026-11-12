@@ -2,7 +2,10 @@
 Projective-variety slice of the AlgebraicGeometry audit, split out so concurrent
 branches append to different files (#480). See the umbrella file for the contract.
 -/
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Ample
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward
+import DerivedAlgGeo.AlgebraicGeometry.Morphisms.Projective
+import DerivedAlgGeo.AlgebraicGeometry.Morphisms.RelativelyAmple
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpace
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.MapPullback
 import DerivedAlgGeo.AlgebraicGeometry.Variety.Projective
@@ -158,3 +161,140 @@ source is generated in degree one.
 #print axioms AlgebraicGeometry.Proj.isIso_mapPullbackTwistingSheaf
 #print axioms AlgebraicGeometry.Proj.mapPullbackTwistingSheafIso
 #print axioms AlgebraicGeometry.Proj.mapPullbackTwistingSheafIso_hom
+
+/-! ## Ample invertible sheaves
+
+The non-vanishing locus `X_s` of a section of an invertible sheaf, defined through stalks (Stacks
+01CY) and pulled back to `Y_{f^* s}` (Stacks 0H78); ampleness (Stacks 01PS), stable under positive
+tensor powers (Stacks 01PT) and pullback along affine morphisms, in particular to closed
+subschemes (Stacks 01PU); the extension of sections from a basic open (Stacks 01PW); and
+separatedness of a scheme with an ample sheaf.
+-/
+#print axioms AlgebraicGeometry.Scheme.Modules.IsAmple
+#print axioms AlgebraicGeometry.Scheme.Modules.IsAmple.isSeparated
+#print axioms AlgebraicGeometry.Scheme.Modules.IsAmple.of_iso
+#print axioms AlgebraicGeometry.Scheme.Modules.IsAmple.pullback
+#print axioms AlgebraicGeometry.Scheme.Modules.IsAmple.pullback_of_isClosedImmersion
+#print axioms AlgebraicGeometry.Scheme.Modules.IsAmpleOn
+#print axioms AlgebraicGeometry.Scheme.Modules.IsAmpleOn.of_iso
+#print axioms AlgebraicGeometry.Scheme.Modules.IsAmpleOn.of_sections
+#print axioms AlgebraicGeometry.Scheme.Modules.IsAmpleOn.pullback
+#print axioms AlgebraicGeometry.Scheme.Modules.IsLocalBasis
+#print axioms AlgebraicGeometry.Scheme.Modules.IsLocalBasis.bijective_stalk
+#print axioms AlgebraicGeometry.Scheme.Modules.IsLocalBasis.coeff
+#print axioms AlgebraicGeometry.Scheme.Modules.IsLocalBasis.coeff_smul
+#print axioms AlgebraicGeometry.Scheme.Modules.IsLocalBasis.nonvanishingLocus_eq
+#print axioms AlgebraicGeometry.Scheme.Modules.IsLocalBasis.res
+#print axioms AlgebraicGeometry.Scheme.Modules.IsLocalBasis.smul_left_injective
+#print axioms AlgebraicGeometry.Scheme.Modules.PicardClass.mk_tensorPow
+#print axioms AlgebraicGeometry.Scheme.Modules.bijective_toSpanSingleton_extendScalars
+#print axioms AlgebraicGeometry.Scheme.Modules.bijective_toSpanSingleton_of_span_eq_top
+#print axioms AlgebraicGeometry.Scheme.Modules.bijective_toSpanSingleton_tmul
+#print axioms AlgebraicGeometry.Scheme.Modules.exists_bijective_stalk
+#print axioms AlgebraicGeometry.Scheme.Modules.exists_germ_eq
+#print axioms AlgebraicGeometry.Scheme.Modules.exists_isLocalBasis
+#print axioms AlgebraicGeometry.Scheme.Modules.exists_pow_smul_eq_res
+#print axioms AlgebraicGeometry.Scheme.Modules.exists_res_eq_of_germ_eq
+#print axioms AlgebraicGeometry.Scheme.Modules.extendScalars_tmul_smul
+#print axioms AlgebraicGeometry.Scheme.Modules.fixedLeftTensorStalkIso_hom_app_germ_tmul
+#print axioms AlgebraicGeometry.Scheme.Modules.germ
+#print axioms AlgebraicGeometry.Scheme.Modules.germ_add
+#print axioms AlgebraicGeometry.Scheme.Modules.germ_app
+#print axioms AlgebraicGeometry.Scheme.Modules.germ_res
+#print axioms AlgebraicGeometry.Scheme.Modules.germ_smul
+#print axioms AlgebraicGeometry.Scheme.Modules.germ_zero
+#print axioms AlgebraicGeometry.Scheme.Modules.isAmpleOn_of_forall_isAmpleOn_basicOpen
+#print axioms AlgebraicGeometry.Scheme.Modules.isAmpleOn_tensorPow_iff
+#print axioms AlgebraicGeometry.Scheme.Modules.isAmple_iff_isAmpleOn_top
+#print axioms AlgebraicGeometry.Scheme.Modules.isAmple_restrict_iff
+#print axioms AlgebraicGeometry.Scheme.Modules.isAmple_tensorPow_iff
+#print axioms AlgebraicGeometry.Scheme.Modules.isInvertible_restrict
+#print axioms AlgebraicGeometry.Scheme.Modules.isInvertible_tensorPow
+#print axioms AlgebraicGeometry.Scheme.Modules.isInvertible_unit
+#print axioms AlgebraicGeometry.Scheme.Modules.isLocalBasis_of_le_nonvanishingLocus
+#print axioms AlgebraicGeometry.Scheme.Modules.mem_nonvanishingLocus_iff
+#print axioms AlgebraicGeometry.Scheme.Modules.nonvanishingLocus
+#print axioms AlgebraicGeometry.Scheme.Modules.nonvanishingLocus_eq_basicOpen
+#print axioms AlgebraicGeometry.Scheme.Modules.nonvanishingLocus_iso
+#print axioms AlgebraicGeometry.Scheme.Modules.nonvanishingLocus_le
+#print axioms AlgebraicGeometry.Scheme.Modules.nonvanishingLocus_map_eqToHom
+#print axioms AlgebraicGeometry.Scheme.Modules.nonvanishingLocus_one
+#print axioms AlgebraicGeometry.Scheme.Modules.nonvanishingLocus_pullbackSection
+#print axioms AlgebraicGeometry.Scheme.Modules.nonvanishingLocus_res
+#print axioms AlgebraicGeometry.Scheme.Modules.nonvanishingLocus_restrict
+#print axioms AlgebraicGeometry.Scheme.Modules.nonvanishingLocus_smul
+#print axioms AlgebraicGeometry.Scheme.Modules.nonvanishingLocus_tensorPowSection
+#print axioms AlgebraicGeometry.Scheme.Modules.nonvanishingLocus_tmulSection
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackSection
+#print axioms AlgebraicGeometry.Scheme.Modules.pullbackTensorPowIso
+#print axioms AlgebraicGeometry.Scheme.Modules.restrictFunctorIsoPullback_hom_app_app
+#print axioms AlgebraicGeometry.Scheme.Modules.restrictTensorPowIso
+#print axioms AlgebraicGeometry.Scheme.Modules.section_ext
+#print axioms AlgebraicGeometry.Scheme.Modules.span_germ_eq_top_iff_mem_basicOpen
+#print axioms AlgebraicGeometry.Scheme.Modules.span_germ_eq_top_iff_mem_basicOpen_coeff
+#print axioms AlgebraicGeometry.Scheme.Modules.span_germ_pullbackSection_eq_top_iff
+#print axioms AlgebraicGeometry.Scheme.Modules.span_germ_tmulSection_eq_top_iff
+#print axioms AlgebraicGeometry.Scheme.Modules.span_one_tmul_eq_top_iff
+#print axioms AlgebraicGeometry.Scheme.Modules.span_singleton_eq_top_iff_isUnit
+#print axioms AlgebraicGeometry.Scheme.Modules.span_singleton_map_equiv_eq_top_iff
+#print axioms AlgebraicGeometry.Scheme.Modules.span_smul_eq_top_iff
+#print axioms AlgebraicGeometry.Scheme.Modules.span_smul_eq_top_iff_isUnit
+#print axioms AlgebraicGeometry.Scheme.Modules.span_tmul_eq_top_iff
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorPow
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorPowAddIso
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorPowCommIso
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorPowIso
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorPowMulIso
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorPowSection
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorPow_succ
+#print axioms AlgebraicGeometry.Scheme.Modules.tensorPow_zero
+
+/-! ## Relatively ample invertible sheaves
+
+Relative ampleness (Stacks 01VH), its tensor powers (Stacks 02NN), the affine base (Stacks 01VK),
+separatedness (Stacks 01VI), pullback along affine morphisms and closed immersions, and base change
+(Stacks 0893).
+-/
+#print axioms AlgebraicGeometry.IsRelativelyAmple
+#print axioms AlgebraicGeometry.IsRelativelyAmple.comp_of_isAffineHom
+#print axioms AlgebraicGeometry.IsRelativelyAmple.isAmpleOn
+#print axioms AlgebraicGeometry.IsRelativelyAmple.isSeparated
+#print axioms AlgebraicGeometry.IsRelativelyAmple.of_isClosedImmersion
+#print axioms AlgebraicGeometry.IsRelativelyAmple.of_isPullback
+#print axioms AlgebraicGeometry.IsRelativelyAmple.of_iso
+#print axioms AlgebraicGeometry.IsRelativelyAmple.pullback
+#print axioms AlgebraicGeometry.IsRelativelyAmple.quasiCompact
+#print axioms AlgebraicGeometry.isRelativelyAmple_iff_isAmple
+#print axioms AlgebraicGeometry.isRelativelyAmple_iff_isAmpleOn
+#print axioms AlgebraicGeometry.isRelativelyAmple_tensorPow_iff
+
+/-! ## H-projective and locally projective morphisms
+
+H-projective and locally projective morphisms (Stacks 01W8, 01WB), their properness (Stacks 01W9,
+01WC) and base change (Stacks 01WF, 02V6); `X_{f/1} = D₊(f)` for the degree-one sections of `𝒪(1)`
+on `Proj`; relative ampleness of `𝒪(1)` on `ℙ(n; S)` and of its restriction along a closed
+immersion; and the comparison of `Variety.IsProjective` with H-projectivity.
+-/
+#print axioms AlgebraicGeometry.IsHProjective
+#print axioms AlgebraicGeometry.IsHProjective.exists_closedImmersion
+#print axioms AlgebraicGeometry.IsHProjective.isLocallyProjective
+#print axioms AlgebraicGeometry.IsHProjective.isProper
+#print axioms AlgebraicGeometry.IsHProjective.isStableUnderBaseChange
+#print axioms AlgebraicGeometry.IsHProjective.morphismRestrict
+#print axioms AlgebraicGeometry.IsLocallyProjective
+#print axioms AlgebraicGeometry.IsLocallyProjective.exists_cover
+#print axioms AlgebraicGeometry.IsLocallyProjective.isProper
+#print axioms AlgebraicGeometry.IsLocallyProjective.isStableUnderBaseChange
+#print axioms AlgebraicGeometry.Proj.basicOpen_fracSection
+#print axioms AlgebraicGeometry.Proj.isLocalBasis_sectionOfMem_one
+#print axioms AlgebraicGeometry.Proj.isUnit_frac_iff
+#print axioms AlgebraicGeometry.Proj.isUnit_germ_iff
+#print axioms AlgebraicGeometry.Proj.nonvanishingLocus_sectionOfMem_one
+#print axioms AlgebraicGeometry.Proj.nonvanishingLocus_sectionOfMem_one_inf
+#print axioms AlgebraicGeometry.Proj.nonvanishingLocus_sectionOfMem_one_of_le
+#print axioms AlgebraicGeometry.ProjectiveSpace.isAffineOpen_preimage_inf_preimage
+#print axioms AlgebraicGeometry.ProjectiveSpace.isRelativelyAmple_pullback_twistingSheaf_one
+#print axioms AlgebraicGeometry.ProjectiveSpace.isRelativelyAmple_twistingSheaf_one
+#print axioms AlgebraicGeometry.Variety.isProjective_iff_isHProjective
+#print axioms AlgebraicGeometry.isHProjective_iff
+#print axioms AlgebraicGeometry.isLocallyProjective_iff
