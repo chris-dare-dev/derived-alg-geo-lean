@@ -10,6 +10,10 @@
 > role file, not the run-loop skill. `CLAUDE.md` only imports this file; edit
 > this one.
 
+[`CREDO.md`](CREDO.md) states what this repository holds and refuses, and
+overrides this file. Its "Not yet met" list names the rules not in force yet;
+for those, this file still applies.
+
 ## Mathematical ownership: required before public API work
 
 Read [the ownership policy](docs/architecture/mathematical-ownership.md) and
@@ -327,6 +331,9 @@ gates/CI paths together; do not silently omit a child or relax coverage globally
 - Add every new public declaration to the relevant audit.
 - Do not edit generated build artifacts by hand.
 - Do not alter unrelated work in a dirty tree.
+- Add no review, handoff, note, loop specification or change proposal as a
+  file; that record is the issue or the pull request.
+- Keep issue and pull-request numbers and dates out of names and comments.
 
 Read `CONTRIBUTING.md` before creating a new directory or publishing a
 change; it owns the human-facing placement and contribution rules.
