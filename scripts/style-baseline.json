@@ -6,9 +6,69 @@
   1
  ],
  [
+  "DerivedAlgGeo/Algebra/Homology/DGCategory.lean",
+  "PROV",
+  "(ADR-0010 Option A′) lands, the subtree moves there in the same change.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Homology/DGCategory.lean",
+  "PROV",
+  "(ADR-0010, ADR-0011); it does not extend `EnrichedCategory`, because the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Homology/DGCategory/Basic.lean",
+  "PROV",
+  "`.claude/notes/2026-08-13-dg-surface-reconnaissance.md`.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Homology/DGCategory/Basic.lean",
+  "PROV",
+  "`ADR-0010` decides against `EnrichedOrdinaryCategory` over",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Homology/DGCategory/Basic.lean",
+  "PROV",
+  "`ADR-0011` decides the remaining question — what the Hom-complexes are",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Homology/DGCategory/Basic.lean",
+  "PROV",
+  "which is the whole point of the `AddCommGrpCat`-valued `dgHom` (ADR-0011). A",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Homology/DGCategory/Copower.lean",
+  "PROV",
+  "of a tensor product (ADR-0010, ADR-0011).",
+  1
+ ],
+ [
   "DerivedAlgGeo/Algebra/Homology/DGCategory/Functor.lean",
   "LONG",
   "  map_comp p q r h f g := by simp [F.map_comp p q r h f g, G.map_comp p q r h (F.map p f) (F.map q g)]",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Homology/DGCategory/Linear.lean",
+  "PROV",
+  "`ADR-0011` records why this is a refinement rather than part of the definition:",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Homology/DGCategory/Model/Complexes.lean",
+  "PROV",
+  "the payoff of ADR-0011 and of the convention correction that followed it. An",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Homology/DGCategory/Pretriangulated/H0/Basic.lean",
+  "PROV",
+  "alone. Under the owner map of `docs/architecture/cutover-ledger.md` row 15 that",
   1
  ],
  [
@@ -18,9 +78,33 @@
   1
  ],
  [
+  "DerivedAlgGeo/Algebra/Homology/DGCategory/Shift.lean",
+  "PROV",
+  "`dg-enhancements-e5` (#376) owns it, and the roadmap is corrected alongside.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Homology/DerivedCategory/CohomologyObjectProperty/HomVanishing.lean",
+  "PROV",
+  "bounded half of the compactness of `𝒪_X` in `Dqc(Spec R)` (#723); the unbounded half needs",
+  1
+ ],
+ [
   "DerivedAlgGeo/Algebra/Homology/DerivedCategory/ExactFunctor/Bounded.lean",
   "LONG",
   "      (shiftFunctor (DerivedCategory B) (n : ℤ)).mapIso ((F.mapDerivedCategorySingleFunctor 0).app Y)",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Homology/DerivedCategory/Ext/Adjunction.lean",
+  "PROV",
+  "`CategoryTheory/Abelian/Ext.lean`. So the cohomology comparison `#572` step 3 asks for,",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Homology/DerivedCategory/Ext/Adjunction.lean",
+  "PROV",
+  "of `#572` step 3 instantiates at `L = ι⁻¹`, `R = ι_*` for a closed immersion. -/",
   1
  ],
  [
@@ -36,9 +120,153 @@
   1
  ],
  [
+  "DerivedAlgGeo/Algebra/Homology/HomotopyCategory/Bounded.lean",
+  "PROV",
+  "(#543): `Kᵇ` of a Hom-finite linear category is Hom-finite with finite",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Homology/HomotopyCategory/DGEnhancement/CommShift.lean",
+  "PROV",
+  "`Functor.CommShift` does, and #378 calls it \"the real content of this epic\".",
+  1
+ ],
+ [
   "DerivedAlgGeo/Algebra/Module/GradedModule/Localization.lean",
   "LONG",
   "    ((a • x : DegreeZeroLocalization 𝒜 𝓜 S) : LocalizedModule S M) = a • (x : LocalizedModule S M) :=",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Module/GradedModule/Localization.lean",
+  "PROV",
+  "(see the Laurent monomial basis of #491).",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Module/GradedModule/Localization.lean",
+  "PROV",
+  "projection (#340's contracting homotopy) reduces to. Like `exists_awayMk`, it costs no domain",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Module/GradedModule/TwistLocalization.lean",
+  "PROV",
+  "This is why the per-chart extensions of `#585` agree where two charts meet: over",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Module/GradedModule/TwistLocalization.lean",
+  "PROV",
+  "`F ⊗ O(d) ≅ F(d)` of `#584` needs it for an **arbitrary** graded module, and nothing in the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Module/LocalizedRadical.lean",
+  "PROV",
+  "That expectation did not hold: `#585` closed without using this lemma at all — the overlap step it",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Module/LocalizedRadical.lean",
+  "PROV",
+  "content, and because the projective-space section-extension argument (#585) was expected to need it",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/MvPolynomial/Cech/Homotopy.lean",
+  "PROV",
+  "The block projections and the contracting homotopy of #340 live at monomial denominators",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/MvPolynomial/Cech/Primitive.lean",
+  "PROV",
+  "The vanishing computation of #340, in cochain form. Given a degree-`(n+1)` cochain `s` of the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/MvPolynomial/LaurentBasis.lean",
+  "PROV",
+  "  `{α | Finsupp.degree α = d ∧ ∀ j ∉ γ.support, 0 ≤ α j}` that #491's basis is indexed by.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/MvPolynomial/LaurentBasis.lean",
+  "PROV",
+  "Combined with `exists_sum_awayMk_monomial` this is the basis statement of #491 in usable form:",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/MvPolynomial/LaurentBasis.lean",
+  "PROV",
+  "This is the statement #491's basis is built on: the assignment `(m, β) ↦ β - m • γ` separates",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/MvPolynomial/LaurentBasis.lean",
+  "PROV",
+  "the sign projection of #340's contracting homotopy needs. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/MvPolynomial/LaurentBasis.lean",
+  "PROV",
+  "the spanning half of #491's basis — the monomial fractions exhaust the localization, and the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/MvPolynomial/LaurentBlock.lean",
+  "PROV",
+  "Step 2 of #340's proof plan decomposes the Čech complex of `O(d)` by the **negative support**",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/MvPolynomial/LaurentBlock.lean",
+  "PROV",
+  "The filter descends to the away localization exactly as the sign projection did in #526: a",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/MvPolynomial/LaurentBlock.lean",
+  "PROV",
+  "exponent. This is the `N α` of #340's proof plan; the block of a Laurent monomial is its",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/MvPolynomial/LaurentBlock.lean",
+  "PROV",
+  "instances, so one lemma serves where #526 needed `divMonomial_pow_mul` and #539 needed",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/MvPolynomial/LaurentBlock.lean",
+  "PROV",
+  "preserves `N α`\" of #340's proof plan, one face and one localization at a time. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/MvPolynomial/LaurentHomotopy.lean",
+  "PROV",
+  "    · -- The face is in another variable: the #539 disjointness pulls it through.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/MvPolynomial/LaurentHomotopy.lean",
+  "PROV",
+  "  #539), but also the faces in `i₀` itself, where the surplus exponent `t` shifts by one and",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/MvPolynomial/LaurentHomotopy.lean",
+  "PROV",
+  "Step 3 of #340's proof plan contracts each block `C_F` of the Čech complex through a cone point",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/MvPolynomial/LaurentHomotopy.lean",
+  "PROV",
+  "is the projection square of #539 conjugated by the reinsertion; for `e = i₀` the surplus",
   1
  ],
  [
@@ -54,15 +282,159 @@
   1
  ],
  [
+  "DerivedAlgGeo/Algebra/MvPolynomial/LaurentProjection.lean",
+  "PROV",
+  "(`δ' i₀ = 0`) is the restriction of §1 of #340's proof plan in hypothesis form: with `hγ'` it",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/MvPolynomial/LaurentProjection.lean",
+  "PROV",
+  "This is the first of the two properties #340's homotopy consumes. On a representative the face",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/MvPolynomial/LaurentProjection.lean",
+  "PROV",
+  "exactly the Čech face of #340's complex. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/MvPolynomial/LaurentProjection.lean",
+  "PROV",
+  "the face commute. That square is the second and last property #340's contracting homotopy",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Algebra/Order/NormalizedShift.lean",
+  "PROV",
+  "This is the neutral core of MO1.12 (#1323): it is a group of order",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Cech/NegativeTwist.lean",
+  "PROV",
+  "The **abelian-group** statement, per #665. The `k`-vector-space structure that",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Cech/NegativeTwist.lean",
+  "PROV",
+  "The abelian-group statement of #665. `Nontrivial ι` is the only hypothesis on the variable set:",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Cech/ProjectiveSpace.lean",
+  "PROV",
+  "This is the layer `#332`'s dévissage consumes. The nonnegative layer above is not a special case",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Cech/ProjectiveSpace.lean",
+  "PROV",
+  "it is kept as it stands and `#340`'s vanishing theorem continues to read it. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Cech/TopDegree.lean",
+  "PROV",
+  "`module_finite_linearCoherentH_of_cech`. That is #666's remaining half, and none of it is claimed",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Cech/Vanishing.lean",
+  "PROV",
+  "The headline of #340. Everything difficult happened earlier: the block decomposition, the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Cech/Vanishing.lean",
+  "PROV",
+  "comparison `polynomialVariableCechComplex_computesCohomology` of #495.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Cech/Vanishing.lean",
+  "PROV",
+  "dévissage of #332 consumes, and neither is claimed here.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/ClosedImmersion.lean",
+  "PROV",
+  "## One way this is still weaker than `#572`'s wording",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/ClosedImmersion.lean",
+  "PROV",
+  "/-- **`#572` step 3 for coherent sheaves.** -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/ClosedImmersion.lean",
+  "PROV",
+  "/-- **`ι_* F` as a coherent sheaf**, by `#572` step 2. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/ClosedImmersion.lean",
+  "PROV",
+  "`CohomologyPushforward.lean`'s abelian-sheaf statement and `#572` step 3's acceptance criterion,",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/ClosedImmersion.lean",
+  "PROV",
+  "`Scheme.isCoherent_pushforward`, `#572` step 2. `cohPushforward` packages the module pushforward of",
+  1
+ ],
+ [
   "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Derived/AffineHomVanishing.lean",
   "LONG",
   "    (f : (DerivedCategory.singleFunctor (Spec R).Modules 0).obj (Scheme.Modules.unit (Spec R)) ⟶ M) :",
   1
  ],
  [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Derived/AffineHomVanishing.lean",
+  "PROV",
+  "`Dqc(Spec R)` (#723, slice 723b). The unbounded half, that `Hom(𝒪_X, M) = 0` for every",
+  1
+ ],
+ [
   "DerivedAlgGeo/AlgebraicGeometry/Cohomology/EulerCharacteristic/Basic.lean",
   "LONG",
   "structure FiniteCohomology (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] extends FiniteDimensionalCohomology k X where",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/EulerCharacteristic/Basic.lean",
+  "PROV",
+  "The inherited data is exactly the linear comparison and degreewise finiteness output of #29.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/EulerCharacteristic/Basic.lean",
+  "PROV",
+  "The two fields added here are the separate #30 boundedness input needed to make the Euler sum",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/EulerCharacteristic/Basic.lean",
+  "PROV",
+  "`FiniteDimensionalCohomology`, the output interface for issue #29. `FiniteCohomology` extends",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/EulerCharacteristic/Basic.lean",
+  "PROV",
+  "that interface only with the eventual-vanishing data tracked separately in issue #30. All",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/Boundedness.lean",
+  "PROV",
+  "cohomology.  This is the constructor which turns the output of #29 into the `FiniteCohomology`",
   1
  ],
  [
@@ -87,6 +459,24 @@
   "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/FiniteDimensional.lean",
   "LONG",
   "structure FiniteDimensionalCohomology (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] extends LinearCohomology k X where",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/FiniteDimensional.lean",
+  "PROV",
+  "* a bound above which the groups vanish is the separate content of #30.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/FiniteDimensional.lean",
+  "PROV",
+  "* finite-dimensionality of each `Hⁱ(X, F)` is the content of #29;",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/FiniteDimensional.lean",
+  "PROV",
+  "This is the exact output interface for #29. A later boundedness result can extend it without",
   1
  ],
  [
@@ -132,9 +522,171 @@
   1
  ],
  [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/Projective.lean",
+  "PROV",
+  "This is S3 of `#332` (`#571`). The two inputs are:",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/ProjectiveSpace.lean",
+  "PROV",
+  "  quasi-coherence is available, with no change to this argument (see issue #439);",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/ProjectiveSpace.lean",
+  "PROV",
+  "* `polynomialVariableCechComplexIso` (#339) — Mathlib's Čech complex of the cover *is* the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/ProjectiveSpace.lean",
+  "PROV",
+  "* `polynomialVariable_isCechAcyclicCover` (#338) — the variable cover is Čech-acyclic for",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/ProjectiveSpace.lean",
+  "PROV",
+  "This is the input `#332`'s dévissage consumes. It surjects a finite sum of `O(-d)` onto a",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/ProjectiveSpace.lean",
+  "PROV",
+  "This is the input `#332`'s dévissage needs: it surjects a finite sum of `O(-d)` onto a coherent",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/ProjectiveSpace.lean",
+  "PROV",
+  "transport rather than by definitional equality, and `#340`'s vanishing theorem reads the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/ProjectiveSpaceCechScalars.lean",
+  "PROV",
+  "Occurrences before the rule was written down: `cechBlockSpan` (#670), `constSection` and",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/ProjectiveSpaceCechScalars.lean",
+  "PROV",
+  "That is the same shape as #662, where `Coh X` carries two `Preadditive` instances defeq at default",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/ProjectiveSpaceCechScalars.lean",
+  "PROV",
+  "`constSectionOn` (#674), and the transport here.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/ProjectiveSpaceScalars.lean",
+  "PROV",
+  "`module_finite_linearCoherentH_of_cech` cannot be fed and #666 is not closed.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/ProjectiveSpaceScalars.lean",
+  "PROV",
+  "same action, and #666's finiteness statement is meaningless until they are.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/ProjectiveSpaceTopFinite.lean",
+  "PROV",
+  "`.claude/references/instance-transparency.md`, technique 5.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Cohomology/Finiteness/ProjectiveVariety.lean",
+  "PROV",
+  "its `FiniteDimensionalCohomology` package is a theorem: step 3 of `#332`, closing it for every",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/CohomologyPushforward.lean",
+  "PROV",
+  "/-- **`#572` step 3 at a closed immersion of schemes.**",
+  1
+ ],
+ [
   "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc.lean",
   "LONG",
   "is recorded here because it is what `Dqc(X)` has to have for \"compact object in `Dqc(X)`\" to be a statement one",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc.lean",
+  "PROV",
+  "(#720).  `DerivedCategory.cohomologyIn` turns that into closure under cones via",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc.lean",
+  "PROV",
+  "/-- **The abelian-side inputs to `Dqc(X)`'s coproduct structure** (#721, third",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc.lean",
+  "PROV",
+  "/-- **The inclusion `Dqc(X) ⥤ D(X.Modules)` preserves coproducts** (#721, third bullet, second",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc.lean",
+  "PROV",
+  "/-- **`Dqc(X)` is closed under coproducts** (#721, third bullet, closure clause).",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc.lean",
+  "PROV",
+  "`ι_isTriangulated` is, because it is the acceptance criterion of #721. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc.lean",
+  "PROV",
+  "assuming it (#721).  The route does not need quasi-coherent sheaves to be an",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc.lean",
+  "PROV",
+  "category** (#721).",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc/AffineCoproducts.lean",
+  "PROV",
+  "arbitrary scheme (#721), and the inclusion into the all-sheaf derived category",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc/AffineIdentification.lean",
+  "PROV",
+  "remains open; see `docs/architecture/cutover-ledger.md`.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc/AffineNonflatExample.lean",
+  "PROV",
+  "This file supplies the concrete example required by SF8.5 item 9.  The ring",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc/AffineNonflatExample.lean",
+  "PROV",
+  "theorems still listed in #554.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc/AffineRealization.lean",
+  "PROV",
+  "The proof moved to `CoherentSheaf/Quasicoherent/Kernels.lean` when #720 needed it",
   1
  ],
  [
@@ -147,6 +699,366 @@
   "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc/Identification.lean",
   "LONG",
   "theorem boundedCoherentDerivedToDqc_faithful_of_coherentExtComparison (h : CoherentExtComparison X) :",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc/Identification.lean",
+  "PROV",
+  "/-- **Essential surjectivity (#1071).** Under the `Ext` comparison, every object of the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc/Identification.lean",
+  "PROV",
+  "/-- **Full faithfulness (#1070).** Under the `Ext` comparison, the concrete functor",
+  2
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc/Identification.lean",
+  "PROV",
+  "/-- **The bounded-coherent identification (#722), from the `Ext` comparison.** The",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Dqc/Identification.lean",
+  "PROV",
+  "2026-09-10 entry of `docs/architecture/cutover-ledger.md`.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/BaseChangeGeneration.lean",
+  "PROV",
+  "The SF11.1 follow-up keeps these facts as geometry-owner inputs: the formal",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/BaseChangeProposition315.lean",
+  "NAMENUM",
+  "/-",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/BaseChangeProposition315.lean",
+  "NAMENUM",
+  "structure Proposition315CoreData",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/BaseChangeProposition315.lean",
+  "NAMENUM",
+  "structure Proposition315ProjectionConstructionData",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/BaseChangeProposition315.lean",
+  "NAMENUM",
+  "structure Proposition315ProjectionData",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/BaseChangeProposition315.lean",
+  "NAMENUM",
+  "structure Proposition315SemiorthogonalityData",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/CoherentPushforward.lean",
+  "PROV",
+  "`.claude/references/instance-transparency.md`), and the triangulated instance below needs this",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/DerivedPushforward.lean",
+  "PROV",
+  "* `docs/architecture/cutover-ledger.md`, row 10.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/DerivedPushforward.lean",
+  "PROV",
+  "MO1.10 (#1321) extracted this capability from",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/DerivedPushforward.lean",
+  "PROV",
+  "discharge -- and MO1.10 is a placement split.  A consumer wanting both states both.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/KProjectivePullback.lean",
+  "PROV",
+  "SF8.5, and on a general scheme the category of all `𝒪_X`-modules does not have",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/SLocal.lean",
+  "NAMENUM",
+  "structure Lemma416Part3Data (L : SLocalData R t) where",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/SLocal.lean",
+  "NAMENUM",
+  "theorem lemma_4_15 (H : NoetherianLocalityData R t) :",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/SLocal.lean",
+  "NAMENUM",
+  "theorem lemma_4_16_3 (L : SLocalData R t) (H : Lemma416Part3Data L) (U : S.Opens)",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Families/Theorem53.lean",
+  "NAMENUM",
+  "/-",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/FourierMukai/KernelAssociativity.lean",
+  "PROV",
+  "  are left as they are because #540 already consumes them in that form.)",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/FourierMukai/KernelAssociativity.lean",
+  "PROV",
+  "#542 split associativity of convolution into a free transform-level theorem",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/FourierMukai/KernelAssociativity.lean",
+  "PROV",
+  "(#542). At the kernel level it is now *derived* for the geometric convolution",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/FourierMukai/KernelAssociativity.lean",
+  "PROV",
+  "This is the consumption site #542 promised that class. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/FourierMukai/KernelAssociativity.lean",
+  "PROV",
+  "`assocIso` the derived `geometricConvolutionAssoc`. Together with #542's",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/FourierMukai/KernelComposition.lean",
+  "PROV",
+  "That is also why it is short. The mathematics was done in #466 abstractly and",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/FourierMukai/KernelConvolution.lean",
+  "PROV",
+  "   #460--462, so no new kind of obligation;",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/FourierMukai/KernelCorrespondence.lean",
+  "PROV",
+  "Since MO1.10 (#1321) this file **assembles** the correspondence and **owns none of its",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/FourierMukai/KernelCorrespondence.lean",
+  "PROV",
+  "Those are kernel-specific, and MO1.10 deliberately left them here rather than moving them",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/FourierMukai/KernelDualizingTwist.lean",
+  "PROV",
+  "Everything #768 proves about a right adjoint kernel then applies: uniqueness of",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Perfect.lean",
+  "PROV",
+  "`docs/architecture/placement.md`.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Perfect/Relative.lean",
+  "PROV",
+  "2026-09-13; see `docs/architecture/cutover-ledger.md`, finding 11.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Perfect/Relative.lean",
+  "PROV",
+  "SCOPE (2026-08-18 review, P2-12): on a locally Noetherian scheme this",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Perfect/Relative.lean",
+  "PROV",
+  "pseudo-coherence; the #554 preservation program must either restrict its",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Stability/BoundedCoherentPullback.lean",
+  "PROV",
+  "`docs/architecture/placement.md`.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Stability/BoundedCoherentPushforward.lean",
+  "PROV",
+  "`docs/architecture/placement.md`, which lets a realization keep the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Stability/K3MukaiTilt.lean",
+  "PROV",
+  "The latter is exactly the existing abstract boundary hypothesis: issue #332",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Stability/K3MukaiTilt.lean",
+  "PROV",
+  "ingredients are tracked from issue #332.  The conclusion is only a stability",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Stability/MassHom.lean",
+  "PROV",
+  "#723 interfaces; discharging them is what earns back the faithfully flat",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Stability/MassHom.lean",
+  "PROV",
+  "The future geometric discharges are tracked by #1033 and #723. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Stability/MassHom.lean",
+  "PROV",
+  "never consumes.  Those two constructions are the precise remaining #1033 and",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Stability/MassHomTheorem75.lean",
+  "NAMENUM",
+  "/-",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Stability/MassHomTheorem75.lean",
+  "NAMENUM",
+  "theorem remark14_autoequivalence_iff",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Stability/MassHomTheorem75.lean",
+  "NAMENUM",
+  "theorem theorem75",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor.lean",
+  "PROV",
+  "* `docs/architecture/cutover-ledger.md`, row 10 (#1321).",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/BoundedCoherent.lean",
+  "PROV",
+  "* `docs/architecture/cutover-ledger.md`, row 10.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/BoundedCoherent.lean",
+  "PROV",
+  "MO1.10 (#1321) extracted this capability from",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/BoundedMonoidal.lean",
+  "PROV",
+  "* `docs/architecture/cutover-ledger.md`, row 10 (#1321).",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/BoundedMonoidal.lean",
+  "PROV",
+  "`CategoryTheory.Triangulated.StabilityCondition.Families`. MO1.10 (#1321,",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/BoundedMonoidal.lean",
+  "PROV",
+  "`dt-1` (#892) proposed this under",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/BoundedMonoidal.lean",
+  "PROV",
+  "merged as #1363) makes that impossible: rule 17 of `scripts/check_layering.py`",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/BoundedMonoidal.lean",
+  "PROV",
+  "would assert the coupling MO1.10 removed.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/Coherent.lean",
+  "PROV",
+  "* `docs/architecture/cutover-ledger.md`, row 10.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/Coherent.lean",
+  "PROV",
+  "MO1.10 (#1321) extracted this file's contents from",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/Relative.lean",
+  "PROV",
+  "* `docs/architecture/cutover-ledger.md`, row 10.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/Relative.lean",
+  "PROV",
+  "MO1.10 (#1321) extracted this file's contents from",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/Relative.lean",
+  "PROV",
+  "itself remains SF8 #554's obligation; this class consumes the existing",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Tensor/Unbounded.lean",
+  "PROV",
+  "MO1.10 (#1321) moved this file from `DerivedCategory/KFlatTensor.lean` so that the three",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/TwistedPushforward.lean",
+  "PROV",
+  "* `docs/architecture/cutover-ledger.md`, row 10.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/TwistedPushforward.lean",
+  "PROV",
+  "It is the independent consumer that MO1.10 (#1321) owes the extracted owners, and the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Divisors/Dual.lean",
+  "PROV",
+  "-- Narrowed from `Divisors.Determinant` (2026-08-15). Everything below needs only",
   1
  ],
  [
@@ -180,9 +1092,93 @@
   1
  ],
  [
+  "DerivedAlgGeo/AlgebraicGeometry/Duality/Serre/Cohomology.lean",
+  "PROV",
+  "This small interface is the exact #40 output used by geometric surface Riemann--Roch.  Its field",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/IntersectionTheory/ChernCharacter/Basic.lean",
+  "PROV",
+  "/-- The reconstructed ring-valued `ch₂` has the degree constructed in issue #37 once the",
+  1
+ ],
+ [
   "DerivedAlgGeo/AlgebraicGeometry/IntersectionTheory/ChernCharacter/Surface.lean",
   "LONG",
   "structure SurfaceChernCharacter (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] where",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Affine/Equivalence.lean",
+  "PROV",
+  "Issue #59 asked for exactly this goal to close by instance search. It does, through",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Affine/Extension.lean",
+  "PROV",
+  "Both are stated for a tilde, and `#585` needs them for an arbitrary quasi-coherent sheaf. The",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Affine/Extension.lean",
+  "PROV",
+  "Both statements above are about a tilde, and `#585` needs them for an arbitrary quasi-coherent",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Affine/Extension.lean",
+  "PROV",
+  "Worth recording against the plan `#585` was written to.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Affine/Extension.lean",
+  "PROV",
+  "`#585` did not reach for it anywhere. The plan expected it to reconcile two charts on their overlap;",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Affine/Extension.lean",
+  "PROV",
+  "`r`, is the restriction of a **global** section. This is the chart-local engine of `#585`: on",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Affine/Extension.lean",
+  "PROV",
+  "are `Proj/Modules/ChartExtension.lean` and `Proj/Modules/Glue.lean`, where `#585` is closed by",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Coherent/Abelian/Basic.lean",
+  "PROV",
+  "/-- Regression test for #662: `abelian.toPreadditive` must be `preadditive` at",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Coherent/Abelian/Kernels.lean",
+  "PROV",
+  "Public rather than private since #720: the quasi-coherent extension argument",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Coherent/AffineChart.lean",
+  "PROV",
+  "Noetherianity is still on the road to `#586`, but it enters strictly later and for a different",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Coherent/AffineChart.lean",
+  "PROV",
+  "Step 2 of `#586` — Serre's global generation — needs, for each chart of a finite affine cover,",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Coherent/AffineChart.lean",
+  "PROV",
+  "`#586` step 2 has to open the structure by hand.",
   1
  ],
  [
@@ -192,9 +1188,117 @@
   1
  ],
  [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Coherent/Linear.lean",
+  "PROV",
+  "/-- Regression test for #662, in the shape that found it: search must reach",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Coherent/Linear.lean",
+  "PROV",
+  "issue #332. A `Hom`-group being a `k`-vector space of unknown dimension is",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Coherent/Linear.lean",
+  "PROV",
+  "supply `cohLinear` by hand. Issue #662 closed that by pinning the field in",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Coherent/Pushforward/Affine.lean",
+  "PROV",
+  "A finite morphism of schemes pushes coherent sheaves to coherent sheaves; `#572` step 2 asked",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Coherent/Pushforward/Finite.lean",
+  "PROV",
+  "instance in `Mathlib/AlgebraicGeometry/Morphisms/Finite.lean`), so `#572` step 2, coherence of",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Coherent/Pushforward/Finite.lean",
+  "PROV",
+  "scheme; for a closed immersion this is `#572` step 2.  The affine opens cover `Y`, and finite",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Coherent/Pushforward/Iso.lean",
+  "PROV",
+  "## Why `#572` step 2 needs this",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Coherent/Pushforward/Iso.lean",
+  "PROV",
+  "The transport `#572` step 2 needs in order to apply the affine pushforward theorem, which is",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Coherent/Pushforward/Iso.lean",
+  "PROV",
+  "immersion of `#572` step 2 is *not* an isomorphism — this is the transport that lets the affine",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Flat.lean",
+  "PROV",
+  "consumer was; see `docs/architecture/cutover-ledger.md`, finding 11.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Quasicoherent/Coproducts.lean",
+  "PROV",
+  "so is one of the two inputs `Dqc(X)`'s coproduct structure needs (#721).",
+  1
+ ],
+ [
   "DerivedAlgGeo/AlgebraicGeometry/Modules/Restriction/Sections.lean",
   "LONG",
   "`show`-ascription residue, so each composition has to be available as a term. `presheaf_map_square_eq`",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Restriction/Sections.lean",
+  "PROV",
+  "`#585` glue composes restrictions constantly, and `rw` cannot be used on goals carrying",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Restriction/Sections.lean",
+  "PROV",
+  "`#824`. `resSection_trans`, `resSection_smul` and `homApp_res` were stated inside",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Modules/Tensor/Basic.lean",
+  "PROV",
+  "The invertibility hypothesis this carried until #833 was an artifact of proving local",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Moduli/Quot/ParameterSpace.lean",
+  "PROV",
+  "/-- Consequently the supported zero Quot construction inhabits the SF8.3",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Moduli/Quot/ParameterSpace.lean",
+  "PROV",
+  "concrete relative-perfect moduli problem from SF8.2. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Moduli/Quot/ParameterSpace.lean",
+  "PROV",
+  "from SF8.3.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Moduli/Quot/ParameterSpace.lean",
+  "PROV",
+  "witness from SF8.3, including geometric-point coverage. -/",
   1
  ],
  [
@@ -228,6 +1332,60 @@
   1
  ],
  [
+  "DerivedAlgGeo/AlgebraicGeometry/Numerical/GrothendieckGroup/EulerPairing.lean",
+  "PROV",
+  "## The symmetry claim in issue #6 is false",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Numerical/GrothendieckGroup/EulerPairing.lean",
+  "PROV",
+  "Calabi–Yau surface. This is the correct form of the claim issue #6 made for all even",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Numerical/GrothendieckGroup/EulerPairing.lean",
+  "PROV",
+  "Issue #6 asked for symmetry in even dimension. It is false: on `ℙ²`, `td₁ = (3/2)H ≠ 0`, so",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Numerical/GrothendieckGroup/EulerPairing.lean",
+  "PROV",
+  "Issue #6 asks for `chi₂ E F = chi₂ F E` in even dimension. That does not hold, and it is not",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Numerical/GrothendieckGroup/EulerPairing.lean",
+  "PROV",
+  "This is the identity issue #6 named as the check that matters, and it is what fixes the sign",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Numerical/GrothendieckGroup/MukaiVector.lean",
+  "PROV",
+  "See #332. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Numerical/Stability/BogomolovGieseker.lean",
+  "PROV",
+  "  statement needs simplicity and Serre duality, which is #740's chain and is",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Numerical/Stability/BogomolovGieseker.lean",
+  "PROV",
+  "* **It is not a discharge of #332.** The conclusion is conditional on a supplied",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Numerical/Stability/BogomolovGieseker.lean",
+  "PROV",
+  "one inequality about `χ`\", blocked on #332 for want of simplicity and Serre",
+  1
+ ],
+ [
   "DerivedAlgGeo/AlgebraicGeometry/Numerical/Stability/SurfaceChargeNumerical.lean",
   "LONG",
   "end CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChargeCoordinates",
@@ -237,6 +1395,210 @@
   "DerivedAlgGeo/AlgebraicGeometry/Numerical/Stability/SurfaceChargeNumerical.lean",
   "LONG",
   "namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.ChargeCoordinates",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Numerical/Stability/ThreefoldTiltTransport.lean",
+  "PROV",
+  "This file composes the two, which is what #1228 asked for and what neither half",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/BasicOpenLemmas.lean",
+  "PROV",
+  "and where `#824` found them.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/BasicOpenLemmas.lean",
+  "PROV",
+  "twist, or a fraction, and neither is about `#585`'s glue — which is where both were first written,",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/AwayChart.lean",
+  "PROV",
+  "\"`#585` extends only across degree-one charts\" -- was true of `#585` and false as a design",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/AwayChart.lean",
+  "PROV",
+  "/-- **One exponent for a finite family of agreements**, the shape `#585`'s glue calls: agreement",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/AwayChart.lean",
+  "PROV",
+  "`exists_pow_smul_eq_of_res_eq_chart` one degree up, and the reason it is needed: `#585`'s pairwise",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/AwayChart.lean",
+  "PROV",
+  "principle, and the two trios were the same theorem with one lemma swapped. `#822` collapsed that:",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/AwayChart.lean",
+  "PROV",
+  "statements one degree up, because `#585`'s cover is made of degree-one charts while its pairwise",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/ChartExtension.lean",
+  "PROV",
+  "There is no separate degree-one spelling. `#585`'s cover is made of degree-one charts and its",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/ChartExtension.lean",
+  "PROV",
+  "This is the first of the three things `#585`'s glue needs. The other two — that the resulting local",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/ChartExtension.lean",
+  "PROV",
+  "`#585`'s chart step. A section of a quasi-coherent `F` over `D₊(g) ⊓ D₊(f)` extends to a section",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/ChartExtension.lean",
+  "PROV",
+  "`exists_globalSection_twistBy`, which is `#585`'s deliverable.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/ChartExtension.lean",
+  "PROV",
+  "for a reason the obvious reading of `#585` misses.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/ChartExtension.lean",
+  "PROV",
+  "needs. `#585` calls this at degree one; the pairwise overlaps of that cover are degree-two charts,",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/ChartGeneration.lean",
+  "PROV",
+  "Step 2 of Serre's global generation (`#586`). On the chart `D₊(g)` of a degree-one element, a",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/ChartProj.lean",
+  "PROV",
+  "The charts here are of arbitrary positive degree because `#585` calls this on the *pairwise",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/ChartProj.lean",
+  "PROV",
+  "`Spec A_{(g)}`, scaled by the away ring's element `isLocalizationElem`. `#585`'s glue consumes them",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/ChartScalar.lean",
+  "PROV",
+  "This is the dictionary entry `#585` needs: the chart lemmas clear the away-ring element",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/ChartScalar.lean",
+  "PROV",
+  "`#585`'s two halves speak different languages. `ChartExtension.lean` produces sections of a",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/ChartScalar.lean",
+  "PROV",
+  "`degreeOneChart_image_basicOpen` at arbitrary positive degrees, which is what `#585` needs on a",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/ChartScalar.lean",
+  "PROV",
+  "`degreeOneChart_image_top` is the case `d = 1`; `#585`'s pairwise overlaps are cut out by a product",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/ChartUnitTwist.lean",
+  "PROV",
+  "The comparison `#585` needs between two charts, with the correction carried as a morphism out of",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/ChartUnitTwist.lean",
+  "PROV",
+  "`#585`'s glue has to compare `fⁿ` and `gⁿ` as multiplications into `O(n)`. They differ by the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/ChartUnitTwist.lean",
+  "PROV",
+  "`fracSection` at `a = fⁿ`, `b = gⁿ`. `#825` made this a definition rather than a second copy of the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/Finiteness.lean",
+  "PROV",
+  "itself, which is all quasi-coherence and coherence of `O(d)` ever need. `#584`'s tensor comparison",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/Frac.lean",
+  "PROV",
+  "`#825`. `fracPow` and `fracPowSection` — the case `a = fⁿ`, `b = gⁿ` — were written first, in",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/FracSection.lean",
+  "PROV",
+  "The two exponents `#585` carries are independent: `n` extends a section across each chart, `m`",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/FracSection.lean",
+  "PROV",
+  "The workhorse for `#585`'s bookkeeping: the exponents that reach the glue are built by different",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/FracSection.lean",
+  "PROV",
+  "`#585`'s glue needs the same statements for an arbitrary pair of homogeneous elements of the same",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/FracSection.lean",
+  "PROV",
+  "`SetLike.pow_mem_graded` states the degree as `d • e`; `#585` meets it as `e • d`, because the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/FracSection.lean",
+  "PROV",
+  "`a / b`. The case `a = fⁿ`, `b = gⁿ` was stated separately in `TwistApp.lean` until `#825`; it had",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/FracSection.lean",
+  "PROV",
+  "degree is stated in, and `#823` needs both because the glue compares one against the other. The",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/GlobalGeneration.lean",
+  "PROV",
+  "This closes `#586`, and it is the first place in the tree where Serre's theorem itself is proved,",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/GlobalGeneration.lean",
+  "PROV",
+  "`TwistInverse.lean` supplies from the tensor inverse of `O(N)` (the `L = O(N)` case of `#806`);",
   1
  ],
  [
@@ -276,15 +1638,435 @@
   1
  ],
  [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/Glue.lean",
+  "PROV",
+  "/-- **`#585`: a section over `D₊(f)`, twisted, is the restriction of a global section.**",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/Glue.lean",
+  "PROV",
+  "`#570`; this is one of its three steps.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/Glue.lean",
+  "PROV",
+  "`Modules/Restriction/Sections.lean` in `#824`; they are stated for any scheme and never used the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/Glue.lean",
+  "PROV",
+  "`exists_globalSection_twistBy` is the deliverable of `#585`. For `F` quasi-coherent on `Proj 𝒜`",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/Glue.lean",
+  "PROV",
+  "agree, which is the form `#585` proved and `GlueUniform.lean` still consumes.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/Glue.lean",
+  "PROV",
+  "completed `#570` route passes through `#586`: `GlobalGeneration.lean` proves the global-generation",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/Glue.lean",
+  "PROV",
+  "this \"the extension theorem of `#585`\", which is right; roadmap prose has more than once slid from",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/Glue.lean",
+  "PROV",
+  "unavailable. It is `f` alone that `#823`",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/GlueUniform.lean",
+  "PROV",
+  "and these witnesses are built by \"sheafification inverts `W`\" — which is exactly what `#585`",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/GlueUniform.lean",
+  "PROV",
+  "the missing ingredient between `#585` and Serre's global generation.",
+  1
+ ],
+ [
   "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TensorTwist.lean",
   "LONG",
   "* `tensorTwist F d` — the definition. `Modules/Tensor/Basic.lean`'s machinery is stated for a locally",
   1
  ],
  [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TensorTwist.lean",
+  "PROV",
+  "Deliverable 4 of `#584`. The graded ring as a module over itself is the unit, so this is",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TensorTwist.lean",
+  "PROV",
+  "`#584` asks for the twist of an arbitrary module sheaf, its two coherence isomorphisms, coherence",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistApp.lean",
+  "PROV",
+  "degree-one pair survived with no consumer until `#825` removed it.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistApp.lean",
+  "PROV",
+  "homogeneous elements of the same degree, and that is what `#585`'s glue actually consumes. The",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistBridge.lean",
+  "PROV",
+  "The bridge between `#585`'s two halves. `ChartExtension.lean` clears a power of `f / g` on the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistBridge.lean",
+  "PROV",
+  "This is the identity that makes the per-chart extensions of `#585` glue, on the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistBridge.lean",
+  "PROV",
+  "`frac` at `a = fⁿ`, `b = gⁿ`, both of degree `n`. `#825` made this a definition rather than a",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistBridge.lean",
+  "PROV",
+  "else. The same thing happened in `#584`'s `chartModuleTwistSectionEquiv_sectionTwistMul`: in this",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistBridge.lean",
+  "PROV",
+  "finishing step, which is the opposite of the order the obvious reading of `#585` suggests.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistBridge.lean",
+  "PROV",
+  "halves of `#585` meet with no correction factor. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistChart.lean",
+  "PROV",
+  "needs. `#584`'s tensor comparison `F ⊗ O(d) ≅ F(d)` needs the module case, and this is the fiber",
+  1
+ ],
+ [
   "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistCoherence.lean",
   "LONG",
   "`DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.Finiteness` by trivializing the twist on the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistComparison.lean",
+  "PROV",
+  "/-- **The twist of a coherent associated sheaf is coherent**, deliverable 3 of `#584`. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistComparison.lean",
+  "PROV",
+  "/-- **The twist preserves coherence**, deliverable 3 of `#584`. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistComparison.lean",
+  "PROV",
+  "/-- **`F ⊗ O(d) ≅ F(d)` for `F = M̃`**, deliverable 2a of `#584`. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistComparison.lean",
+  "PROV",
+  "/-- **`F(d)(e) ≅ F(d + e)` for `F = M̃`**, deliverable 2b of `#584`. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistComparison.lean",
+  "PROV",
+  "/-- **`F(d)(e) ≅ F(d + e)`** for `F` an associated sheaf, deliverable 2b of `#584`. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistComparison.lean",
+  "PROV",
+  "The same three results in the names `#584` uses. `tensorTwist F d` is by definition",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistComparison.lean",
+  "PROV",
+  "`#584`'s remaining structural piece. `TwistMultiplication.lean` built the map",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistComparison.lean",
+  "PROV",
+  "the same graded setting — they are kept only because `#584`'s deliverables are stated in the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistComparison.lean",
+  "PROV",
+  "the same statement written through `tensorObj`, which is the form `#806` needs in order to hand",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistGenerated.lean",
+  "PROV",
+  "global generation: `#586` needs the twisted generators to generate `F(N)` on each chart, and the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistGenerated.lean",
+  "PROV",
+  "work, and the reason is `#585`'s: those isomorphisms are **property witnesses, not computations**.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistInverse.lean",
+  "PROV",
+  "(`associatedSheafSelfIso`). `twistingSheafTensorNegIso` is the composite. As `#806` records, this",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistInverse.lean",
+  "PROV",
+  "Hartshorne II.5.17 / EGA II 2.7.9 in the form `#586` states. The surjection is",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistInverse.lean",
+  "PROV",
+  "Hartshorne II.5.17 in the form `#586` states: every coherent `F` on `Proj 𝒜` is a quotient of a",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistInverse.lean",
+  "PROV",
+  "The `L = O(N)` case of `#806`, and with it the literal deliverable of `#586`.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistInverse.lean",
+  "PROV",
+  "composite did not typecheck before `#821` put both factors in one graded setting; it does now, and",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistInverse.lean",
+  "PROV",
+  "parent issue `#570`.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistInvertible.lean",
+  "PROV",
+  "`#570` surjects onto an *arbitrary* coherent `F`; identifying every coherent sheaf on `Proj` with",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistInvertible.lean",
+  "PROV",
+  "`#584` asks for the twist `F(d) = F ⊗ O(d)` of an arbitrary module sheaf on `Proj`. The sheafified",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistInvertible.lean",
+  "PROV",
+  "quasi-coherent. This is the passage `#585` needs: the per-chart sections that",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistInvertible.lean",
+  "PROV",
+  "statement `#570` needs.** The graded-shift description covers associated sheaves only, while",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistInvertible.lean",
+  "PROV",
+  "tensor — and the comparison between the two descriptions is what deliverable 4 of `#584` asks for.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistMultiplication.lean",
+  "PROV",
+  "This is the same observation that made `#689` and `#692` tractable — the grading is a property of",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistMultiplication.lean",
+  "PROV",
+  "`#584`'s remaining piece is the comparison `F ⊗ O(d) ≅ F(d)` — *tensoring with `O(d)` is shifting",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistMultiplication.lean",
+  "PROV",
+  "`Localization S` where commutativity is free. The same gap appeared in `#695`'s `map_smul'`.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistSection.lean",
+  "PROV",
+  "The maps, and what they do to `1`. **The extension theorem of `#585` is not here** — it needs the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistSection.lean",
+  "PROV",
+  "The original `#570` issue sketch proposed using these maps to build `Γ_*(F)` as a graded module,",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistSection.lean",
+  "PROV",
+  "`#584` gave the twist; this gives the *sections* of it that a homogeneous element supplies, which",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistSection.lean",
+  "PROV",
+  "`#585` asks that `fⁿ · s` extend to a global section of `F(n)`, for `F` quasi-coherent on",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistSection.lean",
+  "PROV",
+  "`F ⟶ F(n)`, and no such map exists. `#584` supplied the twist itself; this file supplies the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistSection.lean",
+  "PROV",
+  "`F` is not assumed to be an associated sheaf, which is the whole point — `#585` multiplies a",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistSection.lean",
+  "PROV",
+  "is what `#585` multiplies by. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/Modules/TwistSection.lean",
+  "PROV",
+  "point: `#584`'s comparison stops at associated sheaves, and `#585` may not inherit that limit —",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/ProjectiveSpectrum/StructureSections.lean",
+  "PROV",
+  "down to exactly this lemma. It is the bridge #666 needs between the `k`-action the Čech lane can",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/RiemannRoch/HigherDimension/Hirzebruch.lean",
+  "PROV",
+  "/-- The scheme-derived dimension-four bridge requested by issue #45. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/RiemannRoch/HigherDimension/Hirzebruch.lean",
+  "PROV",
+  "/-- The scheme-derived dimension-three bridge requested by issue #45. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/RiemannRoch/HigherDimension/Hirzebruch.lean",
+  "PROV",
+  "This file implements the higher-dimensional route selected in issue #45.  The route is",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/RiemannRoch/Surface/Devissage.lean",
+  "PROV",
+  "coherent theorem.  Compatibility with issue #32 is recorded through the explicit geometric",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/RiemannRoch/Surface/Divisor.lean",
+  "PROV",
+  "/-- Realization data connecting #25's twisted fundamental sequence to the intrinsic Picard",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/RiemannRoch/Surface/Divisor.lean",
+  "PROV",
+  "/-- Surface Riemann--Roch for an effective divisor, obtained directly from #25's coherent",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/RiemannRoch/Surface/Divisor.lean",
+  "PROV",
+  "formula to #25's genuine coherent short exact sequence",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Stability.lean",
+  "PROV",
+  "the one module that mentions both. MO1.08 (#1319) put it in that shape; before it, the μ-slope",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Stability/Comparison.lean",
+  "PROV",
+  "MO1.08 (#1319) made `Slope/` and `Gieseker/` siblings over the shared Hilbert-polynomial data,",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Stability/Comparison.lean",
+  "PROV",
+  "form of `hnTrivialOfGiesekerSemistable`, which is the name #905 asks for; the data itself carries",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Stability/Gieseker/Basic.lean",
+  "PROV",
+  "`docs/architecture/abstraction-tree.md` forbids. The comparison between the two theories happens",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Stability/Gieseker/Basic.lean",
+  "PROV",
+  "needs it for a reason that has nothing to do with the Gieseker order, so MO1.08 (#1319) gave it",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Stability/Purity.lean",
+  "PROV",
+  "Before MO1.08 (#1319) it was declared in `Gieseker/Basic.lean`, so the μ-slope theory reached it",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Stability/Slope/Basic.lean",
+  "PROV",
+  "Until MO1.08 (#1319) this file was `Gieseker/MuStability.lean`, a child of the Gieseker",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Stacks/Algebraic.lean",
+  "PROV",
+  "The split is deliberate. Raising the presentations to fppf is SF9.2 (#522)",
   1
  ],
  [
@@ -297,6 +2079,18 @@
   "DerivedAlgGeo/AlgebraicGeometry/Surface/Enriques/Basic.lean",
   "LONG",
   "variable {k : Type u} [Field k] {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsSmoothProperVariety k X]",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Surface/Enriques/PaperExtension.lean",
+  "PROV",
+  "(#853--#855); it is not silently identified with the counit specialization.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Surface/Enriques/PaperMatching.lean",
+  "PROV",
+  "The compatibility remains explicit until #896--#898 derive it from an exact",
   1
  ],
  [
@@ -315,6 +2109,36 @@
   "DerivedAlgGeo/AlgebraicGeometry/Surface/Spherical.lean",
   "LONG",
   "`IntegralMukaiData`. `Surface/SphericalMukai.lean` builds one from a `BilinearRiemannRochStatement`. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Surface/Spherical.lean",
+  "PROV",
+  "  on the dg-enhancement route (issue #378).",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Surface/Spherical.lean",
+  "PROV",
+  "of `Hom` in `Dᵇ(Coh X)` is not available (issue #332, behind the S1--S4",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Surface/SphericalMukai.lean",
+  "PROV",
+  "* **finite-dimensionality of `Hom` in `Dᵇ(Coh X)`** (`#332`). The Serre-finiteness chain now",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Surface/SphericalMukai.lean",
+  "PROV",
+  "Supplied, not proved. Proving it is bilinear HRR, and the finiteness it presupposes is `#332`. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/AlgebraicGeometry/Surface/SphericalMukai.lean",
+  "PROV",
+  "`finrank` measures it -- is the `Hom`-finiteness of `#332`. Nothing here constructs one, and this",
   1
  ],
  [
@@ -342,9 +2166,69 @@
   1
  ],
  [
+  "DerivedAlgGeo/AlgebraicTopology/ExtraCodegeneracy.lean",
+  "PROV",
+  "`exactAt_succ_of_extraDegeneracy` is what #13 consumes: an extra degeneracy on an augmented",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Analysis.lean",
+  "PROV",
+  "The subject was added in MO1.13 (#1324) -- the conscious act rule 6 of",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Analysis/Complex/HalfPlane.lean",
+  "PROV",
+  "`Mathlib/Analysis/Complex/UpperHalfPlane/`. MO1.13 (#1324) acted on that: the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Analysis/Complex/PhaseFiniteSums.lean",
+  "PROV",
+  "`StabilityCondition/Weak/Foundation/StabilityFunction/` until MO1.13 (#1324),",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Analysis/Complex/PhaseFiniteSums.lean",
+  "PROV",
+  "is not under `CategoryTheory/Abelian/Stability/`, where MO1.08 (#1319) placed",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Analysis/Complex/PhaseGeometry.lean",
+  "PROV",
+  "(#1324) made the split because the Euclidean core of the mass-subadditivity",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Analysis/Complex/PhaseGeometry.lean",
+  "PROV",
+  "-- needs an abelian category and stayed there, importing this file. MO1.13",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Analysis/Complex/PhaseGeometry.lean",
+  "PROV",
+  "These declarations were the first half of what MO1.08 (#1319) has since",
+  1
+ ],
+ [
   "DerivedAlgGeo/Analysis/Convex/ComplexPolygonalPath/Basic.lean",
   "LONG",
   "`CategoryTheory/Abelian/Stability/HNPolygon.lean` until MO1.13 (#1324); nothing in it mentions an object, a filtration or a stability",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Analysis/Convex/ComplexPolygonalPath/Basic.lean",
+  "PROV",
+  "`CategoryTheory/Abelian/Stability/HNPolygon.lean` until MO1.13 (#1324); nothing in it mentions an object, a filtration or a stability",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Analysis/Convex/ComplexPolygonalPath/Basic.lean",
+  "PROV",
+  "where MO1.08 (#1319) placed the rest of that directory. It was the",
   1
  ],
  [
@@ -354,9 +2238,141 @@
   1
  ],
  [
+  "DerivedAlgGeo/Analysis/Convex/ComplexPolygonalPath/Perimeter.lean",
+  "PROV",
+  "-- until MO1.13 (#1324). See `ComplexPolygonalPath/Basic.lean` for why",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Abelian/QuasiAbelian.lean",
+  "PROV",
+  "`Triangulated/` until 2026-09-02, when the review of the Mathlib-mesh restructure",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Abelian/QuasiAbelian.lean",
+  "PROV",
+  "weaker than abelian. It sat under `StabilityCondition/Foundation/` until #488",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Abelian/Stability.lean",
+  "PROV",
+  "is not a defect and MO1.08 did not reverse it.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Abelian/Stability.lean",
+  "PROV",
+  "map in `docs/architecture/cutover-ledger.md`.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Abelian/Stability.lean",
+  "PROV",
+  "until MO1.08 (#1319), where an independently abelian subject was owned by the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Abelian/Stability/Charge.lean",
+  "PROV",
+  "(#1324) and now live at `DerivedAlgGeo/Analysis/Complex/HalfPlane.lean`, which",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Abelian/Stability/Charge.lean",
+  "PROV",
+  "It sat at the root of `CategoryTheory/` from #760 until 2026-09-02 -- the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Abelian/Stability/Charge.lean",
+  "PROV",
+  "This is the **neutral core** of the MO1.08 owner map: the class datum and the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Abelian/Stability/Charge.lean",
+  "PROV",
+  "`Triangulated/StabilityCondition/Weak/` until MO1.08 (#1319). What the second",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Abelian/Stability/Charge.lean",
+  "PROV",
+  "`closedUpperHalfPlane`, and their three lemmas) left this file in MO1.13",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Abelian/Stability/Cutoff.lean",
+  "PROV",
+  "Bridgeland's torsion pair is cut from `Coh X` by a slope, and #709 turned the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Abelian/Stability/HNPolygon.lean",
+  "PROV",
+  "about objects or filtrations, and MO1.13 (#1324) moved them to their neutral",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Abelian/Stability/PhaseGeometry.lean",
+  "PROV",
+  "declared here. They say nothing about categories, and MO1.13 (#1324) moved them",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Abelian/Stability/Weak.lean",
+  "PROV",
+  "of its Grothendieck group, and a half-plane. Until MO1.08 (#1319) it lived",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Abelian/Stability/Weak.lean",
+  "PROV",
+  "see decision 1 of the MO1 owner map in `docs/architecture/cutover-ledger.md`.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Abelian/Stability/Weak/Splitting.lean",
+  "PROV",
+  "* `F.chain k`, filtered by `restrict` (#789), whose slopes are all above `μ₀`;",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Abelian/Stability/Weak/Splitting.lean",
+  "PROV",
+  "whose slope exceeds `μ₀` form an initial segment; `exists_crossIndex` (#789) names its length",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Abelian/Stability/Weak/Tail.lean",
+  "PROV",
+  "| `Z.phase_cokernel_ofLE_congr` | `W.slope_cokernel_ofLE_congr` (#789) |",
+  1
+ ],
+ [
   "DerivedAlgGeo/CategoryTheory/Linear/SerreFunctor/Uniqueness.lean",
   "LONG",
   "  exact (D.uniqueIso_unique D (𝟙 D.S) (fun A B phi ↦ by rw [NatTrans.id_app, Category.comp_id])).symm",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Linear/Yoneda.lean",
+  "PROV",
+  "`docs/architecture/cutover-ledger.md`, finding 05.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Sites/Descent/StackInGroupoids/Representable.lean",
+  "PROV",
+  "After #1631, #1637 generalizes this construction in place to independent fibre",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Sites/Descent/StackInGroupoids/Representable.lean",
+  "PROV",
+  "the universe of the Yoneda presheaf; #1637 will generalize this in place after #1631.",
   1
  ],
  [
@@ -372,9 +2388,339 @@
   1
  ],
  [
+  "DerivedAlgGeo/CategoryTheory/Sites/Sheaves/CohomologyPushforward.lean",
+  "PROV",
+  "* `sheafHPushforwardAddEquiv` — the cohomology form, which is `#572` step 3's statement.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Sites/Sheaves/CohomologyPushforward.lean",
+  "PROV",
+  "`#572` step 3's statement. The `HasExt` universe stays a parameter, as that issue asks, and the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Sites/Sheaves/CohomologyPushforward.lean",
+  "PROV",
+  "and is stated directly, as `#572` asks. The `Ext` form is kept because it is the reusable one, not",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Sites/Sheaves/CohomologyPushforward.lean",
+  "PROV",
+  "and there is only one `Preadditive`. Same family as `#662`.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Sites/Sheaves/CohomologyPushforward.lean",
+  "PROV",
+  "pushforward are both exact. This is `#572` step 3 — cohomology invariance along a closed immersion",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated.lean",
+  "PROV",
+  "group in #488, on the same ground as `PostnikovTower` and `GrothendieckGroup`",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated.lean",
+  "PROV",
+  "in #454 — their namespace was already `CategoryTheory.Triangulated` while their",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/CompactlyGenerated/Polishchuk.lean",
+  "PROV",
+  "are intentionally absent. They are the geometric layer of SF7.3.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/CompactlyGenerated/Polishchuk.lean",
+  "PROV",
+  "conservativity-on-bounded-objects hypothesis. Until 2026-08-18 it was",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/CompactlyGenerated/Polishchuk.lean",
+  "PROV",
+  "realization (adversarial review, finding P2-11). -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/CompactlyGenerated/Thick.lean",
+  "PROV",
+  "The geometric consumer is the compact/perfect comparison on `Dqc(X)` (#723): the perfect",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/DGEnhancement/Exact.lean",
+  "PROV",
+  "The seam and exactness obligations themselves belong to `#854` and `#855`. This",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/DGEnhancement/H0.lean",
+  "PROV",
+  "What is left here after `#1320` are the declarations that need something beyond",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/ExtensionClosure.lean",
+  "PROV",
+  "until #488 because its consumers are the deformed phase cuts",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/ExtensionClosure.lean",
+  "PROV",
+  "what it is.  Same move as #454 made for `PostnikovTower` and `K₀`.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/FourierMukai/Autoequivalence.lean",
+  "PROV",
+  "  Since #559's adjunction stage there is one *abstract* constructor:",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/FourierMukai/Autoequivalence.lean",
+  "PROV",
+  "Until #487 this proof had a step in it: the stability track carried its own",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/FourierMukai/ExceptionalExtension.lean",
+  "PROV",
+  "evaluation remain the #853--#855 realization boundary.  Accordingly the two",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/GrothendieckGroup/EulerForm.lean",
+  "PROV",
+  "  `GrothendieckGroup/HomFiniteWitness.lean` (#543).",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/GrothendieckGroup/EulerForm.lean",
+  "PROV",
+  "`Kᵇ(FGModuleCat k)` the named concrete model (#543).",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/GrothendieckGroup/HomFiniteWitness.lean",
+  "PROV",
+  "  The obligation #513 named is discharged in the satisfiability sense only:",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/GrothendieckGroup/HomFiniteWitness.lean",
+  "PROV",
+  "  `k`-linear pretriangulated. This is the honest `Dᵇ` witness #543 asked for.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/GrothendieckGroup/HomFiniteWitness.lean",
+  "PROV",
+  "# A concrete `HomFiniteBounded` category (#543)",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/GrothendieckGroup/HomFiniteWitness.lean",
+  "PROV",
+  "(`Dᵇ(k‑vect) ≃ ℤ`-graded vector spaces) that an earlier reading of #543 took to",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/GrothendieckGroup/HomFiniteWitness.lean",
+  "PROV",
+  "/-- **The `Dᵇ` witness for #543.**",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/GrothendieckGroup/HomFiniteWitness.lean",
+  "PROV",
+  "/-- **The named concrete witness for #543**: bounded complexes of",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/LinearYoneda.lean",
+  "PROV",
+  "`ShiftSequence ℤ` **is** here now (#469), so the shifted Hom-groups",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/SemiorthogonalDecomposition/Admissible.lean",
+  "PROV",
+  "mutation functor needs an enhancement (the dg-enhancement lane, issues #853--#855).  The familiar",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/SemiorthogonalDecomposition/Admissible.lean",
+  "PROV",
+  "spaces, which are outside the present coherent-sheaf linearity interface (issue #332).",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/SemiorthogonalDecomposition/Collection.lean",
+  "PROV",
+  "#332, #806, #833, #824–#828) and are deliberately NOT touched here; the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/SemiorthogonalDecomposition/Collection.lean",
+  "PROV",
+  "(`AlgebraicGeometry/Modules/Coherent/Linear.lean`, issue #332) and is not",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/SemiorthogonalDecomposition/Collection.lean",
+  "PROV",
+  "`D^b(P^n)` land in `AlgebraicGeometry/ProjectiveSpectrum/**` (issues #570, #586, #571,",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/SemiorthogonalDecomposition/DerivedField.lean",
+  "PROV",
+  "design note's requirement — `.claude/notes/2026-08-28-semiorthogonal-reconnaissance.md`",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/SemiorthogonalDecomposition/DerivedField.lean",
+  "PROV",
+  "§4: \"issue #852 requires those notions to be added only when a theorem",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/SemiorthogonalDecomposition/Exceptional.lean",
+  "PROV",
+  "-- component starting `eq_` (#998), so the issue's spelling",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/SemiorthogonalDecomposition/Exceptional.lean",
+  "PROV",
+  "Per `docs/architecture/abstraction-tree.md`, no `KLinearCategory` or other",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/SemiorthogonalDecomposition/Mutation.lean",
+  "PROV",
+  "data and is one of the jobs of the dg lane (#855, #853, #854).",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/SerreFunctor/Shift.lean",
+  "PROV",
+  "corresponding shift equivalence. This is the orientation used in #898;",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/SerreFunctor/Transport.lean",
+  "PROV",
+  "uniqueness/conjugation lane (#896--#898) has not yet produced them",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/SphericalTwist/Definition.lean",
+  "PROV",
+  "  tensor of that kind. No repository module provides one: #892 delivered the monoidal structure of",
+  1
+ ],
+ [
   "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/CentralCharge/Exponential/Divisorial.lean",
   "LONG",
   "proves the two compressed `H`-degree families are it. Those families are Picard rank one. This file does",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/CentralCharge/Exponential/Kernel.lean",
+  "PROV",
+  "formulas, recorded the assumption FALSIFIED on 2026-08-27, and parked the epic.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/CentralCharge/Exponential/Kernel.lean",
+  "PROV",
+  "which spelling survives is #1228.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/CentralCharge/Mukai/Positivity.lean",
+  "PROV",
+  "repository. See #740 and #332.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Families/StabilityOverField.lean",
+  "NAMENUM",
+  "abbrev Definition817Conditions",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Families/StabilityOverField.lean",
+  "NAMENUM",
+  "abbrev Lemma822SemistableConditions",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Families/StabilityOverField.lean",
+  "NAMENUM",
+  "def BLMNPSTheorem2124",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Families/StabilityOverField.lean",
+  "NAMENUM",
+  "def HLRProposition238",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Families/StabilityOverField.lean",
+  "NAMENUM",
+  "def HLRProposition241",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Families/StabilityOverField.lean",
+  "NAMENUM",
+  "def HLRTheorem235OneToTwo {J : Type*}",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Families/StabilityOverField.lean",
+  "NAMENUM",
+  "def PF4Lemma822",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Families/StabilityOverField.lean",
+  "NAMENUM",
+  "theorem lemma822SemistableConditions_of_massHom",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Families/StabilityOverField.lean",
+  "NAMENUM",
+  "theorem theorem823_definition817",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Families/StabilityOverField.lean",
+  "NAMENUM",
+  "theorem theorem823_properGoodModuli",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Foundation/Deformation/LocalInjectivity.lean",
+  "NAMENUM",
+  "theorem bridgeland_lemma_6_4 (σ τ : StabilityCondition.WithClassMap C v) (hZ : σ.Z = τ.Z)",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Mass.lean",
+  "PROV",
+  "MO1.13 (#1324).",
   1
  ],
  [
@@ -387,6 +2733,36 @@
   "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Mass/Basic.lean",
   "LONG",
   "variable (a : CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPair v)",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Mass/Subadditivity/HNPolygonComparison.lean",
+  "PROV",
+  "(#1324) sent the Euclidean half to its neutral owner and gave what stayed a",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Mass/Subadditivity/HNPolygonComparison.lean",
+  "PROV",
+  "`StabilityCondition/Metric/Mass/Subadditivity/PolygonPerimeter.lean`. MO1.13",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/MassHom/Algebraic.lean",
+  "PROV",
+  "Jordan--Hölder bridge is constructed (GitHub issue #1203).",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/MassHom/Algebraic.lean",
+  "PROV",
+  "`HasFiniteLengthHeart` is the missing Jordan--Hölder lane (#1203). -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/MassHom/Algebraic.lean",
+  "PROV",
+  "witness is tracked separately by GitHub issue #1206.",
   1
  ],
  [
@@ -486,6 +2862,18 @@
   1
  ],
  [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/MassHom/Stable.lean",
+  "PROV",
+  "The missing bridge is tracked by GitHub issue #1203.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Metric.lean",
+  "PROV",
+  "does not re-export a sibling root. MO1.13 (#1324).",
+  1
+ ],
+ [
   "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Metric/Distance/Basic.lean",
   "LONG",
   "`WeakStabilityCondition/StabilityCondition/Metric/Mass/Uniqueness.lean` proves that the choice-free definition of",
@@ -516,9 +2904,57 @@
   1
  ],
  [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Mukai/Charge.lean",
+  "PROV",
+  "It is the mechanical half of #740 step 2 — `map_zero`, `map_iso` and",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Mukai/Charge.lean",
+  "PROV",
+  "`nonzero_mem`; the analogous step for `Z(β,ω)` is the open part of #740.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Mukai/Charge.lean",
+  "PROV",
+  "function on the tilted heart `𝒜(β,ω)`.  `CentralCharge/Mukai/Positivity.lean` (#742) proved",
+  1
+ ],
+ [
   "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Mukai/Tilting.lean",
   "LONG",
   "*define* the heart datum by composing with `K₀Ab.toAmbient` (`GrothendieckGroup/HeartComparison.lean`).",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Mukai/Tilting.lean",
+  "PROV",
+  "  finite-dimensional `Hom` — which is not in this repository (#332);",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Mukai/Tilting.lean",
+  "PROV",
+  "`F₀⟦1⟧ → X → T₀` of `hnTilt_heart_iff` splits the charge; #808 signs the two ends; the shift",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Mukai/Tilting.lean",
+  "PROV",
+  "`K₀.of_triangle` and `K₀.of_shift_one` give `Z(X) = -Z(F₀) + Z(T₀)`.  #808 bounds the two ends —",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Phase.lean",
+  "PROV",
+  "and live at `Algebra/Order/NormalizedShift/` since MO1.12 (#1323).",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Phase/Order/Functoriality.lean",
+  "PROV",
+  "destination issue #211 (transferred from source issue #141).",
   1
  ],
  [
@@ -537,6 +2973,24 @@
   "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/Autoequivalence/Slicing/Transport.lean",
   "LONG",
   "Dual to `CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.relabel`, which moves phases",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/Autoequivalence/Slicing/Transport.lean",
+  "PROV",
+  "The third row's subject was retired in #487: the stability track's",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/Autoequivalence/Slicing/Transport.lean",
+  "PROV",
+  "measured 2026-08-05 by doing exactly that and re-running the linter:",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/Autoequivalence/Slicing/Transport.lean",
+  "PROV",
+  "than transplanted — it was taken against the retired instance on 2026-08-05 and",
   1
  ],
  [
@@ -570,6 +3024,18 @@
   1
  ],
  [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/Autoequivalence/Stability/Transport.lean",
+  "PROV",
+  "See the stability-foundation ownership record in `notes/dependencies/`.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde.lean",
+  "PROV",
+  "under `Topology/Covering/`. MO1.12 (#1323), cutover-ledger row 08.",
+  1
+ ],
+ [
   "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Action/Continuous.lean",
   "LONG",
   "statement is proved in `CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Action/JointContinuous.lean`.",
@@ -600,6 +3066,24 @@
   1
  ],
  [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Walls/Rotation.lean",
+  "PROV",
+  "(#1314) renamed the wall locus and its defining expression to `alignmentLocus`",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Walls/Rotation.lean",
+  "PROV",
+  "(`docs/reviews/2026-09-12-abstraction-audit-remediation.md`, §3.5 and §7 PR-8)",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Walls/Rotation.lean",
+  "PROV",
+  "names these statements `phaseRotate_wall` and `phaseRotate_wallValue`.  MO1.03",
+  1
+ ],
+ [
   "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Walls/Spherical/DivisorialRegion.lean",
   "LONG",
   "`signedRayRegularLocus_inter_carrier` says the signedRayRegularLocus of the whole lattice agrees, on the",
@@ -618,9 +3102,99 @@
   1
  ],
  [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Walls/Threefold/Basic.lean",
+  "PROV",
+  "`docs/architecture/abstraction-tree.md`. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Walls/Threefold/Tilt.lean",
+  "PROV",
+  "  `rotatedTiltFamily_wall_eq_preimage`; MO1.03 (#1314) renamed the wall locus to",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Walls/Threefold/TiltComparison.lean",
+  "PROV",
+  "`(n, m) = (3, 2)` tilt charge and asked for a comparison or a deletion (#1228).",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak.lean",
+  "PROV",
+  "MO1.08 (#1319); `Weak/Foundation.lean` consumes that owner and re-exports it, so",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Basic/Definitions.lean",
+  "PROV",
+  "  `target` is a separate, evidence-gated act (#111).",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Families/Basic.lean",
+  "NAMENUM",
+  "structure OrdinaryDefinition20_5Conditions",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Families/Basic.lean",
+  "NAMENUM",
+  "structure WeakDefinition20_5Conditions",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Families/Weak.lean",
+  "NAMENUM",
+  "structure WeakDefinition20_5ClauseZero {t : TStructure C}",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Families/Weak.lean",
+  "PROV",
+  "quotient-uniform support package from issue #82.  Relative HN and boundedness",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Foundation.lean",
+  "PROV",
+  "MO1.08 (#1319) moved them to `CategoryTheory/Abelian/Stability/`; this umbrella",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Foundation/HeartDatum.lean",
+  "PROV",
+  "so nothing here needs `IsTriangulated`. That matters: #760 recorded the open",
+  1
+ ],
+ [
   "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Foundation/Slicing/PhaseTruncation.lean",
   "LONG",
   "theorem Slicing.toTStructure_heart_iff (s : Slicing C) (E : C) : (s.toTStructure C).heart E ↔ s.gtProp C 0 E ∧ s.leProp C 1 E := by",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Heart/Noetherian.lean",
+  "PROV",
+  "characterisation added for the #86 review's finding F1. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Heart/Noetherian.lean",
+  "PROV",
+  "focused modules before these two lemmas are attempted; #108 records the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Heart/Noetherian.lean",
+  "PROV",
+  "orthogonal of its torsion class — the place `free_of_orthogonal` (#94) was",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Mass.lean",
+  "PROV",
+  "`StabilityCondition/Mass/`. It sat under `Weak/Metric/` until MO1.13 (#1324);",
   1
  ],
  [
@@ -636,6 +3210,12 @@
   1
  ],
  [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Tilting/TorsionPair/CutoffPhase.lean",
+  "PROV",
+  "Cases 1--3 of #740 conclude `Im Z(β,ω) > 0` from an object being in the torsion",
+  1
+ ],
+ [
   "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Tilting/TorsionPair/Heart.lean",
   "LONG",
   "    obtain ⟨k, hk⟩ := Triangle.yoneda_exact₃ _ hdist (𝟙 Y) (by show p ≫ 𝟙 Y = 0; simpa using h Y hY p)",
@@ -648,9 +3228,75 @@
   1
  ],
  [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Tilting/TorsionPair/Heart.lean",
+  "PROV",
+  "`tilt_heart_iff` (#106): the heart is exactly the extensions of `T` by",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Tilting/TorsionPair/Heart.lean",
+  "PROV",
+  "tilt (#86, finding F1) observed that the textbook-agreement claim above was",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Tilting/TorsionPair/Slope.lean",
+  "PROV",
+  "(#106) its tilted heart is identified with the extensions of `P((β, 1])` by",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Tilting/TorsionPair/Slope.lean",
+  "PROV",
+  "`P((0, β])`-object. Direct from `tilt_heart_iff` (#106). This is the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Tilting/TorsionPair/WeakStabilityFunction.lean",
+  "PROV",
+  "* `hom_eq_zero` is `hom_eq_zero_of_mem_hnTors_of_mem_hnFree` (#789) — the image of a map is a",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Tilting/TorsionPair/WeakStabilityFunction.lean",
+  "PROV",
+  "The Hom-vanishing axiom ported from the strict theory almost verbatim in #789.  The splitting",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Weak/Tilting/TorsionPair/WeakStabilityFunction.lean",
+  "PROV",
+  "all — sit in `T μ₀` at every finite cutoff (`WeakSlopeData.mem_hnTors_of_rank_zero`, #801).",
+  1
+ ],
+ [
   "DerivedAlgGeo/CategoryTheory/Triangulated/TStructure/Exactness.lean",
   "LONG",
   "theorem isNondegenerate_of_isBounded (h : TStructure.IsBounded t) : TStructure.IsNondegenerate t where",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/TStructure/Exactness.lean",
+  "PROV",
+  "Issue #146 asked for \"the nondegenerate ⟺ bounded equivalence\". Only one",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/TStructure/Exactness.lean",
+  "PROV",
+  "So the equivalence is not stated here, and #146's acceptance criterion should be",
+  1
+ ],
+ [
+  "DerivedAlgGeo/CategoryTheory/Triangulated/TStructure/Shift.lean",
+  "PROV",
+  "homological in every degree. See issue #151.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/AffineProjectiveFoundations.lean",
+  "PROV",
+  "- Issue #1608.",
   1
  ],
  [
@@ -672,9 +3318,297 @@
   1
  ],
  [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "                                         ├──> #31 ──> #32",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "   separately constructed `Ext` connecting morphisms remains an explicit #32 input.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "  #13 + #27 ──> #103 ──> #28 ──> #30 ──┐",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "  #57/#94–#96 ──> #97 polynomial global/Čech algebra ──> #29",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "  deliberately contains no eventual-vanishing claim. #31 and #32 are downstream of it.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "  single-cover comparison, #103 constructs the compact-basis witness, and #28 transports the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "## Dependency graph for #29–#32",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "* **Affine vanishing is complete.** #13 proves affine Čech exactness, #27 proves the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "* **Still not proved.** #29, finite-dimensionality of `H^i(X, F)` over a field. Its Proj object,",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "**Consequence for #31 and #32.** The Euler characteristic cannot be *defined* by a theorem",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "/-! ### The long exact sequence engine for #32 -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "/-- The exact output boundary for #29: a functorial linear lift of derived cohomology together",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "/-- The functorial linear lift itself is now canonical; #29 only still owes the geometric",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "/-- The stable affine boundary used by the completed #28 theorem. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "What remains for #29 is the cohomological Serre-finiteness argument; it must not try to prove the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "`FiniteCohomology` package extending the #29 `FiniteDimensionalCohomology` interface with the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "`IsNoetherian X` already packages locally noetherian with quasi-compactness. #103 constructs the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "epimorphisms is *not* upstream, and #32 needs it. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "in #13 and the single-cover Čech-to-derived comparison in #27.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "issue #26, and it exists so that the next session can start the finiteness proof without",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "non-circular compact-basis comparison of Stacks Tag 01EW, and #28 combines it with affine Čech",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "separate #30 eventual-vanishing bound. #32 proves",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "that separate completed Proj infrastructure from the remaining #29 proof. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "the completed #27 comparison lives in DerivedAlgGeo. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "the declarations that #29 will consume.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "the transported `k`-module structure needed by the #29 finiteness statement. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "this stage will prove, so it must take finiteness as an input rather than derive it. #31 is now",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "vanishing only. The projective-to-proper question (#26 question 3, Chow's lemma plus",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/Cohomology/Strategy.lean",
+  "PROV",
+  "with degreewise finite-dimensionality, but no #30 vanishing bound. -/",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/StabilityCondition/Families/Scaffolding.lean",
+  "PROV",
+  "pre-stability input and asserts nothing vacuously (2026-08-18 adversarial",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Development/StabilityCondition/Families/Scaffolding.lean",
+  "PROV",
+  "review, finding P2-10).",
+  1
+ ],
+ [
+  "DerivedAlgGeo/LinearAlgebra/BilinearForm/Hyperbolic.lean",
+  "PROV",
+  "`docs/architecture/abstraction-tree.md`. The reason the ring has to be",
+  1
+ ],
+ [
+  "DerivedAlgGeo/LinearAlgebra/Complex/Coordinates.lean",
+  "PROV",
+  "MO1.12 (#1323), cutover-ledger row 08, comparison-owner column: a",
+  1
+ ],
+ [
+  "DerivedAlgGeo/LinearAlgebra/Matrix/GeneralLinearGroup/Positive.lean",
+  "PROV",
+  "Extracted by MO1.12 (#1323) from the cover's `Basic.lean`, where it was",
+  1
+ ],
+ [
+  "DerivedAlgGeo/LinearAlgebra/Matrix/GeneralLinearGroup/UniversalCover.lean",
+  "PROV",
+  "MO1.12 (#1323), cutover-ledger row 08. This development is independent of",
+  1
+ ],
+ [
+  "DerivedAlgGeo/LinearAlgebra/Matrix/GeneralLinearGroup/UniversalCover/ComplexRepresentation.lean",
+  "PROV",
+  "comparisons and stay with the cover (MO1.12, #1323; cutover-ledger row 08).",
+  1
+ ],
+ [
+  "DerivedAlgGeo/LinearAlgebra/Matrix/GeneralLinearGroup/UniversalCover/Map.lean",
+  "PROV",
+  "with the topology owner in `Topology/Covering/Basic.lean` (MO1.12, #1323).",
+  1
+ ],
+ [
+  "DerivedAlgGeo/LinearAlgebra/QuadraticForm/OrthogonalityCutNonempty.lean",
+  "PROV",
+  "#700 fixed `positivePlanesAway` to take its cutting classes from a set, after the",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Topology/Covering/Basic.lean",
+  "PROV",
+  "`isCoveringMap_prodMap_id` was extracted here by MO1.12 (#1323) from the",
+  1
+ ],
+ [
   "DerivedAlgGeo/Topology/Sheaves/CohomologyPushforward.lean",
   "LONG",
   "`CategoryTheory/Sites/Sheaves/CohomologyPushforward.lean` proves the comparison abstractly, for a continuous",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Topology/Sheaves/CohomologyPushforward.lean",
+  "PROV",
+  "`#572` step 3, at a map of spaces. Every hypothesis of the abstract comparison is discharged here;",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Topology/Sheaves/CohomologyPushforward.lean",
+  "PROV",
+  "range. This is `#572` step 3's statement, instantiated at an actual map of spaces.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Topology/Sheaves/CohomologyPushforward.lean",
+  "PROV",
+  "spaces, so this applies to one — but that final step is not taken here, and `#572`'s acceptance",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Topology/Sheaves/PushforwardStalks.lean",
+  "PROV",
+  "  is the same functor the site-level `#572` machinery quantifies over.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Topology/Sheaves/PushforwardStalks.lean",
+  "PROV",
+  "Exactness of `ι_*` along a closed immersion is the last input `#572` step 3 needs in order to be",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Topology/Sheaves/PushforwardStalks.lean",
+  "PROV",
+  "This is phrased about `TopCat.Sheaf.pushforward`, while `#572` step 3 quantifies over",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Topology/Sheaves/PushforwardStalks.lean",
+  "PROV",
+  "This is the input `#572` step 3 needs in order to instantiate the abstract cohomology comparison",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Topology/Sheaves/PushforwardStalks.lean",
+  "PROV",
+  "is the last mathematical input `#572` step 3 needs.",
+  1
+ ],
+ [
+  "DerivedAlgGeo/Topology/Sheaves/PushforwardStalks.lean",
+  "PROV",
+  "the site-level `Functor.sheafPushforwardContinuous` that `#572` step 3 actually quantifies over is",
   1
  ]
 ]
