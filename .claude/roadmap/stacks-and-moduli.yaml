@@ -876,7 +876,7 @@ items:
     kind: task
     parent: stacks-and-moduli-pj1
     title: "PJ1.3a: Ample and relatively ample invertible sheaves; H-projective and locally projective morphisms"
-    status: planned
+    status: done
     priority: must
     size: M
     summary: "Ample and relatively ample invertible sheaves; H-projective and locally projective morphisms. This issue defines: 1. the non-vanishing locus X_s of a section of an invertible sheaf (Stacks 01CY); 2. ampleness (Stacks 01PS); 3. relative ampleness for a quasi-compact morphism (Stacks 01VH); 4. H-projective morphisms, those admitting a closed immersion into ℙ(n; S) over S (Stacks 01W8), and locally projective morphisms, locally H-projective over an open cover (Stacks 01WB)."

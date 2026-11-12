@@ -1,5 +1,6 @@
 import DerivedAlgGeo.AlgebraicGeometry.Modules.AB
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Ample
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent
 import DerivedAlgGeo.AlgebraicGeometry.Modules.ExteriorPower
 import DerivedAlgGeo.AlgebraicGeometry.Modules.ExteriorPower.Restriction
