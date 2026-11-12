@@ -357,3 +357,12 @@ Ext finiteness or a geometric vanishing bound.
 #print axioms CochainComplex.hasLiftingProperty_mappingCocone_fst_id
 #print axioms CochainComplex.isKInjective_of_injective_of_homotopy_zero
 #print axioms CochainComplex.isKInjective_of_injective_of_rightOrthogonal
+
+/-! ## Functorial injective replacements in Grothendieck abelian categories -/
+
+#print axioms CochainComplex.injectiveReplacement
+#print axioms CochainComplex.injectiveReplacementι
+#print axioms CochainComplex.mono_injectiveReplacementι_app
+#print axioms CochainComplex.quasiIso_injectiveReplacementι_app
+#print axioms CochainComplex.injective_injectiveReplacement_X
+#print axioms CochainComplex.nonempty_homotopy_zero_injectiveReplacement
