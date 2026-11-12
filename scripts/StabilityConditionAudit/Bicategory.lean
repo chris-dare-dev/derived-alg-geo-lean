@@ -70,3 +70,30 @@ import DerivedAlgGeo.CategoryTheory.Bicategory
 #print axioms CategoryTheory.Pseudofunctor.fiberProduct_obj
 #print axioms CategoryTheory.Pseudofunctor.terminal
 #print axioms CategoryTheory.Pseudofunctor.toTerminal
+
+/-! ## The core of a Cat-valued pseudofunctor -/
+
+#print axioms CategoryTheory.Pseudofunctor.core
+#print axioms CategoryTheory.Pseudofunctor.core_map
+#print axioms CategoryTheory.Pseudofunctor.core_mapComp
+#print axioms CategoryTheory.Pseudofunctor.core_mapComp'_hom_toNatTrans_app_iso_hom
+#print axioms CategoryTheory.Pseudofunctor.core_mapComp'_inv_toNatTrans_app_iso_hom
+#print axioms CategoryTheory.Pseudofunctor.core_mapId
+#print axioms CategoryTheory.Pseudofunctor.core_obj
+#print axioms CategoryTheory.Pseudofunctor.core_obj_isGroupoid
+#print axioms CategoryTheory.Pseudofunctor.coreι
+#print axioms CategoryTheory.Pseudofunctor.coreι_app
+#print axioms CategoryTheory.Pseudofunctor.coreι_naturality
+
+/-! ## Object properties of the core, and inclusions of full sub-pseudofunctors -/
+
+#print axioms CategoryTheory.Pseudofunctor.ObjectProperty.core
+#print axioms CategoryTheory.Pseudofunctor.ObjectProperty.core_isClosedUnderIsomorphisms
+#print axioms CategoryTheory.Pseudofunctor.ObjectProperty.core_isClosedUnderMapObj
+#print axioms CategoryTheory.Pseudofunctor.ObjectProperty.core_prop
+#print axioms CategoryTheory.Pseudofunctor.ObjectProperty.ιOfLE
+#print axioms CategoryTheory.Pseudofunctor.ObjectProperty.ιOfLECompι
+#print axioms CategoryTheory.Pseudofunctor.ObjectProperty.ιOfLECompι_hom_as_app_toNatTrans_app
+#print axioms CategoryTheory.Pseudofunctor.ObjectProperty.ιOfLECompι_inv_as_app_toNatTrans_app
+#print axioms CategoryTheory.Pseudofunctor.ObjectProperty.ιOfLE_app_toFunctor
+#print axioms CategoryTheory.Pseudofunctor.ObjectProperty.ιOfLE_naturality

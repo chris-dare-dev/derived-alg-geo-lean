@@ -395,7 +395,7 @@ items:
     kind: task
     parent: stacks-and-moduli-stk1
     title: "STK1.5: A local, pullback-stable object property of a stack cuts out a substack"
-    status: planned
+    status: done
     priority: must
     size: M
     summary: "Let F : LocallyDiscrete Cᵒᵖ ⥤ᵖ Cat be a stack of categories for J, and let P : F.ObjectProperty be closed under isomorphisms and local for J. Local means stable under pullback, and such that an object whose pullbacks along a covering sieve satisfy P satisfies P. Then: P.fullsubcategory is a stack. This is the Mathlib TODO at Mathlib/CategoryTheory/Bicategory/Functor/Cat/ObjectProperty.lean:19. The core (maximal sub-groupoid) of a stack of categories is a stack in groupoids."
