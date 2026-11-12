@@ -19,7 +19,31 @@ The additive pairing itself is the generic `K₀.EulerForm` abbreviation in this
 file. `K₀.EulerForm.ofLinear` constructs it from the Hom-built form; geometric
 Riemann--Roch comparisons consume that root separately.
 
-## Restrictions, stated up front
+## Main definitions
+
+* `CategoryTheory.Triangulated.K₀.EulerForm` — a biadditive integer-valued form
+  on `K₀ C`, as the nested additive-homomorphism type;
+  `K₀.EulerForm.Preserves` says a triangulated functor preserves two of them.
+* `CategoryTheory.Triangulated.HomFiniteBounded` — every shifted Hom-space is
+  finite-dimensional and only finitely many shifts contribute.
+* `CategoryTheory.Triangulated.chiHom` — the alternating sum of dimensions of
+  shifted Hom-spaces, for every pair of objects.
+* `CategoryTheory.Triangulated.chiRight`, `CategoryTheory.Triangulated.chiK₀`,
+  `K₀.EulerForm.ofLinear` — its descent to `K₀` in one and in both variables.
+
+## Main results
+
+* `chiHom_additive_right`, `chiHom_additive_left` — under `HomFiniteBounded`,
+  `chiHom` is additive on distinguished triangles in each variable.
+* `chiK₀_of_of` — `chiK₀` on classes of objects is `chiHom`.
+* `chiHom_map`, `chiK₀_map`, `K₀.EulerForm.ofLinear_preserves` — a fully
+  faithful linear triangulated functor preserves `χ`.
+* `HomFiniteBounded.of_essSurj` — `HomFiniteBounded` transfers along a fully
+  faithful, essentially surjective linear functor.
+
+## Implementation notes
+
+### Restrictions, stated up front
 
 **`k` is a division ring, not a field and not an arbitrary ring.** That is
 exactly what the arithmetic needs and no more: rank--nullity
@@ -45,7 +69,7 @@ and its shift sequence is `Functor.ShiftSequence.tautological`, whereas
 is what requires `[∀ n, (shiftFunctor C n).Linear k]`. `chiHom` itself carries
 neither hypothesis; `chiK₀` carries the shift-linearity one.
 
-## `chiHom` is junk-total, and that is deliberate
+### `chiHom` is junk-total, and that is deliberate
 
 `Module.finrank` is `0` on a module that is not finite, and `finsum` is `0` on a
 family with infinite support. So `chiHom` is a plain function defined for
@@ -55,15 +79,29 @@ when `HomFiniteBounded` fails. Only the additivity theorems and everything
 downstream of them require that hypothesis. A reader must not take availability
 of `chiHom` as evidence that a category has an Euler form.
 
-## What this file does not assert
+### What this file does not assert
 
 * Nothing *in this file* constructs a `HomFiniteBounded` instance; at this
   generality it is unprovable, see its docstring. A concrete model lives in
-  `GrothendieckGroup/HomFiniteWitness.lean` (#543).
+  `GrothendieckGroup/HomFiniteWitness.lean`.
 * No relation to any geometric Euler characteristic, to `chi₂`, or to
-  Riemann--Roch. Those comparisons remain supplied in the numerical track.
+  Riemann--Roch. Those comparisons are supplied data in the numerical theory,
+  not proved here.
 * Serre duality's twisted `χ` identity is in `SerreFunctor/Euler.lean`;
   no unconditional symmetry or non-degeneracy is asserted here.
+
+## References
+
+The file builds on Mathlib's `Module.finrank`, `finsum`,
+`Module.sum_neg_one_pow_finrank_eq_zero_of_exact` and
+`LinearMap.finrank_range_add_finrank_ker`, on
+`CategoryTheory.Triangulated.linearYonedaShiftSequence`, and on the triangulated
+Grothendieck group `CategoryTheory.Triangulated.K₀`.
+
+## Tags
+
+Euler form, Euler characteristic, Grothendieck group, Hom-finite, triangulated
+category, division ring
 -/
 
 universe w u v u' v'
@@ -113,7 +151,7 @@ nothing in `Pretriangulated` bounds them; nor need `Hom(X, Y⟦i⟧)` vanish for
 large `|i|`, and it does not in an unbounded derived category. It is not
 vacuous either: `GrothendieckGroup/HomFiniteWitness.lean` proves it for the
 bounded homotopy category of any Hom-finite `k`-linear category, with
-`Kᵇ(FGModuleCat k)` the named concrete model (#543).
+`Kᵇ(FGModuleCat k)` the named concrete model.
 
 The two fields are independent: `finrank` returns `0` for a non-finite module,
 so finiteness of the *rank support* says nothing about the modules themselves
@@ -324,9 +362,10 @@ Two linear equivalences composed: full faithfulness moves `Hom(X, Y⟦i⟧)` to
 `Hom(ΦX, Φ(Y⟦i⟧))`, and the `CommShift` isomorphism moves that to
 `Hom(ΦX, (ΦY)⟦i⟧)`.
 
-This was inline inside `finrank_hom_shift_map`. It is named because equality of
-dimensions is not enough to transport `HomFiniteBounded` — finite-dimensionality
-has to travel too, and for that the equivalence itself is needed. -/
+It is a named declaration, rather than a step inside `finrank_hom_shift_map`,
+because equality of dimensions is not enough to transport `HomFiniteBounded` —
+finite-dimensionality has to travel too, and for that the equivalence itself is
+needed. -/
 noncomputable def homShiftLinearEquiv (Φ : C ⥤ D) [Φ.Additive] [Φ.Linear k]
     [Φ.CommShift ℤ] (hΦ : Φ.FullyFaithful) (X Y : C) (i : ℤ) :
     (X ⟶ Y⟦i⟧) ≃ₗ[k] (Φ.obj X ⟶ (Φ.obj Y)⟦i⟧) :=
@@ -386,7 +425,7 @@ This is what `finrank_hom_shift_map` alone could not do. Equality of dimensions
 says nothing about finiteness — `finrank` is junk-valued at `0` on an infinite-
 dimensional space, so two infinite-dimensional Hom-spaces have equal `finrank`
 and neither is finite. The equivalence itself has to travel, which is why
-`homShiftLinearEquiv` was factored out of that proof.
+`homShiftLinearEquiv` is a separate declaration rather than part of that proof.
 
 ## The intended use
 

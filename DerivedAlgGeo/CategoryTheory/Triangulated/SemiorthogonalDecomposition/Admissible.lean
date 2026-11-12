@@ -16,16 +16,43 @@ An object property is right (respectively left) admissible when the inclusion of
 subcategory has a right (respectively left) adjoint.  Completing the counit (respectively unit)
 of that adjunction gives the two orthogonal decomposition triangles.
 
+## Main definitions
+
+* `CategoryTheory.ObjectProperty.IsRightAdmissible`, `IsLeftAdmissible`, `IsAdmissible` — the
+  inclusion of the full subcategory has a right adjoint, a left adjoint, or both.
+* `CategoryTheory.ObjectProperty.zeroObjects` — the object property of being a zero object.
+* `CategoryTheory.Triangulated.SemiorthogonalSequence.twoBlock` — the root-facing two-block
+  sequence attached to `P` and its right orthogonal.
+
+## Main results
+
+* `IsRightAdmissible.exists_distTriang_mem_rightOrthogonal`,
+  `IsLeftAdmissible.exists_distTriang_mem_leftOrthogonal` — the counit and unit triangles have
+  their third vertex in the right, respectively left, orthogonal.
+* `IsRightAdmissible.extensionProduct_rightOrthogonal_eq_top`,
+  `IsLeftAdmissible.leftOrthogonal_extensionProduct_eq_top` — the same as an equality of object
+  properties.
+* `SemiorthogonalSequence.twoBlock_isStronglyFull` — a right-admissible two-block sequence is
+  strongly full with the explicit bound `1`.
+* `top_isRightAdmissible`, `zeroObjects_isRightAdmissible` and their left counterparts — the
+  trivial admissible properties.
+
+## Implementation notes
+
+### Triangles, not mutations
+
 For a right-admissible `P`, the third vertex of the counit triangle is the object usually called
 the **left mutation** of `X` through `P`.  This file deliberately records the triangle and not a
 mutation object or functor.  Cones are not functorial in a bare triangulated category, so a
-mutation functor needs an enhancement (the dg-enhancement lane, issues #853--#855).  The familiar
-formula for mutation through an exceptional object additionally needs finite-dimensional Hom
-spaces, which are outside the present coherent-sheaf linearity interface (issue #332).
+mutation functor needs an enhancement.  The familiar formula for mutation through an exceptional
+object additionally needs finite-dimensional Hom spaces, which the coherent-sheaf linearity
+interface does not provide.
 
 No theorem here claims that an arbitrary triangulated object property is admissible, or that an
 operation on object properties preserves admissibility.  Admissibility remains an explicit
 hypothesis in every decomposition theorem.
+
+### Orientation
 
 The two-block construction feeds the classically ordered family
 `⟨P.rightOrthogonal, P⟩` to
@@ -33,6 +60,17 @@ The two-block construction feeds the classically ordered family
 `P.rightOrthogonal`: the root vanishes Hom from earlier to later, while the literature reads a
 semiorthogonal decomposition in the reverse direction.  `Orientation.lean` is the single source
 of truth for that convention.
+
+## References
+
+The file builds on Mathlib's `CategoryTheory.ObjectProperty.rightOrthogonal`,
+`CategoryTheory.ObjectProperty.IsTriangulated` and `CategoryTheory.Adjunction`, and on
+`CategoryTheory.Triangulated.SemiorthogonalSequence.ofReverseFin`.
+
+## Tags
+
+admissible subcategory, semiorthogonal decomposition, orthogonal, adjunction, triangulated
+category
 -/
 
 open CategoryTheory

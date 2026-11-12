@@ -16,16 +16,10 @@ retracts, the zero object, and cones, so that it is a triangulated object proper
 under retracts, and every triangulated envelope of compact objects consists of compact
 objects (`ObjectProperty.triangEnvelope_le_compactObjects`).
 
-Everything is proved through the direct-sum comparison
-`directSumToHom K X : ⨁ Hom(K, Xᵢ) → Hom(K, ∐ X)`, whose bijectivity for every
-`Type`-indexed coproduct is compactness (`isCompactObject_iff_bijective_directSumToHom`).
-Retracts are a two-out-of-three argument on that map; cones are the five lemma applied to
-the rows `⨁ Hom(-, Xᵢ)` and `Hom(-, ∐ X)` along a distinguished triangle, both exact by
-`Triangle.yoneda_exact₂` and `Triangle.yoneda_exact₃`, the first summandwise.
+## Main definitions
 
-The geometric consumer is the compact/perfect comparison on `Dqc(X)` (#723): the perfect
-locus is the essential image of the thick envelope of finite locally free sheaves, so it
-consists of compact objects as soon as those sheaves are compact.
+This file introduces no new definitions; it proves facts about
+`CategoryTheory.ObjectProperty.compactObjects` and registers instances on it.
 
 ## Main results
 
@@ -35,6 +29,30 @@ consists of compact objects as soon as those sheaves are compact.
   `IsTriangulatedClosed₂`, `IsTriangulatedClosed₃`, `IsTriangulated` on
   `compactObjects.{0}`.
 * `ObjectProperty.triangEnvelope_le_compactObjects`.
+
+## Implementation notes
+
+Everything is proved through the direct-sum comparison
+`directSumToHom K X : ⨁ Hom(K, Xᵢ) → Hom(K, ∐ X)`, whose bijectivity for every
+`Type`-indexed coproduct is compactness (`isCompactObject_iff_bijective_directSumToHom`).
+Retracts are a two-out-of-three argument on that map; cones are the five lemma applied to
+the rows `⨁ Hom(-, Xᵢ)` and `Hom(-, ∐ X)` along a distinguished triangle, both exact by
+`Triangle.yoneda_exact₂` and `Triangle.yoneda_exact₃`, the first summandwise.
+
+The geometric consumer is the compact/perfect comparison on `Dqc(X)`: the perfect
+locus is the essential image of the thick envelope of finite locally free sheaves, so it
+consists of compact objects as soon as those sheaves are compact.
+
+## References
+
+The file builds on `CategoryTheory.directSumToHom`,
+`CategoryTheory.isCompactObject_iff_bijective_directSumToHom`, Mathlib's five lemma
+`AddMonoidHom.bijective_of_surjective_of_bijective_of_bijective_of_injective`, and
+`Pretriangulated.Triangle.yoneda_exact₂` and `Pretriangulated.Triangle.yoneda_exact₃`.
+
+## Tags
+
+compact object, thick subcategory, triangulated subcategory, retract, five lemma
 -/
 
 noncomputable section

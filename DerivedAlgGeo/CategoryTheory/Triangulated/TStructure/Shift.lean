@@ -14,16 +14,34 @@ For a t-structure `t` on a pretriangulated category and `a n : ℤ`,
 ((t.truncGE (a + n)).obj X)⟦n⟧ ≅ (t.truncGE a).obj (X⟦n⟧)
 ```
 
-## Why this is not in Mathlib
+## Main definitions
+
+* `CategoryTheory.Triangulated.TStructure.shiftedTriangleLTGE` — the truncation
+  triangle of `X` at `a + n`, shifted by `n`.
+* `TStructure.shiftedTriangleLTGEIso` — its isomorphism with the truncation
+  triangle of `X⟦n⟧` at `a`, over the identity of `X⟦n⟧`.
+* `TStructure.truncLTShiftIso`, `TStructure.truncGEShiftIso` — the two displayed
+  isomorphisms, as components of that triangle isomorphism.
+
+## Main results
+
+* `TStructure.exists_shiftedTriangleLTGE_iso` — the shifted truncation triangle
+  is isomorphic to the truncation triangle of `X⟦n⟧` at `a`.
+* `TStructure.truncLTShiftIso_hom_comp_truncLTι`,
+  `TStructure.truncGEπ_comp_truncGEShiftIso_hom` — the isomorphisms sit over,
+  respectively under, `X⟦n⟧` up to the sign `(-1)ⁿ`.
+
+## Implementation notes
+
+### Why this is not in Mathlib
 
 Mathlib's truncation API (`TruncLTGE.lean`, `TruncLEGT.lean`) has **no shift
-lemmas at all**, at either of the revisions this project pins — `v4.29.0`
-(`8a178386`) and `v4.32.1` (`520045ab`). The functors, their natural
-transformations, the truncation triangle and its uniqueness are all present; the
-interaction with `shiftFunctor` is simply absent. This file is Mathlib-shaped and
-is written to be upstreamed.
+lemmas at all**. The functors, their natural transformations, the truncation
+triangle and its uniqueness are all present; the interaction with
+`shiftFunctor` is simply absent. This file is Mathlib-shaped and is written to
+be upstreamed.
 
-## The proof, in one paragraph
+### The proof, in one paragraph
 
 Shifting the truncation triangle `τ<ᵃ⁺ⁿX → X → τ≥ᵃ⁺ⁿX → [1]` by `n` gives a
 distinguished triangle (`Triangle.shift_distinguished`) whose middle object is
@@ -37,11 +55,21 @@ triangle isomorphism at once.
 
 That uniqueness lemma is the whole content. Everything else is bookkeeping.
 
-## Downstream
+### Downstream
 
 This is what `originalHeartCohFunctor t n ≅ shiftFunctor C n ⋙ originalHeartCohFunctor t 0`
 needs, and hence what upgrades heart cohomology from homological at `n = 0` to
-homological in every degree. See issue #151.
+homological in every degree.
+
+## References
+
+The file builds on Mathlib's `CategoryTheory.Triangulated.TStructure.triangle_iso_exists`,
+`CategoryTheory.Triangulated.TStructure.triangleLTGE` and
+`CategoryTheory.Pretriangulated.Triangle.shift_distinguished`.
+
+## Tags
+
+t-structure, truncation, shift functor, distinguished triangle
 -/
 
 universe v u
