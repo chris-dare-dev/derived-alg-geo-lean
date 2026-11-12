@@ -24,7 +24,7 @@ brief: |
   below did not survive measurement: the monoidal structure on complexes does
   NOT reach `CochainComplex (ModuleCat k) ℤ` at the pin, so the enriched
   encoding is unavailable and ADR-0010 decided for a bespoke structure. See the
-  `assumptions` block and .claude/notes/2026-08-13-dg-surface-reconnaissance.md.
+  `assumptions` block and https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/notes/2026-08-13-dg-surface-reconnaissance.md.
   At `mathlib_rev` in `pins.json`, Mathlib has: the Hom cochain complex between cochain complexes
   (`Algebra/Homology/HomotopyCategory/HomComplex`, with its shift and
   cohomology files) — which is the dg structure on complexes, already built;
@@ -59,11 +59,11 @@ goal:
     - tier: must
       text: "A dg category is expressible at the pin as a category enriched over cochain complexes of k-modules, using CategoryTheory/Enriched/Ordinary together with Algebra/Homology/Monoidal."
       status: refuted
-      validation: "REFUTED 2026-08-13 against mathlib_rev. `HomologicalComplex.HasTensor` does not synthesize for `CochainComplex (ModuleCat k) ℤ`; the degree-n tensor is a coproduct over the infinite set {(i,j) : i+j=n} and only the finite-fibre instances exist. `ChainComplex (ModuleCat k) ℕ` IS monoidal, which localizes the gap. Evidence and probes: .claude/notes/2026-08-13-dg-surface-reconnaissance.md. ADR-0010 Question 1 therefore decided for Option B (bespoke DGCategory); the enriched route survives as Option A′, an upstreamable ForMathlib slice that blocks nothing in DG1."
+      validation: "REFUTED 2026-08-13 against mathlib_rev. `HomologicalComplex.HasTensor` does not synthesize for `CochainComplex (ModuleCat k) ℤ`; the degree-n tensor is a coproduct over the infinite set {(i,j) : i+j=n} and only the finite-fibre instances exist. `ChainComplex (ModuleCat k) ℕ` IS monoidal, which localizes the gap. Evidence and probes: https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/notes/2026-08-13-dg-surface-reconnaissance.md. ADR-0010 Question 1 therefore decided for Option B (bespoke DGCategory); the enriched route survives as Option A′, an upstreamable ForMathlib slice that blocks nothing in DG1."
     - tier: must
       text: "Mathlib's HomComplex API is complete enough to give C^dg(A) without re-deriving the Hom complex."
       status: confirmed
-      validation: "CONFIRMED 2026-08-13, and stronger than stated: besides `Cochain`, `Cochain.comp`, `δ`, `Cocycle` and `CochainComplex.HomComplex`, the pin already proves `CohomologyClass.homAddEquiv : Hⁿ(Hom•(K,L)) ≅+ Hom_{K(C)}(K, L⟦n⟧)`. The seam theorem of e4 is packaging, not construction. Evidence: .claude/notes/2026-08-13-dg-surface-reconnaissance.md."
+      validation: "CONFIRMED 2026-08-13, and stronger than stated: besides `Cochain`, `Cochain.comp`, `δ`, `Cocycle` and `CochainComplex.HomComplex`, the pin already proves `CohomologyClass.homAddEquiv : Hⁿ(Hom•(K,L)) ≅+ Hom_{K(C)}(K, L⟦n⟧)`. The seam theorem of e4 is packaging, not construction. Evidence: https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/notes/2026-08-13-dg-surface-reconnaissance.md."
     - tier: should
       text: "The h-injective (respectively h-projective) model of the derived enhancement is reachable before the Drinfeld dg quotient is."
       validation: "Mathlib already builds DerivedCategory through KInjective/KProjective. If the seam theorem cannot be closed on that model, the Drinfeld quotient epic un-parks and the milestone slips rather than the claim weakening."

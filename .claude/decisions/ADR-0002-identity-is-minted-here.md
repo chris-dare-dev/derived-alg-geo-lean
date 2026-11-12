@@ -3,8 +3,8 @@
 - **Status:** accepted
 - **Date:** 2026-08-04
 - **Deciders:** Chris Dare
-- **Evidence:** `.claude/notes/2026-08-04-arxmcp-lean-integration-audit.md` §4 (the
-  identifier-durability finding); `.claude/notes/2026-08-04-contract-red-team.md`
+- **Evidence:** https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/notes/2026-08-04-arxmcp-lean-integration-audit.md §4 (the
+  identifier-durability finding); https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/notes/2026-08-04-contract-red-team.md
   gaps 1, 3, 11
 
 ## Context
@@ -93,7 +93,7 @@ hashed), and add a `quote_containment` rung to the resolution ladder — that is
 what actually survives a merge or split.
 
 **Minting is human labor and does not scale past the low tens of entries.**
-This is the design's load-bearing limit; see ADR-0005 and `open-questions.md` Q4.
+This is the design's load-bearing limit; see ADR-0005 and [`open-questions.md`](https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/open-questions.md) Q4.
 
 **Minting tooling belongs in arXMCP, not `mfc`** (red team, gap 3). `mfc`'s
 declared deps (`jsonschema`, `pyyaml`, `copier`) can reach neither LanceDB nor a

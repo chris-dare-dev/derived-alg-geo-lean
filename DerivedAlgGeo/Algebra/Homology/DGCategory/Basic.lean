@@ -13,25 +13,36 @@ groups, with a composition that is biadditive, associative, unital, and
 satisfies the Leibniz rule. `k`-linearity is a refinement, `DGLinear`, rather
 than part of the definition.
 
-## The encoding, and why it is this one
+## Main definitions
 
-`ADR-0010` decides against `EnrichedOrdinaryCategory` over
-`CochainComplex (ModuleCat k) ℤ`: at the pinned Mathlib revision
+* `CategoryTheory.DGCategoryStruct` — a hom-complex for each pair of objects, a
+  degree-zero identity, and a graded composition additive in each variable.
+* `CategoryTheory.DGCategory` — that data subject to associativity, unitality,
+  the identity being a cocycle, and the Leibniz rule.
+
+## Main results
+
+None. The axioms are the fields of `CategoryTheory.DGCategory`; the files
+beside this one build on them.
+
+## Implementation notes
+
+### The encoding
+
+The class does not enrich over `CochainComplex (ModuleCat k) ℤ` through
+`EnrichedOrdinaryCategory`: at the pinned Mathlib revision
 `HomologicalComplex.HasTensor` does not synthesize for the `ℤ`-indexed shape,
-so there is no monoidal category available to enrich over. See
-`.claude/notes/2026-08-13-dg-surface-reconnaissance.md`.
+so there is no monoidal category available to enrich over.
 
-`ADR-0011` decides the remaining question — what the Hom-complexes are
-complexes *of*. They are complexes of abelian groups, matching
-`CochainComplex.HomComplex`, with `k`-linearity layered on top. The first draft
-of this file used `ModuleCat k` and collided with that choice three times; the
-ADR records all three.
+The Hom-complexes are complexes of abelian groups, matching
+`CochainComplex.HomComplex`, with `k`-linearity layered on top. Complexes of
+`ModuleCat k` would not match it.
 
 Composition is a family of biadditive maps on the graded pieces rather than a
 chain map out of a tensor product, because the tensor product of `ℤ`-indexed
 complexes is exactly what the pin does not have.
 
-## Sign convention
+### Sign convention
 
 Composition is **diagrammatic**: `dgComp p q r h f g` is `f` then `g`, matching
 `CochainComplex.HomComplex.Cochain.comp`. The Leibniz rule is
@@ -43,14 +54,20 @@ which is `CochainComplex.HomComplex.δ_comp` at the pin, verbatim.
 **There is a second, equally consistent convention** — `(δf) · g + (-1)^p · f · (δg)`,
 the textbook graded anti-derivation — and it is *not* the one used here. The two
 differ whenever `p` and `q` have different parities; at `p = q = 0` they agree,
-which is exactly why the disagreement can hide. An earlier draft of this file
-stated the textbook form while claiming to match Mathlib, and the claim survived
-review until `dg-enhancements-e4` tried to build `C^dg` on it and could not.
+which is exactly why the disagreement can hide.
 
 Mathlib's form is adopted so that `HomComplex` instantiates this class directly,
-which is the whole point of the `AddCommGrpCat`-valued `dgHom` (ADR-0011). A
-divergence from it must be documented as a divergence rather than absorbed
-silently.
+which is the whole point of the `AddCommGrpCat`-valued `dgHom`. A divergence
+from it must be documented as a divergence rather than absorbed silently.
+
+## References
+
+* Bondal, Kapranov, *Enhanced triangulated categories* (1990).
+* Keller, *On differential graded categories*, ICM (2006).
+
+## Tags
+
+dg category, Hom complex, Leibniz rule
 -/
 
 set_option autoImplicit false

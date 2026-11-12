@@ -18,30 +18,6 @@
   1
  ],
  [
-  "DerivedAlgGeo/Algebra/Homology/DGCategory/Basic.lean",
-  "PROV",
-  "`.claude/notes/2026-08-13-dg-surface-reconnaissance.md`.",
-  1
- ],
- [
-  "DerivedAlgGeo/Algebra/Homology/DGCategory/Basic.lean",
-  "PROV",
-  "`ADR-0010` decides against `EnrichedOrdinaryCategory` over",
-  1
- ],
- [
-  "DerivedAlgGeo/Algebra/Homology/DGCategory/Basic.lean",
-  "PROV",
-  "`ADR-0011` decides the remaining question — what the Hom-complexes are",
-  1
- ],
- [
-  "DerivedAlgGeo/Algebra/Homology/DGCategory/Basic.lean",
-  "PROV",
-  "which is the whole point of the `AddCommGrpCat`-valued `dgHom` (ADR-0011). A",
-  1
- ],
- [
   "DerivedAlgGeo/Algebra/Homology/DGCategory/Copower.lean",
   "PROV",
   "of a tensor product (ADR-0010, ADR-0011).",
@@ -2580,18 +2556,6 @@
   1
  ],
  [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/SemiorthogonalDecomposition/DerivedField.lean",
-  "PROV",
-  "design note's requirement — `.claude/notes/2026-08-28-semiorthogonal-reconnaissance.md`",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/SemiorthogonalDecomposition/DerivedField.lean",
-  "PROV",
-  "§4: \"issue #852 requires those notions to be added only when a theorem",
-  1
- ],
- [
   "DerivedAlgGeo/CategoryTheory/Triangulated/SemiorthogonalDecomposition/Exceptional.lean",
   "PROV",
   "-- component starting `eq_` (#998), so the issue's spelling",
@@ -3008,25 +2972,7 @@
  [
   "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/Autoequivalence/Stability/Transport.lean",
   "LONG",
-  "* **Slicing** — `Slicing.mapEquiv` (`WeakStabilityCondition/StabilityCondition/Symmetry/Autoequivalence/Slicing/Transport.lean`), dual to `relabel`.",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/Autoequivalence/Stability/Transport.lean",
-  "LONG",
   "-- `Λ` gets its own universe, as in `CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Action/Stability.lean`: nothing here",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/Autoequivalence/Stability/Transport.lean",
-  "LONG",
-  "`WeakStabilityCondition/StabilityCondition/Symmetry/Autoequivalence/Stability/ClassMap.lean` bundles the pair and supplies the `MulAction`. **Nothing",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/Autoequivalence/Stability/Transport.lean",
-  "PROV",
-  "See the stability-foundation ownership record in `notes/dependencies/`.",
   1
  ],
  [
@@ -3063,24 +3009,6 @@
   "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Action/Stability.lean",
   "LONG",
   "2. `relabel_intervalProp` (`CategoryTheory/Triangulated/StabilityCondition/Symmetry/GLTilde/Action/Slicing.lean`) — interval subcategories are",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Walls/Rotation.lean",
-  "PROV",
-  "(#1314) renamed the wall locus and its defining expression to `alignmentLocus`",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Walls/Rotation.lean",
-  "PROV",
-  "(`docs/reviews/2026-09-12-abstraction-audit-remediation.md`, §3.5 and §7 PR-8)",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/Walls/Rotation.lean",
-  "PROV",
-  "names these statements `phaseRotate_wall` and `phaseRotate_wallValue`.  MO1.03",
   1
  ],
  [

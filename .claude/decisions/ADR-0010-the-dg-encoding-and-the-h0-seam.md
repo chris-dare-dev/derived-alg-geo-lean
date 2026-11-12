@@ -6,7 +6,7 @@
 - **Decider:** Chris Dare
 - **Decision (Question 1, 2026-08-13):** **Option B — a bespoke `DGCategory`
   structure.** Taken on the measurement in
-  `.claude/notes/2026-08-13-dg-surface-reconnaissance.md`, which showed the
+  https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/notes/2026-08-13-dg-surface-reconnaissance.md, which showed the
   enriching category of Option A does not exist at the pin. Option A′ stays
   live as a separate `upstream-candidate` slice and is not a prerequisite of
   anything in DG1.
@@ -52,7 +52,7 @@ What the pin does supply, and which both routes consume:
   fork.
 
 **Measured 2026-08-13** against `mathlib_rev` exactly — see
-`.claude/notes/2026-08-13-dg-surface-reconnaissance.md` for the commands, the
+https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/notes/2026-08-13-dg-surface-reconnaissance.md for the commands, the
 raw output, and the elaboration probes. Two results change this ADR:
 
 1. **`CochainComplex (ModuleCat k) ℤ` is not monoidal at the pin.**
