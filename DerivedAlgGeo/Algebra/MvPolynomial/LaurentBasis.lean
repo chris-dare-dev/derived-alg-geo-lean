@@ -17,29 +17,37 @@ determined by a single Laurent exponent
 laurentExponent γ m β = β - m • γ  :  ι →₀ ℤ
 ```
 
-with negative entries allowed exactly on the variables `Xᵞ` inverts. This file constructs that
-exponent and proves the three facts that make it an index: it determines the fraction, its
-`Finsupp.degree` is the twist `d`, and it is nonnegative off the support of `γ`.
+with negative entries allowed exactly on the variables `Xᵞ` inverts. The exponent itself is
+`Finsupp.laurentExponent`. Three facts make it an index: it determines the fraction, its
+`Finsupp.degree` is the twist `d`, and it is nonnegative off the support of `γ`. This file proves
+the first, applies the other two to the numerators of degree-zero fractions, and proves that the
+monomial fractions span and are independent.
 
 ## Main definitions
 
-* `natToIntExponent` — an exponent vector read in `ℤ`;
-* `laurentExponent` — the Laurent exponent `β - m • γ` of the fraction `Xᵝ / (Xᵞ)ᵐ`.
+* `MvPolynomial.IsPolynomialTwist` — `𝓜` presents the degree-`d` twist of the polynomial
+  grading, read in `ℤ` so that either sign of `d` is expressible.
+
+The exponents `Finsupp.natToIntExponent` and `Finsupp.laurentExponent` are defined in
+`Algebra/Finsupp/LaurentExponent.lean`.
 
 ## Main statements
 
-* `awayMk_monomial_eq_iff_laurentExponent` — **two monomial fractions over powers of `Xᵞ` are
-  equal exactly when their Laurent exponents agree.** This is what makes the exponent an index
-  rather than a convenience.
-* `degree_laurentExponent` — the exponent has total degree `d`, the twist, with no dependence on
-  `m`. Raising the denominator moves `β` and `m • γ` together, so this is the invariant that
-  survives.
-* `laurentExponent_nonneg_of_apply_eq_zero` — off the support of `γ` the exponent is
+* `MvPolynomial.awayMk_monomial_eq_iff_laurentExponent` — **two monomial fractions over powers
+  of `Xᵞ` are equal exactly when their Laurent exponents agree.** This is what makes the exponent
+  an index rather than a convenience.
+* `Finsupp.degree_laurentExponent` — the exponent has total degree `d`, the twist, with no
+  dependence on `m`. Raising the denominator moves `β` and `m • γ` together, so this is the
+  invariant that survives.
+* `Finsupp.laurentExponent_nonneg_of_apply_eq_zero` — off the support of `γ` the exponent is
   nonnegative. Together with the previous statement this is the index set
-  `{α | Finsupp.degree α = d ∧ ∀ j ∉ γ.support, 0 ≤ α j}` that #491's basis is indexed by.
-* `exists_sum_awayMk_monomial` — **the monomial fractions span.** Every degree-zero fraction away
-  from `Xᵞ` is a finite sum of monomial fractions over one common denominator, and
+  `{α | Finsupp.degree α = d ∧ ∀ j ∉ γ.support, 0 ≤ α j}` that the Laurent monomial basis is
+  indexed by.
+* `MvPolynomial.exists_sum_awayMk_monomial` — **the monomial fractions span.** Every degree-zero
+  fraction away from `Xᵞ` is a finite sum of monomial fractions over one common denominator, and
   `laurentExponent_mem_index` says the exponents they contribute are exactly the admissible ones.
+* `MvPolynomial.sum_awayMk_monomial_eq_zero_iff` — **the monomial fractions are independent** at
+  a fixed denominator.
 
 ## Implementation notes
 
@@ -51,6 +59,11 @@ polynomial case supplies nothing by hand.
 `laurentExponent` is stated with `m` and `β` separate rather than packaged, because the caller
 that matters — a Čech cochain — produces them separately from `exists_awayMk` and never has the
 pair in hand.
+
+## References
+
+This file builds on `GradedModule.DegreeZeroLocalization.awayMk` and Mathlib's
+`MvPolynomial.monomial_eq_monomial_iff`.
 
 ## Tags
 
@@ -117,10 +130,11 @@ theorem awayMk_monomial_eq_iff [IsDomain R] {σM : Type u} [SetLike σM (MvPolyn
 set_option maxHeartbeats 800000 in
 /-- **The Laurent exponent is a complete invariant of a monomial fraction.**
 
-This is the statement #491's basis is built on: the assignment `(m, β) ↦ β - m • γ` separates
-distinct fractions and identifies the ones that only differ by a common denominator. Combined
-with `degree_laurentExponent` and `laurentExponent_nonneg_of_apply_eq_zero`, it says the monomial
-fractions of the twist `d` are indexed by
+This is the statement the Laurent monomial basis is built on: the assignment
+`(m, β) ↦ β - m • γ` separates distinct fractions and identifies the ones that only differ by a
+common denominator. Combined with `degree_laurentExponent` and
+`laurentExponent_nonneg_of_apply_eq_zero`, it says the monomial fractions of the twist `d` are
+indexed by
 `{α : ι →₀ ℤ | α.degree = d ∧ ∀ j, γ j = 0 → 0 ≤ α j}`. -/
 theorem awayMk_monomial_eq_iff_laurentExponent [IsDomain R] {σM : Type u}
     [SetLike σM (MvPolynomial ι R)] [AddSubgroupClass σM (MvPolynomial ι R)] {𝓜 : ℕ → σM}
@@ -315,8 +329,8 @@ theorem exists_sum_awayMk_monomial [Nontrivial R] {σM : Type u}
 twist, and nonnegative off the support of `γ`.
 
 Together with `exists_sum_awayMk_monomial` and `awayMk_monomial_eq_iff_laurentExponent` this is
-the spanning half of #491's basis — the monomial fractions exhaust the localization, and the
-exponents they contribute are exactly the admissible ones. -/
+the spanning half of the Laurent monomial basis — the monomial fractions exhaust the
+localization, and the exponents they contribute are exactly the admissible ones. -/
 theorem laurentExponent_mem_index {d m : ℕ} {γ : ι →₀ ℕ} {p : MvPolynomial ι R}
     (hp : p ∈ natShift (polynomialGrading ι R) d (m • γ.degree)) {β : ι →₀ ℕ}
     (hβ : β ∈ p.support) :
@@ -351,10 +365,10 @@ theorem sum_monomial_eq_zero_iff (s : Finset (ι →₀ ℕ)) (c : (ι →₀ �
 set_option maxHeartbeats 800000 in
 /-- **The monomial fractions are independent at a fixed denominator.**
 
-Combined with `exists_sum_awayMk_monomial` this is the basis statement of #491 in usable form:
-every element is a monomial combination over a common denominator, and that combination is
+Combined with `exists_sum_awayMk_monomial` this is the Laurent monomial basis statement in usable
+form: every element is a monomial combination over a common denominator, and that combination is
 unique. A map may therefore be *defined* by its effect on the monomial fractions, which is what
-the sign projection of #340's contracting homotopy needs. -/
+the sign projection of the Čech contracting homotopy needs. -/
 theorem sum_awayMk_monomial_eq_zero_iff [IsDomain R] {γ : ι →₀ ℕ} {d m : ℕ}
     (s : Finset (ι →₀ ℕ)) (c : (ι →₀ ℕ) → R)
     (hc : ∀ β, MvPolynomial.monomial β (c β) ∈

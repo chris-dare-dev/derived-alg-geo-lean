@@ -16,17 +16,33 @@ import Mathlib.CategoryTheory.Abelian.GrothendieckCategory.HasExt
 # Cohomology is unchanged by pushforward along a closed embedding
 
 `cohomologyPushforwardAddEquiv` : `Hⁿ(X, F) ≃+ Hⁿ(Y, f_* F)` for `f` an inducing map with closed
-range. This is `#572` step 3's statement, instantiated at an actual map of spaces.
+range. This is the abstract comparison `CategoryTheory.sheafHPushforwardAddEquiv`, instantiated
+at an actual map of spaces.
 
-## Everything here is plumbing
+## Main definitions
 
-`CategoryTheory/Sites/Sheaves/CohomologyPushforward.lean` proves the comparison abstractly, for a continuous
-functor of sites whose pullback and pushforward are both exact. This composition-layer file
-discharges those hypotheses for `Opens.map f`. No mathematics happens: the one non-formal input,
-exactness of `f_*`, is `PushforwardStalks.lean`, and the rest is instance supply.
+All in the namespace `DerivedAlgGeo.Topology`:
 
-That was not obvious in advance and it is worth recording why. Three separate estimates of this
-step were wrong, each in the same direction:
+* `cohomologyPushforwardAddEquivAt` — the comparison, at a chosen `HasExt` witness.
+* `cohomologyPushforwardAddEquiv` — the same at the witness instance search finds.
+* `isTerminalTopOpens` and `isTerminalOpensMapTerminal` — `⊤` is terminal in `Opens X`, and
+  `Opens.map f` carries the categorical terminal open of `Y` to a terminal open of `X`.
+
+## Main results
+
+* `cohomologyPushforwardAddEquivAt_naturality` — the comparison is natural in the sheaf.
+* `terminal_opens_eq_top` — the categorical terminal of `Opens` is the lattice `⊤`.
+
+## Implementation notes
+
+### Everything here is plumbing
+
+`CategoryTheory/Sites/Sheaves/CohomologyPushforward.lean` proves the comparison abstractly, for a
+continuous functor of sites whose pullback and pushforward are both exact. This composition-layer
+file discharges those hypotheses for `Opens.map f`. No mathematics happens: the one non-formal
+input, exactness of `f_*`, is `PushforwardStalks.lean`, and the rest is instance supply.
+
+Three facts make that so:
 
 * **the site bridge is `rfl`.** `TopCat.Sheaf.pushforward C f` is *defined* as
   `(Opens.map f).sheafPushforwardContinuous _ _ _`, so the topological and site-level functors are
@@ -37,7 +53,7 @@ step were wrong, each in the same direction:
   indistinguishable from a missing result.
 * **`HasGlobalSectionsFunctor` and the left Kan extension** are already instances for `Opens.map`.
 
-## What must be supplied by hand, and why
+### What must be supplied by hand, and why
 
 Four instances that exist but that search will not find or cannot afford:
 
@@ -48,24 +64,26 @@ Four instances that exist but that search will not find or cannot afford:
 * `Additive` of the pullback — from the pushforward's, through `Adjunction.left_adjoint_additive`.
 * `IsLeftAdjoint`/`IsRightAdjoint` of the two, to get the remaining exactness halves.
 
-## `⊤_` is not `⊤`
+### `⊤_` is not `⊤`
 
 The abstract theorem wants `IsTerminal ((Opens.map f).obj (⊤_ (Opens Y)))`. `Opens.map` sends `⊤`
 to `⊤` by `rfl`, but the *categorical* terminal `⊤_ (Opens Y)` is not syntactically the lattice
 `⊤`; `terminal_opens_eq_top` is the one-line antisymmetry that identifies them, and
 `IsTerminal.ofUnique` does not discharge the goal without it.
 
-## Scope
+### Scope
 
 Spaces, not schemes. A closed immersion of schemes induces a closed embedding of underlying
-spaces, so this applies to one — but that final step is not taken here, and `#572`'s acceptance
-criterion is phrased about schemes.
+spaces, so this applies to one — but that final step is not taken here.
 
-## Main results
+## References
 
-* `cohomologyPushforwardAddEquivAt` — the comparison, at a chosen `HasExt` witness.
-* `cohomologyPushforwardAddEquivAt_naturality` — it is natural in the sheaf.
-* `cohomologyPushforwardAddEquiv` — the same at the witness instance search finds.
+This file instantiates `CategoryTheory.sheafHPushforwardAddEquiv` at Mathlib's `Opens.map`, using
+`TopCat.Sheaf.pushforward` and `IsGrothendieckAbelian`.
+
+## Tags
+
+sheaf cohomology, pushforward, closed embedding, Ext
 -/
 
 universe w' u
@@ -98,11 +116,11 @@ set_option maxHeartbeats 1000000 in
 /-- **Cohomology is unchanged by pushforward along a closed embedding, at a chosen `HasExt`
 witness.**
 
-`#572` step 3, at a map of spaces. Every hypothesis of the abstract comparison is discharged here;
+The abstract comparison at a map of spaces. Every hypothesis of it is discharged here;
 the only one that is not an instance or an import is exactness of `f_*`, which is
 `preservesFiniteColimits_pushforward`.
 
-The `HasExt` witnesses are positional, as in the Čech lane: `Sheaf.H` lands in the `HasExt`
+The `HasExt` witnesses are positional, as in the Čech computation: `Sheaf.H` lands in the `HasExt`
 universe, and a caller whose groups are named at `HasExt.standard` (the coherent-cohomology
 convention, `HasExt.{u + 1}`) cannot let instance search pick the Grothendieck-category
 `HasExt.{u}`, which names different groups. -/

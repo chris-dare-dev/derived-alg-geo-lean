@@ -39,12 +39,27 @@ import DerivedAlgGeo.Algebra.Homology.DGCategory.Model
 Dg categories, their dg functors and elementary constructions, their internal
 pretriangulated refinement, and raw dg models.
 
-`DGCategory` is a bespoke class built on Mathlib's `CochainComplex.HomComplex`
-(ADR-0010, ADR-0011); it does not extend `EnrichedCategory`, because the
-ℤ-graded cochain complexes it would enrich over are not monoidal at the pin.
-By definition site it therefore lives here, beside the homotopy category it
-enhances, and not under `CategoryTheory/Enriched/`. If the enriched encoding
-(ADR-0010 Option A′) lands, the subtree moves there in the same change.
+## Main definitions
+
+None: this umbrella re-exports its children. The class itself is
+`CategoryTheory.DGCategory`.
+
+## Main results
+
+None; this module re-exports its children.
+
+## Implementation notes
+
+### Placement
+
+`DGCategory` is a bespoke class built on Mathlib's `CochainComplex.HomComplex`;
+it does not extend `EnrichedCategory`, because the ℤ-graded cochain complexes it
+would enrich over are not monoidal at the pin. By definition site it therefore
+lives here, beside the homotopy category it enhances, and not under
+`CategoryTheory/Enriched/`. An encoding that did extend `EnrichedCategory` would
+belong under `CategoryTheory/Enriched/` instead.
+
+### The triangulated structure on `H⁰`
 
 The triangulated category carried by `H⁰` of a pretriangulated dg category is
 owned here, under `DGCategory/Pretriangulated/H0/`: the shift, the distinguished
@@ -56,4 +71,13 @@ Comparing that structure with a *specified* ordinary or triangulated category is
 `DerivedAlgGeo.CategoryTheory.Triangulated.DGEnhancement`, which owns both the
 underlying H⁰ presentation and its exact refinement. Nothing in this tree
 imports it.
+
+## References
+
+This tree builds on Mathlib's `CochainComplex.HomComplex` and
+`HomotopyCategory`.
+
+## Tags
+
+dg category, dg functor, pretriangulated, homotopy category
 -/

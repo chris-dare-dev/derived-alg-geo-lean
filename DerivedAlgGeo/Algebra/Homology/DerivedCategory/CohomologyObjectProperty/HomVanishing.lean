@@ -15,15 +15,31 @@ statement that the hypercohomology `Hom(E, M[j])` of such an `M` is computed by
 `Hom(E, H^j M)` alone, in the only case where the answer is zero; the proof is dévissage on
 the amplitude along the truncation triangles.
 
-The geometric instance is `𝒪_X` on an affine scheme with `P` quasi-coherence, where the
-hypothesis is affine vanishing through `Ext^k(𝒪_X, F) ≃ H^k(F)`. That instance is the
-bounded half of the compactness of `𝒪_X` in `Dqc(Spec R)` (#723); the unbounded half needs
-`M ≅ holim τ≥-n M`, which is not available at this Mathlib pin.
+## Main definitions
+
+This file introduces no new definitions; it proves facts about Mathlib's
+`DerivedCategory` and `DerivedCategory.singleFunctor`.
 
 ## Main results
 
 * `DerivedCategory.hom_singleFunctor_eq_zero_of_ext_subsingleton` — the single case.
 * `DerivedCategory.hom_eq_zero_of_isGE_of_isLE_neg_of_cohomologyIn` — the dévissage.
+
+## Implementation notes
+
+The geometric instance is `𝒪_X` on an affine scheme with `P` quasi-coherence, where the
+hypothesis is affine vanishing through `Ext^k(𝒪_X, F) ≃ H^k(F)`. That instance is the
+bounded half of the compactness of `𝒪_X` in `Dqc(Spec R)`; the unbounded half needs
+`M ≅ holim τ≥-n M`, which is not available at this Mathlib pin.
+
+## References
+
+Mathlib's `DerivedCategory`, `DerivedCategory.singleFunctor` and the `Ext` groups
+`CategoryTheory.Abelian.Ext`.
+
+## Tags
+
+derived category, Ext, vanishing, truncation, dévissage
 -/
 
 universe w v u
