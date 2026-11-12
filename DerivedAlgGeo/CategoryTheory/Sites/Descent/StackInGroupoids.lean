@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.CategoryTheory.Sites.Descent.Precoverage
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.IsStack
 
 /-!
 # Stacks in groupoids
@@ -12,13 +13,43 @@ groupoid-valued requirement used in algebraic geometry.  Covers and Čech
 descent are the existing `Sieve`, `Presieve`, and `Pseudofunctor.DescentData`
 objects: this layer does not replace them with parallel definitions.
 
+## Main definitions
+
+* `CategoryTheory.StackInGroupoids`: a pseudofunctor `LocallyDiscrete Cᵒᵖ ⥤ᵖ Cat.{v', u'}`
+  with groupoid fibers and effective descent for a Grothendieck topology.
+* `CategoryTheory.StackInGroupoids.Cover`: an explicitly indexed covering family, with
+  its category of Čech descent data `CategoryTheory.StackInGroupoids.CechDescent`.
+* `CategoryTheory.StackInGroupoids.ofLE`: restriction to a coarser topology.
+* `CategoryTheory.StackInGroupoids.ofEquivalence`: transport along a strong
+  transformation whose components are equivalences of categories.
+
+## Main results
+
+* `CategoryTheory.StackInGroupoids.cechDescentEquivalence`: every fiber is equivalent to
+  the Čech descent data of every covering family.
+* `CategoryTheory.Pseudofunctor.IsStack.of_le`: effective descent for a finer topology
+  gives effective descent for a coarser one.
+
+## Implementation notes
+
 The construction is owned by `CategoryTheory/Sites`: it is generic in a
 category and a Grothendieck topology and imports no algebraic geometry.  The
 declarations use the matching `CategoryTheory` namespace.
 
 `StackInGroupoids` deliberately contains no algebraicity, representability,
 boundedness, or finiteness assertion.  The only conditions are groupoid-valued
-fibers and effective descent for a chosen Grothendieck topology.
+fibers and effective descent for a chosen Grothendieck topology.  The fibers
+live in `Cat.{v', u'}` with independent universes, as in Mathlib's
+`Pseudofunctor.IsStack`, and the carrier states no relation between them.
+
+## References
+
+* [Stacks Project, Tag 026F](https://stacks.math.columbia.edu/tag/026F)
+* [Stacks Project, Tag 02ZI](https://stacks.math.columbia.edu/tag/02ZI)
+
+## Tags
+
+stack, stack in groupoids, descent, Grothendieck topology
 -/
 
 namespace CategoryTheory
@@ -29,13 +60,20 @@ open Opposite
 
 noncomputable section
 
-universe t v w u
+universe t v' v u' u
 
-/-- A groupoid-valued pseudofunctor satisfying effective descent for `J`. -/
+/-- A groupoid-valued pseudofunctor satisfying effective descent for `J`.
+
+The fibers lie in `Cat.{v', u'}`: `v'` is the universe of their morphisms and `u'` the
+universe of their objects.  The two are independent of each other and of `C`, as in
+Mathlib's `Pseudofunctor.IsStack`.  The discrete stack of a `Type w`-valued sheaf has
+fibers in `Cat.{w, w}`, and a representable stack has fibers in `Cat.{v, v}`; placing
+them in other fiber universes is a separate universe lift, not a condition on this
+structure. -/
 structure StackInGroupoids (C : Type u) [Category.{v} C]
     (J : GrothendieckTopology C) where
   /-- The contravariant groupoid-valued pseudofunctor. -/
-  presheaf : Pseudofunctor (LocallyDiscrete Cᵒᵖ) Cat.{w, w}
+  presheaf : Pseudofunctor (LocallyDiscrete Cᵒᵖ) Cat.{v', u'}
   /-- Every fiber is a groupoid. -/
   fiberIsGroupoid (X : LocallyDiscrete Cᵒᵖ) : IsGroupoid (presheaf.obj X)
   /-- Objects and morphisms satisfy effective descent for `J`. -/
@@ -112,7 +150,7 @@ to prove it there. -/
 coarser topology.  This is the only implication between the two conditions;
 there is no reverse transport. -/
 theorem Pseudofunctor.IsStack.of_le {C : Type u} [Category.{v} C]
-    {F : Pseudofunctor (LocallyDiscrete Cᵒᵖ) Cat.{w, w}}
+    {F : Pseudofunctor (LocallyDiscrete Cᵒᵖ) Cat.{v', u'}}
     {J₁ J₂ : GrothendieckTopology C} (h : J₁ ≤ J₂) [F.IsStack J₂] :
     F.IsStack J₁ :=
   Pseudofunctor.IsStack.of_isStackFor fun _ R hR ↦ F.isStackFor' R (h _ hR)
@@ -148,94 +186,21 @@ def Cover.ofLE (h : J₁ ≤ J₂) {S : C} (U : Cover.{t} (J := J₁) S) :
 
 end StackInGroupoids
 
-/-! ## Transport of the stack condition -/
+/-! ## Transport along equivalences -/
 
-/-- Descent-compatible equivalence data between two pseudofunctors.
-
-Mathlib currently has the pseudofunctor and descent-data APIs but no general
-pseudonatural-equivalence API.  This structure records exactly the two
-equivalences and comparison square needed to transport the stack condition;
-it does not hide them behind an unproved equivalence principle. -/
-structure StackEquivalence {C : Type u} [Category.{v} C]
-    (F G : Pseudofunctor (LocallyDiscrete Cᵒᵖ) Cat.{w, w}) where
-  /-- Equivalence on each fiber. -/
-  fiber (S : C) : F.obj (.mk (op S)) ≌ G.obj (.mk (op S))
-  /-- Equivalence on descent data for every sieve. -/
-  descent {S : C} (R : Sieve S) :
-    F.DescentData (fun (f : R.arrows.category) ↦ f.obj.hom) ≌
-      G.DescentData (fun (f : R.arrows.category) ↦ f.obj.hom)
-  /-- Restriction to descent data commutes with the two equivalences. -/
-  comparison {S : C} (R : Sieve S) :
-    F.toDescentData (fun (f : R.arrows.category) ↦ f.obj.hom) ⋙
-        (descent R).functor ≅
-      (fiber S).functor ⋙
-        G.toDescentData (fun (f : R.arrows.category) ↦ f.obj.hom)
-
-namespace StackEquivalence
-
-variable {C : Type u} [Category.{v} C]
-  {F G : Pseudofunctor (LocallyDiscrete Cᵒᵖ) Cat.{w, w}}
-
-private theorem isStackFor_forward (e : StackEquivalence F G)
-    {J : GrothendieckTopology C} [F.IsStack J]
-    {S : C} (R : Sieve S) (hR : R ∈ J S) :
-    G.IsStackFor R.arrows := by
-  let f := fun (a : R.arrows.category) ↦ a.obj.hom
-  letI : (F.toDescentData f).IsEquivalence :=
-    (F.isStackFor' R hR).isEquivalence
-  letI : (e.descent R).functor.IsEquivalence :=
-    inferInstance
-  letI : (F.toDescentData f ⋙ (e.descent R).functor).IsEquivalence :=
-    inferInstance
-  letI : ((e.fiber S).functor ⋙ G.toDescentData f).IsEquivalence :=
-    Functor.isEquivalence_of_iso (e.comparison R)
-  exact ⟨Functor.isEquivalence_of_comp_left
-    (e.fiber S).functor (G.toDescentData f)⟩
-
-private theorem isStackFor_backward (e : StackEquivalence F G)
-    {J : GrothendieckTopology C} [G.IsStack J]
-    {S : C} (R : Sieve S) (hR : R ∈ J S) :
-    F.IsStackFor R.arrows := by
-  let f := fun (a : R.arrows.category) ↦ a.obj.hom
-  letI : (G.toDescentData f).IsEquivalence :=
-    (G.isStackFor' R hR).isEquivalence
-  letI : (e.fiber S).functor.IsEquivalence :=
-    inferInstance
-  letI : ((e.fiber S).functor ⋙ G.toDescentData f).IsEquivalence :=
-    inferInstance
-  letI : (F.toDescentData f ⋙ (e.descent R).functor).IsEquivalence :=
-    Functor.isEquivalence_of_iso (e.comparison R).symm
-  letI : (e.descent R).functor.IsEquivalence :=
-    inferInstance
-  exact ⟨Functor.isEquivalence_of_comp_right
-    (F.toDescentData f) (e.descent R).functor⟩
-
-/-- The stack condition is invariant under descent-compatible equivalence. -/
-theorem isStack_iff (e : StackEquivalence F G)
-    (J : GrothendieckTopology C) :
-    F.IsStack J ↔ G.IsStack J := by
-  constructor
-  · intro hF
-    letI := hF
-    exact Pseudofunctor.IsStack.of_isStackFor
-      (fun _ R hR ↦ e.isStackFor_forward R hR)
-  · intro hG
-    letI := hG
-    exact Pseudofunctor.IsStack.of_isStackFor
-      (fun _ R hR ↦ e.isStackFor_backward R hR)
-
-end StackEquivalence
-
-/-- Transport a stack in groupoids across descent-compatible equivalence.
-The groupoid condition on the target fibers remains explicit. -/
+open scoped Pseudofunctor.StrongTrans in
+/-- Transport a stack in groupoids along a strong transformation whose components are
+equivalences of categories.  The stack condition transfers by
+`CategoryTheory.Pseudofunctor.isStack_iff_of_isEquivalence`.  Each target fiber is a
+groupoid because the inverse of the component equivalence reflects isomorphisms into a
+groupoid. -/
 def StackInGroupoids.ofEquivalence {C : Type u} [Category.{v} C]
     {J : GrothendieckTopology C} (F : StackInGroupoids C J)
-    (G : Pseudofunctor (LocallyDiscrete Cᵒᵖ) Cat.{w, w})
-    (e : StackEquivalence F.presheaf G)
-    (hG : ∀ X, IsGroupoid (G.obj X)) : StackInGroupoids C J where
+    (G : Pseudofunctor (LocallyDiscrete Cᵒᵖ) Cat.{v', u'}) (α : F.presheaf ⟶ G)
+    [∀ X, (α.app X).toFunctor.IsEquivalence] : StackInGroupoids C J where
   presheaf := G
-  fiberIsGroupoid := hG
-  isStack := (e.isStack_iff J).1 F.isStack
+  fiberIsGroupoid X := isGroupoid_of_reflects_iso (α.app X).toFunctor.inv
+  isStack := (Pseudofunctor.isStack_iff_of_isEquivalence α J).1 F.isStack
 
 end
 
