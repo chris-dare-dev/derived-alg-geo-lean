@@ -9,10 +9,31 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.RiemannRoch.K3
 /-!
 # Bogomolov–Gieseker and Hodge index as supplied data, and what they buy
 
-Two inequalities enter the repository here for the first time, both as fields of
-supplied-data structures rather than as theorems, and both are then spent.
+Two inequalities enter here as fields of supplied-data structures rather than as theorems:
+the Bogomolov–Gieseker inequality and the Hodge index inequality. Given them, this file
+derives the nonnegativity of the discriminant and of the tilt discriminant on a surface, and
+the bound `⟨v(E),v(E)⟩ ≥ −2` on a K3 for classes of rank at most one in absolute value.
 
-## Supplied, not proved
+## Main definitions
+
+* `BogomolovGiesekerData` — a supplied semistability predicate together with the
+  Bogomolov–Gieseker inequality for it.
+* `HodgeIndexStatement` — the Hodge index inequality `(∫D·H)² ≥ (∫H²)(∫D²)` at `D = c₁(E)`,
+  supplied.
+* `Examples.k3BogomolovSanity` — a sanity witness, **not** geometry.
+
+## Main results
+
+* `Surface.nonneg_degree_discriminant` — `0 ≤ ∫Δ(E)` at `n = 2`.
+* `Surface.discrH_nonneg` — `0 ≤ discrH`, the bridge to the `(s,t)` plane.
+* `K3.chi₂_self_le`, `K3.mukaiSelfPairing_ge` — the two shifted readings.
+* `K3.neg_two_le_mukaiSelfPairing_of_rank_le_one` and
+  `K3.chi₂_self_le_two_of_rank_le_one` — Lemma 5.1 for `|r| ≤ 1`.
+* `Examples.k3HodgeIndex` — a *proved* witness, by the equality case.
+
+## Implementation notes
+
+### Supplied, not proved
 
 **Bogomolov–Gieseker.** For a `μ_H`-semistable sheaf on a polarised variety,
 `∫ Δ(E)·H^(n-2) ≥ 0`. The classical proof runs through restriction to curves —
@@ -33,32 +54,32 @@ layer has no subobjects — `N` is an abelian group with a rank and a Chern
 character, and nothing more — so the predicate cannot be defined here. It is a
 field, supplied by whichever layer can define it.
 
-## What is genuinely new, and what is merely relocated
+### What is proved, and what is only relocated
 
 `Numerical/GrothendieckGroup/MukaiVector.lean` records `χ(E,E) ≤ 2` at
 `neg_two_le_selfPairing_mukaiVector_iff` as "Bridgeland's Lemma 5.1, reduced to
-one inequality about `χ`", blocked on #332 for want of simplicity and Serre
-duality.
+one inequality about `χ`", which is unavailable there for want of simplicity and
+Serre duality.
 
 **This file does not close that gap. It relocates it.** The semistability
-predicate is opaque and the inequality is a supplied field, so what was an
-unproved theorem about sheaves becomes a named hypothesis.
+predicate is opaque and the inequality is a supplied field, so an unproved
+theorem about sheaves becomes a named hypothesis.
 
-What *is* new is that, given the hypothesis, the rank-`≤ 1` case needs no `Ext`
+What *is* proved is that, given the hypothesis, the rank-`≤ 1` case needs no `Ext`
 and no Serre duality at all. `K3.mukaiSelfPairing_eq` gives
 `⟨v(E),v(E)⟩ = ∫Δ(E) − 2·rank(E)²`, so `∫Δ ≥ 0` together with `rank² ≤ 1` is
 already enough. No cohomology appears anywhere in the derivation.
 
-## Main results
+## References
 
-* `BogomolovGiesekerData`, `HodgeIndexStatement` — the two supplied data.
-* `Surface.nonneg_degree_discriminant` — `0 ≤ ∫Δ(E)` at `n = 2`.
-* `Surface.discrH_nonneg` — `0 ≤ discrH`, the bridge to the `(s,t)` plane.
-* `K3.chi₂_self_le`, `K3.mukaiSelfPairing_ge` — the two shifted readings.
-* `K3.neg_two_le_mukaiSelfPairing_of_rank_le_one` and
-  `K3.chi₂_self_le_two_of_rank_le_one` — Lemma 5.1 for `|r| ≤ 1`.
-* `Examples.k3HodgeIndex` — a *proved* witness, by the equality case.
-* `Examples.k3BogomolovSanity` — a sanity witness, **not** geometry.
+* Bridgeland, *Stability conditions on K3 surfaces*, arXiv:math/0307164, Lemma 5.1.
+* The restriction-to-curves proofs of Bogomolov–Gieseker by Mehta–Ramanathan, and in
+  positive characteristic by Flenner and Langer, are cited above for context only.
+
+## Tags
+
+Bogomolov–Gieseker inequality, Hodge index theorem, discriminant, Mukai vector, K3 surface,
+supplied data
 -/
 
 universe u v w
@@ -176,14 +197,14 @@ Three things this is not, stated plainly because each is easy to over-read:
 
 * **It is not the general case.** For `|r| ≥ 2` the bound degrades to `−2r²`
   and stays there; `mukaiSelfPairing_ge` is all that survives. The general
-  statement needs simplicity and Serre duality, which is #740's chain and is
-  untouched here.
-* **It is not a discharge of #332.** The conclusion is conditional on a supplied
-  `BogomolovGiesekerData`, so the gap that issue records is relocated into a
-  named hypothesis, not closed.
+  statement needs simplicity and Serre duality, neither of which is used or
+  provided here.
+* **It is not an unconditional proof of Lemma 5.1.** The conclusion is
+  conditional on a supplied `BogomolovGiesekerData`, so the gap recorded at
+  `neg_two_le_selfPairing_mukaiVector_iff` is relocated into a named
+  hypothesis, not closed.
 * **It is not cohomological.** No `Ext`, no `Hom`, no Serre duality appears in
-  the derivation — `mukaiSelfPairing_eq` plus `rank² ≤ 1` is the whole proof.
-  That is what is genuinely new here. -/
+  the derivation — `mukaiSelfPairing_eq` plus `rank² ≤ 1` is the whole proof. -/
 theorem neg_two_le_mukaiSelfPairing_of_rank_le_one (B : BogomolovGiesekerData V P)
     (hE : B.Semistable E) (hr : V.rank E ^ 2 ≤ 1) : -2 ≤ mukaiSelfPairing V E := by
   have h := mukaiSelfPairing_ge B hE

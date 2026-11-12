@@ -10,8 +10,8 @@ import DerivedAlgGeo.AlgebraicGeometry.Stacks.Representable
 /-!
 # Scheme morphisms and big-Zariski stack presentation data
 
-This file starts the algebraicity layer with two pieces of data that retain
-their geometric content:
+This file provides two pieces of algebraicity data that retain their geometric
+content:
 
 * a scheme morphism induces a pullback-compatible morphism between the
   corresponding representable big-Zariski stacks;
@@ -25,13 +25,41 @@ proved here, and the diagonal is represented by schemes rather than algebraic
 spaces.  No Artin representability theorem or opaque algebraicity proposition
 is introduced.
 
+## Main definitions
+
+* `representableZariskiStackMap` — the morphism of representable big-Zariski stacks induced
+  by a scheme morphism.
+* `StackMorphism.HasRepresentableProperty` — every fiber of a stack morphism has a
+  representing scheme whose structure morphism satisfies a given property, with the
+  specializations `StackMorphism.IsLocallyOfFinitePresentation`,
+  `StackMorphism.IsSmoothSurjective` and `StackMorphism.IsOpenImmersion`.
+* `StackInGroupoids.HasRepresentableDiagonal` — every isomorphism functor of a stack is
+  represented by a scheme, through `StackInGroupoids.DiagonalFiberRepresentation`.
+* `ZariskiStackPresentation`, `ZariskiStackPresentationOver` — big-Zariski presentations: a
+  scheme diagonal and a smooth-surjective scheme atlas, optionally locally of finite
+  presentation over a base.
+
+## Main results
+
+* `representableZariskiStackMap_isRepresentable` — a scheme-induced morphism of
+  representable stacks is representable by the actual fiber products.
+* `representableZariskiStackMap_hasRepresentableProperty` — a base-change-stable property of
+  a scheme morphism passes to the induced stack morphism.
+* `representableZariskiStack_hasRepresentableDiagonal` — a representable stack has diagonal
+  represented by scheme-theoretic equalizers.
+* `representableZariskiStackPresentationOver` and `affineLineZariskiStackPresentationOver` —
+  every locally finitely presented scheme morphism, and in particular the affine line, gives a
+  big-Zariski presentation over its target.
+
+## Implementation notes
+
 The fppf and étale descent level lives in
 `DerivedAlgGeo.AlgebraicGeometry.Stacks.Descent`, which also shows that a
 smooth surjection is an fppf covering family.  That module does not change
 anything here: the diagonal below is still represented by schemes, and the
 presentations below are still big-Zariski presentations.
 
-## Which declarations here fix the topology, and which do not
+### Which declarations here fix the topology, and which do not
 
 The representability vocabulary -- `StackMorphism.HasRepresentableProperty`
 with its `IsLocallyOfFinitePresentation`, `IsSmoothSurjective` and
@@ -48,8 +76,18 @@ What genuinely is Zariski is everything named for it: the
 and `ZariskiStackPresentationOver`, whose names record exactly the gap
 between what they supply and an algebraic stack.
 
-The split is deliberate. Raising the presentations to fppf is SF9.2 (#522)
-work, and it should not also have to widen the vocabulary it is stated in.
+The split is deliberate: raising the presentations to fppf should not also
+have to widen the vocabulary they are stated in.
+
+## References
+
+This file builds on `StackInGroupoids`, `StackMorphism.IsRepresentable` and
+`StackInGroupoids.representableMap`, and on Mathlib's `Scheme.zariskiTopology` and
+`MorphismProperty`.
+
+## Tags
+
+algebraic stack, representable morphism, diagonal, atlas, Zariski topology, stack in groupoids
 -/
 
 namespace AlgebraicGeometry

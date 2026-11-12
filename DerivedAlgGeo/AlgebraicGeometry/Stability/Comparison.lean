@@ -12,7 +12,25 @@ The two stability notions on `Coh X` are ordered by different data: Gieseker sta
 whole reduced Hilbert polynomial compared at infinity, μ-stability by a single ratio of Hilbert
 coefficients. This file owns everything that mentions both, and is imported by neither.
 
-## What is delivered, and what is not
+## Main definitions
+
+* `PolarizedVarietyData.hnTrivialOfGiesekerSemistable` — the one-step Harder–Narasimhan
+  filtration of a Gieseker-semistable sheaf for the weak μ-slope.
+
+## Main results
+
+* `PolarizedVarietyData.weakSlopeData_slope_eq_normalizedCoefficient` — the μ-slope is the
+  normalized Hilbert coefficient one below the top.
+* `PolarizedVarietyData.topSlope_le_of_giesekerLE` — the Gieseker order between sheaves of
+  positive multiplicity implies the slope inequality.
+* `PolarizedVarietyData.giesekerSemistable_implies_muSemistable` — Gieseker semistability
+  implies weak μ-semistability.
+* `PolarizedVarietyData.giesekerSemistable_implies_hn_trivial` — a Gieseker-semistable sheaf
+  has a one-step Harder–Narasimhan filtration, whose single factor has the slope of the sheaf.
+
+## Implementation notes
+
+### What is delivered, and what is not
 
 One implication in one direction: a Gieseker-semistable sheaf is weakly μ-semistable. The
 converse — μ-semistable implies Gieseker-semistable — is not delivered here in any form, and
@@ -24,7 +42,7 @@ and neither definition mentions the other. `Gieseker/Basic.lean` records separat
 central charge can reproduce the Gieseker order, so the comparison is between *slopes* and
 happens here rather than at the level of the stability functions.
 
-## Why purity is what makes the implication true
+### Why purity is what makes the implication true
 
 `WeakStabilityFunctionOn.IsSemistable` quantifies over every nonzero `B : Subobject F` and
 compares in `WithTop ℝ`, where a multiplicity-zero subobject has slope `⊤` and would destabilise
@@ -32,18 +50,28 @@ compares in `WithTop ℝ`, where a multiplicity-zero subobject has slope `⊤` a
 junk value `0`. The purity conjunct of `IsGiesekerSemistable` is exactly what rules that out:
 every nonzero subobject then has positive multiplicity, both slopes are finite, and the
 lexicographic criterion read at `P.dim - 1` is the slope comparison. Without purity the statement
-is false, so the hypothesis travels with the theorem and is not weakened by the relocation.
+is false, so the hypothesis travels with the theorem and is not weakened.
 
 This is also where the subsheaf quantifier changes shape. Gieseker stability quantifies over
 monomorphisms `G ⟶ F`; the abstract slope theory quantifies over `Subobject F`. The translation
 is made here, in the one file that needs both, and is kept out of either definition.
 
-## Placement
+### Placement
 
-MO1.08 (#1319) made `Slope/` and `Gieseker/` siblings over the shared Hilbert-polynomial data,
-and this file is the comparison owner that split names. The declarations below were previously
-the tail of `Gieseker/MuStability.lean` and of `Gieseker/HarderNarasimhan/Consequences.lean`,
-where they were the only reason either module reached the other theory.
+`Slope/` and `Gieseker/` are siblings over the shared Hilbert-polynomial data, and this file is
+the comparison that imports both. Keeping these declarations here is what lets neither theory
+import the other.
+
+## References
+
+This file compares `PolarizedVarietyData.IsGiesekerSemistable` with the weak slope
+`PolarizedVarietyData.weakSlopeData` through `WeakStabilityFunctionOn.IsSemistable`, and builds
+the filtration with `AbelianWeakHNFiltration.ofSemistable`.
+
+## Tags
+
+Gieseker stability, slope stability, μ-stability, Hilbert polynomial, purity,
+Harder–Narasimhan filtration
 -/
 
 universe u
@@ -128,8 +156,8 @@ noncomputable def hnTrivialOfGiesekerSemistable (h : MuPositivityData P) {F : Co
   AbelianWeakHNFiltration.ofSemistable (giesekerSemistable_implies_muSemistable h hF)
 
 /-- **A Gieseker-semistable sheaf has a one-step Harder–Narasimhan filtration.** The propositional
-form of `hnTrivialOfGiesekerSemistable`, which is the name #905 asks for; the data itself carries
-a camelCase name because mathlib's naming convention forbids underscores in a `def`. -/
+form of `hnTrivialOfGiesekerSemistable`; the data itself carries a camelCase name because
+mathlib's naming convention forbids underscores in a `def`. -/
 theorem giesekerSemistable_implies_hn_trivial (h : MuPositivityData P) {F : Coh X}
     (hF : P.IsGiesekerSemistable F) :
     Nonempty (AbelianWeakHNFiltration (P.weakSlopeData h).toWeakStabilityFunction F) :=

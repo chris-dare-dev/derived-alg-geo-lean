@@ -17,8 +17,45 @@ At the current Mathlib pin no general Quot-scheme or Grassmannian
 representability theorem is available.  The supported construction here is
 the zero quotient: its functor has exactly one quotient over every test
 scheme and is represented by the terminal object `S ⟶ S` of `Over S`.  The
-parameter is finite type and its zero complex realizes the boundedness witness
-from SF8.3.
+parameter is finite type and its zero complex realizes the finite-type
+boundedness witness `zeroFiniteTypeBoundednessWitness`.
+
+## Main definitions
+
+* `RepresentableQuotientProblem` — a quotient problem over `S` with a representing scheme
+  and the full Yoneda universal property; `RepresentableQuotientProblem.universal` is its
+  universal element.
+* `FiniteTypeQuotientParameterSpace` — a representable quotient problem whose parameter
+  morphism is of finite type.
+* `zeroQuotientProblem`, `zeroQuotientRepresentation`, `zeroFiniteTypeQuotientParameterSpace`
+  — the zero quotient functor, its representation by the identity scheme over `S`, and the
+  resulting finite-type parameter space.
+* `zeroQuotientToRelativePerfect`, `zeroQuotientRelativePerfectModuliProblem`,
+  `zeroQuotientFiniteTypeBoundednessWitness` — the zero quotient mapped to the
+  relative-perfect moduli fiber, problem and boundedness witness.
+
+## Main results
+
+* `zeroQuotient_universal_eq` — the universal element of the zero parameter space is the
+  unique zero-quotient point.
+* `zeroQuotient_isGeometricallyBounded` — the zero Quot construction is geometrically
+  bounded.
+
+## Implementation notes
+
+Only the zero quotient is constructed. Representability of a general Quot functor is not
+claimed: a `RepresentableQuotientProblem` must be supplied with its Yoneda isomorphism, and the
+zero problem is the one case where that isomorphism is built here.
+
+## References
+
+This file builds on `Mathlib.CategoryTheory.Yoneda`, on `ModuleQuotient` of
+`Moduli/Quot/Basic.lean`, and on `relativePerfectGeometricBoundednessProblem` and
+`FiniteTypeBoundednessWitness` of `Moduli/PerfectComplex/Boundedness.lean`.
+
+## Tags
+
+Quot scheme, representable functor, Yoneda, parameter space, boundedness, moduli
 -/
 
 attribute [local instance] HasDerivedCategory.standard
@@ -123,21 +160,21 @@ def zeroQuotientToRelativePerfect {S : Scheme.{u}}
   fun _ ↦ relativePerfectZeroObject T
 
 /-- On the identity parameter scheme, the zero quotient produces the
-concrete relative-perfect moduli problem from SF8.2. -/
+concrete relative-perfect moduli problem `identityRelativePerfectModuliProblem`. -/
 def zeroQuotientRelativePerfectModuliProblem
     (S : Scheme.{u}) :
     RelativePerfectModuliProblem S PUnit :=
   identityRelativePerfectModuliProblem (identityRelativePerfectBaseChange S)
 
 /-- The finite-type zero Quot parameter realizes the honest boundedness
-witness from SF8.3, including geometric-point coverage. -/
+witness `zeroFiniteTypeBoundednessWitness`, including geometric-point coverage. -/
 def zeroQuotientFiniteTypeBoundednessWitness
     (S : Scheme.{u}) :
     FiniteTypeBoundednessWitness (zeroRelativePerfectModuliSelector S) :=
   zeroFiniteTypeBoundednessWitness S
 
-/-- Consequently the supported zero Quot construction inhabits the SF8.3
-geometric boundedness predicate. -/
+/-- Consequently the supported zero Quot construction inhabits the geometric
+boundedness predicate of `relativePerfectGeometricBoundednessProblem`. -/
 theorem zeroQuotient_isGeometricallyBounded
     (S : Scheme.{u}) :
     (relativePerfectGeometricBoundednessProblem S).IsBounded
