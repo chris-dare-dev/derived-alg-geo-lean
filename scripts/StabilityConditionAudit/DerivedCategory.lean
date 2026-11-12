@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Limits
 import DerivedAlgGeo.Algebra.Category.ModuleCat.ProjectiveResolution
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.KInjective
 
 /-!
 Audit records for generic derived-category extensions on arbitrary abelian
@@ -349,3 +350,10 @@ Ext finiteness or a geometric vanishing bound.
 #print axioms DerivedCategory.HomFiniteBoundedPair.obj₂_left
 #print axioms DerivedCategory.homFiniteBoundedPair_of_bounded
 #print axioms DerivedCategory.homFiniteBounded_boundedDerived
+
+/-! ## K-injectivity criterion in Grothendieck abelian categories -/
+
+#print axioms CochainComplex.exists_cochain_extension_of_homotopy_zero
+#print axioms CochainComplex.hasLiftingProperty_mappingCocone_fst_id
+#print axioms CochainComplex.isKInjective_of_injective_of_homotopy_zero
+#print axioms CochainComplex.isKInjective_of_injective_of_rightOrthogonal
