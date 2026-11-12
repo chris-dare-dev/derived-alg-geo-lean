@@ -362,7 +362,7 @@ items:
     kind: task
     parent: stacks-and-moduli-stk1
     title: "STK1.1: Stacks in groupoids with fibres in independent universes"
-    status: planned
+    status: done
     priority: must
     size: M
     summary: "The carrier CategoryTheory.StackInGroupoids gets fibres in independent universes Cat.{v', u'}, as in Mathlib's Pseudofunctor.IsStack. Today it ties them as Cat.{w, w}."

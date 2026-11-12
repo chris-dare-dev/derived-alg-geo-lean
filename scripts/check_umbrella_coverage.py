@@ -71,8 +71,8 @@ DECLARATION_OWNERS: dict[str, OwnerWitness] = {
         "19290a0c4f31c13adce63d9f0383a3befa8d39f15059bdd4db594a6301f3c9a6",
     ),
     "DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids": OwnerWitness(
-        35, "structure StackInGroupoids (C : Type u) [Category.{v} C]",
-        "10dd4931c4bf46ca5e21dc4163af721be1befcb17b4399fec3b5fe5e3b74ce72",
+        73, "structure StackInGroupoids (C : Type u) [Category.{v} C]",
+        "8131106ea52b25b007e8bf4ec6a46c2af9a7b9ddfc15668c94104a43ce258879",
     ),
     "DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated": OwnerWitness(
         62, "inductive coprodClosure (P : ObjectProperty C) : ObjectProperty C",
