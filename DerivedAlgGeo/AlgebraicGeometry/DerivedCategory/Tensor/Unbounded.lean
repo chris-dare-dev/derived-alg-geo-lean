@@ -13,7 +13,7 @@ This file specializes the generic K-flat localization construction to the total 
 unbounded complexes of `𝒪_X`-modules. A `SchemeKFlatResolution X` is therefore concrete data for
 the actual sheafified tensor bifunctor, rather than an arbitrary derived-category operation.
 
-`AlgebraicGeometry.DerivedCategory.freeYonedaSchemeKFlatResolution` now gives a
+`AlgebraicGeometry.DerivedCategory.freeYonedaSchemeKFlatResolution` gives a
 canonical functorial resolution for every scheme. Proving that derived tensor
 preserves quasicoherent cohomology and then restricting it to `Dqc X` remain
 geometric steps.
@@ -35,16 +35,7 @@ geometric steps.
 The canonical free-Yoneda inhabitant is defined downstream, so this generic
 scheme specialization does not import its construction.
 
-## References
-
-The underlying localization construction is
-`CategoryTheory.KFlatResolution.derivedTensor`.
-
-## Tags
-
-scheme, derived tensor, K-flat resolution, localization
-
-## Which tensor product this is
+### Which tensor product this is
 
 This is the **unbounded** tier of the `Tensor/` owner, and it is the only tier that
 constructs anything: the bifunctor here is built from a supplied K-flat resolution on
@@ -59,9 +50,16 @@ complexes of module sheaves. The other two tiers are contracts rather than const
   `Tensor/Relative.lean` carries the relative tier -- compatibility of a coherent tensor
   with derived pullback along a morphism of scheme base changes.
 
-MO1.10 (#1321) moved this file from `DerivedCategory/KFlatTensor.lean` so that the three
-tiers sit under one owner; the declaration names are unchanged. The `Dqc`-level K-flat
-tensor stays with its own owner at `DerivedCategory/Dqc/KFlatTensor.lean`.
+The `Dqc`-level K-flat tensor has its own owner at `DerivedCategory/Dqc/KFlatTensor.lean`.
+
+## References
+
+The underlying localization construction is
+`CategoryTheory.KFlatResolution.derivedTensor`.
+
+## Tags
+
+scheme, derived tensor, K-flat resolution, localization
 -/
 
 namespace AlgebraicGeometry.DerivedCategory

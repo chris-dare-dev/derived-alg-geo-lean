@@ -57,10 +57,9 @@ arbitrary derived tensor on a singular scheme, so the bounded coherent tiers are
 contracts a caller discharges rather than theorems proved from the tier above them.
 
 Fourier--Mukai consumes all of this and owns none of it; see
-`DerivedCategory/FourierMukai/`. The tensor cutover kept the historical
-`AlgebraicGeometry.DerivedCategory.FourierMukai` namespace in
-`Tensor/BoundedCoherent.lean`, `Tensor/Coherent.lean`, and `Tensor/Relative.lean`.
-`Tensor/Unbounded.lean`, `Tensor/LeftDerivedTensor.lean`, and
+`DerivedCategory/FourierMukai/`. `Tensor/BoundedCoherent.lean`, `Tensor/Coherent.lean`,
+and `Tensor/Relative.lean` use the `AlgebraicGeometry.DerivedCategory.FourierMukai`
+namespace. `Tensor/Unbounded.lean`, `Tensor/LeftDerivedTensor.lean`, and
 `Tensor/BoundedMonoidal.lean` use `AlgebraicGeometry.DerivedCategory`.
 `Tensor/FiniteKFlat.lean` and `Tensor/BoundedAboveKFlat.lean` use
 `AlgebraicGeometry.Scheme.Modules`, the namespace of the total tensor they
@@ -70,7 +69,8 @@ namespace on every declaration in the subtree.
 
 ## References
 
-* `docs/architecture/cutover-ledger.md`, row 10 (#1321).
+Mathlib's `CategoryTheory.MonoidalCategory` and `Functor.Monoidal`, which the
+monoidal tiers extend, and `AlgebraicGeometry.Scheme.Modules`.
 
 ## Tags
 

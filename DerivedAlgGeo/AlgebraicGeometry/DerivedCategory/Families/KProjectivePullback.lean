@@ -11,12 +11,9 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.KFlatPullback
 `PullbackAcyclicResolution` and `KFlatPullbackAcyclic` both carry two fields
 that are assertions *about the morphism being derived*: that pullback along
 `f` inverts the quasi-isomorphisms produced by the replacement, and that it
-inverts the comparison of an already replaced complex. Until now those two
-fields were supplied by the caller for every nonexact `f`, so the arbitrary
-derived pullback was inhabited only by assuming the preservation it was
-supposed to construct.
+inverts the comparison of an already replaced complex.
 
-This file removes both assertions for replacements whose values are
+This file proves both assertions for replacements whose values are
 K-projective. A quasi-isomorphism between K-projective cochain complexes is
 already an isomorphism in the homotopy category, and degreewise pullback is
 additive, so it preserves the homotopies witnessing that isomorphism. The two
@@ -24,26 +21,50 @@ acyclicity fields are therefore theorems, proved for an arbitrary morphism of
 scheme base changes: no exactness, no flatness, no limit preservation, and no
 caller-supplied assertion about `f`.
 
-What remains supplied is the replacement itself. Nothing here constructs a
-functorial K-projective -- or K-flat -- replacement on `X.Modules`, and this
-file makes no claim that one exists. That is a separate open deliverable of
-SF8.5, and on a general scheme the category of all `𝒪_X`-modules does not have
-enough projectives, so the honest general-scheme route is a K-flat replacement
-whose transport along `f` is still open. The statements below are about what a
-replacement buys once it is in hand, and they are phrased so that the
-K-projectivity hypothesis stays visible at every call site.
+## Main definitions
+
+- `SchemeBaseChange.PullbackAcyclicResolution.ofKProjective`: a functorial
+  K-projective replacement is a pullback-acyclic resolution along every
+  morphism.
+- `SchemeBaseChange.kProjectiveLeftDerivedPullback`: the arbitrary left-derived
+  pullback built from a functorial K-projective replacement alone.
+- `SchemeBaseChange.kProjectiveExactComparison`: along an exact pullback, that
+  construction agrees with the exact derived pullback.
+- `SchemeBaseChange.kFlatLeftDerivedPullbackOfKProjective`: the K-flat derived
+  pullback with its acyclicity hypothesis proved.
 
 ## Main statements
 
 - `SchemeBaseChange.quasiIso_complexPullback_map_of_isKProjective`: degreewise
   pullback along an arbitrary morphism preserves quasi-isomorphisms between
   K-projective complexes.
-- `SchemeBaseChange.PullbackAcyclicResolution.ofKProjective`: a functorial
-  K-projective replacement is a pullback-acyclic resolution along every
-  morphism.
+- `SchemeBaseChange.isIso_complexPullback_map_of_isKProjective`: its localized
+  form in the derived category of the source.
 - `SchemeBaseChange.kFlatPullbackAcyclic_of_isKProjective`: the K-flat
   pullback-acyclicity hypothesis of `kFlatLeftDerivedPullback` is discharged,
   rather than assumed, for a K-projective-valued K-flat replacement.
+
+All names are in the namespace `AlgebraicGeometry.DerivedCategory.Families`.
+
+## Implementation notes
+
+What remains supplied is the replacement itself. Nothing here constructs a
+functorial K-projective -- or K-flat -- replacement on `X.Modules`, and this
+file makes no claim that one exists. On a general scheme the category of all
+`𝒪_X`-modules does not have enough projectives, so the honest general-scheme
+route is a K-flat replacement. The statements below are about what a
+replacement buys once it is in hand, and they are phrased so that the
+K-projectivity hypothesis stays visible at every call site.
+
+## References
+
+The repository's `CochainComplex.IsKProjective.quasiIso_map`,
+`SchemeBaseChange.PullbackAcyclicResolution.isLeftDerived` and
+`SchemeBaseChange.kFlatLeftDerivedPullback`.
+
+## Tags
+
+derived pullback, K-projective complex, K-flat resolution, base change
 -/
 
 attribute [local instance] HasDerivedCategory.standard
@@ -169,8 +190,7 @@ def kProjectiveExactComparison (f : T ⟶ U) [IsExactPullback f]
 caller-supplied hypothesis, as soon as the replacement is K-projective valued.
 
 This discharges the `KFlatPullbackAcyclic` argument of
-`kFlatLeftDerivedPullback` for an arbitrary morphism, where previously it was
-provable only for exact and flat morphisms and otherwise assumed. -/
+`kFlatLeftDerivedPullback` for an arbitrary morphism. -/
 theorem kFlatPullbackAcyclic_of_isKProjective (R : SchemeKFlatResolution U.left)
     (f : T ⟶ U)
     (hKProjective : ∀ K : CochainComplex U.left.Modules ℤ,

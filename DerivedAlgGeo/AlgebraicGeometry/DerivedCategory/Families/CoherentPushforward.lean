@@ -118,7 +118,7 @@ variable {T U : SchemeBaseChange S} (f : T ⟶ U)
 
 /-- Coherent pushforward is additive.  Reflected through the faithful additive
 inclusion `Coh.ι` from additivity of module-sheaf pushforward, using the
-comparison isomorphism; `Functor.mapDerivedCategory` asks for additivity
+comparison isomorphism; `Functor.mapDerivedCategory` requires additivity
 separately from exactness, and this discharges it for every instance. -/
 instance HasCoherentPushforward.sheafPushforward_additive :
     (HasCoherentPushforward.sheafPushforward f).Additive :=
@@ -142,9 +142,8 @@ def coherentDerivedPushforwardFactors :
   (HasCoherentPushforward.sheafPushforward f).mapDerivedCategoryFactors
 
 /-- The shift on the derived direct image is Mathlib's, supplied by name: after unfolding the
-`def`, instance search would still not see through the wrapper (see
-`.claude/references/instance-transparency.md`), and the triangulated instance below needs this
-one to be Mathlib's term, not a re-derivation, to unify at all. -/
+`def`, instance search would still not see through the wrapper, and the triangulated instance
+below needs this one to be Mathlib's term, not a re-derivation, to unify at all. -/
 instance coherentDerivedPushforwardCommShift :
     (coherentDerivedPushforward f).CommShift ℤ := by
   dsimp [coherentDerivedPushforward]
@@ -216,7 +215,7 @@ instance isFinite_comp_left {T U V : SchemeBaseChange S} (f : T ⟶ U) (g : U �
   inferInstanceAs (IsFinite (f.left ≫ g.left))
 
 /-- Finite morphisms between locally Noetherian schemes inhabit the contract:
-`Coh.pushforward` is exact and lands in coherent sheaves, and its comparison
+`Coh.pushforward` is exact and takes values in coherent sheaves, and its comparison
 with module-sheaf pushforward is `Coh.pushforwardCompι`, an `Iso.refl`, so
 nothing is transported.  Closed immersions are finite (Mathlib's instance), so
 this covers Theorem 6.2 of arXiv:2607.28411v1, which constructs stability

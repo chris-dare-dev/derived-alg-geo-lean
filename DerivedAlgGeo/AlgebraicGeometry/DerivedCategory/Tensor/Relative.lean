@@ -17,27 +17,44 @@ which includes the tensorator and unit comparison, their naturality, associativi
 unitality laws, and proofs that the lax and oplax maps are inverse.  Tensor and unit
 compatibility therefore cannot be selected independently at each theorem site.
 
-## Still a supplied capability
+## Main definitions
+
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.HasMonoidalDerivedPullback` —
+  derived pullback along `f` as a strong monoidal functor.
+* `monoidalDerivedPullbackTensorIso` — strong monoidality in the orientation
+  `f*(K ⊗ -) ≅ f*K ⊗ f*(-)`.
+* `monoidalDerivedPullbackLeftUnitor` and `monoidalDerivedPullbackRightUnitor` — the
+  pulled-back unit acts as a left and as a right unit.
+
+## Main results
+
+The isomorphisms above are the results; the file states no separate theorem.
+
+## Implementation notes
+
+### Still a supplied capability
 
 Like the tiers it builds on, this file inhabits nothing.  Strong monoidality of derived
 pullback is a theorem about a morphism of schemes that this repository does not prove, and
 `HasMonoidalDerivedPullback` is where a caller discharges it.  Arbitrary derived pullback
-itself remains SF8 #554's obligation; this class consumes the existing
-`HasCoherentPullback` contract rather than restating it.
+itself is not constructed here; this class consumes the existing `HasCoherentPullback`
+contract rather than restating it.
 
-## Placement
+### Placement and namespace
 
-MO1.10 (#1321) extracted this file's contents from
-`DerivedCategory/FourierMukai/DerivedTensorCoherence.lean`.  Separating it from
-`Tensor/Coherent.lean` is the ledger's requirement that the unbounded, bounded-coherent
-and relative inputs be distinguishable: a consumer needing only the absolute coherent
-tensor imports `Tensor/Coherent.lean` and never mentions a morphism.  Per the cutover
-ledger's standing decision that paths move and namespaces do not, the declarations keep
-the `AlgebraicGeometry.DerivedCategory.FourierMukai` namespace they were introduced with.
+Separating this file from `Tensor/Coherent.lean` keeps the unbounded, bounded-coherent
+and relative inputs distinguishable: a consumer needing only the absolute coherent
+tensor imports `Tensor/Coherent.lean` and never mentions a morphism.  The declarations
+are in the `AlgebraicGeometry.DerivedCategory.FourierMukai` namespace.
 
 ## References
 
-* `docs/architecture/cutover-ledger.md`, row 10.
+Mathlib's `Functor.Monoidal`, `Functor.Monoidal.commTensorLeft` and
+`Functor.Monoidal.εIso`.
+
+## Tags
+
+derived pullback, strong monoidal functor, derived tensor product, base change
 -/
 
 universe u

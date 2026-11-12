@@ -9,11 +9,35 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineRealization
 # Coproducts in the affine quasi-coherent realization of `Dqc`
 
 `Dqc.lean` gives the honest locus `Dqc(X)` its `ι`-indexed coproducts on an
-arbitrary scheme (#721), and the inclusion into the all-sheaf derived category
-preserves them.  Nothing there says anything about the *affine realization*
-functor of `AffineRealization.lean`, and that is what this file supplies.
+arbitrary scheme, and the inclusion into the all-sheaf derived category
+preserves them.  This file proves that the *affine realization* functor of
+`AffineRealization.lean` preserves them too.
 
-Four layers, none of them transported along an unproved equivalence:
+## Main definitions
+
+This file introduces no new definitions; it proves facts about the functors of
+`AffineRealization.lean`.
+
+## Main results
+
+* `Dqc.affineQuasicoherentSheavesInclusion_preservesCoproductsOfShape` — the abelian
+  inclusion preserves `ι`-indexed coproducts.
+* `affineQuasicoherentDerivedCategory_hasCoproductsOfShape`,
+  `affineQuasicoherentQ_preservesCoproductsOfShape` and
+  `affineQuasicoherentHomologyFunctor_preservesCoproductsOfShape` — coproducts in
+  `D(QCoh(Spec R))`, preserved by `Q` and by every `Hⁿ`.
+* `affineTildeDerivedFunctor_preservesCoproductsOfShape` and
+  `affineGammaDerivedFunctor_preservesCoproductsOfShape` — the two halves of the
+  derived tilde equivalence preserve them.
+* `affineQuasicoherentDerivedInclusion_preservesCoproductsOfShape` and
+  `affineQuasicoherentDerivedToDqc_preservesCoproductsOfShape` — the exact derived
+  inclusion and the realization into `Dqc(Spec R)` preserve them.
+
+## Implementation notes
+
+### Four layers
+
+None of the layers is transported along an unproved equivalence:
 
 1. **Abelian.** Quasi-coherent sheaves on `Spec R` have `ι`-indexed coproducts
    and the inclusion into `(Spec R).Modules` creates them
@@ -23,8 +47,8 @@ Four layers, none of them transported along an unproved equivalence:
    equivalence is used.
 2. **Derived.** `D(QCoh(Spec R))` therefore has `ι`-indexed coproducts, `Q`
    preserves them, and so does every `Hⁿ`.  These are the repository's
-   `DerivedCategory.Coproducts` instances, now applicable because layer 1 has
-   supplied their AB4 hypothesis.
+   `DerivedCategory.Coproducts` instances, applicable because layer 1
+   supplies their AB4 hypothesis.
 3. **The exact derived inclusion** `D(QCoh(Spec R)) ⥤ D((Spec R).Modules)`
    preserves them, by
    `Functor.mapDerivedCategory_preservesCoproductsOfShape` applied to the exact,
@@ -33,7 +57,7 @@ Four layers, none of them transported along an unproved equivalence:
    composite with the honest `Dqc` inclusion is layer 3, and that inclusion
    reflects coproducts, because closure makes it create them.
 
-## What this does not prove
+### What this does not prove
 
 Preservation of coproducts is one of the two standing hypotheses of every
 compact-generation argument; it is not the argument.  In particular this file
@@ -47,6 +71,17 @@ needs finite amplitude and does not extend to the unbounded case.
 Coproducts are indexed by a type in the universe of the coordinate ring, one
 indexing type at a time, matching the repository's universe-explicit colimit
 idiom rather than claiming closure under all coproducts.
+
+## References
+
+Mathlib's `preservesColimitsOfShape_of_reflects_of_preserves`, and the
+repository's `DerivedCategory.hasCoproductsOfShape`,
+`Functor.mapDerivedCategory_preservesCoproductsOfShape` and
+`SchemeQuasicoherentDerivedCategory.ι_reflectsCoproductsOfShape`.
+
+## Tags
+
+quasi-coherent sheaves, affine scheme, derived category, coproducts, AB4
 -/
 
 namespace AlgebraicGeometry.DerivedCategory.Dqc
@@ -66,7 +101,7 @@ variable (R : CommRingCat.{u}) (ι : Type u)
 
 /-- The inclusion of affine quasi-coherent sheaves into all module sheaves
 preserves `ι`-indexed coproducts: the affine case of the arbitrary-scheme
-statement, recorded here as the moduli lane's entry point.
+statement, recorded here as the entry point for affine consumers.
 
 With `affineQuasicoherentSheavesInclusion_preservesFiniteLimits` and its colimit
 counterpart this makes it an exact, coproduct-preserving functor, which is
@@ -82,7 +117,7 @@ theorem affineQuasicoherentSheavesInclusion_preservesCoproductsOfShape :
 This is `DerivedCategory.hasCoproductsOfShape` at the abelian category
 `AffineQuasicoherentSheaves R`, and it is available exactly because
 `affineQuasicoherentSheavesHasExactCoproducts` supplies the AB4 hypothesis that
-instance asks for.  Coproducts alone would not do: the construction needs
+instance requires.  Coproducts alone would not do: the construction needs
 quasi-isomorphisms to be stable under coproducts, which is exactness. -/
 theorem affineQuasicoherentDerivedCategory_hasCoproductsOfShape :
     HasCoproductsOfShape ι (AffineQuasicoherentDerivedCategory R) :=

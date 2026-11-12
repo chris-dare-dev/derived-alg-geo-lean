@@ -12,11 +12,33 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.Convolution
 
 `KernelCorrespondence.lean` reduced a geometric `Correspondence` to three named
 inputs. This file does the same for the **composition law**: the abstract
-`ConvolutionData` asks for a kernel operation `conv` *and* the family of
+`ConvolutionData` takes a kernel operation `conv` *and* the family of
 isomorphisms `Φ_P ⋙ Φ_Q ≅ Φ_{conv P Q}`, both as supplied data, and this ledger
 reduces both.
 
-## What this ledger buys
+## Main definitions
+
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.TripleProductGeometry` — a
+  triple product with its three projections, supplied as data.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.convKernel` — the convolution
+  `Rπ_{XW*}(π_{XY}^* P ⊗^L π_{YW}^* Q)`.
+* The classical input classes `HasProjectionFormula`, `HasProjectionFormulaRight`,
+  `HasFlatBaseChange`, `HasCommonPullbackRoute` and `HasCommonPushforwardRoute`,
+  with the compatibility records `HasDerivedPullbackTensor` and
+  `HasDerivedTensorAssoc`.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.geometricCompIso` — Prop. 5.10,
+  derived from the seven classical inputs.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.geometricConvolutionData` — the
+  assembled `ConvolutionData` with no supplied fields.
+
+## Main results
+
+The isomorphism `geometricCompIso` is the result; the file states no separate
+theorem.
+
+## Implementation notes
+
+### What this ledger buys
 
 **`conv` stops being supplied.** Classically
 `conv P Q = Rπ_{XW*}(π_{XY}^* P ⊗^L π_{YW}^* Q)` on the triple product. Every
@@ -33,17 +55,14 @@ slot (`HasProjectionFormula`, `HasProjectionFormulaRight`), flat base change
 pushforward routes across the triple product (`HasCommonPullbackRoute`,
 `HasCommonPushforwardRoute`). The honest statement of this ledger's effect:
 
-> Both fields of `ConvolutionData` are now constructed; what is supplied is
+> Both fields of `ConvolutionData` are constructed; what is supplied is
 > the classical comparison data above, rooted in coherent functorial
 > structures with the
 > geometry it encodes stated in its docstring.
 
-The earlier form of this file supplied `compIso` whole, as a
-`HasConvolutionComparison` class naming the projection formula and flat base
-change beside it without consuming them. That class is gone: the derivation
-consumes its inputs or they would not be here.
+The derivation consumes each of its inputs; none is carried beside it unused.
 
-## Where the product finally becomes load-bearing
+### Where the product finally becomes load-bearing
 
 `KernelCorrespondence.lean` deliberately did *not* require its middle scheme to
 be a product, because `Correspondence` does not consume that. Here the
@@ -56,10 +75,9 @@ intermediate objects are honest fibre products, and the two route classes'
 *assert* that the objects are products — nothing in this file consumes that
 assertion. What consumes it is a caller discharging the seven classes, and
 each class docstring says which piece of product geometry its instance
-encodes. Asserting productness here would be an unconsumed hypothesis, which
-is the shape both review rounds attacked.
+encodes. Asserting productness here would be an unconsumed hypothesis.
 
-## What this file does not assert
+### What this file does not assert
 
 * **Nothing constructs an instance of any of the seven classes**, and no
   scheme is shown to admit any of them. Inhabitant-free, exactly like the
@@ -69,8 +87,18 @@ is the shape both review rounds attacked.
 * No associativity of convolution — `Convolution.lean` says that needs a
   second data layer relating the two bracketings, and this ledger does not
   supply it.
-* No unit: `𝒪_Δ` along the diagonal is absent, so `UnitKernelData` is still
-  unreachable geometrically.
+* No unit: this file does not use `𝒪_Δ` along the diagonal, so it gives no
+  `UnitKernelData`.
+
+## References
+
+* Prop. 5.10, the composition of Fourier--Mukai transforms, as stated by the
+  field `CategoryTheory.Triangulated.FourierMukai.ConvolutionData.compIso`.
+
+## Tags
+
+Fourier--Mukai kernel, convolution, projection formula, flat base change,
+triple product
 -/
 
 universe u
@@ -128,8 +156,7 @@ variable {Z₁ Z₂ Z₃ : SchemeBaseChange S}
 
 `conv P Q = Rπ_{XW*}(π_{XY}^* P ⊗^L π_{YW}^* Q)`, the classical formula, built
 from functors the first ledger already names. This is the field that
-`ConvolutionData` asks for as data and that this ledger removes from the
-obligation list.
+`ConvolutionData` takes as data; here it is constructed instead.
 
 The kernel `π_{YW}^* Q` sits in the *first* slot of the tensor bifunctor, with
 `π_{XY}^* P` as the argument. That choice is aligned with
@@ -209,7 +236,7 @@ class HasDerivedPullbackTensor {T U : SchemeBaseChange S}
       boundedCoherentDerivedPullback f ⋙
         (derivedTensor T).obj ((boundedCoherentDerivedPullback f).obj K)
 
-/-- Forget strong monoidality to the old tensorator-only capability. -/
+/-- Forget strong monoidality to the tensorator-only capability. -/
 noncomputable instance hasDerivedPullbackTensorOfMonoidal
     {T U : SchemeBaseChange S} (f : T ⟶ U)
     [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
@@ -235,9 +262,9 @@ class HasDerivedTensorAssoc (Z : SchemeBaseChange S)
     (derivedTensor Z).obj B ⋙ (derivedTensor Z).obj A ≅
       (derivedTensor Z).obj (((derivedTensor Z).obj A).obj B)
 
-/-- Forget the coherent root to the old single-associator capability.
+/-- Forget the coherent root to the single-associator capability.
 
-This adapter is retained for raw intermediate consumers. There is deliberately
+This adapter serves raw intermediate consumers. There is deliberately
 no instance in the opposite direction. -/
 noncomputable instance hasDerivedTensorAssocOfCoherent (Z : SchemeBaseChange S)
     [IsLocallyNoetherian Z.left] [HasCoherentDerivedTensor Z] :
@@ -311,7 +338,7 @@ section Derivation
 
 /-! ### Deriving Prop. 5.10
 
-`compIso` is no longer supplied. `geometricCompIso` below is the classical
+`compIso` is not supplied. `geometricCompIso` below is the classical
 argument, written as eight intermediate functors `E₀, …, E₇` and eight steps,
 each naming the single input it consumes:
 
@@ -327,8 +354,7 @@ each naming the single input it consumes:
 
 Every intermediate and every step is written with a fully ascribed type,
 inside a single definition, so that no signature is left to section-variable
-inclusion order and no composite is left to higher-order unification — the
-two failure modes that consumed the first attempt at this proof. Mathlib's
+inclusion order and no composite is left to higher-order unification. Mathlib's
 own note on `Functor.associator` warns that leaning on the definitional
 `Functor.assoc` "tends to make Lean slow"; the three private combinators
 below spell the associators out once each.
@@ -528,7 +554,7 @@ variable {X Y W Z₁ Z₂ Z₃ : SchemeBaseChange S}
 
 A `ConvolutionData` for the three geometric correspondences, with `conv` the
 constructed `convKernel` and `compIso` the derived `geometricCompIso`.
-Compare the abstract structure, which asks for both as data; that reduction —
+Compare the abstract structure, which takes both as data; that reduction —
 from two supplied fields to zero, given the seven named classical inputs — is
 the whole content of this ledger. -/
 noncomputable def geometricConvolutionData
@@ -558,12 +584,12 @@ end Assembly
 
 For a geometric Fourier--Mukai theory with composition, a caller must supply:
 
-1. `HasDerivedTensor` on each of the four relevant schemes — absent from the
-   repository;
-2. `HasDerivedPushforward` along each of the five relevant morphisms — absent
-   from the repository, and where properness lives;
-3. `HasCoherentPullback` along each pullback used — an *existing* contract from
-   #460--462, so no new kind of obligation;
+1. `HasDerivedTensor` on each of the four relevant schemes — uninhabited in
+   the repository;
+2. `HasDerivedPushforward` along each of the five relevant morphisms —
+   uninhabited in the repository, and where properness lives;
+3. `HasCoherentPullback` along each pullback used — an *existing* contract of
+   `Families/BoundedGeometry.lean`, so no new kind of obligation;
 4. a `TripleProductGeometry` — the objects and projections;
 5. the classical comparison structures: `HasProjectionFormula`,
    `HasProjectionFormulaRight`, `HasFlatBaseChange`,
@@ -571,15 +597,16 @@ For a geometric Fourier--Mukai theory with composition, a caller must supply:
    `HasCommonPullbackRoute`, `HasCommonPushforwardRoute` — where the product
    structure of the `TripleProductGeometry` finally does its work.
 
-Prop. 5.10 itself is no longer on the list: `geometricCompIso` derives it from
-item 5. Everything else in the Fourier--Mukai lane follows: `transform`,
+Prop. 5.10 itself is not on the list: `geometricCompIso` derives it from
+item 5. Everything else in the Fourier--Mukai development follows: `transform`,
 `transformK₀`, closure of kernel functors under composition, the transport of
 stability conditions, and — with a `KernelAutoequivalence` and a `DualKernel`
 on top — the group action and the Mukai isometry.
 
-Still unreachable geometrically, and not addressed by either ledger:
-`UnitKernelData` (needs `𝒪_Δ`), `DualKernel` (needs `P^∨ ⊗ p^*ω[dim]`), and
-associativity of convolution (needs a second comparison layer).
+Not addressed by either ledger: `UnitKernelData` (needs `𝒪_Δ`), `DualKernel`
+(needs `P^∨ ⊗ p^*ω[dim]`), and associativity of convolution (needs a second
+comparison layer). `KernelUnit.lean`, `KernelAdjunction.lean` and
+`KernelAssociativity.lean` take these up.
 -/
 
 end AlgebraicGeometry.DerivedCategory.FourierMukai
