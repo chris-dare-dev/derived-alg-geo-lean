@@ -40,8 +40,7 @@ homogeneous coordinates, `ℙ(n; S)` is `ℙ^{|n| - 1}_S`.
   `ℙ(n; Spec k)` with the field-level `projectiveSpace` and its structure morphism, so there is one
   projective space.
 * `ProjectiveSpace.isInvertible_twistingSheaf`: `𝒪(d)` is invertible.
-* `ProjectiveSpace.twistingSheafTensorIso`: `𝒪(d) ⊗ 𝒪(e) ≅ 𝒪(d + e)` once pullback along `toProj`
-  is strong monoidal.
+* `ProjectiveSpace.twistingSheafTensorIso`: `𝒪(d) ⊗ 𝒪(e) ≅ 𝒪(d + e)`.
 
 ## Notation
 
@@ -263,8 +262,9 @@ instance isInvertible_twistingSheaf (d : ℤ) :
   Scheme.Modules.isInvertible_pullback _ _
 
 /-- **`𝒪(d) ⊗ 𝒪(e) ≅ 𝒪(d + e)`** on `ℙ(n; S)`: the pullback of
-`Proj.twistingSheafTensorAddIso`, through the tensor comparison of a strong monoidal pullback. -/
-def twistingSheafTensorIso [(Scheme.Modules.pullback (toProj n S)).Monoidal] (d e : ℤ) :
+`Proj.twistingSheafTensorAddIso`, through the tensor comparison of the strong monoidal pullback
+along `toProj`. -/
+def twistingSheafTensorIso (d e : ℤ) :
     Scheme.Modules.tensorObj (twistingSheaf n S d) (twistingSheaf n S e) ≅
       twistingSheaf n S (d + e) :=
   Scheme.Modules.pullbackTensorIso (toProj n S) _ _ ≪≫
