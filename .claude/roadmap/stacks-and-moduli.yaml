@@ -775,7 +775,7 @@ items:
     kind: task
     parent: stacks-and-moduli-dq1
     title: "DQ1.4: The standard t-structure on Dqc(X), with heart QCoh(X)"
-    status: planned
+    status: done
     priority: must
     size: M
     summary: "The standard t-structure on Dqc(X), with heart QCoh(X)."
