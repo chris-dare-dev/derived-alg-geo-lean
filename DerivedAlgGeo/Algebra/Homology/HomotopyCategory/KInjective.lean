@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.KInjective.AcyclicSubcomplex
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.KInjective.Criterion
 
 /-!
@@ -18,8 +19,9 @@ None: this umbrella re-exports its children.
 ## Main results
 
 None; this module re-exports its children, among them
-`CochainComplex.isKInjective_of_injective_of_homotopy_zero`, the criterion of
-Stacks, Tag 079L.
+`CochainComplex.exists_mono_smallAcyclic`, the small family of acyclic complexes of
+Stacks, Tag 079K, and `CochainComplex.isKInjective_of_injective_of_homotopy_zero`, the
+criterion of Stacks, Tag 079L.
 
 ## Implementation notes
 

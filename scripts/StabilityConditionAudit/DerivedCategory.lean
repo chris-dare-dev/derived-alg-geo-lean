@@ -357,3 +357,12 @@ Ext finiteness or a geometric vanishing bound.
 #print axioms CochainComplex.hasLiftingProperty_mappingCocone_fst_id
 #print axioms CochainComplex.isKInjective_of_injective_of_homotopy_zero
 #print axioms CochainComplex.isKInjective_of_injective_of_rightOrthogonal
+
+/-! ## Small acyclic subcomplexes in Grothendieck abelian categories -/
+
+#print axioms CochainComplex.SmallAcyclicIndex
+#print axioms CochainComplex.smallAcyclic
+#print axioms CochainComplex.acyclic_smallAcyclic
+#print axioms CochainComplex.exists_isStrictlyLE_smallAcyclic
+#print axioms CochainComplex.exists_mono_smallAcyclic
+#print axioms CochainComplex.exists_epi_sigma_smallAcyclic
