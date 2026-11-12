@@ -77,17 +77,22 @@ derived category, restricted to the objects with quasi-coherent cohomology. -/
 def standardTStructure : TStructure (SchemeQuasicoherentDerivedCategory X) :=
   (schemeQuasicoherentCohomology X).tStructure DerivedCategory.TStructure.t
 
+/-- Being `≤ n` for the standard t-structure is being `≤ n` in the all-sheaf derived
+category, so amplitude on `Dqc(X)` is measured by ordinary cohomology sheaves. -/
 theorem standardTStructure_isLE_iff (E : SchemeQuasicoherentDerivedCategory X) (n : ℤ) :
     (standardTStructure X).IsLE E n ↔
       (DerivedCategory.TStructure.t (C := X.Modules)).IsLE E.obj n :=
   (schemeQuasicoherentCohomology X).tStructure_isLE_iff _ E n
 
+/-- Being `≥ n` for the standard t-structure is being `≥ n` in the all-sheaf derived
+category. -/
 theorem standardTStructure_isGE_iff (E : SchemeQuasicoherentDerivedCategory X) (n : ℤ) :
     (standardTStructure X).IsGE E n ↔
       (DerivedCategory.TStructure.t (C := X.Modules)).IsGE E.obj n :=
   (schemeQuasicoherentCohomology X).tStructure_isGE_iff _ E n
 
-/-- The bounded objects of the standard t-structure are the ambiently bounded ones. -/
+/-- This is the property `TargetBoundedTStructure` asks of a t-structure on `Dqc(X)`. It
+holds because the induced `IsLE` and `IsGE` are the ambient ones. -/
 theorem standardTStructure_bounded_iff (E : SchemeQuasicoherentDerivedCategory X) :
     (standardTStructure X).bounded E ↔ schemeBoundedQuasicoherent X E := by
   let E' : (DerivedCategory.cohomologyIn
@@ -100,8 +105,10 @@ def standardHeartEquivalence :
       (standardTStructure X).heart.FullSubcategory :=
   DerivedCategory.cohomologyInHeartEquivalence (SheafOfModules.isQuasicoherent X.ringCatSheaf)
 
-/-- The truncations of the standard t-structure keep finite presentation of every
-cohomology sheaf. -/
+/-- The premise `hfpLE` of `TargetBoundedTStructure.boundedCoherentTStructure` for the
+standard t-structure. The induced `τ_{≤ n}` is the ambient one, whose cohomology sheaves
+are those of `E` or zero, and the zero sheaf is finitely presented; no Noetherian
+hypothesis is needed. -/
 theorem standardTStructure_truncLE_mem_finitePresentation
     (E : SchemeQuasicoherentDerivedCategory X) (hE : schemeFinitePresentationCohomology X E)
     (n : ℤ) :

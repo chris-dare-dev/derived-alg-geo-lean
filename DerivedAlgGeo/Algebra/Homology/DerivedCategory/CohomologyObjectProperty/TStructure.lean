@@ -63,8 +63,9 @@ namespace DerivedCategory
 variable {A : Type u} [Category.{v} A] [Abelian A] [HasDerivedCategory.{w} A]
   (P : ObjectProperty A) [P.IsClosedUnderIsomorphisms] [P.ContainsZero]
 
-/-- A single complex on an object of `P` has cohomology in `P`: its cohomology is that
-object in one degree and zero elsewhere. -/
+/-- The converse of `prop_of_cohomologyIn_singleFunctor_obj`. This is where `0 ∈ P` is
+needed: a single complex has its object as cohomology in one degree and vanishes in every
+other degree, so those zero objects must lie in `P`. -/
 lemma cohomologyIn_singleFunctor_obj {Y : A} (hY : P Y) (n : ℤ) :
     cohomologyIn P ((singleFunctor A n).obj Y) := by
   intro i
