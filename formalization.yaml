@@ -289,7 +289,7 @@ fidelity:
 
     AutPairQuot v is NOT Aut(D), and is further from it than AutQuot: its
     elements are pairs, and toAutQuot is neither injective nor surjective in
-    general. See notes/dependencies/BridgelandStabilityAPI.md section 7.
+    general. See https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/notes/dependencies/BridgelandStabilityAPI.md section 7.
 
     CORRECTION (2026-08-03): an earlier revision of this field recorded step 3c
     as BLOCKED on a strict-finite-length restriction lemma said to be absent
@@ -1963,7 +1963,7 @@ fidelity:
     GLTildeJointContinuousAction proves the GLTilde action jointly continuous,
     gives AutPairQuot its standard discrete symmetry-group topology, and
     supplies ContinuousSMul for both factors and their product. API details
-    are mapped in notes/dependencies/BridgelandStabilityAPI.md.
+    are mapped in https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/notes/dependencies/BridgelandStabilityAPI.md.
 
     ComponentAction adds the induced action on connected-component labels,
     component-to-component homeomorphisms, and component-stabilizer actions.

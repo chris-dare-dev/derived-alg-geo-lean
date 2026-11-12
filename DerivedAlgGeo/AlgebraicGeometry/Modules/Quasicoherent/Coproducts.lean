@@ -12,7 +12,25 @@ On an arbitrary scheme, a coproduct of quasi-coherent module sheaves is again
 quasi-coherent, with no noetherian or quasi-compactness hypothesis and no bound
 on the indexing type.
 
-## The shape of the argument
+## Main definitions
+
+* `AlgebraicGeometry.quasicoherent_isClosedUnderCoproducts` — quasi-coherence is closed under
+  `ι`-indexed coproducts, as an object-property instance.
+* `AlgebraicGeometry.quasicoherentSheaves_hasCoproductsOfShape` — the full subcategory of
+  quasi-coherent sheaves has `ι`-indexed coproducts.
+
+## Main results
+
+* `AlgebraicGeometry.Scheme.Modules.isQuasicoherent_sigma_affine` — the affine case.
+* `AlgebraicGeometry.Scheme.Modules.isQuasicoherent_sigma` — coproducts of quasi-coherent module
+  sheaves are quasi-coherent on an arbitrary scheme.
+* `AlgebraicGeometry.quasicoherentSheavesInclusion_preservesCoproductsOfShape` and
+  `AlgebraicGeometry.quasicoherentSheavesInclusion_reflectsCoproductsOfShape` — the inclusion
+  into `X.Modules` preserves and reflects those coproducts.
+
+## Implementation notes
+
+### The shape of the argument
 
 The same two steps as `Kernels.lean`, and this is the *cheap* case there — the
 one that needs no localization criterion:
@@ -23,13 +41,13 @@ one that needs no localization criterion:
 2. General: restriction along an open immersion is also a left adjoint, so it
    preserves the coproduct, and quasi-coherence is affine-local.
 
-## What this is for
+### What this is for
 
 `ObjectProperty.IsClosedUnderColimitsOfShape (Discrete ι)` is what
 `DerivedCategory.cohomologyIn_prop_coproduct` consumes on the abelian side, and
-so is one of the two inputs `Dqc(X)`'s coproduct structure needs (#721).
+so is one of the two inputs `Dqc(X)`'s coproduct structure needs.
 
-**It is not the whole of that bullet.** The other input — that
+**It is not the whole of that structure.** The other input — that
 `DerivedCategory X.Modules` *has* the coproducts and that every `Hⁿ` preserves
 them — is absent from Mathlib at this pin and is not supplied here. Nothing in
 this file asserts anything about the derived category.
@@ -42,6 +60,16 @@ scheme. It says nothing about exactness of those coproducts: the subcategory is
 not abelian on a general scheme, so AB4 for it is not even a statement here, and
 where it is available (the affine case, through the tilde equivalence) it is
 supplied by its own owner.
+
+## References
+
+The file cites no literature. It builds on Mathlib's `tilde.functor`,
+`hasColimitsOfShape_of_closedUnderColimits` and
+`AlgebraicGeometry.Scheme.Modules.isQuasicoherent_iff_restrict_affineOpenCover`.
+
+## Tags
+
+quasi-coherent sheaf, coproduct, full subcategory, tilde, affine-local
 -/
 
 universe u

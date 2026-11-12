@@ -204,10 +204,10 @@ private def twistForwardOfMem : Localization S :=
 Composing the transition from the `g'`-chart to the `g`-chart with the scalar
 that the `g'`-chart clears gives exactly the scalar the `g`-chart clears.
 
-This is why the per-chart extensions of `#585` agree where two charts meet: over
-`D₊(g)`, `s` is cleared by `(f/g)ⁿ`, and over `D₊(g')` by `(f/g')ⁿ`; this
-identity says that carrying the second across by the transition lands on the
-first, with no correction factor.
+This is why the per-chart extensions of a section over a basic open of `Proj`
+agree where two charts meet: over `D₊(g)`, `s` is cleared by `(f/g)ⁿ`, and over
+`D₊(g')` by `(f/g')ⁿ`; this identity says that carrying the second across by the
+transition lands on the first, with no correction factor.
 
 Cancellation of `g'ⁿ`, and nothing else — note `f` never has to be a unit, it
 appears only in numerators. -/
@@ -1032,7 +1032,7 @@ theorem intShiftZeroLinearEquivOfMulMem_apply_mk {h : A} {e : ℕ} (hf : f ∈ �
 
 Everything above is stated for `𝒜` as a module over itself, which is all the twisting sheaf needs
 and all that `TwistChart.lean` and `Finiteness.lean` ever ask for. The tensor comparison
-`F ⊗ O(d) ≅ F(d)` of `#584` needs it for an **arbitrary** graded module, and nothing in the
+`F ⊗ O(d) ≅ F(d)` needs it for an **arbitrary** graded module, and nothing in the
 construction resists: `intTwistScalar` lives in `Localization S` and acts on `LocalizedModule S M`
 exactly as it acts on `LocalizedModule S A`.
 

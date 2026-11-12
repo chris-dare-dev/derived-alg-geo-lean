@@ -13,7 +13,29 @@ the structural facts: the order is reflexive and transitive, it is decided by th
 coefficient vector read lexicographically from the top, and it is total on sheaves of positive
 multiplicity.
 
-## Which classical definition this is
+## Main definitions
+
+* `PolarizedVarietyData.GiesekerLE`, `PolarizedVarietyData.GiesekerLT` — the Gieseker order on
+  reduced Hilbert functions, and its strict form.
+* `PolarizedVarietyData.normalizedCoefficient` — the Hilbert coefficient vector normalized by
+  the multiplicity, with `PolarizedVarietyData.CoeffLexLE` its lexicographic order from the top.
+* `PolarizedVarietyData.IsGiesekerSemistable`, `PolarizedVarietyData.IsGiesekerStable` —
+  Gieseker semistability and stability of a pure sheaf.
+
+## Main results
+
+* `eventually_nonneg_binomial_iff` — an integer binomial sum is eventually nonnegative exactly
+  when its coefficient vector is lexicographically nonnegative from the top.
+* `PolarizedVarietyData.giesekerLE_iff_coeffLexLE` — on sheaves of positive multiplicity the
+  Gieseker order is the lexicographic order on normalized coefficients.
+* `PolarizedVarietyData.giesekerLE_total` — the Gieseker order is total on sheaves of positive
+  multiplicity.
+* `PolarizedVarietyData.normalizedCoefficient_pred_le_of_giesekerLE` — the Gieseker comparison
+  always drops to the index below the top, which is the slope.
+
+## Implementation notes
+
+### Which classical definition this is
 
 With `IsPure` as a conjunct, `IsGiesekerSemistable` is Huybrechts–Lehn's Gieseker semistability
 for a pure sheaf of dimension `P.dim`, with purity expressed through Hilbert multiplicity rather
@@ -22,29 +44,29 @@ claimed: no dimension-of-support theory exists at this pin. The subsheaf quantif
 monomorphisms `G ⟶ F` throughout; the translation to `Subobject F` is made where it is needed,
 in `Comparison.lean`, and is not mixed into the definitions here.
 
-## Why purity is a conjunct and not an afterthought
+### Why purity is a conjunct and not an afterthought
 
 `reducedHilbert P G` divides by `multiplicity P G` and takes Lean's junk value `0` when that is
 zero. Without purity, every nonzero subsheaf of multiplicity zero would satisfy the order
 relation vacuously, the predicate would fail to exclude exactly the subsheaves it exists to
 exclude, and the comparison theorem of `Comparison.lean` would be false.
 
-`IsPure` itself is not declared here. It mentions only the multiplicity, and the μ-slope lane
-needs it for a reason that has nothing to do with the Gieseker order, so MO1.08 (#1319) gave it
-the shared owner `Purity.lean` one level up. This file imports it like any other consumer.
+`IsPure` itself is not declared here. It mentions only the multiplicity, and the μ-slope theory
+needs it for a reason that has nothing to do with the Gieseker order, so it lives in the shared
+`Purity.lean` one level up. This file imports it like any other consumer.
 
-## Why this is not a `StabilityFunctionOn`
+### Why this is not a `StabilityFunctionOn`
 
 Gieseker stability is ordered by a *polynomial*, compared at infinity; the repository's
 `StabilityFunctionOn` is ordered by the argument of a complex charge in the upper half-plane.
 There is no charge whose argument reproduces this order, and encoding a polynomial in a complex
-number to force the two together would be a false unification of the kind
-`docs/architecture/abstraction-tree.md` forbids. The comparison between the two theories happens
-one level down, between *slopes*, and is proved in `Comparison.lean` — which is a comparison and
-not an identification: neither theory is defined in terms of the other, and only one direction
-of one implication is delivered.
+number to force the two together would be a false unification of the kind the repository's
+abstraction rules forbid. The comparison between the two theories happens one level down,
+between *slopes*, and is proved in `Comparison.lean` — which is a comparison and not an
+identification: neither theory is defined in terms of the other, and only one direction of one
+implication is delivered.
 
-## The numerical core
+### The numerical core
 
 `eventually_nonneg_binomial_iff` is subject-neutral: an integer binomial sum is eventually
 nonnegative exactly when its coefficient vector is lexicographically nonnegative from the top. It
@@ -52,6 +74,14 @@ is stated here, for its only consumer, rather than added to `Algebra/NumericalPo
 second consumer appears it should move there. Its proof turns on *integrality*: a strictly
 increasing integer sequence increases without bound, which is what upgrades "the difference is
 eventually positive" to "the sum is eventually positive".
+
+## References
+
+* Huybrechts–Lehn, *The Geometry of Moduli Spaces of Sheaves*.
+
+## Tags
+
+Gieseker stability, reduced Hilbert polynomial, pure sheaf, lexicographic order, coherent sheaf
 -/
 
 universe u

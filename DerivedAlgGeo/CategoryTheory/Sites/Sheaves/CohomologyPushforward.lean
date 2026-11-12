@@ -12,63 +12,79 @@ import Mathlib.CategoryTheory.Sites.SheafCohomology.Basic
 # Cohomology is unchanged by an exact pushforward
 
 `sheafHPushforwardAddEquiv` : `Hⁿ(K, F) ≃+ Hⁿ(J, G_* F)`, for a continuous `G` whose pullback and
-pushforward are both exact. This is `#572` step 3 — cohomology invariance along a closed immersion
-— with the geometry replaced by the two hypotheses that actually carry the argument.
+pushforward are both exact. This is cohomology invariance along a closed immersion, with the
+geometry replaced by the two hypotheses that actually carry the argument.
 
-## The three pieces, and where each came from
+## Main definitions
+
+* `CategoryTheory.sheafCohomologyPushforwardAddEquiv` — the comparison in `Ext` form.
+* `CategoryTheory.sheafHPushforwardAddEquiv` — the comparison in cohomology form,
+  `Hⁿ(K, F) ≃+ Hⁿ(J, G_* F)`.
+
+## Main results
+
+* `CategoryTheory.sheafH_eq_ext` — `Sheaf.H` is that `Ext`, definitionally.
+* `CategoryTheory.sheafHPushforwardAddEquiv_naturality` — the comparison is natural in the
+  sheaf.
+
+## Implementation notes
+
+### The three pieces
 
 `Sheaf.H F n` is `Ext ((constantSheaf J _).obj (ULift ℤ)) F n`, so the comparison is an `Ext`
 transport and not a Čech computation. It assembles from exactly two results and nothing else:
 
 * `constantSheafCompSheafPullbackIso` (`ConstantPullback.lean`) moves the constant sheaf
   across `G⁻¹ ⊣ G_*`, giving `G⁻¹ ℤ_J ≅ ℤ_K`;
-* `extAdjunctionAddEquiv` (`ExtAdjunction.lean`) transports `Ext` across that same adjunction;
+* `extAdjunctionAddEquiv` (`Ext/Adjunction.lean`) transports `Ext` across that same adjunction;
 * `Ext.precompAddEquiv` glues the two, because the first supplies an *isomorphism* rather than an
   equality of first arguments.
 
-The body is one `.trans`. Everything hard happened in the two files it cites.
+The body is one `.trans`. The substance lies in the two results it cites.
 
-## Three traps, all of them costing real time, none of them mathematics
+### Three elaboration traps, none of them mathematics
 
-**The `Abelian` hypothesis is a diamond, and it was the actual blocker.** Writing
+**The `Abelian` hypothesis is a diamond.** Writing
 `[Abelian (Sheaf J AddCommGrpCat.{w})]` as a *variable* puts a second `Preadditive` structure on a
 category that already has one: the hypothesis carries `Abelian.toPreadditive`, while the ambient
 instance is `Preadditive.fullSubcategory (Presheaf.IsSheaf J)`. `Functor.Additive` is stated
 against `Preadditive`, so `(G.sheafPullback _ J K).Additive` then fails to synthesize *even when
 the hypothesis is named, `include`d and `haveI`'d* — the two spellings are not reducibly equal.
 The fix is to assume nothing: with `HasSheafify` and the imports below, `sheafIsAbelian` is found
-and there is only one `Preadditive`. Same family as `#662`.
+and there is only one `Preadditive`.
 
 **`HasSheafify`, not `HasWeakSheafify`.** `sheafIsAbelian` needs the former; with only the latter
 the `Abelian` instance is genuinely absent rather than duplicated.
 
 **The `Sites.Abelian` and `Grp.Abelian` imports are load-bearing.** Neither
-`ConstantPullback.lean` nor `ExtAdjunction.lean` reaches them, and without them
+`ConstantPullback.lean` nor `Ext/Adjunction.lean` reaches them, and without them
 `Abelian (Sheaf J AddCommGrpCat)` is not inferrable — which reads exactly like a missing
 mathematical input and is not one.
 
-## A correction, recorded because the wrong diagnosis was written down first
+### Why both forms are stated
 
-An earlier pass concluded that stating this against `Sheaf.H` was itself the problem — it produced
-a `synthInstance` failure at 20k heartbeats and, raised to 1M, an `isDefEq` timeout after 4m24s —
-and that the cure was to state everything in `Ext` and relegate `Sheaf.H` to a `rfl`-lemma. **That
-was wrong.** The timeout was the diamond above, surfacing at the only place that forced the two
-`Preadditive` structures to meet. With the diamond gone, the `Sheaf.H` form elaborates in seconds
-and is stated directly, as `#572` asks. The `Ext` form is kept because it is the reusable one, not
-because `Sheaf.H` needs avoiding.
+The diamond above surfaces as a `synthInstance` failure, or an `isDefEq` timeout at raised
+heartbeats, at the first place that forces the two `Preadditive` structures to meet, which makes
+it look as if stating the result against `Sheaf.H` were the problem. It is not: with the diamond
+avoided, the `Sheaf.H` form elaborates in seconds and is stated directly. The `Ext` form is kept
+because it is the reusable one, not because `Sheaf.H` needs avoiding.
 
-## Scope
+### Scope
 
 Both exactness hypotheses are real and neither is decoration. `G_*` is exact for a closed
 immersion, which is the intended application, but it is only left exact in general — a caller with
 a general continuous map gets nothing from this file. `EnoughInjectives` is what
 `extAdjunctionAddEquiv` needs.
 
-## Main results
+## References
 
-* `sheafCohomologyPushforwardAddEquiv` — the `Ext` form.
-* `sheafH_eq_ext` — `Sheaf.H` is that `Ext`, definitionally.
-* `sheafHPushforwardAddEquiv` — the cohomology form, which is `#572` step 3's statement.
+The file builds on Mathlib's `CategoryTheory.Sheaf.H` and `CategoryTheory.sheafIsAbelian`, on
+`CategoryTheory.extAdjunctionAddEquiv` and `CategoryTheory.Abelian.Ext.precompAddEquiv`, and on
+`CategoryTheory.constantSheafCompSheafPullbackIso`.
+
+## Tags
+
+sheaf cohomology, pushforward, exact functor, Ext, adjunction, closed immersion
 -/
 
 universe w w' v u
@@ -120,9 +136,9 @@ theorem sheafH_eq_ext (F : Sheaf K AddCommGrpCat.{w}) (n : ℕ) :
 include hLa hLl hLc hRa hRl hRc hInj in
 /-- **`Hⁿ(K, F) ≃+ Hⁿ(J, G_* F)`.**
 
-`#572` step 3's statement. The `HasExt` universe stays a parameter, as that issue asks, and the
-`Sheaf.H` spelling costs nothing over the `Ext` one — see the module docstring, which records why
-an earlier pass believed otherwise. -/
+Cohomology invariance along an exact pushforward, in cohomology form. The `HasExt` universe
+stays a parameter, and the `Sheaf.H` spelling costs nothing over the `Ext` one — see the module
+docstring. -/
 noncomputable def sheafHPushforwardAddEquiv (hG : IsTerminal (G.obj (⊤_ C)))
     (F : Sheaf K AddCommGrpCat.{w}) (n : ℕ) :
     Sheaf.H F n ≃+ Sheaf.H ((G.sheafPushforwardContinuous AddCommGrpCat.{w} J K).obj F) n :=

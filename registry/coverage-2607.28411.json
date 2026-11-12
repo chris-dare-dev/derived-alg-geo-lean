@@ -205,7 +205,7 @@
       "tracking": "https://github.com/chris-dare-dev/derived-alg-geo-lean/issues/211",
       "note": "Candidate mapping only. The abstract strict/weak order, Lemma-3.13 characterizations, autoequivalence Bayer property, and categorical cofiltration shape are represented. The scheme-specific filtration/cofiltration hypotheses and Propositions 3.21 and 3.24--3.27 are not claimed. Mapped is not coverage.",
       "evidence": {
-        "review_doc": ".claude/reviews/2026-08-16-sf5-sf6-closeout-and-sf7-boundary.md",
+        "review_doc": "https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/reviews/2026-08-16-sf5-sf6-closeout-and-sf7-boundary.md",
         "reviewer": "Codex engineering review (not independent source-faithfulness review)",
         "reviewed_at": "2026-08-16",
         "v1_check": "Checked directly against the pinned v1 PDF: Definition 3.12, Lemma 3.13, Remark 3.14, Definition 3.16, and Definition 3.22. Candidate declarations include Slicing.Precedes, Slicing.PrecedesWeak, the four phase-characterization iff theorems, HasBayerProperty/BayerProperty, and CofiltrationData/CofiltrationProperty. Geometric propositions remain outside the mapping."

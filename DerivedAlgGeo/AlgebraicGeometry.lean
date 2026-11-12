@@ -12,7 +12,9 @@ import DerivedAlgGeo.AlgebraicGeometry.IntersectionTheory
 import DerivedAlgGeo.AlgebraicGeometry.Modules
 import DerivedAlgGeo.AlgebraicGeometry.Moduli
 import DerivedAlgGeo.AlgebraicGeometry.Morphisms
+import DerivedAlgGeo.AlgebraicGeometry.Nagata
 import DerivedAlgGeo.AlgebraicGeometry.Numerical
+import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpace
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum
 import DerivedAlgGeo.AlgebraicGeometry.RiemannRoch
 import DerivedAlgGeo.AlgebraicGeometry.Sites

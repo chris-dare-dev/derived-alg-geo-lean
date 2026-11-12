@@ -8,38 +8,71 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Tilting
 /-!
 # The torsion pair of a weak stability function at a slope cutoff
 
-For a weak stability function `W` on an abelian category with the Harder--Narasimhan property,
-and a cutoff `μ₀ : WithTop ℝ`, the two classes of `WeakCutoff.lean`
+For a weak stability function `W` on an abelian category with the
+Harder--Narasimhan property, and a cutoff `μ₀ : WithTop ℝ`, the two classes of
+`CategoryTheory/Abelian/Stability/Weak/Cutoff.lean`
 
 ```
 T μ₀ = {E | every weak HN slope of E exceeds μ₀}   F μ₀ = {E | every one is at most μ₀}
 ```
 
-are a `TorsionPair`.  Both axioms are now proved:
+are a `TorsionPair`.  Both axioms are proved:
 
-* `hom_eq_zero` is `hom_eq_zero_of_mem_hnTors_of_mem_hnFree` (#789) — the image of a map is a
-  quotient of the source and a subobject of the target, so `μMinus_le_of_epi` and
-  `μPlus_le_of_mono` trap its slopes in the empty interval `(μ₀, μ₀]`;
-* `exists_shortExact` is `exists_shortExact_hnTors_hnFree` (`WeakSplitting.lean`) — the HN chain
-  cut at the index where its slopes cross `μ₀`.
+* `hom_eq_zero` is `hom_eq_zero_of_mem_hnTors_of_mem_hnFree` — the image of a
+  map is a quotient of the source and a subobject of the target, so
+  `μMinus_le_of_epi` and `μPlus_le_of_mono` trap its slopes in the empty
+  interval `(μ₀, μ₀]`;
+* `exists_shortExact` is `exists_shortExact_hnTors_hnFree`
+  (`CategoryTheory/Abelian/Stability/Weak/Splitting.lean`) — the HN chain cut at
+  the index where its slopes cross `μ₀`.
 
-## What took so long, recorded because it is the interesting part
+## Main definitions
 
-The Hom-vanishing axiom ported from the strict theory almost verbatim in #789.  The splitting
-did not, and the obstruction was two levels below where it looked: not in `Cutoff.lean` and not
-in the torsion-pair assembly, but in `Uniqueness/SubobjectLattice.lean`, whose
-`pullback_imageSubobject_eq` and `cokernelPullbackIso` were proved from
-`semiClosedUpperHalfPlane_ne_zero` — *a nonzero object has nonzero charge*.  That is exactly the
-implication weak stability drops, and it fails on exactly the object the surface case of
-Bridgeland's Lemma 6.2 is about.  Both statements are true in any abelian category;
-`CategoryTheory/SubobjectCorrespondence.lean` proves them without a charge, `WeakTail.lean`
-ports the truncation on top of them, and this file is what that unblocks.
+All in the namespace `CategoryTheory.Triangulated.WeakStabilityFunctionOn`.
 
-## Cutoff by slope, not by phase
+* `hnTorsProperty`, `hnFreeProperty` — the torsion and torsion-free classes at
+  a weak slope cutoff, as `ObjectProperty`s.
+* `hnTorsionPair` — the two classes as a `Tilting.TorsionPair`.
 
-The strict pair (`TorsionPair/StabilityFunction.lean`) is cut by a phase `β : ℝ`.  This one is
-cut by a slope in `WithTop ℝ`, which is what lets a rank-zero object — slope `⊤`, no phase at
-all — sit in `T μ₀` at every finite cutoff (`WeakSlopeData.mem_hnTors_of_rank_zero`, #801).
+## Main results
+
+* `hnTorsionPair_tors`, `hnTorsionPair_free` — the two classes of the pair.
+* `hnTorsProperty_isClosedUnderIsomorphisms`,
+  `hnFreeProperty_isClosedUnderIsomorphisms` — both classes are closed under
+  isomorphisms.
+
+## Implementation notes
+
+### Where the splitting axiom is delicate
+
+The Hom-vanishing axiom is the strict theory's argument almost verbatim.  The
+splitting axiom is not, and the obstruction is two levels below where it looks:
+not in `Cutoff.lean` and not in the torsion-pair assembly, but in
+`Uniqueness/SubobjectLattice.lean`, whose `pullback_imageSubobject_eq` and
+`cokernelPullbackIso` are proved from `semiClosedUpperHalfPlane_ne_zero` —
+*a nonzero object has nonzero charge*.  That is exactly the implication weak
+stability drops, and it fails on exactly the object the surface case of
+Bridgeland's Lemma 6.2 is about.  Both statements are true in any abelian
+category; `CategoryTheory/SubobjectCorrespondence.lean` proves them without a
+charge, and `CategoryTheory/Abelian/Stability/Weak/Tail.lean` builds the
+truncation on top of them.
+
+### Cutoff by slope, not by phase
+
+The strict pair (`TorsionPair/StabilityFunction.lean`) is cut by a phase
+`β : ℝ`.  This one is cut by a slope in `WithTop ℝ`, which is what lets a
+rank-zero object — slope `⊤`, no phase at all — sit in `T μ₀` at every finite
+cutoff (`WeakSlopeData.mem_hnTors_of_rank_zero`).
+
+## References
+
+* Bridgeland, *Stability conditions on K3 surfaces*, arXiv:math/0307164,
+  Lemma 6.2.
+
+## Tags
+
+weak stability function, torsion pair, slope cutoff, Harder--Narasimhan
+filtration
 -/
 
 noncomputable section

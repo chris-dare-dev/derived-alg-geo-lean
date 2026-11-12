@@ -181,7 +181,7 @@ conservativity and mono-preservation obligations are retained as fields. -/
 structure NoetherianLocalityData (R : OpenRestrictionFamily X P DS)
     (t : TStructure (DS.QuasicoherentCategory P)) where
   /-- The S-local data the two implications below are stated against. Carried
-  rather than existentially quantified, because `lemma_4_15` hands its caller
+  rather than existentially quantified, because `isNoetherian_iff` hands its caller
   `H.localData.restriction U hU` and a proposition would not. -/
   localData : SLocalData R t
   global_to_local : t.IsNoetherian →
@@ -214,7 +214,9 @@ theorem NoetherianLocalityData.local_to_global (H : NoetherianLocalityData R t)
     H.preservesMonomorphisms (fun f hf ↦ H.jointlyReflectsIsomorphisms f hf)
     (fun i ↦ hlocal (H.opens i) (H.compact i))
 
-theorem lemma_4_15 (H : NoetherianLocalityData R t) :
+/-- Lemma 4.15 of arXiv:1902.08184: the t-structure is noetherian exactly when
+its restriction to every quasi-compact open is. -/
+theorem NoetherianLocalityData.isNoetherian_iff (H : NoetherianLocalityData R t) :
     t.IsNoetherian ↔
       ∀ (U : S.Opens) (hU : CompactSpace U.toScheme),
         (H.localData.restriction U hU).tStructure.IsNoetherian :=
@@ -229,14 +231,9 @@ structure Filtration (C : Type*) [Category C] where
   inclusion : ∀ n, object n ⟶ object (n + 1)
   mono : ∀ n, Mono (inclusion n)
 
-/-- Owner data for lifting an arbitrary heart filtration as in Lemma 4.16(3).
-
-Named `Lemma416Part3Data` rather than `Lemma416_3Data`: the `defsWithUnderscore`
-linter reads the underscore separating the lemma number from its clause and
-flags every field of the structure, and this repository's `nolints.json` is a
-shrink-only ratchet, so silencing it is not available. The paper reference is
-unchanged -- Lemma 4.16, clause (3). -/
-structure Lemma416Part3Data (L : SLocalData R t) where
+/-- The inputs for lifting an arbitrary heart filtration, as in Lemma 4.16(3) of
+arXiv:1902.08184. -/
+structure FiltrationLiftHypotheses (L : SLocalData R t) where
   /-- Lifts a filtration in the heart restricted to `U` to one in the global
   heart. It is owner data, not a construction: nothing here builds the lift. -/
   lift (U : S.Opens) (hU : CompactSpace U.toScheme)
@@ -258,7 +255,7 @@ structure Lemma416Part3Data (L : SLocalData R t) where
           ((lift U hU F).inclusion n) ≫ (comparison U hU F (n + 1)).hom
 
 /-- The filtration-lifting conclusion in the orientation of Lemma 4.16(3). -/
-theorem lemma_4_16_3 (L : SLocalData R t) (H : Lemma416Part3Data L) (U : S.Opens)
+theorem exists_filtration_lift (L : SLocalData R t) (H : FiltrationLiftHypotheses L) (U : S.Opens)
     (hU : CompactSpace U.toScheme)
     (F : Filtration ((L.restriction U hU).tStructure.heart.FullSubcategory)) :
     ∃ G : Filtration (t.heart.FullSubcategory),

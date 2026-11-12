@@ -14,34 +14,7 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition.Col
 The abstract layer gets its real inhabitant: the residue field, as a complex
 concentrated in degree zero, is an exceptional object of
 `DerivedCategory (ModuleCat k)`, and it assembles into a length-one
-exceptional collection with its semiorthogonal sequence. This discharges the
-design note's requirement — `.claude/notes/2026-08-28-semiorthogonal-reconnaissance.md`
-§4: "issue #852 requires those notions to be added only when a theorem
-consumes each property" — for this milestone, with a non-geometric consumer
-that leaves the projective-families lane's territory untouched.
-
-## Why this category
-
-`Mathlib/Algebra/Homology/DerivedCategory/Linear.lean` provides
-`noncomputable instance : Linear R (DerivedCategory C)` and
-`instance (n : ℤ) : (shiftFunctor (DerivedCategory C) n).Linear R` — the
-latter is exactly the shift-linearity hypothesis `IsExceptional.shift` had to
-assume in general, and the derived category is one of the few places in
-Mathlib where it is a global instance. `HasDerivedCategory.{w} (ModuleCat k)`
-is a hypothesis throughout; `HasDerivedCategory.standard` supplies it at
-`max u v` for `C : Type u` with `Category.{v} C` — here `u + 1`, since
-`ModuleCat.{u} k : Type (u + 1)` — when a caller needs a concrete choice.
-
-## Fullness is not claimed — and is expected to be false
-
-`ObjectProperty.triangEnvelope` reaches only objects assembled from the
-generator by shifts, binary products, retracts, and FINITELY many extension
-steps (`triangEnvelope = ⨆ n, triangEnvelopeIter n`). An object of the
-unbounded `DerivedCategory (ModuleCat k)` with infinitely many nonzero
-cohomology objects is not reachable that way, so `IsFull` for the length-one
-collection is expected to be FALSE here, not merely unproved. Fullness
-belongs to a bounded-derived-category consumer, which this milestone does not
-file.
+exceptional collection with its semiorthogonal sequence. None of it needs geometry.
 
 ## Main definitions
 
@@ -59,6 +32,30 @@ file.
   `1` inverts `algebraMap` into the linear endomorphisms of the ring itself.
 * `residueObjectExceptionalCollection_component` — the single component is
   the envelope of the shift closure of the residue object.
+
+## Implementation notes
+
+### Why this category
+
+`Mathlib/Algebra/Homology/DerivedCategory/Linear.lean` provides
+`noncomputable instance : Linear R (DerivedCategory C)` and
+`instance (n : ℤ) : (shiftFunctor (DerivedCategory C) n).Linear R` — the
+latter is exactly the shift-linearity hypothesis `IsExceptional.shift` had to
+assume in general, and the derived category is one of the few places in
+Mathlib where it is a global instance. `HasDerivedCategory.{w} (ModuleCat k)`
+is a hypothesis throughout; `HasDerivedCategory.standard` supplies it at
+`max u v` for `C : Type u` with `Category.{v} C` — here `u + 1`, since
+`ModuleCat.{u} k : Type (u + 1)` — when a caller needs a concrete choice.
+
+### Fullness is not claimed — and is expected to be false
+
+`ObjectProperty.triangEnvelope` reaches only objects assembled from the
+generator by shifts, binary products, retracts, and FINITELY many extension
+steps (`triangEnvelope = ⨆ n, triangEnvelopeIter n`). An object of the
+unbounded `DerivedCategory (ModuleCat k)` with infinitely many nonzero
+cohomology objects is not reachable that way, so `IsFull` for the length-one
+collection is expected to be FALSE here, not merely unproved. Fullness is a
+question for the bounded derived category.
 
 ## References
 

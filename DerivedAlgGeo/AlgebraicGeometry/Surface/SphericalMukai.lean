@@ -16,15 +16,32 @@ and `BilinearRiemannRochStatement.toEulerRealization` restricts it to the diagon
 spherical objects. The sphericity result then reads "given bilinear HRR" rather than "given this
 particular restriction of it to spherical objects".
 
-## Supplied, not proved
+## Main definitions
+
+* `K3Surface.euler` — `χ(E, F)` in the three degrees `0, 1, 2`, the two-variable form of
+  `selfEuler`.
+* `K3Surface.BilinearRiemannRochStatement` — bilinear Hirzebruch--Riemann--Roch for pairs
+  concentrated in degrees `0`--`2`, as a supplied statement.
+* `BilinearRiemannRochStatement.toEulerRealization` — its restriction to the diagonal along
+  objects with the spherical Ext profile.
+
+## Main results
+
+* `K3Surface.selfEuler_eq_euler_self` — `selfEuler` is the diagonal of `euler`.
+* `K3Surface.SphericalExtProfile.isSpherical_mukaiVector_of_statement` — an object with the
+  spherical Ext profile has a spherical Mukai vector, given bilinear HRR.
+
+## Implementation notes
+
+### Supplied, not proved
 
 In the idiom of `Duality.Serre.DerivedStatement`: `BilinearRiemannRochStatement` carries a
 genuinely external input as a field. Proving it is bilinear Hirzebruch--Riemann--Roch, and the
 finiteness it presupposes -- that each `Hom(E, F⟦i⟧)` is a finite-dimensional `k`-space, so that
-`finrank` measures it -- is the `Hom`-finiteness of `#332`. Nothing here constructs one, and this
-file does not attempt HRR.
+`finrank` measures it -- is `Hom`-finiteness in `Dᵇ(Coh X)`. Nothing here constructs one, and
+this file does not attempt HRR.
 
-## Why the amplitude condition is a hypothesis of `chi₂_eq`, and not a field
+### Why the amplitude condition is a hypothesis of `chi₂_eq`, and not a field
 
 `euler E F` is a three-term sum over degrees `0, 1, 2`, so the identity `χ_num = euler` can only
 be expected where `Hom(E, F⟦i⟧)` vanishes outside that window. A field asserting that vanishing
@@ -36,20 +53,29 @@ complexes. So the condition is where it is true: a hypothesis of `chi₂_eq`, pe
 `E` satisfies it for the pair `(E, E)` by its own `vanishing` field, which is what makes the
 restriction to `EulerRealization` go through.
 
-## No `cls_iso` field
+### No `cls_iso` field
 
-Nothing in this file consumes invariance of `cls` under isomorphism, and `MukaiVector.lean`
-records the precedent: a field whose measured use count is zero is a field that should not exist.
+Nothing in this file consumes invariance of `cls` under isomorphism, so it is not a field. The
+same rule keeps a symmetry field out of `Numerical.K3.IntegralMukaiData`: a field nothing
+consumes is a field that should not exist.
 
-## What is still missing
+### What is still missing
 
 Two facts a witness needs and does not have:
 
-* **finite-dimensionality of `Hom` in `Dᵇ(Coh X)`** (`#332`). The Serre-finiteness chain now
-  proves `Hⁱ(X, F)` finite-dimensional for every coherent `F` on a projective variety
-  (`Cohomology/Finiteness/ProjectiveVariety.lean`); the passage from sheaf cohomology to
-  `Hom(E, F⟦i⟧)` in the derived category is not in the tree.
+* **finite-dimensionality of `Hom` in `Dᵇ(Coh X)`**. `Hⁱ(X, F)` is proved finite-dimensional for
+  every coherent `F` on a projective variety (`Cohomology/Finiteness/ProjectiveVariety.lean`);
+  the passage from sheaf cohomology to `Hom(E, F⟦i⟧)` in the derived category is not in the tree.
 * **the Hirzebruch--Riemann--Roch identity itself**, which is what the `chi₂_eq` field asserts.
+
+## References
+
+This file builds on `K3Surface.EulerRealization`, `K3Surface.SphericalExtProfile` and the
+numerical Euler pairing `Numerical.NumericalVarietyData.chi₂`.
+
+## Tags
+
+Hirzebruch--Riemann--Roch, Euler pairing, spherical object, Mukai vector, supplied data
 -/
 
 universe u
@@ -86,7 +112,8 @@ The numerical Euler pairing computes the alternating sum of `Hom`-dimensions in 
 pairs whose `Hom` is concentrated in degrees `0`--`2`. That amplitude condition is a hypothesis of
 `chi₂_eq` and deliberately not a field: as a field it would be false, see the module docstring.
 
-Supplied, not proved. Proving it is bilinear HRR, and the finiteness it presupposes is `#332`. -/
+Supplied, not proved. Proving it is bilinear HRR, and the finiteness it presupposes is
+finite-dimensionality of `Hom` in `Dᵇ(Coh X)`. -/
 structure BilinearRiemannRochStatement {A : Type*} {N : Type*} [CommRing A] [Algebra ℚ A]
     [AddCommGroup N] (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))]
     [IsSmoothProperVariety k X] (V : Numerical.NumericalVarietyData 2 A N) where

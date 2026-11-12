@@ -18,10 +18,49 @@ import Mathlib.CategoryTheory.Limits.Shapes.Pullback.IsPullback.Kernels
 The noetherian-torsion layer of §14 of arXiv:1902.08184v4: subobject chains
 in the heart, the termination condition, noetherian torsion subcategories,
 and the identification of a torsion pair's free class with the right
-orthogonal of its torsion class — the place `free_of_orthogonal` (#94) was
-built for.
+orthogonal of its torsion class, through `free_of_orthogonal`.  The relative
+chain condition then constructs the zero-charge torsion pair `(A⁰, (A⁰)⊥)`.
 
-## The design decision, recorded (Remark 14.7 as the definition)
+## Main definitions
+
+All in the namespace `CategoryTheory.Triangulated.WeakStabilityCondition`.
+
+* `IsHeartMono` — a map of heart objects whose cone is again in the heart.
+* `SubobjectChain`, `SubobjectChain.Terminates` — increasing chains of
+  `B`-subobjects of a fixed heart object, and their termination.
+* `NoetherianTorsionSubcategory` — a torsion pair on the heart whose torsion
+  class satisfies the ascending chain condition (Definition 14.6, via
+  Remark 14.7).
+* `rightOrthogonal` — Definition 14.6's `B^⊥` inside the heart.
+* `WeakStabilityFunction.HasZeroChargeDecompositions` — every heart object has
+  a zero-charge subobject with right-orthogonal quotient.
+* `WeakStabilityFunction.zeroChargeTorsionPair` — the torsion pair
+  `(A⁰, (A⁰)⊥)` assembled from those decompositions.
+* `zeroTorsionPair`, `zeroNoetherianTorsion` — the degenerate torsion pair and
+  noetherian torsion subcategory with zero torsion class.
+
+## Main results
+
+* `free_iff_rightOrthogonal` — a torsion pair's free class is the right
+  orthogonal of its torsion class.
+* `noetherian_mono` — chain termination passes to sub-properties.
+* `WeakStabilityFunction.isSemistable_middle_of_zeroCharge_quotient`,
+  `WeakStabilityFunction.isSemistable_quotient_of_zeroCharge_subobject` —
+  semistability is preserved by zero-charge saturation and zero-charge
+  quotients.
+* `WeakStabilityFunction.isNoetherianObject_of_zeroCharge` — zero-charge
+  objects of a noetherian torsion subcategory are noetherian in the abelian
+  heart.
+* `WeakStabilityFunction.hasZeroChargeDecomposition_of_chainCondition`,
+  `WeakStabilityFunction.hasZeroChargeDecompositions_of_chainCondition` — the
+  relative chain condition yields maximal zero-charge subobjects with
+  right-orthogonal quotients.
+* `WeakStabilityFunction.hasZeroChargeDecomposition_of_reduction` — zero-charge
+  decompositions lift across a short exact sequence with zero-charge kernel.
+
+## Implementation notes
+
+### The design decision (Remark 14.7 as the definition)
 
 Definition 14.6 calls `B ⊆ A` a *noetherian torsion subcategory* if `B` is an
 abelian subcategory, `B` is a noetherian abelian category, and `(B, B^⊥)` is
@@ -40,10 +79,11 @@ here**, the torsion-pair half is carried as a `HeartTorsionPair`, and the
 equivalence of Remark 14.7 is *not* claimed — it is the textbook
 justification for the choice, not a theorem of this file.
 
-## What is deliberately NOT declared here
+### What is deliberately NOT declared here
 
-Lemmas 14.8 and 14.11 are **statable but left undeclared**, per the standing
-rule that absent beats sorry-backed. What their proofs need, precisely:
+Lemmas 14.8 and 14.11 are **statable but left undeclared**: an absent
+declaration is preferable to a sorry-backed one. What their proofs need,
+precisely:
 
 * **Lemma 14.8** (`A⁰` noetherian torsion + `Z` over `ℚ[i]` ⟹ `A`
   noetherian): the proof runs on surjection chains, kernels of composites,
@@ -52,15 +92,24 @@ rule that absent beats sorry-backed. What their proofs need, precisely:
   image lemmas needed by the maximal-subobject construction and a
   formalization decision for "Z defined over ℚ[i]" that makes the
   discreteness step honest.  The abelian weak-HN package and its existence for
-  the slicing heart are now available in `HarderNarasimhan.lean`.
+  the slicing heart are in `HarderNarasimhan.lean`.
 * **Lemma 14.11** (bounded-slope chains terminate): the statement needs only
   `slope` and the chains below; the proof needs `μ⁺`/`μ⁻` from HN data, the
   compact-parallelogram argument, and the finitely-many-HN-classes input of
   Remark 12.3, which is support-property infrastructure.
 
-The remaining kernel/image, discreteness and support inputs should be added in
-focused modules before these two lemmas are attempted; #108 records the
-definitions and the boundary.
+The remaining kernel/image, discreteness and support inputs belong in focused
+modules before these two lemmas are attempted.
+
+## References
+
+* arXiv:1902.08184v4, §14: Definition 14.6, Remark 14.7, Lemmas 14.8 and 14.11,
+  Proposition 14.16.
+
+## Tags
+
+noetherian torsion subcategory, torsion pair, heart, zero charge, weak
+stability function
 -/
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition
@@ -144,7 +193,7 @@ theorem rightOrthogonal_of_iso {B : ObjectProperty C} {X Y : C}
 class** — so the pair carried by `NoetherianTorsionSubcategory` really is
 `(B, B^⊥)` in Definition 14.6's sense. The forward inclusion is the
 `hom_eq_zero` axiom; the reverse is `free_of_orthogonal`, the dual
-characterisation added for the #86 review's finding F1. -/
+characterisation. -/
 theorem free_iff_rightOrthogonal (P : HeartTorsionPair t) (X : C) :
     P.free X ↔ rightOrthogonal t P.tors X := by
   constructor
@@ -841,7 +890,7 @@ theorem WeakStabilityFunction.hasZeroChargeDecomposition_of_chainCondition
 /-- A zero-charge decomposition lifts across a short exact sequence whose
 kernel has zero charge.  Concretely, the zero-charge subobject of the
 quotient is pulled back to the middle term; its pullback is again
-zero-charge because it is an extension of the old kernel by that subobject.
+zero-charge because it is an extension of the given kernel by that subobject.
 
 This is the abelian pullback step used after the envelope reduction in the
 proof of Proposition 14.16. -/

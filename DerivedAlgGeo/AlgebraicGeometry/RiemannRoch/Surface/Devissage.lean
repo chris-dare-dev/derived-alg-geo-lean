@@ -18,12 +18,48 @@ currently supported by the repository.
 * A coherent sheaf is treated only when it carries `TwoTermPerfectDeterminantData`.  Its `ch₂`
   is proved to be the difference of the two finite locally free terms in that resolution.
 
+## Main definitions
+
+* `locallyFreeCh2Degree`, `locallyFreeC2Degree` — the degrees of `ch₂` and `c₂` of a
+  determinant-equipped finite locally free coherent sheaf.
+* `perfectC2Degree` — the degree of `c₂` of a coherent sheaf with a two-term perfect
+  resolution.
+* `NumericalVarietyComparison` — a term-by-term comparison between a Layer A numerical class
+  and the geometric data of an explicitly perfect coherent sheaf.
+
+## Main results
+
+* `locallyFree_eulerCharacteristic_eq` — `χ(E) = rχ(O_X) + (c₁²-c₁K_X)/2 - c₂` for a finite
+  locally free sheaf.
+* `locallyFreeCh2Degree_shortExact`, `locallyFreeC2Degree_shortExact` — additivity of `ch₂`
+  and the Whitney formula for `c₂` in a short exact sequence.
+* `chernCharacterTwoDegree_eq_middle_sub_left` — `ch₂` of a perfect coherent sheaf is the
+  difference over its two-term resolution.
+* `perfect_eulerCharacteristic_eq` — the classical rank/`c₁`/`c₂` formula for explicitly
+  perfect coherent sheaves.
+* `grothendieckEulerHom_class_eq_perfect_formula` — that formula computes the Euler
+  homomorphism on the class in `K₀Ab (Coh X)`.
+* `NumericalVarietyComparison.chi_eq_classical` — Layer A and geometric surface
+  Riemann--Roch give the same classical formula.
+
+## Implementation notes
+
 No global resolution property or splitting principle is inferred from coherence.  The current
-The Mathlib/DerivedAlgGeo API has no theorem producing a finite locally free resolution for every
-coherent
-sheaf on a smooth projective surface, so the perfectness certificate remains visible in every
-coherent theorem.  Compatibility with issue #32 is recorded through the explicit geometric
-Grothendieck group and its Euler homomorphism.
+Mathlib/DerivedAlgGeo API has no theorem producing a finite locally free resolution for every
+coherent sheaf on a smooth projective surface, so the perfectness certificate remains visible
+in every coherent theorem.  Compatibility with the coherent Grothendieck group is recorded
+through its Euler homomorphism `FiniteCohomology.grothendieckEulerHom`.
+
+## References
+
+This file builds on `ToddData.Data`, on `Coh.TwoTermPerfectDeterminantData`, on
+`FiniteCohomology.eulerCharacteristic_additive`, and on the Layer A surface expansion
+`Numerical.Surface.chi_eq`.
+
+## Tags
+
+Riemann--Roch, surface, Chern class, Whitney formula, dévissage, perfect complex,
+Grothendieck group
 -/
 
 universe u v w
@@ -240,12 +276,6 @@ theorem discriminantDegree_eq_c2
   ring
 
 /-! ## Grothendieck-group compatibility -/
-
-/- `coherentGrothendieckClass_shortExact` stood here: fourteen lines deriving the
-defining relation of the coherent Grothendieck group by hand, through
-`QuotientAddGroup.mk'`, `AddSubgroup.subset_closure` and the `shortExact`
-constructor. It is `K₀Ab.of_shortExact`, proved once. Nothing referenced it but
-its own audit record. -/
 
 /-- The perfect surface formula computes exactly the value of the Grothendieck Euler
 homomorphism on the coherent-sheaf class. -/

@@ -23,6 +23,16 @@ name: Cache warm
 on:
   push:
     branches: [main]
+    # A push that touches only prose leaves `.lake/build` as it was, and pull
+    # requests restore the previous cache through the key prefix. This is the
+    # prose list of `changes` in ci.yml; change the two together.
+    paths-ignore:
+      - 'docs/**'
+      - 'notes/**'
+      - 'openspec/**'
+      - '.claude/roadmap/**'
+      - '.claude/**/*.md'
+      - '*.md'
   workflow_dispatch:
 
 # Queue, never cancel. GitHub holds at most one pending run per group and a new

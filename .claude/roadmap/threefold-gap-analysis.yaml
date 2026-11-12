@@ -18,7 +18,7 @@ title: "Threefold gap analysis — what survives on Fano and general-type threef
 # not done here. Adding ids later is a deliberate, separately authorized edit.
 
 brief: |
-  The gap analysis of 2026-09-20 (.claude/notes/2026-09-20-threefold-gap-
+  The gap analysis of 2026-09-20 (https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/notes/2026-09-20-threefold-gap-
   analysis.md) asked, for Fano threefolds and for threefolds of general type,
   what open problems the twelve exotic-stability-targets milestones do not
   touch. The honest answer is: almost nothing the repository should take.
@@ -99,11 +99,11 @@ source:
   arxiv: "1602.05055; 1607.08199"
 
 evidence:
-  - "Gap analysis 2026-09-20: .claude/notes/2026-09-20-threefold-gap-analysis.md (untracked in the shared checkout; force-added on branch agent/roadmap-threefold-gap). Page images of seven papers read directly; two automated PDF summaries were wrong and were discarded."
+  - "Gap analysis 2026-09-20: https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/notes/2026-09-20-threefold-gap-analysis.md (untracked in the shared checkout; force-added on branch agent/roadmap-threefold-gap). Page images of seven papers read directly; two automated PDF summaries were wrong and were discarded."
   - "Arithmetic re-derived by hand from Schmidt pp. 1–3 and BMSZ pp. 3, 21–22: H = 2L − E, H^3 = 7, class of O(L) = (7, 4, 1, 1/6), Q = 2α² + 2β² − β, Q(1/8, 1/4) = −3/32; with Γ = k(L² + 2E²), Q^Γ = 2α² + 2β² − (1 + 42k)β + 24k, nonnegative on the half-plane iff 1764k² − 108k + 1 ≤ 0, whose upper root (9 + 4√2)/294 equals BMSZ Prop. 6.1's 3/98 + 2√2/147."
   - "Todd and lattice data checked by HRR: χ = 1 for O_X, O_L, O_E, O_ℓ, O_m, O_pt; χ(O(L)) = 4; χ(O(−E)) = 0 (note §5.2)."
   - "Repository facts verified on origin/main 4bed5192: all threefold models are monogenic (MonogenicRing.lean docstring warns that this is not licensed by Picard rank one above dimension two); BMTData's only inhabitant is ProjectiveSpaceWalls.p3BMTSanity; BMT.lean's 'known for' table stops at abelian threefolds."
-  - "Predecessor notes: .claude/notes/2026-09-19-net-new-results-scoping.md (Theorem A), .claude/notes/2026-09-19-exotic-stability-targets-scoping.md, .claude/notes/2026-09-20-handoff-threefold-gap-analysis.md."
+  - "Predecessor notes: https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/notes/2026-09-19-net-new-results-scoping.md (Theorem A), https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/notes/2026-09-19-exotic-stability-targets-scoping.md, https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/notes/2026-09-20-handoff-threefold-gap-analysis.md."
 
 wont:
   - "No GitHub issues, milestones or labels are created by this file. Minting them is an external write requiring explicit authorization."

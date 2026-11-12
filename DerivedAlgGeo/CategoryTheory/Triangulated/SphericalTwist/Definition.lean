@@ -18,17 +18,22 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SphericalTwist.GrothendieckGrou
 * the class of the copower, `[Hom^•(E,F) ⊗ E] = χ(E,F)·[E]`.
 
 The one theorem it buys is `SphericalTwistData.map_eq_twistK₀`: the induced map on `K₀` is exactly
-`twistK₀ k C E` of `SphericalTwist/GrothendieckGroup.lean`. The lattice half of the lane is
-therefore a consequence of this geometry and not a parallel story.
+`twistK₀ k C E` of `SphericalTwist/GrothendieckGroup.lean`. The `K₀`-level twist is therefore a
+consequence of this functor and not a parallel story.
 
-## Main definitions and results
+## Main definitions
 
 * `SphericalTwistData` — the supplied functor `T_E` with its instances, triangle and copower class.
+
+## Main results
+
 * `SphericalTwistData.class_T` — `[T F] = [F] - [Hom^•(E,F) ⊗ E]`, from `K₀.of_triangle`.
 * `SphericalTwistData.map_eq_twistK₀` — `K₀.map T = twistK₀ k C E`.
 * `map_comp_comp_eq_twistK₀` — the `K₀` map of a three-fold composite of supplied twists.
 
-## Encoding decision
+## Implementation notes
+
+### Encoding decision
 
 `Hom^•(E,-) ⊗_k E` is an object copowered by a complex of `k`-modules. It is neither the
 Fourier--Mukai kernel twist `C.tensor.obj K` of `FourierMukai/Basic.lean` nor the geometric
@@ -36,9 +41,9 @@ Fourier--Mukai kernel twist `C.tensor.obj K` of `FourierMukai/Basic.lean` nor th
 construct it for a concrete category.
 
 * **(a) A derived tensor on an ordinary triangulated category.** `Hom^•(E,-) ⊗_k E` would be a
-  tensor of that kind. No repository module provides one: #892 delivered the monoidal structure of
-  `Dᵇ(Coh X)`, which is a different tensor. Even then it would supply neither a functorial cone nor
-  the three instances on `T`.
+  tensor of that kind. No repository module provides one: the monoidal structure of `Dᵇ(Coh X)`
+  is a different tensor. Even then it would supply neither a functorial cone nor the three
+  instances on `T`.
 * **(b) The dg enhancement.** `Algebra/Homology/DGCategory/Basic.lean` gives the Hom-complexes and
   `DGCategory/Pretriangulated/` the cones with their projections. `DGCategory/Pretriangulated/
   {ObjectTwist,LinearObjectTwist}.lean` already build `Cone(Hom(E,-) ⊗ E ⟶ id)` as a `DGFunctor`
@@ -58,7 +63,7 @@ consequences are stated once and every realization inherits them. It defines no 
 builds no cone, and must not: a tensor product defined here would duplicate the derived-tensor
 foundation and split it.
 
-## Why the functoriality and the instances are fields
+### Why the functoriality and the instances are fields
 
 Cones are not functorial in a triangulated category, so `T F := cone (ev F)` does not define an
 endofunctor; `Surface/Spherical.lean` records the trap and Seidel--Thomas name it in §1c. The
@@ -70,7 +75,7 @@ The three instance fields are not decoration. `K₀.map` has signature
 object assignment, not a triangulated functor, so without the fields `K₀.map T` does not typecheck.
 They are registered with `attribute [instance]`, in the shape `GroupAction.TriEquiv` uses.
 
-## The two external inputs, and the one thing proved
+### The two external inputs, and the one thing proved
 
 * `T F` has class `[F] - [Hom^•(E,F) ⊗ E]`: **a theorem**, `class_T`, from `K₀.of_triangle` applied
   to the supplied triangle. No shift appears, because the relation is read on the first three
@@ -84,7 +89,7 @@ They are registered with `attribute [instance]`, in the shape `GroupAction.TriEq
   after the functor itself. The dg realizations take it as the hypothesis `IsEulerCopower`.
 * `map_eq_twistK₀`: **proved, not a field**, from the two halves above.
 
-## What is not claimed
+### What is not claimed
 
 No spherical object is exhibited, `T_E` is not constructed on `Dᵇ(Coh X)`, and nothing says `T`
 is an autoequivalence: that is the separate supplied `SphericalTwist.AutoequivalenceStatement`.
@@ -96,6 +101,10 @@ Seidel--Thomas, *Braid group actions on derived categories of coherent sheaves*,
 [arXiv:math/0001043v2](https://arxiv.org/abs/math/0001043v2). The triangle
 `Hom^•(E,F) ⊗ E ⟶ F ⟶ T_E F` is §1c. Their Definition 2.5 builds `T_E` on complexes of injectives,
 where it is functorial, which is the dg route (b) here.
+
+## Tags
+
+spherical twist, spherical object, Grothendieck group, triangulated functor, Seidel--Thomas
 -/
 
 universe w v u

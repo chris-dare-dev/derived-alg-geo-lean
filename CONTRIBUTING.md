@@ -1,5 +1,9 @@
 # Contributing to DerivedAlgGeo
 
+[CREDO.md](CREDO.md) is one page on what this repository holds and what it
+refuses. It overrides this file. Its "Not yet met" list names the rules that
+are not in force yet; for those, this file still applies.
+
 ## Place code by mathematics
 
 All stable Lean code lives below `DerivedAlgGeo/`, whose layout follows
@@ -280,8 +284,7 @@ withdraws any of these with an explicit `false` in `.claude/loop-authority.yaml`
 on the default branch. A run changes the loop's own tooling or instructions
 only when the owner puts that work in its queue, and it uses no OpenSpec
 change, loop manifest or review ledger.
-The manifest controller (`scripts/loop_engine.py`, `.claude/loop-specs/`) is off
-the run path, and is kept only for the ledgers it already wrote. Issue closure
+The manifest controller that preceded the run-loop skill has been deleted. Issue closure
 for code work requires a merged PR.
 
 This section previously read "Build the stable root while developing:
@@ -382,7 +385,17 @@ The run-loop skill and `.claude/README.md` document the complete commands.
 
 Module docstrings should explain the mathematical statement, assumptions,
 conventions, and relationship to surrounding APIs. Avoid provenance language
-such as “the old CohLean version”; Git already records that history.
+such as “the old CohLean version”; Git already records that history. The
+same holds for names and comments: no issue or pull-request numbers and no
+dates.
+
+Prose in the tree is limited to the files `CREDO.md` lists. Reviews, handoffs,
+loop specifications and change proposals go in the issue or the pull request,
+not in a file. Architecture notes and decision records are moving to the wiki.
+Until `CREDO.md` drops that line from "Not yet met", change
+`docs/architecture/` and `.claude/decisions/` only in the pull request that
+changes the code they describe; a decision with no code yet stays in its
+issue.
 
 Build generated API documentation through the nested package:
 

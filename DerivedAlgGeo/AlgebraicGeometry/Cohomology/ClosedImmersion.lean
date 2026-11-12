@@ -10,41 +10,60 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Pushforward.Finite
 # Cohomology of a coherent sheaf along a closed immersion
 
 `cohCohomologyPushforwardAddEquiv` : `Hⁿ(X, F) ≃+ Hⁿ(Y, ι_* F)` for `ι` a closed immersion of
-schemes and `F` coherent on `X`, with `ι_* F` itself coherent. This closes the last gap between
-`CohomologyPushforward.lean`'s abelian-sheaf statement and `#572` step 3's acceptance criterion,
-which is phrased for coherent sheaves.
+schemes and `F` coherent on `X`, with `ι_* F` itself coherent. This is the coherent-sheaf form of
+the abelian-sheaf statement `schemeCohomologyPushforwardAddEquiv` of
+`CohomologyPushforward.lean`.
 
-## The passage from modules to abelian sheaves is `rfl`
+## Main definitions
+
+* `AlgebraicGeometry.Scheme.cohPushforward` — `ι_* F` as a coherent sheaf.
+
+## Main results
+
+* `AlgebraicGeometry.Scheme.toSheaf_pushforward` — `Scheme.Modules.toSheaf` commutes with
+  pushforward, by `rfl`.
+* `AlgebraicGeometry.Scheme.modulesCohomologyPushforwardAddEquiv` — cohomology of a module sheaf
+  is unchanged by pushforward along a closed immersion.
+* `AlgebraicGeometry.Scheme.cohCohomologyPushforwardAddEquiv` — the same comparison for a
+  coherent sheaf and its coherent pushforward.
+
+## Implementation notes
+
+### The passage from modules to abelian sheaves is `rfl`
 
 `toSheaf_pushforward` records that `Scheme.Modules.toSheaf` commutes with pushforward **on the
 nose**: the module pushforward *is* the abelian pushforward carrying a module structure, so the two
 composites are the same abelian sheaf.
 
 This is worth stating because the shape — a functor commuting with a functor — looks like it needs
-a comparison isomorphism and does not. It is the last of several places on this lane where an
-unchecked definitional fact was mistaken for unbuilt mathematics; the others were the site bridge
-(also `rfl`) and the `EnoughInjectives`/`HasExt` instances (imports).
+a comparison isomorphism and does not.
 
-## What makes the target coherent
+### What makes the target coherent
 
-`Scheme.isCoherent_pushforward`, `#572` step 2. `cohPushforward` packages the module pushforward of
-a coherent sheaf with that proof, as an object of `Coh Y`. **`IsLocallyNoetherian Y` is spent
-entirely there** — the cohomology comparison needs no chain condition of its own.
+`Scheme.isCoherent_pushforward`: coherence is preserved by pushforward along a finite morphism
+into a locally Noetherian scheme, and a closed immersion is finite. `cohPushforward` packages the
+module pushforward of a coherent sheaf with that proof, as an object of `Coh Y`.
+**`IsLocallyNoetherian Y` is spent entirely there** — the cohomology comparison needs no chain
+condition of its own.
 
-## One way this is still weaker than `#572`'s wording
+### The `HasExt` universe is pinned
 
-**The `HasExt` universe is pinned**, because the instantiation lets instance search find it.
-`Topology/Sheaves/CohomologyPushforward.lean` keeps it positional
+The `HasExt` universe is pinned here, because this instantiation lets instance search find the
+witness. `Topology/Sheaves/CohomologyPushforward.lean` keeps it positional
 (`cohomologyPushforwardAddEquivAt`) for callers who need another witness; the coherent-cohomology
 convention `HasExt.standard` is one such caller, in
 `Cohomology/Finiteness/ProjectiveVariety.lean`, where the comparison is also shown natural in `F`
 and `k`-linear.
 
-## Main results
+## References
 
-* `toSheaf_pushforward` — the passage, by `rfl`.
-* `cohPushforward` — `ι_* F` as a coherent sheaf.
-* `modulesCohomologyPushforwardAddEquiv`, `cohCohomologyPushforwardAddEquiv` — the comparison.
+The file cites no literature. It builds on
+`DerivedAlgGeo.AlgebraicGeometry.schemeCohomologyPushforwardAddEquiv` and
+`AlgebraicGeometry.Scheme.isCoherent_pushforward`.
+
+## Tags
+
+sheaf cohomology, closed immersion, pushforward, coherent sheaf
 -/
 
 universe u
@@ -74,13 +93,13 @@ noncomputable def modulesCohomologyPushforwardAddEquiv (F : X.Modules) (n : ℕ)
   rw [toSheaf_pushforward g F]
   exact schemeCohomologyPushforwardAddEquiv g ((Modules.toSheaf X).obj F) n
 
-/-- **`ι_* F` as a coherent sheaf**, by `#572` step 2. -/
+/-- **`ι_* F` as a coherent sheaf**, by `isCoherent_pushforward`. -/
 noncomputable def cohPushforward [IsLocallyNoetherian Y] (F : Coh X) : Coh Y :=
   ⟨(Modules.pushforward g).obj ((Coh.ι X).obj F),
     isCoherent_pushforward g ((Coh.ι X).obj F) F.2⟩
 
 set_option maxHeartbeats 1000000 in
-/-- **`#572` step 3 for coherent sheaves.** -/
+/-- **Cohomology of a coherent sheaf is unchanged by pushforward along a closed immersion.** -/
 noncomputable def cohCohomologyPushforwardAddEquiv [IsLocallyNoetherian Y]
     (F : Coh X) (n : ℕ) :
     Sheaf.H ((Modules.toSheaf X).obj ((Coh.ι X).obj F)) n

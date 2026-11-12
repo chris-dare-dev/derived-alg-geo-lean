@@ -10,12 +10,36 @@ import Mathlib.Algebra.Category.ModuleCat.Presheaf.Monoidal
 /-!
 # The twisted multiplication `A(d) ⊗ M → M(d)`, at a localization
 
-`#584`'s remaining piece is the comparison `F ⊗ O(d) ≅ F(d)` — *tensoring with `O(d)` is shifting
-the grading by `d`*. Both routes to it need the same thing first: a map, and the map is
-multiplication of homogeneous fractions. This file supplies it at one localization, with the
-bilinearity a tensor lift consumes.
+The comparison `F ⊗ O(d) ≅ F(d)` (`tensorTwistIso` in `TwistComparison.lean`) says *tensoring with
+`O(d)` is shifting the grading by `d`*. Both routes to it need the same thing first: a map, and the
+map is multiplication of homogeneous fractions. This file supplies it at one localization, with
+the bilinearity a tensor lift consumes.
 
-## Why it is short
+## Main definitions
+
+* `AlgebraicGeometry.Proj.twistMul`: multiplication of a degree-zero fraction of `A(d)` with one of
+  `M`, landing in `M(d)`, at one localization.
+* `AlgebraicGeometry.Proj.sectionTwistMul`: the same product on sections.
+* `AlgebraicGeometry.Proj.twistMultiplicationHom`: the twisted multiplication as a map of
+  presheaves of modules `M̃ ⊗ A(d)~ ⟶ M(d)~`.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.twistMul_mk`: the twisted multiplication in explicit fractions.
+* `AlgebraicGeometry.Proj.twistMul_add_left`, `AlgebraicGeometry.Proj.twistMul_add_right`,
+  `AlgebraicGeometry.Proj.twistMul_smul_left`, `AlgebraicGeometry.Proj.twistMul_smul_right`, and
+  their `sectionTwistMul` counterparts: bilinearity.
+* `AlgebraicGeometry.Proj.intShiftZeroModuleLinearEquiv_twistMul`: the chart trivializations
+  intertwine the twisted multiplication.
+
+## Notation
+
+`X` and `𝒪` are local notation for the underlying space `ProjectiveSpectrum.top 𝒜` and its structure
+sheaf.
+
+## Implementation notes
+
+### Why it is short
 
 Because of a fact about the model rather than a construction. `DegreeZeroLocalization 𝒜 𝓝 S` is a
 submodule of `LocalizedModule S M`, and for `𝓝` over the ring itself the ambient is
@@ -25,17 +49,17 @@ no multiplication has to be defined on representatives, and no well-definedness 
 needed. All that is left is to check the product lands in the right submodule, which is
 `smul_mem_intShift` on the numerator and `SetLike.mul_mem_graded` on the denominator.
 
-This is the same observation that made `#689` and `#692` tractable — the grading is a property of
-subobjects of one ambient, not extra structure the ambient knows about.
+The grading is a property of subobjects of one ambient, not extra structure the ambient knows
+about.
 
-## The one thing that does not come free
+### The one thing that does not come free
 
 `twistMul_smul_right` needs `SMulCommClass (HomogeneousLocalization 𝒜 S) (LocalizedModule S A)
 (LocalizedModule S M)`, which is not an instance. The `HomogeneousLocalization 𝒜 S`-action is
 `Module.compHom` along `algebraMap` into `Localization S`, so naming that map moves the goal into
-`Localization S` where commutativity is free. The same gap appeared in `#695`'s `map_smul'`.
+`Localization S` where commutativity is free.
 
-## Up to the presheaf
+### Up to the presheaf
 
 `sectionTwistMul` is the same product on sections. Its local-fraction certificate is the product of
 the two factors' certificates on the intersection of their opens, rebuilt by `twistMul_mk` — which
@@ -50,7 +74,7 @@ scalar lives in `Γ(U, 𝒪)` and a fibre-level one in `HomogeneousLocalization 
 the two `smul` laws push it through `openToLocalization`. The argument order flips with it —
 section-level *left* linearity is fibre-level `twistMul_*_right`.
 
-## What the chart sees
+### What the chart sees
 
 `intShiftZeroModuleLinearEquiv_twistMul` is the identity the isomorphism proof turns on. On a
 localization containing a degree-one `f`, the module trivialization and the ring trivialization are
@@ -60,12 +84,20 @@ action and nothing else. Read the other way: over a degree-one chart the twisted
 `Presheaf.W_of_coversTop` should not need the generator machinery
 `Divisors/AssociatedSheaf/Construction.lean` builds for the corresponding Cartier statement.
 
-## Scope
+### Scope
 
 The map, and what it looks like on a chart. That it is an **isomorphism** is not here:
 `TwistComparison.lean` lifts the chart identity to sections, reads the untwisted multiplication as
 the right unitor, and feeds the result to `Presheaf.W_of_coversTop` over
 `degreeOneCharts_coversTop`.
+
+## References
+
+Mathlib's `ModuleCat.MonoidalCategory.tensorLift` and `LinearMap.mk₂`.
+
+## Tags
+
+projective spectrum, graded module, twisting sheaf, homogeneous localization
 -/
 
 noncomputable section

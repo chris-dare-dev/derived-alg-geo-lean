@@ -9,13 +9,36 @@ import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.ShiftCompar
 /-!
 # The seam commutes with the shift
 
-`dg-enhancements-e7`. `Cdg.seam : H⁰(C^dg A) ≌ K(A)` is an equivalence of
-ordinary categories, and both sides carry a shift by `ℤ`: on the left the one
-`H0Shift.lean` builds out of `IsPretriangulated.exists_shift`, on the right
-Mathlib's, induced through the quotient. Nothing so far relates them.
-`Functor.CommShift` does, and #378 calls it "the real content of this epic".
+`Cdg.seam : H⁰(C^dg A) ≌ K(A)` is an equivalence of ordinary categories, and
+both sides carry a shift by `ℤ`: on the left the one `H0Shift.lean` builds out
+of `IsPretriangulated.exists_shift`, on the right Mathlib's, induced through the
+quotient. Neither shift is defined in terms of the other; this file relates them
+by a `Functor.CommShift` structure on the seam's functor `Cdg.h0Functor`.
 
-## The route: factor through cochain complexes
+## Main definitions
+
+* `CategoryTheory.Cdg.toH0` — the tautological functor from cochain complexes to
+  `H⁰(C^dg A)`: the identity on objects, sending a chain map to the class of its
+  own cochain.
+* `CategoryTheory.Cdg.toH0ShiftIso` — the comparison, in `H⁰`, between the model
+  shift and the chosen shift.
+* `CategoryTheory.Cdg.toH0CommShift` — the `CommShift` structure on `Cdg.toH0`.
+* `CategoryTheory.Cdg.seamCommShiftIso` — the seam's commutation isomorphism with
+  the shift.
+* `CategoryTheory.Cdg.h0FunctorCommShift` — the resulting `CommShift` structure on
+  `Cdg.h0Functor`.
+
+## Main results
+
+* `CategoryTheory.Cdg.h0Functor_map_toH0_map` — `Cdg.toH0 ⋙ Cdg.h0Functor` agrees
+  with `HomotopyCategory.quotient` on morphisms.
+* `CategoryTheory.Cdg.toH0ShiftIso_zero_hom` and
+  `CategoryTheory.Cdg.toH0ShiftIso_add_hom` — the `zero` and `add` coherences of
+  the comparison, componentwise.
+
+## Implementation notes
+
+### The route: factor through cochain complexes
 
 The two shifts are built by different routes out of the same shift on
 `CochainComplex A ℤ`, so the comparison is cleanest with that common source kept
@@ -30,7 +53,7 @@ structure on `Cdg.toH0`, together with Mathlib's on the quotient functor,
 assembles into one on the seam -- and that assembly is formal, which is the point
 of going this way round.
 
-## Where the mathematics actually is
+### Where the mathematics actually is
 
 All of it is in `Cdg.toH0`'s two coherence identities, and both reduce to
 `IsShiftBy.compare` bookkeeping over the model lemmas of
@@ -41,12 +64,21 @@ of the same object by the same degree are canonically isomorphic and that those
 comparisons compose (`IsShiftBy.compare_trans`). The `add` coherence telescopes a
 four-term composite into a single `compare` in exactly that way.
 
-## `backward.isDefEq.respectTransparency`
+### `backward.isDefEq.respectTransparency`
 
 `H0 C` is a type synonym for `C`, so goals about `H0 (Cdg A)` are routinely
 ill-typed at `instances` transparency and no rewrite fires. Mathlib's own
 `set_option backward.isDefEq.respectTransparency false` is the sanctioned way
 through, and it is used here for exactly the declarations that need it.
+
+## References
+
+Mathlib's `CategoryTheory.Functor.CommShift` and its instance on
+`HomotopyCategory.quotient`.
+
+## Tags
+
+dg enhancement, homotopy category, shift, CommShift, H⁰
 -/
 
 set_option autoImplicit false
@@ -262,7 +294,7 @@ lemma seamCommShiftIso_hom_app (n : ℤ) (X : H0 (Cdg A)) :
     (seamCommShiftIso n).hom.app X = (seamShiftIso n X).hom := rfl
 
 set_option backward.isDefEq.respectTransparency false in
-/-- **`dg-enhancements-e7`, the shift half.** -/
+/-- **The seam's functor commutes with the shift.** -/
 noncomputable instance h0FunctorCommShift : (h0Functor (A := A)).CommShift ℤ where
   commShiftIso := seamCommShiftIso
   commShiftIso_zero := by

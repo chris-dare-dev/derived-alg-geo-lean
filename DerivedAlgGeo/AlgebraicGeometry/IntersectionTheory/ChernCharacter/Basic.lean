@@ -604,8 +604,9 @@ theorem chernCharacterComponent_lineBundle
 
 open AlgebraicGeometry.IntersectionTheory.ChernCharacterSurface
 
-/-- The reconstructed ring-valued `ch₂` has the degree constructed in issue #37 once the
-chosen rank, determinant class, and Todd-weighted representatives are explicitly compared.
+/-- The reconstructed ring-valued `ch₂` has the degree-level surface degree
+`chernCharacterTwoDegree` once the chosen rank, determinant class, and Todd-weighted
+representatives are explicitly compared.
 This does not turn the degree-level surface class into an unconditional element of `A`. -/
 theorem degree_chernCharacterComponent_two_eq_surface
     {D : FiniteCohomology k X} {C : D.LinearConnectingSystem}
@@ -630,7 +631,7 @@ theorem degree_chernCharacterComponent_two_eq_surface
   simp only [chernCharacterTwoDegree]
   ring
 
-/-! ## Compatibility with the universal A7 formulas -/
+/-! ## Compatibility with the universal Chern-class formulas of `ChernClassData` -/
 
 /-- Recover Chern classes whose universal formulas give the reconstructed character through
 codimension four. -/

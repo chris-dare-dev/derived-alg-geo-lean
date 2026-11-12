@@ -25,24 +25,59 @@ of charge zero form the subcategory `A⁰` of Definition 14.3, whose closure
 properties under subobjects, quotients and extensions are proved here from
 `K₀` additivity and elementary half-plane arithmetic.
 
-## Phrasing choices, stated for the reviewer
+## Main definitions
+
+All in the namespace `CategoryTheory.Triangulated.WeakStabilityCondition`.
+
+* `WeakPreStabilityCondition` — a slicing and a central charge whose
+  semistable objects have charge on the closed ray at integer phases and the
+  open ray elsewhere (Definition 14.1).
+* `WeakStabilityFunction`, `StabilityFunction` — weak and ordinary stability
+  functions on the heart of a t-structure, as `WeakStabilityFunctionOn` and
+  `StabilityFunctionOn` at `heartDatum t` (Definition 14.2).
+* `StabilityFunction.toWeak` — an ordinary stability function as a weak one.
+* `WeakStabilityFunction.charge`, `WeakStabilityFunction.slope` — the charge of
+  an object and its slope in `WithTop ℝ`.
+* `WeakStabilityFunction.IsSemistable`, `WeakStabilityFunction.IsStable` —
+  `Z`-semistability and `Z`-stability of heart objects.
+* `WeakStabilityFunction.zeroCharge` — the zero-charge subcategory `A⁰`
+  (Definition 14.3).
+
+## Main results
+
+* `WeakStabilityFunction.upper`, `StabilityFunction.upper` — values on nonzero
+  heart objects lie in `ℍ ⊔ ℝ_{≤0}`, respectively `ℍ ⊔ ℝ_{<0}`.
+* `WeakStabilityFunction.charge_triangle` — charges are additive on
+  distinguished triangles.
+* `WeakStabilityFunction.zeroCharge_left`, `WeakStabilityFunction.zeroCharge_right`,
+  `WeakStabilityFunction.zeroCharge_extension` — `A⁰` is closed under
+  subobjects, quotients and extensions.
+
+## Implementation notes
 
 * The heart is carried inside `C` as `t.heart`, following
-  `WeakStabilityCondition/Tilting/TorsionPair/Heart.lean`.  The pinned Mathlib does supply
-  `t.heartFullSubcategoryAbelian`; triangle-form subobject data is retained
-  here because it stays in the ambient category where the charge and slicing
-  live.  `TStructure.heartFullSubcategory_shortExact_of_distTriang` identifies
-  those heart triangles with short exact sequences in the abelian heart.
+  `WeakStabilityCondition/Tilting/TorsionPair/Heart.lean`.  The pinned Mathlib
+  does supply `t.heartFullSubcategoryAbelian`; triangle-form subobject data is
+  retained here because it stays in the ambient category where the charge and
+  slicing live.  `TStructure.heartFullSubcategory_shortExact_of_distTriang`
+  identifies those heart triangles with short exact sequences in the abelian
+  heart.
 * The paper's `K(A)` is replaced by the ambient `K₀ C`, on which this
   library's charges already live; the positivity conditions quantify over heart
-  objects
-  only. The comparison `K(A) ≅ K(D)` for a bounded t-structure is **not**
-  available at the pin and is **not** assumed — nothing here needs it.
+  objects only. The comparison `K(A) ≅ K(D)` for a bounded t-structure is
+  **not** available at the pin and is **not** assumed — nothing here needs it.
 * Slopes take values in `WithTop ℝ`, with `μ = +∞` exactly when the charge
   has vanishing imaginary part, as in Definition 14.2.
-* **No binding to any statement of the paper is claimed.** These declarations
-  are candidates for the §14 coordinates of the coverage map; promotion past
-  `target` is a separate, evidence-gated act (#111).
+* **No binding to any statement of the paper is claimed.**
+
+## References
+
+* arXiv:1902.08184v4, §14, Definitions 14.1–14.3.
+
+## Tags
+
+weak stability condition, stability function, heart, slope, zero-charge
+subcategory
 -/
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition
@@ -86,10 +121,9 @@ additive charge whose value on every nonzero heart object lies in
 
 This is `WeakStabilityFunctionOn` at `heartDatum t` — the ambient
 instantiation of the one charge-positivity structure — **not** a structure of
-its own. The half-plane it used to write out by hand is
-`closedUpperHalfPlane`, and the two agree definitionally. `Z` keeps its name
-as a field and `upper` keeps its name and argument shape as a theorem below,
-so consumers are unaffected. -/
+its own. Its half-plane is `closedUpperHalfPlane`. The charge is the field `Z`,
+and `upper` below states the positivity condition in the curried argument
+shape consumers use. -/
 abbrev WeakStabilityFunction := WeakStabilityFunctionOn (heartDatum t)
 
 /-- An ordinary stability function on the heart of `t`: values on nonzero
@@ -105,8 +139,8 @@ abbrev StabilityFunction := StabilityFunctionOn (heartDatum t)
 variable {t}
 
 /-- **Values on nonzero heart objects lie in `ℍ ⊔ ℝ_{≤0}`** — the defining
-positivity, in the curried argument shape consumers use. Formerly a structure
-field; now the datum's positivity condition, unfolded. -/
+positivity, in the curried argument shape consumers use. This is the datum's
+positivity condition `nonzero_mem`, unfolded. -/
 theorem WeakStabilityFunction.upper (W : WeakStabilityFunction t) (E : C)
     (hE : t.heart E) (hne : ¬IsZero E) :
     0 < (W.Z (K₀.of C E)).im ∨
@@ -131,7 +165,7 @@ variable {t}
 `ℝ_{<0} ⊆ ℝ_{≤0}`, same charge.
 
 The inclusion is `StabilityFunctionOn.toWeak`, proved once for every class
-datum. This wrapper preserves the name and signature the §14 lane uses. -/
+datum. This wrapper specializes it to the heart of `t`. -/
 def toWeak (Z : StabilityFunction t) : WeakStabilityFunction t :=
   StabilityFunctionOn.toWeak Z
 

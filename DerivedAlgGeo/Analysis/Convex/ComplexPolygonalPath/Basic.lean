@@ -15,40 +15,54 @@ vertices `Fin (n + 1) → ℂ` -- together with its Euclidean `length`, the two
 real continuous linear functionals on `ℂ` that the perimeter arguments support
 against, and the supporting-hyperplane form of strict clockwise convexity.
 
-## Main declarations
+## Main definitions
+
+All in the namespace `CategoryTheory.Triangulated.ComplexPolygonalPath`:
 
 * `crossFunctional r`, the oriented area functional `z ↦ r × z`, and
   `unitRay θ`, the unit vector at angle `θ`.
-* `length`, the Euclidean length of a finite path, and
-  `norm_last_sub_zero_le_length`: the chord is no longer than the path.
+* `length`, the Euclidean length of a finite path.
+
+## Main results
+
+* `norm_last_sub_zero_le_length`: the chord is no longer than the path.
 * `exists_strict_support_at_interior`: at an interior vertex of a path whose
   upper-half-plane edge arguments strictly decrease, some real-linear
   functional attains a strict unique maximum there.
+* `sum_edges_eq_last_sub_zero`: the edges sum to the chord.
 
-## Placement
+## Implementation notes
+
+### Placement
 
 This is neutral planar geometry and imports no category theory and no
-stability -- which is why it is not under `CategoryTheory/Abelian/Stability/`,
-where MO1.08 (#1319) placed the rest of that directory. It was the
-`ComplexPolygonalPath` block of what is now
-`CategoryTheory/Abelian/Stability/HNPolygon.lean` until MO1.13 (#1324); nothing in it mentions an object, a filtration or a stability
-function, and the Harder--Narasimhan *reading* of these statements -- that the
-vertices are subobject charges and the edges are semistable-factor charges --
-is the adapter that stayed behind in `HNPolygon.lean`.
+stability -- which is why it is not under `CategoryTheory/Abelian/Stability/`.
+Nothing in it mentions an object, a filtration or a stability function, and the
+Harder--Narasimhan *reading* of these statements -- that the vertices are
+subobject charges and the edges are semistable-factor charges -- is the adapter
+in `CategoryTheory/Abelian/Stability/HNPolygon.lean`.
 
 The perimeter comparison built on this carrier is the sibling
 `ComplexPolygonalPath/Perimeter.lean`.
 
-`Analysis/` is a new top-level subject, added to `KNOWN_SUBJECTS` in
-`scripts/check_layering.py` as the conscious act rule 6 requires. The pinned
-Mathlib revision has no polygonal-chain length and no perimeter at all
-(`Mathlib.Geometry.Polygon.Basic` supplies a vertex tuple with edges and a
-boundary, and stops there), so there was no Mathlib owner to reuse; the
-convexity API these files do consume, `convexHull`, is owned at that revision
-by `Mathlib/Analysis/Convex/Hull.lean`, which is what names the subject.
+`Analysis/` is a top-level subject, registered in `KNOWN_SUBJECTS` in
+`scripts/check_layering.py`. The pinned Mathlib revision has no polygonal-chain
+length and no perimeter at all (`Mathlib.Geometry.Polygon.Basic` supplies a
+vertex tuple with edges and a boundary, and stops there), so there is no
+Mathlib owner to reuse; the convexity API these files do consume,
+`convexHull`, is owned at that revision by `Mathlib/Analysis/Convex/Hull.lean`,
+which is what names the subject.
 
-Declaration names and the `CategoryTheory.Triangulated.ComplexPolygonalPath`
-namespace are unchanged, per standing decision 1 of the cutover ledger.
+The declarations keep their names in the
+`CategoryTheory.Triangulated.ComplexPolygonalPath` namespace.
+
+## References
+
+Mathlib's `Complex.arg`, `Complex.reCLM` and `Complex.imCLM`.
+
+## Tags
+
+polygonal path, complex plane, length, supporting hyperplane, convexity
 -/
 
 open Complex

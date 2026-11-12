@@ -16,35 +16,6 @@ of the identity, an exceptional object is nonzero, its endomorphism ring has
 no idempotents besides `0` and `1`, it is not isomorphic to any nonzero shift
 of itself, and every map between two distinct shifts of it vanishes.
 
-## Why `algebraMap` bijectivity rather than a bundled isomorphism
-
-The endomorphism clause is `Function.Bijective (algebraMap k (End E))`,
-against Mathlib's `Algebra k (End E)` instance from
-`Mathlib/CategoryTheory/Linear/Basic.lean`. Bijectivity is
-proposition-valued, so two proofs of exceptionality of the same object are
-equal and no second carrier appears; a bundled `k ≃ₐ[k] End E` would be data.
-Per `docs/architecture/abstraction-tree.md`, no `KLinearCategory` or other
-new linearity class is introduced — Mathlib's `Preadditive` and `Linear`
-carry everything.
-
-## The trap the vanishing clause avoids
-
-The clause is `∀ f : E ⟶ E⟦n⟧, f = 0`, never `IsZero (E ⟶ E⟦n⟧)` on a bare
-`Type`: the latter would compile, pass every gate, and make the structure
-uninhabitable, because `IsZero` there speaks about a zero object of `Type`,
-not about the zero morphism.
-
-## Transport hypotheses are assumptions at this pin
-
-`IsExceptional.shift` carries `[∀ n : ℤ, (shiftFunctor C n).Linear k]`
-explicitly: `k`-linearity of the shift is not derivable from
-`[Linear k C] [Pretriangulated C]` at this pin —
-`Mathlib/CategoryTheory/Shift/Linear.lean:30` carries the same instance
-argument, and the only global instances of that shape in the library are for
-`DerivedCategory` and for localizations. Without it the ring isomorphism
-`End (E⟦m⟧) ≅ End E` is not a `k`-algebra map and bijectivity of `algebraMap`
-does not transport. `of_equivalence` likewise assumes `[e.functor.Linear k]`.
-
 ## Main definitions
 
 * `IsExceptional` — the predicate. Its fields consume only
@@ -64,6 +35,36 @@ does not transport. `of_equivalence` likewise assumes `[e.functor.Linear k]`.
 * `IsExceptional.shift`, `IsExceptional.of_equivalence` — transport.
 * `CategoryTheory.algebraMap_end_apply` — the `smul` unfolding of
   `algebraMap` into an endomorphism ring, a pure linear-category fact.
+
+## Implementation notes
+
+### Why `algebraMap` bijectivity rather than a bundled isomorphism
+
+The endomorphism clause is `Function.Bijective (algebraMap k (End E))`,
+against Mathlib's `Algebra k (End E)` instance from
+`Mathlib/CategoryTheory/Linear/Basic.lean`. Bijectivity is
+proposition-valued, so two proofs of exceptionality of the same object are
+equal and no second carrier appears; a bundled `k ≃ₐ[k] End E` would be data.
+No `KLinearCategory` or other new linearity class is introduced — Mathlib's
+`Preadditive` and `Linear` carry everything.
+
+### The trap the vanishing clause avoids
+
+The clause is `∀ f : E ⟶ E⟦n⟧, f = 0`, never `IsZero (E ⟶ E⟦n⟧)` on a bare
+`Type`: the latter would compile, pass every gate, and make the structure
+uninhabitable, because `IsZero` there speaks about a zero object of `Type`,
+not about the zero morphism.
+
+### Transport hypotheses are assumptions at this pin
+
+`IsExceptional.shift` carries `[∀ n : ℤ, (shiftFunctor C n).Linear k]`
+explicitly: `k`-linearity of the shift is not derivable from
+`[Linear k C] [Pretriangulated C]` at this pin —
+`Mathlib/CategoryTheory/Shift/Linear.lean:30` carries the same instance
+argument, and the only global instances of that shape in the library are for
+`DerivedCategory` and for localizations. Without it the ring isomorphism
+`End (E⟦m⟧) ≅ End E` is not a `k`-algebra map and bijectivity of `algebraMap`
+does not transport. `of_equivalence` likewise assumes `[e.functor.Linear k]`.
 
 ## References
 
@@ -133,9 +134,9 @@ theorem not_isZero : ¬ IsZero E := by
   exact one_ne_zero (h.algebraMap_bijective.1 h10)
 
 -- Named `end_…` deliberately: `EnumDecls.lean`'s `.eq_` filter drops any
--- component starting `eq_` (#998), so the issue's spelling
--- `eq_zero_or_eq_one_of_mul_self` would silently vanish from the declaration
--- sweep and escape the audit-completeness gate.
+-- component starting `eq_`, so the spelling `eq_zero_or_eq_one_of_mul_self`
+-- would silently vanish from the declaration sweep and escape the
+-- audit-completeness gate.
 /-- The endomorphism ring of an exceptional object has no idempotents besides
 `0` and `1`: transport the idempotent along the algebra bijection and use
 that a field has only trivial idempotents. This is indecomposability in the
@@ -213,8 +214,8 @@ theorem shift [∀ n : ℤ, (shiftFunctor C n).Linear k] (m : ℤ) :
 The functor's linearity is an assumption for the same reason as in `shift`.
 Nothing else is assumed of the target: neither clause consumes a
 triangulation, additivity of the target's shifts, or a zero object, so the
-adapter is usable before any of those are assembled — which is also why the
-issue's `[e.functor.IsTriangulated]` hypothesis is deliberately absent. -/
+adapter is usable before any of those are assembled — which is also why an
+`[e.functor.IsTriangulated]` hypothesis is deliberately absent. -/
 theorem of_equivalence {D : Type*} [Category.{v} D] [Preadditive D]
     [Linear k D] [HasShift D ℤ] (e : C ≌ D)
     [e.functor.CommShift ℤ] [e.functor.Additive] [e.functor.Linear k] :

@@ -9,21 +9,28 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Pushforward.Affine
 /-!
 # Coherence is preserved by pushforward along a finite map of affine schemes
 
-A finite morphism of schemes pushes coherent sheaves to coherent sheaves; `#572` step 2 asked
-for this along a closed immersion. This file proves the affine case, for a finite ring map
+A finite morphism of schemes pushes coherent sheaves to coherent sheaves, and in particular so
+does a closed immersion. This file proves the affine case, for a finite ring map
 `φ : R ⟶ S`, which is where the mathematical content is: everything else is the descent already
 in `Coherent/Descent/Locality.lean` and the chart argument in `Pushforward/Finite.lean`.
 
+## Main definitions
+
+This file introduces no new definitions.
+
 ## Main results
 
-* `moduleFinite_gammaPushforward_of_finite`, `isCoherent_pushforward_of_finite` — the
-  finite-ring-map statements.
-* `moduleFinite_gammaPushforward`, `isCoherent_pushforward_of_surjective` — their surjective
-  corollaries, the closed-immersion case.
+* `AlgebraicGeometry.moduleFinite_gammaPushforward_of_finite`,
+  `AlgebraicGeometry.isCoherent_pushforward_of_finite` — the finite-ring-map statements.
+* `AlgebraicGeometry.moduleFinite_gammaPushforward`,
+  `AlgebraicGeometry.isCoherent_pushforward_of_surjective` — their surjective corollaries, the
+  closed-immersion case.
 
-## The route
+## Implementation notes
 
-Three facts do the work, and all three are at the pin:
+### The route
+
+Three facts do the work:
 
 * a coherent sheaf on an affine scheme is the tilde of its global sections
   (`Scheme.Modules.isIso_fromTildeΓ_of_isQuasicoherent`);
@@ -38,11 +45,21 @@ used through `Module.Finite R S`, so the natural hypothesis is `φ.hom.Finite`, 
 finite morphism of schemes supplies chart by chart (`Scheme.Hom.finite_appTop`). Surjectivity,
 what a closed immersion supplies, is the corollary `isCoherent_pushforward_of_surjective`.
 
-## Noetherian hypotheses
+### Noetherian hypotheses
 
 `R` must be noetherian: finite generation of the pushed-forward module gives finite
 *presentation* only there, and coherence in this repository is finite presentation. `S` needs no
 hypothesis — `moduleFinite_globalSections` reads finiteness straight off the presentation.
+
+## References
+
+The file cites no literature. It builds on
+`AlgebraicGeometry.Scheme.Modules.isIso_fromTildeΓ_of_isQuasicoherent`,
+`AlgebraicGeometry.isIso_fromTildeΓ_pushforward` and `AlgebraicGeometry.gammaPushforwardIso`.
+
+## Tags
+
+coherent sheaf, pushforward, finite morphism, affine scheme, closed immersion
 -/
 
 universe u

@@ -14,22 +14,42 @@ half-plane lies between their arguments. This is proved directly from the
 oriented planar determinant `phaseCross`, and the resulting see-saw bounds are
 the analytic input for Harder--Narasimhan arguments.
 
+## Main definitions
+
+* `CategoryTheory.Triangulated.phaseCross` — the oriented planar determinant
+  `z.re * w.im - z.im * w.re`.
+
+## Main results
+
+All in the namespace `CategoryTheory.Triangulated`:
+
+* `add_mem_semiClosedUpperHalfPlane` — the semi-closed upper half-plane is
+  closed under addition.
+* `phaseCross_nonneg_of_arg_le`, `arg_le_of_phaseCross_nonneg`,
+  `phaseCross_pos_of_arg_lt` and `arg_lt_of_phaseCross_pos` — the argument order
+  as the sign of `phaseCross`.
+* `arg_add_le_max`, `min_arg_le_arg_add` and `arg_add_lt_max` — the see-saw
+  bounds on the argument of a sum.
+
+## Implementation notes
+
 Nothing here is categorical, algebraic or stability-theoretic: every statement
-quantifies over complex numbers.
+quantifies over complex numbers. The `StabilityFunction` see-saw for a short
+exact sequence needs an abelian category, so it is in
+`CategoryTheory/Abelian/Stability/PhaseGeometry.lean`, which imports this file;
+the Euclidean core of the mass-subadditivity proof rests on the bounds here and
+must be importable with no category theory and no stability.
 
-## Placement
+The declarations keep their names in the `CategoryTheory.Triangulated`
+namespace; see the same note in `Analysis/Complex/HalfPlane.lean`.
 
-These declarations were the first half of what MO1.08 (#1319) has since
-renamed `CategoryTheory/Abelian/Stability/PhaseGeometry.lean`, whose second
-half -- the `StabilityFunction` see-saw for a short exact sequence
--- needs an abelian category and stayed there, importing this file. MO1.13
-(#1324) made the split because the Euclidean core of the mass-subadditivity
-proof rests on these bounds and is required to be importable with no category
-theory and no stability.
+## References
 
-Declaration names and the `CategoryTheory.Triangulated` namespace are
-unchanged; see standing decision 1 of the cutover ledger, and the same note in
-`Analysis/Complex/HalfPlane.lean`.
+Mathlib's `Complex.arg`.
+
+## Tags
+
+complex argument, phase, upper half-plane, see-saw, cross product
 -/
 
 noncomputable section

@@ -4,7 +4,7 @@
 - **Date:** 2026-08-04
 - **Deciders:** Chris Dare
 - **Evidence:** `arXMCP/CLAUDE.md` §4.9; this repo's `CLAUDE.md` §2, §3;
-  `.claude/notes/2026-08-04-contract-red-team.md` gaps 7, 8
+  https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/notes/2026-08-04-contract-red-team.md gaps 7, 8
 
 ## Context
 
@@ -58,7 +58,7 @@ thing this repo most fears.** `faithfulness` is human-only. It is the sole axis
 that can catch `CLAUDE.md` §3's failure — describing `Fin 2 → ℤ` as
 `K_num(Ku(X))`. R5 budgets ~2 owner-days for 5–10 reviews against a notebook of
 146 papers and 15,280 chunks. Everything else here scales; this does not. See
-`open-questions.md` Q4.
+[`open-questions.md`](https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/open-questions.md) Q4.
 
 **§3 is not yet mechanized, and the design overclaimed that it was** (red team,
 gap 8). `closed_lanes` checks `forbidden_module_prefixes` against the emission.
@@ -88,4 +88,4 @@ label its evidence `asserted` and fold it under the review axis's discipline.
 verdict occupy the one human axis. The red team accepts that and points out the
 consequence: rejecting it *without a substitute* makes volume unreachable by any
 route. The substitute is a separate `kind: sketch` lane that occupies **zero**
-axes and is excluded from `required_axes` filtering. See `open-questions.md` Q4.
+axes and is excluded from `required_axes` filtering. See [`open-questions.md`](https://github.com/chris-dare-dev/derived-alg-geo-lean/blob/965d62fc66afbbe998482ef0912cacc265a01c5a/.claude/open-questions.md) Q4.

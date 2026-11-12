@@ -17,6 +17,32 @@ assume those formulas or boundedness. The only large-category t-structure
 input on the source is the concrete output of Theorem A.13: a `TStructure`
 together with its proved compact-generation formula.
 
+## Main definitions
+
+* `CategoryTheory.Triangulated.Polishchuk.InducedTStructureDataLarge` — a
+  bounded t-structure on a source subcategory `P`, with (A.3) and (A.4) stated
+  against the large target t-structure.
+* `CategoryTheory.Triangulated.Polishchuk.InducedTStructureData` — the same on
+  `P ≤ F⁻¹ Q`, with (A.3) and (A.4) stated against the restricted target
+  t-structure.
+* `Polishchuk.induce`, `Polishchuk.induceLarge`, `Polishchuk.induceOfLE` —
+  Theorem A.17, categorical Steps 1--4, in the three shapes below.
+* `Polishchuk.induceOfApproximation`, `Polishchuk.induceOfBrown`,
+  `Polishchuk.induceOfApproximationMaps` — the constructor with the source
+  t-structure assembled from approximation triangles, from the Brown tower, or
+  from Brown-style universal maps.
+
+## Main results
+
+The constructors above are the results: each returns the bounded induced
+t-structure together with proofs of (A.3) and (A.4).
+`Polishchuk.InducedTStructureDataLarge.toInducedTStructureData` restates the
+large form inside a bounded target subcategory.
+
+## Implementation notes
+
+### The three shapes
+
 The selected source subcategory comes in three shapes.  `induce` takes the
 preimage `F⁻¹ Q` of a bounded target subcategory, hypothesis (iv) of Theorem
 A.17 built in, and proves truncation stability from (iv).  `induceLarge`
@@ -30,6 +56,8 @@ itself, with no target subcategory; boundedness comes from
 on `TStructure.bounded`.  No geometric instance of `induceOfLE` with
 `P ≠ F⁻¹ Q` is claimed.
 
+### The infinite-extension case
+
 Theorem 2.8 of arXiv:2607.28411v1 for an infinite extension `ℓ/k` is in the
 large shape: `π_*` sends no nonzero coherent object into `Dᵇ(Coh X)`, so
 `P ⊆ F⁻¹ Q` fails for `Q = Dᵇ(Coh X)`, and the paper recognizes `𝒫_ℓ`
@@ -37,8 +65,20 @@ against the Ind-extension on `Dqc(X)`.  `induceLarge` is the Theorem A.17
 half of that, one phase at a time; reading the phases into a slicing, the
 Corollary A.23 half, is the open item in `Phase/Transfer/Inducing.lean`.
 
+### Scope
+
 Scheme realization, bounded-coherent/perfect identification, and S-locality
-are intentionally absent. They are the geometric layer of SF7.3.
+are intentionally absent. They belong to the geometric layer.
+
+## References
+
+* arXiv:2607.28411v1, Theorem A.17 (Steps 1--4), Theorem A.13, Definition A.7,
+  Remark A.8, Corollary A.23 and Theorem 2.8.
+
+## Tags
+
+t-structure, compactly generated, induced t-structure, bounded t-structure,
+Brown representability, adjunction
 -/
 
 noncomputable section
@@ -199,10 +239,9 @@ recognition formulas, and boundedness descends from the restricted target.
 
 Zero reflection is assumed only on objects whose image lies in the selected
 target subcategory `Q` -- the object-property form of A.17's
-conservativity-on-bounded-objects hypothesis. Until 2026-08-18 it was
-demanded on the whole source category, which was sound but strictly stronger
-than the source theorem and a materially harder obligation for the scheme
-realization (adversarial review, finding P2-11). -/
+conservativity-on-bounded-objects hypothesis. Demanding it on the whole source
+category would be sound but strictly stronger than the source theorem and a
+materially harder obligation for the scheme realization. -/
 noncomputable def induce
     {L : Functor D C} {F : Functor C D}
     [L.CommShift ℤ] [L.IsTriangulated]

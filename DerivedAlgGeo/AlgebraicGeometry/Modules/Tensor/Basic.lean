@@ -277,10 +277,9 @@ noncomputable def tensorSheafificationComparisonRight
 
 /-- The left comparison is an isomorphism for **arbitrary** `L`.
 
-The invertibility hypothesis this carried until #833 was an artifact of proving local
-injectivity and local surjectivity separately: the injective half then needed `L` locally
-trivial. Going through stalks avoids the split — see
-`isIso_sheafification_map_whiskerLeft_unit`. -/
+No invertibility hypothesis on `L` is needed. Proving local injectivity and local
+surjectivity separately would need `L` locally trivial for the injective half; going through
+stalks avoids the split — see `isIso_sheafification_map_whiskerLeft_unit`. -/
 lemma isIso_tensorSheafificationComparisonLeft (L : X.Modules) (P : X.PresheafOfModules) :
     IsIso (tensorSheafificationComparisonLeft L P) :=
   isIso_sheafification_map_whiskerLeft_unit ((toPresheafOfModules X).obj L) P

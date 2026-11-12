@@ -8,43 +8,56 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Walls.Threef
 /-!
 # The tilt family is the kernel's, and there is only one of it
 
-The abstraction-audit remediation recorded **three unbridged spellings** of the
-`(n, m) = (3, 2)` tilt charge and asked for a comparison or a deletion (#1228).
-This file settles the kernel-level one, and the module docstring records what
-the other two turned out to be.
+The `(n, m) = (3, 2)` tilt charge has one carrier, `Tilt.tiltFamily`. This file
+proves that it is the exponential kernel of `Exponential/Kernel.lean` at
+truncation degree `m = 2`, so the kernel-level form of the tilt charge is a
+theorem rather than a second carrier.
 
-## The adjudication
+## Main definitions
 
-`Tilt.tiltFamily` is canonical. It is the only one of the three that exists as a
-Lean declaration.
+This file introduces no new definitions: no charge, no polynomial and no slope.
 
-* **`Exp.tiltChargeFamily`, the kernel-level spelling.** Never declared; the
-  remediation planned it for a later slice that did not happen, and
-  `Exponential/Kernel.lean` still forward-referenced it. `tiltFamily_eq_exp`
-  below is that spelling, as a theorem rather than a second carrier: the tilt
-  family **is** the exponential kernel at `m = 2`, reindexed by the surface
-  chart and the `(alpha, beta)` transposition and pulled back along the
-  truncation. Nothing needed constructing; the equation was available from
+## Main results
+
+* `Tilt.tiltFamily_eq_exp` -- the tilt family **is** the exponential kernel at
+  `m = 2`, reindexed by the surface chart and the `(alpha, beta)`
+  transposition and pulled back along the truncation.
+* `Tilt.tiltFamily_charge_eq_exp` -- the same equation read off a single class.
+
+## Implementation notes
+
+### One carrier
+
+`Tilt.tiltFamily` is canonical; it is the only Lean declaration of the tilt
+charge family.
+
+* The kernel-level form is `tiltFamily_eq_exp`, a theorem rather than a second
+  carrier. Nothing needed constructing; the equation follows from
   `stChargeFamily_eq` and the three `ChargeFamily` naturality lemmas.
-* **`tiltWallChargeFamily`, the transport-level spelling.** Never declared
-  either. It existed only in `design-final.lean` in the sketch, and the
-  implemented geometric transport is `ThreefoldWallTransport.wallChargeFamily`,
-  which pulls back the **untilted** `Threefold.chargeFamily`. That is a
-  different object, and `Tilt.exists_tilt_alignmentValue_ne_threefold` already
-  proves it with a computed witness rather than leaving it to a docstring.
+* The geometric transport `AlgebraicGeometry.Numerical.Threefold.wallChargeFamily`
+  pulls back the **untilted** `Threefold.chargeFamily`. That is a different
+  object, and `Tilt.exists_tilt_alignmentValue_ne_threefold` proves it with a
+  computed witness rather than leaving it to a docstring.
 
-## The two slopes
+### The two slopes
 
-`Threefold.nu` and `AlgebraicGeometry.Numerical.Stability.BMT.nu` both survive,
-and neither is redundant: the first is the four-coordinate numerical model, the
+`Threefold.nu` and `AlgebraicGeometry.Numerical.Threefold.nu` both survive, and
+neither is redundant: the first is the four-coordinate numerical model, the
 second its realization on a polarised numerical threefold, which is the
 separation `Numerical/Models/` versus `Numerical/Examples/` exists to keep. They
 are bridged, in the direction the ownership policy wants, by
-`ThreefoldWallTransport.nu_toNumClass`. No third slope is introduced here:
-`Tilt.nu_eq_tilt_slope` states the tilt family's charge slope in terms of the
-existing `Threefold.nu` rather than defining one.
+`AlgebraicGeometry.Numerical.Threefold.nu_toNumClass`. No third slope is
+introduced here: `Tilt.nu_eq_tilt_slope` states the tilt family's charge slope
+in terms of the existing `Threefold.nu` rather than defining one.
 
-This file adds no charge, no polynomial and no slope. It adds one equation.
+## References
+
+This file cites no literature. It builds on `Wall.Exp.chargeFamily`,
+`Wall.Tilt.tiltFamily` and `Wall.stChargeFamily_eq`.
+
+## Tags
+
+tilt stability, charge family, exponential charge, truncation degree
 -/
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall
@@ -55,15 +68,14 @@ namespace Tilt
 
 /-- **The tilt family is the exponential kernel's, at `m = 2`.**
 
-This is the kernel-level spelling the remediation called `Exp.tiltChargeFamily`,
-supplied as a comparison instead of a second carrier. The truncation degree is
-`m = 2` and the dimension is three: the index is the truncation degree, never
-the dimension, which is the whole point of `Exponential/Kernel.lean`'s index
-discussion and the reason `numerical-k-theory-e5` was parked.
+This is the kernel-level form of the tilt charge, supplied as a comparison
+instead of a second carrier. The truncation degree is `m = 2` and the dimension
+is three: the index is the truncation degree, never the dimension, which is the
+whole point of `Exponential/Kernel.lean`'s index discussion.
 
 The parameter map is `Exp.stChart` after the `(alpha, beta)` transposition, and
 the class map is the surface coordinate identification after the four-to-three
-drop. Both were already there; only their composition is new. -/
+drop. Both exist independently; only their composition is new. -/
 theorem tiltFamily_eq_exp :
     tiltFamily
       = ((Exp.chargeFamily 2).reindex (Exp.stChart ∘ _root_.Prod.swap)).pullback

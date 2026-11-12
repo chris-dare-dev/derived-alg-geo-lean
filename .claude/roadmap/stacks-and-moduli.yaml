@@ -351,7 +351,7 @@ items:
     kind: task
     parent: stacks-and-moduli-stk1
     title: "STK1.2: Being a stack is invariant under pseudonatural equivalence"
-    status: planned
+    status: done
     priority: must
     size: M
     summary: "Let F G : LocallyDiscrete Cᵒᵖ ⥤ᵖ Cat.{v', u'} and let α : F ⟶ G be a strong transformation all of whose components (α.app X).toFunctor are equivalences of categories. Then: descent data map functorially along α; restriction to descent data commutes with α up to a natural isomorphism; F is a prestack (a stack) for J if and only if G is."
@@ -832,7 +832,7 @@ items:
     kind: task
     parent: stacks-and-moduli-pj1
     title: "PJ1.1: Projective space ℙ(n; S) over a base scheme, its twisting sheaves, and base change of Proj"
-    status: planned
+    status: done
     priority: must
     size: M
     summary: "Projective space over a base scheme, its twisting sheaves, and base change of Proj. For a type n of homogeneous coordinates and a scheme S, define"
@@ -1067,7 +1067,7 @@ items:
     kind: task
     parent: stacks-and-moduli-stk4
     title: "STK4.7: Nagata and universally Japanese rings and schemes, and BLMNPS's essentially-finite-type DVR lemmas (11.15, 11.16, 11.19)"
-    status: planned
+    status: done
     priority: must
     size: L
     summary: "The commutative algebra and scheme theory behind BLMNPS §11.4 (Nagata valuative criteria), for rings and schemes. Stack-level statements are #1697's."

@@ -63,8 +63,8 @@ DECLARATION_OWNERS: dict[str, OwnerWitness] = {
         "9512f4eb76fceff99bfa01d62b407c6802d97b44c0978e757173f8c083baf928",
     ),
     "DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc": OwnerWitness(
-        69, "def schemeQuasicoherentCohomology (X : Scheme.{u}) :",
-        "cab1b1ba7cd9f40af4d175a3ec76d5a7adf020b8a230de15672b90fa0b2b1433",
+        121, "def schemeQuasicoherentCohomology (X : Scheme.{u}) :",
+        "8625a567e819ea4c5dda058b6693546fa9d038df9b2b0fbfe95f6d05a20fb650",
     ),
     "DerivedAlgGeo.AlgebraicGeometry.Modules.ExteriorPower": OwnerWitness(
         38, "noncomputable def exteriorPower (E : X.Modules) (n : ℕ) : X.Modules :=",

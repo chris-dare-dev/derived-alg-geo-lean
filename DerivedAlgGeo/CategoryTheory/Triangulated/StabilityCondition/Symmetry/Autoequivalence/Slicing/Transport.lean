@@ -10,13 +10,11 @@ import Mathlib.CategoryTheory.Shift.Adjunction
 /-!
 # Transporting slicings along a triangulated auto-equivalence
 
-Groundwork for §8's *other* half: the `Aut(D)` action. `G̃L⁺(2, ℝ)` acts by
-moving phases while fixing objects; an autoequivalence does the opposite.
+The slicing-level half of the `Aut(D)` action of Bridgeland's §8.
+`G̃L⁺(2, ℝ)` acts by moving phases while fixing objects; an autoequivalence
+does the opposite.
 
-The base slicing API has only `HNFiltration.ofIso`, which moves a filtration
-along an isomorphism of its *object*. So the three transport definitions here
-are built directly, and they are
-the substantial part:
+## Main definitions
 
 * `PostnikovTower.mapF` — push a tower through a triangulated functor. Works
   because `ComposableArrows C n` is a functor category, so the transported
@@ -29,10 +27,22 @@ the substantial part:
   `hn_exists` pushes a filtration of `Φ⁻¹ E` forward and lands it on `E` via
   the counit.
 
-The tower and HN operations are stated for `C ⥤ D`; `Slicing.mapEquiv` then
-specializes them to the endofunctors needed by the action.
+All three live in the namespace `CategoryTheory.Triangulated`.
 
-## Why there is no `MulAction` here
+## Main results
+
+* `Slicing.mapEquiv_P` — the phase-`φ` slice of `s.mapEquiv Φ` holds at `X`
+  exactly when `s.P φ` holds at `Φ⁻¹ X`, by definition.
+
+## Implementation notes
+
+The base slicing API has only `HNFiltration.ofIso`, which moves a filtration
+along an isomorphism of its *object*. So the three transport definitions here
+are built directly, and they are the substantial part. The tower and HN
+operations are stated for `C ⥤ D`; `Slicing.mapEquiv` then specializes them to
+the endofunctors needed by the action.
+
+### Why there is no `MulAction` here
 
 Unlike `GLTilde`, the acting object is **not** a group in Lean. `C ≌ C` under
 composition is associative only up to natural isomorphism, so it carries no
@@ -41,7 +51,10 @@ acts" is a statement about the induced action on isomorphism classes; a strict
 formalisation would need to quotient, or to work with a strictified group of
 autoequivalences. That is a design decision, not an oversight.
 
-## What the full stability-condition action still needs
+### From slicings to stability conditions
+
+The stability-condition action built on this transport is in
+`Autoequivalence/Stability/Transport.lean`. Beyond the slicing it needs:
 
 1. `K₀` functoriality — `K₀.map Φ`, via `K₀.lift` and an `IsTriangleAdditive`
    proof.
@@ -49,49 +62,48 @@ autoequivalences. That is a design decision, not an oversight.
    together with a `λ : Λ ≃+ Λ` satisfying `v ∘ K₀.map Φ = λ ∘ v`. For `v = id`
    this is forced; in general it is extra data, exactly as `Compatible` is for
    `GLTilde`.
-3. Local finiteness under `mapEquiv`. Note this is a *different* problem from
-   step 3c: the phase windows do not move at all here, so no uniform-continuity
-   argument is needed. What is needed instead is that strict finite length is
-   invariant under an equivalence of interval categories — and
+3. Local finiteness under `mapEquiv`. This is a *different* problem from
+   local finiteness under the `G̃L⁺(2, ℝ)` relabelling: the phase windows do
+   not move at all here, so no uniform-continuity argument is needed. What is
+   needed instead is that strict finite length is invariant under an
+   equivalence of interval categories — and
    `interval_thinFiniteLength_of_inclusion_strict` does not apply, since it
    compares two `intervalProp`s on the *same* object.
 
-## Why two `@[nolint unusedArguments]`s below, and one in
-`CategoryTheory/Triangulated/GrothendieckGroup/Functorial.lean`
+### Why two `@[nolint unusedArguments]`s below, and one in `GrothendieckGroup/Functorial.lean`
 
 The environment linter reports `[F.Additive]` unused by `PostnikovTower.mapF`
 and `[Φ.inverse.Additive]` unused by `Slicing.mapEquiv`. Both are true of the
 proof terms, and both hypotheses are kept anyway.
 
-Deleting them does not remove the finding — it **moves it one caller up**,
-measured 2026-08-05 by doing exactly that and re-running the linter:
+Deleting them does not remove the finding — it **moves it one caller up**:
 
 | deleted from | the linter then flags |
 |---|---|
 | `PostnikovTower.mapF` | `HNFiltration.mapF`, which passes it straight through |
 | `Slicing.mapEquiv` | `Slicing.mapEquiv_P`, whose *statement* carries it |
-| `isTriangleAdditive_of_isTriangulated` (retired, see below) | `K₀.map` |
 
-Six errors before, six after; the build stayed green throughout.
+`K₀.isTriangleAdditive_map` in `CategoryTheory/Triangulated/GrothendieckGroup/Functorial.lean`
+carries the same `@[nolint unusedArguments]` for the same stated reason.
 
-The third row's subject was retired in #487: the stability track's
-endofunctor-only `K₀.mapF` and the `isTriangleAdditive_of_isTriangulated`
-instance that fed it are gone, superseded by the generic `K₀.map` and
-`K₀.isTriangleAdditive_map`. The measurement above is left as recorded rather
-than transplanted — it was taken against the retired instance on 2026-08-05 and
-has not been re-run against its replacement. What carries over is only the
-uncontroversial part: `K₀.isTriangleAdditive_map` carries the same
-`@[nolint unusedArguments]` for the same stated reason.
-
-Following the chase to its end amputates the hypothesis from `K₀.map_of`, from
-`AutStabilityAction`, and finally from `TriEquiv.iAdd` — a structure field
-whose whole purpose is to make the six instances of a triangulated
-auto-equivalence travel together.
+Following the chase to its end amputates the hypothesis from `K₀.map_of` and
+finally from `TriEquiv.iAdd` — a structure field whose whole purpose is to make
+the six instances of a triangulated auto-equivalence travel together.
 
 So the hypothesis set is the interface, not an artefact of how the fields were
 discharged: "triangulated functor" here means `Additive` + `CommShift ℤ` +
 `IsTriangulated`, every consumer supplies all three, and a later reproof that
 does use additivity must not be a breaking signature change.
+
+## References
+
+* Bridgeland, *Stability conditions on triangulated categories*, Ann. of Math.
+  (2007), §8.
+
+## Tags
+
+stability condition, slicing, autoequivalence, Postnikov tower,
+Harder--Narasimhan filtration
 -/
 
 open CategoryTheory.Triangulated

@@ -13,16 +13,54 @@ import Mathlib.Tactic
 An algebraic stability condition has a finite-length heart with finitely many
 simple objects.  The categorical content needed here is recorded operationally:
 the slicing has Jordan--Hölder filtrations and its stable objects form finitely
-many shift-orbits.  This avoids identifying the repository's free lattice of
-simple charges with a categorical Grothendieck group before the missing
-Jordan--Hölder bridge is constructed (GitHub issue #1203).
+many shift-orbits.  With the properness input `HomFiniteBounded`, such a
+stability condition has a global mass--Hom bound; this is the algebraic base
+case in Halpern--Leistner--Robotis, arXiv:2501.00710v2, Example 2.9.
+
+## Main definitions
+
+* `WeakStabilityCondition.FiniteLength.tiltedImaginaryPart` — the real
+  functional `z ↦ z.im - δ * z.re` that tilts the boundary ray of the
+  semi-closed upper half plane into an open half plane.
+* `StabilityCondition.WithClassMap.HasFiniteLengthHeart` — every object of the
+  canonical heart is Artinian and Noetherian, and finitely many simple objects
+  exhaust its simples up to isomorphism.
+* `StabilityCondition.WithClassMap.HasFiniteStableOrbits` — same-phase
+  Jordan--Hölder filtrations exist and stable objects are shifts of finitely
+  many representatives.
+* `StabilityCondition.WithClassMap.IsAlgebraic` — the conjunction of the two.
+* `StabilityCondition.WithClassMap.IsAlgebraic.totalShiftedHomRank` — the total
+  dimension of all shifted Hom-spaces from one object to another.
+
+## Main results
+
+* `WeakStabilityCondition.FiniteLength.exists_common_positive_functional`,
+  `WeakStabilityCondition.FiniteLength.exists_common_unit_direction` — finitely
+  many charges in the semi-closed upper half plane admit one strictly positive
+  real linear functional with a uniform positive lower bound.
+* `StabilityCondition.WithClassMap.IsAlgebraic.hasJordanHolder` — the explicit
+  Jordan--Hölder input of an algebraic stability condition.
+* `StabilityCondition.WithClassMap.IsAlgebraic.exists_classicalGenerator` — the
+  finite stable representatives classically generate the category.
+* `StabilityCondition.WithClassMap.IsAlgebraic.hasGlobalMassHomBound` — an
+  algebraic stability condition on a proper category has a mass--Hom bound.
+
+## Implementation notes
+
+### Algebraicity is recorded operationally
+
+The Jordan--Hölder bridge from a finite-length heart to the slicing is not
+derived here; `HasFiniteStableOrbits` states it as an explicit hypothesis.
+This avoids identifying the repository's free lattice of simple charges with a
+categorical Grothendieck group before that bridge is constructed.
+
+### The bound
 
 With the properness input `HomFiniteBounded`, a fixed source has only finitely
 many nonzero shifted Hom-spaces into each simple representative.  Summing those
 dimensions and dividing by the finitely many positive simple masses gives a
 stable-target bound; the stable-object reduction then gives the global
-mass--Hom bound.  This is the algebraic base case in
-Halpern--Leistner--Robotis, arXiv:2501.00710v2, Example 2.9.
+mass--Hom bound.
 
 This proof deliberately does not use the tempting estimate
 `dim Hom(Sⱼ⟦m⟧, F) ≤ length(F)`: finite length controls morphisms in the
@@ -37,11 +75,21 @@ positive lower bound.  Its functional `(x,y) ↦ y - δx` is the unnormalised
 form of taking real part after rotation; normalising does not affect strict
 positivity.
 
+### What is not here
+
 No geometry is imported, and no stability condition is manufactured from the
 finite-lattice charge model.  In particular, the concrete
 `Kᵇ(FGModuleCat k)` properness witness does not by itself supply a heart,
-slicing, or stability condition.  The nondegenerate concrete stability
-witness is tracked separately by GitHub issue #1206.
+slicing, or stability condition.
+
+## References
+
+* Halpern--Leistner, Robotis, arXiv:2501.00710v2, Example 2.9.
+
+## Tags
+
+stability condition, algebraic stability condition, finite-length heart,
+Jordan--Hölder filtration, mass--Hom bound
 -/
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
@@ -183,10 +231,10 @@ def HasFiniteLengthHeart (σ : StabilityCondition.WithClassMap C v₀) : Prop :=
     ∀ T : σ.slicing.toTStructure.heart.FullSubcategory, Simple T →
       ∃ i, Nonempty (T ≅ S i)
 
-/-- The currently explicit categorical bridge from a finite-length heart to
-the slicing: same-phase Jordan--Hölder filtrations exist, and stable objects
-are shifts of finitely many representatives.  Deriving this bridge from
-`HasFiniteLengthHeart` is the missing Jordan--Hölder lane (#1203). -/
+/-- The explicit categorical bridge from a finite-length heart to the
+slicing: same-phase Jordan--Hölder filtrations exist, and stable objects are
+shifts of finitely many representatives.  This bridge is a hypothesis here; it
+is not derived from `HasFiniteLengthHeart`. -/
 def HasFiniteStableOrbits (σ : StabilityCondition.WithClassMap C v₀) : Prop :=
   ∃ (n : ℕ) (S : Fin n → C),
     0 < n ∧ σ.slicing.HasJordanHolderFiltrations ∧

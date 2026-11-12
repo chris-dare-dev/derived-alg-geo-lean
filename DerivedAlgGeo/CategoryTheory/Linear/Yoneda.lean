@@ -12,14 +12,30 @@ objects are unique up to a canonical isomorphism, that isomorphism is the one
 the presheaf comparison names, and two morphisms agreeing after the embedding
 are equal.
 
+## Main definitions
+
+* `CategoryTheory.SerreFunctor.isoOfLinearYonedaIso` — the isomorphism of
+  representing objects induced by a natural isomorphism of their linear Yoneda
+  presheaves.
+
+## Main results
+
+* `CategoryTheory.SerreFunctor.map_isoOfLinearYonedaIso` — that isomorphism maps
+  back to the given presheaf isomorphism.
+* `CategoryTheory.SerreFunctor.hom_ext_of_linearYoneda` — two morphisms agreeing
+  after the linear Yoneda embedding are equal.
+
+## Implementation notes
+
+### No Serre functor
+
 None of the three mentions a Serre functor, a shift, or a triangulation; each
 is `Functor.preimageIso`, `Functor.map_preimage` or `Functor.map_injective`
-against Mathlib's `full_linearYoneda` and `faithful_linearYoneda`. They were
-proved that way from the start, and the uniqueness of a Serre functor is only
-their first consumer -- a downstream lane needs the representability step on a
-functor that is not a Serre functor at all.
+against Mathlib's `full_linearYoneda` and `faithful_linearYoneda`. The
+uniqueness of a Serre functor is one consumer; the representability step is
+also needed for functors that are not Serre functors at all.
 
-## Trap: which variable a Yoneda argument runs in
+### Trap: which variable a Yoneda argument runs in
 
 `Hom(A,B)` is contravariant in `A` and covariant in `B`, and the dual flips
 both, so `Dual (A ⟶ B)` is **covariant in `A`** and **contravariant in `B`**.
@@ -29,14 +45,20 @@ not on `linearCoyoneda`. In this repository `(linearCoyoneda k C).obj (op X)`
 is the *covariant* `Hom(X, −)`, so the same argument run there typechecks
 against the opposite functor and proves nothing about the original one.
 
-## Namespace
+### Namespace
 
-The declarations keep the `CategoryTheory.SerreFunctor` namespace they were
-published under. Their path and their namespace disagree on purpose: the
-repository's cutover policy moves paths and preserves fully qualified
-declaration names, because a namespace cutover would invalidate the immutable
-review payloads `exe/RestateHistoricalNames.lean` exists to protect. See
-`docs/architecture/cutover-ledger.md`, finding 05.
+The declarations live in the `CategoryTheory.SerreFunctor` namespace. Their
+path and their namespace disagree on purpose: fully qualified declaration
+names are kept stable for the external references that use them.
+
+## References
+
+The file builds on Mathlib's `CategoryTheory.linearYoneda`,
+`CategoryTheory.full_linearYoneda` and `CategoryTheory.faithful_linearYoneda`.
+
+## Tags
+
+linear Yoneda embedding, representable functor, fully faithful, Serre functor
 -/
 
 universe w v u

@@ -11,10 +11,10 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor.Transport
 /-!
 # Mutation, curve chains, Ext computations, and extension for the Enriques papers
 
-This is the geometric adapter for the next layer of
-arXiv:1912.04332v2 and arXiv:2104.13610v2.
+This is the geometric adapter for the mutation, curve-chain, Ext and extension
+arguments of arXiv:1912.04332v2 (Paper I) and arXiv:2104.13610v2 (Paper II).
 
-* proposition-valued admissibility now produces an actual residual projection;
+* proposition-valued admissibility produces an actual residual projection;
 * the projection counit gives the paper's mutation triangle;
 * an `A_n` chain of effective Cartier divisors records the `(-2)`-curve
   geometry of Paper II, Proposition 1.4;
@@ -27,19 +27,63 @@ arXiv:1912.04332v2 and arXiv:2104.13610v2.
 * the closing aliases specialize the generic Fourier--Mukai extension result
   to the actual residual and ambient categories used here.
 
+## Main definitions
+
+* `PaperResidualAdmissibilityData` — supplied right admissibility of the residual
+  component; `PaperResidualAdmissibilityData.projectionData` chooses the projection.
+* `PaperBlockData.mutationTriangle` — the paper's objectwise mutation triangle, built
+  from the projection counit.
+* `MinusTwoCurveChain` — an `A_n` chain of effective Cartier divisors with the
+  intersection matrix of `(-2)`-curves, and its step triangles
+  `MinusTwoCurveChain.lineBundleStepTriangle`.
+* `PaperCurveChainData` — the curve chains behind a block decomposition, with
+  `PaperCurveChainData.projectionTriangles` the projection-chain triangle data they
+  construct.
+* `PaperIProjectionExtData`, `PaperIIProjectionExtData` — the Ext computations of
+  Paper I and Paper II for the projected objects.
+* `PaperResidualKernelEquivalence`, `PaperExceptionalBlockExtensionData` — the generic
+  Fourier--Mukai extension notions specialized to two Enriques surfaces.
+
+## Main results
+
+* `MinusTwoCurveChain.lineBundleStepTriangle_distinguished` and
+  `PaperCurveChainData.projectionTriangle_distinguished` — the divisor-chain step
+  triangles, and their transports to the block representatives, are distinguished.
+* `PaperCurveChainData.projectionIso` — Paper II, Remark 2.3(ii): every member of a
+  block has the same residual projection as its first member.
+* `PaperIIProjectionExtData.spherical_of_singleton` and
+  `PaperIIProjectionExtData.pseudoprojective_of_longer` — the Ext and Serre
+  computations make singleton projections spherical and longer-block projections
+  pseudoprojective.
+* `PaperIProjectionExtData.toProjectionClassificationData` and
+  `PaperIIProjectionExtData.toProjectionClassificationData` — the classification
+  packages of the two papers, assembled from the Ext computations.
+
+## Implementation notes
+
 The remaining geometric gaps stay visible. The current Cartier-divisor API
 has no predicate saying that an effective divisor is an irreducible curve,
-and `PaperCurveChainData` still supplies residual orthogonality of each curve
-quotient. It no longer supplies the triangles themselves. Likewise,
-the abstract dg cone and its pointwise transform triangle are now functorial,
+and `PaperCurveChainData` supplies residual orthogonality of each curve
+quotient, while the triangles themselves are constructed rather than supplied.
+The abstract dg cone and its pointwise transform triangle are functorial,
 with `DGFunctor.HomogeneousNatTrans.ConeData` as the construction root and
 `FourierMukai.CounitKernelConeData` as the adjunction-counit specialization.
-Constructing the paper's extended Fourier--Mukai kernel still waits on the
+Constructing the paper's extended Fourier--Mukai kernel requires the
 geometric `H⁰` model, the paper's ordinary kernel morphism with its exact
-counit-transform equation, an enhancement, and exactness of kernel evaluation
-(#853--#855); it is not silently identified with the counit specialization.
-Its categorical consequences continue to use the existing kernel/adjunction
-roots immediately.
+counit-transform equation, an enhancement, and exactness of kernel
+evaluation, none of which is constructed here; it is not silently identified
+with the counit specialization. Its categorical consequences use the existing
+kernel/adjunction roots directly.
+
+## References
+
+* arXiv:1912.04332v2 (Paper I).
+* arXiv:2104.13610v2 (Paper II), Proposition 1.4, Lemma 1.9 and Remark 2.3(ii).
+
+## Tags
+
+Enriques surface, exceptional block, mutation, `(-2)`-curve, spherical object,
+pseudoprojective object, Fourier--Mukai
 -/
 
 universe u t
@@ -365,8 +409,8 @@ noncomputable def projectionTriangles :
 /-- **Paper II, Remark 2.3(ii): every member of a block has the same residual
 projection as its first member.**
 
-Unlike the earlier supplied statement seam, this is proved from the
-successive divisor triangles and their residual-orthogonality. -/
+This is proved, not supplied: it follows from the successive divisor
+triangles and their residual-orthogonality. -/
 noncomputable def projectionIso
     (Q : T.PaperResidualProjectionData exceptional semiorthogonal)
     (i : I) (j : Fin (B.blocks.length i)) :
@@ -528,7 +572,7 @@ variable {W W' : Type u} [Category W] [Category W']
 
 /-- A Fourier--Mukai-type equivalence between the residual categories of two
 Enriques block decompositions.  The block residuals are identified with the
-previously constructed neutral residual components by `PaperBlockData.residual_eq`. -/
+neutral residual components `residualComponent` by `PaperBlockData.residual_eq`. -/
 abbrev PaperResidualKernelEquivalence
     (corr : Correspondence (DerivedCat Y₁) (DerivedCat Y₂) W) :=
   ResidualKernelEquivalence B₁.blocks B₂.blocks corr

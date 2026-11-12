@@ -56,7 +56,7 @@ variable {P₁ : T₁.PaperCategoryData exceptional₁ semiorthogonal₁}
   {P₂ : T₂.PaperCategoryData exceptional₂ semiorthogonal₂}
 
 /-- A Serre-compatible equivalence between the two residual categories.
-The compatibility remains explicit until #896--#898 derive it from an exact
+The compatibility is supplied explicitly; it is not derived here from an exact
 linear equivalence. -/
 abbrev PaperResidualSerreEquivalence
     (P₁ : T₁.PaperCategoryData exceptional₁ semiorthogonal₁)

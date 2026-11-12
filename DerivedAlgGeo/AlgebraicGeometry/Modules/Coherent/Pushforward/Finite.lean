@@ -17,8 +17,8 @@ For a finite morphism `f : X ⟶ Y` into a locally Noetherian scheme, `f_*` send
 sheaves to coherent sheaves and is exact on them.  This file proves both and packages the
 result as the functor `Coh.pushforward f : Coh X ⥤ Coh Y`, the `f_*` on coherent sheaves that
 the derived direct image on `Dᵇ(Coh)` is built from.  A closed immersion is finite (Mathlib's
-instance in `Mathlib/AlgebraicGeometry/Morphisms/Finite.lean`), so `#572` step 2, coherence of
-`ι_* F` along a closed immersion, is the theorem `isCoherent_pushforward` here.
+instance in `Mathlib/AlgebraicGeometry/Morphisms/Finite.lean`), so coherence of `ι_* F` along a
+closed immersion is the theorem `isCoherent_pushforward` here.
 
 ## Main definitions
 
@@ -33,10 +33,11 @@ instance in `Mathlib/AlgebraicGeometry/Morphisms/Finite.lean`), so `#572` step 2
 * `Coh.pushforward_preservesFiniteLimits`, `Coh.pushforward_preservesEpimorphisms`, and
   `Coh.pushforward_preservesFiniteColimits`: the functor is exact.
 
-## The three inputs to coherence, and what each was missing
+## Implementation notes
 
-Every ingredient existed before the closed-immersion version of this argument; none of them
-fitted the next one without a bridge, and the same three bridges serve the finite case.
+### The three inputs to coherence
+
+Each ingredient needs a bridge to the next:
 
 * `isCoherent_pushforward_of_finite` (`Pushforward/Affine.lean`) is the mathematics, and it is
   stated about `Spec.map φ : Spec S ⟶ Spec R` — a map **of spectra**.  An affine open cover
@@ -50,8 +51,7 @@ The affine case is a factorisation, not an induction: `Scheme.isoSpec_inv_natura
 composite is the composite of pushforwards **by `rfl`**, so the affine case is three steps with no
 glue: transport to `Spec Γ(X, ⊤)` along an isomorphism, apply the affine theorem, transport back.
 `isAffine_of_isAffineHom` supplies affineness of `X` and `Scheme.Hom.finite_appTop` finiteness of
-the coordinate-ring map, the two facts a closed immersion used to supply as affineness and
-surjectivity.
+the coordinate-ring map; for a closed immersion these are affineness and surjectivity.
 
 The globalisation is by opens, not by an `AffineOpenCover`:
 `Modules.isCoherent_iff_restrict_affineOpenCover` is the obvious criterion and is *not* what this
@@ -66,7 +66,7 @@ as the covering hypothesis.
 `_of_finite` (a ring map, `RingHom.Finite`) and `IsFinite f` (a morphism of schemes) both occur
 in this directory and follow Mathlib's naming of the two notions.
 
-## Exactness
+### Exactness
 
 Exactness is where finite morphisms differ from closed immersions.  Pushforward along a closed
 immersion is exact on every module sheaf; along a finite morphism it is exact only on
@@ -82,6 +82,10 @@ through `Coh.ι`; `preservesHomology_of_preservesEpis_and_kernels` then gives fi
   finite morphism is coherent) and Exercise II.5.17(b), (e).
 * arXiv:2607.28411v1, Definition 3.1 and Proposition 3.3, which use `f_*` along finite
   morphisms.
+
+## Tags
+
+coherent sheaf, pushforward, finite morphism, closed immersion, exact functor
 -/
 
 universe u
@@ -129,7 +133,7 @@ theorem isCoherent_restrict_chart [IsLocallyNoetherian Y] [IsFinite f]
     (AlgebraicGeometry.pushforwardRestrictIso f U M).symm hpush
 
 /-- **Coherence is preserved by pushforward along a finite morphism** into a locally Noetherian
-scheme; for a closed immersion this is `#572` step 2.  The affine opens cover `Y`, and finite
+scheme, in particular along a closed immersion.  The affine opens cover `Y`, and finite
 presentation descends along a covering family; each chart is `isCoherent_restrict_chart`. -/
 theorem isCoherent_pushforward [IsLocallyNoetherian Y] [IsFinite f]
     (M : X.Modules) (hM : Modules.IsCoherent X M) :

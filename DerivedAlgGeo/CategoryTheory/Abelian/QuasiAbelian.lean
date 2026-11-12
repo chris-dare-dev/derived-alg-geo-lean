@@ -26,39 +26,85 @@ Four layers, in order:
   object properties they generate, each paired with its non-strict counterpart;
 * transfer of all of it along a fully faithful functor preserving monos.
 
-## Placement
+## Main definitions
+
+* `CategoryTheory.Triangulated.IsStrict` — the coimage-to-image comparison of a
+  morphism is an isomorphism; `IsStrictMono` and `IsStrictEpi` add `Mono`,
+  respectively `Epi`.
+* `CategoryTheory.Triangulated.QuasiAbelian` — strict epimorphisms are stable
+  under pullback and strict monomorphisms under pushout.
+* `CategoryTheory.Triangulated.StrictShortExact` — a short exact complex whose
+  two maps are strict.
+* `CategoryTheory.Triangulated.IsStrictSubobject`, `StrictSubobject` — the
+  subobjects whose arrow is a strict monomorphism.
+* `CategoryTheory.Triangulated.isStrictArtinianObject`,
+  `isStrictNoetherianObject` — the chain conditions on strict subobjects.
+* `CategoryTheory.Triangulated.IsStrictFiniteLengthObject`,
+  `IsFiniteLengthObject` — both chain conditions on strict, respectively all,
+  subobjects.
+* `CategoryTheory.Triangulated.subobjectImageOfFullFaithful`,
+  `strictSubobjectImageOfFullFaithful` — the image of a subobject, respectively
+  a strict subobject, under a fully faithful functor.
+
+## Main results
+
+* `isStrictEpi_of_isColimitCokernelCofork`, `isStrictMono_of_isLimitKernelFork`
+  — a cokernel of its own kernel is a strict epimorphism, and a kernel of its
+  own cokernel is a strict monomorphism.
+* `IsStrictEpi.strongEpi`, `IsStrictMono.strongMono` — strict epimorphisms and
+  monomorphisms are strong; `IsStrictEpi.regularEpi` and
+  `IsStrictMono.regularMono` make them regular.
+* `isStrict_of_abelian`, `strictShortExact_of_shortExact` — in an abelian
+  category every morphism is strict and every short exact sequence is strictly
+  short exact.
+* `isStrictArtinianObject_of_isArtinianObject`,
+  `isArtinianObject_of_isStrictArtinianObject` and their Noetherian
+  counterparts — comparison of the strict and ordinary chain conditions, the
+  second direction in an abelian category.
+* `isStrictArtinianObject_of_fullFaithful_map_strictMono`,
+  `isStrictNoetherianObject_of_fullFaithful_map_strictMono` — an object whose
+  image under a fully faithful functor mapping strict monomorphisms to strict
+  monomorphisms is Artinian (Noetherian) is strict-Artinian
+  (strict-Noetherian).
+* `isStrictFiniteLengthObject_iff_isFiniteLengthObject` — in an abelian
+  category the two finite-length conditions agree.
+
+## Implementation notes
+
+### Placement
 
 Generic category theory: this file imports only Mathlib's abelian, short-complex,
 pullback, and subobject material, mentions no stability condition, and uses
 nothing triangulated. It lives under `CategoryTheory/Abelian/`, beside Mathlib's
 `Abelian/NonPreadditive.lean` precedent for a category with exactness conditions
-weaker than abelian. It sat under `StabilityCondition/Foundation/` until #488
-because its first consumer was Bridgeland's thin-interval argument
-(`Foundation/Slicing/IntervalStrictness.lean` is still the caller), then under
-`Triangulated/` until 2026-09-02, when the review of the Mathlib-mesh restructure
-applied the rule that a file belongs under `Triangulated/` only if it uses
-something triangulated. The namespace stays `CategoryTheory.Triangulated`:
-declaration names are unchanged across moves so that the immutable review
-payloads the `exe/RestateHistoricalNames.lean` bridge protects keep resolving.
+weaker than abelian. It is consumed by Bridgeland's thin-interval argument in
+`Foundation/Slicing/IntervalStrictness.lean`. The declarations live in the
+namespace `CategoryTheory.Triangulated`, which differs from the path, so that
+their fully qualified names stay stable for the external references that use
+them.
 
-## What this file asserts, and where
+### What this file asserts
 
-The `QuasiAbelian` class below states the two stability axioms — strict
+The `QuasiAbelian` class states the two stability axioms — strict
 epimorphisms stable under pullback, strict monomorphisms stable under pushout.
 It is inhabited: `Slicing.intervalCat_quasiAbelian`
 (`Foundation/Slicing/IntervalStrictness.lean`) shows a thin owner slicing
-interval is quasi-abelian, and it is the only instance at the time of writing.
+interval is quasi-abelian.
 
 Most of the file is prior to that class: strictness of individual morphisms and
 the finiteness conditions built on it, none of which needs the axioms.
 
-Two earlier versions of this section were wrong, in opposite directions. The
-first said `QuasiAbelian` "appears in no declaration in this file", which the
-class below contradicts. Its replacement said no category is shown to be
-quasi-abelian, which `intervalCat_quasiAbelian` contradicts — the search behind
-that claim matched one line at a time, and the instance carries its type on the
-next line. Neither claim should have been made without a search that could see
-a multi-line signature.
+## References
+
+The file builds on Mathlib's `CategoryTheory.Abelian.coimageImageComparison`,
+`CategoryTheory.Subobject`, `CategoryTheory.IsArtinianObject`,
+`CategoryTheory.IsNoetherianObject`, `CategoryTheory.NormalMono`,
+`CategoryTheory.RegularEpi` and `CategoryTheory.ShortComplex.ShortExact`.
+
+## Tags
+
+strict morphism, quasi-abelian category, strict subobject, Artinian object,
+Noetherian object, finite length
 -/
 
 noncomputable section

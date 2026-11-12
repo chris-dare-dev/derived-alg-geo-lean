@@ -28,7 +28,20 @@ semistability and Harder--Narasimhan theory it determines. The subject needs an
 abelian category and nothing more: no shift, no distinguished triangle, no
 t-structure, no heart, and no scheme.
 
-## The four owners
+## Main definitions
+
+None; this module re-exports its children. The central ones are
+`CategoryTheory.ClassDatum` and `CategoryTheory.IsPositive` in `Charge.lean`, and
+`CategoryTheory.Triangulated.StabilityFunctionOn` and
+`CategoryTheory.Triangulated.WeakStabilityFunctionOn` in `Basic.lean`.
+
+## Main results
+
+None; this module re-exports its children.
+
+## Implementation notes
+
+### The four owners
 
 * **Definition owner** -- this subtree. `Basic.lean` defines `StabilityFunctionOn`
   and `WeakStabilityFunctionOn` over a `ClassDatum`; `HarderNarasimhan.lean` and
@@ -45,20 +58,28 @@ t-structure, no heart, and no scheme.
 * **Comparison owner** -- `AlgebraicGeometry/Stability/Comparison.lean`, for the
   geometric theories; the weak/strong comparison is internal to this subtree.
 
-## Weak is a child, and the dependency still runs upward
+### Weak is a child, and the dependency still runs upward
 
 `Weak/` holds the variant in which the charge may vanish. As with
 `MetricSpace/Pseudo/` in Mathlib, the directory is named for the canonical
 concept and the weakened one is its adjective-named child, while the import
 direction is the reverse: `Slope.lean` imports `Weak/Slope.lean`. That nesting
-is not a defect and MO1.08 did not reverse it.
+is not a defect.
 
-## Placement
+### Namespace
 
-This subtree was `Triangulated/StabilityCondition/Weak/Foundation/StabilityFunction/`
-until MO1.08 (#1319), where an independently abelian subject was owned by the
-triangulated theory it is a foundation for. No declaration was renamed by the
-move: fully qualified names stay in `CategoryTheory.Triangulated`, which reads
-oddly here and is accepted rather than repaired, per decision 1 of the MO1 owner
-map in `docs/architecture/cutover-ledger.md`.
+The subject is abelian and imports nothing triangulated, but the fully
+qualified names of the stability-function declarations lie in
+`CategoryTheory.Triangulated`. This reads oddly here and is accepted, so that
+those names stay stable for the external references that use them.
+
+## References
+
+The subtree builds on Mathlib's `CategoryTheory.Abelian` and
+`CategoryTheory.Subobject`; its Grothendieck group is the repository's `K₀Ab`.
+
+## Tags
+
+stability function, weak stability function, abelian category, central charge,
+Harder--Narasimhan filtration
 -/

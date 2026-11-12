@@ -11,22 +11,49 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineGeometricCorePs
 /-!
 # A supported non-flat affine derived pullback
 
-This file supplies the concrete example required by SF8.5 item 9.  The ring
-map `ℤ → ZMod 2` is a non-isomorphism and is not flat, while the existing
+This file supplies a concrete non-flat example of the affine derived pullback.
+The ring map `ℤ → ZMod 2` is a non-isomorphism and is not flat, while the
 geometric affine bounded-above-projective core pseudofunctor constructs its
 pullback without a flatness hypothesis.
 
+## Main definitions
+
+* `AlgebraicGeometry.DerivedCategory.Dqc.zmodTwoRing`, `zmodTwoRingMap` and
+  `zmodTwoSchemeMap` — the ring `ZMod 2`, the ring map `ℤ → ZMod 2`, and the
+  corresponding morphism `Spec (ZMod 2) ⟶ Spec ℤ`.
+* `AlgebraicGeometry.DerivedCategory.Dqc.zmodTwoAffinePullback` — the supported
+  affine derived pullback along that morphism.
+
+## Main results
+
+* `AlgebraicGeometry.DerivedCategory.Dqc.zmodTwoRingMap_not_flat` and
+  `zmodTwoSchemeMap_not_flat` — the ring map and the scheme morphism are not flat.
+* `AlgebraicGeometry.DerivedCategory.Dqc.zmodTwoRingMap_not_iso` — the ring map is
+  not an isomorphism.
+
+## Implementation notes
+
 This is deliberately an example, not an existence theorem for arbitrary
-scheme-module resolutions.  It consumes the supported affine
-K-projective-derived lane already constructed in
-`AffineGeometricCorePseudofunctor.lean`; it does not identify that lane with
-the full relative-perfect locus or prove the general-scheme preservation
-theorems still listed in #554.
+scheme-module resolutions.  It consumes the supported affine K-projective
+derived construction in `AffineGeometricCorePseudofunctor.lean`; it does not
+identify that construction with the full relative-perfect locus, and it does not
+construct derived pullback or prove its preservation theorems on general
+schemes.
 
 `AffineNonflatDerivedObject.lean` separately computes the degree-minus-one
 effect of this particular map on an explicit two-term free representative.
-That calculation remains in the same affine bounded-projective lane and does
+That calculation stays in the same affine bounded-projective setting and does
 not enlarge this example into a scheme-level assertion.
+
+## References
+
+Mathlib's `AlgebraicGeometry.Flat.SpecMap_iff` and
+`Module.isTorsionFree_iff_smul_eq_zero`, and the repository's
+`affineGeometricBoundedAboveProjectiveCorePullback`.
+
+## Tags
+
+flatness, closed immersion, affine scheme, derived pullback, example
 -/
 
 namespace AlgebraicGeometry.DerivedCategory.Dqc

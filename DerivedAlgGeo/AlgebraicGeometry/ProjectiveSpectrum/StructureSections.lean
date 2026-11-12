@@ -12,7 +12,25 @@ graded ring becomes a global function. This file computes that function: **it is
 At every point its value is `a / 1` in the homogeneous localization there, which is
 `HomogeneousLocalization.fromZeroRingHom`.
 
-## Why it is not immediate
+## Main definitions
+
+This file introduces no new definitions; it computes Mathlib's `Proj.toSpecZero` on global
+sections.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.toSpecZero_appTop_eq`: the ring map `𝒜 0 → Γ(Proj 𝒜, ⊤)` induced by the
+  structure morphism is `fromZeroRingHom` followed by `awayToSection` at `f = 1`.
+* `AlgebraicGeometry.Proj.toSpecZero_transport_eq`: the three transports collapse to one
+  restriction.
+* `AlgebraicGeometry.Proj.openToLocalization_presheaf_map`: evaluating a section at a point
+  commutes with restriction.
+* `AlgebraicGeometry.Proj.openToLocalization_toSpecZero_appTop`: a degree-zero element becomes the
+  constant function with value `a / 1`.
+
+## Implementation notes
+
+### Why it is not immediate
 
 `toSpecZero` is not defined pointwise. It is built from `basicOpenToSpec 𝒜 1` through three
 transports — `Scheme.topIso`, `Scheme.isoOfEq` along `basicOpen 𝒜 1 = ⊤`, and
@@ -30,16 +48,25 @@ against `Spec (𝒜 0)` rather than against sections. So the computation has thr
   definitional: `openToLocalization` is literally `s.1 ⟨x, hx⟩`, presheaf restriction is
   restriction of the function, and `awayToSection` was pointwise all along.
 
-## What it is for
+### What it is for
 
 The base-field action on cohomology (`varietyScalarAction`) is multiplication by the global
 function attached to a scalar, and it acts on the sections of an associated sheaf *pointwise* on
 fibers. So identifying that action with scalar multiplication on the graded localizations comes
-down to exactly this lemma. It is the bridge #666 needs between the `k`-action the Čech lane can
-compute with and the one `module_finite_linearCoherentH_of_cech` consumes.
+down to exactly this lemma. It is the bridge between the `k`-action the Čech computation uses and
+the one `module_finite_linearCoherentH_of_cech` consumes.
 
 `Fintype ι` and the polynomial grading play no part: this is a statement about an arbitrary
 `ℕ`-graded ring.
+
+## References
+
+Mathlib's `AlgebraicGeometry.Proj.toSpecZero`, `AlgebraicGeometry.Proj.basicOpenToSpec_app_top`
+and `HomogeneousLocalization.fromZeroRingHom`.
+
+## Tags
+
+projective spectrum, structure sheaf, global sections, degree-zero element
 -/
 
 universe u

@@ -26,15 +26,55 @@ vertices, and the semistable-descent/maximal-phase algebra needed for the
 ambient boundary theorem are proved separately below; none is hidden inside
 the path representation.
 
-The planar carrier itself is not here. `ComplexPolygonalPath.length`, the
-cross and unit-ray functionals and the supporting-hyperplane lemma say nothing
-about objects or filtrations, and MO1.13 (#1324) moved them to their neutral
-owner `Analysis/Convex/ComplexPolygonalPath/Basic.lean`, which this file
-imports. What remains here is the Harder--Narasimhan reading of that carrier.
-
 The support-completeness theorem for every positive-angle direction is stated
 explicitly and avoids identifying the whole ambient polygon with the closed HN
 vertex hull, which is false in general.
+
+## Main definitions
+
+* `CategoryTheory.Triangulated.StabilityFunction.hnPolygon` — the convex hull
+  of the charges of all subobjects of an object.
+* `AbelianHNFiltration.polygonVertex`, `AbelianHNFiltration.polygonEdge`,
+  `AbelianHNFiltration.polygonLength` — the vertices, edges and length of the
+  distinguished decreasing-phase boundary path of a chosen HN filtration.
+* `AbelianHNFiltration.mass` — the sum of the norms of the factor charges.
+* `AbelianHNFiltration.quotientHNFiltration` — the tail of an HN filtration
+  after the `k`-th vertex, as a filtration of the quotient by that vertex.
+
+## Main results
+
+* `StabilityFunction.hnPolygon_mono` — a monomorphism includes HN polygons.
+* `AbelianHNFiltration.polygonVertex_succ_sub` — consecutive edges are the
+  charges of the semistable factors; `polygonLength_eq_mass` follows.
+* `AbelianHNFiltration.semistable_le_chain_of_phase_gt`,
+  `AbelianHNFiltration.subobject_phase_le_first` — semistable descent and the
+  maximal-phase bound.
+* `AbelianHNFiltration.hnPolygon_le_of_polygonVertex_isMax` — every
+  positive-angle support functional reaches its ambient HN-polygon maximum on
+  the distinguished HN path.
+* `AbelianHNFiltration.polygonVertex_exists_strict_support_hnPolygon` — every
+  interior HN path vertex is an exposed point of the ambient HN polygon.
+* `AbelianHNFiltration.norm_charge_le_mass` — the norm of the total charge is
+  at most the HN mass.
+
+## Implementation notes
+
+The planar carrier itself is not here. `ComplexPolygonalPath.length`, the
+cross and unit-ray functionals and the supporting-hyperplane lemma say nothing
+about objects or filtrations, so they live at their neutral owner
+`Analysis/Convex/ComplexPolygonalPath/Basic.lean`, which this file imports.
+This file is the Harder--Narasimhan reading of that carrier.
+
+## References
+
+The file builds on `ComplexPolygonalPath.length`,
+`ComplexPolygonalPath.exists_strict_support_at_interior` and Mathlib's
+`convexHull`.
+
+## Tags
+
+Harder--Narasimhan polygon, stability function, mass, convex hull, support
+functional
 -/
 
 open CategoryTheory.Triangulated

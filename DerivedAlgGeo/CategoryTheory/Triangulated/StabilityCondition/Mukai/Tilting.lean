@@ -11,51 +11,102 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mukai.Ambien
 # The Mukai exponential charge on an HN-tilted heart
 
 `Mukai.Slope` reads the sign of `Im Z(β,ω)` against the cutoff classes of the
-**untilted** heart.  `WeakHnTilt.lean` builds the tilt.  This file joins them: **every object of
-the tilted heart has `0 ≤ Im Z(β,ω)`.**
+**untilted** heart.  `WeakHnTilt.lean` builds the tilt.  This file joins them:
+**every object of the tilted heart has `0 ≤ Im Z(β,ω)`.**  It then closes the
+strict-below, positive-rank torsion, dimension-zero and boundary-generator
+cases of the upper-half-plane argument when their numerical hypotheses are
+supplied explicitly.
 
-## The obstruction this removes
+## Main definitions
 
-`MukaiChargeData` carries `mukai : K₀Ab A →+ Mukai.RealExtension V` — a charge on an *abelian*
-category.  The tilted heart's objects are *ambient*: `hnTilt_heart_iff` presents `X : C` inside a
-triangle `F₀⟦1⟧ → X → T₀`, and only `F₀` and `T₀` lie in `t.heart`.  So nothing could be said
-about `Z(X)` at all: the additivity was available, the charge was not.
+This file introduces no new definitions; it proves facts about
+`CategoryTheory.Triangulated.MukaiChargeData.ambientCharge` on the heart of
+`WeakStabilityFunctionOn.hnTilt`.
 
-**The fix is a restriction, not a hypothesis.**  Take the charge on `K₀ C` as the primitive and
-*define* the heart datum by composing with `K₀Ab.toAmbient` (`GrothendieckGroup/HeartComparison.lean`).
-Compatibility is then `rfl` rather than a field, so there is no new structure to inhabit and no
-new assumption to discharge — which is the failure mode `Mukai.Charge` warns about and that the
-`single-instantiation` gate now catches.
+## Main results
 
-Note this uses only the **map** `K₀Ab 𝒜 →+ K₀ C`.  The *isomorphism* `K(𝒜) ≅ K(D)` is
-unavailable at this pin and is not assumed; `HeartComparison.lean` says so, and nothing here needs
-it.
+* `MukaiWeakSlopeCompat.im_ambientCharge_nonneg_of_mem_hnTilt_heart` — every
+  object of the tilted heart has `0 ≤ Im Z(β,ω)`.
+* `MukaiChargeData.mem_semiClosedUpperHalfPlane_of_ambientCharge_of_dimension_zero`
+  — a heart object of Mukai class `(0, 0, s)` with `0 < s` has charge on the
+  negative real ray.
+* `MukaiWeakSlopeCompat.mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_slope_lt`
+  and `MukaiWeakSlopeCompat.mem_semiClosedUpperHalfPlane_of_hnTors_of_rank_pos`
+  — the strict-below free-generator case and the positive-rank torsion case.
+* `MukaiWeakSlopeCompat.mem_semiClosedUpperHalfPlane_of_shift_of_boundary_factors_of_re_pos`
+  — the boundary free-generator case from factorwise real positivity, with no
+  Hodge theory.
+* `MukaiWeakSlopeCompat.re_charge_pos_of_margin`,
+  `MukaiWeakSlopeCompat.re_charge_pos_of_lower_bound` — factorwise real
+  positivity from the exact Hodge margin or a uniform quadratic lower bound.
+* `MukaiWeakSlopeCompat.mem_semiClosedUpperHalfPlane_of_shift_of_boundary_factors_of_margin`,
+  `MukaiWeakSlopeCompat.mem_semiClosedUpperHalfPlane_of_shift_of_boundary_factors_of_lower_bound`,
+  `MukaiWeakSlopeCompat.mem_semiClosedUpperHalfPlane_of_shift_of_boundary_factors`
+  — the boundary free-generator case under those inputs, the last at the K3
+  normalization `δ = 1`.
+* `MukaiWeakSlopeCompat.mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_slope_eq_of_lower_bound`
+  and its K3 normalization `δ = 1`, in the same namespace,
+  `mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_slope_eq_of_mukai_square_ge_neg_one`
+  — one-class boundary adapters with a bound on the whole class.
 
-## The argument
+## Implementation notes
 
-`K₀.of_triangle` and `K₀.of_shift_one` give `Z(X) = -Z(F₀) + Z(T₀)`.  #808 bounds the two ends —
-`Im Z(T₀) ≥ 0` because `T₀` is torsion, `Im Z(F₀) ≤ 0` because `F₀` is torsion-free — and the
-signs combine.  The zero object is handled separately at each end, where the charge vanishes.
+### The charge is restricted from the ambient category
 
-## What this is still not
+`MukaiChargeData` carries `mukai : K₀Ab A →+ Mukai.RealExtension V` — a charge
+on an *abelian* category.  The tilted heart's objects are *ambient*:
+`hnTilt_heart_iff` presents `X : C` inside a triangle `F₀⟦1⟧ → X → T₀`, and
+only `F₀` and `T₀` lie in `t.heart`.  So a charge on the heart alone says
+nothing about `Z(X)`: the additivity is available, the charge is not.
+
+**The remedy is a restriction, not a hypothesis.**  Take the charge on `K₀ C`
+as the primitive and *define* the heart datum by composing with
+`K₀Ab.toAmbient` (`GrothendieckGroup/HeartComparison.lean`).  Compatibility is
+then `rfl` rather than a field, so there is no new structure to inhabit and no
+new assumption to discharge — which is the failure mode `Mukai.Charge` warns
+about and that the `single-instantiation` gate catches.
+
+Note this uses only the **map** `K₀Ab 𝒜 →+ K₀ C`.  The *isomorphism*
+`K(𝒜) ≅ K(D)` is unavailable at this pin and is not assumed;
+`HeartComparison.lean` says so, and nothing here needs it.
+
+### The argument
+
+`K₀.of_triangle` and `K₀.of_shift_one` give `Z(X) = -Z(F₀) + Z(T₀)`.
+`MukaiWeakSlopeCompat.im_charge_nonneg_of_mem_hnTors` and
+`MukaiWeakSlopeCompat.im_charge_nonpos_of_mem_hnFree` bound the two ends —
+`Im Z(T₀) ≥ 0` because `T₀` is torsion, `Im Z(F₀) ≤ 0` because `F₀` is
+torsion-free — and the signs combine.  The zero object is handled separately
+at each end, where the charge vanishes.
+
+### What this is not
 
 It is **not** Bridgeland's Lemma 6.2.  Lemma 6.2 needs the charge in
-`semiClosedUpperHalfPlane` — `Im > 0`, or `Im = 0` **and `Re < 0`**.  This supplies only the
-imaginary half for arbitrary tilted-heart objects.  The adapters below close the
-strict-below, positive-rank torsion, dimension-zero, and boundary-generator cases
-when their numerical hypotheses are supplied explicitly.
+`semiClosedUpperHalfPlane` — `Im > 0`, or `Im = 0` **and `Re < 0`**.  This
+supplies only the imaginary half for arbitrary tilted-heart objects.  The
+adapters below close the strict-below, positive-rank torsion, dimension-zero,
+and boundary-generator cases when their numerical hypotheses are supplied
+explicitly.
 
-The remaining geometric and torsion work is outside this lane:
+The remaining geometric and torsion work is outside this file:
 
 * the exact-margin and uniform-lower-bound boundary theorems both take their
   numerical inequality as a **hypothesis**. The assembly-safe adapter takes it
   factorwise; for K3 surfaces, supplying `realForm ≥ -1` for each `μ`-stable
   factor is the paper's Lemma 5.1 — Serre duality, Riemann--Roch,
-  finite-dimensional `Hom` — which is not in this repository (#332);
-* the torsion cases split by **dimension of support** and use ampleness, and `WeakSlopeData`
-  carries a rank and a degree and nothing else.
+  finite-dimensional `Hom` — which is not in this repository;
+* the torsion cases split by **dimension of support** and use ampleness, and
+  `WeakSlopeData` carries a rank and a degree and nothing else.
 
 Neither is a case analysis, and nothing here pretends otherwise.
+
+## References
+
+* Bridgeland, <https://arxiv.org/abs/math/0307164>, Lemmas 5.1 and 6.2.
+
+## Tags
+
+Mukai vector, central charge, tilted heart, torsion pair, upper half plane
 -/
 
 noncomputable section
@@ -104,8 +155,9 @@ variable {t : TStructure C}
 /-- **Every object of the tilted heart has `0 ≤ Im Z(β,ω)`.**
 
 The imaginary half of Bridgeland's Lemma 6.2, on the tilted heart.  The triangle
-`F₀⟦1⟧ → X → T₀` of `hnTilt_heart_iff` splits the charge; #808 signs the two ends; the shift
-flips the torsion-free one so both contributions are nonnegative.
+`F₀⟦1⟧ → X → T₀` of `hnTilt_heart_iff` splits the charge; `im_charge_nonneg_of_mem_hnTors`
+and `im_charge_nonpos_of_mem_hnFree` sign the two ends; the shift flips the torsion-free one so
+both contributions are nonnegative.
 
 This is **not** Lemma 6.2: that needs `Re < 0` on the `Im = 0` boundary, which is blocked on
 Lemma 5.1 and on dimension-of-support data.  See the module docstring. -/
@@ -427,8 +479,8 @@ theorem mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_slope_eq_of_lower_bound
   · intro
     exact hMukaiSquare
 
-/-- The historical one-class K3 boundary adapter, obtained from the arbitrary
-lower-bound theorem with `δ = 1`. -/
+/-- The one-class K3 boundary adapter, obtained from the arbitrary lower-bound
+theorem with `δ = 1`. -/
 theorem mem_semiClosedUpperHalfPlane_of_shift_hnFree_of_slope_eq_of_mukai_square_ge_neg_one
     {m : K₀ C →+ Mukai.RealExtension V} {b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ} {β ω : V}
     (hb : ∀ x y : V, b x y = b y x)

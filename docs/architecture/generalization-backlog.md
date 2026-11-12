@@ -9,11 +9,6 @@ the ancestor module. Before this file existed, that observation had nowhere to
 go: the reviewer could either suppress it or make it a blocking `needs_changes`
 the chunk could not legally satisfy. Both outcomes lost the finding.
 
-**Deliberately outside `openspec/changes/`.** `openspec_digest` in
-`scripts/loop_engine.py` hashes only the required artifacts under a change
-directory. A backlog living there would be digest-frozen, and appending to it
-mid-run would invalidate every passed ledger in the run. Here it is free to grow.
-
 ## Rules
 
 - Append only. Never delete a row; change its state in place.
@@ -362,7 +357,7 @@ mid-run would invalidate every passed ledger in the run. Here it is free to grow
   `.lake/packages/mathlib/Mathlib/CategoryTheory/Subobject/NoetherianObject.lean:88`
 - source note:        `isNoetherianObject_iff_isEventuallyConstant` supplies ACC
   once a localization filtration is lifted into subobjects of a fixed global
-  heart object. The current `Lemma416Part3Data` lifts to a chain of objects
+  heart object. The current `FiltrationLiftHypotheses` lifts to a chain of objects
   but records no common ambient object or embeddings, so this application
   remains unverified.
 - state:              UNVERIFIED

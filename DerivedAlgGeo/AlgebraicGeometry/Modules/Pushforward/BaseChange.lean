@@ -184,7 +184,7 @@ theorem restrictSquareSections_smul (V : U.toScheme.Opens) (r : Γ(U.toScheme, V
 /-- **The comparison on sections over one open, as a linear equivalence.**
 
 Named at the `Γ` spelling: written through the unfolded pushforward the `Module` instance does not
-synthesize, which is `references/instance-transparency.md` technique 5 in its usual form. -/
+synthesize. -/
 noncomputable def restrictSquareSectionsEquiv (V : U.toScheme.Opens) :
     Γ(((Scheme.Modules.pushforward f).obj M).restrict U.ι, V) ≃ₗ[Γ(U.toScheme, V)]
       Γ((Scheme.Modules.pushforward (f ∣_ U)).obj (M.restrict (f ⁻¹ᵁ U).ι), V) where
