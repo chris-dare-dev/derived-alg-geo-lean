@@ -61,7 +61,7 @@ the one `KFlatBaseChange.lean` uses. They are not what base change is. Stating
 the downstream API on the model means a second construction -- pullback along an
 open immersion, which `OpenImmersionPullback.lean` already proves exact and so
 needs no resolution at all; a flat base; an eventual `∞`-categorical tensor --
-cannot reuse any of it. `abstraction-tree.md` names that failure directly: a
+cannot reuse any of it. That is the failure to avoid: a
 leaf must not copy the carrier or fields of its root, and this bundle is the
 root such a leaf reaches.
 

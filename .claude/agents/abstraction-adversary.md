@@ -124,7 +124,7 @@ into the PR's follow-ups. The finding cannot be quietly dropped, and it cannot
 stall the change.
 
 If the general statement turns out not to hold, say so with the counterexample.
-`abstraction-tree.md` is explicit that a falsified unification is a successful
+The [abstraction tree](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Abstraction-Tree) is explicit that a falsified unification is a successful
 architecture result. You are never penalized for proposing a lift that fails.
 
 ## Output

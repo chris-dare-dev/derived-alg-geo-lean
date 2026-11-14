@@ -8,7 +8,7 @@
 - [ ] Canonical root named (declaration and module).
 - [ ] Root-to-consumer import direction stated; the old consumer path is not retained as a shim.
 - [ ] Specialization uses an instance, projection, `extends`, `abbrev`, or a proved comparison; it does not copy the root.
-- [ ] Carriers: two consumers are named, or the statement-layer exception is explained. Lifts and carriers with content follow the proof-witness test (`abstraction-tree.md` clause 2a).
+- [ ] Carriers: two consumers are named, or the statement-layer exception is explained. Lifts and carriers with content follow the proof-witness test (abstraction tree, clause 2a).
 - [ ] Existing and transported instances have an agreement/diamond test where both paths exist.
 - [ ] Generic roots do not import geometric, stability-specific, or paper-specific leaves.
 - [ ] Any rejected generalization is recorded with its counterexample.
