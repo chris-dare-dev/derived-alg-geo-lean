@@ -1275,8 +1275,10 @@ jobs:
   # The roadmap-vs-tracker gate (#620), in its own job since #1392.
   #
   # Routed exactly like `build`: ubuntu-latest here, the owner's runners in the
-  # private mirror. This job has no reason to want a warm `.lake`; it follows
-  # `build` only because a hosted job in a PRIVATE repository bills minutes.
+  # private mirror. This job has no use for a warm `.lake`; it follows `build`
+  # only because a hosted job in a PRIVATE repository bills minutes. On an
+  # owner runner it checks out into the same directory as `build`, so it must
+  # leave that `.lake` where it is.
   roadmap:
     runs-on: ${{ vars.OWNER_CI_RUNS_ON && fromJSON(vars.OWNER_CI_RUNS_ON) || 'ubuntu-latest' }}
     # Seconds of work. The cap is here so a hung `gh` call cannot hold the
@@ -1288,6 +1290,20 @@ jobs:
           # `--scope-to-diff=origin/main` resolves a merge base, so the
           # default single-commit checkout will not do.
           fetch-depth: 0
+          # The default, clean: true, runs `git clean -ffdx`, which deletes the
+          # ignored `.lake` that `build` keeps in this directory, so the
+          # runner's next build would start cold. The next step cleans
+          # everything else.
+          clean: false
+
+      # The same reset as in `build`: nothing an earlier job left behind,
+      # tracked or untracked, survives into the tests below.
+      - name: Reset the tree, keeping .lake
+        run: |
+          set -euo pipefail
+          git reset --hard
+          git clean -ffdx -e .lake
+          echo "kept: $(du -sh .lake 2>/dev/null | cut -f1 || echo 'no .lake')"
 
       # The roadmap step runs every repository Python test, including the
       # header-parser fixtures that compile tiny Lean clients. This job has no

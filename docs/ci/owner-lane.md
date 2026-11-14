@@ -82,7 +82,10 @@ archive does not know, and `roadmap` runs it with `--require-api`, so an old
 ### Speed
 
 Measured on 2026-11-08, on `main` at `2f7f7c22`. Each runner's `.lake` is kept
-between jobs, so a warm build compiles only what changed.
+between jobs, so a warm build compiles only what changed. Every job in `ci.yml`
+that runs on the owner's runners checks out with `clean: false` for this
+reason, since the default deletes `.lake`;
+`scripts/tests/test_owner_lane_checkout.py` fails if one does not.
 
 | Job | Ubuntu PC | Mac VM |
 | --- | --- | --- |
@@ -110,12 +113,24 @@ timeout-minutes: ${{ vars.OWNER_CI_RUNS_ON && 180 || 90 }}
 ```
 
 The extra time is for a cold build on a Mac runner, such as the first build
-after a Mathlib bump. No such build has been measured yet. Of the 180 minutes,
-the Mac's 57 minutes after the library build leave 123 for the library build
-itself. That is about four times the Ubuntu PC's cold 29 minutes, the same
-ratio as the Mac's steps after the library build. If a build still runs out of
-time, the partial `.lake` is kept, so the next job on that runner continues
-from where it stopped.
+after a Mathlib bump. It is not enough when both Mac runners build cold at
+once. On 2026-11-10, on `522c321a`, the first commit after a Lean and Mathlib
+bump, all six runners were busy together, with a cold build on each Mac runner
+and on two Ubuntu runners:
+
+| Cold build, side by side | Ubuntu PC | Mac VM |
+| --- | --- | --- |
+| `lean-action` (the library build) | 33 min | 155 min |
+| algebraic-geometry and stability-condition axiom audits | 4.4 and 2.9 min | 12.6–14.4 and 8.0–8.3 min |
+| `build`, total | 49 and 50 min | timed out at 180 min |
+
+Both Mac jobs stopped in `Audit completeness`. With two builds in the VM, the
+audits ran about 1.4–1.5 times slower than the single build in the first
+table. CPU was the limit: each Mac runner used on average 2.6 of its 3 CPUs,
+and memory pressure held each back for one to one and a half minutes in all,
+with no OOM kill. A single cold build on the Mac has not been measured. When a build
+runs out of time its `.lake` is kept, so the next build on that runner
+continues from where it stopped.
 
 ## Using the lane
 
