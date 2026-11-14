@@ -767,8 +767,8 @@ noncomputable abbrev derivedH
     (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) : Type (u + 1) :=
   @Sheaf.H (Opens X) _ (Opens.grothendieckTopology X) F inferInstance hExt n
 
-/-- The group structure of `derivedH`. On Lean 4.35 instance search no longer recovers `Ext`'s
-group from the explicit `TopCat.Sheaf` witness, so it is supplied here. -/
+/-- The group structure of `derivedH`. Instance search does not recover `Ext`'s group from the
+explicit `TopCat.Sheaf` witness, so it is supplied here. -/
 private noncomputable abbrev derivedHAddCommGroup
     {X : TopCat.{u}} (hExt : HasExt.{u + 1} (TopCat.Sheaf AddCommGrpCat.{u} X))
     (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) : AddCommGroup (derivedH hExt F n) :=

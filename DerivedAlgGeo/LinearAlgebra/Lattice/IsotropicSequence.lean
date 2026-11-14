@@ -163,8 +163,8 @@ theorem pairing_sum_sum :
 if `∑ gᵢ vᵢ` pairs to zero against every member, every coefficient vanishes.
 This is non-degeneracy of the pairing on the span of the sequence, stated
 without mentioning the span; `linearIndependent` is its immediate consumer,
-and the Torelli-lane numerical steps consume it directly when the vanishing
-comes from geometry rather than from a linear relation.
+and it is stated on its own because the vanishing it needs may come from
+geometry rather than from a linear relation.
 
 By `pairing_smul_sum_left`, the hypothesis says every coefficient equals the
 common sum `S`; summing again gives `S = nS`, and `n ≥ 2` forces `S = 0` in

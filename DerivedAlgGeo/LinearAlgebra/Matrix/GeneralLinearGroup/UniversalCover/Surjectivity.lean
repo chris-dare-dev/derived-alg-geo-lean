@@ -11,11 +11,29 @@ import DerivedAlgGeo.LinearAlgebra.Matrix.GeneralLinearGroup.UniversalCover.Fibr
 Every `T ∈ GL⁺(2, ℝ)` admits a compatible phase relabelling, so `toMatHom`
 is onto.
 
+## Main definitions
+
+* `lift T`: the explicit phase relabelling `φ ↦ φ + arg a / π + arg (W φ) / π`
+  attached to `T`, and `liftShift T`, the same map as a normalized shift.
+* `sect`: the canonical section of the projection `G̃L⁺(2, ℝ) → GL⁺(2, ℝ)`.
+* `cross`: the `2×2` cross product `v × w = v₀w₁ - v₁w₀`.
+
+## Main results
+
+* `lift_strictMono`, `lift_continuous` and `lift_surjective`: the lift is an
+  increasing homeomorphism of `ℝ`.
+* `toMatHom_surjective`: `G̃L⁺(2, ℝ) → GL⁺(2, ℝ)` is surjective.
+* `existsUnique_deck_mul_sect`: every element is uniquely a deck transformation
+  composed with the canonical lift of its matrix part.
+* `exact_deckHom_toMatHom`: `1 → ℤ → G̃L⁺(2, ℝ) → GL⁺(2, ℝ) → 1` is exact.
+
+## Implementation notes
+
 Together with `UniversalCover/Fibre.lean` this closes the algebraic exact sequence.
-`UniversalCover/SourceTopology.lean` now supplies a topology, continuity of the projection,
+`UniversalCover/SourceTopology.lean` supplies a topology, continuity of the projection,
 and simple connectedness; `UniversalCover/Map.lean` proves the covering-map property.
 
-## The construction, and why it needs no branch cut
+### The construction, and why it needs no branch cut
 
 Write `T` acting on `ℂ` in the form `z ↦ a z + b z̄`. This is possible for any
 real-linear map, and the determinant comes out as `‖a‖² - ‖b‖²`, so **`det T > 0`
@@ -39,7 +57,7 @@ lift φ = φ + arg a / π + arg (W φ) / π
 No covering-space machinery, no path lifting, no monodromy. The branch cut is
 avoided by construction rather than worked around.
 
-## Monotonicity without differentiating
+### Monotonicity without differentiating
 
 The obvious route is to differentiate: `lift' φ = (1 - ‖b/a‖²) / ‖W φ‖² > 0`.
 That is true and is the reason the result holds, but it costs a chain rule
@@ -58,6 +76,14 @@ ambiguous modulo 2 — but `arg (W ·)` lands in `(-π/2, π/2)`, so
 
 Positivity of `det` is used **twice**, and differently: once to put `W` in the
 right half-plane, once to sign the cross product.
+
+## References
+
+Mathlib's `Complex.arg`, `Complex.exp` and `intermediate_value_Icc`.
+
+## Tags
+
+universal cover, general linear group, phase lift, surjectivity, cross product
 -/
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction

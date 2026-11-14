@@ -8,7 +8,27 @@ import DerivedAlgGeo.Algebra.Homology.DGCategory.Basic
 /-!
 # The opposite dg category
 
-## The sign convention, and why this one
+The opposite `Cᵒᵖ` of a dg category `C` has the same objects, the Hom complexes of `C`
+reversed, and composition reversed with a Koszul sign. This file constructs it and records
+why that sign is forced.
+
+## Main definitions
+
+* `CategoryTheory.DGCategory.opStruct`: the dg structure on `Cᵒᵖ`, with
+  `f ∘ᵒᵖ g = (-1) ^ (|f| * |g|) • (g ∘ f)`.
+* `CategoryTheory.DGCategory.op`: the opposite dg category.
+
+## Main results
+
+* `CategoryTheory.DGCategory.op_dgComp_apply`: composition in `Cᵒᵖ` is the signed reversed
+  composition of `C`.
+* `CategoryTheory.DGCategory.dgComp_units_smul_left` and
+  `CategoryTheory.DGCategory.dgComp_units_smul_right`: `dgComp` is `ℤˣ`-equivariant in each
+  argument.
+
+## Implementation notes
+
+### The sign convention, and why this one
 
 The opposite of a dg category reverses composition and inserts a Koszul sign:
 
@@ -26,17 +46,23 @@ to disagree without either noticing.
 
 and `(p + q) * r + p * q = p * (q + r) + q * r`.
 
-**Leibniz.** Under the convention of `DerivedAlgGeo.Algebra.Homology.DGCategory/Basic.lean` —
-Mathlib's,
-`δ (f · g) = f · (δg) + (-1) ^ q • (δf) · g` — the two sides carry
+**Leibniz.** The convention of `DerivedAlgGeo.Algebra.Homology.DGCategory.Basic` is
+Mathlib's, `δ (f · g) = f · (δg) + (-1) ^ q • (δf) · g`. Under it the two sides carry
 `(-1) ^ (p * q)` on `g · (δf)` and `(-1) ^ (p * q + p)` on `(δg) · f`, on both
 sides, once `p * (q + 1) = p * q + p` and `q + (p + 1) * q = p * q + 2 * q` are
-used and `(-1) ^ (2 * q) = 1` is discharged. The Koszul sign is unchanged from
-the earlier draft, which used the mirror convention: only the term-matching
-moved.
+used and `(-1) ^ (2 * q) = 1` is discharged.
 
 The units live in `ℤˣ` via `Int.negOnePow`, matching Mathlib's convention in
 `CochainComplex.HomComplex` rather than introducing a second one.
+
+## References
+
+The repository's `DGCategory` class in `DerivedAlgGeo.Algebra.Homology.DGCategory.Basic`,
+and Mathlib's `Int.negOnePow` and `CochainComplex.HomComplex`.
+
+## Tags
+
+dg category, opposite category, Koszul sign
 -/
 
 set_option autoImplicit false

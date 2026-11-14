@@ -8,16 +8,36 @@ import DerivedAlgGeo.LinearAlgebra.QuadraticForm.SignatureAdditive
 /-!
 # The signature of the real Mukai extension, from the signature of `V`
 
-`PeriodDomain.HasSignatureTwo` has been a hypothesis everywhere in route (A).
-For the Mukai extension it should be a consequence: `ℝ × V × ℝ` is a hyperbolic
+`PeriodDomain.HasSignatureTwo` is a hypothesis of the period-domain results.
+For the Mukai extension it is a consequence: `ℝ × V × ℝ` is a hyperbolic
 plane orthogonal to `V`, the plane contributes `(1, 1)`, and the rest is `V`'s
 own signature. With `V = NS(X) ⊗ ℝ` that reduces the hypothesis to the Hodge
 index theorem, which is where it should rest.
 
-This is step 2 of the additivity work; step 1 is
-`QuadraticForm/SignatureAdditive.lean`.
+## Main definitions
 
-## Shape of the argument
+* `QuadraticMap.rangeIsometry`: the restriction of a form to the range of an
+  injective map is isometric to the form pulled back along that map.
+* `Mukai.hyperbolicIncl` and `Mukai.middleIncl`: the inclusions of the summands
+  `{(r, 0, s)}` and `{(0, c, 0)}`.
+* `Mukai.hyperbolic` and `Mukai.middle`: their ranges, the hyperbolic plane and
+  the middle summand.
+
+## Main results
+
+* `QuadraticMap.sigPos_smul_of_pos` and `QuadraticMap.sigNeg_smul_of_pos`: a
+  positive scalar does not change the indices of inertia.
+* `Mukai.isCompl_hyperbolic_middle` and `Mukai.orthogonal_hyperbolic_middle`:
+  the two summands are complementary and `realForm`-orthogonal.
+* `Mukai.hasSignatureTwo_realForm`: if `b` has signature `(1, dim V - 1)`, then
+  `realForm b` has signature `(2, dim V)`.
+
+## Implementation notes
+
+The additivity of the signature over an orthogonal direct sum, which this file
+applies, is `QuadraticMap.sigPos_eq_add` in `QuadraticForm/SignatureAdditive.lean`.
+
+### Shape of the argument
 
 The two summands are the **ranges** of the obvious inclusions rather than
 `Submodule.prod`s. That is not cosmetic: a range comes with
@@ -29,12 +49,21 @@ The plane's own signature is pinned by two explicit lines — `(1, -1)` is
 positive, `(1, 1)` is negative — plus the counting identity, which forces
 `sigPos = sigNeg = 1` and leaves no radical.
 
-## Convention, restated because it is load-bearing
+### Convention, restated because it is load-bearing
 
 `realForm b` is **half** the self-pairing (`Mukai/RealForm.lean`), so on the
 plane it is `(r, s) ↦ -r * s`, and on the middle summand it is `c ↦ b c c / 2`.
 Halving does not move definite subspaces, which is `sigPos_smul_of_pos` below,
 so `V`'s signature transports unchanged.
+
+## References
+
+`QuadraticMap.sigPos_eq_add` of `DerivedAlgGeo.LinearAlgebra.QuadraticForm.SignatureAdditive`,
+and Mathlib's `LinearEquiv.ofInjective` and `QuadraticMap.IsometryEquiv`.
+
+## Tags
+
+Mukai lattice, signature, hyperbolic plane, quadratic form, Hodge index theorem
 -/
 
 open QuadraticMap
