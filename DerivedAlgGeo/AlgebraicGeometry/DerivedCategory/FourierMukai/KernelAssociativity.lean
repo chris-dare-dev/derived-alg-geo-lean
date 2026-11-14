@@ -74,7 +74,7 @@ consumed by the derivation, in the pattern of the route classes.
   quadruple object and its projections as data and does not assert that
   anything is a product; the guards state the intended instantiation.
 * This file does not assemble the geometric construction into abstract
-  `CoherentConvolutionData`; that requires functoriality of `convKernel` on
+  `CoherentConvolutionHypotheses`; that requires functoriality of `convKernel` on
   kernel morphisms and comparison of the geometric associator/unitors with
   the coherent root. The tensor and pullback inputs themselves are coherent.
 
@@ -520,7 +520,7 @@ end Assembly
 At the transform level associativity is a theorem for any convolution data
 (`convolutionTransformAssoc`). At the kernel level it is *derived* for the
 geometric convolution from the quadruple-product inputs above. What remains
-supplied is exactly those inputs. The abstract `CoherentConvolutionData` root
+supplied is exactly those inputs. The abstract `CoherentConvolutionHypotheses` root
 states the pentagon and triangle; this geometric file does not promote
 `convKernel` to that functorial root, so it deliberately exports only the
 derived three-kernel comparison.

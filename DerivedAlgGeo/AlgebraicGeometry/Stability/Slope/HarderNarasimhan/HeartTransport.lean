@@ -16,18 +16,18 @@ the two, discharging from geometry a stability-theoretic hypothesis stated for a
 
 ## Main definitions
 
-* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.cohHeart` — the heart of the
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.cohHeart` — the heart of the
   canonical t-structure on `D(Coh X)`.
-* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.heartWeakSlopeData` — the μ-slope,
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.heartWeakSlopeData` — the μ-slope,
   read on the heart.
 
 ## Main results
 
-* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.heart_hasHNProperty` — the
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.heart_hasHNProperty` — the
   Harder–Narasimhan property on the heart.
-* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.heartWeakSlopeData_rank_functor`
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.heartWeakSlopeData_rank_functor`
   and
-  `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.heartWeakSlopeData_topSlope_functor`
+  `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.heartWeakSlopeData_topSlope_functor`
   — rank and slope on the heart are those of the sheaf.
 
 ## Implementation notes
@@ -82,9 +82,9 @@ open AlgebraicGeometry.Cohomology
 variable {k : Type u} [Field k]
 variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 
-namespace PolarizedVarietyData
+namespace PolarizedVarietyHypotheses
 
-variable {P : PolarizedVarietyData k X}
+variable {P : PolarizedVarietyHypotheses k X}
 
 /-- The heart of the canonical t-structure on the derived category of coherent sheaves. -/
 abbrev cohHeart : ObjectProperty (DerivedCategory (Coh X)) :=
@@ -120,6 +120,6 @@ theorem heartWeakSlopeData_topSlope_functor (h : MuPositivityData P) (F : Coh X)
       (P.weakSlopeData h).topSlope F :=
   WeakSlopeData.congr_topSlope_functor _ _ F
 
-end PolarizedVarietyData
+end PolarizedVarietyHypotheses
 
 end AlgebraicGeometry.Stability.Gieseker

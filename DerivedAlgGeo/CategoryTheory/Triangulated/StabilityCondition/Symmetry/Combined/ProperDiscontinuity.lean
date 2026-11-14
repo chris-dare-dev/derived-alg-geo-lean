@@ -13,7 +13,7 @@ This file isolates the geometric and topological input needed to treat the
 compatible-autoequivalence action on a Bridgeland stability space as properly
 discontinuous.  At the generality of `StabilityCondition.WithClassMap C v`,
 that input is not a theorem: it is packaged explicitly in
-`ProperDiscontinuityData`.
+`ProperDiscontinuityHypotheses`.
 
 From the supplied data we derive finite point stabilizers, the standard local
 neighbourhood consequences, Hausdorff separation of the orbit space, and the
@@ -31,7 +31,7 @@ interface.
 
 ## Missing geometric input
 
-No inhabitant of `ProperDiscontinuityData` is constructed here.  A geometric
+No inhabitant of `ProperDiscontinuityHypotheses` is constructed here.  A geometric
 construction would require arithmetic control of the image of compatible
 autoequivalences in lattice isometries, local finiteness for the corresponding
 walls on the stability space, and finite-dimensionality sufficient to deduce
@@ -62,7 +62,7 @@ variable {Λ : Type u'} [AddCommGroup Λ] {v : K₀ C →+ Λ}
 
 /-- External input asserting proper discontinuity and the two hypotheses
 needed for its Hausdorff-local consequences on the stability space. -/
-structure ProperDiscontinuityData (v : K₀ C →+ Λ) : Prop where
+structure ProperDiscontinuityHypotheses (v : K₀ C →+ Λ) : Prop where
   /-- The compatible-autoequivalence action is properly discontinuous. -/
   properlyDiscontinuous :
     ProperlyDiscontinuousSMul (AutPairQuot v)
@@ -89,16 +89,16 @@ theorem finite_stabilizer_of_properlyDiscontinuousSMul
 /-- Compatibility wrapper for clients that already hold the complete external
 data bundle.  Use `finite_stabilizer_of_properlyDiscontinuousSMul` when only
 proper discontinuity is available. -/
-theorem ProperDiscontinuityData.finite_stabilizer
-    (d : ProperDiscontinuityData v)
+theorem ProperDiscontinuityHypotheses.finite_stabilizer
+    (d : ProperDiscontinuityHypotheses v)
     (σ : StabilityCondition.WithClassMap C v) :
     (MulAction.stabilizer (AutPairQuot v) σ : Set (AutPairQuot v)).Finite :=
   finite_stabilizer_of_properlyDiscontinuousSMul d.properlyDiscontinuous σ
 
 /-- Every stability condition has a neighbourhood whose translates can meet
 it only under elements fixing the original point. -/
-theorem ProperDiscontinuityData.exists_nhds_image_smul_eq_self
-    (d : ProperDiscontinuityData v)
+theorem ProperDiscontinuityHypotheses.exists_nhds_image_smul_eq_self
+    (d : ProperDiscontinuityHypotheses v)
     (σ : StabilityCondition.WithClassMap C v) :
     ∃ U ∈ 𝓝 σ, ∀ q : AutPairQuot v,
       (((q • ·) '' U) ∩ U).Nonempty → q • σ = σ := by
@@ -110,8 +110,8 @@ theorem ProperDiscontinuityData.exists_nhds_image_smul_eq_self
 
 /-- Every stability condition has a neighbourhood disjoint from each
 translate whose group element does not fix the original point. -/
-theorem ProperDiscontinuityData.exists_nhds_disjoint_image
-    (d : ProperDiscontinuityData v)
+theorem ProperDiscontinuityHypotheses.exists_nhds_disjoint_image
+    (d : ProperDiscontinuityHypotheses v)
     (σ : StabilityCondition.WithClassMap C v) :
     ∃ U ∈ 𝓝 σ, ∀ q : AutPairQuot v,
       q • σ ≠ σ → Disjoint ((q • ·) '' U) U := by
@@ -123,8 +123,8 @@ theorem ProperDiscontinuityData.exists_nhds_disjoint_image
 
 /-- A properly discontinuous compatible-autoequivalence quotient is
 Hausdorff under the supplied local-compactness and surjectivity inputs. -/
-theorem ProperDiscontinuityData.t2Space_autPairOrbitSpace
-    (d : ProperDiscontinuityData v) : T2Space (AutPairOrbitSpace v) := by
+theorem ProperDiscontinuityHypotheses.t2Space_autPairOrbitSpace
+    (d : ProperDiscontinuityHypotheses v) : T2Space (AutPairOrbitSpace v) := by
   letI := d.properlyDiscontinuous
   letI := d.locallyCompact
   letI := CategoryTheory.Triangulated.t2Space_withClassMap d.surjective
@@ -133,8 +133,8 @@ theorem ProperDiscontinuityData.t2Space_autPairOrbitSpace
 /-- The compatible-autoequivalence orbit projection is a covering map over
 the image of the free locus.  No covering claim is made at points with
 nontrivial stabilizer. -/
-theorem ProperDiscontinuityData.isCoveringMapOn_autPairOrbitMap
-    (d : ProperDiscontinuityData v) :
+theorem ProperDiscontinuityHypotheses.isCoveringMapOn_autPairOrbitMap
+    (d : ProperDiscontinuityHypotheses v) :
     IsCoveringMapOn (autPairOrbitMap (C := C) (v := v))
       ((autPairOrbitMap (C := C) (v := v)) ''
         {σ | MulAction.stabilizer (AutPairQuot v) σ = ⊥}) := by

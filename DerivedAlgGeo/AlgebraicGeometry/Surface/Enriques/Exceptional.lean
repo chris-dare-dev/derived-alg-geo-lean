@@ -29,13 +29,13 @@ constructed here.
 * `DerivedCat` -- `Dᵇ(Coh Y)` in the Enriques namespace.
 * `ExtComparison` -- the precise self-Ext comparison boundary for one line
   bundle.
-* `IsotropicCollection.ExceptionalityData` -- the common degree-two
+* `IsotropicCollection.ExceptionalityHypotheses` -- the common degree-two
   vanishing and the ten comparison witnesses.
 
 ## Main results
 
 * `isExceptional_of_extComparison` -- the exceptionality reduction.
-* `IsotropicCollection.ExceptionalityData.bundle_isExceptional` -- every
+* `IsotropicCollection.ExceptionalityHypotheses.bundle_isExceptional` -- every
   member of a supplied isotropic collection is exceptional.
 -/
 
@@ -127,7 +127,7 @@ variable (T : IsotropicCollection (Y := Y) (C := C) D S)
 /-- The supplied cohomological input needed to prove exceptionality of all
 ten line bundles in an isotropic collection. The common `H²` vanishing is
 stored once; each bundle has its own self-Ext comparison. -/
-structure ExceptionalityData : Prop where
+structure ExceptionalityHypotheses : Prop where
   /-- `H²(Y,O_Y) = 0`, pending the Serre-duality realization described in
   `Enriques.Basic`. -/
   h_two_vanishing : IsZero
@@ -137,8 +137,8 @@ structure ExceptionalityData : Prop where
 
 /-- Every member of an isotropic collection is exceptional from the shared
 degree-two vanishing and its supplied self-Ext comparison. -/
-theorem ExceptionalityData.bundle_isExceptional
-    (data : T.ExceptionalityData) (i : Fin 10) :
+theorem ExceptionalityHypotheses.bundle_isExceptional
+    (data : T.ExceptionalityHypotheses) (i : Fin 10) :
     IsExceptional k (T.bundles i).boundedDerivedObject :=
   isExceptional_of_extComparison (C := C) (T.bundles i) (data.comparison i)
     data.h_two_vanishing

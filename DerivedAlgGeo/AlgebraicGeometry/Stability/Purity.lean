@@ -13,13 +13,13 @@ polynomials, no slope, and no semistability notion.
 
 ## Main definitions
 
-* `PolarizedVarietyData.IsPure` — Hilbert purity: the sheaf is nonzero and every nonzero
+* `PolarizedVarietyHypotheses.IsPure` — Hilbert purity: the sheaf is nonzero and every nonzero
   subsheaf has positive multiplicity.
 
 ## Main results
 
-* `PolarizedVarietyData.IsPure.multiplicity_pos` — a pure sheaf has positive multiplicity.
-* `PolarizedVarietyData.IsPure.of_iso` — purity is invariant under isomorphism.
+* `PolarizedVarietyHypotheses.IsPure.multiplicity_pos` — a pure sheaf has positive multiplicity.
+* `PolarizedVarietyHypotheses.IsPure.of_iso` — purity is invariant under isomorphism.
 
 ## Implementation notes
 
@@ -47,7 +47,7 @@ of.
 
 ## References
 
-This file builds on the Hilbert multiplicity `PolarizedVarietyData.multiplicity` of
+This file builds on the Hilbert multiplicity `PolarizedVarietyHypotheses.multiplicity` of
 `Stability/Coefficients.lean`.
 
 ## Tags
@@ -67,9 +67,9 @@ open AlgebraicGeometry.Cohomology
 variable {k : Type u} [Field k]
 variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 
-namespace PolarizedVarietyData
+namespace PolarizedVarietyHypotheses
 
-variable (P : PolarizedVarietyData k X)
+variable (P : PolarizedVarietyHypotheses k X)
 
 /-- **Hilbert purity.** Every nonzero subsheaf has positive multiplicity, that is, full
 `P.dim`-dimensional support in the Hilbert sense.
@@ -94,6 +94,6 @@ theorem IsPure.of_iso {F G : Coh X} (h : P.IsPure F) (e : F ≅ G) : P.IsPure G 
   haveI := hi
   exact h.2 H (i ≫ e.inv) (mono_comp i e.inv) hH
 
-end PolarizedVarietyData
+end PolarizedVarietyHypotheses
 
 end AlgebraicGeometry.Stability.Gieseker

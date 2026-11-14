@@ -49,9 +49,9 @@ open AlgebraicGeometry.Cohomology
 variable {k : Type u} [Field k]
 variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 
-namespace PolarizedVarietyData
+namespace PolarizedVarietyHypotheses
 
-variable {P : PolarizedVarietyData k X}
+variable {P : PolarizedVarietyHypotheses k X}
 
 /-- A subobject whose arrow is an isomorphism is the top subobject, so a sheaf equal to its own
 maximal destabilizing subobject is semistable. -/
@@ -147,6 +147,6 @@ theorem hasHNProperty (h : MuPositivityData P) (I : MuHNInput P h) :
     (P.weakSlopeData h).toWeakStabilityFunction.HasHNProperty :=
   fun _ hF ↦ exists_filtration h I hF
 
-end PolarizedVarietyData
+end PolarizedVarietyHypotheses
 
 end AlgebraicGeometry.Stability.Gieseker

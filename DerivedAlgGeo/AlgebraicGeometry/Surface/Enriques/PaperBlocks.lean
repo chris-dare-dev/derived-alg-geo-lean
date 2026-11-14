@@ -12,7 +12,7 @@ This file formalizes the common paper-content layer of
 arXiv:1912.04332v2, Setup 4.5 and Lemmas 4.7--4.8, and
 arXiv:2104.13610v2, Proposition 1.4, Setup 2.5, Lemma 2.4, and Theorem 2.7.
 
-An `PaperBlockData` partitions the ten selected exceptional line bundles into
+An `PaperBlockHypotheses` partitions the ten selected exceptional line bundles into
 positive-length, mutually orthogonal exceptional blocks.  Its residual is
 identified with the already constructed neutral residual component.  A
 `PaperResidualProjectionData` then chooses the right adjoint to the residual
@@ -23,15 +23,15 @@ inclusion, and `projectedObject` is exactly the paper's
 
 All in the namespace `AlgebraicGeometry.EnriquesSurface.IsotropicCollection`:
 
-* `PaperBlockData` — the partition into exceptional blocks.
+* `PaperBlockHypotheses` — the partition into exceptional blocks.
 * `PaperResidualProjectionData` — a chosen right-adjoint projection onto the residual category.
-* `PaperBlockData.projectedObject` — the residual projection object `S_i := ζ_K^!(L_{i1})`.
+* `PaperBlockHypotheses.projectedObject` — the residual projection object `S_i := ζ_K^!(L_{i1})`.
 * `PaperIProjectionClassificationData` and `PaperIIProjectionClassificationData` — the Paper I
   and Paper II projection statements and classifications, as supplied data.
 
 ## Main results
 
-* `PaperBlockData.totalLength_eq_ten` — the block lengths total ten.
+* `PaperBlockHypotheses.totalLength_eq_ten` — the block lengths total ten.
 * `PaperIIProjectionClassificationData.projectedObject_dichotomy` — every Paper II projection
   object is `3`-spherical or `3`-pseudoprojective.
 * The non-vanishing and non-shift consequences of each classification:
@@ -90,8 +90,8 @@ is precisely the original family of ten bundles, up to reindexing and
 isomorphism.  `residual_eq` records that taking the right orthogonal after
 grouping into triangulated block spans gives the same neutral residual
 property already constructed in `Enriques.Residual`. -/
-structure PaperBlockData (exceptional : T.ExceptionalityData)
-    (semiorthogonal : T.SemiorthogonalityData) (ι : Type t) [Fintype ι] where
+structure PaperBlockHypotheses (exceptional : T.ExceptionalityHypotheses)
+    (semiorthogonal : T.SemiorthogonalityHypotheses) (ι : Type t) [Fintype ι] where
   /-- The mutually orthogonal exceptional blocks. -/
   blocks : OrthogonalExceptionalBlocks k (DerivedCat Y) ι
   /-- The block positions enumerate exactly ten objects. -/
@@ -105,13 +105,13 @@ structure PaperBlockData (exceptional : T.ExceptionalityData)
   residual_eq : blocks.residual =
     T.residualComponent exceptional semiorthogonal
 
-namespace PaperBlockData
+namespace PaperBlockHypotheses
 
 variable {T}
-variable {exceptional : T.ExceptionalityData}
-  {semiorthogonal : T.SemiorthogonalityData}
+variable {exceptional : T.ExceptionalityHypotheses}
+  {semiorthogonal : T.SemiorthogonalityHypotheses}
 variable {ι : Type t} [Fintype ι]
-variable (B : T.PaperBlockData exceptional semiorthogonal ι)
+variable (B : T.PaperBlockHypotheses exceptional semiorthogonal ι)
 
 /-- The block lengths sum to ten, derived from the supplied enumeration rather
 than stored as a second numerical field. -/
@@ -147,22 +147,22 @@ theorem singleton_or_longer (i : ι) :
     B.blocks.length i = 1 ∨ 2 ≤ B.blocks.length i :=
   B.blocks.length_eq_one_or_two_le i
 
-end PaperBlockData
+end PaperBlockHypotheses
 
 /-- A chosen right-adjoint projection from the ambient derived category onto
 the already constructed residual category. -/
 abbrev PaperResidualProjectionData
-    (exceptional : T.ExceptionalityData)
-    (semiorthogonal : T.SemiorthogonalityData) :=
+    (exceptional : T.ExceptionalityHypotheses)
+    (semiorthogonal : T.SemiorthogonalityHypotheses) :=
   RightProjectionData (T.residualComponent exceptional semiorthogonal)
 
-namespace PaperBlockData
+namespace PaperBlockHypotheses
 
 variable {T}
-variable {exceptional : T.ExceptionalityData}
-  {semiorthogonal : T.SemiorthogonalityData}
+variable {exceptional : T.ExceptionalityHypotheses}
+  {semiorthogonal : T.SemiorthogonalityHypotheses}
 variable {ι : Type t} [Fintype ι]
-variable (B : T.PaperBlockData exceptional semiorthogonal ι)
+variable (B : T.PaperBlockHypotheses exceptional semiorthogonal ι)
 
 /-- The paper's residual projection object
 `S_i := ζ_K^!(L_{i1})`. -/
@@ -190,16 +190,16 @@ theorem projectedObjectHomEquiv_id
       Q.counitApp (B.blocks.firstObject i) :=
   Q.homEquivFromProject_id (B.blocks.firstObject i)
 
-end PaperBlockData
+end PaperBlockHypotheses
 
 /-- Paper I's singleton-block projection statements and classification.
 This combines Lemma 4.8 and Proposition 4.10 while fixing the candidate
 family to the residual projections above. -/
 structure PaperIProjectionClassificationData
-    {exceptional : T.ExceptionalityData}
-    {semiorthogonal : T.SemiorthogonalityData}
-    (P : T.PaperCategoryData exceptional semiorthogonal)
-    (B : T.PaperBlockData exceptional semiorthogonal (Fin 10))
+    {exceptional : T.ExceptionalityHypotheses}
+    {semiorthogonal : T.SemiorthogonalityHypotheses}
+    (P : T.PaperCategoryHypotheses exceptional semiorthogonal)
+    (B : T.PaperBlockHypotheses exceptional semiorthogonal (Fin 10))
     (Q : T.PaperResidualProjectionData exceptional semiorthogonal) : Prop where
   /-- Paper I has ten singleton blocks. -/
   singleton : ∀ i, B.blocks.length i = 1
@@ -217,10 +217,10 @@ structure PaperIProjectionClassificationData
 namespace PaperIProjectionClassificationData
 
 variable {T}
-variable {exceptional : T.ExceptionalityData}
-  {semiorthogonal : T.SemiorthogonalityData}
-variable {P : T.PaperCategoryData exceptional semiorthogonal}
-variable {B : T.PaperBlockData exceptional semiorthogonal (Fin 10)}
+variable {exceptional : T.ExceptionalityHypotheses}
+  {semiorthogonal : T.SemiorthogonalityHypotheses}
+variable {P : T.PaperCategoryHypotheses exceptional semiorthogonal}
+variable {B : T.PaperBlockHypotheses exceptional semiorthogonal (Fin 10)}
 variable {Q : T.PaperResidualProjectionData exceptional semiorthogonal}
 variable (A : T.PaperIProjectionClassificationData P B Q)
 
@@ -264,11 +264,11 @@ end PaperIProjectionClassificationData
 /-- Paper II's block-sensitive projection statements and classification.
 The first three fields are Lemma 2.4; the final two are Theorem 2.7. -/
 structure PaperIIProjectionClassificationData
-    {exceptional : T.ExceptionalityData}
-    {semiorthogonal : T.SemiorthogonalityData}
-    (P : T.PaperCategoryData exceptional semiorthogonal)
+    {exceptional : T.ExceptionalityHypotheses}
+    {semiorthogonal : T.SemiorthogonalityHypotheses}
+    (P : T.PaperCategoryHypotheses exceptional semiorthogonal)
     {ι : Type t} [Fintype ι]
-    (B : T.PaperBlockData exceptional semiorthogonal ι)
+    (B : T.PaperBlockHypotheses exceptional semiorthogonal ι)
     (Q : T.PaperResidualProjectionData exceptional semiorthogonal) : Prop where
   /-- Singleton blocks produce `3`-spherical residual projections. -/
   spherical_of_singleton : ∀ i, B.blocks.length i = 1 →
@@ -295,11 +295,11 @@ structure PaperIIProjectionClassificationData
 namespace PaperIIProjectionClassificationData
 
 variable {T}
-variable {exceptional : T.ExceptionalityData}
-  {semiorthogonal : T.SemiorthogonalityData}
-variable {P : T.PaperCategoryData exceptional semiorthogonal}
+variable {exceptional : T.ExceptionalityHypotheses}
+  {semiorthogonal : T.SemiorthogonalityHypotheses}
+variable {P : T.PaperCategoryHypotheses exceptional semiorthogonal}
 variable {ι : Type t} [Fintype ι]
-variable {B : T.PaperBlockData exceptional semiorthogonal ι}
+variable {B : T.PaperBlockHypotheses exceptional semiorthogonal ι}
 variable {Q : T.PaperResidualProjectionData exceptional semiorthogonal}
 variable (A : T.PaperIIProjectionClassificationData P B Q)
 

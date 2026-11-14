@@ -48,25 +48,25 @@ variable {D₁ : Cohomology.FiniteCohomology k Y₁}
   {S₁ : D₁.LinearConnectingSystem} {S₂ : D₂.LinearConnectingSystem}
 variable {T₁ : IsotropicCollection (Y := Y₁) (C := C₁) D₁ S₁}
   {T₂ : IsotropicCollection (Y := Y₂) (C := C₂) D₂ S₂}
-variable {exceptional₁ : T₁.ExceptionalityData}
-  {exceptional₂ : T₂.ExceptionalityData}
-  {semiorthogonal₁ : T₁.SemiorthogonalityData}
-  {semiorthogonal₂ : T₂.SemiorthogonalityData}
-variable {P₁ : T₁.PaperCategoryData exceptional₁ semiorthogonal₁}
-  {P₂ : T₂.PaperCategoryData exceptional₂ semiorthogonal₂}
+variable {exceptional₁ : T₁.ExceptionalityHypotheses}
+  {exceptional₂ : T₂.ExceptionalityHypotheses}
+  {semiorthogonal₁ : T₁.SemiorthogonalityHypotheses}
+  {semiorthogonal₂ : T₂.SemiorthogonalityHypotheses}
+variable {P₁ : T₁.PaperCategoryHypotheses exceptional₁ semiorthogonal₁}
+  {P₂ : T₂.PaperCategoryHypotheses exceptional₂ semiorthogonal₂}
 
 /-- A Serre-compatible equivalence between the two residual categories.
 The compatibility is supplied explicitly; it is not derived here from an exact
 linear equivalence. -/
 abbrev PaperResidualSerreEquivalence
-    (P₁ : T₁.PaperCategoryData exceptional₁ semiorthogonal₁)
-    (P₂ : T₂.PaperCategoryData exceptional₂ semiorthogonal₂) :=
+    (P₁ : T₁.PaperCategoryHypotheses exceptional₁ semiorthogonal₁)
+    (P₂ : T₂.PaperCategoryHypotheses exceptional₂ semiorthogonal₂) :=
   SerreCompatibleEquivalence P₁.residualSerre.serre P₂.residualSerre.serre
 
 namespace PaperIProjectionClassificationData
 
-variable {B₁ : T₁.PaperBlockData exceptional₁ semiorthogonal₁ (Fin 10)}
-  {B₂ : T₂.PaperBlockData exceptional₂ semiorthogonal₂ (Fin 10)}
+variable {B₁ : T₁.PaperBlockHypotheses exceptional₁ semiorthogonal₁ (Fin 10)}
+  {B₂ : T₂.PaperBlockHypotheses exceptional₂ semiorthogonal₂ (Fin 10)}
 variable {Q₁ : T₁.PaperResidualProjectionData exceptional₁ semiorthogonal₁}
   {Q₂ : T₂.PaperResidualProjectionData exceptional₂ semiorthogonal₂}
 variable (A₁ : T₁.PaperIProjectionClassificationData P₁ B₁ Q₁)
@@ -93,8 +93,8 @@ end PaperIProjectionClassificationData
 namespace PaperIIProjectionClassificationData
 
 variable {I : Type t} {J : Type t'} [Fintype I] [Fintype J]
-variable {B₁ : T₁.PaperBlockData exceptional₁ semiorthogonal₁ I}
-  {B₂ : T₂.PaperBlockData exceptional₂ semiorthogonal₂ J}
+variable {B₁ : T₁.PaperBlockHypotheses exceptional₁ semiorthogonal₁ I}
+  {B₂ : T₂.PaperBlockHypotheses exceptional₂ semiorthogonal₂ J}
 variable {Q₁ : T₁.PaperResidualProjectionData exceptional₁ semiorthogonal₁}
   {Q₂ : T₂.PaperResidualProjectionData exceptional₂ semiorthogonal₂}
 variable (A₁ : T₁.PaperIIProjectionClassificationData P₁ B₁ Q₁)

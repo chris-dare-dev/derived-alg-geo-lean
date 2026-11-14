@@ -355,6 +355,6 @@ are derived for the geometric convolution; and what is supplied is the
 diagonal/section geometry with its named classical isomorphisms. Tensor and
 pullback coherence come from the monoidal roots. Not proved here: that the
 geometric `convKernel` construction assembles the abstract
-`CoherentConvolutionData`; nor does this file build a `DualKernel`. -/
+`CoherentConvolutionHypotheses`; nor does this file build a `DualKernel`. -/
 
 end AlgebraicGeometry.DerivedCategory.FourierMukai

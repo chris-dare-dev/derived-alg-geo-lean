@@ -180,9 +180,9 @@ noncomputable def spliceFactorSuccIso {F : Coh X} (B : Subobject F) {m : ℕ}
   exact (cokernelOfLECongr hle (Functor.monotone _ hlec) h1 h2).trans
     (CategoryTheory.Abelian.cokernelPullbackIso B hlec)
 
-namespace PolarizedVarietyData
+namespace PolarizedVarietyHypotheses
 
-variable {P : PolarizedVarietyData k X}
+variable {P : PolarizedVarietyHypotheses k X}
 
 /-- **The first factor of a filtration is its first chain step.**
 
@@ -283,4 +283,4 @@ noncomputable def splice (h : MuPositivityData P) {F : Coh X} {B : Subobject F}
           (le_of_lt (G.chain_strictMono Fin.castSucc_lt_succ))).symm
         (G.factor_semistable j')
 
-end PolarizedVarietyData
+end PolarizedVarietyHypotheses

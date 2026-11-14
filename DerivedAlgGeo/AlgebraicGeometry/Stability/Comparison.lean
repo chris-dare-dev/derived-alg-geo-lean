@@ -14,18 +14,18 @@ coefficients. This file owns everything that mentions both, and is imported by n
 
 ## Main definitions
 
-* `PolarizedVarietyData.hnTrivialOfGiesekerSemistable` — the one-step Harder–Narasimhan
+* `PolarizedVarietyHypotheses.hnTrivialOfGiesekerSemistable` — the one-step Harder–Narasimhan
   filtration of a Gieseker-semistable sheaf for the weak μ-slope.
 
 ## Main results
 
-* `PolarizedVarietyData.weakSlopeData_slope_eq_normalizedCoefficient` — the μ-slope is the
+* `PolarizedVarietyHypotheses.weakSlopeData_slope_eq_normalizedCoefficient` — the μ-slope is the
   normalized Hilbert coefficient one below the top.
-* `PolarizedVarietyData.topSlope_le_of_giesekerLE` — the Gieseker order between sheaves of
+* `PolarizedVarietyHypotheses.topSlope_le_of_giesekerLE` — the Gieseker order between sheaves of
   positive multiplicity implies the slope inequality.
-* `PolarizedVarietyData.giesekerSemistable_implies_muSemistable` — Gieseker semistability
+* `PolarizedVarietyHypotheses.giesekerSemistable_implies_muSemistable` — Gieseker semistability
   implies weak μ-semistability.
-* `PolarizedVarietyData.giesekerSemistable_implies_hn_trivial` — a Gieseker-semistable sheaf
+* `PolarizedVarietyHypotheses.giesekerSemistable_implies_hn_trivial` — a Gieseker-semistable sheaf
   has a one-step Harder–Narasimhan filtration, whose single factor has the slope of the sheaf.
 
 ## Implementation notes
@@ -64,8 +64,8 @@ import the other.
 
 ## References
 
-This file compares `PolarizedVarietyData.IsGiesekerSemistable` with the weak slope
-`PolarizedVarietyData.weakSlopeData` through `WeakStabilityFunctionOn.IsSemistable`, and builds
+This file compares `PolarizedVarietyHypotheses.IsGiesekerSemistable` with the weak slope
+`PolarizedVarietyHypotheses.weakSlopeData` through `WeakStabilityFunctionOn.IsSemistable`, and builds
 the filtration with `AbelianWeakHNFiltration.ofSemistable`.
 
 ## Tags
@@ -86,9 +86,9 @@ open AlgebraicGeometry.Cohomology
 variable {k : Type u} [Field k]
 variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 
-namespace PolarizedVarietyData
+namespace PolarizedVarietyHypotheses
 
-variable {P : PolarizedVarietyData k X}
+variable {P : PolarizedVarietyHypotheses k X}
 
 /-! ### The slope, read as a normalized Hilbert coefficient -/
 
@@ -180,6 +180,6 @@ theorem giesekerSemistable_hn_trivial_muMinus (h : MuPositivityData P) {F : Coh 
     (hnTrivialOfGiesekerSemistable h hF).μMinus =
       (P.weakSlopeData h).topSlope F := rfl
 
-end PolarizedVarietyData
+end PolarizedVarietyHypotheses
 
 end AlgebraicGeometry.Stability.Gieseker

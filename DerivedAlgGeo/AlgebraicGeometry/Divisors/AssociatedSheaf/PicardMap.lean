@@ -13,7 +13,7 @@ a principal divisor gives the structure sheaf, the associated sheaf of a sum is
 the tensor product, and the resulting map to the Picard group is an additive
 homomorphism that factors through the divisor class group.
 
-No unconditional pullback theorem is stated.  `CartierPullbackData` supplies a
+No unconditional pullback theorem is stated.  `CartierPullbackHypotheses` supplies a
 justified function-field pullback for divisors, but a comparison with pullback
 of module sheaves would also need compatibility between that data, rational
 sections, and module sheafification.  That extra compatibility is not part of

@@ -18,7 +18,7 @@ codimension-zero and codimension-one terms are the expected explicit classes
 The top component is not postulated.  It is the representative reconstructed from the
 structure-sheaf twist polynomial, and its degree is proved to be the geometric Euler
 characteristic `χ(O_X)`.  Representability of the twist functional remains explicit through
-`PairingContext.ReconstructionData`; no global Chow group or hidden existence instance is used.
+`PairingContext.ReconstructionHypotheses`; no global Chow group or hidden existence instance is used.
 
 The resulting component family carries the grading and normalization statements expected by
 `NumericalVarietyData`. A final comparison theorem turns geometric K3 hypotheses into a Layer A
@@ -113,7 +113,7 @@ linear Todd term with `-K_X/2`. -/
 structure Data
     (P : PairingContext D C 2 A)
     (K : SmoothProperVariety.CanonicalSheafData k X 2) where
-  structureData : P.ReconstructionData
+  structureData : P.ReconstructionHypotheses
     (structureSheafObject P.intersection.structureSheafCoherent)
   structure_rank : structureData.rank = 1
   structure_twists : structureData.twists.eulerPic = P.intersection.eulerPic
@@ -261,7 +261,7 @@ theorem structureToddOne_eq_toddOne (T : Data P K) :
     AlgebraicGeometry.IntersectionTheory.ChernCharacter.toddComponent T.structureData 1 =
       toddOne (P := P) (K := K) := by
   apply P.divisorPairing_ext 1 (by omega)
-    (PairingContext.ReconstructionData.tauComponent_mem T.structureData 1)
+    (PairingContext.ReconstructionHypotheses.tauComponent_mem T.structureData 1)
     toddOne_mem
   intro classes hlength
   cases classes with

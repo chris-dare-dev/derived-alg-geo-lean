@@ -17,7 +17,7 @@ The finite-type condition is the standard scheme-theoretic one: a structure
 morphism is locally of finite type and quasi-compact.  It is recorded on the
 actual object of `Over S`, not as a caller-chosen eligibility label.
 
-The input is `GeometricPreStabilityBaseChangeData`, constructed from genuine
+The input is `GeometricPreStabilityBaseChangeHypotheses`, constructed from genuine
 bounded coherent pullback and the phase-indexed output of the owned Appendix-A
 inducing theorem.  Its exported phase equivalence has two consequences.
 
@@ -89,14 +89,14 @@ variable {S : Scheme.{u}} {F : SchemeTriangulatedFiberFamily S}
 /-- Every semistable locus on an actual finite-type base change is Zariski
 open, with no openness conclusion supplied by the caller. -/
 theorem finiteTypeSchemeSemistableLocus_isOpen
-    (h : GeometricPreStabilityBaseChangeData F R classMap sigma)
+    (h : GeometricPreStabilityBaseChangeHypotheses F R classMap sigma)
     (j : FiniteTypeSchemeSemistableLocusIndex F) :
     _root_.IsOpen (schemeSemistableLocus F classMap sigma j.index) :=
   schemeSemistableLocus_isOpen h.toFiberPreStabilityBaseChangeData j.index
 
 /-- Universal openness restricted to actual finite-type scheme base changes. -/
 theorem universalFiniteTypeSchemeSemistableOpenness
-    (h : GeometricPreStabilityBaseChangeData F R classMap sigma) :
+    (h : GeometricPreStabilityBaseChangeHypotheses F R classMap sigma) :
     UniversalOpenness
       (fun j : FiniteTypeSchemeSemistableLocusIndex F ↦
         schemeSemistableOpenProbe F classMap sigma j.index) :=
@@ -106,7 +106,7 @@ theorem universalFiniteTypeSchemeSemistableOpenness
 /-- Generic openness is obtained from the same Zariski-open semistable locus,
 not from a separate generic-openness premise. -/
 theorem finiteTypeSchemeGenericSemistabilityProbe_isGenericallyOpen
-    (h : GeometricPreStabilityBaseChangeData F R classMap sigma)
+    (h : GeometricPreStabilityBaseChangeHypotheses F R classMap sigma)
     (j : FiniteTypeSchemeGenericSemistableLocusIndex F) :
     (schemeGenericSemistabilityProbe F classMap sigma j.index).IsGenericallyOpen :=
   schemeGenericSemistabilityProbe_isGenericallyOpen
@@ -114,7 +114,7 @@ theorem finiteTypeSchemeGenericSemistabilityProbe_isGenericallyOpen
 
 /-- Universal generic openness on actual finite-type scheme base changes. -/
 theorem universalFiniteTypeSchemeGenericSemistabilityOpenness
-    (h : GeometricPreStabilityBaseChangeData F R classMap sigma) :
+    (h : GeometricPreStabilityBaseChangeHypotheses F R classMap sigma) :
     UniversalGenericOpenness
       (fun j : FiniteTypeSchemeGenericSemistableLocusIndex F ↦
         schemeGenericSemistabilityProbe F classMap sigma j.index) :=
@@ -125,7 +125,7 @@ regular finite-type curve.  The ordinary HN filtration comes from the slicing;
 the geometric witness constructs all residue-fiber filtrations and their
 compatibility. -/
 noncomputable def finiteTypeSchemeRelativeHNFiltration
-    (h : GeometricPreStabilityBaseChangeData F R classMap sigma)
+    (h : GeometricPreStabilityBaseChangeHypotheses F R classMap sigma)
     (T : RegularCurveBaseChange S) (_ : finiteTypeRegularCurveEligible T)
     (E : F.Fiber T.baseChange) :
     SchemeRelativeHNFiltration F classMap sigma E :=
@@ -136,7 +136,7 @@ noncomputable def finiteTypeSchemeRelativeHNFiltration
 /-- The geometric bounded-coherent witness supplies objectwise relative HN
 existence on every regular finite-type curve base change. -/
 theorem hasFiniteTypeSchemeRelativeHNFiltrations
-    (h : GeometricPreStabilityBaseChangeData F R classMap sigma) :
+    (h : GeometricPreStabilityBaseChangeHypotheses F R classMap sigma) :
     HasSchemeRelativeHNFiltrations F classMap sigma
       finiteTypeRegularCurveEligible := by
   intro T hT E
@@ -146,7 +146,7 @@ theorem hasFiniteTypeSchemeRelativeHNFiltrations
 existing object-level relative-HN problem, without accepting
 `HasSchemeRelativeHNFiltrations` as an input. -/
 theorem integratesAfterFiniteTypeRegularCurveBaseChange
-    (h : GeometricPreStabilityBaseChangeData F R classMap sigma) :
+    (h : GeometricPreStabilityBaseChangeHypotheses F R classMap sigma) :
     IntegratesAfterDedekindBaseChange
       (schemeRelativeHNProblem F classMap sigma
         finiteTypeRegularCurveEligible) :=
@@ -175,9 +175,9 @@ structure FiniteTypeGeometricConsequences
     finiteTypeRegularCurveEligible
 
 /-- Construct every finite-type geometric consequence from the bounded-coherent
-base-change input `GeometricPreStabilityBaseChangeData`. -/
-theorem GeometricPreStabilityBaseChangeData.finiteTypeConsequences
-    (h : GeometricPreStabilityBaseChangeData F R classMap sigma) :
+base-change input `GeometricPreStabilityBaseChangeHypotheses`. -/
+theorem GeometricPreStabilityBaseChangeHypotheses.finiteTypeConsequences
+    (h : GeometricPreStabilityBaseChangeHypotheses F R classMap sigma) :
     FiniteTypeGeometricConsequences F classMap sigma where
   semistableOpenness := universalFiniteTypeSchemeSemistableOpenness h
   genericOpenness := universalFiniteTypeSchemeGenericSemistabilityOpenness h

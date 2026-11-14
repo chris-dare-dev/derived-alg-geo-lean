@@ -56,7 +56,7 @@ def schemeTiltStabilityFunction
     (RR : Numerical.Surface.NumericalRealization
       (RiemannRoch.Surface.Assembly.toNumericalVariety T Rg).ring (D := W))
     {β ω : W}
-    (G : PolarizedVarietyData k X)
+    (G : PolarizedVarietyHypotheses k X)
     (N : SlopeNormalization (V := RiemannRoch.Surface.Assembly.toNumericalVariety T Rg)
       G RR ω)
     (hμ : MuPositivityData G) (hbounded : SlopeBoundedness G)
@@ -83,7 +83,7 @@ theorem schemeTiltStabilityFunction_Z
     (RR : Numerical.Surface.NumericalRealization
       (RiemannRoch.Surface.Assembly.toNumericalVariety T Rg).ring (D := W))
     {β ω : W}
-    (G : PolarizedVarietyData k X)
+    (G : PolarizedVarietyHypotheses k X)
     (N : SlopeNormalization (V := RiemannRoch.Surface.Assembly.toNumericalVariety T Rg)
       G RR ω)
     (hμ : MuPositivityData G) (hbounded : SlopeBoundedness G)
@@ -107,7 +107,7 @@ def canonicalSchemeTiltStabilityFunction
     (RR : Numerical.Surface.NumericalRealization
       (RiemannRoch.Surface.Assembly.toNumericalVariety T Rg).ring (D := W))
     {β ω : W}
-    (G : PolarizedVarietyData k X)
+    (G : PolarizedVarietyHypotheses k X)
     (N : SlopeNormalization (V := RiemannRoch.Surface.Assembly.toNumericalVariety T Rg)
       G RR ω)
     (hμ : MuPositivityData G) (hbounded : SlopeBoundedness G)
@@ -132,7 +132,7 @@ theorem canonicalSchemeTiltStabilityFunction_Z
     (RR : Numerical.Surface.NumericalRealization
       (RiemannRoch.Surface.Assembly.toNumericalVariety T Rg).ring (D := W))
     {β ω : W}
-    (G : PolarizedVarietyData k X)
+    (G : PolarizedVarietyHypotheses k X)
     (N : SlopeNormalization (V := RiemannRoch.Surface.Assembly.toNumericalVariety T Rg)
       G RR ω)
     (hμ : MuPositivityData G) (hbounded : SlopeBoundedness G)

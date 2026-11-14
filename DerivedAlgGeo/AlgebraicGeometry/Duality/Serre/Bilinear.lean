@@ -21,28 +21,28 @@ supplies it, in the same idiom, and proves the consequences.
 
 ## Main definitions
 
-* `AlgebraicGeometry.Duality.Serre.BilinearData` — bilinear coherent Serre duality, as supplied
+* `AlgebraicGeometry.Duality.Serre.BilinearHypotheses` — bilinear coherent Serre duality, as supplied
   realization data.
-* `AlgebraicGeometry.Duality.Serre.BilinearData.TrivialCanonical` — a trivial canonical bundle,
+* `AlgebraicGeometry.Duality.Serre.BilinearHypotheses.TrivialCanonical` — a trivial canonical bundle,
   recorded on the realized `Ext` spaces.
-* `AlgebraicGeometry.Duality.Serre.BilinearData.eulerChar` — the categorical Euler
+* `AlgebraicGeometry.Duality.Serre.BilinearHypotheses.eulerChar` — the categorical Euler
   characteristic of a pair.
 
 ## Main results
 
-* `AlgebraicGeometry.Duality.Serre.BilinearData.finrank_eq` — complementary `Ext` dimensions
+* `AlgebraicGeometry.Duality.Serre.BilinearHypotheses.finrank_eq` — complementary `Ext` dimensions
   agree.
-* `AlgebraicGeometry.Duality.Serre.BilinearData.finrank_top_eq_finrank_hom` — with trivial
+* `AlgebraicGeometry.Duality.Serre.BilinearHypotheses.finrank_top_eq_finrank_hom` — with trivial
   canonical bundle, `Ext^n(E,E)` and `Hom(E,E)` have the same dimension.
-* `AlgebraicGeometry.Duality.Serre.BilinearData.surface_selfEuler_eq` and
-  `AlgebraicGeometry.Duality.Serre.BilinearData.surface_selfEuler_le` — on a surface with
+* `AlgebraicGeometry.Duality.Serre.BilinearHypotheses.surface_selfEuler_eq` and
+  `AlgebraicGeometry.Duality.Serre.BilinearHypotheses.surface_selfEuler_le` — on a surface with
   trivial canonical bundle, `χ(E,E) = 2·hom(E,E) − ext¹(E,E) ≤ 2·hom(E,E)`.
 
 ## Implementation notes
 
 ### Supplied, and why
 
-`BilinearData` is **data, not a theorem**, exactly as `DerivedStatement` and `Data` are, and for
+`BilinearHypotheses` is **data, not a theorem**, exactly as `DerivedStatement` and `Data` are, and for
 the same upstream reason recorded there: the pinned Mathlib has derived categories and `Ext` but
 no derived global-sections functor into `D(k)`, no coherent `RHom`, and no Grothendieck-duality
 theorem.  `Duality.Serre.DerivedStatement` is this repository's idiom for "supplied, not proved"
@@ -130,7 +130,7 @@ local instance hasExtCohBilinear : HasExt.{u + 1} (Coh X) :=
 The fields mirror `Serre.Data`: a base-field-linear realization of the `Ext` groups, its
 comparison with Mathlib's actual `Abelian.Ext`, finiteness, the canonical twist `E ⊗ ω_X`, and
 the duality isomorphism itself. -/
-structure BilinearData (K : SmoothProperVariety.CanonicalSheafData k X n) where
+structure BilinearHypotheses (K : SmoothProperVariety.CanonicalSheafData k X n) where
   /-- A base-field-linear realization of `Ext^j(E,F)`. -/
   extSpace : Coh X → Coh X → ℕ → ModuleCat.{u + 1} k
   /-- Forgetting scalars recovers Mathlib's actual Ext group. -/
@@ -147,9 +147,9 @@ structure BilinearData (K : SmoothProperVariety.CanonicalSheafData k X n) where
   duality : ∀ (E F : Coh X) (i : ℕ), i ≤ n →
     Module.Dual k (extSpace E F i) ≃ₗ[k] extSpace F (canonicalTwist E) (n - i)
 
-namespace BilinearData
+namespace BilinearHypotheses
 
-variable {K : SmoothProperVariety.CanonicalSheafData k X n} (S : BilinearData K)
+variable {K : SmoothProperVariety.CanonicalSheafData k X n} (S : BilinearHypotheses K)
 
 /-- Perfection gives equality of complementary Ext dimensions. -/
 theorem finrank_eq (E F : Coh X) (i : ℕ) (hi : i ≤ n) :
@@ -223,7 +223,7 @@ theorem surface_selfEuler_le (hn : n = 2) (T : S.TrivialCanonical)
   have : (0 : ℤ) ≤ (Module.finrank k (S.extSpace E E 1) : ℤ) := Int.natCast_nonneg _
   linarith
 
-end BilinearData
+end BilinearHypotheses
 
 end
 

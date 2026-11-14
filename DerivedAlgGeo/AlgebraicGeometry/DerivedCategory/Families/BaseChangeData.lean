@@ -33,9 +33,9 @@ cannot reuse any of it. `abstraction-tree.md` names that failure directly: a
 leaf must not copy the carrier or fields of its root, and until this file there
 was no root for a leaf to reach.
 
-So `KFlatBaseChangeData` keeps its resolutions and becomes a producer of this
+So `KFlatBaseChangeHypotheses` keeps its resolutions and becomes a producer of this
 structure rather than a rival carrier, through
-`KFlatBaseChangeData.toDerivedBaseChangeData`.
+`KFlatBaseChangeHypotheses.toDerivedBaseChangeData`.
 
 Nothing here is inhabited, and nothing here is new mathematics: every
 declaration is the corresponding one from `KFlatBaseChange.lean` with the model
@@ -58,7 +58,7 @@ variable {S : Scheme.{u}}
 /-- The derived operations base change is built from: a derived pullback along
 each projection off the fibre product, and a derived tensor on it.
 
-This is the model-free root. `KFlatBaseChangeData` produces one of these from
+This is the model-free root. `KFlatBaseChangeHypotheses` produces one of these from
 K-flat resolutions; any other construction of the same three operations
 produces one too, and reaches the whole API below by doing so. -/
 structure DerivedBaseChangeData (X T : SchemeBaseChange S) where

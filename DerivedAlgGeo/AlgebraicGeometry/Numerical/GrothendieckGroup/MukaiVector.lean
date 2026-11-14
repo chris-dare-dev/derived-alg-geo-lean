@@ -80,7 +80,7 @@ namespace AlgebraicGeometry.Numerical
 
 namespace K3
 
-open NumericalRingData NumericalRingDualData NumericalVarietyData
+open NumericalRingData NumericalRingDualHypotheses NumericalVarietyData
 
 variable {A : Type u} {N : Type v} {Λ : Type w}
 variable [CommRing A] [Algebra ℚ A] [AddCommGroup N] [AddCommGroup Λ]

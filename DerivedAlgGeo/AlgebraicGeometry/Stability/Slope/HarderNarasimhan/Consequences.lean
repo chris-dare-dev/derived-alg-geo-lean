@@ -20,18 +20,18 @@ statements, in `Stability/Comparison.lean`.
 
 ## Main definitions
 
-* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.hnFiltration` — a chosen
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.hnFiltration` — a chosen
   Harder–Narasimhan filtration of a nonzero coherent sheaf.
-* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.muPlus` and
-  `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.muMinus` — its largest and smallest
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.muPlus` and
+  `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.muMinus` — its largest and smallest
   slopes.
 
 ## Main results
 
-* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.muMinus_le_muPlus`.
-* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.muPlus_ne_top_of_isPure` — `μPlus`
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.muMinus_le_muPlus`.
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.muPlus_ne_top_of_isPure` — `μPlus`
   of a pure coherent sheaf is finite.
-* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.exists_shortExact_hnTors_hnFree` —
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.exists_shortExact_hnTors_hnFree` —
   the torsion/torsion-free splitting at a cutoff.
 
 ## Implementation notes
@@ -73,9 +73,9 @@ open AlgebraicGeometry.Cohomology
 variable {k : Type u} [Field k]
 variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 
-namespace PolarizedVarietyData
+namespace PolarizedVarietyHypotheses
 
-variable {P : PolarizedVarietyData k X}
+variable {P : PolarizedVarietyHypotheses k X}
 
 /-- **The Harder–Narasimhan filtration of a nonzero coherent sheaf.** A choice of one of the
 filtrations `exists_filtration` produces. -/
@@ -160,6 +160,6 @@ theorem exists_shortExact_hnTors_hnFree (h : MuPositivityData P) (I : MuHNInput 
   WeakStabilityFunctionOn.exists_shortExact_hnTors_hnFree
     (μ₀ := μ₀) (hasHNProperty h I) F
 
-end PolarizedVarietyData
+end PolarizedVarietyHypotheses
 
 end AlgebraicGeometry.Stability.Gieseker

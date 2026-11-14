@@ -296,13 +296,13 @@
  [
   "DerivedAlgGeo/AlgebraicGeometry/Variety/Numerical.lean",
   "LONG",
-  "noncomputable def toNumericalVariety (D : NumericalData k X n A N) : NumericalVarietyData n A N where",
+  "noncomputable def toNumericalVariety (D : NumericalHypotheses k X n A N) : NumericalVarietyData n A N where",
   1
  ],
  [
   "DerivedAlgGeo/AlgebraicGeometry/Variety/Numerical.lean",
   "LONG",
-  "structure NumericalData (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] (n : ℕ) (A : Type u) (N : Type v)",
+  "structure NumericalHypotheses (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] (n : ℕ) (A : Type u) (N : Type v)",
   1
  ],
  [

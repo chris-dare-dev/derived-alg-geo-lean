@@ -29,7 +29,7 @@ The construction provides:
 ## Deliberate boundaries
 
 Mathlib v4.32.1 does not construct a function-field map for an arbitrary morphism of integral
-schemes, so this file does not claim an unconditional pullback. `CartierPullbackData` states the
+schemes, so this file does not claim an unconditional pullback. `CartierPullbackHypotheses` states the
 exact missing hypotheses. Likewise, `coefficient` is not packaged as an `AlgebraicCycle`: the
 upstream order-of-vanishing API does not yet prove local finiteness of its support. No cycle
 infrastructure is duplicated here.
@@ -280,13 +280,13 @@ variable {X Y : Scheme.{u}} [IsIntegral X] [IsIntegral Y] (f : X ⟶ Y)
 
 The field map and the condition that it carries local units to local units are explicit because
 Mathlib v4.32.1 provides no such map for an arbitrary scheme morphism. -/
-structure CartierPullbackData where
+structure CartierPullbackHypotheses where
   fieldMap : Additive Y.functionFieldˣ →+ Additive X.functionFieldˣ
   map_localUnits : ∀ x, localUnits Y (f x) ≤ (localUnits X x).comap fieldMap
 
-namespace CartierPullbackData
+namespace CartierPullbackHypotheses
 
-variable (p : CartierPullbackData f)
+variable (p : CartierPullbackHypotheses f)
 
 /-- The induced map on local Cartier classes. -/
 def localMap (x : X) : LocalCartierClass Y (f x) →+ LocalCartierClass X x :=
@@ -318,7 +318,7 @@ lemma pullback_principal (g : Additive Y.functionFieldˣ) :
   ext
   rfl
 
-end CartierPullbackData
+end CartierPullbackHypotheses
 
 end Pullback
 

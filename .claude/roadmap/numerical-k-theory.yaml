@@ -89,9 +89,9 @@ items:
     gh_sub_issues: []
     kind: epic
     parent: numerical-k-theory-m1
-    title: "NumericalData's class map becomes a hom out of K₀Ab"
+    title: "NumericalHypotheses's class map becomes a hom out of K₀Ab"
     status: done
-    summary: "`NumericalData` (`Variety/Numerical.lean:63`) carried `classOf`, `classOf_iso`, `classOf_shortExact`. The two laws say the function factors through the Grothendieck group, so they were never data: three fields become `classOfHom : K₀Ab (Coh X) →+ N`, with `classOf` surviving as an object-level abbreviation and both laws as theorems of unchanged name and shape. This is the second of the three axiom triples #760 announced; #766 collapsed `SlopeData`. Scoped to `NumericalData` alone because it targets an abstract `N` and is therefore separable — see e2 for why `CoherentAdditiveInvariant` is not."
+    summary: "`NumericalHypotheses` (`Variety/Numerical.lean:63`) carried `classOf`, `classOf_iso`, `classOf_shortExact`. The two laws say the function factors through the Grothendieck group, so they were never data: three fields become `classOfHom : K₀Ab (Coh X) →+ N`, with `classOf` surviving as an object-level abbreviation and both laws as theorems of unchanged name and shape. This is the second of the three axiom triples #760 announced; #766 collapsed `SlopeData`. Scoped to `NumericalHypotheses` alone because it targets an abstract `N` and is therefore separable — see e2 for why `CoherentAdditiveInvariant` is not."
     priority: must
     size: M
     tags: [lean, k-theory, refactor]

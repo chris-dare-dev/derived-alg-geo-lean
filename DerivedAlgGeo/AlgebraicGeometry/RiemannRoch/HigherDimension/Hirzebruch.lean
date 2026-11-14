@@ -16,7 +16,7 @@ This file proves Hirzebruch--Riemann--Roch for coherent sheaves on a variety of 
 dimension at most four. The route is numerical rather than cycle-valued:
 
 * Snapper polynomiality supplies the Picard Euler polynomial of every coherent sheaf;
-* `PairingContext.ReconstructionData` represents its homogeneous coefficients as the
+* `PairingContext.ReconstructionHypotheses` represents its homogeneous coefficients as the
   Todd-weighted components `tau_i(F)` in a chosen numerical ring;
 * the structure sheaf supplies the positive-degree Todd components;
 * the triangular identities from `Intersection/ChernCharacter/Basic` recover `ch_i(F)`; and
@@ -67,7 +67,7 @@ new HRR axiom.
 
 ## References
 
-This file builds on `PairingContext.ReconstructionData` and its triangular Chern-character
+This file builds on `PairingContext.ReconstructionHypotheses` and its triangular Chern-character
 identities, on `ReconstructionSystem`, and on the numerical displays `Threefold.chi_eq` and
 `Fourfold.chi_eq`.
 
@@ -126,7 +126,7 @@ private theorem homogeneousPicardCoefficient_nil
 /-- The Picard Euler function in any reconstruction package takes the trivial class to the
 actual Euler characteristic of its coherent sheaf. -/
 theorem reconstruction_eulerPic_one {F : Coh X}
-    (Q : P.ReconstructionData F) :
+    (Q : P.ReconstructionHypotheses F) :
     Q.twists.eulerPic 1 = D.eulerCharacteristic F := by
   let L : Fin 0 → Pic X := fun i ↦ Fin.elim0 i
   have h := Q.twists.realization 0 L (0 : Fin 0 → ℤ)
@@ -143,7 +143,7 @@ theorem reconstruction_eulerPic_one {F : Coh X}
 /-- In every dimension, the degree of the top reconstructed Todd-weighted component is the
 coherent Euler characteristic. -/
 theorem degree_tauComponent_top_eq_eulerCharacteristic
-    {F : Coh X} (Q : P.ReconstructionData F) :
+    {F : Coh X} (Q : P.ReconstructionHypotheses F) :
     P.ring.degree (Q.tauComponent d) =
       (D.eulerCharacteristic F : ℚ) := by
   have h := Q.degree_tauComponent_mul_divisorProduct d (by omega) [] (by simp)
@@ -159,23 +159,23 @@ theorem degree_tauComponent_top_eq_eulerCharacteristic
 
 /-- The reconstructed Todd component, normalized to `td₀ = 1`.  Positive components are the
 Todd-weighted representatives reconstructed from the structure sheaf. -/
-noncomputable def reconstructedToddComponent (RO : P.ReconstructionData O) : ℕ → A
+noncomputable def reconstructedToddComponent (RO : P.ReconstructionHypotheses O) : ℕ → A
   | 0 => 1
   | i + 1 => toddComponent RO (i + 1)
 
 @[simp]
-theorem reconstructedToddComponent_zero (RO : P.ReconstructionData O) :
+theorem reconstructedToddComponent_zero (RO : P.ReconstructionHypotheses O) :
     reconstructedToddComponent RO 0 = (1 : A) := rfl
 
 @[simp]
-theorem reconstructedToddComponent_succ (RO : P.ReconstructionData O) (i : ℕ) :
+theorem reconstructedToddComponent_succ (RO : P.ReconstructionHypotheses O) (i : ℕ) :
     reconstructedToddComponent RO (i + 1) = toddComponent RO (i + 1) := rfl
 
-theorem reconstructedToddComponent_mem (RO : P.ReconstructionData O) (i : ℕ) :
+theorem reconstructedToddComponent_mem (RO : P.ReconstructionHypotheses O) (i : ℕ) :
     reconstructedToddComponent RO i ∈ P.ring.piece i := by
   cases i with
   | zero => exact P.ring.one_mem_piece_zero
-  | succ i => exact PairingContext.ReconstructionData.tauComponent_mem RO (i + 1)
+  | succ i => exact PairingContext.ReconstructionHypotheses.tauComponent_mem RO (i + 1)
 
 private theorem degree_sum_mul_sum_eq_antidiagonal
     (ch td : ℕ → A)
@@ -197,8 +197,8 @@ private theorem degree_sum_mul_sum_eq_antidiagonal
   · exact absurd (Finset.mem_range.mpr (by omega)) hmem
 
 private theorem degree_antidiagonal_eq_tauComponent
-    (RO : P.ReconstructionData O) {F : Coh X}
-    (Q : P.ReconstructionData F)
+    (RO : P.ReconstructionHypotheses O) {F : Coh X}
+    (Q : P.ReconstructionHypotheses F)
     (hdpos : 1 ≤ d) (hd4 : d ≤ 4) :
     (∑ i ∈ Finset.range (d + 1),
         P.ring.degree
@@ -209,7 +209,7 @@ private theorem degree_antidiagonal_eq_tauComponent
 
 /-- Reconstructed HRR for every coherent sheaf in every positive dimension at most four. -/
 theorem sheaf_hirzebruch_riemannRoch
-    (RO : P.ReconstructionData O)
+    (RO : P.ReconstructionHypotheses O)
     (R : ReconstructionSystem (P := P))
     (hdpos : 1 ≤ d) (hd4 : d ≤ 4)
     (F : Coh X) :
@@ -227,17 +227,17 @@ theorem sheaf_hirzebruch_riemannRoch
 
 /-- The total reconstructed Chern character as an additive homomorphism on `K₀(Coh X)`. -/
 noncomputable def totalChernCharacterHom
-    (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P)) :
+    (RO : P.ReconstructionHypotheses O) (R : ReconstructionSystem (P := P)) :
     K₀Ab (Coh X) →+ A :=
   ∑ i ∈ Finset.range (d + 1), R.chernCharacterHom RO i
 
 /-- The total reconstructed Todd representative through the geometric dimension. -/
-noncomputable def totalTodd (RO : P.ReconstructionData O) : A :=
+noncomputable def totalTodd (RO : P.ReconstructionHypotheses O) : A :=
   ∑ j ∈ Finset.range (d + 1), reconstructedToddComponent RO j
 
 /-- The reconstructed right side of HRR as an additive homomorphism on `K₀(Coh X)`. -/
 noncomputable def riemannRochHom
-    (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P)) :
+    (RO : P.ReconstructionHypotheses O) (R : ReconstructionSystem (P := P)) :
     K₀Ab (Coh X) →+ ℚ where
   toFun E := P.ring.degree
     (totalChernCharacterHom RO R E * totalTodd RO)
@@ -253,7 +253,7 @@ noncomputable def rationalEulerHom : K₀Ab (Coh X) →+ ℚ where
 
 @[simp]
 theorem totalChernCharacterHom_class
-    (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P))
+    (RO : P.ReconstructionHypotheses O) (R : ReconstructionSystem (P := P))
     (F : Coh X) :
     totalChernCharacterHom RO R (K₀Ab.of F) =
       ∑ i ∈ Finset.range (d + 1),
@@ -262,7 +262,7 @@ theorem totalChernCharacterHom_class
 
 @[simp]
 theorem riemannRochHom_class
-    (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P))
+    (RO : P.ReconstructionHypotheses O) (R : ReconstructionSystem (P := P))
     (F : Coh X) :
     riemannRochHom RO R (K₀Ab.of F) =
       P.ring.degree
@@ -279,7 +279,7 @@ theorem rationalEulerHom_class (F : Coh X) :
 
 /-- Reconstructed HRR descends from coherent sheaves to every virtual Grothendieck class. -/
 theorem hirzebruch_riemannRoch
-    (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P))
+    (RO : P.ReconstructionHypotheses O) (R : ReconstructionSystem (P := P))
     (hdpos : 1 ≤ d) (hd4 : d ≤ 4)
     (E : K₀Ab (Coh X)) :
     (D.grothendieckEulerHom C E : ℚ) = P.ring.degree
@@ -299,7 +299,7 @@ This constructor only selects data. The positive-dimension and codimension-four 
 bounds occur on `toNumericalVariety_satisfiesHRR`, where they are actually needed. -/
 @[reducible]
 noncomputable def toNumericalVariety
-    (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P)) :
+    (RO : P.ReconstructionHypotheses O) (R : ReconstructionSystem (P := P)) :
     NumericalVarietyData d A (K₀Ab (Coh X)) where
   ring := P.ring
   rank := R.rankHom
@@ -314,13 +314,13 @@ noncomputable def toNumericalVariety
 
 /-- The reconstructed numerical presentation satisfies HRR. -/
 theorem toNumericalVariety_satisfiesHRR
-    (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P))
+    (RO : P.ReconstructionHypotheses O) (R : ReconstructionSystem (P := P))
     (hdpos : 1 ≤ d) (hd4 : d ≤ 4) :
     (toNumericalVariety RO R).SatisfiesHRR :=
   ⟨hirzebruch_riemannRoch RO R hdpos hd4⟩
 
 theorem toNumericalVariety_rank_class
-    (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P))
+    (RO : P.ReconstructionHypotheses O) (R : ReconstructionSystem (P := P))
     (F : Coh X) :
     (toNumericalVariety RO R).rank (K₀Ab.of F) =
       (R.reconstruction F).rank := by
@@ -328,7 +328,7 @@ theorem toNumericalVariety_rank_class
   exact R.rankHom_class F
 
 theorem toNumericalVariety_chComp_class
-    (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P))
+    (RO : P.ReconstructionHypotheses O) (R : ReconstructionSystem (P := P))
     (F : Coh X) (i : ℕ) :
     (toNumericalVariety RO R).chComp (K₀Ab.of F) i =
       chernCharacterComponent RO (R.reconstruction F) i := by
@@ -338,13 +338,13 @@ theorem toNumericalVariety_chComp_class
 
 @[simp]
 theorem toNumericalVariety_toddComp
-    (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P))
+    (RO : P.ReconstructionHypotheses O) (R : ReconstructionSystem (P := P))
     (i : ℕ) :
     (toNumericalVariety RO R).toddComp i =
       reconstructedToddComponent RO i := rfl
 
 theorem toNumericalVariety_chi_class
-    (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P))
+    (RO : P.ReconstructionHypotheses O) (R : ReconstructionSystem (P := P))
     (F : Coh X) :
     (toNumericalVariety RO R).chi (K₀Ab.of F) =
       D.eulerCharacteristic F := by
@@ -354,7 +354,7 @@ theorem toNumericalVariety_chi_class
 
 /-- The numerical class of a coherent sheaf in the Euler-radical quotient fixed by Layer A. -/
 noncomputable def numericalClass
-    (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P))
+    (RO : P.ReconstructionHypotheses O) (R : ReconstructionSystem (P := P))
     (F : Coh X) :
     NumericalVarietyData.NumericalQuotient (toNumericalVariety RO R) :=
   Submodule.Quotient.mk (K₀Ab.of F)
@@ -366,7 +366,7 @@ noncomputable def numericalClass
 noncomputable def toThreefoldNumericalVariety
     {A : Type v} [CommRing A] [Algebra ℚ A]
     {P : PairingContext D C 3 A} {O : Coh X}
-    (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P)) :
+    (RO : P.ReconstructionHypotheses O) (R : ReconstructionSystem (P := P)) :
     NumericalVarietyData 3 A (K₀Ab (Coh X)) :=
   toNumericalVariety RO R
 
@@ -375,7 +375,7 @@ noncomputable def toThreefoldNumericalVariety
 noncomputable def toFourfoldNumericalVariety
     {A : Type v} [CommRing A] [Algebra ℚ A]
     {P : PairingContext D C 4 A} {O : Coh X}
-    (RO : P.ReconstructionData O) (R : ReconstructionSystem (P := P)) :
+    (RO : P.ReconstructionHypotheses O) (R : ReconstructionSystem (P := P)) :
     NumericalVarietyData 4 A (K₀Ab (Coh X)) :=
   toNumericalVariety RO R
 
@@ -384,7 +384,7 @@ scheme-derived bridge. -/
 theorem threefold_eulerCharacteristic_eq
     {B : Type v} [CommRing B] [Algebra ℚ B]
     {P3 : PairingContext D C 3 B} {O3 : Coh X}
-    (RO : P3.ReconstructionData O3) (R : ReconstructionSystem (P := P3))
+    (RO : P3.ReconstructionHypotheses O3) (R : ReconstructionSystem (P := P3))
     (F : Coh X) :
     (D.eulerCharacteristic F : ℚ) =
       ((R.reconstruction F).rank : ℚ) *
@@ -407,7 +407,7 @@ scheme-derived bridge. -/
 theorem fourfold_eulerCharacteristic_eq
     {B : Type v} [CommRing B] [Algebra ℚ B]
     {P4 : PairingContext D C 4 B} {O4 : Coh X}
-    (RO : P4.ReconstructionData O4) (R : ReconstructionSystem (P := P4))
+    (RO : P4.ReconstructionHypotheses O4) (R : ReconstructionSystem (P := P4))
     (F : Coh X) :
     (D.eulerCharacteristic F : ℚ) =
       ((R.reconstruction F).rank : ℚ) *

@@ -27,7 +27,7 @@ local equation.  For two equations on the same open, `equationTransitionIso`
 gives the canonical change of trivialization, and `equationTransitionIso_trans`
 records its cocycle law.
 
-No unconditional pullback theorem is stated. `CartierPullbackData` supplies a
+No unconditional pullback theorem is stated. `CartierPullbackHypotheses` supplies a
 justified function-field pullback for divisors, but a comparison with pullback
 of module sheaves would also need compatibility between that data, rational
 sections, and module sheafification. That extra compatibility is not part of

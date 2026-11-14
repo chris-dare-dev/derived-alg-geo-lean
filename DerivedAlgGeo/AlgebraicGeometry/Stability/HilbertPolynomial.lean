@@ -20,28 +20,28 @@ the geometric packaging and the additivity theorem. It creates no new carrier.
 
 ## Main definitions
 
-* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData` — a polarized variety, as
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses` — a polarized variety, as
   supplied data.
-* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.hilbertFunction` — the Hilbert
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.hilbertFunction` — the Hilbert
   function `n ↦ χ(F ⊗ L^n)`.
-* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.hilbertHom` — the Hilbert function
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.hilbertHom` — the Hilbert function
   as a homomorphism `K₀(Coh X) → (ℤ → ℤ)`.
 
 ## Main results
 
-* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.hilbertFunction_eq_eulerPic` —
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.hilbertFunction_eq_eulerPic` —
   the Hilbert function is the Picard-level Euler function at `L ^ n`.
-* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.hilbertFunction_additive` —
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.hilbertFunction_additive` —
   additivity on short exact sequences.
-* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.hilbertFunction_degreeLE` and
-  `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyData.fwdDiff_hilbertFunction` —
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.hilbertFunction_degreeLE` and
+  `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.fwdDiff_hilbertFunction` —
   Snapper's bound.
 
 ## Implementation notes
 
 ### What is supplied, and why
 
-`PolarizedVarietyData k X` is the `…Data` idiom for genuinely external input. Its five fields
+`PolarizedVarietyHypotheses k X` is the `…Data` idiom for genuinely external input. Its five fields
 are a line-bundle class `L`, finite coherent cohomology `D`, a linear connecting system `C`,
 a natural number `dim`, and, for every coherent sheaf, a `TwistContext`. Every
 supplied-not-proved field reachable from it is listed here:
@@ -118,7 +118,7 @@ variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 cohomology with linear connecting maps, a dimension, and Snapper's inputs for every coherent
 sheaf. See the module docstring for what each field supplies and why none is proved here;
 in particular `L` is not asserted to be ample. -/
-structure PolarizedVarietyData (k : Type u) [Field k] (X : Scheme.{u})
+structure PolarizedVarietyHypotheses (k : Type u) [Field k] (X : Scheme.{u})
     [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] where
   /-- The polarizing line-bundle class. Not asserted to be ample. -/
   L : Pic X
@@ -132,9 +132,9 @@ structure PolarizedVarietyData (k : Type u) [Field k] (X : Scheme.{u})
   geometric induction, and the Picard-level Euler function with its realization. -/
   twists : ∀ F : Coh X, TwistContext D F dim
 
-namespace PolarizedVarietyData
+namespace PolarizedVarietyHypotheses
 
-variable (P : PolarizedVarietyData k X)
+variable (P : PolarizedVarietyHypotheses k X)
 
 /-- The rank-one coherent twist family `n ↦ F ⊗ L^n`, projected from `twists`. -/
 noncomputable abbrev twistFamily (F : Coh X) :
@@ -242,6 +242,6 @@ theorem fwdDiff_hilbertFunction (F : Coh X) :
   oneVariable_fwdDiff_euler_vanishes P.D P.C P.L (P.twistFamily F) P.dim
     ((P.twists F).geometricInduction 1 (fun _ ↦ P.L))
 
-end PolarizedVarietyData
+end PolarizedVarietyHypotheses
 
 end AlgebraicGeometry.Stability.Gieseker

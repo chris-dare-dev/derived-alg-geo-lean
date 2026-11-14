@@ -15,7 +15,7 @@ factors through `N(X)` modulo the radical of that pairing.
 
 ## Why a separate data bundle
 
-`NumericalRingDualData R` is an explicit extension of one selected presentation
+`NumericalRingDualHypotheses R` is an explicit extension of one selected presentation
 `R : NumericalRingData n A`, not a field of every numerical ring and not an independent
 bundle with another path back to `R`.
 A ring that has no chosen dual needs no placeholder, while two choices can coexist without
@@ -23,7 +23,7 @@ instance search selecting between them.
 
 ## Main definitions
 
-* `NumericalRingDualData R` — the involution, as data plus the axiom that it acts by
+* `NumericalRingDualHypotheses R` — the involution, as data plus the axiom that it acts by
   `(-1)^i` on `piece i`.
 * `chDual E` — `ch(E)^∨`, written directly as `Σᵢ (-1)ⁱ chᵢ(E)` rather than as `dual (ch E)`.
 
@@ -54,17 +54,17 @@ acting on codimension `i` by `(-1)^i`.
 Geometrically this is `E ↦ E^∨` read through the Chern character: `chᵢ(E^∨) = (-1)ⁱchᵢ(E)`.
 It is carried as data because `NumericalRingData` does not expose the graded projections, so
 there is nothing to define it *from* at this layer. -/
-structure NumericalRingDualData {n : ℕ} {A : Type u} [CommRing A] [Algebra ℚ A]
+structure NumericalRingDualHypotheses {n : ℕ} {A : Type u} [CommRing A] [Algebra ℚ A]
     (R : NumericalRingData n A) where
   /-- The involution, as a `ℚ`-algebra map. -/
   dual : A →ₐ[ℚ] A
   /-- It acts on codimension `i` by `(-1)^i`. -/
   dual_of_mem_piece : ∀ {i : ℕ} {x : A}, x ∈ R.piece i → dual x = (-1 : ℚ) ^ i • x
 
-namespace NumericalRingDualData
+namespace NumericalRingDualHypotheses
 
 variable {n : ℕ} {A : Type u} [CommRing A] [Algebra ℚ A]
-variable {R : NumericalRingData n A} (D : NumericalRingDualData R)
+variable {R : NumericalRingData n A} (D : NumericalRingDualHypotheses R)
 
 /-- `(-)^∨` preserves each graded piece: it only rescales it. -/
 theorem dual_mem_piece {i : ℕ} {x : A} (hx : x ∈ R.piece i) :
@@ -82,11 +82,11 @@ theorem dual_involutive_of_mem_piece {i : ℕ} {x : A} (hx : x ∈ R.piece i) :
 theorem dual_algebraMap (q : ℚ) : D.dual (algebraMap ℚ A q) = algebraMap ℚ A q := by
   rw [D.dual_of_mem_piece (R.algebraMap_mem_piece_zero q), pow_zero, one_smul]
 
-end NumericalRingDualData
+end NumericalRingDualHypotheses
 
 namespace NumericalVarietyData
 
-open NumericalRingDualData
+open NumericalRingDualHypotheses
 
 variable {n : ℕ} {A : Type u} {N : Type v}
 variable [CommRing A] [Algebra ℚ A] [AddCommGroup N]
@@ -101,7 +101,7 @@ theorem ch_add (E F : N) : V.ch (E + F) = V.ch E + V.ch F := by
 
 /-- The **dual Chern character** `ch(E)^∨ = Σᵢ (-1)ⁱ chᵢ(E)`.
 
-Defined from the grading alone, with no `NumericalRingDualData` argument in sight: the
+Defined from the grading alone, with no `NumericalRingDualHypotheses` argument in sight: the
 alternating sum is available on any `NumericalVarietyData`, and `dual_ch` below is what says it
 deserves the name. Everything the Euler pairing needs lives at this level of generality. -/
 noncomputable def chDual (E : N) : A :=
@@ -113,7 +113,7 @@ theorem chDual_add (E F : N) :
   simp only [chDual, V.chComp_add, smul_add]
   exact Finset.sum_add_distrib
 
-variable (D : NumericalRingDualData V.ring)
+variable (D : NumericalRingDualHypotheses V.ring)
 
 /-- `chᵢ(E^∨) = (-1)ⁱ chᵢ(E)`. -/
 theorem dual_chComp (E : N) (i : ℕ) :

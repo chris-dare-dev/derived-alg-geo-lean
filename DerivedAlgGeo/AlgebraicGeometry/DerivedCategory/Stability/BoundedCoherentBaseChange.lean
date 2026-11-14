@@ -24,7 +24,7 @@ The bridge has three layers.
   output into preimage data.
 * `BoundedCoherentDerivedRealization` identifies an abstract strict fiber
   family with the genuine `Dᵇ(Coh)` fibers and their pullbacks.
-  `GeometricPreStabilityBaseChangeData.toFiberPreStabilityBaseChangeData`
+  `GeometricPreStabilityBaseChangeHypotheses.toFiberPreStabilityBaseChangeData`
   then exports the downstream witness without accepting `Slicing.PreimageData`
   from the caller.
 
@@ -304,7 +304,7 @@ end BoundedCoherentDerivedRealization
 `FiberPreStabilityBaseChangeData`, this structure does not contain a
 `Slicing.PreimageData` field: every such witness is constructed from the
 actual bounded coherent pullback and its phase-indexed A.17 output. -/
-structure GeometricPreStabilityBaseChangeData
+structure GeometricPreStabilityBaseChangeHypotheses
     {S : Scheme.{u}} (F : SchemeTriangulatedFiberFamily S)
     [∀ T : SchemeBaseChange S, IsLocallyNoetherian T.left]
     [∀ {T U : SchemeBaseChange S} (f : T ⟶ U),
@@ -330,7 +330,7 @@ structure GeometricPreStabilityBaseChangeData
     (sigma U).slicing = (sigma T).slicing.preimage (F.pull f)
     (R.preimageData f (sigma T).slicing (inducing f))
 
-namespace GeometricPreStabilityBaseChangeData
+namespace GeometricPreStabilityBaseChangeHypotheses
 
 variable {S : Scheme.{u}} {F : SchemeTriangulatedFiberFamily S}
   [∀ T : SchemeBaseChange S, IsLocallyNoetherian T.left]
@@ -345,7 +345,7 @@ variable {S : Scheme.{u}} {F : SchemeTriangulatedFiberFamily S}
 /-- Export the ordinary categorical base-change witness.  Its preimage field
 is built from bounded coherent geometry and the inducing theorem. -/
 theorem toFiberPreStabilityBaseChangeData
-    (h : GeometricPreStabilityBaseChangeData F R classMap sigma) :
+    (h : GeometricPreStabilityBaseChangeHypotheses F R classMap sigma) :
     FiberPreStabilityBaseChangeData F classMap sigma where
   classMap_compatible := h.classMapCompatible
   charge_compatible := h.chargeCompatible
@@ -355,7 +355,7 @@ theorem toFiberPreStabilityBaseChangeData
 /-- Phase membership is detected by the geometrically realized bounded
 coherent pullback. -/
 theorem phase_iff
-    (h : GeometricPreStabilityBaseChangeData F R classMap sigma)
+    (h : GeometricPreStabilityBaseChangeHypotheses F R classMap sigma)
     {T U : SchemeBaseChange S} (f : T ⟶ U) (phi : ℝ) (E : F.Fiber U) :
     (sigma U).slicing.P phi E ↔
       (sigma T).slicing.P phi ((F.pull f).obj E) :=
@@ -365,14 +365,14 @@ theorem phase_iff
 after its pullbacks have been identified with bounded coherent derived
 pullback. -/
 theorem phase_iff_comp
-    (h : GeometricPreStabilityBaseChangeData F R classMap sigma)
+    (h : GeometricPreStabilityBaseChangeHypotheses F R classMap sigma)
     {T U V' : SchemeBaseChange S} (f : T ⟶ U) (g : U ⟶ V')
     (phi : ℝ) (E : F.Fiber V') :
     (sigma V').slicing.P phi E ↔
       (sigma T).slicing.P phi ((F.pull f).obj ((F.pull g).obj E)) :=
   h.toFiberPreStabilityBaseChangeData.phase_iff_comp f g phi E
 
-end GeometricPreStabilityBaseChangeData
+end GeometricPreStabilityBaseChangeHypotheses
 
 end
 

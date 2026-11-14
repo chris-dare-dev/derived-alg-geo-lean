@@ -141,7 +141,7 @@ open CategoryTheory.Triangulated
 
 section Euler
 
-open NumericalRingData NumericalRingDualData NumericalVarietyData
+open NumericalRingData NumericalRingDualHypotheses NumericalVarietyData
 
 variable {n : ℕ} {A : Type y₁} {A' : Type y₂} {N : Type x₁} {N' : Type x₂}
   [CommRing A] [Algebra ℚ A] [AddCommGroup N]
@@ -161,7 +161,7 @@ end Euler
 
 section PairingTransfer
 
-open NumericalRingData NumericalRingDualData NumericalVarietyData K3
+open NumericalRingData NumericalRingDualHypotheses NumericalVarietyData K3
 
 variable {A : Type y₁} {A' : Type y₂} {N : Type x₁} {N' : Type x₂}
   {Λ : Type w₁} {Λ' : Type w₂}
@@ -288,7 +288,7 @@ end PairingTransfer
 
 section KernelFunctor
 
-open NumericalRingData NumericalRingDualData NumericalVarietyData K3
+open NumericalRingData NumericalRingDualHypotheses NumericalVarietyData K3
 open CategoryTheory.Triangulated.FourierMukai
 
 variable {𝒳 : Type u₁} {𝒴 : Type u₂} {𝒲 : Type u₃}

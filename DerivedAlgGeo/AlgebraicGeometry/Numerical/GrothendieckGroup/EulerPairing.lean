@@ -62,7 +62,7 @@ hypotheses needed for its underlying `ℤ`-lattice.
 
 ## References
 
-This file builds on `NumericalVarietyData`, the dual involution `NumericalRingDualData`, and
+This file builds on `NumericalVarietyData`, the dual involution `NumericalRingDualHypotheses`, and
 the K3 self-pairing `K3.mukaiSelfPairing` with its formula `K3.mukaiSelfPairing_eq`.
 
 ## Tags
@@ -76,7 +76,7 @@ namespace AlgebraicGeometry.Numerical
 
 namespace NumericalVarietyData
 
-open NumericalRingData NumericalRingDualData Finset
+open NumericalRingData NumericalRingDualHypotheses Finset
 
 variable {n : ℕ} {A : Type u} {N : Type v}
 variable [CommRing A] [Algebra ℚ A] [AddCommGroup N]
@@ -84,7 +84,7 @@ variable (V : NumericalVarietyData n A N)
 
 /-- The **Euler pairing** `χ(E,F) = ∫_X ch(E)^∨ · ch(F) · td(X)`.
 
-Note what this does *not* require: no `NumericalRingDualData` value. `chDual` is the
+Note what this does *not* require: no `NumericalRingDualHypotheses` value. `chDual` is the
 explicit alternating sum `Σᵢ (-1)ⁱ chᵢ(E)`, which the grading alone supplies. The involution
 is what *justifies* calling it a dual — `chi₂_eq_degree_dual_ch` below — but the pairing and
 every consequence of it are available on any `NumericalVarietyData`. -/
@@ -178,7 +178,7 @@ theorem chi₂_add_left (E F G : N) :
 /-- `chi₂` written with the involution rather than with `chDual`, which is how
 Hirzebruch–Riemann–Roch states it. This is the only place the involution is needed, and it
 is what earns `chDual` its name. -/
-theorem chi₂_eq_degree_dual_ch (D : NumericalRingDualData V.ring) (E F : N) :
+theorem chi₂_eq_degree_dual_ch (D : NumericalRingDualHypotheses V.ring) (E F : N) :
     V.chi₂ E F = V.ring.degree (D.dual (V.ch E) * V.ch F * V.todd) := by
   rw [chi₂, V.dual_ch D]
 
@@ -186,7 +186,7 @@ end NumericalVarietyData
 
 namespace Surface
 
-open NumericalRingData NumericalRingDualData NumericalVarietyData Finset
+open NumericalRingData NumericalRingDualHypotheses NumericalVarietyData Finset
 
 variable {A : Type u} {N : Type v}
 variable [CommRing A] [Algebra ℚ A] [AddCommGroup N]
@@ -261,7 +261,7 @@ end Surface
 
 namespace K3
 
-open NumericalRingData NumericalRingDualData NumericalVarietyData Finset
+open NumericalRingData NumericalRingDualHypotheses NumericalVarietyData Finset
 
 variable {A : Type u} {N : Type v}
 variable [CommRing A] [Algebra ℚ A] [AddCommGroup N]

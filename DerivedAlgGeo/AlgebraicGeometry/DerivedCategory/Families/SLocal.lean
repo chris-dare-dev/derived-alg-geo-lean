@@ -24,7 +24,7 @@ Three things make the quantifier cheap to state.
   restriction is an ordinary base-change pullback.
 * An open is already an object of `Over S`, by `opensBaseChange`.
 * Base change is already functorial in the index, by
-  `KFlatBaseChangeData.quasicoherentPullback`.
+  `KFlatBaseChangeHypotheses.quasicoherentPullback`.
 
 What is *not* cheap, and is therefore an explicit input, is the base-change data
 over each open. The repository's base change consumes bundled K-flat
@@ -63,10 +63,10 @@ the component-preservation statement that `quasicoherentPullback` consumes, and
 both are geometry. -/
 structure OpenRestrictionFamily (X : SchemeBaseChange S)
     (P : ObjectProperty (SourceDqc X)) [P.ContainsZero]
-    (DS : KFlatBaseChangeData X (identityBaseChange S)) where
+    (DS : KFlatBaseChangeHypotheses X (identityBaseChange S)) where
   /-- The base change of `X` to each quasi-compact open of the base. -/
   data (U : S.Opens) (hU : CompactSpace U.toScheme) :
-    KFlatBaseChangeData X (opensBaseChange U)
+    KFlatBaseChangeHypotheses X (opensBaseChange U)
   /-- Restriction from the base to that open. -/
   restriction (U : S.Opens) (hU : CompactSpace U.toScheme) :
     DS.QuasicoherentCategory P ⥤ (data U hU).QuasicoherentCategory P
@@ -74,7 +74,7 @@ structure OpenRestrictionFamily (X : SchemeBaseChange S)
 namespace OpenRestrictionFamily
 
 variable {X : SchemeBaseChange S} {P : ObjectProperty (SourceDqc X)}
-  [P.ContainsZero] {DS : KFlatBaseChangeData X (identityBaseChange S)}
+  [P.ContainsZero] {DS : KFlatBaseChangeHypotheses X (identityBaseChange S)}
 
 /-- **`S`-locality** (§4 of arXiv:1902.08184): the t-structure restricts along
 the restriction to every quasi-compact open of the base.
@@ -178,7 +178,7 @@ The finite family below is intended to come from a quasi-compact open cover.
 Since `OpenRestrictionFamily` carries abstract functors, a topological cover
 alone would not prove that they detect isomorphisms; the categorical
 conservativity and mono-preservation obligations are retained as fields. -/
-structure NoetherianLocalityData (R : OpenRestrictionFamily X P DS)
+structure NoetherianLocalityHypotheses (R : OpenRestrictionFamily X P DS)
     (t : TStructure (DS.QuasicoherentCategory P)) where
   /-- The S-local data the two implications below are stated against. Carried
   rather than existentially quantified, because `isNoetherian_iff` hands its caller
@@ -205,7 +205,7 @@ structure NoetherianLocalityData (R : OpenRestrictionFamily X P DS)
 /-- The local-to-global half of Lemma 4.15 follows from the chosen finite
 detecting family. This adapter supplies the finite detector above with the
 record's categorical hypotheses; the converse `global_to_local` is not used. -/
-theorem NoetherianLocalityData.local_to_global (H : NoetherianLocalityData R t)
+theorem NoetherianLocalityHypotheses.local_to_global (H : NoetherianLocalityHypotheses R t)
     (hlocal : ∀ (U : S.Opens) (hU : CompactSpace U.toScheme),
       (H.localData.restriction U hU).tStructure.IsNoetherian) :
     t.IsNoetherian := by
@@ -216,7 +216,7 @@ theorem NoetherianLocalityData.local_to_global (H : NoetherianLocalityData R t)
 
 /-- Lemma 4.15 of arXiv:1902.08184: the t-structure is noetherian exactly when
 its restriction to every quasi-compact open is. -/
-theorem NoetherianLocalityData.isNoetherian_iff (H : NoetherianLocalityData R t) :
+theorem NoetherianLocalityHypotheses.isNoetherian_iff (H : NoetherianLocalityHypotheses R t) :
     t.IsNoetherian ↔
       ∀ (U : S.Opens) (hU : CompactSpace U.toScheme),
         (H.localData.restriction U hU).tStructure.IsNoetherian :=

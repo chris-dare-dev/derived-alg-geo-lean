@@ -10,7 +10,7 @@ import DerivedAlgGeo.CategoryTheory.ObjectProperty.Lift
 
 A morphism `f : T ⟶ U` over `S` induces `X ×_S T ⟶ X ×_S U`. The generic part of
 this file restricts any supplied `Dqc` pullback to `(Dqc)_U ⟶ (Dqc)_T` and
-`D_U ⟶ D_T`. The separate `KFlatBaseChangeData.pullbackAlong` constructor is
+`D_U ⟶ D_T`. The separate `KFlatBaseChangeHypotheses.pullbackAlong` constructor is
 the K-flat producer for that ambient pullback.
 
 The only component-level hypothesis is preservation of `(Dqc)`. Once the derived pullback also
@@ -136,13 +136,13 @@ theorem boundedFunctor_obj_obj (pull : DqcLeftDerivedPullback f)
 
 end DqcLeftDerivedPullback
 
-namespace KFlatBaseChangeData
+namespace KFlatBaseChangeHypotheses
 
 variable {f : T ⟶ U}
 
 /-- Construct pullback along `X ×_S T ⟶ X ×_S U` from the K-flat resolution on
 `X ×_S U` carried by the target base-change data. -/
-def pullbackAlong (D : KFlatBaseChangeData X U) (f : T ⟶ U)
+def pullbackAlong (D : KFlatBaseChangeHypotheses X U) (f : T ⟶ U)
     (hAcyclic : KFlatPullbackAcyclic D.tensorResolution (baseChangeMap X f))
     (hQuasicoherent : KFlatResolvedPullbackPreservesQuasicoherentCohomology
       D.tensorResolution (baseChangeMap X f)) :
@@ -155,7 +155,7 @@ underlying the K-flat pullback is essentially surjective.  Open immersions are
 stable under the product base change `X ×_S -`, and the preceding geometric
 construction applies to that induced open immersion. -/
 noncomputable instance pullbackAlong_ambient_essSurj_of_isOpenImmersion
-    (D : KFlatBaseChangeData X U) (f : T ⟶ U)
+    (D : KFlatBaseChangeHypotheses X U) (f : T ⟶ U)
     (hAcyclic : KFlatPullbackAcyclic D.tensorResolution (baseChangeMap X f))
     (hQuasicoherent : KFlatResolvedPullbackPreservesQuasicoherentCohomology
       D.tensorResolution (baseChangeMap X f)) [IsOpenImmersion f.left] :
@@ -164,7 +164,7 @@ noncomputable instance pullbackAlong_ambient_essSurj_of_isOpenImmersion
   dsimp [pullbackAlong, kFlatDqcLeftDerivedPullback]
   exact LeftDerivedPullback.essSurj_of_isOpenImmersion _
 
-end KFlatBaseChangeData
+end KFlatBaseChangeHypotheses
 
 namespace DerivedBaseChangeData
 
@@ -295,12 +295,12 @@ noncomputable def boundedPullbackCompInclusion
 
 end DerivedBaseChangeData
 
-namespace KFlatBaseChangeData
+namespace KFlatBaseChangeHypotheses
 
 /-- The fully K-flat form of pullback on `(Dqc)`: both the ambient derived functor and its
 restriction to the constructed component are obtained from the resolutions. -/
 noncomputable def kFlatQuasicoherentPullback
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : KFlatBaseChangeHypotheses X T) (DU : KFlatBaseChangeHypotheses X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (f : T ⟶ U)
     (hAcyclic : KFlatPullbackAcyclic DU.tensorResolution (baseChangeMap X f))
@@ -317,7 +317,7 @@ noncomputable def kFlatQuasicoherentPullback
 /-- The fully K-flat form of pullback on `D`: the bounded restriction is constructed from the
 same K-flat derived pullback used on `(Dqc)`. -/
 noncomputable def kFlatBoundedPullback
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : KFlatBaseChangeHypotheses X T) (DU : KFlatBaseChangeHypotheses X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (f : T ⟶ U)
     (hAcyclic : KFlatPullbackAcyclic DU.tensorResolution (baseChangeMap X f))
@@ -332,7 +332,7 @@ noncomputable def kFlatBoundedPullback
     DU.toDerivedBaseChangeData P (DU.pullbackAlong f hAcyclic hQuasicoherent)
     hComponent hBounded
 
-end KFlatBaseChangeData
+end KFlatBaseChangeHypotheses
 
 namespace DerivedBaseChangeData
 

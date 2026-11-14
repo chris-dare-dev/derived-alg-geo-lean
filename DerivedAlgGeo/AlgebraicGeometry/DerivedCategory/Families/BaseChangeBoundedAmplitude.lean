@@ -42,7 +42,7 @@ Nothing here asserts finite amplitude for any projector.
   amplitude preserves ambient boundedness.
 * `DerivedBaseChangeData.DecompositionData.toBoundedData`: finite amplitude, coherence
   preservation and generation give the bounded-coherent restriction.
-* `KFlatBaseChangeData.DecompositionCoreData.boundedSequence_isStrong`: the
+* `KFlatBaseChangeHypotheses.DecompositionCoreData.boundedSequence_isStrong`: the
   bounded-coherent sequence of Proposition 3.15 is strong under the same inputs.
 
 ## Implementation notes
@@ -178,9 +178,9 @@ end DecompositionData
 
 end DerivedBaseChangeData
 
-namespace KFlatBaseChangeData
+namespace KFlatBaseChangeHypotheses
 
-variable {X T : SchemeBaseChange S} {D : KFlatBaseChangeData X T}
+variable {X T : SchemeBaseChange S} {D : KFlatBaseChangeHypotheses X T}
   {ι : Type w} [Preorder ι]
   {A : SemiorthogonalSequence (SourceDqc X) ι}
   {hcompact : D.PreservesCompactObjects}
@@ -188,7 +188,7 @@ variable {X T : SchemeBaseChange S} {D : KFlatBaseChangeData X T}
 
 namespace DecompositionCoreData
 
-variable {P : D.SourceTensorData} {BP : KFlatBasePullbackData X}
+variable {P : D.SourceTensorHypotheses} {BP : KFlatBasePullbackHypotheses X}
   (C : D.DecompositionCoreData A P BP hcompact)
 
 /-- The bounded-coherent restriction of the Proposition 3.15 decomposition
@@ -232,6 +232,6 @@ theorem boundedSequence_isStrong
 
 end DecompositionCoreData
 
-end KFlatBaseChangeData
+end KFlatBaseChangeHypotheses
 
 end AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange

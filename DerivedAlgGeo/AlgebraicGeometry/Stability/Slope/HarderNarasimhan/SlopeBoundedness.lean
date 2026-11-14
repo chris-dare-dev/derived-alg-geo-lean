@@ -20,7 +20,7 @@ bound for `degree(F/B)`.
 
 ## The remaining geometric obligation
 
-Nothing in the current `PolarizedVarietyData` API says that `P.L` is ample, and the tree has no
+Nothing in the current `PolarizedVarietyHypotheses` API says that `P.L` is ample, and the tree has no
 uniform Castelnuovo--Mumford regularity theorem or equivalent graded-submodule estimate.
 Consequently this file does not claim Grothendieck boundedness. It isolates it as the sharp
 reusable obligation `quotientDegree_bddBelow` accepted by
@@ -40,9 +40,9 @@ open AlgebraicGeometry.Cohomology
 variable {k : Type u} [Field k]
 variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 
-namespace PolarizedVarietyData
+namespace PolarizedVarietyHypotheses
 
-variable {P : PolarizedVarietyData k X}
+variable {P : PolarizedVarietyHypotheses k X}
 
 /-- The codimension-one Hilbert coefficient of a coherent sheaf is the sum of those of a
 subobject and its canonical quotient. -/
@@ -128,13 +128,13 @@ theorem slope_bddAbove_iff_quotientDegree_bddBelow (h : MuPositivityData P) (F :
         apply mul_le_mul_of_nonneg_left _ (le_max_right _ _)
         exact_mod_cast (show (1 : ℤ) ≤ P.multiplicity (B : Coh X) by omega)
 
-end PolarizedVarietyData
+end PolarizedVarietyHypotheses
 
 /-- On a Noetherian scheme, a uniform lower bound for quotient degree coefficients is exactly
 the remaining input needed to construct sheaf-level μ-Harder--Narasimhan filtrations. This
 constructor does not assert that bound: it packages a proof of the geometric obligation through
-`PolarizedVarietyData.slope_bddAbove_iff_quotientDegree_bddBelow`. -/
-theorem MuHNInput.ofQuotientDegreeLowerBound {P : PolarizedVarietyData k X}
+`PolarizedVarietyHypotheses.slope_bddAbove_iff_quotientDegree_bddBelow`. -/
+theorem MuHNInput.ofQuotientDegreeLowerBound {P : PolarizedVarietyHypotheses k X}
     {h : MuPositivityData P} [IsNoetherian X]
     (quotientDegree_bddBelow : ∀ F : Coh X, ∃ d₀ : ℤ, ∀ B : Subobject F,
       0 < P.multiplicity (B : Coh X) →

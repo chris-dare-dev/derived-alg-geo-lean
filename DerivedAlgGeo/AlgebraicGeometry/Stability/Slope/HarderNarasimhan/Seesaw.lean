@@ -44,9 +44,9 @@ open AlgebraicGeometry.Cohomology
 variable {k : Type u} [Field k]
 variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 
-namespace PolarizedVarietyData
+namespace PolarizedVarietyHypotheses
 
-variable {P : PolarizedVarietyData k X}
+variable {P : PolarizedVarietyHypotheses k X}
 
 /-- Multiplicity is additive on a short exact sequence. -/
 theorem multiplicity_shortExact {S : ShortComplex (Coh X)} (hS : S.ShortExact) :
@@ -115,6 +115,6 @@ theorem topSlope_le_of_shortExact (h : MuPositivityData P) {S : ShortComplex (Co
       rw [hmr, hdr]
       nlinarith [hle, hm1r, hm3r]
 
-end PolarizedVarietyData
+end PolarizedVarietyHypotheses
 
 end AlgebraicGeometry.Stability.Gieseker

@@ -59,7 +59,7 @@ second is made.
 * Nothing is an `instance`.  A global `Correspondence` instance would put the
   trivial one in front of every instance search that mentions the structure,
   which is precisely the wrong trade for a witness whose only job is to exist.
-* No witness for `CoherentConvolutionData`, which needs a `MonoidalCategory`
+* No witness for `CoherentConvolutionHypotheses`, which needs a `MonoidalCategory`
   presentation of the kernel category, or for `ConvolutionData`, which already
   has inhabitants.
 

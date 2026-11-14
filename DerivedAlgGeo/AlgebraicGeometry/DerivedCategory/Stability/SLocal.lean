@@ -85,7 +85,7 @@ variable {S : Scheme.{u}}
 namespace OpenRestrictionFamily
 
 variable {X : SchemeBaseChange S} {P : ObjectProperty (SourceDqc X)}
-  [P.ContainsZero] {DS : KFlatBaseChangeData X (identityBaseChange S)}
+  [P.ContainsZero] {DS : KFlatBaseChangeHypotheses X (identityBaseChange S)}
 
 variable {R : OpenRestrictionFamily X P DS}
   {s : Slicing (DS.QuasicoherentCategory P)}
@@ -94,30 +94,30 @@ variable {R : OpenRestrictionFamily X P DS}
 phase predicates and associated t-structure are compatible with restriction.
 The target slicings are chosen because downstream phase arguments need the
 actual owner data, not only a proposition that some slicing exists. -/
-structure SLocalSlicingData (R : OpenRestrictionFamily X P DS)
+structure SLocalSlicingHypotheses (R : OpenRestrictionFamily X P DS)
     (s : Slicing (DS.QuasicoherentCategory P)) where
   /-- The restricted slicing on each quasi-compact open of the base, as owner
   data. `IsSLocalSlicing` below is the propositional shadow of this field. -/
   restriction (U : S.Opens) (hU : CompactSpace U.toScheme) :
     s.Restriction (R.restriction U hU)
 
-/-- Propositional shadow of `SLocalSlicingData`. -/
+/-- Propositional shadow of `SLocalSlicingHypotheses`. -/
 def IsSLocalSlicing (R : OpenRestrictionFamily X P DS)
     (s : Slicing (DS.QuasicoherentCategory P)) : Prop :=
   ∀ (U : S.Opens) (hU : CompactSpace U.toScheme),
     Nonempty (s.Restriction (R.restriction U hU))
 
-namespace SLocalSlicingData
+namespace SLocalSlicingHypotheses
 
 variable {R : OpenRestrictionFamily X P DS}
   {s : Slicing (DS.QuasicoherentCategory P)}
 
 /-- Chosen slicing restrictions witness the propositional S-local condition. -/
-theorem isSLocal (L : SLocalSlicingData R s) : R.IsSLocalSlicing s :=
+theorem isSLocal (L : SLocalSlicingHypotheses R s) : R.IsSLocalSlicing s :=
   fun U hU ↦ ⟨L.restriction U hU⟩
 
 /-- Forget the phase data to obtain the associated S-local t-structure. -/
-def toSLocalData (L : SLocalSlicingData R s) :
+def toSLocalData (L : SLocalSlicingHypotheses R s) :
     SLocalData R (s.toTStructure _) where
   restriction U hU :=
     (L.restriction U hU).toTStructureRestriction
@@ -125,7 +125,7 @@ def toSLocalData (L : SLocalSlicingData R s) :
 /-- Slicing restrictions agree once their complete phase predicates agree.
 The phase comparison is left explicit because image-generation of a target
 category is geometric, not a consequence of t-exactness alone. -/
-theorem restriction_eq_of_phase_iff (_L : SLocalSlicingData R s)
+theorem restriction_eq_of_phase_iff (_L : SLocalSlicingHypotheses R s)
     (U : S.Opens) (hU : CompactSpace U.toScheme)
     {r₁ r₂ : s.Restriction (R.restriction U hU)}
     (h : ∀ (φ : ℝ) (Y : (R.data U hU).QuasicoherentCategory P),
@@ -133,7 +133,7 @@ theorem restriction_eq_of_phase_iff (_L : SLocalSlicingData R s)
     r₁.slicing = r₂.slicing := by
   exact Slicing.Restriction.slicing_eq_of_phase_iff r₁ r₂ h
 
-end SLocalSlicingData
+end SLocalSlicingHypotheses
 
 /-- An affine-base package containing two distinct S-local t-structures.
 
@@ -154,7 +154,7 @@ structure TwoDistinctAffineSLocalTStructures
 def TwoDistinctAffineSLocalTStructures.ofSlicingData
     (hAffine : IsAffine S)
     {s₁ s₂ : Slicing (DS.QuasicoherentCategory P)}
-    (L₁ : SLocalSlicingData R s₁) (L₂ : SLocalSlicingData R s₂)
+    (L₁ : SLocalSlicingHypotheses R s₁) (L₂ : SLocalSlicingHypotheses R s₂)
     (hne : s₁.toTStructure _ ≠ s₂.toTStructure _) :
     TwoDistinctAffineSLocalTStructures R s₁ s₂ where
   affineBase := hAffine

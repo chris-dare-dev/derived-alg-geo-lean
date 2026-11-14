@@ -17,7 +17,7 @@ a Picard Euler polynomial.  Raw finite differences below top degree are not suff
 mix the desired term with higher-degree terms.  We remove that mixing by interpolating the
 scaled mixed coefficient and taking its lowest possible ordinary coefficient.
 
-Second, `PairingContext` and `ReconstructionData` state exactly when those divisor-tested
+Second, `PairingContext` and `ReconstructionHypotheses` state exactly when those divisor-tested
 functionals are represented by elements of a chosen `NumericalRingData`.  Representability gives
 existence; `divisorPairing_ext` gives uniqueness.  Neither is inferred from the intersection
 numbers.  In particular, on a higher-dimensional variety products of divisors need not separate
@@ -187,7 +187,7 @@ noncomputable def twistPairing {F : Coh X}
 
 This is separate from `PairingContext.divisorPairing_ext`: existence and uniqueness are distinct
 hypotheses. -/
-structure ReconstructionData (F : Coh X) where
+structure ReconstructionHypotheses (F : Coh X) where
   twists : TwistContext D F d
   rank : ℤ
   representable : ∀ (i : ℕ), i ≤ d → ∃ x : A,
@@ -196,16 +196,16 @@ structure ReconstructionData (F : Coh X) where
         P.ring.degree (x * divisorProduct P.divisorClass classes) =
           twistPairing twists i classes
 
-namespace ReconstructionData
+namespace ReconstructionHypotheses
 
 variable {P : PairingContext D C d A} {F G H : Coh X}
 
 /-- The unique chosen representative of the Todd-weighted component `tau_i(F)` when `i ≤ d`,
 and zero above the dimension. -/
-noncomputable def tauComponent (R : P.ReconstructionData F) (i : ℕ) : A :=
+noncomputable def tauComponent (R : P.ReconstructionHypotheses F) (i : ℕ) : A :=
   if hi : i ≤ d then Classical.choose (R.representable i hi) else 0
 
-theorem tauComponent_mem (R : P.ReconstructionData F) (i : ℕ) :
+theorem tauComponent_mem (R : P.ReconstructionHypotheses F) (i : ℕ) :
     R.tauComponent i ∈ P.ring.piece i := by
   by_cases hi : i ≤ d
   · rw [tauComponent, dite_eq_left hi]
@@ -213,7 +213,7 @@ theorem tauComponent_mem (R : P.ReconstructionData F) (i : ℕ) :
   · rw [tauComponent, dite_eq_right hi]
     exact Submodule.zero_mem _
 
-theorem degree_tauComponent_mul_divisorProduct (R : P.ReconstructionData F)
+theorem degree_tauComponent_mul_divisorProduct (R : P.ReconstructionHypotheses F)
     (i : ℕ) (hi : i ≤ d) (classes : List (Pic X))
     (hlength : classes.length = d - i) :
     P.ring.degree
@@ -223,7 +223,7 @@ theorem degree_tauComponent_mul_divisorProduct (R : P.ReconstructionData F)
   exact (Classical.choose_spec (R.representable i hi)).2 classes hlength
 
 theorem tauComponent_eq_of_twistPairing_eq
-    (R : P.ReconstructionData F) (S : P.ReconstructionData G) (i : ℕ)
+    (R : P.ReconstructionHypotheses F) (S : P.ReconstructionHypotheses G) (i : ℕ)
     (hpair : ∀ classes : List (Pic X), classes.length = d - i →
       twistPairing R.twists i classes = twistPairing S.twists i classes) :
     R.tauComponent i = S.tauComponent i := by
@@ -236,7 +236,7 @@ theorem tauComponent_eq_of_twistPairing_eq
   · simp [tauComponent, hi]
 
 theorem tauComponent_eq_of_eulerPic_eq
-    (R : P.ReconstructionData F) (S : P.ReconstructionData G)
+    (R : P.ReconstructionHypotheses F) (S : P.ReconstructionHypotheses G)
     (h : R.twists.eulerPic = S.twists.eulerPic) (i : ℕ) :
     R.tauComponent i = S.tauComponent i := by
   apply tauComponent_eq_of_twistPairing_eq R S i
@@ -244,8 +244,8 @@ theorem tauComponent_eq_of_eulerPic_eq
   simp only [PairingContext.twistPairing, h]
 
 theorem tauComponent_add
-    (R : P.ReconstructionData F) (S : P.ReconstructionData G)
-    (Q : P.ReconstructionData H)
+    (R : P.ReconstructionHypotheses F) (S : P.ReconstructionHypotheses G)
+    (Q : P.ReconstructionHypotheses H)
     (heuler : Q.twists.eulerPic = R.twists.eulerPic + S.twists.eulerPic)
     (i : ℕ) :
     Q.tauComponent i = R.tauComponent i + S.tauComponent i := by
@@ -260,16 +260,16 @@ theorem tauComponent_add
     rfl
   · simp [tauComponent, hi]
 
-end ReconstructionData
+end ReconstructionHypotheses
 
 end PairingContext
 
 /-! ## Todd normalization and Chern-character components through degree four -/
 
-open PairingContext.ReconstructionData
+open PairingContext.ReconstructionHypotheses
 
 variable {P : PairingContext D C d A}
-variable {O : Coh X} (RO : P.ReconstructionData O)
+variable {O : Coh X} (RO : P.ReconstructionHypotheses O)
 
 /-- The reconstructed Todd component is the Todd-weighted component of the structure sheaf. -/
 noncomputable def toddComponent (i : ℕ) : A := RO.tauComponent i
@@ -277,7 +277,7 @@ noncomputable def toddComponent (i : ℕ) : A := RO.tauComponent i
 variable {F : Coh X}
 
 /-- Chern-character components recovered from `tau(F) = ch(F) * td(X)`, through degree four. -/
-noncomputable def chernCharacterComponent (R : P.ReconstructionData F) : ℕ → A
+noncomputable def chernCharacterComponent (R : P.ReconstructionHypotheses F) : ℕ → A
   | 0 => algebraMap ℚ A (R.rank : ℚ)
   | 1 => R.tauComponent 1 -
       algebraMap ℚ A (R.rank : ℚ) * toddComponent RO 1
@@ -295,29 +295,29 @@ noncomputable def chernCharacterComponent (R : P.ReconstructionData F) : ℕ →
             algebraMap ℚ A (R.rank : ℚ) * toddComponent RO 4
   | _ => 0
 
-@[simp] theorem chernCharacterComponent_zero (R : P.ReconstructionData F) :
+@[simp] theorem chernCharacterComponent_zero (R : P.ReconstructionHypotheses F) :
     chernCharacterComponent RO R 0 = algebraMap ℚ A (R.rank : ℚ) := by
   simp [chernCharacterComponent]
 
-@[simp] theorem chernCharacterComponent_one (R : P.ReconstructionData F) :
+@[simp] theorem chernCharacterComponent_one (R : P.ReconstructionHypotheses F) :
     chernCharacterComponent RO R 1 = R.tauComponent 1 -
       algebraMap ℚ A (R.rank : ℚ) * toddComponent RO 1 := by
   simp [chernCharacterComponent]
 
-@[simp] theorem chernCharacterComponent_two (R : P.ReconstructionData F) :
+@[simp] theorem chernCharacterComponent_two (R : P.ReconstructionHypotheses F) :
     chernCharacterComponent RO R 2 = R.tauComponent 2 -
       chernCharacterComponent RO R 1 * toddComponent RO 1 -
         algebraMap ℚ A (R.rank : ℚ) * toddComponent RO 2 := by
   simp [chernCharacterComponent]
 
-@[simp] theorem chernCharacterComponent_three (R : P.ReconstructionData F) :
+@[simp] theorem chernCharacterComponent_three (R : P.ReconstructionHypotheses F) :
     chernCharacterComponent RO R 3 = R.tauComponent 3 -
       chernCharacterComponent RO R 2 * toddComponent RO 1 -
         chernCharacterComponent RO R 1 * toddComponent RO 2 -
           algebraMap ℚ A (R.rank : ℚ) * toddComponent RO 3 := by
   simp [chernCharacterComponent]
 
-@[simp] theorem chernCharacterComponent_four (R : P.ReconstructionData F) :
+@[simp] theorem chernCharacterComponent_four (R : P.ReconstructionHypotheses F) :
     chernCharacterComponent RO R 4 = R.tauComponent 4 -
       chernCharacterComponent RO R 3 * toddComponent RO 1 -
         chernCharacterComponent RO R 2 * toddComponent RO 2 -
@@ -325,12 +325,12 @@ noncomputable def chernCharacterComponent (R : P.ReconstructionData F) : ℕ →
             algebraMap ℚ A (R.rank : ℚ) * toddComponent RO 4 := by
   simp [chernCharacterComponent]
 
-@[simp] theorem chernCharacterComponent_of_five_le (R : P.ReconstructionData F)
+@[simp] theorem chernCharacterComponent_of_five_le (R : P.ReconstructionHypotheses F)
     {i : ℕ} (hi : 5 ≤ i) : chernCharacterComponent RO R i = 0 := by
   rcases i with _ | _ | _ | _ | _ | i <;>
     simp [chernCharacterComponent] at hi ⊢
 
-theorem chernCharacterComponent_mem (R : P.ReconstructionData F) (i : ℕ) :
+theorem chernCharacterComponent_mem (R : P.ReconstructionHypotheses F) (i : ℕ) :
     chernCharacterComponent RO R i ∈ P.ring.piece i := by
   have h0 : chernCharacterComponent RO R 0 ∈ P.ring.piece 0 := by
     simpa using P.ring.algebraMap_mem_piece_zero (R.rank : ℚ)
@@ -379,26 +379,26 @@ theorem chernCharacterComponent_mem (R : P.ReconstructionData F) (i : ℕ) :
   · simp
 
 theorem chernCharacterComponent_eq_zero_of_dimension_lt
-    (R : P.ReconstructionData F) {i : ℕ} (hi : d < i) :
+    (R : P.ReconstructionHypotheses F) {i : ℕ} (hi : d < i) :
     chernCharacterComponent RO R i = 0 :=
   P.ring.eq_zero_of_mem_piece_of_lt hi (chernCharacterComponent_mem RO R i)
 
 /-! ## The triangular extraction principle -/
 
-theorem tauComponent_one_eq (R : P.ReconstructionData F) :
+theorem tauComponent_one_eq (R : P.ReconstructionHypotheses F) :
     R.tauComponent 1 = chernCharacterComponent RO R 1 +
       chernCharacterComponent RO R 0 * toddComponent RO 1 := by
   simp only [chernCharacterComponent_zero, chernCharacterComponent_one]
   ring
 
-theorem tauComponent_two_eq (R : P.ReconstructionData F) :
+theorem tauComponent_two_eq (R : P.ReconstructionHypotheses F) :
     R.tauComponent 2 = chernCharacterComponent RO R 2 +
       chernCharacterComponent RO R 1 * toddComponent RO 1 +
         chernCharacterComponent RO R 0 * toddComponent RO 2 := by
   simp only [chernCharacterComponent_zero, chernCharacterComponent_two]
   ring
 
-theorem tauComponent_three_eq (R : P.ReconstructionData F) :
+theorem tauComponent_three_eq (R : P.ReconstructionHypotheses F) :
     R.tauComponent 3 = chernCharacterComponent RO R 3 +
       chernCharacterComponent RO R 2 * toddComponent RO 1 +
         chernCharacterComponent RO R 1 * toddComponent RO 2 +
@@ -406,7 +406,7 @@ theorem tauComponent_three_eq (R : P.ReconstructionData F) :
   simp only [chernCharacterComponent_zero, chernCharacterComponent_three]
   ring
 
-theorem tauComponent_four_eq (R : P.ReconstructionData F) :
+theorem tauComponent_four_eq (R : P.ReconstructionHypotheses F) :
     R.tauComponent 4 = chernCharacterComponent RO R 4 +
       chernCharacterComponent RO R 3 * toddComponent RO 1 +
         chernCharacterComponent RO R 2 * toddComponent RO 2 +
@@ -418,7 +418,7 @@ theorem tauComponent_four_eq (R : P.ReconstructionData F) :
 /-! ## Invariance and exact-sequence additivity -/
 
 theorem chernCharacterComponent_eq_of_eulerPic_eq
-    {G : Coh X} (R : P.ReconstructionData F) (S : P.ReconstructionData G)
+    {G : Coh X} (R : P.ReconstructionHypotheses F) (S : P.ReconstructionHypotheses G)
     (hrank : R.rank = S.rank) (heuler : R.twists.eulerPic = S.twists.eulerPic) (i : ℕ) :
     chernCharacterComponent RO R i = chernCharacterComponent RO S i := by
   have htau : ∀ j, R.tauComponent j = S.tauComponent j :=
@@ -428,17 +428,17 @@ theorem chernCharacterComponent_eq_of_eulerPic_eq
 
 /-- Isomorphism invariance once the chosen rank and twist-polynomial realizations have been
 compared.  The comparison hypotheses stay explicit because a bare coherent-sheaf isomorphism
-does not choose compatible `ReconstructionData`. -/
+does not choose compatible `ReconstructionHypotheses`. -/
 theorem chernCharacterComponent_iso
-    {G : Coh X} (R : P.ReconstructionData F) (S : P.ReconstructionData G)
+    {G : Coh X} (R : P.ReconstructionHypotheses F) (S : P.ReconstructionHypotheses G)
     (_e : F ≅ G) (hrank : R.rank = S.rank)
     (heuler : R.twists.eulerPic = S.twists.eulerPic) (i : ℕ) :
     chernCharacterComponent RO R i = chernCharacterComponent RO S i :=
   chernCharacterComponent_eq_of_eulerPic_eq RO R S hrank heuler i
 
 theorem chernCharacterComponent_add
-    {G H : Coh X} (R : P.ReconstructionData F)
-    (S : P.ReconstructionData G) (Q : P.ReconstructionData H)
+    {G H : Coh X} (R : P.ReconstructionHypotheses F)
+    (S : P.ReconstructionHypotheses G) (Q : P.ReconstructionHypotheses H)
     (hrank : Q.rank = R.rank + S.rank)
     (heuler : Q.twists.eulerPic = R.twists.eulerPic + S.twists.eulerPic)
     (i : ℕ) :
@@ -497,7 +497,7 @@ noncomputable def lineTauCandidate (x : A) (i : ℕ) : A :=
 
 This is the precise missing translation/representability input.  It is stated on the extracted
 twist coefficients, not as the desired Chern-character equality. -/
-structure LineBundleComparison (R : P.ReconstructionData F) (L : Pic X) where
+structure LineBundleComparison (R : P.ReconstructionHypotheses F) (L : Pic X) where
   rank_eq_one : R.rank = 1
   candidate_mem : ∀ (i : ℕ), i ≤ d → i ≤ 4 →
     lineTauCandidate RO (P.divisorClass (Additive.ofMul L)) i ∈
@@ -513,7 +513,7 @@ structure LineBundleComparison (R : P.ReconstructionData F) (L : Pic X) where
 The conclusion uses both the stated representability and the explicit divisor-pairing
 nondegeneracy from `PairingContext`. -/
 theorem tauComponent_eq_lineTauCandidate
-    (R : P.ReconstructionData F) (L : Pic X)
+    (R : P.ReconstructionHypotheses F) (L : Pic X)
     (Q : LineBundleComparison RO R L) (i : ℕ) (hi : i ≤ d) (hi4 : i ≤ 4) :
     R.tauComponent i = lineTauCandidate RO (P.divisorClass (Additive.ofMul L)) i := by
   apply P.divisorPairing_ext i hi (tauComponent_mem R i) (Q.candidate_mem i hi hi4)
@@ -524,7 +524,7 @@ theorem tauComponent_eq_lineTauCandidate
 /-- Under the visible normalization `td₀ = 1`, the reconstructed Chern character of a line
 bundle is `exp(c₁)` through the supported degree four. -/
 theorem chernCharacterComponent_lineBundle
-    (R : P.ReconstructionData F) (L : Pic X)
+    (R : P.ReconstructionHypotheses F) (L : Pic X)
     (Q : LineBundleComparison RO R L) (htoddZero : toddComponent RO 0 = 1)
     (i : ℕ) (hi : i ≤ d) (hi4 : i ≤ 4) :
     chernCharacterComponent RO R i =
@@ -612,7 +612,7 @@ theorem degree_chernCharacterComponent_two_eq_surface
     {D : FiniteCohomology k X} {C : D.LinearConnectingSystem}
     {A : Type v} [CommRing A] [Algebra ℚ A]
     (P : PairingContext D C 2 A) {O F : Coh X}
-    (RO : P.ReconstructionData O) (R : P.ReconstructionData F)
+    (RO : P.ReconstructionHypotheses O) (R : P.ReconstructionHypotheses F)
     (Qdet : Coh.TwoTermPerfectDeterminantData F)
     (hrank : R.rank = virtualRank Qdet)
     (htauTop : P.ring.degree (R.tauComponent 2) =
@@ -635,7 +635,7 @@ theorem degree_chernCharacterComponent_two_eq_surface
 
 /-- Recover Chern classes whose universal formulas give the reconstructed character through
 codimension four. -/
-noncomputable def toChernClassData (R : P.ReconstructionData F) : ChernClassData A where
+noncomputable def toChernClassData (R : P.ReconstructionHypotheses F) : ChernClassData A where
   rank := R.rank
   c := fun i ↦
     match i with
