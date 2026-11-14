@@ -45,13 +45,40 @@ walls in the geometric sense:
   vanishes identically. `wall_subset_of_crossZero` and `wall_eq_of_meet`
   exclude this case by hypothesis for exactly that reason.
 
-## What this is a theorem about, and what it is not
+## Main definitions
+
+* `minA`, `minB`, `minC` — the three `2 × 2` minors of the matrix with rows `v`
+  and `w`.
+* `wallExpr` — the cross product of the two charges, which vanishes exactly
+  when they are real-proportional.
+* `shift` — the scalar shift of `w` by `v`, componentwise.
+* `crossAB`, `crossAC`, `crossBC` — the cross terms of two minor vectors.
+* `degV` — the degenerate class of the worked counterexample.
+
+## Main results
+
+* `wallExpr_eq` — the collapse. Proved as an identity, with no side conditions.
+* `wall_iff_circle` — the circle/line form, for `t ≠ 0`.
+* `wall_circle_eq` — centre `(-minB/minA, 0)` and radius² `(minB² - 2·minA·minC)/minA²`.
+* `minA_shift`, `minB_shift`, `minC_shift`, `wallExpr_shift` — a wall depends
+  only on `w` modulo `v`.
+* `charge_eq_zero_iff` — where the charge degenerates, hence where all walls
+  of a fixed `v` concur.
+* `eq_of_two_walls` — two walls through a common point with non-proportional
+  minor vectors pin down that point uniquely.
+* `wall_eq_of_meet` — distinct walls of a fixed `v` are **disjoint**. This is
+  the separation half of Bertram's nested wall theorem; the ordering half
+  needs the discriminant and is not proved here.
+
+## Implementation notes
+
+### What this is a theorem about, and what it is not
 
 Everything here is arithmetic on triples of real numbers. There is **no**
 surface: no coherent sheaf, no Chern character, no polarisation, no
 Bogomolov–Gieseker inequality. `NumClass` is a triple, not `ch(E)`, and the
-identification is geometry that Mathlib cannot express at the pin — CLAUDE.md
-§4 closes that lane, and nothing here reopens it.
+identification is geometry that Mathlib cannot express at the pinned revision;
+nothing here asserts it.
 
 In particular **no discriminant hypothesis is assumed anywhere below**, because
 none is needed: the wall equation is an identity. Where the geometric theory
@@ -65,34 +92,30 @@ nesting would need. It is discussion, not a hypothesis: no statement below
 mentions it. `Walls/Numerical/Discriminant.lean` supplies it and removes the
 excluded point of `wall_eq_of_meet`.
 
-## Where this material is expounded
+### Where this material is expounded
 
 The `(s, t)` half plane, the twisted charge, and the wall and chamber structure
 are Macrì–Schmidt, *Lectures on Bridgeland Stability* (`arXiv:1607.01262v3`),
 §6.4 — there in the `(α, β)` coordinates. The manuscript is pinned as
 `registry/coverage-1607.01262.json`, **at status `target` throughout**: naming
 it here says where a reader can find the surrounding theory, and asserts no
-correspondence between any declaration below and any statement of it. That
-claim would be status `mapped` and needs a review this file has not had.
+correspondence between any declaration below and any statement of it.
 
 The primary artifacts stay primary. For the surface construction that is
 Arcara–Bertram and, on a K3, Bridgeland `math/0307164` §6; the nested-wall
 ordering is Maciocia's. A lecture note is where the material is explained, not
-what a future binding is checked against.
+the statement a declaration is checked against.
 
-## Main results
+## References
 
-* `wallExpr_eq` — the collapse. Proved as an identity, with no side conditions.
-* `wall_iff_circle` — the circle/line form, for `t ≠ 0`.
-* `wall_circle_eq` — centre `(-minB/minA, 0)` and radius² `(minB² - 2·minA·minC)/minA²`.
-* `minA_add_smul` and friends — a wall depends only on `w` modulo `v`.
-* `charge_eq_zero_iff` — where the charge degenerates, hence where all walls
-  of a fixed `v` concur.
-* `eq_of_two_walls` — two walls through a common point with non-proportional
-  minor vectors pin down that point uniquely.
-* `wall_eq_of_meet` — distinct walls of a fixed `v` are **disjoint**. This is
-  the separation half of Bertram's nested wall theorem; the ordering half
-  needs the discriminant and is not proved here.
+* Macrì, Schmidt, *Lectures on Bridgeland Stability*, arXiv:1607.01262v3, §6.4.
+* Arcara, Bertram, for the surface construction; Bridgeland, math/0307164, §6,
+  on a K3.
+* Maciocia, for the nested-wall ordering.
+
+## Tags
+
+numerical wall, tilt stability, half plane, nested semicircles, minors
 -/
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall
@@ -316,10 +339,10 @@ def crossBC (v w₁ w₂ : NumClass) : ℝ := minB v w₁ * minC v w₂ - minB v
 
 **Deliberately not `@[simp]`.** An antisymmetry lemma whose two sides are the
 same head symbol with permuted arguments rewrites forever: `simp` takes
-`crossAB v w₂ w₁` to `-crossAB v w₁ w₂`, then the inner term back again. Marking
-these `@[simp]` was the first version here, and `lake exe runLinter` rejected
-all three with `maximum recursion depth has been reached` -- a loop `lake build`
-does not see, because nothing in this file happened to call `simp` on one. -/
+`crossAB v w₂ w₁` to `-crossAB v w₁ w₂`, then the inner term back again. Marked
+`@[simp]`, all three fail `lake exe runLinter` with `maximum recursion depth has
+been reached` -- a loop `lake build` does not see unless something calls `simp`
+on one. -/
 
 theorem crossAB_swap (v w₁ w₂ : NumClass) :
     crossAB v w₂ w₁ = -crossAB v w₁ w₂ := by simp only [crossAB]; ring

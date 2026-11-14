@@ -52,9 +52,9 @@ open NumericalPolynomial
 variable {k : Type u} [Field k]
 variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 
-namespace PolarizedVarietyData
+namespace PolarizedVarietyHypotheses
 
-variable (P : PolarizedVarietyData k X)
+variable (P : PolarizedVarietyHypotheses k X)
 
 /-! ### The Newton coefficients -/
 
@@ -215,6 +215,6 @@ theorem reducedHilbert_eq_sum_choose (F : Coh X) (n : ℕ) :
   rw [Finset.sum_div]
   exact Finset.sum_congr rfl fun j _ ↦ by ring
 
-end PolarizedVarietyData
+end PolarizedVarietyHypotheses
 
 end AlgebraicGeometry.Stability.Gieseker

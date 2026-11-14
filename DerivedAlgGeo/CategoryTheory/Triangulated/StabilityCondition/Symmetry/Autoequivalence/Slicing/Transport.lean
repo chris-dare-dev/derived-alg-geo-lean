@@ -162,7 +162,7 @@ and fixes
 objects.
 
 `[Φ.inverse.Additive]` is unused by this term and kept regardless: without it
-`Φ` is no longer an equivalence of *triangulated* categories, which is what
+`Φ` is not an equivalence of *triangulated* categories, which is what
 this definition transports along. See the module docstring. -/
 @[nolint unusedArguments]
 noncomputable def Slicing.mapEquiv (s : Slicing C) (Φ : C ≌ C)

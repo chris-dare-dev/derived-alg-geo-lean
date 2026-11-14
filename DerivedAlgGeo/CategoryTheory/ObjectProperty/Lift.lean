@@ -16,18 +16,6 @@ restriction `P.FullSubcategory ⥤ Q.FullSubcategory`, transports the `Additive`
 `IsTriangulated` instances `lift` already carries, and restricts an adjunction on either side of
 `F` to those subcategories.
 
-Nothing here mentions a t-structure, a slicing, or a stability condition. The declarations lived in
-`CategoryTheory/Triangulated/TStructure/Restriction.lean` until this cutover because that is where
-Theorem A.17 of arXiv:2607.28411v1 first needed them; their carrier is `ObjectProperty`, whose
-`lift`, `ι`, `ιOfLE`, `liftCompιIso`, and `fullyFaithfulι` Mathlib defines in
-`Mathlib/CategoryTheory/ObjectProperty/FullSubcategory.lean`, so this file mirrors that directory.
-It is named for the operation it adds rather than for Mathlib's file because
-`ObjectProperty/FullSubcategory.lean` is one of the two paths `scripts/check_source_independence.py`
-keeps retired -- a verbatim copy from the retired stability source once lived there and was replaced
-by an owner-native proof, and that gate has no allowlist. The consumers now import this file
-directly. That the block is not t-structure theory is settled by its own import list: it needs
-Mathlib alone, and nothing from `DerivedAlgGeo`.
-
 ## Main definitions
 
 * `ObjectProperty.liftOfLE`: the restriction of `F` to a subcategory `P ≤ F⁻¹ Q`, landing in `Q`,
@@ -41,9 +29,31 @@ Mathlib alone, and nothing from `DerivedAlgGeo`.
   on either side of `F` restricted to those subcategories, through Mathlib's
   `Adjunction.restrictFullyFaithful`; the suffix names which adjoint of `F` is restricted.
 
+## Main results
+
+* `ObjectProperty.instIsTriangulatedLiftOfLE` and
+  `ObjectProperty.instIsTriangulatedPreimageLift`: the restrictions of a triangulated functor
+  between triangulated subcategories are triangulated.
+* `ObjectProperty.instFullLiftOfLE`, `ObjectProperty.instFaithfulLiftOfLE` and their
+  `preimageLift` counterparts: fullness and faithfulness restrict.
+
+## Implementation notes
+
+Nothing here mentions a t-structure, a slicing, or a stability condition: the file needs Mathlib
+alone, and nothing from `DerivedAlgGeo`. Its carrier is `ObjectProperty`, whose `lift`, `ι`,
+`ιOfLE`, `liftCompιIso`, and `fullyFaithfulι` Mathlib defines in
+`Mathlib/CategoryTheory/ObjectProperty/FullSubcategory.lean`, so this file mirrors that directory.
+It is named for the operation it adds rather than for Mathlib's file because
+`scripts/check_source_independence.py` forbids the path `ObjectProperty/FullSubcategory.lean`
+outright, with no allowlist.
+
 ## References
 
 * arXiv:2607.28411v1, Theorem A.17 and Proposition 3.8, where these restrictions are used.
+
+## Tags
+
+full subcategory, object property, restriction of functors, triangulated functor, adjunction
 -/
 
 noncomputable section

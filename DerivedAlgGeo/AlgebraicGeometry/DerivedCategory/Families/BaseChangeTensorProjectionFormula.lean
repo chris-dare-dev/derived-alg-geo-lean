@@ -31,29 +31,29 @@ open CategoryTheory CategoryTheory.Triangulated AlgebraicGeometry
 universe u w
 
 variable {S : Scheme.{u}} {X T : SchemeBaseChange S}
-  (D : KFlatBaseChangeData X T)
+  (D : KFlatBaseChangeHypotheses X T)
   {ι : Type w} [Preorder ι]
 
-namespace KFlatBaseChangeData
+namespace KFlatBaseChangeHypotheses
 
 /-- The additional quasicoherence input needed to use the first K-flat
 resolution as the derived tensor on the source `Dqc(X)`. -/
-structure SourceTensorData where
+structure SourceTensorHypotheses where
   /-- Resolved tensor on `X` preserves quasicoherent cohomology. -/
   tensorQuasicoherent :
     D.fstResolution.ResolvedTensorPreservesQuasicoherentCohomology
 
-namespace SourceTensorData
+namespace SourceTensorHypotheses
 
-/-- The source K-flat derived tensor selected by `SourceTensorData`. -/
-noncomputable def derivedTensor (Q : D.SourceTensorData) :
+/-- The source K-flat derived tensor selected by `SourceTensorHypotheses`. -/
+noncomputable def derivedTensor (Q : D.SourceTensorHypotheses) :
     SourceDqc X ⥤ SourceDqc X ⥤ SourceDqc X :=
   D.fstResolution.derivedTensorToDqc
     (D.fstResolution.preservesQuasicoherentCohomology_of_resolvedTensor
       Q.tensorQuasicoherent)
 
 @[simp]
-theorem derivedTensor_obj_obj_obj (Q : D.SourceTensorData)
+theorem derivedTensor_obj_obj_obj (Q : D.SourceTensorHypotheses)
     (E F : SourceDqc X) :
     (((Q.derivedTensor).obj E).obj F).obj =
       ((D.fstResolution.derivedTensor.obj E.obj).obj F.obj) :=
@@ -65,13 +65,13 @@ arbitrary object of `Dqc(X)`.
 This strong form is useful as a generic sufficient condition. The projection
 formula below also exposes a weaker coefficient-local condition. -/
 def RightTensorClosedComponents
-    (Q : D.SourceTensorData)
+    (Q : D.SourceTensorHypotheses)
     (A : SemiorthogonalSequence (SourceDqc X) ι) : Prop :=
   ∀ ⦃j : ι⦄ (F : SourceDqc X), A.component j F →
     ∀ B : SourceDqc X,
       A.component j ((Q.derivedTensor.obj F).obj B)
 
-end SourceTensorData
+end SourceTensorHypotheses
 
 /-- Projection formula for the dualized external products used in the Hom
 reduction.
@@ -81,7 +81,7 @@ The isomorphism is stated for every source object, independently of a chosen
 semiorthogonal sequence. -/
 structure CompactFiberProjectionFormula
     (H : D.toDerivedBaseChangeData.CompactFiberTensorDuality)
-    (Q : D.SourceTensorData)
+    (Q : D.SourceTensorHypotheses)
     (pushFst : DqcRightDerivedPushforward (baseChangeFst X T)) where
   /-- The source-side coefficient left after duality and pushforward. -/
   coefficient :
@@ -101,7 +101,7 @@ formula: its coefficient twists preserve the corresponding source
 components. -/
 def PreservesSourceComponents
     {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
-    {Q : D.SourceTensorData}
+    {Q : D.SourceTensorHypotheses}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     (P : D.CompactFiberProjectionFormula H Q pushFst)
     (A : SemiorthogonalSequence (SourceDqc X) ι) : Prop :=
@@ -114,11 +114,11 @@ def PreservesSourceComponents
 coefficient-local source-linearity condition. -/
 theorem preservesSourceComponents_of_rightTensorClosed
     {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
-    {Q : D.SourceTensorData}
+    {Q : D.SourceTensorHypotheses}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     (P : D.CompactFiberProjectionFormula H Q pushFst)
     (A : SemiorthogonalSequence (SourceDqc X) ι)
-    (hA : SourceTensorData.RightTensorClosedComponents
+    (hA : SourceTensorHypotheses.RightTensorClosedComponents
       (D := D) Q A) :
     PreservesSourceComponents (D := D) P A := by
   intro j Fj Gi Gj a b
@@ -128,7 +128,7 @@ theorem preservesSourceComponents_of_rightTensorClosed
 to the pushforward object required by compact-fibre duality. -/
 theorem pushforwardPreservesSourceComponents
     {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
-    {Q : D.SourceTensorData}
+    {Q : D.SourceTensorHypotheses}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     (P : D.CompactFiberProjectionFormula H Q pushFst)
     (A : SemiorthogonalSequence (SourceDqc X) ι)
@@ -154,7 +154,7 @@ theorem perfectComponentsSemiorthogonal_of_projectionFormula
     (hA : A.HasTriangulatedComponents)
     (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
     (H : D.toDerivedBaseChangeData.CompactFiberTensorDuality)
-    (Q : D.SourceTensorData)
+    (Q : D.SourceTensorHypotheses)
     (pushFst : DqcRightDerivedPushforward (baseChangeFst X T))
     (adj : D.pullFst.functor ⊣ pushFst.functor)
     [D.pullFst.functor.Additive]
@@ -177,12 +177,12 @@ theorem perfectComponentsSemiorthogonal_of_projectionFormula_of_rightTensorClose
     (hA : A.HasTriangulatedComponents)
     (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
     (H : D.toDerivedBaseChangeData.CompactFiberTensorDuality)
-    (Q : D.SourceTensorData)
+    (Q : D.SourceTensorHypotheses)
     (pushFst : DqcRightDerivedPushforward (baseChangeFst X T))
     (adj : D.pullFst.functor ⊣ pushFst.functor)
     [D.pullFst.functor.Additive]
     (P : D.CompactFiberProjectionFormula H Q pushFst)
-    (hTensor : SourceTensorData.RightTensorClosedComponents
+    (hTensor : SourceTensorHypotheses.RightTensorClosedComponents
       (D := D) Q A) :
     D.toDerivedBaseChangeData.PerfectComponentsSemiorthogonal A :=
   D.perfectComponentsSemiorthogonal_of_projectionFormula A hA hIso H Q
@@ -190,6 +190,6 @@ theorem perfectComponentsSemiorthogonal_of_projectionFormula_of_rightTensorClose
     (CompactFiberProjectionFormula.preservesSourceComponents_of_rightTensorClosed
       (D := D) P A hTensor)
 
-end KFlatBaseChangeData
+end KFlatBaseChangeHypotheses
 
 end AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange

@@ -24,9 +24,33 @@ the rest, as instances on `Proj (polynomialGrading ι k)` itself rather than on 
 * `k[Xᵢ]` is of finite type over `𝒜 0` when the variables are finite in number, which is what
   Mathlib's `LocallyOfFiniteType (Proj.toSpecZero 𝒜)` consumes.
 
-Finiteness of the variable set is genuinely required here and not elsewhere in the Čech lane:
-acyclicity of the variable cover holds for any index type, but `Pⁿ` is of finite type over `k`
-only for finitely many variables.
+## Main definitions
+
+* `AlgebraicGeometry.Proj.projectiveSpaceToSpec` — the structure morphism of polynomial
+  projective space to the base field.
+* `AlgebraicGeometry.Proj.projectiveSpaceTwist` — the twisting sheaf `O(d)` as a coherent sheaf.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.isProper_projectiveSpaceToSpec` — the structure morphism is proper.
+* `AlgebraicGeometry.Proj.isVariety_projectiveSpace` — polynomial projective space is a variety
+  over the base field.
+* `AlgebraicGeometry.Proj.polynomialIntShift_isCoherent` — every twist `O(d)` is coherent.
+
+## Implementation notes
+
+Finiteness of the variable set is genuinely required here and not elsewhere in the Čech
+computation: acyclicity of the variable cover holds for any index type, but `Pⁿ` is of finite
+type over `k` only for finitely many variables.
+
+## References
+
+Integrality is Mathlib's `AlgebraicGeometry.Proj.isIntegral`; properness comes from
+`Mathlib/AlgebraicGeometry/ProjectiveSpectrum/Proper.lean`.
+
+## Tags
+
+projective space, variety, proper morphism, finite type, twisting sheaf
 -/
 
 universe u
@@ -155,7 +179,7 @@ noncomputable def projectiveSpaceTwist (d : ℤ) :
     polynomialIntShift_isCoherent ι k d⟩
 
 /-- The coherent-sheaf bundle changes nothing about the underlying module sheaf, so the Čech
-lane's results about the twist apply to it directly. -/
+computation's results about the twist apply to it directly. -/
 lemma projectiveSpaceTwist_obj (d : ℤ) :
     (Coh.ι (Proj (polynomialGrading ι k))).obj (projectiveSpaceTwist ι k d) =
       associatedSheaf (polynomialGrading ι k) (intShift (polynomialGrading ι k) d) :=

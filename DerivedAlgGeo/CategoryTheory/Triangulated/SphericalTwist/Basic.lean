@@ -11,9 +11,27 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SerreFunctor.Objects
 `IsSphericalObject k n E` says `Hom(E, E⟦i⟧)` vanishes off `{0, n}` and is the base field at both.
 From it, `chiHom_self_eq` computes `χ(E,E) = 1 + (-1)ⁿ`, and at `n = 2` that discharges the
 hypothesis `χ(E,E) = 2` which the spherical twist's involutivity consumes — so a caller holding a
-spherical object no longer supplies it by hand.
+spherical object need not supply it by hand.
 
-## Why a second sphericity predicate, and how it relates to the first
+## Main definitions
+
+* `CategoryTheory.Triangulated.SphericalTwist.IsSphericalObject`: the Ext profile of an
+  `n`-spherical object, with no Serre functor.
+
+## Main results
+
+All in the namespace `CategoryTheory.Triangulated.SphericalTwist`:
+
+* `chiHom_self_eq`: `χ(E,E) = 1 + (-1)ⁿ` for `n ≠ 0`, and `chiHom_self_eq_one_of_zero` for the
+  degenerate value at `n = 0`.
+* `chiK₀_of_self_eq_two`: `χ(E,E) = 2` for a `2`-spherical object.
+* `IsSphericalObject.twistK₀_involutive` and `IsSphericalObject.twistK₀_bijective`: the twist on
+  `K₀` at a `2`-spherical object is involutive and bijective.
+* `IsSphericalObject.of_serreFunctor`: the Serre-relative predicate projects onto this one.
+
+## Implementation notes
+
+### Why a second sphericity predicate, and how it relates to the first
 
 `SerreFunctor/Objects.lean` already has `SerreFunctor.IsSphericalObject D n E`, relative to a chosen
 Serre functor, carrying a fourth clause `S(E) ≅ E⟦n⟧`. This one is deliberately **weaker**: a
@@ -22,7 +40,7 @@ needs none. Rather than leave two parallel predicates, `of_serreFunctor` project
 one onto this one, so the Euler computation proved here is available there too. The projection is
 one-way and must stay so: nothing here reconstructs a Serre functor.
 
-## Trap: `n = 0` makes the Euler computation false, not vacuous
+### Trap: `n = 0` makes the Euler computation false, not vacuous
 
 The structure is perfectly inhabitable at `n = 0` — `vanishing`'s two side conditions collapse into
 one, the support is `{0}`, and `end_one` and `top_one` say the same thing up to `shiftFunctor 0`.
@@ -32,19 +50,27 @@ or closes it by silently strengthening the structure, which is worse. The hypoth
 `{0, n}` a two-element set so the sum splits. The degenerate value is recorded separately as
 `chiHom_self_eq_one_of_zero`.
 
-## Trap: the spelling of the vanishing clause
+### Trap: the spelling of the vanishing clause
 
 `vanishing` reads `∀ f : E ⟶ E⟦i⟧, f = 0`, and must not read `IsZero (E ⟶ E⟦i⟧)`. That Hom is a
 bare `Type`; `IsZero` there demands an object both initial and terminal, and `Type` has none, so the
 field would be unsatisfiable, the structure uninhabitable, and every theorem below vacuously true —
-while compiling and passing every gate. `AlgebraicGeometry/Surface/Spherical.lean` records the same
-trap; the spelling is copied from it deliberately.
+while still compiling. `AlgebraicGeometry/Surface/Spherical.lean` records the same trap; the
+spelling is copied from it deliberately.
 
-## What is not here
+### What is not here
 
 No Serre-duality argument deriving `top_one` from `end_one`: the two clauses stay independent, as
 they do in the K3-specific profile. The twist itself, the Mukai lattice and the braid relation are
 their own files.
+
+## References
+
+The library's `chiHom`, `chiK₀`, `twistK₀` and `SerreFunctor.IsSphericalObject`.
+
+## Tags
+
+spherical object, Euler characteristic, Ext profile, spherical twist, Serre functor
 -/
 
 universe w v u

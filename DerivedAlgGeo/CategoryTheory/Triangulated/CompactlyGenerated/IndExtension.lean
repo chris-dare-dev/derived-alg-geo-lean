@@ -329,7 +329,7 @@ Neeman-style compact generating property.
 
 The only comparison input is the honest geometric statement that the compact
 generators and the mapped bounded aisle have the same coproduct-and-extension
-closure.  Restriction is no longer supplied by the caller. -/
+closure.  Restriction is not a hypothesis: `ofCompactGenerators` proves it. -/
 theorem ofBrown
     (P : ObjectProperty C) [P.IsTriangulated]
     (small : TStructure P.FullSubcategory)

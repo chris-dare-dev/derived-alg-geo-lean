@@ -195,15 +195,14 @@ omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 /-- **Lemma 14.17 (source coordinates).**  The two cases are separated by the
 sign of the imaginary part of the original charge.
 
-The phase-free field the second branch used to carry is no longer a
-hypothesis: `phaseFree_of_tiltHeart_triangle` derives it from the standing
-hypotheses of the printed lemma.  The branch still carries the
+The second branch carries no phase-free field as a hypothesis:
+`phaseFree_of_tiltHeart_triangle` derives it from the standing hypotheses of
+the printed lemma.  The branch does carry the
 positive-imaginary Hom implication, which is the positive-imaginary half of
 the printed `moreover` clause and is load-bearing: a split `U⟦1⟧ ⊕ V` with `V`
 a nonzero zero-charge object meets every other clause of case (2) and is not
 semistable, because Definition 14.2 gives a zero-charge subobject the slope
-`+∞`.  Promotion of the coverage coordinate remains owner-gated on accepting
-that reading of the source. -/
+`+∞`. -/
 theorem sourceTiltWeakStabilityFunction_isSemistable_iff_classification
     (sigma : WeakPreStabilityCondition v) (b : ℝ) {E : C}
     (hEtilt : ((sigma.slopeTorsionPair b).tilt).heart E)

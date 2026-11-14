@@ -396,12 +396,12 @@ the chunk could not legally satisfy. Both outcomes lost the finding.
   have not been tested; do not present it as an available API.
 - state:              UNVERIFIED
 
-### 2026-09-24 — `SLocalSlicingData.restriction_eq_of_phase_iff`
+### 2026-09-24 — `SLocalSlicingHypotheses.restriction_eq_of_phase_iff`
 - chunk:              sf11-4a-1496-noetherian-cover
 - reviewing commit:   ce58cc9e44340c07c89836ba2a81fdd07aaee6b4
 - found by:           hypothesis-elimination-scout
 - proposed ancestor:  `DerivedAlgGeo/AlgebraicGeometry/DerivedCategory/Stability/SLocal.lean`
-- weaker hypotheses:  drop `_L : SLocalSlicingData R s`; retain the open,
+- weaker hypotheses:  drop `_L : SLocalSlicingHypotheses R s`; retain the open,
   compactness, both restrictions, and the phase comparison.
 - pin status:         Focused copy of the existing proof compiled from
   `/dev/stdin` at this base.

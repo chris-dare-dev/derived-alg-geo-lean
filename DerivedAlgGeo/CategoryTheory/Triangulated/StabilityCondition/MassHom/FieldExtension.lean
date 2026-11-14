@@ -18,9 +18,39 @@ exactly as the formulas used in the paper:
 * pushforward of the base-changed HN filtration multiplies mass by the same
   degree.
 
+## Main definitions
+
+* `UniformMassHomBound` — a uniform numerical mass--Hom estimate on an
+  arbitrary index of field/object tests.
+* `FieldExtensionAdjunctionDimensionFormula` — the adjunction and
+  restriction-of-scalars dimension formula used in (8.4).
+* `FieldExtensionHNMassFormula` — the HN-preserving pushforward mass formula
+  used in (8.4).
+
+## Main results
+
+* `UniformMassHomBound.of_scaled` — cancel a positive degree from the two sides
+  of a uniform mass--Hom estimate.
+* `finiteDimensional_of_finiteType_field` — Zariski's lemma in the form used in
+  Theorem 8.23.
+* `inequality84` — inequality (8.4) for one finite-type field extension, with
+  the same constant as the base mass--Hom bound.
+
+## Implementation notes
+
 The theorem cancels this positive common factor.  It does not manufacture
-either formula or a scalar-base-change stability condition; those are the
-geometric outputs of the Theorem 2.8 lane.
+either formula or a scalar-base-change stability condition; those are
+geometric outputs of scalar extension of stability conditions (Theorem 2.8 of
+the same paper), which this file does not construct.
+
+## References
+
+* arXiv:2607.28411v1, Theorem 8.23 and inequality (8.4).
+* Mathlib's `finite_of_finite_type_of_isJacobsonRing` (Zariski's lemma).
+
+## Tags
+
+mass, Hom dimension, field extension, Zariski's lemma, stability condition
 -/
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated

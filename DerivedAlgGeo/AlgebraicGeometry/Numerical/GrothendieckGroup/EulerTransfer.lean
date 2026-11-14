@@ -82,7 +82,7 @@ namespace AlgebraicGeometry.Numerical
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated
-open NumericalRingData NumericalRingDualData NumericalVarietyData
+open NumericalRingData NumericalRingDualHypotheses NumericalVarietyData
 
 section Transfer
 

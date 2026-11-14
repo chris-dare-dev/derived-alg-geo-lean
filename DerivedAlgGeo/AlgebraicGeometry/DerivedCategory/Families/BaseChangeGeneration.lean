@@ -18,7 +18,7 @@ perfect base-change sequence is full.
 * `DerivedBaseChangeData.perfectCategoryExternalProductGenerators` — the bundled
   derived external products, as an object property of the compact carrier of
   `Dqc(X_T)`.
-* `DerivedBaseChangeData.QuasicoherentFullnessPropagationData` — compact
+* `DerivedBaseChangeData.QuasicoherentFullnessPropagationHypotheses` — compact
   generation of the target, the perfect-to-quasicoherent filtration comparison,
   and coproduct closure of the quasicoherent envelope.
 
@@ -29,7 +29,7 @@ perfect base-change sequence is full.
   base-change sequence.
 * `DerivedBaseChangeData.perfectCategorySequence_isFull_of_externalProducts` —
   classical generation by external products makes the perfect sequence full.
-* `DerivedBaseChangeData.QuasicoherentFullnessPropagationData.quasicoherentSequence_isFull`
+* `DerivedBaseChangeData.QuasicoherentFullnessPropagationHypotheses.quasicoherentSequence_isFull`
   — perfect fullness propagates to quasicoherent fullness.
 
 All names are in the namespace
@@ -111,7 +111,7 @@ theorem perfectCategorySequence_isFull_of_externalProducts
 it only says that a finite perfect filtration remains a finite filtration
 after forgetting compactness. Compact generation and coproduct closure then
 prove quasicoherent fullness. -/
-structure QuasicoherentFullnessPropagationData
+structure QuasicoherentFullnessPropagationHypotheses
     (hcompact : D.PreservesCompactObjects)
     (horth : D.PerfectComponentsSemiorthogonal A) where
   /-- Compact objects generate the target `Dqc` category. -/
@@ -129,12 +129,12 @@ structure QuasicoherentFullnessPropagationData
       ((D.quasicoherentSequence A hcompact horth).total.triangEnvelope)
       (Discrete κ)
 
-namespace QuasicoherentFullnessPropagationData
+namespace QuasicoherentFullnessPropagationHypotheses
 
 variable {D A}
   {hcompact : D.PreservesCompactObjects}
   {horth : D.PerfectComponentsSemiorthogonal A}
-  (G : D.QuasicoherentFullnessPropagationData A hcompact horth)
+  (G : D.QuasicoherentFullnessPropagationHypotheses A hcompact horth)
 
 include G
 
@@ -158,7 +158,7 @@ theorem quasicoherentSequence_isFull
   rw [hperfect]
   trivial
 
-end QuasicoherentFullnessPropagationData
+end QuasicoherentFullnessPropagationHypotheses
 
 end DerivedBaseChangeData
 

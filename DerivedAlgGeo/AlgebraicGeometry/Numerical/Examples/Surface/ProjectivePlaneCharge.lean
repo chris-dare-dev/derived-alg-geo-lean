@@ -16,10 +16,38 @@ This file instantiates the intrinsic divisorial surface construction for
 `ℙ²`.  Its divisor space is one-dimensional, with the hyperplane class `H`
 normalized by `H² = 1`.  Two class carriers carry a full
 `ChernCharacter`: a placeholder integral triple `(r, c, v)` and the
-existing `SurfaceNum` presentation.  Their comparison is made before choosing
+shared `SurfaceNum` presentation.  Their comparison is made before choosing
 `B` and `omega`.
 
-## What is, and is not, compared here
+## Main definitions
+
+* `AlgebraicGeometry.Numerical.Examples.p2DivisorSpace` and
+  `AlgebraicGeometry.Numerical.Examples.p2Hyperplane` — the one-dimensional divisor space of
+  `ℙ²` and its hyperplane class.
+* `AlgebraicGeometry.Numerical.Examples.p2ProjectiveChernCharacter` and
+  `AlgebraicGeometry.Numerical.Examples.p2SurfaceChernCharacter` — the full Chern character on
+  the two carriers.
+* `AlgebraicGeometry.Numerical.Examples.p2NumericalRealization` — the projective-plane
+  numerical ring realized in `N¹(ℙ²)_ℝ`.
+* `AlgebraicGeometry.Numerical.Examples.p2ProjectiveToSurface` and
+  `AlgebraicGeometry.Numerical.Examples.p2ChernCharacterPullback` — the comparison map of the
+  two carriers.
+* `AlgebraicGeometry.Numerical.Examples.p2ProjectiveCharge` and
+  `AlgebraicGeometry.Numerical.Examples.p2SurfaceCharge` — the divisorial charge on each
+  carrier.
+
+## Main results
+
+* `AlgebraicGeometry.Numerical.Examples.p2ProjectiveCharge_eq_surfaceCharge` — the two charges
+  agree along the comparison map.
+* `AlgebraicGeometry.Numerical.Examples.p2ProjectiveCharge_apply` — the charge is the
+  projective-space exponential `-∫ exp(-(b + i a) H) ch` in `(r, c, v)` coordinates.
+* `AlgebraicGeometry.Numerical.Examples.p2SurfaceCharge_eq_BFieldCharge` — for rational `β`,
+  the surface charge is the charge built from the twisted Chern character at `B = βH`.
+
+## Implementation notes
+
+### What is, and is not, compared here
 
 The two carriers have identical coordinates: on both, `ch₂ = c/2 + v`, and
 the comparison map `p2ProjectiveToSurface` is the identity on coordinates.
@@ -39,14 +67,22 @@ case in which no Todd correction appears (arXiv:2607.28411v1, (5.5) and
 Remark 6.3).  For any other embedding the pulled-back charge is not of this
 form until the GRR/Todd term has been computed.
 
-The older scalar `ChargeCoordinates` objects are derived compatibility
+The scalar `ChargeCoordinates` objects are derived compatibility
 views.  Thus the projective-plane charge is a child of the same parent as the
 smooth-quadric charge, rather than a parent or a separate charge polynomial.
 
 The adapter is only arithmetic.  It does not claim that either carrier is
 `K₀(ℙ²)` or `Λ_ι`, does not compare stability conditions, hearts, or slicings,
-and does not provide the geometric family map or the C1/C2 properties needed
-by the eventual stability comparison.
+and does not provide the geometric family map or the C1/C2 properties a
+stability comparison would need.
+
+## References
+
+* arXiv:2607.28411v1, (5.5) and Remark 6.3.
+
+## Tags
+
+projective plane, central charge, Chern character, divisorial charge, B-field
 -/
 
 open Complex
@@ -93,7 +129,7 @@ presentation of the charge.
 
 It has the same coordinates as `SurfaceNum` (`ch₂ = c/2 + v` on both) and is
 a separate Lean type only so that the adapter below carries an explicit
-source-to-target map, where a geometric class map can later be substituted.
+source-to-target map, where a geometric class map can be substituted.
 It is not Li's image lattice `Λ_ι` and carries no information about `K₀(ℙ²)`. -/
 abbrev P2ProjectiveCoordinates : Type := ℤ × ℤ × ℤ
 
@@ -118,7 +154,7 @@ noncomputable def p2ProjectiveChernCharacter :
     push_cast
     ring)
 
-/-- The old scalar-coordinate view, derived from the full character at `H`. -/
+/-- The scalar-coordinate view, derived from the full character at `H`. -/
 noncomputable def p2ProjectiveChargeCoordinates :
     ChargeCoordinates P2ProjectiveCoordinates :=
   p2ProjectiveChernCharacter.coordinatesAt p2DivisorSpace p2Hyperplane
@@ -299,7 +335,7 @@ noncomputable def p2SurfaceChargeCoordinates :
 
 /-- The full Chern character on the existing surface numerical presentation.
 
-Because `N¹(ℙ²)_ℝ = ℝH` and `H² = 1`, the old `H`-degree is exactly the
+Because `N¹(ℙ²)_ℝ = ℝH` and `H² = 1`, the scalar `H`-degree is exactly the
 coefficient of the full first Chern class. -/
 noncomputable def p2SurfaceChernCharacter :
     ChernCharacter SurfaceNum P2Divisor :=
@@ -398,7 +434,7 @@ noncomputable def p2ChernCharacterPullback :
     rfl
 
 /-- The coordinates derived from the full surface character agree with the
-legacy numerical coordinates.  This bridge exists only because `H² = 1` on
+scalar numerical coordinates.  This bridge exists only because `H² = 1` on
 the chosen rank-one basis. -/
 noncomputable def p2SurfaceCoordinatesPullback :
     ChargeCoordinates.Pullback
@@ -421,7 +457,7 @@ noncomputable def p2SurfaceCoordinatesPullback :
     rw [ChernCharacter.coordinatesAt_hyperplaneSquare,
       p2Hyperplane_square, p2SurfaceChargeCoordinates_hyperplaneSquare]
 
-/-- The full-character comparison induces the legacy scalar-coordinate
+/-- The full-character comparison induces the scalar-coordinate
 comparison at the projective hyperplane. -/
 noncomputable def p2ChargePullback :
     ChargeCoordinates.Pullback
@@ -458,7 +494,7 @@ noncomputable def p2ProjectiveCharge (a b : ℝ) :
     P2ProjectiveCoordinates →+ ℂ :=
   p2ProjectiveChernCharacter.centralCharge p2DivisorSpace (p2Parameters a b)
 
-/-- The same parent charge on the existing `SurfaceNum` presentation. -/
+/-- The same parent charge on the shared `SurfaceNum` presentation. -/
 noncomputable def p2SurfaceCharge (a b : ℝ) :
     SurfaceNum →+ ℂ :=
   p2SurfaceChernCharacter.centralCharge p2DivisorSpace (p2Parameters a b)

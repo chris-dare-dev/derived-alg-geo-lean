@@ -215,7 +215,7 @@ One piece of plumbing here is deliberate. The `@` and the named
 instance search cannot find that instance through this application even though
 `quasicoherent_isClosedUnderCoproducts` two declarations above finds it by
 `inferInstance`: unifying `A := X.Modules` routes the category through
-`Scheme.Modules.instCategory`, and the goal it then poses no longer matches the
+`Scheme.Modules.instCategory`, and the goal it then poses does not match the
 instance's own head.  Supplying it by name is not a workaround for an unproved fact —
 it is the same instance, named. -/
 theorem sigma_mem {ι : Type u} (E : ι → SchemeDerivedCategory X)

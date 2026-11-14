@@ -738,9 +738,8 @@ This is what the bare existential form cannot state. A scalar action on cohomolo
 induced by an endomorphism of the sheaf, so `k`-linearity of the comparison is this square at
 `φ = ` multiplication by a scalar, with `Φ` any lift of it to the resolutions.
 
-The `HasExt` witness is passed positionally throughout, for the reason recorded across this
-lane: `HasExt.{u}` and `HasExt.{u + 1}` name different groups, and instance search must not be
-allowed to choose. -/
+The `HasExt` witness is passed positionally throughout: `HasExt.{u}` and `HasExt.{u + 1}` name
+different groups, and instance search must not be allowed to choose. -/
 theorem cechComparisonAddEquiv_naturality
     (hT : IsTerminal T) (U : ind → Opens Y) (φ : F ⟶ G)
     (I : InjectiveResolution F) (I' : InjectiveResolution G)

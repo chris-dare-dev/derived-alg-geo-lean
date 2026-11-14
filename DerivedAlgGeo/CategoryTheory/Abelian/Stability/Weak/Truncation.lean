@@ -10,7 +10,28 @@ import DerivedAlgGeo.CategoryTheory.Abelian.Stability.Weak.Cutoff
 This is `Truncation.lean` for the slope-indexed weak filtration, together with
 `Splitting.lean`'s crossing index and the **sub** half of the splitting.
 
-## What ports and what does not, stated precisely
+## Main definitions
+
+* `CategoryTheory.Triangulated.AbelianWeakHNFiltration.restrict`: the chain
+  below an index, read as a weak HN filtration of the term at that index.
+* `CategoryTheory.Triangulated.AbelianWeakHNFiltration.ofIso`: a weak HN
+  filtration transported along an isomorphism of the object it filters.
+
+## Main results
+
+* `CategoryTheory.Triangulated.AbelianWeakHNFiltration.restrict_μMinus`: the
+  lowest slope of a restriction is the last slope below the cut.
+* `CategoryTheory.Triangulated.AbelianWeakHNFiltration.exists_crossIndex`: the
+  index at which the HN slopes cross a slope cutoff.
+* `CategoryTheory.Triangulated.WeakStabilityFunctionOn.hnTors_of_iso` and
+  `CategoryTheory.Triangulated.WeakStabilityFunctionOn.hnFree_of_iso`: both
+  classes at a cutoff are closed under isomorphism.
+* `CategoryTheory.Triangulated.WeakStabilityFunctionOn.exists_subobject_hnTors`:
+  every object has a subobject in the torsion class.
+
+## Implementation notes
+
+### What ports and what does not, stated precisely
 
 `Truncation.lean` has two truncations and they behave differently under
 weakening.
@@ -20,23 +41,34 @@ weakening.
   `Subobject.map_obj_injective` and the successive-quotient congruences, and
   mentions no charge.  It ports verbatim, and is `restrict` below.
 * `Uniqueness/Tail.lean`'s `tailAt` — push the chain **above** an index down to
-  the quotient.  It did **not** port when this file was written: its two
-  supporting lemmas, `pullback_imageSubobject_eq` and `cokernelPullbackIso`, were
-  proved from `semiClosedUpperHalfPlane_ne_zero` — a nonzero object has nonzero
-  charge — which is precisely the implication weak stability drops, and which
-  fails on the skyscraper.
+  the quotient.  It does not port as written: its two supporting lemmas in
+  `Uniqueness/SubobjectLattice.lean`, `pullback_imageSubobject_eq` and
+  `cokernelPullbackIso`, are proved from `semiClosedUpperHalfPlane_ne_zero` — a
+  nonzero object has nonzero charge — which is precisely the implication weak
+  stability drops, and which fails on the skyscraper.
 
-  **That obstruction is gone.**  Both statements are true in any abelian
-  category, being the subobject correspondence for a quotient, and
+  Both statements are nevertheless true in any abelian category, being the
+  subobject correspondence for a quotient, and
   `CategoryTheory/SubobjectCorrespondence.lean` proves them with no charge
-  anywhere.  `WeakTail.lean` ports `tailAt` on top of them.
+  anywhere.  `Weak/Tail.lean` ports `tailAt` on top of them.
+
+### The torsion subobject
 
 `exists_subobject_hnTors` below gives the torsion **subobject** of the splitting.
-It is kept because it is the weaker statement and needs no truncation of the
-quotient, but it is **superseded** by
+It is the weaker statement and needs no truncation of the quotient.
 `WeakStabilityFunctionOn.exists_subobject_hnTors_cokernel_hnFree`
-(`WeakSplitting.lean`), which supplies both halves — and hence by the weak
-`TorsionPair` in `Weak/Tilting/TorsionPair/WeakStabilityFunction.lean`.
+(`Weak/Splitting.lean`) supplies both halves, and the weak `TorsionPair` in
+`Weak/Tilting/TorsionPair/WeakStabilityFunction.lean` is built on it.
+
+## References
+
+The library's `AbelianWeakHNFiltration`, `WeakStabilityFunctionOn.hnTors` and
+`WeakStabilityFunctionOn.hnFree`, and Mathlib's `Subobject.map`.
+
+## Tags
+
+weak stability function, Harder–Narasimhan filtration, truncation, slope cutoff,
+torsion class
 -/
 
 noncomputable section
@@ -221,9 +253,9 @@ theorem hnFree_of_iso {E E' : A} (e : E ≅ E') (h : E ∈ hnFree W μ₀) :
 /-- **The torsion subobject of the splitting.**  Cutting an HN filtration at its
 crossing index gives a subobject in `T μ₀`.
 
-This is one half of `exists_subobject_hnTors_cokernel_hnFree`, and is superseded
-by it: `WeakSplitting.lean` now supplies the torsion-free quotient too.  Kept
-because it is the weaker statement and does not truncate the quotient. -/
+This is one half of `exists_subobject_hnTors_cokernel_hnFree`, which also
+supplies the torsion-free quotient.  It is the weaker statement and does not
+truncate the quotient. -/
 theorem exists_subobject_hnTors (hHN : W.HasHNProperty) (E : A) :
     ∃ T : Subobject E, ((T : A) ∈ hnTors W μ₀) := by
   by_cases hE : IsZero E

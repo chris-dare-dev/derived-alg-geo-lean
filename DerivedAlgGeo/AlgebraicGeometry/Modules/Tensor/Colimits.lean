@@ -11,14 +11,37 @@ import DerivedAlgGeo.CategoryTheory.Limits.Preserves.Reflective
 Presheaf tensor preserves colimits objectwise. The arbitrary-sheaf tensor/sheafification
 comparisons transfer that property to the sheafified tensor in both slots.
 
-The main results are `AlgebraicGeometry.Scheme.Modules.tensorLeft_preservesColimitsOfShape` and
-`AlgebraicGeometry.Scheme.Modules.tensorRight_preservesColimitsOfShape`.
-Their index categories have the same universe as
+## Main definitions
+
+* `AlgebraicGeometry.Scheme.Modules.tensorLeftFreeIso` — tensoring a module sheaf with the free
+  sheaf on an index type is a coproduct of copies of it.
+
+## Main results
+
+* `AlgebraicGeometry.Scheme.Modules.tensorLeft_preservesColimitsOfShape` and
+  `AlgebraicGeometry.Scheme.Modules.tensorRight_preservesColimitsOfShape` — the sheafified
+  tensor preserves colimits in either slot.
+* `AlgebraicGeometry.Scheme.Modules.tensorLeftFunctor_preservesFiniteColimits` and
+  `AlgebraicGeometry.Scheme.Modules.tensorLeftFunctor_additive` — tensoring by any module
+  sheaf is right exact and additive.
+
+## Implementation notes
+
+The index categories have the same universe as
 the underlying scheme site, matching the available presheaf tensor instance.
-The historical `AlgebraicGeometry.Scheme.Modules.tensorLeftFunctor` is the canonical
+`AlgebraicGeometry.Scheme.Modules.tensorLeftFunctor` is the canonical
 `tensorLeft`, so its finite-colimit and additive instances and
 `AlgebraicGeometry.Scheme.Modules.tensorLeftFreeIso` follow here without an invertibility
 hypothesis.
+
+## References
+
+The comparison is with Mathlib's `PresheafOfModules.sheafificationAdjunction`, through the
+reflective-colimit transfer of `CategoryTheory/Limits/Preserves/Reflective.lean`.
+
+## Tags
+
+tensor product, module sheaf, colimit, sheafification, right exact
 -/
 
 open CategoryTheory CategoryTheory.Limits TopologicalSpace MonoidalCategory

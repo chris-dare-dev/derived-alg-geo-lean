@@ -15,20 +15,31 @@ the integral pairing, which is what `Lattice/Mukai/Basic.lean` builds. This file
 connects them, so that "finitely many spherical walls" is a statement about
 integral classes rather than about an abstract `ZSpan`.
 
-## Three steps
+## Main definitions
 
-* `extendBasis` — a basis of `V` induces one of `ℝ × V × ℝ`, namely `(1,0,0)`,
+* `Mukai.extendBasis` — a basis of `V` induces one of `ℝ × V × ℝ`, namely `(1,0,0)`,
   `(0, vᵢ, 0)`, `(0,0,1)`. The finiteness theorems want a basis of the whole
   space; this is it.
-* `span_range_extendBasis` — its `ℤ`-span **is** the integral Mukai extension:
-  integer rank and corank, lattice middle. This is what turns those theorems
-  into statements about integral classes.
-* `realPairing_extendMap` — for a lattice map `f` respecting the two forms, the
+* `Mukai.integralExtension` — the integral Mukai extension of a lattice in `V`.
+* `Mukai.extendMap` and `Mukai.extendMapHom` — the map of Mukai extensions induced by a
+  map of middle summands, bare and bundled.
+
+## Main results
+
+* `Mukai.span_range_extendBasis` — the `ℤ`-span of `extendBasis` **is** the integral Mukai
+  extension: integer rank and corank, lattice middle. This is what turns the finiteness
+  theorems into statements about integral classes.
+* `Mukai.realPairing_extendMap` — for a lattice map `f` respecting the two forms, the
   induced map on Mukai extensions carries `Mukai.pairing` to `Mukai.realPairing`.
   This is the literal statement that the two files describe the same pairing,
   and it is where a factor or a sign error would surface.
+* `Mukai.finite_sphericalOrthogonal_integralExtension` and
+  `Mukai.finite_orthogonalClasses_integralExtension` — finitely many integral spherical
+  classes are orthogonal to a positive plane, pointwise and region-wise.
 
-## The lattice is presented by a basis, not by a tensor product
+## Implementation notes
+
+### The lattice is presented by a basis, not by a tensor product
 
 `N ⊗ ℝ` would be the textbook construction and is not used: a basis gives
 everything below with no tensor-product plumbing, and the geometric input — that
@@ -36,20 +47,27 @@ everything below with no tensor-product plumbing, and the geometric input — th
 
 `V` remains an arbitrary real bilinear space; no geometry is asserted.
 
-## Why this path
+### Why this path
 
-The cutover ledger's row 03 puts the Mukai vector, the integral structure and
-the surface realization under `AlgebraicGeometry/Numerical/Mukai/`, and this is
-the integral structure. The directory is numerical Mukai theory, not
-scheme-level geometry -- `Pairing.lean` and `VectorClass.lean` beside it mention
-no scheme either -- so a file that asserts no geometry is at home here.
+`AlgebraicGeometry/Numerical/Mukai/` holds the Mukai vector, the integral structure and
+the surface realization, and this is the integral structure. The directory is numerical
+Mukai theory, not scheme-level geometry -- `Pairing.lean` and `VectorClass.lean` beside it
+mention no scheme either -- so a file that asserts no geometry is at home here.
 
-Every consumer is already in this subtree: the two surface wall examples and
-`GrothendieckGroup/CentralChargeK3.lean`. Nothing under `StabilityCondition/`
-reaches it, which is the evidence that it is not part of the charge bridge it
-travelled with; it is the comparison between the integral Mukai lattice and its
-real extension, plus the two finiteness statements that comparison exists to
-supply.
+Its direct importers all lie under `AlgebraicGeometry/Numerical/`, among them the surface
+wall examples and `GrothendieckGroup/CentralChargeK3.lean`. Nothing under
+`StabilityCondition/` reaches it: it is not part of the charge bridge but the comparison
+between the integral Mukai lattice and its real extension, plus the two finiteness
+statements that comparison exists to supply.
+
+## References
+
+The finiteness inputs are the repository's `PeriodDomain.finite_sphericalOrthogonal_inter`
+and `PeriodDomain.PlaneRegion.finite_orthogonalClasses_inter`.
+
+## Tags
+
+Mukai lattice, integral structure, spherical class, wall finiteness, real extension
 -/
 
 open QuadraticMap
@@ -140,9 +158,8 @@ theorem extendMap_add (f : N →ₗ[ℤ] V) (u w : MukaiLattice N) :
   push_cast
   rfl
 
-/-- **`extendMap` as a bundled hom.**  It was proved additive and left as a bare
-function, which is what forces every consumer to re-prove additivity of whatever
-composite it sits in. -/
+/-- **`extendMap` as a bundled hom.**  Bundling `extendMap_add` spares every
+consumer from re-proving additivity of whatever composite it sits in. -/
 noncomputable def extendMapHom (f : N →ₗ[ℤ] V) : MukaiLattice N →+ RealExtension V :=
   AddMonoidHom.mk' (extendMap f) (extendMap_add f)
 

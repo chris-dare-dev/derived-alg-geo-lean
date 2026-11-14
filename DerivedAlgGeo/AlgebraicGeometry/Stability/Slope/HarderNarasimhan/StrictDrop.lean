@@ -48,9 +48,9 @@ open AlgebraicGeometry.Cohomology
 variable {k : Type u} [Field k]
 variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 
-namespace PolarizedVarietyData
+namespace PolarizedVarietyHypotheses
 
-variable {P : PolarizedVarietyData k X}
+variable {P : PolarizedVarietyHypotheses k X}
 
 /-- A subobject containing a nonzero subobject is itself nonzero. -/
 theorem not_isZero_of_le {F : Coh X} {B C : Subobject F} (hBC : B ≤ C)
@@ -124,6 +124,6 @@ theorem multiplicity_pos_of_maximalDestabilizing (h : MuPositivityData P) {F : C
     exact absurd hlt (by simp)
   omega
 
-end PolarizedVarietyData
+end PolarizedVarietyHypotheses
 
 end AlgebraicGeometry.Stability.Gieseker

@@ -22,7 +22,7 @@ There are three layers.
   proposition: a new kernel agrees on the old component, maps the new
   exceptional object, kills the remaining orthogonal, and is an equivalence
   on the enlarged triangulated span.
-* `ExceptionalBlockExtensionData` is the finite iteration's conclusion: an
+* `ExceptionalBlockExtensionHypotheses` is the finite iteration's conclusion: an
   ambient kernel equivalence extending the residual equivalence and matching
   every object of every exceptional block, with one common shift per block.
 
@@ -37,7 +37,7 @@ There are three layers.
 * `FourierMukai.OneStepExtensionData`, `FourierMukai.OneStepExtensionCriterion`
   — the conclusion of one extension step, and the criterion that derives the
   enlarged equivalence from full faithfulness and essential surjectivity.
-* `FourierMukai.ExceptionalBlockExtensionData` — the conclusion of the finite
+* `FourierMukai.ExceptionalBlockExtensionHypotheses` — the conclusion of the finite
   blockwise extension.
 
 ## Main results
@@ -47,10 +47,10 @@ There are three layers.
 * `OneStepExtensionCriterion.toExtensionData` — the criterion yields the
   one-step result consumed by finite extension induction.
 * `OneStepExtensionData.restrictedFunctor_isEquivalence` and
-  `RightAdjunctionData.restrictedRightAdjoint_isEquivalence` — the restricted
+  `RightAdjunctionHypotheses.restrictedRightAdjoint_isEquivalence` — the restricted
   functors of a one-step extension are equivalences.
-* `ExceptionalBlockExtensionData.toKernelEquivalence` and
-  `ExceptionalBlockExtensionData.transform_isEquivalence` — the ambient
+* `ExceptionalBlockExtensionHypotheses.toKernelEquivalence` and
+  `ExceptionalBlockExtensionHypotheses.transform_isEquivalence` — the ambient
   equivalence is derived from the stored adjunction data.
 
 ## Implementation notes
@@ -426,7 +426,7 @@ geometric inputs.  The comparison between the restricted right adjoint and
 the inverse of the enlarged equivalence is deliberately not a field: both are
 right adjoint to the same restricted transform, so right-adjoint uniqueness
 supplies the canonical comparison. -/
-structure RightAdjunctionData
+structure RightAdjunctionHypotheses
     {W' : Type u'''} [Category.{v'''} W']
     (corr' : Correspondence Y X W') where
   /-- A kernel-presented right adjoint of the extended transform. -/
@@ -435,11 +435,11 @@ structure RightAdjunctionData
   mapsAdjoin : ∀ B : (adjoinObject Q F).FullSubcategory,
     adjoinObject P E ((corr'.transform rightAdjoint.adjKernel).obj B.obj)
 
-namespace RightAdjunctionData
+namespace RightAdjunctionHypotheses
 
 variable {W' : Type u'''} [Category.{v'''} W']
   {corr' : Correspondence Y X W'}
-  (R : RightAdjunctionData A corr')
+  (R : RightAdjunctionHypotheses A corr')
 
 /-- The right adjoint restricted to the enlarged target and source spans. -/
 noncomputable def restrictedRightAdjoint :
@@ -479,7 +479,7 @@ noncomputable def stageAdjunction :
     A.restrictedFunctor ⊣ A.enlargedEquiv.inverse :=
   R.kernelRestrictedAdjunction.ofNatIsoRight R.restrictedInverseIso
 
-end RightAdjunctionData
+end RightAdjunctionHypotheses
 
 end OneStepRightAdjunction
 
@@ -491,7 +491,7 @@ Paper II, Theorem 3.3.
 Paper II.  The ambient equivalence is not stored redundantly: a
 kernel-presented right adjoint and pointwise invertibility of its unit and
 counit are stored, and `toKernelEquivalence` derives it. -/
-structure ExceptionalBlockExtensionData
+structure ExceptionalBlockExtensionHypotheses
     {I : Type t} {J : Type t'}
     (B_X : Triangulated.OrthogonalExceptionalBlocks k X I)
     (B_Y : Triangulated.OrthogonalExceptionalBlocks k Y J)
@@ -527,14 +527,14 @@ structure ExceptionalBlockExtensionData
       ((B_Y.collection (blockEquiv i)).obj
         (Fin.cast (length_eq i) j))⟦shift i⟧
 
-namespace ExceptionalBlockExtensionData
+namespace ExceptionalBlockExtensionHypotheses
 
 variable {I : Type t} {J : Type t'}
   {B_X : Triangulated.OrthogonalExceptionalBlocks k X I}
   {B_Y : Triangulated.OrthogonalExceptionalBlocks k Y J}
   {corr : Correspondence X Y W} {corr' : Correspondence Y X W'}
   {R : ResidualKernelEquivalence B_X B_Y corr}
-  (A : ExceptionalBlockExtensionData B_X B_Y corr corr' R)
+  (A : ExceptionalBlockExtensionHypotheses B_X B_Y corr corr' R)
 
 /-- The ambient Fourier--Mukai equivalence, derived from the final adjunction
 and its invertible unit and counit. -/
@@ -561,7 +561,7 @@ noncomputable def ambientEquivalence : X ≌ Y :=
 theorem ambientEquivalence_functor :
     A.ambientEquivalence.functor = corr.transform A.kernel := rfl
 
-end ExceptionalBlockExtensionData
+end ExceptionalBlockExtensionHypotheses
 
 end Results
 

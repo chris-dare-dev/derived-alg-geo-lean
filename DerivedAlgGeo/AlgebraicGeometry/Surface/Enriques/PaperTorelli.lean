@@ -54,15 +54,15 @@ variable {C : SmoothProperVariety.CanonicalSheafData k Y 2}
 variable {D : Cohomology.FiniteCohomology k Y}
   {S : D.LinearConnectingSystem}
 variable {T : IsotropicCollection (Y := Y) (C := C) D S}
-variable {exceptional : T.ExceptionalityData}
-  {semiorthogonal : T.SemiorthogonalityData}
+variable {exceptional : T.ExceptionalityHypotheses}
+  {semiorthogonal : T.SemiorthogonalityHypotheses}
 variable {I : Type t} [Fintype I]
 
 /-- The adjacent `k ⊕ k[-1]` Ext computations for the actual exceptional
 blocks of an Enriques paper decomposition. -/
-abbrev PaperAdjacentExtData
-    (B : T.PaperBlockData exceptional semiorthogonal I) :=
-  B.blocks.AdjacentExtData
+abbrev PaperAdjacentExtHypotheses
+    (B : T.PaperBlockHypotheses exceptional semiorthogonal I) :=
+  B.blocks.AdjacentExtHypotheses
 
 section TwoSurfaces
 
@@ -79,32 +79,32 @@ variable {D₁ : Cohomology.FiniteCohomology k Y₁}
   {S₁ : D₁.LinearConnectingSystem} {S₂ : D₂.LinearConnectingSystem}
 variable {T₁ : IsotropicCollection (Y := Y₁) (C := C₁) D₁ S₁}
   {T₂ : IsotropicCollection (Y := Y₂) (C := C₂) D₂ S₂}
-variable {exceptional₁ : T₁.ExceptionalityData}
-  {exceptional₂ : T₂.ExceptionalityData}
-  {semiorthogonal₁ : T₁.SemiorthogonalityData}
-  {semiorthogonal₂ : T₂.SemiorthogonalityData}
+variable {exceptional₁ : T₁.ExceptionalityHypotheses}
+  {exceptional₂ : T₂.ExceptionalityHypotheses}
+  {semiorthogonal₁ : T₁.SemiorthogonalityHypotheses}
+  {semiorthogonal₂ : T₂.SemiorthogonalityHypotheses}
 variable {I : Type t} {J : Type t'} [Fintype I] [Fintype J]
-variable {B₁ : T₁.PaperBlockData exceptional₁ semiorthogonal₁ I}
-  {B₂ : T₂.PaperBlockData exceptional₂ semiorthogonal₂ J}
+variable {B₁ : T₁.PaperBlockHypotheses exceptional₁ semiorthogonal₁ I}
+  {B₂ : T₂.PaperBlockHypotheses exceptional₂ semiorthogonal₂ J}
 
 /-! ## Exact length and common-shift conclusions -/
 
 /-- Prefix-by-prefix extension in both directions for two paper block
 decompositions. -/
-abbrev PaperBidirectionalPrefixData (e : I ≃ J) :=
-  BidirectionalPrefixBlockEmbeddingData B₁.blocks B₂.blocks e
+abbrev PaperBidirectionalPrefixHypotheses (e : I ≃ J) :=
+  BidirectionalPrefixBlockEmbeddingHypotheses B₁.blocks B₂.blocks e
 
 /-- Corresponding Enriques blocks have equal length, derived from the two
 prefix extensions. -/
-theorem PaperBidirectionalPrefixData.length_eq {e : I ≃ J}
-    (A : PaperBidirectionalPrefixData (B₁ := B₁) (B₂ := B₂) e)
+theorem PaperBidirectionalPrefixHypotheses.length_eq {e : I ≃ J}
+    (A : PaperBidirectionalPrefixHypotheses (B₁ := B₁) (B₂ := B₂) e)
     (i : I) : B₁.blocks.length i = B₂.blocks.length (e i) :=
-  BidirectionalPrefixBlockEmbeddingData.length_eq A i
+  BidirectionalPrefixBlockEmbeddingHypotheses.length_eq A i
 
 namespace PaperIIProjectionClassificationData
 
-variable {P₁ : T₁.PaperCategoryData exceptional₁ semiorthogonal₁}
-  {P₂ : T₂.PaperCategoryData exceptional₂ semiorthogonal₂}
+variable {P₁ : T₁.PaperCategoryHypotheses exceptional₁ semiorthogonal₁}
+  {P₂ : T₂.PaperCategoryHypotheses exceptional₂ semiorthogonal₂}
 variable {Q₁ : T₁.PaperResidualProjectionData exceptional₁ semiorthogonal₁}
   {Q₂ : T₂.PaperResidualProjectionData exceptional₂ semiorthogonal₂}
 variable (A₁ : T₁.PaperIIProjectionClassificationData P₁ B₁ Q₁)
@@ -113,57 +113,57 @@ variable (A₁ : T₁.PaperIIProjectionClassificationData P₁ B₁ Q₁)
 
 /-- Bidirectional prefix extension indexed by the block matching forced by
 the residual spherical/pseudoprojective classification. -/
-abbrev MatchingPrefixData :=
-  PaperBidirectionalPrefixData (B₁ := B₁) (B₂ := B₂)
+abbrev MatchingPrefixHypotheses :=
+  PaperBidirectionalPrefixHypotheses (B₁ := B₁) (B₂ := B₂)
     (A₁.matchingEquiv A₂ F)
 
 /-- **Matched Paper II blocks have exactly equal length.**  Classification
 determines the matching, and the two prefix extensions determine its exact
 lengths. -/
-theorem matchingEquiv_length_eq (L : A₁.MatchingPrefixData A₂ F)
+theorem matchingEquiv_length_eq (L : A₁.MatchingPrefixHypotheses A₂ F)
     (i : I) :
     B₁.blocks.length i = B₂.blocks.length (A₁.matchingEquiv A₂ F i) :=
-  PaperBidirectionalPrefixData.length_eq L i
+  PaperBidirectionalPrefixHypotheses.length_eq L i
 
 end PaperIIProjectionClassificationData
 
 /-- Memberwise images of two Enriques block decompositions, before adjacent
 Ext rigidity identifies the shifts. -/
-abbrev PaperMemberwiseBlockShiftData (e : I ≃ J)
+abbrev PaperMemberwiseBlockShiftHypotheses (e : I ≃ J)
     (length_eq : ∀ i, B₁.blocks.length i = B₂.blocks.length (e i))
     (G : DerivedCat Y₁ ⥤ DerivedCat Y₂) :=
-  MemberwiseBlockShiftData B₁.blocks B₂.blocks e length_eq G
+  MemberwiseBlockShiftHypotheses B₁.blocks B₂.blocks e length_eq G
 
 namespace PaperIIProjectionClassificationData
 
-variable {P₁ : T₁.PaperCategoryData exceptional₁ semiorthogonal₁}
-  {P₂ : T₂.PaperCategoryData exceptional₂ semiorthogonal₂}
+variable {P₁ : T₁.PaperCategoryHypotheses exceptional₁ semiorthogonal₁}
+  {P₂ : T₂.PaperCategoryHypotheses exceptional₂ semiorthogonal₂}
 variable {Q₁ : T₁.PaperResidualProjectionData exceptional₁ semiorthogonal₁}
   {Q₂ : T₂.PaperResidualProjectionData exceptional₂ semiorthogonal₂}
 variable (A₁ : T₁.PaperIIProjectionClassificationData P₁ B₁ Q₁)
   (A₂ : T₂.PaperIIProjectionClassificationData P₂ B₂ Q₂)
   (F : PaperResidualSerreEquivalence P₁ P₂)
-  (L : A₁.MatchingPrefixData A₂ F)
+  (L : A₁.MatchingPrefixHypotheses A₂ F)
 
 /-- Memberwise image data indexed by the classification-derived block
 matching and its prefix-derived exact length equality. -/
-abbrev MatchingMemberwiseShiftData (G : DerivedCat Y₁ ⥤ DerivedCat Y₂) :=
-  PaperMemberwiseBlockShiftData (B₁ := B₁) (B₂ := B₂)
+abbrev MatchingMemberwiseShiftHypotheses (G : DerivedCat Y₁ ⥤ DerivedCat Y₂) :=
+  PaperMemberwiseBlockShiftHypotheses (B₁ := B₁) (B₂ := B₂)
     (A₁.matchingEquiv A₂ F) (A₁.matchingEquiv_length_eq A₂ F L) G
 
 end PaperIIProjectionClassificationData
 
-namespace PaperMemberwiseBlockShiftData
+namespace PaperMemberwiseBlockShiftHypotheses
 
 variable {e : I ≃ J}
   {length_eq : ∀ i, B₁.blocks.length i = B₂.blocks.length (e i)}
   {G : DerivedCat Y₁ ⥤ DerivedCat Y₂}
 variable [G.Additive] [G.Linear k] [G.CommShift ℤ]
 variable [∀ n : ℤ, (shiftFunctor (DerivedCat Y₂) n).Linear k]
-variable (M : PaperMemberwiseBlockShiftData
+variable (M : PaperMemberwiseBlockShiftHypotheses
   (B₁ := B₁) (B₂ := B₂) e length_eq G)
-  (A₁ : T₁.PaperAdjacentExtData B₁)
-  (A₂ : T₂.PaperAdjacentExtData B₂)
+  (A₁ : T₁.PaperAdjacentExtHypotheses B₁)
+  (A₂ : T₂.PaperAdjacentExtHypotheses B₂)
 
 /-- The common shift attached to a matched block. -/
 noncomputable def commonShift (i : I) : ℤ :=
@@ -188,7 +188,7 @@ noncomputable def commonObjectIso (hG : G.FullyFaithful) (i : I)
   rw [← M.shift_eq_common A₁ A₂ hG i j]
   exact M.objectIso i j
 
-end PaperMemberwiseBlockShiftData
+end PaperMemberwiseBlockShiftHypotheses
 
 /-! ## Finite Fourier--Mukai extension and ambient generation -/
 
@@ -198,12 +198,12 @@ variable (R : ResidualKernelEquivalence B₁.blocks B₂.blocks corr)
 
 /-- The finite extension sequence for the two actual Enriques exceptional
 parts, including the admissibility data which certifies ambient generation. -/
-abbrev PaperGeneratedExtensionSequenceData :=
-  GeneratedBlockExtensionSequenceData B₁.blocks B₂.blocks corr R
+abbrev PaperGeneratedExtensionSequenceHypotheses :=
+  GeneratedBlockExtensionSequenceHypotheses B₁.blocks B₂.blocks corr R
 
-namespace PaperGeneratedExtensionSequenceData
+namespace PaperGeneratedExtensionSequenceHypotheses
 
-variable (A : PaperGeneratedExtensionSequenceData
+variable (A : PaperGeneratedExtensionSequenceHypotheses
   (B₁ := B₁) (B₂ := B₂) R)
 
 /-- **Ambient extension conclusion of Paper I, Theorem 5.1, and Paper II,
@@ -212,7 +212,7 @@ Theorem 3.3.**
 The final equivalence of the ambient derived categories is presented by the
 last Fourier--Mukai kernel in the extension sequence. -/
 noncomputable def toKernelEquivalence : KernelEquivalence corr :=
-  GeneratedBlockExtensionSequenceData.toKernelEquivalence A
+  GeneratedBlockExtensionSequenceHypotheses.toKernelEquivalence A
 
 /-- The underlying promoted equivalence of ambient derived categories. -/
 noncomputable def ambientEquivalence : DerivedCat Y₁ ≌ DerivedCat Y₂ :=
@@ -226,7 +226,7 @@ theorem transform_isEquivalence :
     A.toGeneratedExtensionSequenceData.sourceGenerates
     A.toGeneratedExtensionSequenceData.targetGenerates
 
-end PaperGeneratedExtensionSequenceData
+end PaperGeneratedExtensionSequenceHypotheses
 
 end TwoSurfaces
 

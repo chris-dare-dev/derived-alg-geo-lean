@@ -14,9 +14,46 @@ to a positive vector, while `HodgeDefinite` records negative definiteness on its
 orthogonal complement.  The latter determines the signature and nondegeneracy
 of the pairing.
 
+## Main definitions
+
+* `DivisorSpace`: a real vector space with a symmetric bilinear pairing, and
+  `DivisorSpace.pair` for the pairing.
+* `DivisorSpace.HodgeIndex`: the Hodge index inequality relative to a vector of
+  positive square.
+* `DivisorSpace.HodgeDefinite`: negative definiteness on `H^⊥`, together with
+  positivity of `H²`.
+* `DivisorSpace.intersectionQuadratic`: the self-pairing as a quadratic form.
+
+## Main results
+
+* `DivisorSpace.HodgeDefinite.toHodgeIndex`: definiteness on `H^⊥` implies the
+  index inequality.
+* `DivisorSpace.sigPos_sigNeg_of_hodgeDefinite` and
+  `DivisorSpace.nondegenerate_of_hodgeDefinite`: a Hodge-definite pairing has
+  one positive index of inertia and is nondegenerate.
+* `DivisorSpace.HodgeDefinite.of_pair_pos`: Hodge definiteness transports to
+  any vector of positive square.
+* `DivisorSpace.hasSignatureTwo_of_hodgeDefinite`: the real Mukai extension of
+  a Hodge-definite pairing has signature two.
+
+## Implementation notes
+
 All declarations in this file are linear algebra.  No charge family, Chern
 character, scheme, support predicate, or wall arrangement is imported.  The
-existing namespace is preserved by the ownership cutover.
+declarations are in the namespace
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial`,
+which they share with the divisorial charge and wall modules that consume them;
+it differs from this file's path.
+
+## References
+
+The real Mukai form and its signature, `Mukai.realForm` and
+`Mukai.hasSignatureTwo_realForm` of
+`DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.RealFormSignature`.
+
+## Tags
+
+Hodge index theorem, symmetric bilinear form, signature, negative definite
 -/
 
 open QuadraticMap

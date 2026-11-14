@@ -8,10 +8,28 @@ import Mathlib.CategoryTheory.Abelian.Exact
 /-!
 # Functoriality of the Grothendieck group of an abelian category
 
-`K₀Ab` had no functoriality at all: every map out of it in the tree lands in a fixed abelian group
-through `liftOf`, and there was no `K₀Ab A →+ K₀Ab B`. This file supplies it.
+A functor between abelian categories that carries short exact sequences to short exact sequences
+induces an additive map `K₀Ab A →+ K₀Ab B`, and an equivalence induces an isomorphism.
 
-## Why the hypothesis is short exactness, not exactness
+## Main definitions
+
+* `CategoryTheory.K₀Ab.map`: the map induced by a functor that preserves short exactness.
+* `CategoryTheory.K₀Ab.mapOfExact`: the map induced by a functor preserving finite limits and
+  colimits.
+* `CategoryTheory.K₀Ab.congr` and `CategoryTheory.K₀Ab.congrHom`: the isomorphism of
+  Grothendieck groups induced by an equivalence, and its underlying additive hom.
+
+## Main results
+
+* `CategoryTheory.K₀Ab.map_of`: the induced map sends `[X]` to `[F X]`.
+* `CategoryTheory.K₀Ab.map_id`, `CategoryTheory.K₀Ab.map_comp` and
+  `CategoryTheory.K₀Ab.map_congr`: identity, composition and naturally isomorphic functors.
+* `CategoryTheory.K₀Ab.congr_of` and `CategoryTheory.K₀Ab.congr_symm_of`: the isomorphism and
+  its inverse on classes of objects.
+
+## Implementation notes
+
+### Why the hypothesis is short exactness, not exactness
 
 `K₀Ab` is presented by short exact sequences, so the only thing a functor has to do to induce a map
 is carry a short exact sequence to a short exact one. That is weaker than being exact, and it is
@@ -19,7 +37,7 @@ exactly what `liftOf` consumes, so `map` takes it as a plain hypothesis in the s
 this directory. `mapOfExact` is the convenience wrapper for a functor that preserves finite limits
 and colimits, where Mathlib's `ShortExact.map_of_exact` discharges it.
 
-## The equivalence case, and what it is for
+### The equivalence case, and what it is for
 
 `congr` upgrades an equivalence of abelian categories to an isomorphism of Grothendieck groups. The
 inverse is the equivalence's own inverse functor, and the round trips are `hom_ext` against
@@ -27,8 +45,16 @@ inverse is the equivalence's own inverse functor, and the round trips are `hom_e
 
 This is the first half of transporting numerical data along an equivalence. The motivating case is
 identifying coherent sheaves with the heart of the standard t-structure on their derived category:
-the μ-slope data of the Gieseker lane lives on `Coh X`, while the Mukai tilt assembly wants it on a
+the μ-slope data of coherent sheaves lives on `Coh X`, while the Mukai tilt assembly wants it on a
 heart, and a rank or degree homomorphism moves between them by precomposition with `congr`.
+
+## References
+
+The library's `K₀Ab` and `K₀Ab.liftOf`, and Mathlib's `ShortComplex.ShortExact.map_of_exact`.
+
+## Tags
+
+Grothendieck group, functoriality, exact functor, equivalence of categories
 -/
 
 universe v₁ v₂ v₃ u₁ u₂ u₃

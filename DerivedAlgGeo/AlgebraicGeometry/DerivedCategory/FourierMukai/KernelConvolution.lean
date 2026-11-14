@@ -225,7 +225,7 @@ class HasFlatBaseChange {T T' U U' : SchemeBaseChange S}
 
 /-- Compatibility record containing only the tensorator of derived pullback.
 
-New stable convolution APIs require `HasMonoidalDerivedPullback`, which also
+Stable convolution APIs require `HasMonoidalDerivedPullback`, which also
 states tensorator associativity, unitality, naturality, and invertibility. -/
 class HasDerivedPullbackTensor {T U : SchemeBaseChange S}
     [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left] (f : T ⟶ U)
@@ -246,7 +246,7 @@ noncomputable instance hasDerivedPullbackTensorOfMonoidal
   iso := monoidalDerivedPullbackTensorIso f
 
 /-- Compatibility record for callers that have only a chosen tensor
-associator. New stable convolution APIs require `HasCoherentDerivedTensor`,
+associator. Stable convolution APIs require `HasCoherentDerivedTensor`,
 whose Mathlib `MonoidalCategory` parent also supplies naturality, the pentagon,
 and the triangle.
 

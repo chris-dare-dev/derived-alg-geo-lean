@@ -105,16 +105,16 @@ theorem canonicalClass_eq_of_iso {C' : CanonicalSheafData k X n}
 
 Existence is kept as data because the present Cartier-to-Picard API does not prove essential
 surjectivity for every line bundle. -/
-structure CanonicalDivisorData where
+structure CanonicalDivisorHypotheses where
   /-- A Cartier divisor representing the canonical class. -/
   divisor : Scheme.CartierDivisor X
   /-- Its associated invertible sheaf is the canonical sheaf. -/
   associatedSheafIso :
     Scheme.CartierDivisor.associatedSheaf divisor ≅ C.canonicalSheaf
 
-namespace CanonicalDivisorData
+namespace CanonicalDivisorHypotheses
 
-variable (D : CanonicalDivisorData C)
+variable (D : CanonicalDivisorHypotheses C)
 
 /-- The associated Cartier divisor maps to the canonical Picard class. -/
 theorem toPic_eq_canonicalClass :
@@ -137,7 +137,7 @@ theorem classToPic_eq_canonicalClass :
   rw [canonicalDivisorClass, Scheme.CartierDivisor.classToPic_toClass]
   exact D.toPic_eq_canonicalClass
 
-end CanonicalDivisorData
+end CanonicalDivisorHypotheses
 
 /-- Comparison data between a separately constructed dualizing-sheaf candidate and `ω_X`.
 

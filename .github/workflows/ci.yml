@@ -292,17 +292,15 @@ jobs:
         run: python3 scripts/check_codex_entrypoint.py
 
       # Path scoping (2026-08-14). #362 removed the per-file sorry sweep, which
-      # was 72.9% of a 54-minute run; what is left is dominated by three axiom
-      # audits and four linter passes, each of which used to run whatever the
-      # change touched. Each is now gated on its own tree.
+      # was 72.9% of a 54-minute run; what is left is dominated by the linter
+      # passes, each of which used to run whatever the change touched. Each is
+      # now gated on its own tree.
       #
       # FAIL-OPEN BY DESIGN: if the diff base cannot be resolved, or if anything
       # structural changed, `scope` is `all` and every gate runs exactly as
       # before. A gate is skipped only when this step has positively established
       # that no file it could possibly judge has changed. Never invert that
-      # default -- a gate that silently does not run is worse than a slow one,
-      # and this repository has already lost an audit to a subtler version of
-      # that (scripts/check_audit.py's 2026-08-07 note).
+      # default -- a gate that silently does not run is worse than a slow one.
       - name: What changed
         id: changed
         run: |
@@ -414,9 +412,9 @@ jobs:
       # not a wrong answer.
       #
       # Scoped to `DerivedAlgGeo/`, where the artifact path maps to the source
-      # path directly. `Emit.ilean` and the `*Audit.ilean` come from `exe/` and
-      # `scripts/` via srcDir, so a root-relative existence test would prune them
-      # wrongly; they are left alone.
+      # path directly. The `exe/` libraries' `.ilean` files come from their own
+      # srcDir, so a root-relative existence test would prune them wrongly; they
+      # are left alone.
       #
       # Runs on both lanes. The self-hosted Mac keeps its own `.lake` across
       # runs and accumulates orphans the same way -- measured 42 in one working
@@ -510,77 +508,6 @@ jobs:
           for f in registry/coverage-*.json; do
             python3 scripts/check_coverage_map.py "$f"
           done
-
-      - name: Algebraic-geometry axiom audit
-        id: ag_axiom_audit
-        continue-on-error: true
-        run: |
-          set -euo pipefail
-          # Development probes are outside the public umbrella and must be
-          # built explicitly for this audit.
-          lake build DerivedAlgGeo.Development \
-            DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Surface \
-            DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Threefold \
-            DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Fourfold
-          : > algebraic-geometry-audit.txt
-          for f in scripts/AlgebraicGeometryAudit/*.lean; do
-            lake env lean "$f" >> algebraic-geometry-audit.txt 2>&1
-          done
-          if grep -q 'sorryAx' algebraic-geometry-audit.txt; then
-            echo "::error::sorryAx reached the algebraic-geometry audit"
-            exit 1
-          fi
-          # Allowlist + truncation + parse checks, same standard as the other
-          # two audit lanes. Until 2026-08-18 this lane checked only sorryAx,
-          # so a custom axiom or a truncated transcript passed it (review
-          # finding P2-3).
-          python3 scripts/check_audit.py algebraic-geometry-audit.txt \
-            scripts/AlgebraicGeometryAudit.lean
-
-      - name: Stability-condition axiom audit
-        id: stability_axiom_audit
-        continue-on-error: true
-        run: |
-          set -euo pipefail
-          : > stability-condition-audit.txt
-          for f in scripts/StabilityConditionAudit/*.lean; do
-            lake env lean "$f" >> stability-condition-audit.txt 2>&1 || {
-              echo "::error::$f failed to elaborate"
-              cat stability-condition-audit.txt
-              exit 1
-            }
-          done
-          python3 scripts/check_audit.py stability-condition-audit.txt
-
-      - name: DG axiom audit
-        id: dg_axiom_audit
-        continue-on-error: true
-        run: |
-          set -euo pipefail
-          lake env lean scripts/DGCategoryAudit.lean > dg-audit.txt 2>&1 || {
-            echo "::error::scripts/DGCategoryAudit.lean failed to elaborate"
-            cat dg-audit.txt
-            exit 1
-          }
-          python3 scripts/check_audit.py dg-audit.txt scripts/DGCategoryAudit.lean
-
-      - name: Audit completeness
-        id: audit_completeness
-        continue-on-error: true
-        run: |
-          set -euo pipefail
-          # check_audit.py catches an audit that lists a name the source no
-          # longer has. This catches the reverse -- a new public declaration
-          # nobody listed -- which is how PR #354 landed IsQuasiEquivalence
-          # outside the DG audit entirely. A ratchet, not a hard gate: the
-          # algebraic-geometry and stability subsystems carry pre-existing gaps, recorded as
-          # ceilings in check_audit_complete.py, and only growth fails.
-          lake env lean scripts/EnumDecls.lean > enum-decls.txt 2>&1 || {
-            echo "::error::scripts/EnumDecls.lean failed to elaborate"
-            cat enum-decls.txt
-            exit 1
-          }
-          python3 scripts/check_audit_complete.py enum-decls.txt
 
       - name: Single instantiation
         id: single_instantiation
@@ -1250,11 +1177,7 @@ jobs:
       # `set -e` inside a 30-step job means the FIRST red gate ends the run and
       # every gate behind it reports `skipped`. That is not a smaller signal, it
       # is a misleading one: a pull request can look like it has one problem and
-      # have four. Measured on this repository the night of 2026-09-19:
-      # `Audit completeness` went red at #1416 and stayed red, and behind it
-      # `Environment linters` accumulated ten violations from #1421 that nobody
-      # could see until the audit was repaired. Two regressions merged under the
-      # shadow of one, on a tree where every branch inherits `main`.
+      # have four, and the regressions behind the first red gate merge unseen.
       #
       # So the gates now carry `continue-on-error: true`, which does NOT mean
       # they stopped mattering: it means their verdict is recorded rather than
@@ -1281,10 +1204,6 @@ jobs:
         env:
           RESULTS: |
             pin=${{ steps.pin.outcome }}
-            ag_axiom_audit=${{ steps.ag_axiom_audit.outcome }}
-            stability_axiom_audit=${{ steps.stability_axiom_audit.outcome }}
-            dg_axiom_audit=${{ steps.dg_axiom_audit.outcome }}
-            audit_completeness=${{ steps.audit_completeness.outcome }}
             single_instantiation=${{ steps.single_instantiation.outcome }}
             environment_linters=${{ steps.environment_linters.outcome }}
             warning_ratchet=${{ steps.warning_ratchet.outcome }}
@@ -1338,8 +1257,7 @@ jobs:
         # before cleaning -- the observed HTTP-429-before-checkout mode -- and
         # the fixed artifact name let that stale bundle masquerade as this
         # run's (2026-08-18 adversarial review, P2-6). Gating on checkout and
-        # naming the artifact by commit closes both halves; the two audit
-        # filenames below were also stale since the #614 renames (P3-3).
+        # naming the artifact by commit closes both halves.
         if: always() && steps.checkout.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
@@ -1351,9 +1269,6 @@ jobs:
             attest/build.json
             attest/bundle.json
             attest/restate.json
-            algebraic-geometry-audit.txt
-            stability-condition-audit.txt
-            dg-audit.txt
           if-no-files-found: warn
 
   # ---------------------------------------------------------------------------

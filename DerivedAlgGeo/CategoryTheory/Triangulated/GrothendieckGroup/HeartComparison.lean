@@ -13,7 +13,24 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.TStructure.HeartBridge
 underlying ambient object, `K₀Ab 𝒜 →+ K₀ C` for `𝒜` the heart of a t-structure
 on `C`.
 
-## Why only one direction, and why that is enough
+## Main definitions
+
+* `CategoryTheory.Triangulated.TStructure.shortExactToTriangle`: a short exact
+  sequence in the heart, as a distinguished triangle on the same three ambient
+  objects.
+* `CategoryTheory.K₀Ab.toAmbient`: the comparison map `K₀Ab 𝒜 →+ K₀ C`.
+
+## Main results
+
+* `CategoryTheory.Triangulated.TStructure.toAmbient_isAdditive`: the
+  underlying-object function carries the abelian relations of the heart into
+  the triangulated relations of `C`.
+* `CategoryTheory.K₀Ab.toAmbient_of`: the comparison sends the class of a heart
+  object to the class of its underlying object.
+
+## Implementation notes
+
+### Why only one direction, and why that is enough
 
 `Weak/Basic/Definitions.lean` records that the comparison `K(𝒜) ≅ K(D)` for a
 bounded t-structure is not available at this Mathlib pin and is not assumed.
@@ -26,12 +43,20 @@ carried into the triangulated ones and `GrothendieckPresentation.map` applies.
 Every conversion between a charge on a heart and a charge on `K₀ C` uses the map
 in this direction only, so nothing here depends on the unavailable iso.
 
-## What this replaces
+### Charges on the heart and on `K₀ C`
 
-Charges written on heart objects and charges written on `K₀ C` were previously
-two unrelated families, and the conversion between them existed once, hand-rolled
-and inlined, inside a mass-subadditivity file.  With this map the conversion is
-`AddMonoidHom.comp`.
+With this map, a charge written on `K₀ C` gives a charge on the heart's `K₀Ab`
+by `AddMonoidHom.comp`; no separate conversion is needed.
+
+## References
+
+The library's `GrothendieckPresentation.map`, `K₀Ab`, `K₀` and
+`heartFullSubcategory_shortExact_triangle`.
+
+## Tags
+
+Grothendieck group, heart, t-structure, distinguished triangle, short exact
+sequence
 -/
 
 universe v u

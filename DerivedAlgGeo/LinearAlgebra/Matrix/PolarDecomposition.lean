@@ -20,10 +20,27 @@ returns nothing. This file supplies the case this repo needs, in the
 `ForMathlib` pattern this repository uses for Mathlib gaps, and is written to be
 upstreamable rather than to be convenient here.
 
-## Why it costs almost nothing now
+## Main definitions
+
+* `Matrix.polarFactor`: the positive-definite factor `√(Aᴴ A)`.
+* `Matrix.polarUnitary`: the unitary factor `A · √(Aᴴ A)⁻¹`.
+
+## Main results
+
+* `Matrix.polarFactor_posDef`: for invertible `A` the factor `√(Aᴴ A)` is
+  positive definite.
+* `Matrix.polarUnitary_mem_unitaryGroup`: the factor `A · √(Aᴴ A)⁻¹` is unitary.
+* `Matrix.exists_polarDecomposition`: every invertible matrix is a unitary
+  matrix times a positive-definite one.
+* `Matrix.eq_polarFactor_of_mul`, `Matrix.eq_polarUnitary_of_mul` and
+  `Matrix.existsUnique_polarDecomposition`: both factors are unique.
+
+## Implementation notes
+
+### Why it costs almost nothing
 
 The classical proof needs a square root of the positive-definite matrix
-`Aᴴ A`, and historically that meant the spectral theorem. It no longer does:
+`Aᴴ A`, which usually comes from the spectral theorem. Here it does not:
 Mathlib's **continuous functional calculus** applies to real matrices once the
 Loewner order is in scope (`open scoped MatrixOrder`), so `CFC.sqrt` is
 available directly and `CFC.sqrt_mul_sqrt_self` is the only property needed.
@@ -34,12 +51,21 @@ That is the whole trick. `P := √(Aᴴ A)`, `Q := A P⁻¹`, and
 Qᴴ Q = P⁻¹ Aᴴ A P⁻¹ = P⁻¹ (P P) P⁻¹ = 1.
 ```
 
-## Uniqueness
+### Uniqueness
 
 Both factors are unique. If `A = Q P` with `Q` unitary and `P` positive
 definite then `Pᴴ Qᴴ Q P = P P`, so `P` is *a* nonnegative square root of
 `Aᴴ A` — and the nonnegative square root is unique (`CFC.sqrt_unique`), so it
 is *the* one. `Q = A P⁻¹` then follows.
+
+## References
+
+Mathlib's `CFC.sqrt`, `CFC.sqrt_mul_sqrt_self`, `CFC.sqrt_unique` and
+`Matrix.unitaryGroup`.
+
+## Tags
+
+polar decomposition, matrix square root, unitary matrix, positive definite
 -/
 
 set_option backward.defeqAttrib.useBackward true

@@ -23,23 +23,67 @@ coherence, and geometric existence must be supplied by a producer or by the
 theorem using the operation. A field of this type is therefore an interface,
 not a proof of the corresponding geometric fact.
 
-**Why the bundle is the root and not the K-flat one.** K-flat resolutions are a
-*model*: one way to produce these three operations, and the one
-`KFlatBaseChange.lean` uses. They are not what base change is. Stating the
-downstream API on the model means a second construction -- pullback along an
+## Main definitions
+
+* `SchemeBaseChange.DerivedBaseChangeData`: the two derived pullbacks off the
+  fibre product `X_T` and a tensor bifunctor on `Dqc(X_T)`.
+* `SchemeBaseChange.DerivedBaseChangeData.ofExactPullbacks`: the bundle built
+  from exact canonical pullbacks, a supplied tensor and supplied `Dqc`
+  preservation along both projections.
+* `SchemeBaseChange.DerivedBaseChangeData.externalProduct`, `perfectGenerators`,
+  `shiftedPerfectGenerators` and `perfectEnvelope`: the external product of the
+  bundled operations and the generator properties it spans.
+* `SchemeBaseChange.DerivedBaseChangeData.quasicoherentComponent` and
+  `boundedComponent`, with their full subcategories `QuasicoherentCategory` and
+  `BoundedCategory`: the components `(Dqc)_T` and `D_T`.
+* `SchemeBaseChange.DerivedBaseChangeData.PreservesCompactObjects`: the
+  compactness obligations on the three bundled operations.
+
+## Main results
+
+* `SchemeBaseChange.DerivedBaseChangeData.externalProduct_mem_perfectGenerators`
+  and `externalProduct_shift_mem_shiftedPerfectGenerators`: every external
+  product, and every shift of one, lies in the corresponding generator property.
+* `SchemeBaseChange.DerivedBaseChangeData.externalProduct_obj_isCompact`: under
+  `PreservesCompactObjects` every external-product generator is compact.
+* `SchemeBaseChange.DerivedBaseChangeData.perfectEnvelope_le_compact`: under the
+  same obligations the whole perfect envelope consists of compact objects.
+* Instances: the shifted generators are stable under shift, the perfect envelope
+  and `(Dqc)_T` are triangulated when the source property contains zero, and the
+  envelope, `(Dqc)_T` and `D_T` are closed under isomorphisms.
+
+## Implementation notes
+
+### Why the bundle is the root and not the K-flat one
+
+K-flat resolutions are a *model*: one way to produce these three operations, and
+the one `KFlatBaseChange.lean` uses. They are not what base change is. Stating
+the downstream API on the model means a second construction -- pullback along an
 open immersion, which `OpenImmersionPullback.lean` already proves exact and so
 needs no resolution at all; a flat base; an eventual `∞`-categorical tensor --
 cannot reuse any of it. `abstraction-tree.md` names that failure directly: a
-leaf must not copy the carrier or fields of its root, and until this file there
-was no root for a leaf to reach.
+leaf must not copy the carrier or fields of its root, and this bundle is the
+root such a leaf reaches.
 
-So `KFlatBaseChangeData` keeps its resolutions and becomes a producer of this
-structure rather than a rival carrier, through
-`KFlatBaseChangeData.toDerivedBaseChangeData`.
+So `KFlatBaseChangeHypotheses`, the package of supplied K-flat resolutions with
+their resolved acyclicity and quasicoherence facts, keeps its resolutions and is
+a producer of this structure rather than a rival carrier, through
+`KFlatBaseChangeHypotheses.toDerivedBaseChangeData`.
 
-Nothing here is inhabited, and nothing here is new mathematics: every
-declaration is the corresponding one from `KFlatBaseChange.lean` with the model
-projected away.
+### Scope
+
+No bundle is inhabited unconditionally: `ofExactPullbacks` still takes the tensor
+and both `Dqc` preservation statements as arguments. Nothing here is new
+mathematics: every other declaration is the corresponding one from
+`KFlatBaseChange.lean` with the model projected away.
+
+## References
+
+* arXiv:1902.08184, §3.
+
+## Tags
+
+base change, derived pullback, derived tensor, external product, perfect envelope
 -/
 
 attribute [local instance] HasDerivedCategory.standard
@@ -58,7 +102,7 @@ variable {S : Scheme.{u}}
 /-- The derived operations base change is built from: a derived pullback along
 each projection off the fibre product, and a derived tensor on it.
 
-This is the model-free root. `KFlatBaseChangeData` produces one of these from
+This is the model-free root. `KFlatBaseChangeHypotheses` produces one of these from
 K-flat resolutions; any other construction of the same three operations
 produces one too, and reaches the whole API below by doing so. -/
 structure DerivedBaseChangeData (X T : SchemeBaseChange S) where

@@ -79,7 +79,7 @@ hypothesis the structure does not consume.
 The product *is* needed, but downstream and for a different purpose: it is what
 makes `ConvolutionData` — the composition law `Φ_Q ∘ Φ_P ≅ Φ_{Q∗P}` — provable,
 via the projection formula and flat base change on a triple product. Those are
-listed in the closing section as the next ledger, not smuggled in here.
+listed in the closing section and named in `KernelConvolution.lean`, not smuggled in here.
 
 Nor is `Z` required locally Noetherian *as a consequence* of `X` and `Y` being
 so. Mathlib has no instance making a pullback of schemes locally Noetherian, so
@@ -220,7 +220,7 @@ end Exactness
 
 end Assembly
 
-/-! ## The next ledger, and what is in it
+/-! ## Beyond the correspondence
 
 `geometricCorrespondence` reaches everything in the Fourier--Mukai development that
 needs only a `Correspondence`: `transform`, `IsKernelFunctor`, `transformK₀`,
@@ -229,8 +229,8 @@ stability conditions.
 
 It does **not** reach the composition law. `ConvolutionData` takes a kernel
 operation `conv` together with `Φ_P ⋙ Φ_Q ≅ Φ_{conv P Q}` *uniformly in `Q`*,
-and that is where the product structure finally becomes load-bearing. A second
-ledger would have to name:
+and that is where the product structure becomes load-bearing. Classically it
+needs:
 
 * `Z ≅ X ×_S Y`, and a triple product `X ×_S Y ×_S W` with its three
   projections;
@@ -239,9 +239,10 @@ ledger would have to name:
 * and the identification of `conv` itself as
   `Rπ_{XZ*}(π_{XY}^* P ⊗^L π_{YZ}^* Q)`.
 
-None of those is stated here.  Similarly, a `UnitKernelData` would need `𝒪_Δ`
-along the diagonal, and a `DualKernel` the derived dual `P^∨ ⊗ p^*ω[dim]` —
-both geometric, neither stated here.
+None of those is stated here; `KernelConvolution.lean` is the ledger that names
+them.  Similarly, a `UnitKernelData` would need `𝒪_Δ` along the diagonal, and a
+`DualKernel` the derived dual `P^∨ ⊗ p^*ω[dim]` — both geometric, neither stated
+here; `KernelUnit.lean` and `KernelAdjunction.lean` take them up.
 
 Those are kernel-specific, so they belong with the kernel files rather than with the
 general owners: the projection formula, convolution, and the compositor and adjunction

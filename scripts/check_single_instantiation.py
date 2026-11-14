@@ -21,7 +21,7 @@ inhabitant, data structures a consumer supplies from outside the repository,
 and abstractions whose second instantiation is genuinely future work. A gate
 failing on all of them fires on 45% of the tree and stops being read.
 
-So this follows `audit_missing_baseline.txt`: the known ones are named, and only
+So this is a ratchet: the known ones are named, and only
 a NEW name fails. That converts the failure mode from invisible drift into a
 deliberate, reviewable act -- the author either instantiates it twice in the same
 change, or adds the name and says why in the third column of its owner record.

@@ -427,7 +427,7 @@ noncomputable instance GLTilde.contractibleSpace : ContractibleSpace GLTilde := 
 /-- **The space underlying Bridgeland's pair presentation is simply
 connected.**
 
-This proves the formerly missing simple-connectedness fact.  The covering-map
+It follows from contractibility, `GLTilde.contractibleSpace`.  The covering-map
 theorem is proved separately in `UniversalCover/Map.lean`. -/
 noncomputable instance GLTilde.simplyConnectedSpace : SimplyConnectedSpace GLTilde :=
   SimplyConnectedSpace.ofContractible GLTilde

@@ -733,8 +733,7 @@ def check_baseline(relax: bool) -> int:
     if relax and not STYLE_BASELINE.exists():
         # First adoption, and the only time this file is written from a state
         # it does not already dominate. Every later `--relax` may lower it and
-        # never raise it, for the reason `check_audit_complete.py` gives about
-        # its ceilings: a change that leaves more debt than it found is the
+        # never raise it: a change that leaves more debt than it found is the
         # thing the ratchet exists to stop.
         write_style_baseline(current)
         print(f"--relax: recorded {sum(current.values())} pre-existing ERROR(s) "

@@ -5,12 +5,43 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineKProjectiveUnitality
 
 /-!
-# Coherence for the affine bounded-projective pullback lane
+# Coherence for the affine bounded-projective pullback
 
 The extension-of-scalars pentagon is first transported to cochain complexes
 and then through the homotopy quotient. This supplies the main higher
 coherence equation needed to package the affine supported pullbacks as a
 pseudofunctor.
+
+## Main definitions
+
+* `AlgebraicGeometry.DerivedCategory.Dqc.affineBoundedAboveProjectiveHomotopyPseudofunctor`
+  packages affine extension of scalars on bounded-above projective homotopy representatives
+  as a pseudofunctor.
+
+## Main results
+
+* `AlgebraicGeometry.DerivedCategory.Dqc.affineExtendScalarsComplex_associativity` and its
+  unitality companions transport the extension-of-scalars coherence equations to cochain
+  complexes.
+* `AlgebraicGeometry.DerivedCategory.Dqc.affineBoundedAboveProjectiveHomotopyPullback_associativity`
+  and its unitality companions give the pentagon and triangle equations on homotopy
+  representatives.
+
+## Implementation notes
+
+Each equation is the corresponding module-level coherence, transported degreewise to
+cochain complexes by `NatTrans.mapHomologicalComplex` and then passed through the homotopy
+quotient; `LocallyDiscrete.mkPseudofunctor` assembles the pseudofunctor from them.
+
+## References
+
+The module-level coherences are Mathlib's `ModuleCat.extendScalars_assoc'`,
+`ModuleCat.extendScalars_id_comp` and `ModuleCat.extendScalars_comp_id`; the pseudofunctor is
+built with `CategoryTheory.LocallyDiscrete.mkPseudofunctor`.
+
+## Tags
+
+pseudofunctor, extension of scalars, homotopy category, projective complex, pullback
 -/
 
 namespace AlgebraicGeometry.DerivedCategory.Dqc

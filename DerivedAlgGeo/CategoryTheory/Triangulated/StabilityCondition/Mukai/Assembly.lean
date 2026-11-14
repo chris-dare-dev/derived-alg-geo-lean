@@ -350,12 +350,12 @@ def tiltStabilityFunctionOfLowerBound
       Cpt.re_charge_pos_of_lower_bound δ hb hsigPos hω hωδ hrank hslope hv)
     hboundary
 
-/-- The historical K3-normalized stability-function constructor.
+/-- The K3-normalized stability-function constructor.
 
 This is the `δ = 1` specialization of
-`tiltStabilityFunctionOfLowerBound`. The wrapper keeps existing consumers
-source-compatible while making the geometric constant explicit for new
-surface children. -/
+`tiltStabilityFunctionOfLowerBound`. It is a named wrapper for K3 consumers;
+other surface realizations make the geometric constant explicit through
+`tiltStabilityFunctionOfLowerBound`. -/
 def tiltStabilityFunction
     {m : K₀ C →+ Mukai.RealExtension V} {b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ} {β ω : V}
     (hb : ∀ x y : V, b x y = b y x)

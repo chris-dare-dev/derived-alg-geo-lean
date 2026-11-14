@@ -11,18 +11,36 @@ The `n = 2` specialisation of `AlgebraicGeometry.Numerical.NumericalVarietyData.
 
 This is an optional display specialization of the dimension-general API. It contains no
 foundational surface object: `NumericalVarietyData 2 A N` is the general variety interface at
-dimension two, and the discriminant itself now lives in
+dimension two, and the discriminant itself lives in
 `Numerical/GrothendieckGroup/Discriminant.lean` for
 arbitrary dimension.
+
+## Main definitions
+
+* `AlgebraicGeometry.Numerical.Surface.chiStructureSheaf` — `χ(O_X)`, read off the top Todd
+  component.
+* `AlgebraicGeometry.Numerical.Surface.discriminant` — the Bogomolov–Gieseker discriminant, as
+  a compatibility alias for the dimension-general one.
 
 ## Main results
 
 * `chi_eq` — `χ(E) = r·∫td₂(X) + ∫c₁(E)·td₁(X) + ∫ch₂(E)`.
 * compatibility aliases for the dimension-general numerical discriminant.
 
+## Implementation notes
+
 Writing `td₁(X) = −K_X/2` and `ch₂(E) = (c₁² − 2c₂)/2` turns `chi_eq` into the classical
 `χ(E) = r·χ(O_X) + ½c₁(c₁ − K_X) − c₂`. Those substitutions need `K_X` and `c₂`, which are
 Layer B objects, so they are *not* asserted here.
+
+## References
+
+The general statement is `AlgebraicGeometry.Numerical.NumericalVarietyData.chi_eq_sum`, and the
+discriminant is `NumericalVarietyData.discriminant`.
+
+## Tags
+
+Riemann–Roch, surface, discriminant, Todd class, numerical variety
 -/
 
 universe u v
