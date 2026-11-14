@@ -13,11 +13,51 @@ a principal divisor gives the structure sheaf, the associated sheaf of a sum is
 the tensor product, and the resulting map to the Picard group is an additive
 homomorphism that factors through the divisor class group.
 
-No unconditional pullback theorem is stated.  `CartierPullbackData` supplies a
-justified function-field pullback for divisors, but a comparison with pullback
-of module sheaves would also need compatibility between that data, rational
-sections, and module sheafification.  That extra compatibility is not part of
-the current Mathlib API.
+## Main definitions
+
+* `Scheme.CartierDivisor.associatedSheafZeroIso` and
+  `Scheme.CartierDivisor.associatedSheafPrincipalIso`: `O_X(0)` and `O_X(div f)`
+  are the structure sheaf.
+* `Scheme.CartierDivisor.associatedTensorInverseIso`: `O_X(-D)` is a tensor
+  inverse of `O_X(D)`.
+* `Scheme.CartierDivisor.toPic`: the Picard-group element represented by
+  `O_X(D)`.
+* `Scheme.CartierDivisor.divisorToPicAdd`: `D ↦ O_X(D)` as an additive map to
+  the Picard group.
+* `Scheme.CartierDivisor.classToPicAdd` and `Scheme.CartierDivisor.classToPic`:
+  the induced additive and multiplicative maps from the divisor class group.
+
+## Main results
+
+* `Scheme.CartierDivisor.divisorToPicAdd_principal`: principal divisors map to
+  zero in the Picard group.
+* `Scheme.CartierDivisor.coe_toPic` and
+  `Scheme.CartierDivisor.classToPic_toClass`: the Picard class of `D` is the
+  class of `O_X(D)`, and the class-group map agrees with `toPic` on classes.
+
+## Implementation notes
+
+The Picard element `toPic D` records `O_X(-D)` as its inverse through
+`Modules.Pic.mkOfTensorInverse`; additivity of `divisorToPicAdd` is the tensor
+comparison `associatedTensorAddIso`, and principal divisors vanish by the
+canonical global-equation trivialization.
+
+No unconditional pullback theorem is stated.  `CartierPullbackHypotheses`
+supplies a function-field pullback for divisors as an explicit input, but a
+comparison with pullback of module sheaves would also need compatibility
+between that input, rational sections, and module sheafification.  That extra
+compatibility is not part of the current Mathlib API.
+
+## References
+
+This file builds on `Scheme.CartierDivisor.associatedSheaf`,
+`Scheme.CartierDivisor.associatedTensorAddIso` and
+`Scheme.CartierDivisor.globalEquationIso`, and on this library's
+`AlgebraicGeometry.Scheme.Modules.Pic`.
+
+## Tags
+
+Cartier divisor, associated sheaf, Picard group, divisor class group, principal divisor
 -/
 
 set_option backward.isDefEq.respectTransparency false

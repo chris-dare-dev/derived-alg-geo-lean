@@ -100,7 +100,7 @@ the duality, and `serreIsEquivalence` supplies the clause that makes it a Serre
 functor rather than only a right one.
 
 This is the common categorical package used by geometric residual categories.
-The stronger `EnriquesCategoryData` adds a specified relation between the
+The stronger `EnriquesCategoryHypotheses` adds a specified relation between the
 square of the Serre functor and a shift. -/
 structure SerreCategoryData where
   /-- The chosen Serre functor and duality. -/

@@ -195,7 +195,7 @@ below.
    - What you will build and where it lives, what you rejected, and what you
      will not do.
 2. **Build.**
-   - Implement by the rules in AGENTS.md: placement, audits, umbrellas, and no
+   - Implement by the rules in AGENTS.md: placement, umbrellas, and no
      `sorry`, `admit` or new axioms.
    - Check with targeted builds
      (`LEAN_NUM_THREADS=2 ~/.elan/bin/lake build <Module>`) and with
@@ -461,7 +461,7 @@ Never:
 - Do not change the loop's own tooling and instructions during a run unless the
   owner put that work in the queue. That means `.claude/` (except
   `.claude/roadmap/`), `.agents/`, `.codex/`, `.github/`,
-  `AGENTS.md`, `CLAUDE.md`, and `scripts/` (except the audit and census
+  `AGENTS.md`, `CLAUDE.md`, and `scripts/` (except the baseline and census
   records). If the tooling gets in your way, work around it or park the issue,
   and describe the problem in the final report.
 - Do not create OpenSpec changes, loop manifests or review ledgers. The PR

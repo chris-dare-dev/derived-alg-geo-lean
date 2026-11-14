@@ -501,7 +501,7 @@ structure LocalizedFinitePresentationData where
 
 /-- Explicit hypotheses for the common noetherian criterion: every standard chart ring is
 noetherian and every degree-zero localized module is finitely generated. -/
-structure LocalizedNoetherianFiniteData where
+structure LocalizedNoetherianFiniteHypotheses where
   isNoetherian (i : StandardChartIndex 𝒜) :
     IsNoetherianRing (HomogeneousLocalization.Away 𝒜 (i.2 : A))
   finite (i : StandardChartIndex 𝒜) :
@@ -557,7 +557,7 @@ theorem associatedSheaf_self_isCoherent :
 for coherence.  Both hypotheses are fields of `hfin`, so neither is inferred globally. -/
 theorem associatedSheaf_isCoherent_of_noetherian_finite
     (c : AffineComparisonData 𝒜 𝓜)
-    (hfin : LocalizedNoetherianFiniteData 𝒜 𝓜) :
+    (hfin : LocalizedNoetherianFiniteHypotheses 𝒜 𝓜) :
     AlgebraicGeometry.Scheme.Modules.IsCoherent
       (AlgebraicGeometry.Proj 𝒜) (associatedSheaf 𝒜 𝓜) := by
   let hfp : LocalizedFinitePresentationData 𝒜 𝓜 :=

@@ -17,14 +17,9 @@ target; these are formulas (A.3) and (A.4). Boundedness of the restricted
 source t-structure then follows from boundedness of the images, which is
 Step 4.
 
-The theorem is independent of schemes and of the compact-generation argument
-that constructs the large source t-structure in Step 1.
+## Main definitions
 
-The functor and adjunction restrictions this file used to own -- `liftOfLE`,
-`preimageLift`, `inverseImageLift`, `liftToInverseImage`, and the two
-`Adjunction.restrictInverseImage*` -- mention no t-structure and now live at
-their carrier's path, `CategoryTheory/ObjectProperty/Lift.lean`,
-which this file imports.
+This file introduces no carrier, class, or instance.
 
 ## Main results
 
@@ -40,9 +35,25 @@ which this file imports.
   that shape, together with `tStructure_isBounded_iff_le_bounded`, the form in
   which a bounded target subcategory supplies its hypothesis.
 
+## Implementation notes
+
+The theorem is independent of schemes and of the compact-generation argument
+that constructs the large source t-structure in Step 1.
+
+The functor and adjunction restrictions it uses -- `liftOfLE`, `preimageLift`,
+`inverseImageLift`, `liftToInverseImage`, and the two
+`Adjunction.restrictInverseImage*` -- mention no t-structure and live at their
+carrier's path, `CategoryTheory/ObjectProperty/Lift.lean`, which this file
+imports.
+
 ## References
 
 * arXiv:2607.28411v1, Theorem A.17 (Steps 2--4) and Proposition 3.8.
+
+## Tags
+
+t-structure, induced t-structure, t-exact functor, restriction, bounded
+t-structure
 -/
 
 noncomputable section
@@ -63,8 +74,9 @@ variable {C : Type u₁} [Category.{v₁} C] [Preadditive C]
   {F : Functor C D} {t : TStructure C} {t' : TStructure D}
   {P : ObjectProperty C} {Q : ObjectProperty D}
 
-/-- Step 2 of A.17: restriction of the target t-structure and detection of
-the two bounded subcategories imply restriction of the source t-structure.
+/-- The second step of the proof of Theorem A.17: restriction of the target
+t-structure and detection of the two bounded subcategories imply restriction of
+the source t-structure.
 
 The proof compares truncations using `Functor.mapTruncLEIso` and
 `Functor.mapTruncGEIso`. Thus the conclusion is derived from t-exactness and
@@ -106,8 +118,8 @@ theorem hasInducedTStructure_of_preimage
 
 
 /-- Formula (A.3) against the large target t-structure, with no target
-subcategory: the content of Step 3 of Theorem A.17, in the shape Theorem 2.8(1)
-of arXiv:2607.28411v1 recognizes the base-changed slicing.  Right t-exactness
+subcategory: the content of the third step of the proof of Theorem A.17, in the
+shape Theorem 2.8(1) of arXiv:2607.28411v1 recognizes the base-changed slicing.  Right t-exactness
 gives `→`; for `←`, `F (τ^{≥ n+1} X) ≅ τ'^{≥ n+1} (F X) = 0` by t-exactness,
 `τ^{≥ n+1} X ∈ P` by `P.HasInducedTStructure t`, and zero reflection at that
 truncation finishes.  That is why truncation stability of `P` and zero
@@ -197,8 +209,8 @@ theorem isGE_iff_isGE_map
     exact (t.isGE_iff_isZero_truncLT_obj n X).2 (hzero _ hP hMapped)
 
 /-- The induced t-structure on `Q` is bounded exactly when `Q` consists of
-`t'`-bounded objects, the form in which Step 4 of Theorem A.17 consumes a
-bounded target subcategory. -/
+`t'`-bounded objects, the form in which the fourth step of the proof of
+Theorem A.17 consumes a bounded target subcategory. -/
 theorem tStructure_isBounded_iff_le_bounded [Q.IsTriangulated]
     [Q.HasInducedTStructure t'] :
     TStructure.IsBounded (Q.tStructure t') ↔ Q ≤ t'.bounded := by
@@ -210,8 +222,9 @@ theorem tStructure_isBounded_iff_le_bounded [Q.IsTriangulated]
     obtain ⟨⟨a, ha⟩, ⟨b, hb⟩⟩ := h X.obj X.property
     exact ⟨⟨a, (Q.tStructure_isGE_iff t' _ a).2 ha⟩, ⟨b, (Q.tStructure_isLE_iff t' _ b).2 hb⟩⟩
 
-/-- Step 4 of Theorem A.17 with no target subcategory: if `F` sends `P` into
-the `t'`-bounded objects, the induced t-structure on `P` is bounded. -/
+/-- The fourth step of the proof of Theorem A.17, with no target subcategory:
+if `F` sends `P` into the `t'`-bounded objects, the induced t-structure on `P`
+is bounded. -/
 theorem tStructure_isBounded_of_le_bounded_inverseImage
     [P.IsTriangulated] [P.IsClosedUnderIsomorphisms] [P.HasInducedTStructure t]
     [F.CommShift ℤ] [F.IsTriangulated] [F.IsTExact t t']

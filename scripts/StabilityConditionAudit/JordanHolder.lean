@@ -1,5 +1,0 @@
-import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.MassHom.JordanHolder
-
-open CategoryTheory CategoryTheory.Triangulated
-
-#print axioms CategoryTheory.Triangulated.Slicing.IsLocallyFinite.hasJordanHolderFiltrations

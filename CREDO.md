@@ -92,14 +92,12 @@ The repository does not meet these yet. A line is deleted when it becomes
 true. Until then the older rule in `AGENTS.md` or `CONTRIBUTING.md` applies to
 what that line names and to nothing else.
 
-- Public declarations are listed by hand in the audit files under `scripts/`,
-  and a gate requires it (Lean rules).
 - `docs/`, `.claude/decisions/` and `.claude/roadmap/` are in the tree, and
   `AGENTS.md`, `scripts/check_layering.py` and `scripts/check_roadmap.py`
   read them (§1).
-- `AGENTS.md` is over 200 lines and carries dated history (§1).
+- `AGENTS.md` is over 200 lines: its subject-ownership rules leave with
+  `docs/` for the wiki (§1).
 - `scripts/` holds loop, evidence and receipt tooling with its own fixtures
   and tests (§3).
-- Some Lean comments still narrate history ("this lane", "previously",
-  "cutover"), and some names pass 60 characters (§4).
+- Some names pass 60 characters (§4).
 - Structures that package unproved inputs are named `Data` (Lean rules).

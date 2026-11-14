@@ -223,18 +223,22 @@ end DeterminantData
 
 The comparison is explicit: constructing it geometrically is precisely compatibility of
 top exterior powers with direct sums. -/
-structure DirectSumDeterminantData (E F : X.Modules) where
+structure DirectSumDeterminantHypotheses (E F : X.Modules) where
+  /-- Determinant data of the first summand. -/
   left : DeterminantData E
+  /-- Determinant data of the second summand. -/
   right : DeterminantData F
+  /-- Determinant data of the direct sum. -/
   sum : DeterminantData (E ⊞ F)
+  /-- The determinant line of the sum is the tensor product of the summands' lines. -/
   lineIso : sum.line ≅ tensorObj left.line right.line
 
-namespace DirectSumDeterminantData
+namespace DirectSumDeterminantHypotheses
 
 variable {E F : X.Modules}
 
 /-- Determinants turn direct sums into tensor products. -/
-theorem firstChernClass_eq_mul (D : DirectSumDeterminantData E F) :
+theorem firstChernClass_eq_mul (D : DirectSumDeterminantHypotheses E F) :
     D.sum.firstChernClass =
       D.left.firstChernClass * D.right.firstChernClass := by
   apply Units.ext
@@ -244,13 +248,13 @@ theorem firstChernClass_eq_mul (D : DirectSumDeterminantData E F) :
   exact (PicardClass.mk_eq_mk_iff _ _).2 ⟨D.lineIso⟩
 
 /-- Additive form of determinant compatibility with direct sums. -/
-theorem firstChernClassAdd_eq_add (D : DirectSumDeterminantData E F) :
+theorem firstChernClassAdd_eq_add (D : DirectSumDeterminantHypotheses E F) :
     D.sum.firstChernClassAdd =
       D.left.firstChernClassAdd + D.right.firstChernClassAdd := by
   apply Additive.toMul.injective
   exact D.firstChernClass_eq_mul
 
-end DirectSumDeterminantData
+end DirectSumDeterminantHypotheses
 
 /-- Determinant compatibility data for a short exact sequence. -/
 structure ShortExactDeterminantData (S : ShortComplex X.Modules) where
@@ -389,20 +393,24 @@ end TwoTermPerfectDeterminantData
 
 /-- Determinant comparison data for a coherent short exact sequence whose terms carry
 two-term finite locally free resolutions. -/
-structure PerfectShortExactDeterminantData [IsLocallyNoetherian X]
+structure PerfectShortExactDeterminantHypotheses [IsLocallyNoetherian X]
     (S : ShortComplex (Coh X)) where
   shortExact : S.ShortExact
+  /-- A two-term locally free determinant presentation of the left term. -/
   left : TwoTermPerfectDeterminantData S.X₁
+  /-- A two-term locally free determinant presentation of the middle term. -/
   middle : TwoTermPerfectDeterminantData S.X₂
+  /-- A two-term locally free determinant presentation of the right term. -/
   right : TwoTermPerfectDeterminantData S.X₃
+  /-- The middle determinant line is the tensor product of the outer two. -/
   lineIso : middle.determinantLine.line ≅
     Scheme.Modules.tensorObj left.determinantLine.line right.determinantLine.line
 
-namespace PerfectShortExactDeterminantData
+namespace PerfectShortExactDeterminantHypotheses
 
 /-- First Chern classes are additive for a perfect short exact comparison. -/
 theorem firstChernClassAdd_eq_add [IsLocallyNoetherian X]
-    {S : ShortComplex (Coh X)} (D : PerfectShortExactDeterminantData S) :
+    {S : ShortComplex (Coh X)} (D : PerfectShortExactDeterminantHypotheses S) :
     D.middle.firstChernClassAdd =
       D.left.firstChernClassAdd + D.right.firstChernClassAdd := by
   apply Additive.toMul.injective
@@ -413,7 +421,7 @@ theorem firstChernClassAdd_eq_add [IsLocallyNoetherian X]
   rw [Scheme.Modules.PicardClass.mk_mul_mk]
   exact (Scheme.Modules.PicardClass.mk_eq_mk_iff _ _).2 ⟨D.lineIso⟩
 
-end PerfectShortExactDeterminantData
+end PerfectShortExactDeterminantHypotheses
 
 end
 

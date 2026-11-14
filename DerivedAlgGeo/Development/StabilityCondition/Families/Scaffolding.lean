@@ -268,7 +268,7 @@ private theorem weakSupportConstant
     {t : TStructure C} {W : WeakStabilityFunction t}
     {V₀ : Submodule ℝ V} {Zlin : V →ₗ[ℝ] ℂ}
     {hV₀ : V₀ ≤ LinearMap.ker Zlin}
-    (hQ : WeakQuotientQuadraticSupportData W v₀ V₀ Zlin hV₀) :
+    (hQ : WeakQuotientQuadraticSupportHypotheses W v₀ V₀ Zlin hV₀) :
     WeakStabilityFunction.QuotientUniformQuadraticSupportData
       (fun _ : PUnit.{1} ↦ W) v₀ V₀ Zlin hV₀ :=
   ⟨fun _ ↦ hQ.charge_compatible, fun _ ↦ hQ.zero_class_mem,
@@ -281,7 +281,7 @@ example
     (hN : IsNoetherianTorsionSubcategory t W.zeroCharge)
     (V₀ : Submodule ℝ V) (Zlin : V →ₗ[ℝ] ℂ)
     (hV₀ : V₀ ≤ LinearMap.ker Zlin)
-    (hQ : WeakQuotientQuadraticSupportData W v₀ V₀ Zlin hV₀)
+    (hQ : WeakQuotientQuadraticSupportHypotheses W v₀ V₀ Zlin hV₀)
     (k : K₀ C) (E : C) :
     WeakStabilityInFamiliesData (v := v₀)
       (fun _ : PUnit.{1} ↦ W)

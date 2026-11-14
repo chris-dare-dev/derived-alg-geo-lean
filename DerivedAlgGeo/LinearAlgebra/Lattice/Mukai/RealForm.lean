@@ -6,7 +6,7 @@ import DerivedAlgGeo.LinearAlgebra.Lattice.Mukai.Basic
 import DerivedAlgGeo.LinearAlgebra.QuadraticForm.PositiveFrame
 
 /-!
-# The real Mukai extension as a bundled quadratic form, and the exponential chart
+# The real Mukai extension as a bundled quadratic form
 
 `Lattice/Mukai/Basic.lean` builds the Mukai extension of a symmetric bilinear
 `ℤ`-lattice as a bare pairing. `QuadraticForm/PositivePlane.lean` and its
@@ -15,7 +15,29 @@ theory is quadratic-form-native. This file is the bridge: the real Mukai
 extension `ℝ × V × ℝ` of a real bilinear space, bundled, together with the
 vectors that make it useful.
 
-## The normalisation, which is the whole point of the file
+## Main definitions
+
+* `Mukai.RealExtension`: the real Mukai extension `ℝ × V × ℝ`.
+* `Mukai.realPairing` and `Mukai.realBilin`: its Mukai pairing, as a function
+  and bundled.
+* `Mukai.realDiscriminant`: the unhalved self-pairing `b c c - 2rs` as a
+  quadratic form.
+* `Mukai.realForm`: half the self-pairing, as a quadratic form.
+
+## Main results
+
+* `Mukai.polar_realForm`: the polar form of `realForm b` is `realPairing b`.
+* `Mukai.realDiscriminant_eq_selfPairing`: the discriminant is the Mukai
+  self-pairing.
+* `Mukai.realPairing_mul_eq_alternatingSum`: the graded `n = 2` pairing is
+  `realPairing` on the scalar line.
+* `Mukai.realPairing_compression_rankOne` and
+  `Mukai.realForm_compression_rankOne`: the weighted rank-one bridge between
+  the two.
+
+## Implementation notes
+
+### The normalisation, which is the whole point of the file
 
 The Mukai pairing is `⟪(r,c,s), (r',c',s')⟫ = b c c' - r s' - r' s`, and a
 spherical class has `⟪δ, δ⟫ = -2`. The quadratic form here is **half** the
@@ -39,27 +61,25 @@ Signatures are unaffected: scaling a form by a positive constant does not move
 its positive or negative definite subspaces, so `sigPos` and `sigNeg` are the
 same for `realForm b` and for the pairing.
 
-## The exponential chart is not here
+### The exponential chart is not here
 
-`expRe`, `expIm` and `isPositiveFrame_exp` used to sit below the pairing
-lemmas. They are a *choice* of one distinguished positive frame, made because a
-central charge is wanted, and the cutover ledger's row 03 puts that choice with
-the numerical central-charge construction rather than with the quadratic
-extension. They now live in
+`expRe`, `expIm` and `isPositiveFrame_exp` are a *choice* of one distinguished
+positive frame, made because a central charge is wanted, so they belong with the
+numerical central-charge construction rather than with the quadratic extension.
+They are in
 `CategoryTheory/Triangulated/StabilityCondition/CentralCharge/Mukai/Chart.lean`,
-keeping the `Mukai` namespace.
+in the `Mukai` namespace.
 
-The carrier could not follow them. This file is upstream of the neutral charge
-root `LinearAlgebra/BilinearForm/HodgeIndex.lean`, by way of
+The carrier stays here. This file is upstream of the neutral charge root
+`LinearAlgebra/BilinearForm/HodgeIndex.lean`, by way of
 `RealFormSignature.lean`, and that root's transitive closure may contain neither
-stability conditions nor geometry. Severing the chart is what let the row move
-at all.
+stability conditions nor geometry.
 
-## The graded pairing is this pairing, and the `∫H²` weight is real
+### The graded pairing is this pairing, and the `∫H²` weight is real
 
-An abstraction audit proposed a graded form `-∑_k (-1)^k v_k w_{n-k}` on
-`Fin (n + 1) → ℝ`, together with a parity theorem about it. At `n = 2` that form
-is the one already here: both it and `b c c' - r s' - r' s` expand to
+A graded form `-∑_k (-1)^k v_k w_{n-k}` on `Fin (n + 1) → ℝ`, together with a
+parity theorem about it, is a natural candidate for a second pairing. At `n = 2`
+that form is the one already here: both it and `b c c' - r s' - r' s` expand to
 `v₁w₁ - v₀w₂ - v₂w₀`, with no weight, no transport and no hypothesis.
 `realPairing_mul_eq_alternatingSum` records that, so the graded form is never
 declared a second owner of the even case. Nothing new is defined here; these are
@@ -69,7 +89,7 @@ The compression `v ↦ (∫H²·rk, ∫H·c₁, ch₂)` relates the two on the r
 slice `c = x • H`, and `realPairing_compression_rankOne` carries the weight
 `∫H² = b H H` explicitly rather than absorbing it.
 
-### Three unifications that are refuted, and why a graded form still earns `n ≠ 2`
+#### Three unifications that are refuted, and why a graded form still earns `n ≠ 2`
 
 * **Odd degree is alternating, and no `realPairing` is.** At odd `n` the graded
   form has `⟪v, v⟫ = 0` for every `v`, because the sum pairs slot `k` with slot
@@ -86,17 +106,29 @@ slice `c = x • H`, and `realPairing_compression_rankOne` carries the weight
   `H` rescales the weight rather than clearing it, so the two forms agree on the
   nose only under that normalisation.
 
-## What is not here
+### What is not here
 
 * **The integral comparison.** Relating this to `Mukai.pairing` on
   `MukaiLattice N` needs `N ⊗ ℝ` and a compatible embedding; it is a separate
   step and nothing below depends on it.
 * **The signature.** `HasSignatureTwo (realForm b)` when `b` has signature
   `(1, n - 1)` — the Hodge-index input — needs additivity of the signature over
-  an orthogonal direct sum, which the pinned Mathlib does not have. Stated
-  nowhere below; `isPositiveFrame_exp`, now downstream, deliberately needs
-  only `0 < b ω ω`.
+  an orthogonal direct sum, which the pinned Mathlib does not have. It is
+  `hasSignatureTwo_realForm` in `RealFormSignature.lean`, downstream of this
+  file; `isPositiveFrame_exp` in the chart file deliberately needs only
+  `0 < b ω ω`.
 * **Any geometry.** `V` is an arbitrary real bilinear space, not `NS(X) ⊗ ℝ`.
+
+## References
+
+* Macrì--Schmidt, for the unhalved discriminant convention of
+  `realDiscriminant`.
+* Mathlib's `LinearMap.BilinMap.toQuadraticMap` and
+  `LinearMap.BilinMap.polar_toQuadraticMap`.
+
+## Tags
+
+Mukai lattice, quadratic form, polar form, discriminant, normalisation
 -/
 
 open QuadraticMap
@@ -105,13 +137,7 @@ namespace Mukai
 
 variable {V : Type*} [AddCommGroup V] [Module ℝ V]
 
-/-- The real Mukai extension `ℝ ⊕ V ⊕ ℝ`.
-
-The wall arithmetic in
-`CategoryTheory/Triangulated/StabilityCondition/Walls/Spherical/Basic.lean` used
-to declare this type and its pairing a second time, as `RealMukai`, and this
-docstring named that copy rather than the file importing this one. It now
-imports it. -/
+/-- The real Mukai extension `ℝ ⊕ V ⊕ ℝ`. -/
 abbrev RealExtension (V : Type*) : Type _ := ℝ × V × ℝ
 
 variable (b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ)
@@ -120,14 +146,14 @@ variable (b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ)
 
 An `abbrev`, not a second definition: `RealExtension V` is `ℝ × V × ℝ` and
 `Basic.lean`'s `pairing` is stated over an arbitrary coefficient ring, so this
-is the same function under a name the real lane reads better. Every lemma below
+is the same function under a name that reads better over `ℝ`. Every lemma below
 is therefore a statement about the one root. -/
 abbrev realPairing (v w : RealExtension V) : ℝ := pairing b v w
 
 /-- Not a `simp` lemma: `pairing_mk` is already `simp` and `realPairing` is
 reducible, so the two would be the same rewrite registered twice and the
-normal-form linter rejects the duplicate. Kept as a named statement because the
-real lane rewrites by it. -/
+normal-form linter rejects the duplicate. It is a named statement because proofs
+about the real extension rewrite by it. -/
 theorem realPairing_apply (r : ℝ) (c : V) (s : ℝ) (r' : ℝ) (c' : V) (s' : ℝ) :
     realPairing b (r, c, s) (r', c', s') = b c c' - r * s' - r' * s := rfl
 
@@ -153,9 +179,9 @@ of `realForm`: the discriminant convention of Macrì--Schmidt is the unhalved
 one, and `realDiscriminant_eq_selfPairing` is what pins the choice.
 
 It lives here rather than beside a divisor space because it parents the
-divisorial discriminant leaves, and its former home imported two of them. `V`
-is an arbitrary real bilinear space; the `DivisorSpace` spelling in
-`Walls/Divisorial/Support.lean` is this form at `b = S.intersection`. -/
+divisorial discriminant leaves. `V` is an arbitrary real bilinear space; the
+`DivisorSpace` spelling in `StabilityCondition/Support/Divisorial.lean` is this
+form at `b = S.intersection`. -/
 def realDiscriminant : QuadraticForm ℝ (RealExtension V) :=
   (realBilin b).toQuadraticMap
 
@@ -203,7 +229,7 @@ where it is used, so that it never becomes a second name for `realPairing`. -/
 
 /-- **The graded `n = 2` pairing is `realPairing` on the scalar line.**
 
-The right-hand side is the audit's graded form `-∑_k (-1)^k d_k e_{2-k}` written
+The right-hand side is the graded form `-∑_k (-1)^k d_k e_{2-k}` written
 out. There is no weight, no hypothesis and no transport: at `n = 2` the two are
 one equation, so the graded form must not be declared a second owner of the even
 case. Odd degree is a different matter; see the module docstring. -/

@@ -21,38 +21,6 @@ that, against the objects this repository already has:
 * "no first cohomology" is vanishing of `H¹(X, O_X)`, using the constructed
   functor `Cohomology.coherentH`, verbatim the `IsK3Surface` clause.
 
-## The characteristic is not a field of the structure
-
-Over a field of characteristic 2 the surfaces classically called Enriques
-split into classical, singular, and supersingular types, and for some of them
-`ω_X` is trivial, contradicting `canonicalClass_ne_one`. The definition here
-is the characteristic `≠ 2` one, but the exclusion is *not* recorded as a
-field: the source papers (Li--Nuer--Stellari--Zhao, arXiv:1912.04332, and
-Li--Stellari--Zhao, arXiv:2104.13610) assume an algebraically closed field of
-characteristic different from 2 theorem by theorem, and that is where the
-hypothesis belongs. A characteristic field here would make every downstream
-statement carry it even when unused.
-
-## What this file does not do
-
-* **It exhibits no Enriques surface.** Nothing here constructs an `X`, a
-  `CanonicalSheafData k X 2`, or an `IsEnriquesSurface`; every statement is
-  conditional on data nobody has yet produced, exactly as for `IsK3Surface`.
-* **It states no geometric numerical consequence.** Both `H²(X, O_X) = 0` and
-  `χ(O_X) = 1` reduce to one missing input: Serre duality against the
-  non-triviality of `ω_X`. It gives `H²(X, O_X) ≅ H⁰(X, ω_X)^∨ = 0`, because
-  a non-trivial torsion line bundle has no sections, and then
-  `χ(O_X) = h⁰ - h¹ + h² = 1` needs nothing further. `Duality/Serre/` carries
-  that duality as `DerivedStatement` realization data rather than as a
-  theorem, so neither geometric consequence is available at the pin. A
-  separate numerical shadow now exists in
-  `Numerical/Models/Surface/Enriques.lean`, including a degree-one witness
-  of `td₁ = 0` and `∫td₂ = 1`; no bridge from that numerical model to a
-  geometric `Scheme` or to `IsEnriquesSurface` is claimed.
-* **It does not construct the K3 double cover.** The 2-torsion class
-  classically determines an étale double cover with trivial canonical class;
-  no covering machinery exists at the pin and none is stated.
-
 ## Main definitions
 
 * `IsEnriquesSurface` — the `Prop`-valued definition, over a supplied
@@ -68,6 +36,40 @@ statement carry it even when unused.
   class is its own inverse.
 * `IsEnriquesSurface.not_isK3Surface` — the same canonical-sheaf package
   cannot witness both definitions.
+
+## Implementation notes
+
+### The characteristic is not a field of the structure
+
+Over a field of characteristic 2 the surfaces classically called Enriques
+split into classical, singular, and supersingular types, and for some of them
+`ω_X` is trivial, contradicting `canonicalClass_ne_one`. The definition here
+is the characteristic `≠ 2` one, but the exclusion is *not* recorded as a
+field: the source papers (Li--Nuer--Stellari--Zhao, arXiv:1912.04332, and
+Li--Stellari--Zhao, arXiv:2104.13610) assume an algebraically closed field of
+characteristic different from 2 theorem by theorem, and that is where the
+hypothesis belongs. A characteristic field here would make every downstream
+statement carry it even when unused.
+
+### What this file does not do
+
+* **It exhibits no Enriques surface.** Nothing here constructs an `X`, a
+  `CanonicalSheafData k X 2`, or an `IsEnriquesSurface`; every statement is
+  conditional on supplied data, exactly as for `IsK3Surface`.
+* **It states no geometric numerical consequence.** Both `H²(X, O_X) = 0` and
+  `χ(O_X) = 1` reduce to one missing input: Serre duality against the
+  non-triviality of `ω_X`. It gives `H²(X, O_X) ≅ H⁰(X, ω_X)^∨ = 0`, because
+  a non-trivial torsion line bundle has no sections, and then
+  `χ(O_X) = h⁰ - h¹ + h² = 1` needs nothing further. `Duality/Serre/` carries
+  that duality as `DerivedStatement` realization data rather than as a
+  theorem, so neither geometric consequence is available at the pin. A
+  separate numerical shadow is `Numerical/Models/Surface/Enriques.lean`,
+  including a degree-one witness of `td₁ = 0` and `∫td₂ = 1`; no bridge from
+  that numerical model to a geometric `Scheme` or to `IsEnriquesSurface` is
+  claimed.
+* **It does not construct the K3 double cover.** The 2-torsion class
+  classically determines an étale double cover with trivial canonical class;
+  no covering machinery exists at the pin and none is stated.
 
 ## References
 
@@ -161,7 +163,7 @@ theorem canonicalSheaf_not_iso_unit :
 Stated for Serre duality, whose surface-level statements twist by `κ * L⁻¹`
 (`Duality.Serre.SurfacePicardSymmetry`): on an Enriques surface the `ω_X` and
 `ω_X⁻¹` twists coincide, so the two directions of the duality agree without a
-case split. Nothing consumes it yet — those statements take the canonical
+case split. Those statements do not consume it: they take the canonical
 class as a bare `Pic` parameter and never see a `CanonicalSheafData`. -/
 theorem antiCanonicalClass_eq_canonicalClass :
     C.antiCanonicalLineBundle.toPic = C.canonicalClass := by

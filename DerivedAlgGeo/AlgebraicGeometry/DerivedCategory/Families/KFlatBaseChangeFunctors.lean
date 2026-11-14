@@ -10,12 +10,80 @@ import DerivedAlgGeo.CategoryTheory.ObjectProperty.Lift
 
 A morphism `f : T ⟶ U` over `S` induces `X ×_S T ⟶ X ×_S U`. The generic part of
 this file restricts any supplied `Dqc` pullback to `(Dqc)_U ⟶ (Dqc)_T` and
-`D_U ⟶ D_T`. The separate `KFlatBaseChangeData.pullbackAlong` constructor is
+`D_U ⟶ D_T`. The separate `KFlatBaseChangeHypotheses.pullbackAlong` constructor is
 the K-flat producer for that ambient pullback.
 
-The only component-level hypothesis is preservation of `(Dqc)`. Once the derived pullback also
-preserves bounded coherent cohomology, preservation of `D_U` follows formally because `D_U` was
-constructed as the inverse image of `(Dqc)_U` in that intrinsic bounded-coherent locus.
+## Main definitions
+
+* `SchemeBaseChange.baseChangeMap`: the morphism `X ×_S T ⟶ X ×_S U` induced by
+  `f : T ⟶ U`.
+* `SchemeBaseChange.DqcLeftDerivedPullback.PreservesBoundedCoherent` and
+  `SchemeBaseChange.DqcLeftDerivedPullback.boundedFunctor`: preservation of the
+  intrinsic bounded-coherent locus, and the pullback restricted to it.
+* `SchemeBaseChange.KFlatBaseChangeHypotheses.pullbackAlong`: the `Dqc` pullback
+  along `X ×_S f`, built from the K-flat resolution on `X ×_S U` in the supplied
+  target hypotheses together with acyclicity and quasicoherence along `X ×_S f`.
+* `SchemeBaseChange.DerivedBaseChangeData.PullbackPreservesQuasicoherentComponent`
+  and `SchemeBaseChange.DerivedBaseChangeData.PullbackMapsPerfectEnvelope`: the
+  component-level and generator-level preservation conditions.
+* `SchemeBaseChange.DerivedBaseChangeData.quasicoherentPullback` and
+  `SchemeBaseChange.DerivedBaseChangeData.boundedPullback`, with their
+  `OfPerfectEnvelope` variants: the restrictions `(Dqc)_U ⥤ (Dqc)_T` and
+  `D_U ⥤ D_T`.
+* `SchemeBaseChange.KFlatBaseChangeHypotheses.kFlatQuasicoherentPullback` and
+  `SchemeBaseChange.KFlatBaseChangeHypotheses.kFlatBoundedPullback`: the same
+  restrictions with the ambient pullback built from K-flat resolutions.
+* `SchemeBaseChange.DerivedBaseChangeData.quasicoherentPullbackOfDetection` and
+  `SchemeBaseChange.DerivedBaseChangeData.boundedPullbackOfDetection`: the
+  restrictions when component membership is detected after ambient pullback.
+
+## Main results
+
+* `SchemeBaseChange.baseChangeMap_isPullback`: `X ×_S f` and the second
+  projections form a pullback square over `S`.
+* `SchemeBaseChange.isOpenImmersion_baseChangeMap`,
+  `SchemeBaseChange.quasiCompact_baseChangeMap` and
+  `SchemeBaseChange.isAffineHom_baseChangeMap`: `X ×_S -` preserves open
+  immersions, quasi-compact morphisms and affine morphisms.
+* `SchemeBaseChange.KFlatBaseChangeHypotheses.pullbackAlong_ambient_essSurj_of_isOpenImmersion`:
+  for an open immersion of bases the ambient K-flat pullback is essentially
+  surjective.
+* `DerivedBaseChangeData.pullback_preservesQuasicoherentComponent_of_perfectEnvelope`:
+  a coproduct-preserving triangulated pullback that maps the perfect envelope into
+  the target component preserves the whole quasicoherent component.
+* `SchemeBaseChange.DerivedBaseChangeData.pullback_preservesBoundedComponent`:
+  preservation of `(Dqc)` and of bounded coherent cohomology give preservation of
+  the bounded component.
+* `SchemeBaseChange.DerivedBaseChangeData.quasicoherentPullbackOfDetectionEquivalence`
+  and `SchemeBaseChange.DerivedBaseChangeData.boundedPullbackOfDetectionEquivalence`:
+  Lemma 3.18, an ambient equivalence that detects component membership restricts
+  to equivalences `(Dqc)_U ≌ (Dqc)_T` and `D_U ≌ D_T`; the essential
+  surjectivity, fullness and faithfulness instances behind them are proved
+  separately.
+
+## Implementation notes
+
+### The bounded component
+
+The only component-level hypothesis is preservation of `(Dqc)`. Once the derived
+pullback also preserves bounded coherent cohomology, preservation of `D_U`
+follows formally because `D_U` is defined as the inverse image of `(Dqc)_U` in
+that intrinsic bounded-coherent locus.
+
+### Equivalences are hypotheses on the ambient functor
+
+The Lemma 3.18 statements assume that the ambient pullback is an equivalence, or
+is full, faithful or essentially surjective. Nothing here proves that any
+base-change pullback is an equivalence.
+
+## References
+
+* arXiv:1902.08184v4, Lemma 3.18.
+
+## Tags
+
+base change, derived pullback, K-flat resolution, quasicoherent component,
+bounded component, equivalence
 -/
 
 attribute [local instance] HasDerivedCategory.standard
@@ -136,13 +204,13 @@ theorem boundedFunctor_obj_obj (pull : DqcLeftDerivedPullback f)
 
 end DqcLeftDerivedPullback
 
-namespace KFlatBaseChangeData
+namespace KFlatBaseChangeHypotheses
 
 variable {f : T ⟶ U}
 
 /-- Construct pullback along `X ×_S T ⟶ X ×_S U` from the K-flat resolution on
 `X ×_S U` carried by the target base-change data. -/
-def pullbackAlong (D : KFlatBaseChangeData X U) (f : T ⟶ U)
+def pullbackAlong (D : KFlatBaseChangeHypotheses X U) (f : T ⟶ U)
     (hAcyclic : KFlatPullbackAcyclic D.tensorResolution (baseChangeMap X f))
     (hQuasicoherent : KFlatResolvedPullbackPreservesQuasicoherentCohomology
       D.tensorResolution (baseChangeMap X f)) :
@@ -155,7 +223,7 @@ underlying the K-flat pullback is essentially surjective.  Open immersions are
 stable under the product base change `X ×_S -`, and the preceding geometric
 construction applies to that induced open immersion. -/
 noncomputable instance pullbackAlong_ambient_essSurj_of_isOpenImmersion
-    (D : KFlatBaseChangeData X U) (f : T ⟶ U)
+    (D : KFlatBaseChangeHypotheses X U) (f : T ⟶ U)
     (hAcyclic : KFlatPullbackAcyclic D.tensorResolution (baseChangeMap X f))
     (hQuasicoherent : KFlatResolvedPullbackPreservesQuasicoherentCohomology
       D.tensorResolution (baseChangeMap X f)) [IsOpenImmersion f.left] :
@@ -164,7 +232,7 @@ noncomputable instance pullbackAlong_ambient_essSurj_of_isOpenImmersion
   dsimp [pullbackAlong, kFlatDqcLeftDerivedPullback]
   exact LeftDerivedPullback.essSurj_of_isOpenImmersion _
 
-end KFlatBaseChangeData
+end KFlatBaseChangeHypotheses
 
 namespace DerivedBaseChangeData
 
@@ -295,12 +363,12 @@ noncomputable def boundedPullbackCompInclusion
 
 end DerivedBaseChangeData
 
-namespace KFlatBaseChangeData
+namespace KFlatBaseChangeHypotheses
 
 /-- The fully K-flat form of pullback on `(Dqc)`: both the ambient derived functor and its
 restriction to the constructed component are obtained from the resolutions. -/
 noncomputable def kFlatQuasicoherentPullback
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : KFlatBaseChangeHypotheses X T) (DU : KFlatBaseChangeHypotheses X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (f : T ⟶ U)
     (hAcyclic : KFlatPullbackAcyclic DU.tensorResolution (baseChangeMap X f))
@@ -317,7 +385,7 @@ noncomputable def kFlatQuasicoherentPullback
 /-- The fully K-flat form of pullback on `D`: the bounded restriction is constructed from the
 same K-flat derived pullback used on `(Dqc)`. -/
 noncomputable def kFlatBoundedPullback
-    (DT : KFlatBaseChangeData X T) (DU : KFlatBaseChangeData X U)
+    (DT : KFlatBaseChangeHypotheses X T) (DU : KFlatBaseChangeHypotheses X U)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (f : T ⟶ U)
     (hAcyclic : KFlatPullbackAcyclic DU.tensorResolution (baseChangeMap X f))
@@ -332,7 +400,7 @@ noncomputable def kFlatBoundedPullback
     DU.toDerivedBaseChangeData P (DU.pullbackAlong f hAcyclic hQuasicoherent)
     hComponent hBounded
 
-end KFlatBaseChangeData
+end KFlatBaseChangeHypotheses
 
 namespace DerivedBaseChangeData
 

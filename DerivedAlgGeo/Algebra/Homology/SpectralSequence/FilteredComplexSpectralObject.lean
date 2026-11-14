@@ -16,7 +16,7 @@ precomposing it with a functor into cochain complexes produces the spectral obje
 a filtered complex. The remaining bridge applies a homological functor to obtain a spectral
 object in an abelian category.
 
-Mathlib (since v4.35) supplies that bridge for an arbitrary homological functor as
+Mathlib supplies that bridge for an arbitrary homological functor as
 `CategoryTheory.Triangulated.SpectralObject.mapHomologicalFunctor`; this file specializes it to
 homology on the homotopy category.  Thus a filtration
 `K : ι ⥤ CochainComplex C ℤ` canonically produces an
@@ -33,9 +33,10 @@ homology on the homotopy category.  Thus a filtration
 
 ## Implementation notes
 
-Until the Lean/Mathlib v4.35 bump this file also defined
-`CategoryTheory.Triangulated.SpectralObject.mapHomologicalFunctor`; Mathlib now provides it
-under the same name and shape, so the local copy was removed.
+The passage to an abelian spectral object is Mathlib's
+`CategoryTheory.Triangulated.SpectralObject.mapHomologicalFunctor`. This file only chooses the
+homological functor, degree-zero homology on the homotopy category, and the precomposition
+with `K`.
 
 ## References
 
@@ -46,9 +47,6 @@ under the same name and shape, so the local copy was removed.
 
 spectral object, spectral sequence, filtered complex, homological functor
 -/
-
--- `CategoryTheory.Triangulated.SpectralObject.mapHomologicalFunctor`, formerly defined here, is
--- upstream in Mathlib since v4.35 (`Mathlib/CategoryTheory/Triangulated/SpectralObject.lean`).
 
 namespace HomotopyCategory
 

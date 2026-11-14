@@ -119,9 +119,8 @@ existential, because `htrunc` must name `tC φ`.
 
 Assumption (i) of Theorem A.17 and S-linearity of `Φ` remain outside the
 categorical layer, as in `Polishchuk.lean`. The family-level S-local slicing
-API now lives in `Families/SLocal.lean`; its geometric restriction witnesses
-are still explicit inputs. What is proved here is Corollary A.23 at
-`S = Spec ℤ`.
+API is in `Families/SLocal.lean`, where its geometric restriction witnesses
+are explicit inputs. What is proved here is Corollary A.23 at `S = Spec ℤ`.
 
 `w` is the coproduct-size universe and is the first universe parameter of
 every declaration here, which is what `.{w}` binds.  Both categories share one
@@ -138,6 +137,10 @@ flatness, are the remaining inputs of Proposition 3.8;
 
 * arXiv:2607.28411v1, Theorem 2.8, Definition A.22, Corollary A.23, and the proof of
   Proposition 3.8.
+
+## Tags
+
+slicing, induced t-structure, Ind-extension, Polishchuk, base change
 -/
 
 noncomputable section
@@ -492,13 +495,13 @@ extension, at the level of the phase-indexed t-structures.  `Polishchuk.induceLa
 each phase.  `hbdd` is the hypothesis that `F` sends `P` into the `τ̂'_φ`-bounded objects,
 which for `F = π_*` is the descent-to-a-finite-subextension argument of Remark A.12(3); it is
 the one hypothesis this shape adds over `nonempty_inducedTStructures_of_le`, which bought it
-from `hle`.  It joins `hzero`, `hG`/`htC` and `htrunc` on the list of geometric inputs still to
-be supplied for `π : X_ℓ → X`.
+from `hle`.  Like `hzero`, `hG`/`htC` and `htrunc`, it is a geometric input for
+`π : X_ℓ → X` that this theorem takes as a hypothesis.
 
-One thing still separates this from the slicing `𝒫_ℓ` itself: HN existence for
-`largePreimagePhase`, which `largePreimage` takes as a hypothesis.  The phase shift, open when
-this shape landed, is now `largePhase_shift_iff`.  See the implementation notes for the full
-accounting against `Slicing`'s fields. -/
+One thing separates this from the slicing `𝒫_ℓ` itself: HN existence for
+`largePreimagePhase`, which `largePreimage` takes as a hypothesis.  The phase shift is
+`largePhase_shift_iff`.  See the implementation notes for the full accounting against
+`Slicing`'s fields. -/
 theorem nonempty_inducedTStructuresLarge (P : ObjectProperty C) [P.IsTriangulated]
     [P.IsClosedUnderIsomorphisms]
     (adj : L ⊣ F) (hF : F.PreservesSmallCoproducts.{w})

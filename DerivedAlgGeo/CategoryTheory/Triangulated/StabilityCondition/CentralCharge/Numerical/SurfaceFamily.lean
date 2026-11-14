@@ -49,7 +49,7 @@ theorem stCharge_im (s t : ℝ) (v : NumClass) :
     (stCharge s t v).im = imZ s t v := by
   simp [stCharge]
 
-/-- The old half-plane model, represented as a child of `ChargeFamily`.
+/-- The `(s, t)` half-plane model, represented as a child of `ChargeFamily`.
 
 No positivity condition is built into the parameter type: the hypotheses
 `t > 0` or `t ≠ 0` remain attached to precisely the geometric consequences

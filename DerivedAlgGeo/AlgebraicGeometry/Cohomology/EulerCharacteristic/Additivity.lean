@@ -290,9 +290,9 @@ namespace FiniteCohomology
 /-- **The Euler characteristic as a homomorphism `K₀(Coh X) → ℤ`.**
 
 `K₀Ab.liftOf` wants additivity and nothing else: `map_zero` and `map_iso` follow
-from `of_isZero` and `of_iso`, which are theorems. The old route to this hom went
-through `FreeAbelianGroup.lift`, an `AddSubgroup.closure_le` argument and
-`QuotientAddGroup.lift`, all of which are now `K₀Ab`'s. -/
+from `of_isZero` and `of_iso`, which are theorems. The free-group lift and the
+quotient by the additivity relations are part of `K₀Ab`'s universal property, so
+none of that bookkeeping appears here. -/
 noncomputable def grothendieckEulerHom (D : FiniteCohomology k X)
     (L : D.LinearConnectingSystem) : K₀Ab (Coh X) →+ ℤ :=
   K₀Ab.liftOf D.eulerCharacteristic

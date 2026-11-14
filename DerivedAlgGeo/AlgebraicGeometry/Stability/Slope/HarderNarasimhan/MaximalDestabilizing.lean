@@ -61,7 +61,7 @@ variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 /-- **The two inputs sheaf-level Harder–Narasimhan theory needs.** The first is proved for
 Noetherian schemes; the second remains Grothendieck's boundedness lemma. See the module docstring
 for why boundedness must be stated with a real bound rather than in `WithTop ℝ`. -/
-structure MuHNInput (P : PolarizedVarietyData k X) (h : MuPositivityData P) : Prop where
+structure MuHNInput (P : PolarizedVarietyHypotheses k X) (h : MuPositivityData P) : Prop where
   /-- Ascending chains of subobjects terminate. `Coh.isNoetherianObject` supplies this on a
   Noetherian scheme. -/
   noetherian : ∀ F : Coh X, IsNoetherianObject F
@@ -74,7 +74,7 @@ structure MuHNInput (P : PolarizedVarietyData k X) (h : MuPositivityData P) : Pr
 
 /-- On a Noetherian scheme, Grothendieck slope boundedness is the only remaining input for
 sheaf-level μ-Harder–Narasimhan theory. -/
-theorem MuHNInput.ofSlopeBoundedness {P : PolarizedVarietyData k X} {h : MuPositivityData P}
+theorem MuHNInput.ofSlopeBoundedness {P : PolarizedVarietyHypotheses k X} {h : MuPositivityData P}
     [IsNoetherian X]
     (slope_bddAbove : ∀ F : Coh X, ∃ μ₀ : ℝ, ∀ B : Subobject F, ¬IsZero (B : Coh X) →
       0 < P.multiplicity (B : Coh X) →
@@ -84,9 +84,9 @@ theorem MuHNInput.ofSlopeBoundedness {P : PolarizedVarietyData k X} {h : MuPosit
   noetherian := fun _ ↦ inferInstance
   slope_bddAbove := slope_bddAbove
 
-namespace PolarizedVarietyData
+namespace PolarizedVarietyHypotheses
 
-variable {P : PolarizedVarietyData k X}
+variable {P : PolarizedVarietyHypotheses k X}
 
 /-! ### Multiplicity is bounded along monomorphisms -/
 
@@ -111,7 +111,7 @@ theorem multiplicity_subobject_le (h : MuPositivityData P) {F : Coh X} (B : Subo
 /-! ### The maximal slope is attained -/
 
 /-- The slope of a nonzero subobject of positive multiplicity, as a real number. -/
-private noncomputable def realSlope (P : PolarizedVarietyData k X) {F : Coh X}
+private noncomputable def realSlope (P : PolarizedVarietyHypotheses k X) {F : Coh X}
     (B : Subobject F) : ℝ :=
   (P.hilbertDegreeCoefficient (B : Coh X) : ℝ) / (P.multiplicity (B : Coh X) : ℝ)
 
@@ -289,6 +289,6 @@ theorem topSlope_maximalDestabilizing_eq_top_iff (h : MuPositivityData P) {F : C
     rw [weakSlopeData_topSlope_of_multiplicity_zero h hmk0] at hle
     exact top_le_iff.mp hle
 
-end PolarizedVarietyData
+end PolarizedVarietyHypotheses
 
 end AlgebraicGeometry.Stability.Gieseker

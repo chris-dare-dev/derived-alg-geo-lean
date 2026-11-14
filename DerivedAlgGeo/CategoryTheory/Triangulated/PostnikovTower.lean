@@ -9,11 +9,41 @@ import Mathlib.CategoryTheory.ComposableArrows.Basic
 import Mathlib.CategoryTheory.Triangulated.Pretriangulated
 
 /-!
-# Owner-authored Postnikov towers
+# Postnikov towers
 
-This file begins the repository-owned foundation for Bridgeland stability. A
-`PostnikovTower C E` packages a finite filtration of `E` by distinguished
-triangles and depends only on Mathlib.
+A `PostnikovTower C E` packages a finite filtration of `E` by distinguished
+triangles. It is the foundation the slicings of Bridgeland stability are built
+on, and depends only on Mathlib.
+
+## Main definitions
+
+* `CategoryTheory.Triangulated.PostnikovTower`: a finite chain from a zero
+  object to `E` whose consecutive steps are completed to distinguished
+  triangles.
+* `CategoryTheory.Triangulated.PostnikovTower.length`,
+  `CategoryTheory.Triangulated.PostnikovTower.factor` and
+  `CategoryTheory.Triangulated.PostnikovTower.factors`: the number of factors
+  and the factor objects.
+
+## Main results
+
+* `CategoryTheory.Triangulated.PostnikovTower.isZero_of_length_zero`: a tower
+  with no factors filters only a zero object.
+
+## Implementation notes
+
+The triangles are related to the chain only up to isomorphism
+(`triangle_obj₁`, `triangle_obj₂`), and the top of the chain to `E` only up to
+isomorphism (`top_iso`), each as a `Nonempty` field, so a tower is not tied to
+chosen representatives.
+
+## References
+
+Mathlib's `ComposableArrows` and `Pretriangulated.Triangle`.
+
+## Tags
+
+Postnikov tower, filtration, distinguished triangle, triangulated category
 -/
 
 noncomputable section
@@ -53,9 +83,9 @@ def PostnikovTower.length {E : C} (P : PostnikovTower C E) : ℕ := P.n
 variable {C} in
 /-- **A tower with no factors filters only a zero object.**
 
-Formerly a structure field (`zero_isZero`), which overstated what a
-constructor must supply: a length-zero chain starts and ends at the same
-object, so `base_isZero` transported across `top_iso` already proves this. -/
+This is a theorem rather than a structure field: a length-zero chain starts
+and ends at the same object, so `base_isZero` transported across `top_iso`
+proves it. -/
 theorem PostnikovTower.isZero_of_length_zero {E : C} (P : PostnikovTower C E)
     (h : P.n = 0) : IsZero E := by
   have h0 : P.chain.right = P.chain.left :=

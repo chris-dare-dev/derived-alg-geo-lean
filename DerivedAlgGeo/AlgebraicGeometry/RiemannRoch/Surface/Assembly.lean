@@ -50,7 +50,7 @@ noncomputable section
 /-- The Picard Euler function in any reconstruction package takes the trivial class to the
 actual Euler characteristic of its coherent sheaf. -/
 theorem reconstruction_eulerPic_one {F : Coh X}
-    (Q : P.ReconstructionData F) :
+    (Q : P.ReconstructionHypotheses F) :
     Q.twists.eulerPic 1 = D.eulerCharacteristic F := by
   let L : Fin 0 → Pic X := fun i ↦ Fin.elim0 i
   have h := Q.twists.realization 0 L (0 : Fin 0 → ℤ)
@@ -67,7 +67,7 @@ theorem reconstruction_eulerPic_one {F : Coh X}
 /-- The degree of the top reconstructed Todd-weighted component is the coherent Euler
 characteristic. -/
 theorem degree_tauComponent_two_eq_eulerCharacteristic
-    {F : Coh X} (Q : P.ReconstructionData F) :
+    {F : Coh X} (Q : P.ReconstructionHypotheses F) :
     P.ring.degree (Q.tauComponent 2) =
       (D.eulerCharacteristic F : ℚ) := by
   have h := Q.degree_tauComponent_mul_divisorProduct 2 (by omega) [] (by simp)

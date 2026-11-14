@@ -20,8 +20,8 @@ of `N¹(X)` says nothing about `N²(X)`, which can be larger than `ℚ·H²`; th
 assumption is strictly stronger and is the one every construction below actually uses. A model
 built here is therefore not licensed by exhibiting a variety of Picard rank one.
 
-The `rankOne` prefix on the declarations is historical and names the `n = 2` case it was
-extracted from; it is not a claim that Picard rank one suffices.
+The `rankOne` prefix on the declarations names the `n = 2` case, where the two hypotheses
+agree; it is not a claim that Picard rank one suffices.
 
 This file does the construction once, for arbitrary `n`, and hands back a constructor for
 `NumericalVarietyData`. A model then costs exactly four numbers-worth of input: the degree
@@ -50,11 +50,10 @@ codimension `i` is `algebraMap (coefficient i) * Hⁱ` for *every* `i`, and abov
 `Hⁱ = 0` makes it vanish on its own. That removes an `if` from every downstream membership
 proof, at the cost of the caller's coefficient function being ignored above the dimension.
 
-The existing surface construction is not rebuilt on top of this file. `SurfaceRing` is the
-`n = 2` case of `RankOneRing`, but migrating `Models/Surface/K3.lean` and
-`Models/Surface/ProjectivePlane.lean` onto the general ring would rewrite two working
-models and their audit entries for no new mathematics; it is deliberate follow-up work, not
-part of this file.
+The surface models are not built on this file. `SurfaceRing` (in `Models/Surface/RankOne.lean`)
+is the `n = 2` case of `RankOneRing`, and `Models/Surface/K3.lean` and
+`Models/Surface/ProjectivePlane.lean` are built on it directly; rebuilding them on the general
+ring would add no new mathematics.
 
 `d` is a rational rather than a natural because a model may want a normalisation that is not
 the self-intersection of an integral class. The individual models take integer degrees.
@@ -63,6 +62,10 @@ the self-intersection of an integral class. The individual models take integer d
 
 * Hartshorne, *Algebraic Geometry*, appendix A
 * Fulton, *Intersection Theory*, ch. 15 and 19
+
+## Tags
+
+numerical intersection ring, ample class, Riemann–Roch, Todd class, truncated polynomial ring
 -/
 
 universe v
@@ -181,7 +184,7 @@ noncomputable def rankOneDegree (n : ℕ) (d : ℚ) : RankOneRing n →ₗ[ℚ] 
   d • (rankOnePB n).basis.coord (rankOneIdx n (le_refl n))
 
 -- `simp` is the wrong tool here: `PowerBasis.coe_basis` fires first and turns `basis i` into
--- `gen ^ i`, after which `Basis.repr_self` no longer matches. Rewrite by hand.
+-- `gen ^ i`, after which `Basis.repr_self` does not match. Rewrite by hand.
 theorem rankOneDegree_basis_of_ne (n : ℕ) (d : ℚ) (i : Fin (rankOnePB n).dim)
     (hi : rankOneW n i ≠ n) : rankOneDegree n d ((rankOnePB n).basis i) = 0 := by
   have hne : i ≠ rankOneIdx n (le_refl n) := fun h => hi (by rw [h]; rfl)

@@ -17,6 +17,33 @@ This file constructs the comparison between degree-`d` homogeneous polynomials a
 sections of `O(d)` on polynomial `Proj`.  The proof uses the variable basic-open cover, the
 constructed chart comparison from `TwistChart`, and the generic point of the polynomial ring.
 
+## Main definitions
+
+* `AlgebraicGeometry.Proj.polynomialGenericPoint` — the zero homogeneous ideal, the generic
+  point of polynomial projective space.
+* `AlgebraicGeometry.Proj.polynomialNatGlobalSectionsAddEquiv`,
+  `AlgebraicGeometry.Proj.polynomialTwistingGlobalSectionsAddEquiv` and
+  `AlgebraicGeometry.Proj.polynomialTwistingGlobalSectionsModuleIso` — degree-`d` homogeneous
+  polynomials are exactly `Γ(Proj k[Xᵢ], O(d))`, additively and as `k`-modules.
+* `AlgebraicGeometry.Proj.cechTermSectionAddEquiv` and
+  `AlgebraicGeometry.Proj.intCechTermSectionAddEquiv` — the algebraic Čech term for `O(d)` is
+  the sections of `O(d)` over the corresponding intersection, for `d : ℕ` and `d : ℤ`.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.polynomialToNatGlobalSections_surjective` and
+  `AlgebraicGeometry.Proj.polynomialToNatGlobalSections_injective`.
+* `AlgebraicGeometry.Proj.polynomialNatShift_isQuasicoherent` and
+  `AlgebraicGeometry.Proj.polynomialIntShift_isQuasicoherent` — every twist of polynomial
+  projective space is quasi-coherent.
+* `AlgebraicGeometry.Proj.cechTermSectionAddEquiv_res_face` and
+  `AlgebraicGeometry.Proj.intCechTermSectionAddEquiv_res_face` — the comparisons carry the
+  algebraic Čech faces to restriction.
+* `AlgebraicGeometry.Proj.moduleAwayToSection_cechDenominator_bijective` and
+  `AlgebraicGeometry.Proj.moduleAwayToSection_intCechDenominator_bijective`.
+
+## Implementation notes
+
 The global-section comparison is stated over a field and for a nonempty finite variable type,
 which is the projective-space range consumed by the Serre-finiteness argument.  These hypotheses
 make the generic-point and denominator-cancellation steps explicit.
@@ -25,8 +52,18 @@ The global-section comparison is for a *nonnegative* twist. The imported algebra
 variable generation, exact monomial division, the canonical localization fraction, and both Čech
 terms: `polynomialVariableCechTerm` for `d : ℕ` and `polynomialVariableIntCechTerm` for `d : ℤ`.
 This file begins where geometry enters by comparing those terms with projective basic opens and
-sections. The two algebraic terms are not yet identified for a nonnegative `d`; the landed Čech
-differential still uses the `ℕ` version.
+sections. The two algebraic terms are not identified here for a nonnegative `d`; the Čech
+differential uses the `ℕ` version.
+
+## References
+
+The algebraic Čech terms are `polynomialVariableCechTerm` and `polynomialVariableIntCechTerm`;
+the twist quasi-coherence criteria are `natShift_isQuasicoherent` and
+`intShift_isQuasicoherent`.
+
+## Tags
+
+projective space, twisting sheaf, global sections, homogeneous polynomial, Čech complex
 -/
 
 noncomputable section

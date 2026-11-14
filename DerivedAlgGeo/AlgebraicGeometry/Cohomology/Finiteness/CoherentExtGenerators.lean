@@ -9,8 +9,8 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Coherent.Linear
 /-!
 # Coherent Ext-finiteness from restricted-twist presentations
 
-This file connects the projective presentation lane to the generic quotient-generator
-dévissage for Ext.  It gives two honest reductions:
+This file connects projective presentations of a variety to the generic quotient-generator
+dévissage for Ext. It gives two reductions:
 
 1. coherent presentations whose middle terms have finite ambient Ext imply degreewise finite
    ambient Ext between arbitrary coherent sheaves;
@@ -22,11 +22,28 @@ That counit premise is discharged in `RestrictedTwistPresentation` through faith
 closed-immersion pushforward. The reductions here remain useful independently, while
 `module_finite_ambientExt` gives their unconditional projective-variety specialization.
 
-## Remaining geometric boundary
+## Main definitions
+
+This file introduces no new definitions.
+
+## Main results
+
+* `AlgebraicGeometry.ProjectivePresentation.module_finite_ambientExt_of_coherent_presentations`
+  derives degreewise finite ambient Ext from coherent quotient presentations.
+* `AlgebraicGeometry.ProjectivePresentation.module_finite_ambientExt_of_restrictedTwists`
+  reduces this to the closed-immersion counit and Ext-finiteness of restricted twists.
+* `AlgebraicGeometry.ProjectivePresentation.module_finite_ambientExt_of_counit_epi`
+  needs only the counit premise.
+* `AlgebraicGeometry.ProjectivePresentation.module_finite_ambientExt` is the unconditional
+  statement for a projective variety.
+
+## Implementation notes
+
+### Remaining geometric boundary
 
 The restricted-twist premise is discharged by `module_finite_restrictedTwistExt`, and the counit
-epimorphism follows without the unavailable stronger comparison `ι^* ι_* F ≅ F`. Two later
-geometric obligations remain:
+epimorphism follows without the unavailable stronger comparison `ι^* ι_* F ≅ F`. Two geometric
+inputs are not supplied here:
 
 * these theorems concern Ext in `X.Modules`. Passing to Ext internal to `Coh X` still requires
   the non-affine `CoherentExtComparison X`;
@@ -34,8 +51,18 @@ geometric obligations remain:
   `DerivedCategory.ExtFiniteBounded.of_ext`.  A geometric regularity/global-dimension bound
   remains necessary.
 
-Thus the result advances the Serre/Dqc lane as far as the present APIs justify, without assuming
-Grothendieck boundedness, postulating a class map, or installing a `MuHNInput` instance.
+The file therefore assumes no Grothendieck boundedness, postulates no class map, and installs no
+`MuHNInput` instance.
+
+## References
+
+The dévissage is `Ext.module_finite_of_quotient_generators`; the presentations come from
+`ProjectivePresentation.exists_shortExact_coproduct_restrictedTwist_of_counit_epi`, and the
+counit is epi by `Scheme.Modules.pullbackPushforwardAdjunction_counit_epi_of_isClosedImmersion`.
+
+## Tags
+
+Ext, coherent sheaf, projective variety, restricted twist, finite-dimensional
 -/
 
 universe u

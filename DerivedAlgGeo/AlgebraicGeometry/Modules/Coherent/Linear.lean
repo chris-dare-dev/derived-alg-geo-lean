@@ -95,8 +95,8 @@ field: `globalSectionAction M : Γ(X, ⊤) →+* End M` is already a ring
 homomorphism, and every clause below uses only that plus `Preadditive`. Nothing
 here is specific to a variety, and no field appears.
 
-`Variety.homModule` is this composed with `k → Γ(X, ⊤)`; it predates this and is
-left as it is. -/
+`Variety.homModule` is this composed with `k → Γ(X, ⊤)`, though it is defined
+directly from `varietyScalarAction`. -/
 @[reducible]
 noncomputable def homModuleGlobal (M N : X.Modules) :
     Module Γ(X, (⊤ : X.Opens)) (M ⟶ N) where

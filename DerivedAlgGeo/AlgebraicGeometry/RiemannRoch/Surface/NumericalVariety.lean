@@ -55,7 +55,7 @@ variable {C : D.LinearConnectingSystem}
 variable {A : Type v} [CommRing A] [Algebra ℚ A]
 variable {P : PairingContext D C 2 A}
 variable {O : Coh X}
-variable (RO : P.ReconstructionData O)
+variable (RO : P.ReconstructionHypotheses O)
 
 /- The surface `ReconstructionSystem` was the general one at `d = 2`, restated.
 It now comes from `RiemannRoch/Reconstruction.lean`. -/
@@ -68,7 +68,7 @@ surface.
 
 The sheaf-level HRR property is deliberately kept separate from this selected data. Its proof
 for every virtual Grothendieck class is `GeometricData.hirzebruch_riemannRoch` below. -/
-structure GeometricData (RO : P.ReconstructionData O)
+structure GeometricData (RO : P.ReconstructionHypotheses O)
     (R : ReconstructionSystem (P := P)) where
   /-- The geometrically constructed Todd components. -/
   toddComponent : ℕ → A

@@ -56,7 +56,7 @@ DECLARATION_OWNERS: dict[str, OwnerWitness] = {
     ),
     "DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor": OwnerWitness(
         68, "noncomputable def Adjunction.mapHomologicalComplex {F : A ⥤ B} {G : B ⥤ A}",
-        "ffeaa23911af287a408bb8cd37300c817e84f4cbe7c6dd58d4191a0039e4264a",
+        "34a6eada3b3f4c38e7dbc028d121c29e488d800d85c3539ec1655ae79f51f7c7",
     ),
     "DerivedAlgGeo.Algebra.Homology.DerivedCategory.GrothendieckGroup": OwnerWitness(
         39, "noncomputable abbrev boundedHomologyFunctor (n : ℤ) : Bounded A ⥤ A :=",
@@ -64,7 +64,7 @@ DECLARATION_OWNERS: dict[str, OwnerWitness] = {
     ),
     "DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc": OwnerWitness(
         121, "def schemeQuasicoherentCohomology (X : Scheme.{u}) :",
-        "8625a567e819ea4c5dda058b6693546fa9d038df9b2b0fbfe95f6d05a20fb650",
+        "aca78a7474af4863f040c5f164f0953afeb24cbc4173959f181c8988a139d4b3",
     ),
     "DerivedAlgGeo.AlgebraicGeometry.Modules.ExteriorPower": OwnerWitness(
         38, "noncomputable def exteriorPower (E : X.Modules) (n : ℕ) : X.Modules :=",
@@ -76,7 +76,7 @@ DECLARATION_OWNERS: dict[str, OwnerWitness] = {
     ),
     "DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated": OwnerWitness(
         62, "inductive coprodClosure (P : ObjectProperty C) : ObjectProperty C",
-        "09b4648348ccee0833f209cb4851ab7ef690c0e81c22f669d887b5814983ff19",
+        "efed94e7b7375f09146d24476030591e43597717a12ca78fc7cda3207d7055ef",
     ),
     "DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing": OwnerWitness(
         37, "structure HNFiltration (P : ℝ → ObjectProperty C) (E : C)",

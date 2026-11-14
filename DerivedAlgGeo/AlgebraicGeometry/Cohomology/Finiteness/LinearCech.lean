@@ -8,9 +8,29 @@ import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.FiniteDimensional
 /-!
 # The base-field-linear form of the Čech comparison
 
-Everything in the Čech lane is valued in `AddCommGrpCat`, and the interface a finiteness theorem
-has to discharge is not: `Module.Finite k` needs the `k`-module structure that
-`coherentScalarAction` supplies. This file supplies the missing half.
+The Čech comparison `cechComparisonAddEquiv` is valued in `AddCommGrpCat`, and the interface a
+finiteness theorem has to discharge is not: `Module.Finite k` needs the `k`-module structure that
+`coherentScalarAction` supplies. This file makes the comparison `k`-linear.
+
+## Main definitions
+
+* `AlgebraicGeometry.Cohomology.cechCohomologyFunctor` is Čech cohomology of an abelian sheaf
+  for a fixed cover, as an additive functor.
+* `AlgebraicGeometry.Cohomology.cechScalarAction` and
+  `AlgebraicGeometry.Cohomology.cechCohomologyModule` give the base-field action on Čech
+  cohomology of a module sheaf over a variety.
+* `AlgebraicGeometry.Cohomology.cechComparisonLinearEquiv` is the Čech comparison as a
+  `k`-linear equivalence onto `linearCoherentH`.
+
+## Main results
+
+* `AlgebraicGeometry.Cohomology.cechComparisonAddEquiv_smul` and
+  `AlgebraicGeometry.Cohomology.cechComparisonAddEquiv_coherentSmul` show that the comparison
+  commutes with the scalar actions.
+* `AlgebraicGeometry.Cohomology.module_finite_linearCoherentH_of_cech` transfers
+  finite-dimensionality from Čech cohomology to `linearCoherentH`.
+
+## Implementation notes
 
 The `k`-action on a cohomology group is not extra data. For `r : k`, multiplication by `r` is an
 endomorphism of the sheaf -- `varietyScalarAction`, built from the central action of global
@@ -18,6 +38,15 @@ functions through the variety's structure morphism -- and the action on cohomolo
 that endomorphism induces. So both sides of the Čech comparison carry an action for the same
 reason, and `k`-linearity of the comparison is exactly the statement that it commutes with the
 maps induced by an endomorphism, which is `cechComparisonAddEquiv_naturality`.
+
+## References
+
+This builds on `cechComparisonAddEquiv` and `cechComparisonAddEquiv_naturality` and on the
+scalar action `varietyScalarAction`.
+
+## Tags
+
+Čech cohomology, coherent sheaf, linear equivalence, finite-dimensional
 -/
 
 universe h u
@@ -110,10 +139,10 @@ This is the form the finiteness interface consumes: the target is the group `coh
 carrying the action `coherentScalarAction` supplies, and the comparison respects it.
 
 The `HasExt` reconciliation is made here and is explicit. `coherentH` fixes its witness as
-`HasExt.standard _` at `HasExt.{u + 1}`, while the Čech lane passes the witness positionally so
-that instance search cannot pick `HasExt.{u}` -- a different group. The two conventions meet by
-instantiating the positional witness at `HasExt.standard _`, written out below rather than left
-to elaboration. -/
+`HasExt.standard _` at `HasExt.{u + 1}`, while `cechComparisonAddEquiv` takes the witness
+positionally so that instance search cannot pick `HasExt.{u}` -- a different group. The two
+conventions meet by instantiating the positional witness at `HasExt.standard _`, written out
+below rather than left to elaboration. -/
 theorem cechComparisonAddEquiv_coherentSmul (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] (F : Coh Y)
     {ind : Type u} (U : ind → Opens Y)
     (I : InjectiveResolution

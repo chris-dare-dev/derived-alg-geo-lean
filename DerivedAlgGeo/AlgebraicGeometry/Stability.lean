@@ -48,9 +48,10 @@ canonical t-structure on `D(Coh X)` and is a leaf.
 
 ## References
 
-This umbrella re-exports `PolarizedVarietyData`, `PolarizedVarietyData.IsPure`,
-`PolarizedVarietyData.IsGiesekerSemistable` and `PolarizedVarietyData.weakSlopeData`, with
-their comparison `PolarizedVarietyData.giesekerSemistable_implies_muSemistable`.
+This umbrella re-exports `PolarizedVarietyHypotheses`, `PolarizedVarietyHypotheses.IsPure`,
+`PolarizedVarietyHypotheses.IsGiesekerSemistable` and `PolarizedVarietyHypotheses.weakSlopeData`,
+with
+their comparison `PolarizedVarietyHypotheses.giesekerSemistable_implies_muSemistable`.
 
 ## Tags
 

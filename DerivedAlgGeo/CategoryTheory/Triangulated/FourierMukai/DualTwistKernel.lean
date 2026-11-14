@@ -18,6 +18,32 @@ triangle is conventionally called the **dual twist** triangle
 
 `dualTwist ⟶ id_Y ⟶ Φ_Q ⋙ Φ_P ⟶ dualTwist⟦1⟧`.
 
+## Main definitions
+
+All in the namespace `CategoryTheory.Triangulated.FourierMukai`:
+
+* `DualTwistKernelData` and `DualTwistKernelConeData`: an ordinary kernel arrow
+  realizing the left-adjunction unit, and an enhanced representative with a
+  chosen cone for it.
+* `DualTwistKernelConeData.dualTwist` and
+  `DualTwistKernelConeData.dualTwistKernel`: the choice-dependent dual twist and
+  the shifted cone kernel presenting it.
+* `DualTwistKernelConeData.dualTwistTriangleInTarget` and
+  `DualTwistKernelConeData.distinguishedDualTwistTriangleInTarget`: the dual-twist
+  triangle family on `Y`, and its distinguished refinement.
+
+## Main results
+
+* `DualTwistKernelConeData.dualTwistKernelIso` and
+  `DualTwistKernelConeData.isKernelFunctor_dualTwist`: the dual twist is the
+  transform of `dualTwistKernel`, hence a kernel functor.
+* `DualTwistKernelConeData.dualTwistTriangleInTarget_unit`: the second map of the
+  triangle is the left-adjunction unit.
+* `DualTwistKernelConeData.dualTwistTriangleInTarget_obj_distinguished`: every
+  value of the dual-twist triangle is distinguished.
+
+## Implementation notes
+
 The implementation introduces no second cone or normalization mechanism.
 `LeftAdjointKernelData.toRightAdjointKernelData` reads the same adjunction as a
 right adjunction for `Φ_Q`, and all constructions below delegate to the
@@ -28,7 +54,16 @@ functor.
 The ordinary unit-kernel arrow, its enhanced representative, and its cone are
 still supplied or selected noncanonically.  Nothing here makes the dual twist
 exact, invertible, canonical, or spherical, and no dual-cotwist construction
-is bundled into this lane.
+is bundled here; that is `DualCotwistKernel.lean`.
+
+## References
+
+The library's `AdjunctionUnitKernelConeData`, `LeftAdjointKernelData` and
+`Enhancement`.
+
+## Tags
+
+Fourier--Mukai kernel, dual twist, adjunction unit, cone, distinguished triangle
 -/
 
 set_option autoImplicit false

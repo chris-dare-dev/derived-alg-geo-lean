@@ -21,10 +21,33 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Families
 
 The Bridgeland refinement of weak stability, together with phase analysis,
 symmetry actions, metric geometry, support properties, numerical walls, and
-abstract family interfaces. Weak stability is the child `Weak/`, which this
-umbrella imports; ordinary prestability and stability conditions carry their
-weak parent structurally. Declaration namespaces remain
-`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition`; a
-namespace cutover would invalidate the immutable review payloads that
-`exe/RestateHistoricalNames.lean` protects.
+abstract family interfaces.
+
+## Main definitions
+
+None: this umbrella re-exports its children. Among them are
+`CategoryTheory.Triangulated.PreStabilityCondition.WithClassMap` and
+`CategoryTheory.Triangulated.StabilityCondition.WithClassMap` (`Foundation`),
+with the weak theory under `Weak`.
+
+## Main results
+
+None; this module re-exports its children.
+
+## Implementation notes
+
+Weak stability is the child `Weak/`, which this umbrella imports; ordinary
+prestability and stability conditions carry their weak parent structurally.
+Many declarations live in the namespace
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition`, which
+does not follow the directory path.
+
+## References
+
+The children carry the precise citations. The umbrella builds on the
+library's `Slicing` and `K₀`.
+
+## Tags
+
+stability condition, slicing, central charge, weak stability condition
 -/

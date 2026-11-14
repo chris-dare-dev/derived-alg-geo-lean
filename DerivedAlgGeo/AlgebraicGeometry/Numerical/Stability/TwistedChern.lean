@@ -15,10 +15,26 @@ polarisation `H` give the familiar specialization `B = βH`:
 ch^β_i(E) = ∑_{j ≤ i} ((−β)^(i−j) / (i−j)!) · ch_j(E) · H^(i−j)
 ```
 
-Nothing of the sort existed in the numerical layer, so the tilt slope `ν_{α,β}`
-and the BMT quantity `Q_{α,β}` could not previously be written down at all.
+The tilt slope `ν_{α,β}` and the BMT quantity `Q_{α,β}` are stated in terms of these
+components.
 
-## What makes the name honest
+## Main definitions
+
+* `twistCoeff` — the scalar exponential coefficients.
+* `twist` — the convolution of a family against those coefficients.
+* `BField` and `chBComp` — an arbitrary rational numerical `B`-field and
+  `ch^B_i(E)`;
+* `chBetaComp` — the Picard-rank-one notation `ch^(βH)_i(E)`.
+
+## Main results
+
+* `twistCoeff_add` — the scalar exponential identity.
+* `twist_add_beta` and `chBetaComp_add_beta` — **the group law**.
+* `chBComp_along_eq_chBetaComp` — the two notations agree.
+
+## Implementation notes
+
+### What makes the name honest
 
 The exponential notation is a claim, and `twist_add_beta` is the theorem that
 earns it: twisting by `β₁ + β₂` is twisting by `β₂` and then by `β₁`. That is
@@ -36,7 +52,7 @@ the double sum. The reindexing is where the work is: the two sums run in
 opposite directions, so a reflection (`Finset.sum_range_reflect`) sits between
 them.
 
-## Stated on a bare graded ring first
+### Stated on a bare graded ring first
 
 `twistCoeff` and `twist` mention no variety, no polarisation and no Chern
 character: `twist` convolves an arbitrary family `c : ℕ → A` against the
@@ -48,14 +64,14 @@ This is deliberate. The group law has nothing to do with geometry, and proving
 it against `NumericalVarietyData` would have hidden that behind hypotheses it
 never uses.
 
-## Main results
+## References
 
-* `twistCoeff`, `twistCoeff_add` — the scalar exponential coefficients.
-* `twist`, `twist_add_beta` — the convolution and **the group law**.
-* `BField` and `chBComp` — an arbitrary rational numerical `B`-field and
-  `ch^B_i(E)`;
-* `chBetaComp` — the Picard-rank-one notation `ch^(βH)_i(E)`, with
-  `chBComp_along_eq_chBetaComp` proving that the two notations agree.
+The reindexing uses Mathlib's `Finset.sum_range_reflect`; the binomial theorem is Mathlib's
+`add_pow`.
+
+## Tags
+
+twisted Chern character, B-field, tilt stability, exponential, numerical variety
 -/
 
 open Finset

@@ -13,42 +13,63 @@ isomorphism and additive on short exact sequences, factors it through the Grothe
 as `hilbertHom : K₀Ab (Coh X) →+ (ℤ → ℤ)`, and records that Snapper's theorem bounds its
 finite-difference degree by the supplied dimension.
 
-Both the numerical content and the supplied-input carrier already exist under other names:
+Both the numerical content and the supplied-input carrier exist under other names:
 `Snapper.oneVariableEulerFunction` is the function, and
 `IntersectionTheory.Number.TwistContext` is the carrier of Snapper's inputs. This file is
-the geometric packaging and the additivity that nobody had stated. It creates no new carrier.
+the geometric packaging and the additivity theorem. It creates no new carrier.
 
-## What is supplied, and why
+## Main definitions
 
-`PolarizedVarietyData k X` is the `…Data` idiom for genuinely external input. Its five fields
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses` — a polarized variety, as
+  supplied data.
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.hilbertFunction` — the Hilbert
+  function `n ↦ χ(F ⊗ L^n)`.
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.hilbertHom` — the Hilbert
+  function
+  as a homomorphism `K₀(Coh X) → (ℤ → ℤ)`.
+
+## Main results
+
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.hilbertFunction_eq_eulerPic` —
+  the Hilbert function is the Picard-level Euler function at `L ^ n`.
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.hilbertFunction_additive` —
+  additivity on short exact sequences.
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.hilbertFunction_degreeLE` and
+  `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.fwdDiff_hilbertFunction` —
+  Snapper's bound.
+
+## Implementation notes
+
+### What is supplied, and why
+
+`PolarizedVarietyHypotheses k X` packages genuinely external input. Its five fields
 are a line-bundle class `L`, finite coherent cohomology `D`, a linear connecting system `C`,
 a natural number `dim`, and, for every coherent sheaf, a `TwistContext`. Every
 supplied-not-proved field reachable from it is listed here:
 
-* `L : Pic X` is **not** asserted to be ample. Ampleness does not exist at this pin;
-  `git grep -in 'ample'` finds only numerical-example docstrings. Nothing below uses it,
-  and the objects that would (positivity of the leading coefficient, hyperplane sections)
-  belong to later issues in this lane.
+* `L : Pic X` is **not** asserted to be ample. Nothing below uses ampleness, and the objects
+  that would (positivity of the leading coefficient, hyperplane sections) are not constructed
+  here.
 * `D : FiniteCohomology k X` supplies coherent cohomology as finite-dimensional `k`-modules
   with a vanishing bound, the two inputs that make `χ` a finite sum.
 * `C : D.LinearConnectingSystem` chooses, for every short exact sequence of coherent
   sheaves, `k`-linear connecting maps compatible with the `Ext` connecting maps. Euler
-  additivity is proved from it; it is the temporary input that a Grothendieck-group
+  additivity is proved from it; it is the input that a Grothendieck-group
   factorization needs.
 * `twists F : TwistContext D F dim` bundles, for every finite family of Picard classes,
   the coherence of every integer twist (`CoherentTwistFamily`), the hyperplane-section
   induction that the classical proof of Snapper's theorem uses (`GeometricInduction`), and a
   Picard-level Euler function `eulerPic` together with its identification `realization`
   with the geometric one. Coherence of a twist by an invertible sheaf and the geometric
-  induction are both open at this pin; `dim` is the number of cuts after which the induction
-  terminates, and is not derived from `X`.
+  induction are both supplied rather than proved here; `dim` is the number of cuts after which
+  the induction terminates, and is not derived from `X`.
 
 Compare `RiemannRoch.ReconstructionSystem`, which also quantifies a `TwistContext` over
 every coherent sheaf but additionally demands a `PairingContext`, a graded ring, a rank, and
 takes additivity of `eulerPic` as a *field*. None of that is needed here, and additivity of
 the Hilbert function is a theorem below rather than an assumption.
 
-## Why the definition goes through `oneVariableEulerFunction`
+### Why the definition goes through `oneVariableEulerFunction`
 
 `hilbertFunction` is defined as `Snapper.oneVariableEulerFunction` on the rank-one twist
 family, and `hilbertFunction_eq_eulerPic` identifies it with `eulerPic (L ^ n)` as a lemma.
@@ -58,15 +79,24 @@ unprovable: `TwistContext` carries no additivity of `eulerPic`, which is precise
 from `Coh.shortExact_map_ι`, `Modules.shortExact_map_tensorLeft_of_invertible` and
 `eulerCharacteristic_additive_modules`, and both descriptions are then available.
 
-## Placement
+### Placement
 
 `AlgebraicGeometry/Stability/` is stability *of sheaves*: slope, Gieseker, and their
-Harder–Narasimhan theory on `Coh X`. It is distinct from `AlgebraicGeometry/StabilityCondition/`,
-which belongs to the derived-category families lane, and it imports nothing from the
-abstract stability-condition tree.
+Harder–Narasimhan theory on `Coh X`. It is distinct from Bridgeland stability conditions on
+derived categories, and it imports nothing from the abstract stability-condition tree.
 
 Not here: coefficient extraction (multiplicity and degree), any semistability notion,
 Harder–Narasimhan filtrations, and any construction of `GeometricInduction` from ampleness.
+
+## References
+
+Snapper's theorem, through the repository's `Snapper.oneVariableEulerFunction` and
+`IntersectionTheory.Number.TwistContext`; the factorization through `K₀` follows
+`FiniteCohomology.grothendieckEulerHom`.
+
+## Tags
+
+Hilbert polynomial, Euler characteristic, coherent sheaf, polarization, Snapper's theorem
 -/
 
 universe u
@@ -89,7 +119,7 @@ variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 cohomology with linear connecting maps, a dimension, and Snapper's inputs for every coherent
 sheaf. See the module docstring for what each field supplies and why none is proved here;
 in particular `L` is not asserted to be ample. -/
-structure PolarizedVarietyData (k : Type u) [Field k] (X : Scheme.{u})
+structure PolarizedVarietyHypotheses (k : Type u) [Field k] (X : Scheme.{u})
     [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] where
   /-- The polarizing line-bundle class. Not asserted to be ample. -/
   L : Pic X
@@ -103,9 +133,9 @@ structure PolarizedVarietyData (k : Type u) [Field k] (X : Scheme.{u})
   geometric induction, and the Picard-level Euler function with its realization. -/
   twists : ∀ F : Coh X, TwistContext D F dim
 
-namespace PolarizedVarietyData
+namespace PolarizedVarietyHypotheses
 
-variable (P : PolarizedVarietyData k X)
+variable (P : PolarizedVarietyHypotheses k X)
 
 /-- The rank-one coherent twist family `n ↦ F ⊗ L^n`, projected from `twists`. -/
 noncomputable abbrev twistFamily (F : Coh X) :
@@ -213,6 +243,6 @@ theorem fwdDiff_hilbertFunction (F : Coh X) :
   oneVariable_fwdDiff_euler_vanishes P.D P.C P.L (P.twistFamily F) P.dim
     ((P.twists F).geometricInduction 1 (fun _ ↦ P.L))
 
-end PolarizedVarietyData
+end PolarizedVarietyHypotheses
 
 end AlgebraicGeometry.Stability.Gieseker

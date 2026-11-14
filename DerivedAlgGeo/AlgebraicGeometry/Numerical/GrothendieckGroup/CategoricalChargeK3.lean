@@ -13,15 +13,29 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharg
 `MukaiChargeData C W` carries a hom `K₀Ab A →+ RealExtension W` and nothing ties
 it to any geometry: an arbitrary hom typechecks, so `charge` need not be the
 charge of anything.  Separately, `AdditiveMukaiData.numericalCharge` computes the
-same shape from a **numerical** class in `N`, and the two were never related by
-any lemma.
+same shape from a **numerical** class in `N`, and no lemma relates the two by
+itself.
 
-That gap is why the support-property theorems proved on the numerical side —
+Without that comparison the support-property theorems proved on the numerical side —
 `numericalCharge_ne_zero_of_nonneg`, `mukaiForm_neg_of_numericalCharge_eq_zero`,
-`mem_wall_iff_numericalCharge_eq_zero` — were unreachable from an object of a
+`mem_wall_iff_numericalCharge_eq_zero` — are unreachable from an object of a
 heart, which is exactly what a stability function's positivity obligation holds.
 
-## What this file does
+## Main definitions
+
+* `AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.toMukaiChargeData` — the categorical Mukai
+  charge carrier built from a class map and numerical Mukai data.
+
+## Main results
+
+* `AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.charge_toMukaiChargeData` — the categorical
+  charge of an object is the numerical charge of its class.
+* `AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.mem_wall_iff_numericalCharge_eq_zero` — a
+  wall is a vanishing charge, for the class of an object.
+
+## Implementation notes
+
+### What this file does
 
 `toMukaiChargeData` builds the class map as a **composition of homs**
 
@@ -34,18 +48,29 @@ the numerical charge of its class.  Nothing along the chain re-proves additivity
 and a `MukaiChargeData` built this way cannot be unrelated to the geometry,
 because the geometry is what it is made of.
 
-## What is still supplied, not proved
+### What is supplied, not proved
 
-`cl : K₀Ab A →+ N` is an argument.  Nothing in this repository constructs one —
+`cl : K₀Ab A →+ N` is an argument, and this file constructs none.
 The generic `K₀.Realization` root likewise treats such a class map as supplied,
 so this file makes the comparison available without pretending it exists.
 
-The **numerical quotient** is also still bypassed.  `N` is documented as
-`K(X)/≡`, but the lane quotients it again by `leftRadical`, and the only
-geometric class map in the tree lands in that quotient while `numericalCharge`
-is defined on `N`.  Until `leftRadical ≤ ker mukaiVectorHom` is proved, the
+The **numerical quotient** is also bypassed.  `N` is documented as
+`K(X)/≡`, but `NumericalVarietyData.NumericalQuotient` quotients it again by `leftRadical`,
+and the geometric class map lands in that quotient while `numericalCharge`
+is defined on `N`.  Without `leftRadical ≤ ker mukaiVectorHom` — which
+`RadicalKernel.lean` proves only under the supplied hypothesis `DetectsRadical` — the
 support-property theorems keep their `extendMap … ≠ 0` hypotheses instead of the
 `E ≠ 0` a consumer can actually discharge.
+
+## References
+
+The repository's `CategoryTheory.Triangulated.MukaiChargeData`,
+`AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.numericalCharge` and
+`Mukai.mem_orthogonalityLocus_iff_expCharge_eq_zero`.
+
+## Tags
+
+Mukai vector, central charge, K3 surface, Grothendieck group, numerical class
 -/
 
 universe w' w v u
@@ -79,12 +104,12 @@ theorem toMukaiChargeData_mukai (x : K₀Ab C) :
 
 variable (bR : W →ₗ[ℝ] W →ₗ[ℝ] ℝ) (β ω : W)
 
-/-- **The lemma that was missing**: the categorical charge of an object is the
+/-- **The comparison**: the categorical charge of an object is the
 numerical charge of its class.
 
 Definitional, because the class map is a composition of homs rather than a
 separately-postulated function. Its use is that every support-property theorem
-stated about `numericalCharge` now applies to an object of an abelian category
+stated about `numericalCharge` applies to an object of an abelian category
 through its class. -/
 theorem charge_toMukaiChargeData (E : C) :
     (D.toMukaiChargeData f cl).charge bR β ω E

@@ -28,7 +28,7 @@ SOURCE_ROOT = ROOT / "DerivedAlgGeo"
 DATA_NAMES = (
     "NumericalRingData",
     "NumericalVarietyData",
-    "NumericalRingDualData",
+    "NumericalRingDualHypotheses",
 )
 DATA_NAME = "(?:" + "|".join(DATA_NAMES) + ")"
 

@@ -16,19 +16,63 @@ set_option backward.isDefEq.respectTransparency false
 This file supplies the two-term cohomology bridge used by weak tilting
 arguments.  It has two independent parts:
 
-* `originalHeartCohFunctor t n` is the historical tilting-facing name for
+* `originalHeartCohFunctor t n` is the tilting-facing name for
   `t.heartCohFunctor n`, the degree-`n` cohomology of an arbitrary t-structure.
-  Unlike `HeartStabilityData.heartCohFunctor`, it requires no stability or HN data.
+  It requires no stability or HN data.
 * for a torsion pair `P` and an object `X` of the tilted heart, the canonical
   truncation triangle is exposed as
 
   `H⁻¹_t(X)⟦1⟧ ⟶ X ⟶ H⁰_t(X)`.
 
 The first term is torsion-free, the last is torsion, and the triangle induces
-a short exact sequence in the tilted heart.  The final two theorems expose
-the inclusion as a kernel and the projection as a cokernel, so downstream
+a short exact sequence in the tilted heart.
+`HeartTorsionPair.originalCohomologyShortComplex_f_isKernel` and
+`HeartTorsionPair.originalCohomologyShortComplex_g_isCokernel` expose the
+inclusion as a kernel and the projection as a cokernel, so downstream
 semistability proofs can use abelian kernel/image language without reopening
 the ambient triangulated-category argument.
+
+## Main definitions
+
+* `originalHeartCohFunctor`, `originalHeartCoh` — t-structure heart cohomology
+  under its tilting-facing name, and its object-level notation.
+* `originalHeartCohFunctorZeroIso` — degree zero agrees with
+  `t.heartH0Functor`.
+* `HeartTorsionPair.tiltedHeartCohFunctor` — the same construction for the
+  tilted t-structure.
+* `HeartTorsionPair.originalHMinusOne`, `HeartTorsionPair.originalHZero` — the
+  original `H⁻¹` and `H⁰` factors of a tilted-heart object.
+* `originalCohomologyTriangle` — the level-zero truncation triangle with first
+  term written as `H⁻¹(X)⟦1⟧`.
+* `HeartTorsionPair.originalCohomologyShortComplex` — the induced short
+  complex in the tilted heart.
+
+## Main results
+
+* `HeartTorsionPair.originalHMinusOne_free`, `HeartTorsionPair.originalHZero_tors`
+  — the first factor is torsion-free and the last is torsion.
+* `originalCohomologyTriangle_distinguished` — the triangle is distinguished.
+* `HeartTorsionPair.originalCohomologyShortComplex_shortExact` — the short
+  complex is short exact in the tilted heart.
+* `HeartTorsionPair.originalHMinusOne_isZero_of_tors`,
+  `HeartTorsionPair.originalHZero_isZero_of_free_shift` — the vanishing
+  factors of pure torsion and shifted torsion-free objects.
+
+## Implementation notes
+
+The cohomology functor is owned by the t-structure, in
+`TStructure/HeartBridge.lean`; this file only names it for tilting and adds
+the torsion-pair statements, so the same construction serves both the
+original and the tilted heart.
+
+## References
+
+`TStructure.heartCohFunctor` of `TStructure/HeartBridge.lean`, and Mathlib's
+`TStructure.triangleLTGE` and `ShortComplex.ShortExact`.
+
+## Tags
+
+t-structure, HRS tilt, torsion pair, heart cohomology, short exact sequence
 -/
 
 namespace CategoryTheory.Triangulated.Tilting
@@ -41,7 +85,7 @@ variable {C : Type*} [Category C] [Preadditive C] [HasZeroObject C] [HasShift C 
 
 /-! ## Cohomology attached only to a t-structure -/
 
-/-- Historical tilting-facing name for t-structure-owned heart cohomology. -/
+/-- Tilting-facing name for t-structure-owned heart cohomology. -/
 noncomputable abbrev originalHeartCohFunctor [IsTriangulated C]
     (t : TStructure C) (n : ℤ) :
     C ⥤ t.heart.FullSubcategory := t.heartCohFunctor n
@@ -51,8 +95,8 @@ theorem originalHeartCohFunctor_additive [IsTriangulated C]
     Functor.Additive (originalHeartCohFunctor t n) :=
   t.heartCohFunctor_additive n
 
-/-- The existing degree-zero tilted-cohomology notation agrees naturally with
-the t-structure-owned degree-zero heart functor. -/
+/-- The degree-zero tilting-facing cohomology agrees naturally with the
+t-structure-owned degree-zero heart functor. -/
 noncomputable def originalHeartCohFunctorZeroIso [IsTriangulated C]
     (t : TStructure C) :
     originalHeartCohFunctor t 0 ≅ t.heartH0Functor :=

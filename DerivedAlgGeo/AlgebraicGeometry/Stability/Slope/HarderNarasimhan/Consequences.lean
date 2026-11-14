@@ -18,7 +18,28 @@ Everything here is about the **μ-slope**. The Gieseker order is not mentioned a
 the one-step filtration of a Gieseker-semistable sheaf lives with the other comparison
 statements, in `Stability/Comparison.lean`.
 
-## The chosen filtration
+## Main definitions
+
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.hnFiltration` — a chosen
+  Harder–Narasimhan filtration of a nonzero coherent sheaf.
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.muPlus` and
+  `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.muMinus` — its largest and
+  smallest
+  slopes.
+
+## Main results
+
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.muMinus_le_muPlus`.
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.muPlus_ne_top_of_isPure` —
+  `μPlus`
+  of a pure coherent sheaf is finite.
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.exists_shortExact_hnTors_hnFree`
+  —
+  the torsion/torsion-free splitting at a cutoff.
+
+## Implementation notes
+
+### The chosen filtration
 
 The HN filtration is not unique as a term, only as a mathematical object, and the abstract theory
 states existence as `Nonempty`. `hnFiltration` picks one with choice. Everything downstream that
@@ -26,12 +47,21 @@ mentions `μPlus` or `μMinus` is therefore about *that* choice, which is why th
 mathematical statement below, `filtration_muPlus_ne_top_of_isPure`, is proved for an arbitrary
 filtration first and only then specialized.
 
-## The torsion/torsion-free splitting
+### The torsion/torsion-free splitting
 
 For a cutoff `μ₀`, `exists_shortExact_hnTors_hnFree` cuts the filtration at its crossing index and
 produces a short exact sequence whose subsheaf has all slopes above `μ₀` and whose quotient has
 all slopes at or below it. That is the input a tilted heart is built from; constructing the tilt
-belongs to the abstract tilting lane, not here.
+belongs to the abstract tilting theory, not here.
+
+## References
+
+The abstract results are `WeakStabilityFunctionOn.exists_subobject_hnTors_cokernel_hnFree` and
+`WeakStabilityFunctionOn.exists_shortExact_hnTors_hnFree`, applied through `hasHNProperty`.
+
+## Tags
+
+Harder–Narasimhan filtration, slope stability, coherent sheaf, torsion pair, tilting
 -/
 
 universe u
@@ -46,9 +76,9 @@ open AlgebraicGeometry.Cohomology
 variable {k : Type u} [Field k]
 variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 
-namespace PolarizedVarietyData
+namespace PolarizedVarietyHypotheses
 
-variable {P : PolarizedVarietyData k X}
+variable {P : PolarizedVarietyHypotheses k X}
 
 /-- **The Harder–Narasimhan filtration of a nonzero coherent sheaf.** A choice of one of the
 filtrations `exists_filtration` produces. -/
@@ -123,7 +153,7 @@ theorem exists_subobject_hnTors_cokernel_hnFree (h : MuPositivityData P) (I : Mu
     (μ₀ := μ₀) (hasHNProperty h I) F
 
 /-- **The torsion/torsion-free splitting as a short exact sequence.** This is the input a tilted
-heart is built from; the tilt itself belongs to the abstract tilting lane. -/
+heart is built from; the tilt itself belongs to the abstract tilting theory. -/
 theorem exists_shortExact_hnTors_hnFree (h : MuPositivityData P) (I : MuHNInput P h)
     (μ₀ : WithTop ℝ) (F : Coh X) :
     ∃ (T Q : Coh X) (i : T ⟶ F) (p : F ⟶ Q) (w : i ≫ p = 0),
@@ -133,6 +163,6 @@ theorem exists_shortExact_hnTors_hnFree (h : MuPositivityData P) (I : MuHNInput 
   WeakStabilityFunctionOn.exists_shortExact_hnTors_hnFree
     (μ₀ := μ₀) (hasHNProperty h I) F
 
-end PolarizedVarietyData
+end PolarizedVarietyHypotheses
 
 end AlgebraicGeometry.Stability.Gieseker

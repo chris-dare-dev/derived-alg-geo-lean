@@ -214,7 +214,7 @@ sequence. -/
 theorem numericalFirstChernClass_shortExact
     {D : FiniteCohomology k X} {C : D.LinearConnectingSystem}
     (I : IntersectionContext D C 2) {S : ShortComplex (Coh X)}
-    (P : Coh.PerfectShortExactDeterminantData S) :
+    (P : Coh.PerfectShortExactDeterminantHypotheses S) :
     numericalFirstChernClass I P.middle =
       numericalFirstChernClass I P.left + numericalFirstChernClass I P.right := by
   unfold numericalFirstChernClass picardFirstChernClass
@@ -224,7 +224,7 @@ theorem numericalFirstChernClass_shortExact
 sequence. -/
 theorem picardFirstChernClass_shortExact
     {S : ShortComplex (Coh X)}
-    (P : Coh.PerfectShortExactDeterminantData S) :
+    (P : Coh.PerfectShortExactDeterminantHypotheses S) :
     picardFirstChernClass P.middle =
       picardFirstChernClass P.left + picardFirstChernClass P.right :=
   P.firstChernClassAdd_eq_add
@@ -234,7 +234,7 @@ independently chosen two-term resolutions are also known to have additive virtua
 theorem chernCharacterTwoDegree_shortExact
     {D : FiniteCohomology k X} {C : D.LinearConnectingSystem}
     (I : IntersectionContext D C 2) {S : ShortComplex (Coh X)}
-    (P : Coh.PerfectShortExactDeterminantData S)
+    (P : Coh.PerfectShortExactDeterminantHypotheses S)
     (hrank : virtualRank P.middle = virtualRank P.left + virtualRank P.right) :
     chernCharacterTwoDegree I P.middle =
       chernCharacterTwoDegree I P.left + chernCharacterTwoDegree I P.right := by

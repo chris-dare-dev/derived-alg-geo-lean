@@ -13,12 +13,33 @@ determinant of a pair is `B v v * B w w - (B v w)^2`, and the pair is
 **hyperbolic** when that determinant is negative -- signature `(1, 1)` for a
 rank-two lattice.
 
-## This is stated over an arbitrary ambient form, not over one extension
+## Main definitions
 
-`Lattice/Mukai/RankTwo.lean` used to own these identities on the single carrier
-`ℤ × N × ℤ`, but every one of them is arithmetic of two vectors under a
-bilinear form. They are restated here on `(R, M, B)` and the Mukai file
-specialises them at `B := Mukai.pairingBilin b`.
+* `BilinearForm.gram`: the Gram determinant of a pair.
+* `BilinearForm.orthWitness`: `B v w • v - B v v • w`, the projection of `w`
+  off `v` cleared of denominators.
+* `BilinearForm.pairSpan`: the set of `R`-combinations of two vectors.
+* `BilinearForm.IsHyperbolicPair`: negative Gram determinant.
+
+## Main results
+
+* `BilinearForm.gram_lincomb`: the Gram determinant transforms by the square
+  of the change-of-basis determinant.
+* `BilinearForm.apply_orthWitness` and `BilinearForm.self_orthWitness`: the
+  witness is orthogonal to `v` and has self-pairing `B v v * gram B v w`.
+* `BilinearForm.isHyperbolicPair_lincomb`: hyperbolicity is invariant under a
+  change of basis whose determinant squares to `1`.
+* `BilinearForm.exists_neg_self_of_isHyperbolicPair`: a hyperbolic pair with
+  `B v v > 0` spans a nonzero vector of negative square.
+
+## Implementation notes
+
+### This is stated over an arbitrary ambient form, not over one extension
+
+Every identity here is arithmetic of two vectors under a bilinear form, and none
+of it depends on a particular carrier. So it is stated on `(R, M, B)`, and
+`Lattice/Mukai/RankTwo.lean` specialises it on the carrier `ℤ × N × ℤ` at
+`B := Mukai.pairingBilin b`.
 
 The file splits at the point where order is needed, which is also where the
 hypotheses stop being purely algebraic:
@@ -28,16 +49,27 @@ hypotheses stop being purely algebraic:
 * `IsHyperbolicPair` and everything reading a sign need a linear order and a
   strict ordered ring structure.
 
-## What is deliberately not here
+### What is deliberately not here
 
-`HasSphericalClass` and `HasIsotropicClass` stay with the Mukai lane. They are
-phrased in terms of `IsSpherical` and `IsIsotropic`, which are application
-vocabulary for `-2` and `0`, and the ledger keeps that vocabulary with the
+`HasSphericalClass` and `HasIsotropicClass` stay in `Lattice/Mukai/RankTwo.lean`.
+They are phrased in terms of `IsSpherical` and `IsIsotropic`, which are
+application vocabulary for `-2` and `0`, and that vocabulary stays with the
 application.
 
 No geometry is asserted. The correspondence between rank-two data and actual
 walls in a space of stability conditions is Bayer--Macrì Theorem 5.7; it needs
 moduli of stable objects and is **not** formalised anywhere below.
+
+## References
+
+* Bayer--Macrì, Theorem 5.7, cited only for the wall correspondence this file
+  does not formalise.
+* Mathlib's bilinear maps `M →ₗ[R] M →ₗ[R] R` in
+  `Mathlib.LinearAlgebra.BilinearForm.Basic`.
+
+## Tags
+
+bilinear form, Gram determinant, hyperbolic pair, signature
 -/
 
 namespace BilinearForm

@@ -8,13 +8,31 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.GrothendieckGroup.MukaiVector
 /-!
 # The Euler radical against the kernel of the Mukai vector
 
-`CategoricalCharge` records that the numerical quotient is bypassed: `N` is
-documented as `K(X)/≡`, the lane quotients it again by `leftRadical`, and the
-only geometric class map in the tree lands in that quotient while
+`CategoricalChargeK3` records that the numerical quotient is bypassed: `N` is
+documented as `K(X)/≡`, `NumericalVarietyData.NumericalQuotient` quotients it again by
+`leftRadical`, and the geometric class map lands in that quotient while
 `numericalCharge` is defined on `N`.  Closing that gap is the statement
 `leftRadical ≤ ker mukaiVectorHom`, and this file settles what it costs.
 
-## The two inclusions are not equally cheap
+## Main definitions
+
+* `AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.DetectsRadical` — the supplied
+  nondegeneracy hypothesis: the Mukai vector detects the Euler radical.
+* `AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.mukaiVectorQuotient` — the Mukai vector
+  descended to `NumericalVarietyData.NumericalQuotient`.
+
+## Main results
+
+* `AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.ker_le_leftRadical` — the free inclusion.
+* `AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.detectsRadical_of` — sufficient conditions
+  for `DetectsRadical`.
+* `AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.leftRadical_le_ker` and
+  `AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.leftRadical_eq_ker` — under
+  `DetectsRadical`, the Euler radical is the kernel of the Mukai vector.
+
+## Implementation notes
+
+### The two inclusions are not equally cheap
 
 One is free.  `mukaiForm_eq_neg_chi₂` already identifies the Mukai form with
 `−χ₂` under `SatisfiesHRR` and `IsK3`, so a class whose Mukai vector vanishes
@@ -33,14 +51,24 @@ integral `pairingBilin` has none.
 So it is carried as a named hypothesis, `DetectsRadical`, in the way
 `rank_nonneg` and `degree_pos_of_rank_zero` are fields rather than pretended
 theorems.  For an actual K3 it is discharged by unimodularity of the Mukai
-lattice; that is geometry this lane does not have yet.
+lattice, which is not formalized here.
 
-## What the hypothesis buys
+### What the hypothesis buys
 
 `mukaiVectorQuotient` — the Mukai vector descended to
 `NumericalVarietyData.NumericalQuotient`, which is the quotient the geometric
 class map actually lands in.  That is the missing link named in
-`CategoricalCharge`'s "what is still supplied, not proved" section.
+`CategoricalChargeK3`'s "what is supplied, not proved" section.
+
+## References
+
+The free inclusion rests on the repository's `mukaiForm_eq_neg_chi₂`; the quotient is
+`NumericalVarietyData.NumericalQuotient` and the descent uses Mathlib's
+`QuotientAddGroup.lift`.
+
+## Tags
+
+Mukai vector, Euler pairing, radical, K3 surface, numerical quotient
 -/
 
 universe u v w

@@ -16,14 +16,14 @@ the independent geometric inputs that the base-change API isolates.
 
 ## Main definitions
 
-* `KFlatBaseChangeData.DecompositionSemiorthogonalityData` — presentable
+* `KFlatBaseChangeHypotheses.DecompositionSemiorthogonalityData` — presentable
   `S`-linearity, the K-flat fibre-coefficient comparison and faithful derived
   base change.
-* `KFlatBaseChangeData.DecompositionCoreData` — that package with
+* `KFlatBaseChangeHypotheses.DecompositionCoreData` — that package with
   external-product generation and propagation from perfect objects to `Dqc`.
-* `KFlatBaseChangeData.DecompositionProjectionData` — the chosen perfect and
+* `KFlatBaseChangeHypotheses.DecompositionProjectionData` — the chosen perfect and
   quasicoherent projections.
-* `KFlatBaseChangeData.DecompositionProjectionHypotheses` — the geometric
+* `KFlatBaseChangeHypotheses.DecompositionProjectionHypotheses` — the geometric
   inputs the projections are built from: cocontinuity of the truncations,
   preservation of compact objects, and the compact-intersection identification.
 
@@ -65,10 +65,10 @@ open CategoryTheory CategoryTheory.Triangulated AlgebraicGeometry
 
 universe u w
 
-namespace KFlatBaseChangeData
+namespace KFlatBaseChangeHypotheses
 
 variable {S : Scheme.{u}} {X T : SchemeBaseChange S}
-  (D : KFlatBaseChangeData X T)
+  (D : KFlatBaseChangeHypotheses X T)
   {ι : Type w} [Preorder ι]
 
 /-- The semiorthogonality part of Proposition 3.15, with the source
@@ -76,13 +76,13 @@ triangulatedness and the presentably extended base-linearity retained for
 later construction steps. -/
 structure DecompositionSemiorthogonalityData
     (A : SemiorthogonalSequence (SourceDqc X) ι)
-    (Q : D.SourceTensorData)
-    (B : KFlatBasePullbackData X) where
+    (Q : D.SourceTensorHypotheses)
+    (B : KFlatBasePullbackHypotheses X) where
   /-- The original source components are triangulated. -/
   sourceComponentsTriangulated : A.HasTriangulatedComponents
   /-- The `Perf(S)`-linear source action has been extended to `Dqc(S)`. -/
   sourceComponentsDqcSLinear :
-    SourceTensorData.KFlatDqcSLinearComponents (D := D) Q B A
+    SourceTensorHypotheses.KFlatDqcSLinearComponents (D := D) Q B A
   /-- The perfect external-product envelopes are semiorthogonal. -/
   perfectSemiorthogonal :
     D.toDerivedBaseChangeData.PerfectComponentsSemiorthogonal A
@@ -101,12 +101,12 @@ theorem ofKFlatTensorCoefficientComparison
     (hCoprod : ∀ j (κ : Type u),
       (A.component j).IsClosedUnderColimitsOfShape (Discrete κ))
     (H : D.toDerivedBaseChangeData.CompactFiberTensorDuality)
-    (Q : D.SourceTensorData)
-    (B : KFlatBasePullbackData X)
-    (presentable : SourceTensorData.PresentableBaseActionData
+    (Q : D.SourceTensorHypotheses)
+    (B : KFlatBasePullbackHypotheses X)
+    (presentable : SourceTensorHypotheses.PresentableBaseActionHypotheses
       (D := D) Q B.pullback)
-    (K : KFlatFiberTensorData T)
-    (V : KFlatCompactFiberDualityData K)
+    (K : KFlatFiberTensorHypotheses T)
+    (V : KFlatCompactFiberDualityHypotheses K)
     (pushBase : DqcRightDerivedPushforward (toIdentityBaseChange T))
     (pushFst : DqcRightDerivedPushforward (baseChangeFst X T))
     (adj : D.pullFst.functor ⊣ pushFst.functor)
@@ -115,11 +115,11 @@ theorem ofKFlatTensorCoefficientComparison
     (faithful : D.DqcFaithfulBaseChange B.pullback pushBase pushFst)
     (C : CompactFiberProjectionFormula.KFlatTensorCoefficientComparison
       (D := D) P K V)
-    (hS : SourceTensorData.KFlatSLinearComponents (D := D) Q B A) :
+    (hS : SourceTensorHypotheses.KFlatSLinearComponents (D := D) Q B A) :
     D.DecompositionSemiorthogonalityData A Q B := by
-  let hDqcS : SourceTensorData.KFlatDqcSLinearComponents
+  let hDqcS : SourceTensorHypotheses.KFlatDqcSLinearComponents
       (D := D) Q B A :=
-    SourceTensorData.PresentableBaseActionData.dqcSLinearComponents
+    SourceTensorHypotheses.PresentableBaseActionHypotheses.dqcSLinearComponents
       (D := D) Q B.pullback presentable A hA hIso hCoprod hS
   exact
     { sourceComponentsTriangulated := hA
@@ -135,8 +135,8 @@ base-change sequences are semiorthogonal and full, and the source linearity
 used in the construction is available at the `Dqc(S)` level. -/
 structure DecompositionCoreData
     (A : SemiorthogonalSequence (SourceDqc X) ι)
-    (Q : D.SourceTensorData)
-    (B : KFlatBasePullbackData X)
+    (Q : D.SourceTensorHypotheses)
+    (B : KFlatBasePullbackHypotheses X)
     (hcompact : D.PreservesCompactObjects) where
   /-- Semiorthogonality and presentable source linearity. -/
   semiorthogonality : D.DecompositionSemiorthogonalityData A Q B
@@ -152,10 +152,10 @@ structure DecompositionCoreData
 
 namespace DecompositionSemiorthogonalityData
 
-variable {D : KFlatBaseChangeData X T}
+variable {D : KFlatBaseChangeHypotheses X T}
   {A : SemiorthogonalSequence (SourceDqc X) ι}
-  {Q : D.SourceTensorData}
-  {B : KFlatBasePullbackData X}
+  {Q : D.SourceTensorHypotheses}
+  {B : KFlatBasePullbackHypotheses X}
   (C : D.DecompositionSemiorthogonalityData A Q B)
 
 /-- Add the two generation inputs to the semiorthogonality package.
@@ -167,7 +167,7 @@ theorem toCoreData
     (hcompact : D.PreservesCompactObjects)
     (hgen : ObjectProperty.IsClassicalTriangulatedGenerator
       (D.toDerivedBaseChangeData.perfectCategoryExternalProductGenerators A))
-    (G : D.toDerivedBaseChangeData.QuasicoherentFullnessPropagationData A
+    (G : D.toDerivedBaseChangeData.QuasicoherentFullnessPropagationHypotheses A
       (D.toDerivedPreservesCompactObjects hcompact)
       C.perfectSemiorthogonal) :
     D.DecompositionCoreData A Q B hcompact := by
@@ -185,8 +185,8 @@ has been assembled. No existence or cocontinuity theorem for these projectors
 is inferred from semiorthogonality or generation. -/
 structure DecompositionProjectionData
     {A : SemiorthogonalSequence (SourceDqc X) ι}
-    {Q : D.SourceTensorData}
-    {B : KFlatBasePullbackData X}
+    {Q : D.SourceTensorHypotheses}
+    {B : KFlatBasePullbackHypotheses X}
     {hcompact : D.PreservesCompactObjects}
     (C : D.DecompositionCoreData A Q B hcompact) where
   /-- Chosen right projections onto the perfect components. -/
@@ -206,12 +206,12 @@ structure DecompositionProjectionData
 are constructed. -/
 structure DecompositionProjectionHypotheses
     {A : SemiorthogonalSequence (SourceDqc X) ι}
-    {Q : D.SourceTensorData}
-    {B : KFlatBasePullbackData X}
+    {Q : D.SourceTensorHypotheses}
+    {B : KFlatBasePullbackHypotheses X}
     {hcompact : D.PreservesCompactObjects}
     (C : D.DecompositionCoreData A Q B hcompact) : Prop where
   /-- Compact-generator approximations for the perfect envelopes. -/
-  approximation : D.toDerivedBaseChangeData.QuasicoherentProjectionApproximationData A
+  approximation : D.toDerivedBaseChangeData.QuasicoherentProjectionApproximationHypotheses A
   /-- The zero truncation attached to each approximation preserves
   coproducts in the scheme universe. -/
   truncationCocontinuous (i : ι) :
@@ -220,7 +220,7 @@ structure DecompositionProjectionHypotheses
   /-- The quasicoherent projectors preserve compact objects, and compact
   intersection identifies their restrictions with the perfect components. -/
   compactRestriction :
-    D.toDerivedBaseChangeData.PerfectProjectionRestrictionData A
+    D.toDerivedBaseChangeData.PerfectProjectionRestrictionHypotheses A
       (D.toDerivedPreservesCompactObjects hcompact)
       C.semiorthogonality.perfectSemiorthogonal
       (approximation.quasicoherentProjections
@@ -229,10 +229,10 @@ structure DecompositionProjectionHypotheses
 
 namespace DecompositionProjectionHypotheses
 
-variable {D : KFlatBaseChangeData X T}
+variable {D : KFlatBaseChangeHypotheses X T}
   {A : SemiorthogonalSequence (SourceDqc X) ι}
-  {Q : D.SourceTensorData}
-  {B : KFlatBasePullbackData X}
+  {Q : D.SourceTensorHypotheses}
+  {B : KFlatBasePullbackHypotheses X}
   {hcompact : D.PreservesCompactObjects}
   {C : D.DecompositionCoreData A Q B hcompact}
   (P : D.DecompositionProjectionHypotheses C)
@@ -254,10 +254,10 @@ end DecompositionProjectionHypotheses
 
 namespace DecompositionCoreData
 
-variable {D : KFlatBaseChangeData X T}
+variable {D : KFlatBaseChangeHypotheses X T}
   {A : SemiorthogonalSequence (SourceDqc X) ι}
-  {Q : D.SourceTensorData}
-  {B : KFlatBasePullbackData X}
+  {Q : D.SourceTensorHypotheses}
+  {B : KFlatBasePullbackHypotheses X}
   {hcompact : D.PreservesCompactObjects}
   (C : D.DecompositionCoreData A Q B hcompact)
 
@@ -288,6 +288,6 @@ noncomputable def toDecompositionDataOfProjectionConstruction
 
 end DecompositionCoreData
 
-end KFlatBaseChangeData
+end KFlatBaseChangeHypotheses
 
 end AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange

@@ -18,7 +18,37 @@ description
 needs the projection formula and flat base change on a triple product, none of
 which the abstract `Correspondence` of `FourierMukai.Basic` carries.
 
-So convolution enters here as *supplied data*, not as a theorem.  A
+## Main definitions
+
+* `CategoryTheory.Triangulated.FourierMukai.ConvolutionData`: a kernel-level
+  operation with the composition isomorphisms of Prop. 5.10.
+* `CategoryTheory.Triangulated.FourierMukai.CoherentConvolutionHypotheses`: convolution
+  for endocorrespondences as a monoidal structure on the kernel category, with
+  `CoherentConvolutionHypotheses.toConvolutionData` forgetting it.
+* `CategoryTheory.Triangulated.FourierMukai.ConvolutionAssocData`,
+  `CategoryTheory.Triangulated.FourierMukai.ConvolutionLeftUnitData` and
+  `CategoryTheory.Triangulated.FourierMukai.ConvolutionRightUnitData`: the
+  kernel-level associativity and unit laws, as supplied data.
+* `CategoryTheory.Triangulated.FourierMukai.convolutionTransformAssoc`,
+  `CategoryTheory.Triangulated.FourierMukai.convolutionTransformUnitLeft` and
+  `CategoryTheory.Triangulated.FourierMukai.convolutionTransformUnitRight`: the
+  same laws at the transform level, derived from `compIso`.
+
+## Main results
+
+* `CategoryTheory.Triangulated.FourierMukai.ConvolutionData.isKernelFunctor_comp`:
+  kernel functors are closed under composition.
+* `CategoryTheory.Triangulated.FourierMukai.ConvolutionData.transformMapConvIso`:
+  isomorphic kernels convolve to kernels with isomorphic transforms.
+* `CategoryTheory.Triangulated.FourierMukai.CoherentConvolutionHypotheses.pentagon` and
+  `CategoryTheory.Triangulated.FourierMukai.CoherentConvolutionHypotheses.triangle`:
+  the coherence laws of a coherent convolution presentation.
+
+## Implementation notes
+
+### Convolution as supplied data
+
+Convolution enters here as *supplied data*, not as a theorem.  A
 `ConvolutionData` names a kernel-level operation together with the family of
 isomorphisms that Prop. 5.10 asserts, for three correspondences that share
 their outer categories in the pattern `𝒳 → 𝒴 → 𝒵`.  What this file then proves
@@ -31,13 +61,13 @@ a caller and the file proves what follows from them.  The value is that a
 later geometric realization has one named obligation to discharge rather than
 an implicit one, and that everything downstream of Prop. 5.10 is already
 available once it is. For endocorrespondences whose kernels genuinely form a
-monoidal category, `CoherentConvolutionData` is the stable root: it makes the
+monoidal category, `CoherentConvolutionHypotheses` is the stable root: it makes the
 operation functorial and packages its associator, unitors, pentagon, and
 triangle together. It forgets one-way to `ConvolutionData`.
 
-## What this file does not assert
+### What this file does not assert
 
-* Nothing constructs a `ConvolutionData` or `CoherentConvolutionData`, and no
+* Nothing constructs a `ConvolutionData` or `CoherentConvolutionHypotheses`, and no
   example is exhibited. That is not an omission for want of trying: `compIso`
   is required to hold
   *uniformly in* `Q`, so the cheap degenerate constructions — fold the middle
@@ -45,7 +75,7 @@ triangle together. It forgets one-way to `ConvolutionData`.
   produce a `C₃` whose transform has one fixed `Q` baked into it and so cannot
   meet the requirement for any other. The uniformity is what gives the
   structure content, and discharging it is a geometric obligation.
-* The legacy `ConvolutionData.conv` is a bare function
+* The weaker interface's `ConvolutionData.conv` is a bare function
   `𝒲₁ → 𝒲₂ → 𝒲₃`, not a functor. It is not assumed
   to be additive, exact, or even to send isomorphic kernels to isomorphic
   kernels — only to send them to kernels with *isomorphic transforms*, which
@@ -57,7 +87,7 @@ triangle together. It forgets one-way to `ConvolutionData`.
   kernel-level isomorphism from the transform-level one would need a kernel
   to be determined by its transform (Orlov uniqueness), which is not
   available here.  No result here depends on the kernel-level layer, and
-  nothing constructs it. `CoherentConvolutionData` is the stronger alternative
+  nothing constructs it. `CoherentConvolutionHypotheses` is the stronger alternative
   when a caller can supply the full monoidal kernel structure.
 * Triangulatedness does not transport across `compIso`.  Moving
   `IsTriangulated` along a natural isomorphism needs that isomorphism to
@@ -65,6 +95,17 @@ triangle together. It forgets one-way to `ConvolutionData`.
   on the supplied data rather than a consequence of it.
 * No kernel is claimed to be determined by its transform, so `conv` is not
   claimed to be the unique operation satisfying `compIso`.
+
+## References
+
+* Prop. 5.10, the composition of Fourier--Mukai transforms, as stated by the
+  field `CategoryTheory.Triangulated.FourierMukai.ConvolutionData.compIso`.
+* Orlov's uniqueness of Fourier--Mukai kernels, which this file does not use.
+* Mathlib's `CategoryTheory.MonoidalCategory`.
+
+## Tags
+
+Fourier--Mukai kernel, convolution, composition of transforms, monoidal category
 -/
 
 namespace CategoryTheory.Triangulated.FourierMukai
@@ -105,7 +146,7 @@ presentations on the same kernel category can coexist.
 
 `toConvolutionData` below is the one-way compatibility map to the older,
 law-free interface. -/
-structure CoherentConvolutionData (C : Correspondence 𝒳 𝒳 𝒲₁) where
+structure CoherentConvolutionHypotheses (C : Correspondence 𝒳 𝒳 𝒲₁) where
   /-- The complete monoidal structure underlying kernel convolution. -/
   monoidal : MonoidalCategory 𝒲₁
   /-- Composition of transforms agrees with monoidal convolution. -/
@@ -113,72 +154,72 @@ structure CoherentConvolutionData (C : Correspondence 𝒳 𝒳 𝒲₁) where
     ∀ P Q : 𝒲₁, C.transform P ⋙ C.transform Q ≅
       C.transform (MonoidalCategory.tensorObj P Q)
 
-namespace CoherentConvolutionData
+namespace CoherentConvolutionHypotheses
 
 open MonoidalCategory
 
 variable {C : Correspondence 𝒳 𝒳 𝒲₁}
 
 /-- Kernel convolution selected by a coherent presentation. -/
-def conv (D : CoherentConvolutionData C) (P Q : 𝒲₁) : 𝒲₁ :=
+def conv (D : CoherentConvolutionHypotheses C) (P Q : 𝒲₁) : 𝒲₁ :=
   letI := D.monoidal
   P ⊗ Q
 
 /-- The coherent convolution unit. -/
-def unit (D : CoherentConvolutionData C) : 𝒲₁ :=
+def unit (D : CoherentConvolutionHypotheses C) : 𝒲₁ :=
   letI := D.monoidal
   𝟙_ 𝒲₁
 
 /-- The convolution associator, derived from the coherent root. -/
-def assocIso (D : CoherentConvolutionData C) (P Q R : 𝒲₁) :
+def assocIso (D : CoherentConvolutionHypotheses C) (P Q R : 𝒲₁) :
     D.conv (D.conv P Q) R ≅ D.conv P (D.conv Q R) := by
   letI := D.monoidal
   exact α_ P Q R
 
 /-- The left convolution unitor, derived from the coherent root. -/
-def leftUnitIso (D : CoherentConvolutionData C) (P : 𝒲₁) :
+def leftUnitIso (D : CoherentConvolutionHypotheses C) (P : 𝒲₁) :
     D.conv D.unit P ≅ P := by
   letI := D.monoidal
   exact λ_ P
 
 /-- The right convolution unitor, derived from the coherent root. -/
-def rightUnitIso (D : CoherentConvolutionData C) (P : 𝒲₁) :
+def rightUnitIso (D : CoherentConvolutionHypotheses C) (P : 𝒲₁) :
     D.conv P D.unit ≅ P := by
   letI := D.monoidal
   exact ρ_ P
 
 /-- The pentagon proposition for a coherent convolution presentation. -/
-def Pentagon (D : CoherentConvolutionData C) (P Q R T : 𝒲₁) : Prop :=
+def Pentagon (D : CoherentConvolutionHypotheses C) (P Q R T : 𝒲₁) : Prop :=
   letI := D.monoidal
   MonoidalCategory.Pentagon P Q R T
 
 /-- Every coherent convolution presentation satisfies the pentagon. -/
-theorem pentagon (D : CoherentConvolutionData C) (P Q R T : 𝒲₁) :
+theorem pentagon (D : CoherentConvolutionHypotheses C) (P Q R T : 𝒲₁) :
     D.Pentagon P Q R T := by
   letI := D.monoidal
   exact MonoidalCategory.pentagon P Q R T
 
 /-- The triangle proposition for a coherent convolution presentation. -/
-def Triangle (D : CoherentConvolutionData C) (P Q : 𝒲₁) : Prop :=
+def Triangle (D : CoherentConvolutionHypotheses C) (P Q : 𝒲₁) : Prop :=
   letI := D.monoidal
   (α_ P (𝟙_ 𝒲₁) Q).hom ≫ P ◁ (λ_ Q).hom = (ρ_ P).hom ▷ Q
 
 /-- Every coherent convolution presentation satisfies the triangle. -/
-theorem triangle (D : CoherentConvolutionData C) (P Q : 𝒲₁) :
+theorem triangle (D : CoherentConvolutionHypotheses C) (P Q : 𝒲₁) :
     D.Triangle P Q := by
   letI := D.monoidal
   exact MonoidalCategory.triangle P Q
 
-/-- Forget coherent convolution to the legacy operation-and-comparison
+/-- Forget coherent convolution to the weaker operation-and-comparison
 interface. No adapter exists in the opposite direction. -/
-def toConvolutionData (D : CoherentConvolutionData C) :
+def toConvolutionData (D : CoherentConvolutionHypotheses C) :
     ConvolutionData C C C := by
   letI := D.monoidal
   exact
     { conv := MonoidalCategory.tensorObj
       compIso := D.compIso }
 
-end CoherentConvolutionData
+end CoherentConvolutionHypotheses
 
 namespace ConvolutionData
 
@@ -279,8 +320,8 @@ transform, which nothing in this repository provides.
 
 Geometrically the classical proof works on the quadruple product, by the same
 projection-formula and base-change arguments that derive Prop. 5.10 on the
-triple product.  That derivation is the geometric ledger's future work, and
-this structure is the layer it would discharge.  Nothing here constructs one,
+triple product.  That derivation is a geometric obligation, and this
+structure is the layer it would discharge.  Nothing here constructs one,
 and no result in this file depends on it. -/
 structure ConvolutionAssocData
     (D₁₂ : ConvolutionData C₁ C₂ C₁₂) (D₂₃ : ConvolutionData C₂ C₃ C₂₃)
@@ -340,26 +381,26 @@ structure ConvolutionRightUnitData {C₁ : Correspondence 𝒴 𝒴 𝒲₁}
 
 end Unit
 
-namespace CoherentConvolutionData
+namespace CoherentConvolutionHypotheses
 
 variable {C : Correspondence 𝒳 𝒳 𝒲₁}
 
-/-- Forget coherent convolution to the legacy kernel associativity layer. -/
-def toConvolutionAssocData (D : CoherentConvolutionData C) :
+/-- Forget coherent convolution to the supplied kernel associativity layer. -/
+def toConvolutionAssocData (D : CoherentConvolutionHypotheses C) :
     ConvolutionAssocData D.toConvolutionData D.toConvolutionData
       D.toConvolutionData D.toConvolutionData where
   assocIso := D.assocIso
 
-/-- Forget coherent convolution to the legacy left-unit layer. -/
-def toConvolutionLeftUnitData (D : CoherentConvolutionData C) :
+/-- Forget coherent convolution to the supplied left-unit layer. -/
+def toConvolutionLeftUnitData (D : CoherentConvolutionHypotheses C) :
     ConvolutionLeftUnitData D.toConvolutionData D.unit where
   leftUnitIso := D.leftUnitIso
 
-/-- Forget coherent convolution to the legacy right-unit layer. -/
-def toConvolutionRightUnitData (D : CoherentConvolutionData C) :
+/-- Forget coherent convolution to the supplied right-unit layer. -/
+def toConvolutionRightUnitData (D : CoherentConvolutionHypotheses C) :
     ConvolutionRightUnitData D.toConvolutionData D.unit where
   rightUnitIso := D.rightUnitIso
 
-end CoherentConvolutionData
+end CoherentConvolutionHypotheses
 
 end CategoryTheory.Triangulated.FourierMukai

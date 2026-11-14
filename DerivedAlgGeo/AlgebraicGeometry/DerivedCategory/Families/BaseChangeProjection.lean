@@ -44,16 +44,16 @@ variable {S : Scheme.{u}} {X T : SchemeBaseChange S}
 /-- Componentwise compact-generator approximations for the perfect envelopes.
 Their zero aisles are definitionally the quasicoherent base-change
 components. -/
-structure QuasicoherentProjectionApproximationData : Prop where
+structure QuasicoherentProjectionApproximationHypotheses : Prop where
   /-- Brown-style approximation data for each perfect envelope. -/
   componentApproximation (i : ι) :
     TStructure.CompactGeneratorApproximation.{u}
       (D.perfectEnvelope (A.component i))
 
-namespace QuasicoherentProjectionApproximationData
+namespace QuasicoherentProjectionApproximationHypotheses
 
 variable {D A}
-  (B : D.QuasicoherentProjectionApproximationData A)
+  (B : D.QuasicoherentProjectionApproximationHypotheses A)
 include B
 
 /-- Assemble the componentwise compactly generated projections into chosen
@@ -87,11 +87,11 @@ theorem quasicoherentIsStrong
     ((B.quasicoherentProjections hcompact horth).componentProjection i)
       (D.quasicoherentSequence_hasTriangulatedComponents A hA hcompact horth i)
 
-end QuasicoherentProjectionApproximationData
+end QuasicoherentProjectionApproximationHypotheses
 
 /-- Data identifying the compact restriction of chosen quasicoherent
 projectors with the perfect base-change sequence. -/
-structure PerfectProjectionRestrictionData
+structure PerfectProjectionRestrictionHypotheses
     (hcompact : D.PreservesCompactObjects)
     (horth : D.PerfectComponentsSemiorthogonal A)
     (Q : (D.quasicoherentSequence A hcompact horth).RightProjectionData) : Prop where
@@ -107,10 +107,10 @@ structure PerfectProjectionRestrictionData
         (targetPerfectToDqc X T) =
       (D.perfectCategorySequence A horth).component i
 
-namespace PerfectProjectionRestrictionData
+namespace PerfectProjectionRestrictionHypotheses
 
 variable {D A hcompact horth Q}
-  (B : D.PerfectProjectionRestrictionData A hcompact horth Q)
+  (B : D.PerfectProjectionRestrictionHypotheses A hcompact horth Q)
 include B
 
 /-- Restrict the quasicoherent projectors to compact objects and identify the
@@ -128,7 +128,7 @@ theorem perfectIsStrong (hA : A.HasTriangulatedComponents) :
   fun i ↦ ((perfectProjections B).componentProjection i).isRightAdmissible
     (D.perfectCategorySequence_hasTriangulatedComponents A hA horth i)
 
-end PerfectProjectionRestrictionData
+end PerfectProjectionRestrictionHypotheses
 
 end DerivedBaseChangeData
 

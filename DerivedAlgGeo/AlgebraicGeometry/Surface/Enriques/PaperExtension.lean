@@ -29,41 +29,41 @@ arguments of arXiv:1912.04332v2 (Paper I) and arXiv:2104.13610v2 (Paper II).
 
 ## Main definitions
 
-* `PaperResidualAdmissibilityData` — supplied right admissibility of the residual
-  component; `PaperResidualAdmissibilityData.projectionData` chooses the projection.
-* `PaperBlockData.mutationTriangle` — the paper's objectwise mutation triangle, built
+* `PaperResidualAdmissibilityHypotheses` — supplied right admissibility of the residual
+  component; `PaperResidualAdmissibilityHypotheses.projectionData` chooses the projection.
+* `PaperBlockHypotheses.mutationTriangle` — the paper's objectwise mutation triangle, built
   from the projection counit.
 * `MinusTwoCurveChain` — an `A_n` chain of effective Cartier divisors with the
   intersection matrix of `(-2)`-curves, and its step triangles
   `MinusTwoCurveChain.lineBundleStepTriangle`.
-* `PaperCurveChainData` — the curve chains behind a block decomposition, with
-  `PaperCurveChainData.projectionTriangles` the projection-chain triangle data they
+* `PaperCurveChainHypotheses` — the curve chains behind a block decomposition, with
+  `PaperCurveChainHypotheses.projectionTriangles` the projection-chain triangle data they
   construct.
-* `PaperIProjectionExtData`, `PaperIIProjectionExtData` — the Ext computations of
+* `PaperIProjectionExtHypotheses`, `PaperIIProjectionExtHypotheses` — the Ext computations of
   Paper I and Paper II for the projected objects.
-* `PaperResidualKernelEquivalence`, `PaperExceptionalBlockExtensionData` — the generic
+* `PaperResidualKernelEquivalence`, `PaperExceptionalBlockExtensionHypotheses` — the generic
   Fourier--Mukai extension notions specialized to two Enriques surfaces.
 
 ## Main results
 
 * `MinusTwoCurveChain.lineBundleStepTriangle_distinguished` and
-  `PaperCurveChainData.projectionTriangle_distinguished` — the divisor-chain step
+  `PaperCurveChainHypotheses.projectionTriangle_distinguished` — the divisor-chain step
   triangles, and their transports to the block representatives, are distinguished.
-* `PaperCurveChainData.projectionIso` — Paper II, Remark 2.3(ii): every member of a
+* `PaperCurveChainHypotheses.projectionIso` — Paper II, Remark 2.3(ii): every member of a
   block has the same residual projection as its first member.
-* `PaperIIProjectionExtData.spherical_of_singleton` and
-  `PaperIIProjectionExtData.pseudoprojective_of_longer` — the Ext and Serre
+* `PaperIIProjectionExtHypotheses.spherical_of_singleton` and
+  `PaperIIProjectionExtHypotheses.pseudoprojective_of_longer` — the Ext and Serre
   computations make singleton projections spherical and longer-block projections
   pseudoprojective.
-* `PaperIProjectionExtData.toProjectionClassificationData` and
-  `PaperIIProjectionExtData.toProjectionClassificationData` — the classification
+* `PaperIProjectionExtHypotheses.toProjectionClassificationData` and
+  `PaperIIProjectionExtHypotheses.toProjectionClassificationData` — the classification
   packages of the two papers, assembled from the Ext computations.
 
 ## Implementation notes
 
 The remaining geometric gaps stay visible. The current Cartier-divisor API
 has no predicate saying that an effective divisor is an irreducible curve,
-and `PaperCurveChainData` supplies residual orthogonality of each curve
+and `PaperCurveChainHypotheses` supplies residual orthogonality of each curve
 quotient, while the triangles themselves are constructed rather than supplied.
 The abstract dg cone and its pointwise transform triangle are functorial,
 with `DGFunctor.HomogeneousNatTrans.ConeData` as the construction root and
@@ -118,34 +118,34 @@ attribute [local instance] residualComponent_isTriangulated
 The papers obtain this from an admissible semiorthogonal decomposition.  It is
 kept supplied here because the current Enriques construction proves only that
 the residual right orthogonal is triangulated. -/
-structure PaperResidualAdmissibilityData
-    (exceptional : T.ExceptionalityData)
-    (semiorthogonal : T.SemiorthogonalityData) : Prop where
+structure PaperResidualAdmissibilityHypotheses
+    (exceptional : T.ExceptionalityHypotheses)
+    (semiorthogonal : T.SemiorthogonalityHypotheses) : Prop where
   /-- The residual inclusion has a right adjoint. -/
   rightAdmissible :
     (T.residualComponent exceptional semiorthogonal).IsRightAdmissible
 
-namespace PaperResidualAdmissibilityData
+namespace PaperResidualAdmissibilityHypotheses
 
 variable {T}
-variable {exceptional : T.ExceptionalityData}
-  {semiorthogonal : T.SemiorthogonalityData}
-variable (A : T.PaperResidualAdmissibilityData exceptional semiorthogonal)
+variable {exceptional : T.ExceptionalityHypotheses}
+  {semiorthogonal : T.SemiorthogonalityHypotheses}
+variable (A : T.PaperResidualAdmissibilityHypotheses exceptional semiorthogonal)
 
 /-- Choose the geometric residual projection from admissibility. -/
 noncomputable def projectionData :
     T.PaperResidualProjectionData exceptional semiorthogonal :=
   RightProjectionData.ofIsRightAdmissible A.rightAdmissible
 
-end PaperResidualAdmissibilityData
+end PaperResidualAdmissibilityHypotheses
 
-namespace PaperBlockData
+namespace PaperBlockHypotheses
 
 variable {T}
-variable {exceptional : T.ExceptionalityData}
-  {semiorthogonal : T.SemiorthogonalityData}
+variable {exceptional : T.ExceptionalityHypotheses}
+  {semiorthogonal : T.SemiorthogonalityHypotheses}
 variable {I : Type t} [Fintype I]
-variable (B : T.PaperBlockData exceptional semiorthogonal I)
+variable (B : T.PaperBlockHypotheses exceptional semiorthogonal I)
 
 /-- The paper's objectwise mutation triangle
 
@@ -160,7 +160,7 @@ noncomputable def mutationTriangle
     (T.residualComponent_isTriangulated exceptional semiorthogonal)
     (B.blocks.firstObject i)
 
-end PaperBlockData
+end PaperBlockHypotheses
 
 /-! ## `(-2)`-curve chains -/
 
@@ -263,11 +263,11 @@ isomorphic to the corresponding tensor product by `O(prefix j)`; the adapter
 chooses such isomorphisms. The divisor-derived triangle is therefore
 constructed below rather than stored. Only residual orthogonality of its
 quotient remains supplied. -/
-structure PaperCurveChainData
-    {exceptional : T.ExceptionalityData}
-    {semiorthogonal : T.SemiorthogonalityData}
+structure PaperCurveChainHypotheses
+    {exceptional : T.ExceptionalityHypotheses}
+    {semiorthogonal : T.SemiorthogonalityHypotheses}
     {I : Type t} [Fintype I]
-    (B : T.PaperBlockData exceptional semiorthogonal I) where
+    (B : T.PaperBlockHypotheses exceptional semiorthogonal I) where
   /-- A chain of length one less than each exceptional block. -/
   chain : ∀ i, T.MinusTwoCurveChain (B.blocks.length i - 1)
   /-- The Picard-class formula for every member of every block. -/
@@ -288,14 +288,14 @@ structure PaperCurveChainData
       (((chain i).lineBundleStepTriangle
         (T.bundles (B.firstBundleIndex i)) j (by omega)).obj₃)
 
-namespace PaperCurveChainData
+namespace PaperCurveChainHypotheses
 
 variable {T}
-variable {exceptional : T.ExceptionalityData}
-  {semiorthogonal : T.SemiorthogonalityData}
+variable {exceptional : T.ExceptionalityHypotheses}
+  {semiorthogonal : T.SemiorthogonalityHypotheses}
 variable {I : Type t} [Fintype I]
-variable {B : T.PaperBlockData exceptional semiorthogonal I}
-variable (A : T.PaperCurveChainData B)
+variable {B : T.PaperBlockHypotheses exceptional semiorthogonal I}
+variable (A : T.PaperCurveChainHypotheses B)
 
 /-- The Picard-class formula chooses an isomorphism from each selected bundle
 to the first bundle tensored by the corresponding Cartier prefix. -/
@@ -420,16 +420,16 @@ noncomputable def projectionIso
       A.projectionTriangles
       (T.residualComponent_isTriangulated exceptional semiorthogonal) i j
 
-end PaperCurveChainData
+end PaperCurveChainHypotheses
 
 /-! ## Ext computations and classification constructors -/
 
 /-- Paper I's Ext computations for the ten projected objects, separated from
 their Serre-shift identifications and the completeness argument. -/
-structure PaperIProjectionExtData
-    {exceptional : T.ExceptionalityData}
-    {semiorthogonal : T.SemiorthogonalityData}
-    (B : T.PaperBlockData exceptional semiorthogonal (Fin 10))
+structure PaperIProjectionExtHypotheses
+    {exceptional : T.ExceptionalityHypotheses}
+    {semiorthogonal : T.SemiorthogonalityHypotheses}
+    (B : T.PaperBlockHypotheses exceptional semiorthogonal (Fin 10))
     (Q : T.PaperResidualProjectionData exceptional semiorthogonal) : Prop where
   /-- Every projected object has the 3-spherical self-Ext profile. -/
   selfExt : ∀ i, SphericalExtProfile (k := k) 3 (B.projectedObject Q i)
@@ -437,15 +437,15 @@ structure PaperIProjectionExtData
   pairwise : ∀ {i j}, i ≠ j →
     IsGradedOrthogonal (B.projectedObject Q i) (B.projectedObject Q j)
 
-namespace PaperIProjectionExtData
+namespace PaperIProjectionExtHypotheses
 
 variable {T}
-variable {exceptional : T.ExceptionalityData}
-  {semiorthogonal : T.SemiorthogonalityData}
-variable {P : T.PaperCategoryData exceptional semiorthogonal}
-variable {B : T.PaperBlockData exceptional semiorthogonal (Fin 10)}
+variable {exceptional : T.ExceptionalityHypotheses}
+  {semiorthogonal : T.SemiorthogonalityHypotheses}
+variable {P : T.PaperCategoryHypotheses exceptional semiorthogonal}
+variable {B : T.PaperBlockHypotheses exceptional semiorthogonal (Fin 10)}
 variable {Q : T.PaperResidualProjectionData exceptional semiorthogonal}
-variable (A : T.PaperIProjectionExtData B Q)
+variable (A : T.PaperIProjectionExtHypotheses B Q)
 
 include A
 
@@ -466,15 +466,15 @@ theorem toProjectionClassificationData
   pairwise_orthogonal := A.pairwise
   complete := complete
 
-end PaperIProjectionExtData
+end PaperIProjectionExtHypotheses
 
 /-- Paper II's block-sensitive self-Ext and cross-Ext computations. -/
-structure PaperIIProjectionExtData
-    {exceptional : T.ExceptionalityData}
-    {semiorthogonal : T.SemiorthogonalityData}
-    (P : T.PaperCategoryData exceptional semiorthogonal)
+structure PaperIIProjectionExtHypotheses
+    {exceptional : T.ExceptionalityHypotheses}
+    {semiorthogonal : T.SemiorthogonalityHypotheses}
+    (P : T.PaperCategoryHypotheses exceptional semiorthogonal)
     {I : Type t} [Fintype I]
-    (B : T.PaperBlockData exceptional semiorthogonal I)
+    (B : T.PaperBlockHypotheses exceptional semiorthogonal I)
     (Q : T.PaperResidualProjectionData exceptional semiorthogonal) : Prop where
   /-- Singleton blocks have the spherical Ext profile. -/
   sphericalExt : ∀ i, B.blocks.length i = 1 →
@@ -490,16 +490,16 @@ structure PaperIIProjectionExtData
   pairwise : ∀ {i j}, i ≠ j →
     IsGradedOrthogonal (B.projectedObject Q i) (B.projectedObject Q j)
 
-namespace PaperIIProjectionExtData
+namespace PaperIIProjectionExtHypotheses
 
 variable {T}
-variable {exceptional : T.ExceptionalityData}
-  {semiorthogonal : T.SemiorthogonalityData}
-variable {P : T.PaperCategoryData exceptional semiorthogonal}
+variable {exceptional : T.ExceptionalityHypotheses}
+  {semiorthogonal : T.SemiorthogonalityHypotheses}
+variable {P : T.PaperCategoryHypotheses exceptional semiorthogonal}
 variable {I : Type t} [Fintype I]
-variable {B : T.PaperBlockData exceptional semiorthogonal I}
+variable {B : T.PaperBlockHypotheses exceptional semiorthogonal I}
 variable {Q : T.PaperResidualProjectionData exceptional semiorthogonal}
-variable (A : T.PaperIIProjectionExtData P B Q)
+variable (A : T.PaperIIProjectionExtHypotheses P B Q)
 
 include A
 
@@ -537,7 +537,7 @@ theorem toProjectionClassificationData
   spherical_complete := sphericalComplete
   pseudoprojective_complete := pseudoprojectiveComplete
 
-end PaperIIProjectionExtData
+end PaperIIProjectionExtHypotheses
 
 end AlgebraicGeometry.EnriquesSurface.IsotropicCollection
 
@@ -561,18 +561,18 @@ variable {D₁ : Cohomology.FiniteCohomology k Y₁}
   {S₁ : D₁.LinearConnectingSystem} {S₂ : D₂.LinearConnectingSystem}
 variable (T₁ : IsotropicCollection (Y := Y₁) (C := C₁) D₁ S₁)
   (T₂ : IsotropicCollection (Y := Y₂) (C := C₂) D₂ S₂)
-variable {exceptional₁ : T₁.ExceptionalityData}
-  {exceptional₂ : T₂.ExceptionalityData}
-  {semiorthogonal₁ : T₁.SemiorthogonalityData}
-  {semiorthogonal₂ : T₂.SemiorthogonalityData}
+variable {exceptional₁ : T₁.ExceptionalityHypotheses}
+  {exceptional₂ : T₂.ExceptionalityHypotheses}
+  {semiorthogonal₁ : T₁.SemiorthogonalityHypotheses}
+  {semiorthogonal₂ : T₂.SemiorthogonalityHypotheses}
 variable {I : Type t} {J : Type t} [Fintype I] [Fintype J]
-variable (B₁ : T₁.PaperBlockData exceptional₁ semiorthogonal₁ I)
-  (B₂ : T₂.PaperBlockData exceptional₂ semiorthogonal₂ J)
+variable (B₁ : T₁.PaperBlockHypotheses exceptional₁ semiorthogonal₁ I)
+  (B₂ : T₂.PaperBlockHypotheses exceptional₂ semiorthogonal₂ J)
 variable {W W' : Type u} [Category W] [Category W']
 
 /-- A Fourier--Mukai-type equivalence between the residual categories of two
 Enriques block decompositions.  The block residuals are identified with the
-neutral residual components `residualComponent` by `PaperBlockData.residual_eq`. -/
+neutral residual components `residualComponent` by `PaperBlockHypotheses.residual_eq`. -/
 abbrev PaperResidualKernelEquivalence
     (corr : Correspondence (DerivedCat Y₁) (DerivedCat Y₂) W) :=
   ResidualKernelEquivalence B₁.blocks B₂.blocks corr
@@ -582,10 +582,10 @@ the exceptional blocks of two Enriques surfaces.  Its
 `ambientEquivalence` is the promoted equivalence of ambient derived
 categories, and its `objectIso` uses one common shift on every member of a
 block. -/
-abbrev PaperExceptionalBlockExtensionData
+abbrev PaperExceptionalBlockExtensionHypotheses
     (corr : Correspondence (DerivedCat Y₁) (DerivedCat Y₂) W)
     (corr' : Correspondence (DerivedCat Y₂) (DerivedCat Y₁) W')
     (R : T₁.PaperResidualKernelEquivalence T₂ B₁ B₂ corr) :=
-  ExceptionalBlockExtensionData B₁.blocks B₂.blocks corr corr' R
+  ExceptionalBlockExtensionHypotheses B₁.blocks B₂.blocks corr corr' R
 
 end AlgebraicGeometry.EnriquesSurface.IsotropicCollection

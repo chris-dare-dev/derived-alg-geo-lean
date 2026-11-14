@@ -13,6 +13,25 @@ an abelian category by a slope `μ₀ : WithTop ℝ`.  This file feeds it throug
 Happel–Reiten–Smalø machinery that `HeartAdapter.lean` and `HnTiltHeart.lean` already set up for
 the strict case, and describes the resulting heart.
 
+## Main definitions
+
+* `WeakStabilityFunctionOn.hnHeartTorsionPair` — the weak cutoff pair in the heart-torsion-pair
+  form Happel–Reiten–Smalø consumes.
+* `WeakStabilityFunctionOn.hnTilt` — the tilt of a weak stability function at a slope cutoff,
+  as a t-structure on the ambient category.
+
+## Main results
+
+* `WeakStabilityFunctionOn.hnHeartTorsionPair_tors`,
+  `WeakStabilityFunctionOn.hnHeartTorsionPair_free` — the two classes of the pair.
+* `WeakStabilityFunctionOn.hnTilt_heart_iff` — the tilted heart is the extensions of `T μ₀` by
+  `F μ₀ ⟦1⟧`.
+* `WeakStabilityFunctionOn.mem_hnTilt_heart_of_hnTors`,
+  `WeakStabilityFunctionOn.shift_mem_hnTilt_heart_of_hnFree` — a torsion object lies in the
+  tilted heart, and a torsion-free object does after one shift.
+
+## Implementation notes
+
 **Nothing here is new mathematics.**  Every declaration is one composition, exactly as in the
 strict `HeartAdapter.lean` / `HnTiltHeart.lean` pair.  The chain
 
@@ -20,30 +39,40 @@ strict `HeartAdapter.lean` / `HnTiltHeart.lean` pair.  The chain
 TorsionPair t.heart.FullSubcategory → HeartTorsionPair t → (tilt) TStructure C
 ```
 
-is generic in the torsion pair, so once the weak pair exists — which is what took the work, and
-what needed the charge-free subobject correspondence behind it — the tilt is immediate.
+is generic in the torsion pair, so given the weak pair — whose construction rests on the
+charge-free subobject correspondence — the tilt is immediate.
 
-## The one difference that matters
+### The one difference that matters
 
 The strict `hnTilt` cuts by a **phase** `β : ℝ`.  This one cuts by a **slope** in `WithTop ℝ`,
 and that is not cosmetic: on a surface a skyscraper has charge `0` and no phase at all, so no
 phase cutoff can place it, while every finite slope cutoff puts it in `T μ₀`
 (`WeakSlopeData.mem_hnTors_of_rank_zero`).  The tilted heart here therefore contains the objects
-that the strict construction cannot even speak about, which is the entire reason the weak lane
-exists.
+that the strict construction cannot even speak about, which is the entire reason for the weak
+construction.
 
 Both are at `abelianDatum` of the heart, so they are strictly parallel: the strict
 `StabilityFunction t.heart.FullSubcategory` is `StabilityFunctionOn (abelianDatum …)`, and this
 is `WeakStabilityFunctionOn` at the same datum.  Neither is at `heartDatum t`, whose classes live
 in the ambient `K₀ C`.
 
-## What this is still not
+### What this is not
 
 It is not Bridgeland's Lemma 6.2.  This says *what the tilted heart is*; Lemma 6.2 says that
 `Z(β,ω)` is a stability function **on** it, which is the four-case positivity argument and needs
 the real part as well as the imaginary one.  `StabilityCondition/Mukai/Slope.lean`
 supplies the imaginary half against the untilted classes; nothing here closes
 the gap.
+
+## References
+
+`WeakStabilityFunctionOn.hnTorsionPair` of `TorsionPair/WeakStabilityFunction.lean`,
+`Tilting.HeartTorsionPair.ofTorsionPair` of `TorsionPair/HeartAdapter.lean`, and
+`Tilting.HeartTorsionPair.tilt` of `TorsionPair/Heart.lean`.
+
+## Tags
+
+weak stability function, slope, torsion pair, HRS tilt, heart
 -/
 
 noncomputable section

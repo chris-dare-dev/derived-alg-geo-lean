@@ -265,8 +265,8 @@ def threads_offence(value: str | None) -> str | None:
 # command word that mentions `gates.sh` is still refused, which is the safe
 # direction for a check whose job is refusing things.
 READERS = {
-    "awk", "bat", "cat", "cut", "diff", "egrep", "fgrep", "file",
-    "grep", "head", "less", "ls", "md5sum", "more", "nl", "rg", "sed",
+    "awk", "bat", "cat", "cut", "diff", "echo", "egrep", "fgrep", "file",
+    "grep", "head", "less", "ls", "md5sum", "more", "nl", "printf", "rg", "sed",
     "sha256sum", "shellcheck", "sort", "stat", "tail", "uniq", "wc",
 }
 
@@ -275,10 +275,12 @@ READERS = {
 # the worst version of the thing this gate refuses, and `git rebase --exec`,
 # `git submodule foreach` and `git filter-branch` all execute too. An allow-list
 # of subcommands keeps the probe in .claude/skills/land-pr working without
-# opening that door.
+# opening that door. The index and history commands from `add` on take a path
+# as data -- staging, committing or deleting `scripts/gates.sh` runs nothing.
 GIT_READ_SUBCOMMANDS = {
     "blame", "cat-file", "diff", "grep", "log", "ls-files", "ls-tree",
     "rev-parse", "show", "status",
+    "add", "checkout", "commit", "mv", "reset", "restore", "rm", "stash",
 }
 
 # A leading `VAR=value` is an environment assignment, not the command.
@@ -354,24 +356,212 @@ def target_name(token: str) -> str:
     return token.lstrip("@+").split(":", 1)[0]
 
 
+# Programs that run their input as shell commands. A heredoc or here-string fed
+# to one of these is code, and `bash -c STRING` runs STRING; fed to anything
+# else, the same text is data.
+SHELLS = {"bash", "sh", "zsh", "dash", "ksh"}
+
+HEREDOC = re.compile(r"<<(-?)[ \t]*(['\"]?)([A-Za-z0-9_.-]+)\2")
+
+
+def _matching_paren(text: str, start: int) -> int:
+    """Index of the `)` closing the `(` at `start`, or -1. Quotes are skipped."""
+    depth, i, quote = 0, start, None
+    while i < len(text):
+        c = text[i]
+        if quote:
+            if c == "\\" and quote == '"':
+                i += 2
+                continue
+            if c == quote:
+                quote = None
+        elif c in "'\"":
+            quote = c
+        elif c == "(":
+            depth += 1
+        elif c == ")":
+            depth -= 1
+            if depth == 0:
+                return i
+        i += 1
+    return -1
+
+
+def _substitutions(text: str) -> list[str]:
+    """The commands inside `$(...)` and backticks in expanding text.
+
+    Double-quoted strings and unquoted heredoc bodies are data to the command
+    that receives them, but a command substitution inside them still runs.
+    """
+    found: list[str] = []
+    i = 0
+    while i < len(text):
+        if text.startswith("$(", i):
+            end = _matching_paren(text, i + 1)
+            if end < 0:
+                found.append(text[i + 2 :])
+                break
+            found.append(text[i + 2 : end])
+            i = end + 1
+        elif text[i] == "`":
+            end = text.find("`", i + 1)
+            found.append(text[i + 1 :] if end < 0 else text[i + 1 : end])
+            if end < 0:
+                break
+            i = end + 1
+        else:
+            i += 1
+    return found
+
+
+def split_commands(command: str) -> list[str] | None:
+    """The simple commands a shell would run for `command`, as raw strings.
+
+    Operators split only outside quotes: `grep -E 'a|b' file` is one command.
+    Command substitutions inside double quotes are returned as commands of
+    their own, because they run. A heredoc body is skipped when the command it
+    feeds is not a shell, and is split as commands when it is; an unquoted
+    delimiter also expands substitutions in the body. Returns None when the
+    quoting does not balance, so the caller can fall back to over-splitting.
+    """
+    out: list[str] = []
+    buf: list[str] = []
+    pending: list[tuple[str, bool, bool, str]] = []  # delimiter, strip tabs, quoted, owner
+    i, n, quote = 0, len(command), None
+
+    def flush() -> None:
+        raw = "".join(buf).strip()
+        if raw:
+            out.append(raw)
+        buf.clear()
+
+    while i < n:
+        c = command[i]
+        if quote == "'":
+            buf.append(c)
+            quote = None if c == "'" else quote
+            i += 1
+            continue
+        if c == "\\" and i + 1 < n:
+            buf.append(command[i : i + 2])
+            i += 2
+            continue
+        if quote == '"':
+            if c == '"':
+                quote = None
+            elif command.startswith("$(", i) or c == "`":
+                close = _matching_paren(command, i + 1) if c == "$" else command.find("`", i + 1)
+                if close < 0:
+                    return None
+                inner = command[i + 2 : close] if c == "$" else command[i + 1 : close]
+                out.extend(split_commands(inner) or [inner])
+                buf.append(command[i : close + 1])
+                i = close + 1
+                continue
+            buf.append(c)
+            i += 1
+            continue
+        if c in "'\"":
+            quote = c
+            buf.append(c)
+            i += 1
+            continue
+        if command.startswith("<<", i) and not command.startswith("<<<", i):
+            if m := HEREDOC.match(command, i):
+                owner = "".join(buf)
+                pending.append((m.group(3), m.group(1) == "-", bool(m.group(2)), owner))
+                buf.append(m.group(0))
+                i = m.end()
+                continue
+        if c == "\n" and pending:
+            flush()
+            i += 1
+            for delim, strip_tabs, quoted, owner in pending:
+                body: list[str] = []
+                while i < n:
+                    end = command.find("\n", i)
+                    line = command[i:] if end < 0 else command[i:end]
+                    i = n if end < 0 else end + 1
+                    if (line.lstrip("\t") if strip_tabs else line) == delim:
+                        break
+                    body.append(line)
+                text = "\n".join(body)
+                try:
+                    word = command_word(shlex.split(owner))
+                except ValueError:
+                    word = None
+                if word is not None and os.path.basename(word) in SHELLS:
+                    out.extend(split_commands(text) or [text])
+                elif not quoted:
+                    for inner in _substitutions(text):
+                        out.extend(split_commands(inner) or [inner])
+            pending.clear()
+            continue
+        if command.startswith(("&&", "||"), i):
+            flush()
+            i += 2
+            continue
+        if c in ";|&\n()":
+            flush()
+            i += 1
+            continue
+        if c == "`":
+            close = command.find("`", i + 1)
+            if close < 0:
+                return None
+            flush()
+            out.extend(split_commands(command[i + 1 : close]) or [command[i + 1 : close]])
+            i = close + 1
+            continue
+        buf.append(c)
+        i += 1
+    if quote:
+        return None
+    flush()
+    return out
+
+
 def segments(command: str) -> list[list[str]]:
     """Split a shell command into simple commands, tokenised.
 
-    `shlex` is used per segment rather than over the whole string so that an
-    unbalanced quote in one segment cannot silently swallow the rest.
+    Quote-aware first (`split_commands`). Only when the quoting does not
+    balance does it fall back to splitting at every operator character,
+    which over-approximates and is the safe direction for a check that
+    refuses things.
     """
+    raws = split_commands(command)
+    if raws is None:
+        raws = [r.strip() for r in SEPARATORS.split(command) if r.strip()]
     out: list[list[str]] = []
-    for raw in SEPARATORS.split(command):
-        raw = raw.strip()
-        if not raw:
-            continue
+    for raw in raws:
         try:
             out.append(shlex.split(raw))
         except ValueError:
-            # Unparseable: fall back to whitespace, which over-approximates and
-            # is the safe direction for a check that refuses things.
             out.append(raw.split())
     return out
+
+
+def nested_commands(tokens: list[str]) -> list[str]:
+    """Strings this simple command hands to a shell to run.
+
+    `bash -c STRING`, `eval ARGS` and a here-string fed to a shell all run
+    their text as commands, so it is checked as commands rather than as an
+    argument that merely mentions a file.
+    """
+    word = command_word(tokens)
+    if word is None:
+        return []
+    base = os.path.basename(word)
+    rest = tokens[tokens.index(word) + 1 :]
+    if base == "eval":
+        return [" ".join(rest)]
+    if base not in SHELLS:
+        return []
+    nested = []
+    for flag, arg in zip(rest, rest[1:]):
+        if flag == "<<<" or (flag.startswith("-") and not flag.startswith("--") and "c" in flag):
+            nested.append(arg)
+    return nested
 
 
 def lake_interpreter_offence(token: str) -> str | None:
@@ -460,11 +650,16 @@ def offence(tokens: list[str]) -> str | None:
     return None
 
 
-def check(command: str) -> str | None:
+def check(command: str, depth: int = 0) -> str | None:
     for tokens in segments(command):
         reason = offence(tokens)
         if reason is not None:
             return reason
+        if depth < 8:
+            for nested in nested_commands(tokens):
+                reason = check(nested, depth + 1)
+                if reason is not None:
+                    return reason
     return None
 
 

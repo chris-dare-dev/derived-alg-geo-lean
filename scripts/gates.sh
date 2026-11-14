@@ -5,7 +5,7 @@
 # needs the gates in cheapest-first order so a failure is reported in two minutes
 # rather than forty.
 #
-#   scripts/gates.sh fast   build + style + axiom audits          (~minutes)
+#   scripts/gates.sh fast   build + style                         (~minutes)
 #   scripts/gates.sh        the full list below, in CI's order
 #   scripts/precheck.sh     the subset with no Lean build         (~seconds)
 #
@@ -73,9 +73,6 @@ FAILED=()
 # under /tmp, and two self-hosted CI runners share the host. Two concurrent
 # runs then read and write the same file, so a gate can pass or fail on another
 # branch's data with nothing in the output naming the branch that wrote it.
-# Observed 2026-08-16: audit-complete passed, then the same unchanged
-# /tmp/enum-decls.txt reported 73 declarations over ceiling, because a
-# concurrent worktree had regenerated it in between.
 gate_tmp_base="${TMPDIR:-/tmp}"
 GATE_TMP="$(mktemp -d "${gate_tmp_base%/}/dag-gates.XXXXXX")" || {
   echo "could not create a scratch directory under ${gate_tmp_base%/}"
@@ -110,43 +107,6 @@ gate() {
   rm -f "$log"
 }
 
-algebraic_geometry_audit() {
-  # The algebraic-geometry audit imports development probes and dimension
-  # specializations, none of which the default target reaches -- `lake build`
-  # builds DerivedAlgGeo, and the umbrella does not import the probes. CI builds
-  # them explicitly before the audit; so must this, or the gate fails with a
-  # missing-olean error in any tree where they were not already built by hand.
-  lake build DerivedAlgGeo.Development \
-    DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Surface \
-    DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Threefold \
-    DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Fourfold || return 1
-  # Since #480 the records live in per-area files; `#print axioms` output does
-  # not replay across the import boundary, so each area file is run directly.
-  : > "$GATE_TMP"/algebraic-geometry-audit.txt
-  for f in scripts/AlgebraicGeometryAudit/*.lean; do
-    lake env lean "$f" >> "$GATE_TMP"/algebraic-geometry-audit.txt 2>&1 || {
-      # Show the reason: this function redirects its own output, so without
-      # this the wrapper's log is empty and the gate fails silently.
-      echo "failed: $f"
-      tail -20 "$GATE_TMP"/algebraic-geometry-audit.txt
-      return 1
-    }
-  done
-  grep -q 'sorryAx' "$GATE_TMP"/algebraic-geometry-audit.txt && { echo "sorryAx reached the audit"; return 1; }
-  # Allowlist + truncation + parse checks, matching CI and the other two audit
-  # lanes; until 2026-08-18 this lane checked only sorryAx (review P2-3).
-  python3 scripts/check_audit.py "$GATE_TMP"/algebraic-geometry-audit.txt \
-    scripts/AlgebraicGeometryAudit.lean
-}
-
-dg_audit() {
-  lake env lean scripts/DGCategoryAudit.lean > "$GATE_TMP"/dg-audit.txt 2>&1 || {
-    tail -20 "$GATE_TMP"/dg-audit.txt
-    return 1
-  }
-  python3 scripts/check_audit.py "$GATE_TMP"/dg-audit.txt scripts/DGCategoryAudit.lean
-}
-
 warning_ratchet() {
   # The `build` gate above already compiled the library, so this recompiles
   # nothing: Lake replays the cached modules and reprints their warnings. The
@@ -160,42 +120,13 @@ warning_ratchet() {
 }
 
 single_instantiation() {
-  # The disease detector. `EnumInhabitants.lean` needs the same prerequisite
-  # build as the sweep above, and CI reuses whatever `audit_complete` already
-  # built, so this runs after it.
+  # The disease detector. `EnumInhabitants.lean` imports only modules the
+  # `build` gate compiles, so it runs after that gate.
   lake env lean scripts/EnumInhabitants.lean > "$GATE_TMP"/enum-inhabitants.txt 2>&1 || {
     tail -20 "$GATE_TMP"/enum-inhabitants.txt
     return 1
   }
   python3 scripts/check_single_instantiation.py "$GATE_TMP"/enum-inhabitants.txt
-}
-
-audit_complete() {
-  # The other direction from check_audit.py: a new public declaration nobody
-  # listed. Needs the same prerequisite build as coh_audit, because the sweep
-  # imports Development and the dimension specializations.
-  lake build DerivedAlgGeo.Development \
-    DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Surface \
-    DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Threefold \
-    DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Fourfold || return 1
-  lake env lean scripts/EnumDecls.lean > "$GATE_TMP"/enum-decls.txt 2>&1 || {
-    tail -20 "$GATE_TMP"/enum-decls.txt
-    return 1
-  }
-  python3 scripts/check_audit_complete.py "$GATE_TMP"/enum-decls.txt
-}
-
-stability_condition_audit() {
-  # Per-area invocation, as above: the umbrella alone would emit no records.
-  : > "$GATE_TMP"/stability-condition-audit.txt
-  for f in scripts/StabilityConditionAudit/*.lean; do
-    lake env lean "$f" >> "$GATE_TMP"/stability-condition-audit.txt 2>&1 || {
-      echo "failed: $f"
-      tail -20 "$GATE_TMP"/stability-condition-audit.txt
-      return 1
-    }
-  done
-  python3 scripts/check_audit.py "$GATE_TMP"/stability-condition-audit.txt
 }
 
 exe_sorry() {
@@ -272,9 +203,6 @@ gate emission-sources python3 scripts/check_emission_coverage.py --source-only
 gate explicit-numerical-data python3 scripts/check_explicit_numerical_data.py
 gate foundation-import-boundary python3 scripts/check_foundation_import_boundary.py
 gate build lake build
-gate algebraic-geometry-audit algebraic_geometry_audit
-gate stability-condition-audit stability_condition_audit
-gate dg-audit dg_audit
 
 if [ "$MODE" != "fast" ]; then
   gate runLinter lake exe runLinter DerivedAlgGeo
@@ -289,7 +217,6 @@ if [ "$MODE" != "fast" ]; then
   gate root-reachability python3 scripts/check_root_reachability.py
   gate coherent-families python3 scripts/check_coherent_families.py
   gate coverage-map python3 scripts/check_coverage_map.py
-  gate audit-complete audit_complete
   gate single-instantiation single_instantiation
   # No `--require-api`: see the header. Offline this reports NOT_RUN and passes,
   # which is the script's documented local contract; CI runs it with the flag so

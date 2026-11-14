@@ -65,8 +65,9 @@ namespace EvaluationData
 variable {C : Type u} [DGCategory.{v} C] {E : C} (V : EvaluationData E)
 
 /-- Cone preservation for the evaluation functor transports across a change of
-evaluation data.  This structured compatibility theorem remains useful even
-though every dg functor now supplies cone preservation directly. -/
+evaluation data.  Every dg functor also preserves chosen cones outright, by
+`DGFunctor.preservesChosenCones`; this records the transport along
+`EvaluationData.compareIso`. -/
 noncomputable def preservesChosenConesOfCompare (W : EvaluationData E)
     (hV : DGFunctor.PreservesChosenCones V.functor) :
     DGFunctor.PreservesChosenCones W.functor :=
@@ -224,14 +225,16 @@ lemma compareIso_trans {W X : EvaluationData E}
 
 /-- **The object twist preserves shifts.**
 
-Kept as the object-twist accessor for the unconditional generic capability. -/
+The object-twist accessor for the generic `DGFunctor.preservesShifts`, which
+holds for every dg functor. -/
 noncomputable def preservesShifts : DGFunctor.PreservesShifts K.twist :=
   DGFunctor.preservesShifts _
 
 /-- **The structured 3-by-3 cone-preservation witness for the object twist.**
 
-The endpoint argument is now redundant as a hypothesis, but retaining this
-constructor records how the cone-functor witness is assembled. -/
+The endpoint argument is redundant as a hypothesis, since every dg functor
+preserves chosen cones; this constructor records how the cone-functor witness
+is assembled. -/
 noncomputable def preservesChosenCones
     (hV : DGFunctor.PreservesChosenCones V.functor) :
     DGFunctor.PreservesChosenCones K.twist :=
