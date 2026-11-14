@@ -23,7 +23,31 @@ So μ-slope stability is not a parallel theory: it is the repository's own
 `StabilityFunction`, and the phase, semistability, and Harder–Narasimhan
 machinery already built on that interface applies to it unchanged.
 
-## The order bridge
+## Main definitions
+
+* `CategoryTheory.Triangulated.SlopeData`: rank and degree homomorphisms out of
+  `K₀Ab A`, with nonnegative rank and positive degree on nonzero objects of rank
+  zero.
+* `CategoryTheory.Triangulated.SlopeData.charge`: the charge `-degree + i * rank`.
+* `CategoryTheory.Triangulated.SlopeData.slope`: the slope `degree / rank`.
+* `CategoryTheory.Triangulated.SlopeData.toStabilityFunction`: the charge as a
+  `StabilityFunction`.
+* `CategoryTheory.Triangulated.SlopeData.toWeakSlopeData`: the forgetful map to
+  `WeakSlopeData`.
+
+## Main results
+
+* `CategoryTheory.Triangulated.SlopeData.charge_mem_semiClosedUpperHalfPlane`:
+  a nonzero object has its charge in the semi-closed upper half-plane.
+* `CategoryTheory.Triangulated.SlopeData.rank_additive` and
+  `CategoryTheory.Triangulated.SlopeData.degree_additive`: rank and degree are
+  additive on short exact sequences.
+* `CategoryTheory.Triangulated.SlopeData.phase_le_iff_slope_le`: on objects of
+  positive rank the phase order is the slope order.
+
+## Implementation notes
+
+### The order bridge
 
 `phase_le_iff_slope_le`: on objects of positive rank the phase order **is** the
 slope order. The computation is one line through `phaseCross`,
@@ -36,36 +60,45 @@ which is nonnegative exactly when `degree E / rank E ≤ degree F / rank F`. Tha
 is what lets a torsion pair cut by a slope be read as one cut by a phase, which
 is the form the tilting machinery consumes.
 
-## What is data and what is proved
+### What is data and what is proved
 
 `rank_nonneg` and `degree_pos_of_rank_zero` are **fields**: they are the
 geometric input, not provable here, since `A` is an arbitrary abelian category.
 
-**They are the CURVE case, not the surface case, and an earlier version of this
-docstring said surface.** On a curve a nonzero torsion sheaf has degree equal to
-its length, which is positive. On a **surface** it is false: a dimension-zero
-sheaf — a skyscraper — has `c₁ = 0`, hence `degree = c₁ · ω = 0`, so
-`degree_pos_of_rank_zero` fails on exactly those objects.
+**They are the curve case, not the surface case.** On a curve a nonzero torsion
+sheaf has degree equal to its length, which is positive. On a **surface** it is
+false: a dimension-zero sheaf — a skyscraper — has `c₁ = 0`, hence
+`degree = c₁ · ω = 0`, so `degree_pos_of_rank_zero` fails on exactly those
+objects.
 
 The consequence is not cosmetic. μ-slope on a surface is a **weak** stability
 function, not a stability function: a skyscraper has zero rank and zero degree, so
 its charge is `0`, which `semiClosedUpperHalfPlane` excludes. That is why the weak
-theory exists, and it is why a surface lane must not instantiate `SlopeData`.
+theory exists, and it is why slope data on a surface must not instantiate
+`SlopeData`.
 
 The slope itself is `degree / rank`, which is junk at rank zero where the
 classical slope is `+∞`; every statement about it carries a positive-rank
 hypothesis, and the torsion sheaves are handled by the charge rather than by the
 slope.
 
-## The surface case is the weakening, not a parallel theory
+### The surface case is the weakening, not a parallel theory
 
-`WeakSlopeData` (in `WeakSlope.lean`) replaces `degree_pos_of_rank_zero` by
+`WeakSlopeData` (in `Weak/Slope.lean`) replaces `degree_pos_of_rank_zero` by
 `degree_nonneg_of_rank_zero`, and `toWeakSlopeData` below is the forgetful map
 `0 < d → 0 ≤ d`. Everything in this file that carries a positive-rank hypothesis
 — `phaseCross_charge`, `charge_ne_zero_of_rank_pos`, `arg_pos_of_rank_pos` and
 the order bridge `phase_le_iff_slope_le` — is proved once on `WeakSlopeData` and
-inherited here, so the surface lane gets the order bridge without a second copy
-of its proof.
+inherited here, so slope data on a surface gets the order bridge without a
+second copy of its proof.
+
+## References
+
+The library's `StabilityFunction`, `K₀Ab`, `WeakSlopeData` and `phaseCross`.
+
+## Tags
+
+slope stability, μ-stability, stability function, rank, degree, phase
 -/
 
 noncomputable section
@@ -106,11 +139,11 @@ abbrev rank (E : A) : ℤ := D.rankHom (K₀Ab.of E)
 /-- The degree of an object. -/
 abbrev degree (E : A) : ℝ := D.degreeHom (K₀Ab.of E)
 
-/-! ### The six formal properties, now theorems
+/-! ### The six formal properties
 
-`rank_zero`, `rank_iso`, `rank_additive` and their degree counterparts were fields.
-They are exactly `K₀Ab.of_isZero`, `of_iso` and `of_shortExact` composed with a hom,
-so they are proved here and the names and argument shapes are unchanged. -/
+`rank_zero`, `rank_iso`, `rank_additive` and their degree counterparts are exactly
+`K₀Ab.of_isZero`, `of_iso` and `of_shortExact` composed with a hom, so they are
+theorems rather than fields. -/
 
 theorem rank_zero (E : A) (hE : IsZero E) : D.rank E = 0 := by
   rw [rank, K₀Ab.of_isZero hE, map_zero]
@@ -172,10 +205,10 @@ theorem charge_mem_semiClosedUpperHalfPlane {E : A} (hE : ¬IsZero E) :
 
 /-- **Slope stability is a stability function.**
 
-`map_zero` and `map_iso` are gone: they were consequences of additivity all
-along, and `K₀Ab` proves them once.  Only the additivity of `charge` on short
-exact sequences is supplied here, and it is the same two-line computation the
-`additive` field used to carry. -/
+Vanishing on zero objects and invariance under isomorphism are consequences of
+additivity, and `K₀Ab` proves them once.  Only the additivity of `charge` on short
+exact sequences is supplied here, a two-line computation from `rank_additive` and
+`degree_additive`. -/
 noncomputable def toStabilityFunction : StabilityFunction A where
   Z := K₀Ab.liftOf D.charge (fun S hS ↦ by
     apply Complex.ext

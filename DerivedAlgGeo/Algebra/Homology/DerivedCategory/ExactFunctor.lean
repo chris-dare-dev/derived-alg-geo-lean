@@ -39,10 +39,10 @@ sheaf, or other geometric input occurs here.
 
 ## Implementation notes
 
-Mathlib v4.35 added `Functor.mapDerivedCategoryIdIso` and a `Functor.mapDerivedCategoryCompIso`
-for the composite `F ⋙ G` itself. The identity isomorphism formerly defined here had the same
-statement and was removed in favour of Mathlib's; the composite isomorphism here takes an
-arbitrary factorization `F ⋙ G ≅ H` and is named `Functor.mapDerivedCategoryCompIsoOfIso`.
+The identity isomorphism is Mathlib's `Functor.mapDerivedCategoryIdIso`, and Mathlib's
+`Functor.mapDerivedCategoryCompIso` covers the composite `F ⋙ G` itself. The composite
+isomorphism here takes an arbitrary factorization `F ⋙ G ≅ H` and is named
+`Functor.mapDerivedCategoryCompIsoOfIso`.
 
 ## References
 
@@ -186,16 +186,15 @@ noncomputable def NatIso.mapDerivedCategory {F G : A ⥤ B} [F.Additive]
     (Functor.isoWhiskerRight (NatIso.mapHomologicalComplex e (ComplexShape.up ℤ))
       DerivedCategory.Q)
 
--- `Functor.mapDerivedCategoryIdIso`, formerly defined here, is upstream in Mathlib since v4.35
--- (`Mathlib/Algebra/Homology/DerivedCategory/ExactFunctor.lean`) with the same statement.
+-- The identity isomorphism is Mathlib's `Functor.mapDerivedCategoryIdIso`
+-- (`Mathlib/Algebra/Homology/DerivedCategory/ExactFunctor.lean`).
 
 /-- A factorization `F ⋙ G ≅ H` of exact functors induces the factorization of
 the derived functors, in the shape of `Functor.mapHomologicalComplexCompIso`:
 the composite is given as a third functor `H` so that a caller need not
 elaborate `(F ⋙ G).mapDerivedCategory`, whose exactness instances
 `comp_preservesFiniteLimits` does not supply by search. Mathlib's
-`Functor.mapDerivedCategoryCompIso` (v4.35) is the special case `H = F ⋙ G`; this
-declaration carried that name until the toolchain bump. -/
+`Functor.mapDerivedCategoryCompIso` is the special case `H = F ⋙ G`. -/
 noncomputable def Functor.mapDerivedCategoryCompIsoOfIso {F : A ⥤ B} {G : B ⥤ C} {H : A ⥤ C}
     (e : F ⋙ G ≅ H)
     [F.Additive] [PreservesFiniteLimits F] [PreservesFiniteColimits F]

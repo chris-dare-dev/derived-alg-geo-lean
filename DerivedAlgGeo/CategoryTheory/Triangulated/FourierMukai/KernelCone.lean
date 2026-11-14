@@ -178,8 +178,8 @@ theorem coneTriangleInSource_obj_obj₃
       (corr.transform (e.equiv.functor.obj A.cone)).obj E :=
   rfl
 
-/-- Evaluation of the source-natural transform triangle is the previously
-constructed pointwise image of the kernel cone. -/
+/-- Evaluation of the source-natural transform triangle is the pointwise image
+of the kernel cone, `coneTriangleFunctor`. -/
 theorem coneTriangleInSource_obj
     (A : DGCategory.ConePresentation e.dgCat) (E : X) :
     (h.coneTriangleInSource e A).obj E =

@@ -15,14 +15,7 @@ Fano polarization `Δ` an isotropic 10-sequence of numerical classes `fᵢ` sati
 `3δ = f₁ + ⋯ + f₁₀`.
 
 This file records line-bundle lifts of those classes against a supplied surface intersection
-context.  The repository has no geometric `Num(Y)` quotient, nef predicate, or ampleness API.
-Consequently the numerical equality is supplied in its intrinsic intersection-theoretic form:
-`3δ` and `∑ fᵢ` have equal intersection with every Picard class.  The field does not claim that
-the chosen Picard lift is nef or ample, and no collection is constructed on a concrete surface.
-
-The two arithmetic consequences used by the Torelli lane are proved rather than stored:
-`Δ · Fᵢ = 3` and `Δ² = 10`.  In particular, the stale value `Δ · Fᵢ = 1` is not compatible
-with equation (3.2): the sum of the other nine isotropic classes pairs to `9`.
+context.
 
 ## Main definitions
 
@@ -38,6 +31,26 @@ with equation (3.2): the sum of the other nine isotropic classes pairs to `9`.
 * `IsotropicCollection.bundleClass_ne` -- distinct indices give distinct Picard classes.
 * `IsotropicCollection.fano_intersection_bundle` -- `Δ · Fᵢ = 3`.
 * `IsotropicCollection.fano_self_intersection` -- `Δ² = 10`.
+
+## Implementation notes
+
+The repository has no geometric `Num(Y)` quotient, nef predicate, or ampleness API.
+Consequently the numerical equality is supplied in its intrinsic intersection-theoretic form:
+`3δ` and `∑ fᵢ` have equal intersection with every Picard class.  The field does not claim that
+the chosen Picard lift is nef or ample, and no collection is constructed on a concrete surface.
+
+The two arithmetic consequences used by the derived Torelli argument are proved rather than
+stored: `Δ · Fᵢ = 3` and `Δ² = 10`.  In particular, the value `Δ · Fᵢ = 1` is not compatible
+with equation (3.2): the sum of the other nine isotropic classes pairs to `9`.
+
+## References
+
+* Li, Nuer, Stellari, Zhao, *A refined Derived Torelli Theorem for Enriques surfaces*,
+  arXiv:1912.04332v2, Definition 3.2 and equation (3.2).
+
+## Tags
+
+Enriques surface, isotropic sequence, Fano polarization, Picard group, intersection number
 -/
 
 open CategoryTheory
@@ -60,7 +73,7 @@ variable {D : Cohomology.FiniteCohomology k Y} {S : D.LinearConnectingSystem}
 /-- Supplied geometric data for an isotropic 10-collection of line bundles.
 
 The normalization is equation (3.2) of arXiv:1912.04332v2, expressed through all intersection
-probes because the repository does not yet construct `Num(Y)`.  `fano` is only a Picard lift of
+probes because the repository does not construct `Num(Y)`.  `fano` is only a Picard lift of
 the numerical Fano class: nefness and ampleness are deliberately not asserted. -/
 structure IsotropicCollection
     {C : SmoothProperVariety.CanonicalSheafData k Y 2}

@@ -12,25 +12,43 @@ The numerical Grothendieck group is the quotient by the radical of the Euler pai
 file makes that construction explicit from `NumericalVarietyData.chi₂` and records the precise
 finiteness input needed before the quotient is a lattice.
 
+## Main definitions
+
+* `NumericalVarietyData.eulerPairing` is the Euler pairing as a bi-additive map.
+* `NumericalVarietyData.leftRadical` and `NumericalVarietyData.rightRadical` are the two
+  Euler radicals.
+* `NumericalVarietyData.NumericalQuotient` is the quotient by the radical.
+* `NumericalVarietyData.numericalPairing` is the descended pairing.
+
+## Main results
+
+* `NumericalVarietyData.leftRadical_eq_rightRadical` identifies the two radicals when the Euler
+  form is symmetric.
+* `NumericalVarietyData.numericalPairing_left_nondegenerate`,
+  `NumericalVarietyData.numericalPairing_right_nondegenerate` and
+  `NumericalVarietyData.numericalPairing_ker_eq_bot`: the descended pairing is nondegenerate.
+* `NumericalQuotient` is finitely generated over `ℤ` whenever `N` is
+  (`instFiniteNumericalQuotient`, from `Module.Finite.quotient`), and free
+  whenever it is also torsion-free, by Mathlib's instance
+  `Module.free_of_finite_type_torsion_free'`.
+* `K3.numericalPairing_mk_eq_neg_mukaiPairing` fixes the K3 sign convention.
+
+## Implementation notes
+
 The Euler pairing supplied by `NumericalVarietyData` is `ℚ`-valued.  Consequently the descended
 pairing below is also `ℚ`-valued; no integrality statement is silently assumed.  The integral
 object is its underlying finite free `ℤ`-module.
 
-## Main results
+The lattice structure is Mathlib's `[Module.Finite ℤ _] [Module.Free ℤ _]`; the repository
+carries no separate class for it.
 
-* `NumericalVarietyData.leftRadical` and `NumericalVarietyData.rightRadical` are the two
-  Euler radicals.
-* `NumericalVarietyData.leftRadical_eq_rightRadical` identifies them when the Euler form
-  is symmetric.
-* `NumericalVarietyData.NumericalQuotient` is the quotient by the radical.
-* `NumericalVarietyData.numericalPairing` is the descended, nondegenerate pairing.
-* `NumericalQuotient` is finitely generated over `ℤ` whenever `N` is
-  (`instFiniteNumericalQuotient`, from `Module.Finite.quotient`), and free
-  whenever it is also torsion-free, by Mathlib's instance
-  `Module.free_of_finite_type_torsion_free'`. The lattice structure is
-  therefore Mathlib's `[Module.Finite ℤ _] [Module.Free ℤ _]`; the repository
-  no longer carries a class for it.
-* `K3.numericalPairing_mk_eq_neg_mukaiPairing` fixes the K3 sign convention.
+## References
+
+Mathlib's `Module.Finite.quotient` and `Module.free_of_finite_type_torsion_free'`.
+
+## Tags
+
+numerical Grothendieck group, Euler pairing, radical, lattice, K3 surface
 -/
 
 universe u v w

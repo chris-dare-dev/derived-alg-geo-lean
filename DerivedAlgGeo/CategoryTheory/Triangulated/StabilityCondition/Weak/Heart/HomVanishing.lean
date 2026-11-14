@@ -263,8 +263,8 @@ theorem ambientPhasePredicate_hom_zero
       simpa [g] using hg
     exact (shiftFunctor C (-n₂ : ℤ)).map_injective (by simpa using hshift)
 
-/-- Once ambient HN existence is supplied, Hom vanishing no longer needs to
-be an independent reverse-slicing premise. -/
+/-- Given ambient HN existence, Hom vanishing is not an independent
+reverse-slicing premise: `ambientPhasePredicate_hom_zero` proves it. -/
 theorem reverseSlicingObligationsOfHN
     (hHN : ∀ E : C, Nonempty (HNFiltration C W.ambientPhasePredicate E)) :
     W.ReverseSlicingObligations where

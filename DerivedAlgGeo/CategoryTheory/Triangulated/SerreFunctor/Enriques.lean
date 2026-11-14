@@ -35,18 +35,18 @@ variable (k : Type w) [Field k] (C : Type u) [Category.{v} C]
 
 /-- An Enriques-category structure of half-integral dimension
 `twiceDimension / 2`. -/
-structure EnriquesCategoryData (twiceDimension : ℤ)
+structure EnriquesCategoryHypotheses (twiceDimension : ℤ)
     extends SerreCategoryData k C where
   /-- The square of the Serre functor is the indicated shift. -/
   squareShift : Nonempty (serre.S ⋙ serre.S ≅ shiftFunctor C twiceDimension)
 
 /-- The paper's `2`-Enriques categories, for which `S² ≅ [4]`. -/
-abbrev TwoEnriquesCategoryData := EnriquesCategoryData k C 4
+abbrev TwoEnriquesCategoryHypotheses := EnriquesCategoryHypotheses k C 4
 
-namespace EnriquesCategoryData
+namespace EnriquesCategoryHypotheses
 
 variable {k C} {twiceDimension : ℤ}
-  (A : EnriquesCategoryData k C twiceDimension)
+  (A : EnriquesCategoryHypotheses k C twiceDimension)
 
 /-- The half-integral Enriques dimension, retained as a readable invariant. -/
 def dimension : ℚ := (twiceDimension : ℚ) / 2
@@ -66,7 +66,7 @@ inside a consumer without making equivalence a global instance. -/
 theorem hasSerreEquivalence : A.serre.S.IsEquivalence :=
   A.serreIsEquivalence
 
-end EnriquesCategoryData
+end EnriquesCategoryHypotheses
 
 variable {k C}
 

@@ -15,6 +15,10 @@ terminal object. On a prime spectrum, the separate lemma
 `PrimeSpectrum.coversTop_basicOpen_of_span_eq_top` translates
 the algebraic criterion that a family generates the unit ideal.
 
+## Main definitions
+
+This file introduces no carrier, class, or instance.
+
 ## Main results
 
 * `TopCat.Opens.grothendieckTopology_coversTop` — a family of opens with `⨆ i, U i = ⊤` covers
@@ -23,17 +27,26 @@ the algebraic criterion that a family generates the unit ideal.
   `RingTheory/Spectrum/Prime/CoversTop.lean`, a unit-ideal generating family gives a cover of the
   prime spectrum by basic opens.
 
-## Why this is its own file
+## Implementation notes
 
-`TopCat.Opens.grothendieckTopology_coversTop` previously lived in
-`DerivedAlgGeo/AlgebraicGeometry/Modules/Coherent/Descent/Locality.lean`. It is a statement about
-topological spaces with no reference to coherence, sheaves of modules, or schemes, and its position
-there made it unreachable from the lower-level topology and algebraic-geometry infrastructure
-without creating an import cycle.
+### Why this is its own file
+
+`TopCat.Opens.grothendieckTopology_coversTop` is a statement about topological spaces with no
+reference to coherence, sheaves of modules, or schemes. It lives with the open-set site so that
+the lower-level topology and algebraic-geometry infrastructure can reach it without an import
+cycle, which a home beside the coherent-sheaf descent results would create.
 
 The general topological bridge stays independent of schemes. Its prime-spectrum specialization
 lives with `PrimeSpectrum.basicOpen`, under `RingTheory/Spectrum/Prime/`, and assumes only a
 commutative semiring; it is not part of the affine module comparison.
+
+## References
+
+Mathlib's `CategoryTheory.GrothendieckTopology.CoversTop` and `Opens.grothendieckTopology`.
+
+## Tags
+
+Grothendieck topology, open cover, terminal object, site of opens
 -/
 
 universe u v

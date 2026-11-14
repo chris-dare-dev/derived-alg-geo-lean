@@ -14,15 +14,37 @@ finitely generated module is a quotient of one. The first statement is projectiv
 modules transported along the forgetful functor, which preserves epimorphisms because it
 preserves finite colimits; the second is `Module.Finite.exists_fin'` read in the category.
 
-Neither statement needs `R` noetherian, and this file no longer assumes it. Mathlib's
+These are the "enough acyclic generators" inputs for coherent sheaves on an affine
+noetherian scheme, through `Coh.affineEquivalence`.
+
+## Main definitions
+
+This file introduces no carrier, class, or instance.
+
+## Main results
+
+* `FGModuleCat.exists_finFree_epi`: every finitely generated module is a quotient of a
+  free module of finite rank.
+* `FGModuleCat.projective_of_finFree`: free modules of finite rank are projective in
+  `FGModuleCat R`.
+
+## Implementation notes
+
+Neither statement needs `R` noetherian, and this file does not assume it. Mathlib's
 `PreservesFiniteColimits (forget₂ (FGModuleCat k) (ModuleCat k))` holds over any ring,
 because a finite colimit of finitely generated modules is a quotient of a finite coproduct.
 Noetherian hypotheses enter `FGModuleCat` for finite *limits*, where a kernel of finitely
-generated modules need not be finitely generated. The consumers below are noetherian for
-their own reasons, not for this one.
+generated modules need not be finitely generated. The consumers of these lemmas are
+noetherian for their own reasons, not for this one.
 
-These are the "enough acyclic generators" inputs for coherent sheaves on an affine
-noetherian scheme, through `Coh.affineEquivalence`.
+## References
+
+Mathlib's `Module.Finite.exists_fin'`, `ModuleCat.projective_of_free`, and the
+`PreservesFiniteColimits` instance for `forget₂ (FGModuleCat R) (ModuleCat R)`.
+
+## Tags
+
+finitely generated module, free module, projective object
 -/
 
 universe u

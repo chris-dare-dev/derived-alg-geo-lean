@@ -134,9 +134,9 @@ end ProjectiveSpace
 `k`, compatible with the two structure morphisms.
 
 The variable set is data rather than a natural number because the ambient projective space is
-`Proj` of a polynomial ring on an index *type*, which is how the Proj lane in this repository
-states everything else. `Finite ι` is what makes the ambient space proper, and it is an instance
-field so that the properness instance below fires without an explicit argument. -/
+`Proj` of a polynomial ring on an index *type*, which is how this repository's construction of
+`Proj` states everything else. `Finite ι` is what makes the ambient space proper, and it is an
+instance field so that the properness instance below fires without an explicit argument. -/
 structure ProjectivePresentation (k : Type u) [Field k] (X : Scheme.{u})
     [X.Over (Spec (CommRingCat.of k))] where
   /-- The homogeneous coordinates of the ambient projective space. -/

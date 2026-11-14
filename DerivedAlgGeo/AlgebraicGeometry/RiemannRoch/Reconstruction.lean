@@ -60,7 +60,7 @@ variable {O : Coh X}
 /-- A compatible choice of reconstruction data for every coherent sheaf in dimension `d`. -/
 structure ReconstructionSystem where
   /-- Reconstruction data for every coherent sheaf. -/
-  reconstruction : ∀ F : Coh X, P.ReconstructionData F
+  reconstruction : ∀ F : Coh X, P.ReconstructionHypotheses F
   /-- Rank is invariant under coherent-sheaf isomorphism. -/
   rank_iso : ∀ {F G : Coh X} (_e : F ≅ G),
     (reconstruction F).rank = (reconstruction G).rank
@@ -88,7 +88,7 @@ noncomputable def rankInvariant (R : ReconstructionSystem (P := P)) :
 /-- The reconstructed `i`-th Chern-character component as an additive coherent-sheaf
 invariant valued in the certified graded piece. -/
 noncomputable def chernCharacterInvariant (R : ReconstructionSystem (P := P))
-    (RO : P.ReconstructionData O) (i : ℕ) :
+    (RO : P.ReconstructionHypotheses O) (i : ℕ) :
     K₀Ab (Coh X) →+ (P.ring.piece i) :=
   K₀Ab.liftOf
     (fun F => ⟨chernCharacterComponent RO (R.reconstruction F) i,
@@ -107,7 +107,7 @@ noncomputable def rankHom (R : ReconstructionSystem (P := P)) :
 
 /-- The reconstructed `i`-th Chern-character component on `K₀(Coh X)`. -/
 noncomputable def chernCharacterHom (R : ReconstructionSystem (P := P))
-    (RO : P.ReconstructionData O) (i : ℕ) :
+    (RO : P.ReconstructionHypotheses O) (i : ℕ) :
     K₀Ab (Coh X) →+ A :=
   (P.ring.piece i).subtype.toAddMonoidHom.comp
     (R.chernCharacterInvariant RO i)
@@ -119,14 +119,14 @@ theorem rankHom_class (R : ReconstructionSystem (P := P)) (F : Coh X) :
 
 @[simp]
 theorem chernCharacterHom_class (R : ReconstructionSystem (P := P))
-    (RO : P.ReconstructionData O) (F : Coh X) (i : ℕ) :
+    (RO : P.ReconstructionHypotheses O) (F : Coh X) (i : ℕ) :
     R.chernCharacterHom RO i (K₀Ab.of F) =
       chernCharacterComponent RO (R.reconstruction F) i := by
   simp [chernCharacterHom, chernCharacterInvariant]
 
 /-- Every descended Chern-character component remains in its graded piece. -/
 theorem chernCharacterHom_mem (R : ReconstructionSystem (P := P))
-    (RO : P.ReconstructionData O)
+    (RO : P.ReconstructionHypotheses O)
     (E : K₀Ab (Coh X)) (i : ℕ) :
     R.chernCharacterHom RO i E ∈ P.ring.piece i :=
   (R.chernCharacterInvariant RO i E).property
@@ -139,7 +139,7 @@ noncomputable def intAlgebraMap : ℤ →+ A where
 
 /-- The descended zeroth Chern character is the algebra image of rank. -/
 theorem chernCharacterHom_zero (R : ReconstructionSystem (P := P))
-    (RO : P.ReconstructionData O) (E : K₀Ab (Coh X)) :
+    (RO : P.ReconstructionHypotheses O) (E : K₀Ab (Coh X)) :
     R.chernCharacterHom RO 0 E = algebraMap ℚ A (R.rankHom E : ℚ) := by
   have hhom : R.chernCharacterHom RO 0 =
       (intAlgebraMap (A := A)).comp R.rankHom := by
@@ -149,7 +149,7 @@ theorem chernCharacterHom_zero (R : ReconstructionSystem (P := P))
   exact DFunLike.congr_fun hhom E
 
 theorem chernCharacterHom_add (R : ReconstructionSystem (P := P))
-    (RO : P.ReconstructionData O)
+    (RO : P.ReconstructionHypotheses O)
     (E F : K₀Ab (Coh X)) (i : ℕ) :
     R.chernCharacterHom RO i (E + F) =
       R.chernCharacterHom RO i E + R.chernCharacterHom RO i F :=

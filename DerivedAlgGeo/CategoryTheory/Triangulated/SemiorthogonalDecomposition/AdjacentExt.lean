@@ -148,7 +148,7 @@ variable (B : OrthogonalExceptionalBlocks k C ι)
 
 /-- Adjacent Ext profiles for every consecutive pair in every exceptional
 block. -/
-structure AdjacentExtData : Prop where
+structure AdjacentExtHypotheses : Prop where
   /-- Every consecutive pair has profile `k ⊕ k[-1]`. -/
   profile : ∀ (i : ι) (j : ℕ) (hj : j + 1 < B.length i),
     AdjacentExtProfile (k := k)
@@ -162,7 +162,7 @@ end OrthogonalExceptionalBlocks
 /-- A one-sided prefix-by-prefix matching of block members.  The index
 equality records the output of iterating the one-step extension in order: the
 `j`-th source member is matched to the `j`-th target member. -/
-structure PrefixBlockEmbeddingData
+structure PrefixBlockEmbeddingHypotheses
     {I : Type t} {J : Type t'}
     [Limits.HasZeroObject C] [∀ n : ℤ, (shiftFunctor C n).Additive]
     [Pretriangulated C]
@@ -175,7 +175,7 @@ structure PrefixBlockEmbeddingData
   /-- Extension proceeds in the same order inside the two blocks. -/
   targetIndex_val : ∀ i j, (targetIndex i j).1 = j.1
 
-namespace PrefixBlockEmbeddingData
+namespace PrefixBlockEmbeddingHypotheses
 
 variable {I : Type t} {J : Type t'}
 variable [Limits.HasZeroObject C] [∀ n : ℤ, (shiftFunctor C n).Additive]
@@ -184,7 +184,7 @@ variable [Limits.HasZeroObject D] [∀ n : ℤ, (shiftFunctor D n).Additive]
   [Pretriangulated D]
 variable {B_C : OrthogonalExceptionalBlocks k C I}
   {B_D : OrthogonalExceptionalBlocks k D J} {e : I ≃ J}
-variable (A : PrefixBlockEmbeddingData B_C B_D e)
+variable (A : PrefixBlockEmbeddingHypotheses B_C B_D e)
 
 /-- The ordered member map is an embedding. -/
 def embedding (i : I) : Fin (B_C.length i) ↪ Fin (B_D.length (e i)) where
@@ -201,11 +201,11 @@ theorem length_le (i : I) : B_C.length i ≤ B_D.length (e i) := by
   simpa using Fintype.card_le_of_injective (A.targetIndex i)
     (A.embedding i).injective
 
-end PrefixBlockEmbeddingData
+end PrefixBlockEmbeddingHypotheses
 
 /-- Prefix extension in both directions forces exact equality of
 corresponding block lengths. -/
-structure BidirectionalPrefixBlockEmbeddingData
+structure BidirectionalPrefixBlockEmbeddingHypotheses
     {I : Type t} {J : Type t'}
     [Limits.HasZeroObject C] [∀ n : ℤ, (shiftFunctor C n).Additive]
     [Pretriangulated C]
@@ -214,11 +214,11 @@ structure BidirectionalPrefixBlockEmbeddingData
     (B_C : OrthogonalExceptionalBlocks k C I)
     (B_D : OrthogonalExceptionalBlocks k D J) (e : I ≃ J) where
   /-- Forward prefix extension. -/
-  forward : PrefixBlockEmbeddingData B_C B_D e
+  forward : PrefixBlockEmbeddingHypotheses B_C B_D e
   /-- Prefix extension after reversing the equivalence. -/
-  backward : PrefixBlockEmbeddingData B_D B_C e.symm
+  backward : PrefixBlockEmbeddingHypotheses B_D B_C e.symm
 
-namespace BidirectionalPrefixBlockEmbeddingData
+namespace BidirectionalPrefixBlockEmbeddingHypotheses
 
 variable {I : Type t} {J : Type t'}
 variable [Limits.HasZeroObject C] [∀ n : ℤ, (shiftFunctor C n).Additive]
@@ -227,7 +227,7 @@ variable [Limits.HasZeroObject D] [∀ n : ℤ, (shiftFunctor D n).Additive]
   [Pretriangulated D]
 variable {B_C : OrthogonalExceptionalBlocks k C I}
   {B_D : OrthogonalExceptionalBlocks k D J} {e : I ≃ J}
-variable (A : BidirectionalPrefixBlockEmbeddingData B_C B_D e)
+variable (A : BidirectionalPrefixBlockEmbeddingHypotheses B_C B_D e)
 
 include A in
 /-- Corresponding blocks have equal length.  This is a theorem from the two
@@ -239,18 +239,18 @@ theorem length_eq (i : I) : B_C.length i = B_D.length (e i) := by
 /-- The forward prefix position is the canonical cast along `length_eq`. -/
 theorem targetIndex_eq_cast (i : I) (j : Fin (B_C.length i)) :
     A.forward.targetIndex i j = Fin.cast
-      (BidirectionalPrefixBlockEmbeddingData.length_eq A i) j := by
+      (BidirectionalPrefixBlockEmbeddingHypotheses.length_eq A i) j := by
   apply Fin.ext
   exact A.forward.targetIndex_val i j
 
-end BidirectionalPrefixBlockEmbeddingData
+end BidirectionalPrefixBlockEmbeddingHypotheses
 
 /-! ## Common shifts along a matched block -/
 
 /-- Memberwise image data after a finite extension has matched blocks of
 equal length.  The shift is initially allowed to depend on the member; the
 adjacent-Ext theorem below proves that it is constant on each block. -/
-structure MemberwiseBlockShiftData
+structure MemberwiseBlockShiftHypotheses
     {I : Type t} {J : Type t'}
     [Limits.HasZeroObject C] [∀ n : ℤ, (shiftFunctor C n).Additive]
     [Pretriangulated C]
@@ -268,7 +268,7 @@ structure MemberwiseBlockShiftData
     G.obj ((B_C.collection i).obj j) ≅
       ((B_D.collection (e i)).obj (Fin.cast (length_eq i) j))⟦shift i j⟧
 
-namespace MemberwiseBlockShiftData
+namespace MemberwiseBlockShiftHypotheses
 
 variable {I : Type t} {J : Type t'}
 variable [Limits.HasZeroObject C] [∀ n : ℤ, (shiftFunctor C n).Additive]
@@ -279,8 +279,8 @@ variable {B_C : OrthogonalExceptionalBlocks k C I}
   {B_D : OrthogonalExceptionalBlocks k D J} {e : I ≃ J}
   {length_eq : ∀ i, B_C.length i = B_D.length (e i)}
   {G : C ⥤ D} [G.Additive] [G.Linear k] [G.CommShift ℤ]
-variable (M : MemberwiseBlockShiftData B_C B_D e length_eq G)
-  (A_C : B_C.AdjacentExtData) (A_D : B_D.AdjacentExtData)
+variable (M : MemberwiseBlockShiftHypotheses B_C B_D e length_eq G)
+  (A_C : B_C.AdjacentExtHypotheses) (A_D : B_D.AdjacentExtHypotheses)
 
 include M A_C A_D in
 /-- **Every member of a matched block has the shift of its first member.** -/
@@ -315,6 +315,6 @@ theorem shift_eq_first (hG : G.FullyFaithful) (i : I) :
             exact hj)) G hG _ _ ePrev eNext
       exact hstep.symm.trans (shift_eq_first hG i ⟨j, by omega⟩)
 
-end MemberwiseBlockShiftData
+end MemberwiseBlockShiftHypotheses
 
 end CategoryTheory.Triangulated

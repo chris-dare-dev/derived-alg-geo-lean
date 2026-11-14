@@ -13,19 +13,39 @@ exponent and proves the combinatorial fact the top cohomology of `Pⁿ` rests on
 variable at a fixed total degree. This file turns that count into a statement about the
 localization itself.
 
-## Why the base field has to appear
+## Main definitions
 
-Everything in the Čech lane is valued in abelian groups, and "finitely many exponents" is not by
-itself a finiteness statement about a group: the block is a `k`-vector space, and it is spanned —
-not generated as an abelian group — by the corresponding monomial fractions. So the `k`-action
-has to be named before the count can be used.
+* `MvPolynomial.polynomialToHomogeneousLocalization`: the base field mapping into a homogeneous
+  localization of the polynomial ring through the constants.
+* `MvPolynomial.degreeZeroLocalizationModule`: the `k`-module structure on a degree-zero
+  homogeneous localization, by restriction of scalars.
+* `MvPolynomial.blockRep`: a chosen monomial fraction with a prescribed Laurent exponent.
+
+## Main results
+
+* `MvPolynomial.awayMk_smul` and `MvPolynomial.smul_mk`: scaling a fraction scales its
+  numerator.
+* `MvPolynomial.blockProj_univ_mem_span`: the full block lies in the span of a fixed family
+  indexed by a finite exponent set.
+* `MvPolynomial.fg_blockSpan`: the full block of one localization is a finite-dimensional
+  `k`-space.
+* `MvPolynomial.mapOfLE_smul`: enlarging the denominator submonoid is `k`-linear.
+
+## Implementation notes
+
+### Why the base field has to appear
+
+Everything in the Čech computation of sheaf cohomology is valued in abelian groups, and "finitely
+many exponents" is not by itself a finiteness statement about a group: the block is a
+`k`-vector space, and it is spanned — not generated as an abelian group — by the corresponding
+monomial fractions. So the `k`-action has to be named before the count can be used.
 
 It is not extra data. A constant is a degree-zero homogeneous element, so `k` maps into every
 homogeneous localization through `HomogeneousLocalization.fromZeroRingHom`, and
 `degreeZeroLocalizationModule` is the restriction of scalars along that map. `awayMk_smul` is the
 computation that makes it usable: scaling a fraction scales its numerator.
 
-## The spanning argument
+### The spanning argument
 
 `blockProj_univ_mem_span` decomposes an arbitrary element into monomial fractions, filters to the
 full block, strips each coefficient with `awayMk_smul`, and replaces each monomial fraction by
@@ -33,11 +53,22 @@ full block, strips each coefficient with `awayMk_smul`, and replaces each monomi
 rather than dependent on the element, and it is sound because the Laurent exponent is a complete
 invariant (`awayMk_monomial_eq_iff_laurentExponent`).
 
-## Scope
+### Scope
 
 One localization. Assembling the blocks of a Čech cochain, and matching this action against the
 `cechScalarAction` that `module_finite_linearCoherentH_of_cech` consumes, are separate and are not
 done here.
+
+## References
+
+The Laurent-exponent decomposition of `DerivedAlgGeo.Algebra.MvPolynomial.LaurentBlock`
+(`finite_setOf_degree_eq_of_neg`) and `DerivedAlgGeo.Algebra.MvPolynomial.LaurentBasis`
+(`awayMk_monomial_eq_iff_laurentExponent`), and Mathlib's
+`HomogeneousLocalization.fromZeroRingHom`.
+
+## Tags
+
+homogeneous localization, Laurent polynomial, restriction of scalars, finite-dimensional
 -/
 
 universe u

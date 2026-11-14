@@ -202,8 +202,8 @@ variable (ch : ChernCharacter N D)
 
 /-- Untwisted charge coordinates measured against one divisor class `H`.
 
-This is the lossy rank-one view used by the pre-existing surface charge API:
-it retains `H.chOne` and `H^2`, but not the full first Chern class. -/
+This is the lossy rank-one view used by the `ChargeCoordinates` surface charge
+API: it retains `H.chOne` and `H^2`, but not the full first Chern class. -/
 def coordinatesAt (S : DivisorSpace D) (H : D) : ChargeCoordinates N where
   rank := ch.rank
   degree := (S.intersection H).toAddMonoidHom.comp ch.chOne
@@ -262,8 +262,8 @@ namespace Pullback
 variable {L M : Type*} [AddCommGroup L] [AddCommGroup M]
 variable {source : ChernCharacter L D} {target : ChernCharacter M D}
 
-/-- A full-character comparison induces the old rank-one coordinate comparison
-at every chosen divisor class `H`. -/
+/-- A full-character comparison induces the rank-one coordinate comparison
+`ChargeCoordinates.Pullback` at every chosen divisor class `H`. -/
 def coordinatesAt (h : Pullback source target)
     (S : DivisorSpace D) (H : D) :
     ChargeCoordinates.Pullback
@@ -346,8 +346,9 @@ theorem centralCharge_apply
 /-- The intrinsic charge restricts to the existing scalar-twist formula on
 the rank-one slice `B = beta H`, `omega = alpha H`.
 
-Thus the old compressed coordinates remain a valid downstream interface; they
-are no longer asked to represent an arbitrary `B`-field. -/
+Thus the compressed coordinates `ChargeCoordinates` remain a valid downstream
+interface on that slice; an arbitrary `B`-field is represented only by the
+intrinsic charge. -/
 theorem centralCharge_rankOne_eq
     (S : DivisorSpace D) (H : D) (alpha beta : ℝ) (E : N) :
     ch.centralCharge S (StabilityParameters.rankOne H alpha beta) E =

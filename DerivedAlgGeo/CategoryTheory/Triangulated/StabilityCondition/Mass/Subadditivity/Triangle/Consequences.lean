@@ -14,7 +14,40 @@ the phase-one hypothesis by head--tail octahedral induction, inhabits the named
 targets stated in `HeartShortExact`, and derives the unconditional topology
 comparison from the conditional substrate in `Metric.Distance.Topology`.
 
-This is the module a consumer of the milestone should import.
+## Main definitions
+
+This file introduces no carrier, class, or instance. The `Prop`-valued targets
+it inhabits are defined in `HeartShortExact` and `Metric.Distance.Topology`.
+
+## Main results
+
+* `stabilityMass_triangle_le_of_obj₁_phase_one` — mass is subadditive for a
+  distinguished triangle whose first object lies in the phase-one slice.
+* `stabilityMassSemistableLeftTriangleInequality` — the triangle inequality
+  whenever the left endpoint is semistable, at an arbitrary phase.
+* `stabilityMassTriangleInequality` — Harder--Narasimhan mass is subadditive
+  along every distinguished triangle.
+* `stabilityDistanceTopologyCompatible` — full-distance balls form a
+  neighbourhood basis for the Section 6 topology.
+* `stabilityMassHeartShortExactInequality_of_triangle`,
+  `stabilityMass_heart_shortExact_le_of_obj₂_semistable`,
+  `stabilityMass_heart_shortExact_le_of_same_phase` — the heart-level
+  short-exact inequalities.
+
+## Implementation notes
+
+This is the module a consumer of mass subadditivity should import. The phase
+needed by `stabilityMass_triangle_le_of_obj₁_phase_one` is reached from an
+arbitrary phase by a lifted rotation, which preserves every object's HN mass.
+
+## References
+
+* Bridgeland, *Stability conditions on triangulated categories*, Ann. of Math.
+  (2007), Proposition 8.1.
+
+## Tags
+
+mass, subadditivity, triangle inequality, stability condition, topology
 -/
 
 set_option backward.defeqAttrib.useBackward true
@@ -160,8 +193,8 @@ theorem stabilityMass_triangle_le_of_obj₁_phase_one
   linarith
 
 set_option maxHeartbeats 3000000 in
-/-- The second mass-triangle milestone: the triangle inequality whenever the
-left endpoint is semistable, at an arbitrary phase.  A lifted rotation moves
+/-- The triangle inequality whenever the left endpoint is semistable, at an
+arbitrary phase.  A lifted rotation moves
 that phase to one and preserves every object's HN mass. -/
 theorem stabilityMassSemistableLeftTriangleInequality :
     StabilityMassSemistableLeftTriangleInequality (C := C) (v := v) := by
@@ -183,8 +216,8 @@ theorem stabilityMassTriangleInequality :
     stabilityMassSemistableLeftTriangleInequality
 
 set_option maxHeartbeats 3000000 in
-/-- Full-distance balls form a neighbourhood basis for the pre-existing
-Section 6 topology.  This closes the explicit mass-triangle premise of the
+/-- Full-distance balls form a neighbourhood basis for the Section 6
+topology.  This discharges the explicit mass-triangle premise of the
 topology comparison without installing a second topology or metric instance. -/
 @[cites "stmt:a520a8d4f877:bridgeland2007.prop-8.1" (relation := no_claim)
         (note := "Unconditional topology comparison obtained by applying the \

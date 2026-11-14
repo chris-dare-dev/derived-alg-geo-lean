@@ -8,11 +8,10 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.Autoequivalence
 /-!
 # The unit kernel `𝒪_Δ`: the third ledger
 
-`Symmetry/Autoequivalence/FourierMukai.lean` defines `UnitKernelData` — a
-kernel presenting the identity functor as a transform — and until now nothing
-geometric could discharge it: the classical unit kernel is `𝒪_Δ = Rδ_* 𝒪_X`
-along the diagonal `δ : X ⟶ X ×_S X`, and neither `𝒪_X` nor anything about
-`δ` was named.
+`CategoryTheory/Triangulated/FourierMukai/Autoequivalence.lean` defines `UnitKernelData` — a
+kernel presenting the identity functor as a transform. The classical unit kernel is
+`𝒪_Δ = Rδ_* 𝒪_X` along the diagonal `δ : X ⟶ X ×_S X`, so discharging it geometrically needs
+`𝒪_X` and the diagonal `δ` to be named.
 
 This file is the ledger for it, in the same shape as the two kernel ledgers:
 
@@ -28,18 +27,37 @@ This file is the ledger for it, in the same shape as the two kernel ledgers:
   `UnitKernelData (geometricCorrespondence X X Z p q)` from exactly those
   inputs and no others.
 
-## Where the diagonal geometry lives
+## Main definitions
+
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.HasTensorUnit` — a raw tensor bifunctor with a
+  chosen left unit; `hasTensorUnitOfCoherent` obtains it from the coherent root.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.HasPullbackRetraction` and
+  `AlgebraicGeometry.DerivedCategory.FourierMukai.HasPushforwardRetraction` — derived pullback
+  and pushforward along a section collapse, supplied with a triangle-identity guard.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.diagonalKernel` — the unit kernel `Rδ_* 𝒪`.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.geometricUnitIso` — the transform of the unit
+  kernel is the identity, derived from the four inputs.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.geometricUnitKernelData` — the assembled
+  `UnitKernelData` with no supplied fields.
+
+## Main results
+
+The isomorphism `geometricUnitIso` is the result; the file states no separate theorem.
+
+## Implementation notes
+
+### Where the diagonal geometry lives
 
 Classically every input below is a theorem about the diagonal of a product:
 `δ ≫ p = 𝟙 = δ ≫ q` are the defining triangle identities, pullback and
 pushforward along a retraction compose to the identity by functoriality, and
 `− ⊗ 𝒪` is the identity because `𝒪` is the monoidal unit. The tensor unit and
-unitor now come from one structure whose triangle law is explicit. The two
+unitor come from one structure whose triangle law is explicit. The two
 retraction classes carry their triangle identity as
 a `comm` **guard** — deliberately not consumed by the derivation, which uses
 `iso` alone; the guard is what makes `iso` the right thing to ask for.
 
-## What this file does not assert
+### What this file does not assert
 
 * **Nothing constructs an instance of any class here**, and no scheme is
   shown to admit one. Inhabitant-free, like both kernel ledgers.
@@ -47,21 +65,25 @@ a `comm` **guard** — deliberately not consumed by the derivation, which uses
   classes are stated at arbitrary morphisms with the guards making the
   intended instantiation precise.
 * No `DualKernel`. The classical dual kernel is `P^∨ ⊗ p^* ω_X [dim X]`,
-  which needs derived duals and a dualizing complex — machinery with no
-  substrate in this repository when this file was written.
-
-  Half of that reason has since lapsed and the sentence is corrected rather
-  than left standing: `KernelAdjunction.lean` now ledgers the three constituent
-  adjunctions, and they *are* consumed — by
-  `FourierMukai.ConstituentRightAdjoints`, and through it by
-  `KernelAutoequivalence.DualKernel.ofRightAdjointKernel`. What remains true is
-  the other half: nothing discharges those classes. A `DualKernel` is now
-  reachable — `KernelSwap.geometricDualKernel` assembles one — but only from
-  that whole uninhabited ledger plus a supplied equivalence, so this file's
-  own inputs still do not produce one.
+  which needs derived duals and a dualizing complex. `KernelAdjunction.lean`
+  ledgers the three constituent adjunctions, consumed by
+  `FourierMukai.ConstituentRightAdjoints` and through it by
+  `KernelAutoequivalence.DualKernel.ofRightAdjointKernel`, and `geometricDualKernel`
+  (in `KernelSwap.lean`) assembles a `DualKernel` from that whole uninhabited
+  ledger plus a supplied equivalence. Nothing discharges those classes, and this
+  file's own inputs do not produce one.
 * This file alone does not prove the kernel is a unit *for convolution*;
   `KernelUnitConvolution.lean` derives those laws from additional section and
   base-change geometry.
+
+## References
+
+The repository's `CategoryTheory.Triangulated.FourierMukai.UnitKernelData` and
+`CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.id`.
+
+## Tags
+
+Fourier--Mukai kernel, diagonal, unit kernel, projection formula, identity functor
 -/
 
 universe u
@@ -85,7 +107,7 @@ section UnitInputs
 
 /-- Compatibility record for a raw tensor bifunctor with a chosen left unit.
 
-New stable unit and convolution APIs require `HasCoherentDerivedTensor`, where
+Stable unit and convolution APIs require `HasCoherentDerivedTensor`, where
 this unit and both unitors belong to the same monoidal structure as the
 associator, pentagon, and triangle. -/
 class HasTensorUnit (T : SchemeBaseChange S) [IsLocallyNoetherian T.left]
@@ -96,7 +118,7 @@ class HasTensorUnit (T : SchemeBaseChange S) [IsLocallyNoetherian T.left]
   iso : (derivedTensor T).obj unit ≅
     𝟭 (SchemeBoundedCoherentDerivedCategory T.left)
 
-/-- Forget the coherent root to the old selected-unit capability.
+/-- Forget the coherent root to the selected-unit capability `HasTensorUnit`.
 
 This supports raw intermediate callers without allowing a selected unit to
 synthesize monoidal coherence. -/
@@ -252,16 +274,15 @@ noncomputable def geometricUnitKernelData {X Z : SchemeBaseChange S}
 
 end Derivation
 
-/-! ## What the three ledgers together leave
+/-! ## What the three ledgers together give
 
-The unit side of the autoequivalence story is now: a caller who discharges
+On the unit side of the autoequivalence story, a caller who discharges
 the first ledger's contracts at `p`, `q`, `δ` plus `HasProjectionFormulaRight`
 at `δ`, `HasCoherentDerivedTensor`, and the two retraction classes gets
-`KernelAutoequivalence.id` with a geometric kernel. Still absent, and named
-absences rather than ledgers: `DualKernel` (needs derived duals and a
-dualizing complex) and the unit's compatibility with convolution (needs
-`ConvolutionData` for the self-correspondence and a comparison of
-`convKernel` with `diagonalKernel`).
+`KernelAutoequivalence.id` with a geometric kernel. Not derived here: a
+`DualKernel` (needs derived duals and a dualizing complex) and the unit's
+compatibility with convolution (needs `ConvolutionData` for the
+self-correspondence and a comparison of `convKernel` with `diagonalKernel`).
 -/
 
 end AlgebraicGeometry.DerivedCategory.FourierMukai

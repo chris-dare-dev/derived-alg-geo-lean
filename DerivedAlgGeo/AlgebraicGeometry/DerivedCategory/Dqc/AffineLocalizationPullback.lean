@@ -381,7 +381,7 @@ instance affineQuasicoherentBoundedLocalizationPullbackToDqc_essSurj :
   infer_instance
 
 /-- Bounded localization pullback and bounded affine realization have the same essential
-image; both now reach the entire intrinsic bounded target `Dqc` category. -/
+image; both reach the entire intrinsic bounded target `Dqc` category. -/
 theorem affineQuasicoherentBoundedLocalizationPullbackToDqc_essImage :
     (affineQuasicoherentBoundedLocalizationPullbackToDqc M).essImage =
       (affineQuasicoherentBoundedDerivedToDqc
@@ -412,8 +412,8 @@ def affineQuasicoherentLocalizationRestriction :
     (affineLocalizationDerivedRestriction (R := R) (A := A))
 
 include M in
-/-- The general geometric affine pullback specializes to the previously
-constructed transported localization pullback. -/
+/-- The general geometric affine pullback specializes to the transported
+localization pullback `affineQuasicoherentLocalizationPullback`. -/
 def affineQuasicoherentLocalizationPullbackComparison :
     affineQuasicoherentDerivedPullback
         (CommRingCat.ofHom (algebraMap R A))
@@ -567,7 +567,8 @@ theorem affineQuasicoherentBoundedDerivedPullbackToDqc_essImage_of_isLocalizatio
 
 include M in
 /-- Realizing the general bounded affine pullback along a localization agrees
-with the earlier transported localization realization. -/
+with the transported localization realization
+`affineQuasicoherentBoundedLocalizationPullbackToDqc`. -/
 def affineQuasicoherentBoundedLocalizationPullbackToDqcComparison :
     affineQuasicoherentBoundedDerivedPullbackToDqc
         (CommRingCat.ofHom (algebraMap R A))
@@ -683,7 +684,7 @@ def affineQuasicoherentLocalizationPullbackToDqc :
 
 include M in
 /-- Realizing the general affine pullback along a localization agrees with
-the earlier transported localization realization. -/
+the transported localization realization `affineQuasicoherentLocalizationPullbackToDqc`. -/
 def affineQuasicoherentLocalizationPullbackToDqcComparison :
     affineQuasicoherentDerivedPullbackToDqc
         (CommRingCat.ofHom (algebraMap R A))

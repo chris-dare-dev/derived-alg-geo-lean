@@ -166,7 +166,8 @@ def componentSeminormBall (cc : ConnectedComponents (StabilityCondition.WithClas
   {F | stabilitySeminorm C (componentRep C cc) (↑F - ↑W) < ENNReal.ofReal r}
 
 omit [IsTriangulated C] in
-/-- The old seminorm balls are exactly the metric balls for the induced norm on `V(Σ)`. -/
+/-- The seminorm balls `componentSeminormBall` are exactly the metric balls for the induced
+norm on `V(Σ)`. -/
 theorem componentSeminormBall_eq_ball
     (cc : ConnectedComponents (StabilityCondition.WithClassMap C v))
     (W : componentSeminormSubgroup C cc) {r : ℝ} (hr : 0 < r) :
@@ -192,7 +193,7 @@ abbrev componentSeminormTopology (cc : ConnectedComponents (StabilityCondition.W
   TopologicalSpace.generateFrom (componentSeminormBasis C cc)
 
 omit [IsTriangulated C] in
-/-- The old seminorm-ball basis is a genuine topological basis for the norm topology on `V(Σ)`. -/
+/-- The seminorm-ball basis is a genuine topological basis for the norm topology on `V(Σ)`. -/
 theorem isTopologicalBasis_componentSeminormBasis
     (cc : ConnectedComponents (StabilityCondition.WithClassMap C v)) :
     @TopologicalSpace.IsTopologicalBasis (componentSeminormSubgroup C cc)

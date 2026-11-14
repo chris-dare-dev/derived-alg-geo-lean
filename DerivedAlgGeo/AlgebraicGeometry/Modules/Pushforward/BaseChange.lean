@@ -23,7 +23,32 @@ to push forward a module sheaf and restrict it across the square
 
 The comparison is independent of finiteness, affineness, and coherence.
 
-## Why this is the whole geometric content
+## Main definitions
+
+* `AlgebraicGeometry.restrictSquareOpensIso` — the restriction square commutes on opens.
+* `AlgebraicGeometry.restrictSquareSections` and
+  `AlgebraicGeometry.restrictSquareSectionsEquiv` — the transport of sections across the
+  square, and its linear form.
+* `AlgebraicGeometry.pushforwardRestrictIso` and `AlgebraicGeometry.pushforwardRestrictNatIso`
+  — the comparison of pushforward and restriction, object by object and as a natural
+  isomorphism.
+* `AlgebraicGeometry.pullbackRestrictNatIso` and `AlgebraicGeometry.squarePushforwardIso` —
+  the pullback comparison and the comparison of the two pushforward composites.
+
+## Main results
+
+* `AlgebraicGeometry.restrictSquareSections_smul` — the transport of sections is linear.
+* `AlgebraicGeometry.pushforwardRestrictNatIso_mate`,
+  `AlgebraicGeometry.pullbackRestrictNatIso_conjugate` and
+  `AlgebraicGeometry.pullbackRestrictNatIso_mate` — the mate and conjugate identities relating
+  the three comparisons.
+* `AlgebraicGeometry.pullbackRestrictNatIso_unit` and
+  `AlgebraicGeometry.pullbackRestrictNatIso_unit_sections` — the pullback/pushforward units
+  obey the open-square unit equation, and on sections it is `restrictSquareSections`.
+
+## Implementation notes
+
+### Why this is the whole geometric content
 
 Both composites send an open `V` of `U` to the preimage of `V` under `f`, viewed in `X` —
 `image_morphismRestrict_preimage` is exactly that equality, and it is at the pin. `Opens` is a
@@ -31,23 +56,22 @@ poset, so a natural transformation between functors into it is determined by not
 agreement on objects *is* the isomorphism, and `NatIso.ofComponents` discharges naturality
 because the naturality squares live in a subsingleton.
 
-## The comparison of module sheaves, object by object
+### The comparison of module sheaves, object by object
 
 `pushforwardRestrictIso` compares the resulting module sheaves for one `M`.
 `pushforwardRestrictNatIso` assembles these isomorphisms into a functor comparison;
 its naturality is the naturality of a sheaf morphism on the same transported
 sections. The coherent pushforward chart argument consumes the object component.
 
-## What the comparison rests on
+### What the comparison rests on
 
 Both sides have the *same sections*: `Γ(M, f ⁻¹ᵁ (U.ι ''ᵁ V))` and
 `Γ(M, (f ⁻¹ᵁ U).ι ''ᵁ ((f ∣_ U) ⁻¹ᵁ V))` are `rfl`-equal to the two composites, and the opens are
 equal by `image_morphismRestrict_preimage` — the equality this file's first half packages. So the
 comparison map is that transport, `restrictSquareSections`.
 
-What has to be proved is that the transport is linear, and this is the "equality of sheaf-of-rings
-data" the earlier version of this file left open. It decomposes into four steps, three of which are
-definitional:
+What has to be proved is that the transport is linear, an "equality of sheaf-of-rings data". It
+decomposes into four steps, three of which are definitional:
 
 * each side's scalar action unfolds to an action through `Scheme.Hom.app`, by `rfl`;
 * the open immersion's `Scheme.Hom.appIso` is the identity — `Scheme.Opens.ι_appIso`, and this one
@@ -56,7 +80,7 @@ definitional:
 * the two structure-sheaf maps differ by exactly that transport — `morphismRestrict_app`, whose
   `eqToHom` is the same one, direction included.
 
-## Why the naturality square is written with explicit morphisms
+### Why the naturality square is written with explicit morphisms
 
 `presheaf_map_square_eq` is applied at its four opens morphisms spelled out, and that is the whole
 reason this file needs no `maxHeartbeats` raise. Left as `_`, they are metavariables Lean has to
@@ -64,12 +88,14 @@ solve by unifying against a goal that also carries the `instances`-transparency 
 more than twenty times the default budget and buys nothing, since the morphisms are determined and
 can simply be written down. Supplied explicitly, the square closes in one `exact`, in seconds.
 
-The lesson generalises, and it is the opposite of the reflex: a large heartbeat bump here meant the
-*statement* was underspecified, not that the proof was hard.
+The point generalises, and it is the opposite of the reflex: a large heartbeat requirement here
+signals an underspecified *statement*, not a hard proof.
 
 `presheaf_map_square_eq` is stated separately because in a clean context its rewrites fire, while at
 the use site only `exact` is available — `exact` unifies up to defeq and never has to match
 syntactically, which is what the defective goal rules out.
+
+### Mates and the unit square
 
 The functor comparison is built from these explicit objectwise components.
 The mate of the independent pushforward/restriction comparison in the
@@ -81,6 +107,16 @@ The actual pullback/pushforward units obey the resulting natural open-square
 unit equation. Its ordinary-section form evaluates the pushforward comparison
 as `restrictSquareSections`; this is distinct from slice-site `pullbackOverIso`
 transport and does not assert relative base-change invertibility.
+
+## References
+
+The geometric input is Mathlib's `AlgebraicGeometry.image_morphismRestrict_preimage` and
+`AlgebraicGeometry.morphismRestrict_app`; the mate calculus is Mathlib's
+`Mathlib/CategoryTheory/Adjunction/Mates.lean`.
+
+## Tags
+
+pushforward, restriction, open immersion, base change, module sheaf, mate
 -/
 
 universe u

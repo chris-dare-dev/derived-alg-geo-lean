@@ -16,7 +16,7 @@ CategoryTheory	CategoryTheory.MonoidalCategory.IsCompatibleWithTriangulation	rec
 CategoryTheory	CategoryTheory.ObjectProperty.OnTriangle	a three-field spelling of `P` on all three vertices; built inline at `liftTriangle` call sites, and named at one geometric site so far [adoption pending, tracked in the single-instantiation follow-up]
 CategoryTheory	CategoryTheory.Pretriangulated.Axioms	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Pretriangulated.Triangle.FirstMapNormalizationData.ComparisonData	the uniqueness comparison between two normalizations, built where two are actually compared
-CategoryTheory	CategoryTheory.SerreFunctor.EnriquesCategoryData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.SerreFunctor.EnriquesCategoryHypotheses	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.SerreFunctor.HomFinite	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.SerreFunctor.MixedClassificationData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.SerreFunctor.PseudoprojectiveExtProfile	recorded before the reason column existed; reason not yet written
@@ -24,25 +24,25 @@ CategoryTheory	CategoryTheory.SerreFunctor.SerreCompatibleEquivalence	recorded b
 CategoryTheory	CategoryTheory.SerreFunctor.SphericalClassificationData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.SerreFunctor.SphericalExtProfile	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.AdjacentExtProfile	recorded before the reason column existed; reason not yet written
-CategoryTheory	CategoryTheory.Triangulated.BidirectionalPrefixBlockEmbeddingData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.BidirectionalPrefixBlockEmbeddingHypotheses	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.CofiltrationData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.ComponentTopologicalLinearLocalModel	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.Families.TriangulatedFiberFamily.CompatibleClassMaps	recorded before the reason column existed; reason not yet written
-CategoryTheory	CategoryTheory.Triangulated.FourierMukai.CoherentConvolutionData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.FourierMukai.CoherentConvolutionHypotheses	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.FourierMukai.ConstituentLeftAdjoints	recorded before the reason column existed; reason not yet written
-CategoryTheory	CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionData	recorded before the reason column existed; reason not yet written
-CategoryTheory	CategoryTheory.Triangulated.FourierMukai.GeneratedBlockExtensionSequenceData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.FourierMukai.ExceptionalBlockExtensionHypotheses	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.FourierMukai.GeneratedBlockExtensionSequenceHypotheses	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.FourierMukai.GeneratedExtensionSequenceData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.FourierMukai.OneStepExtensionCriterion	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.FourierMukai.OneStepExtensionData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.FourierMukai.ResidualKernelEquivalence	recorded before the reason column existed; reason not yet written
-CategoryTheory	CategoryTheory.Triangulated.FourierMukai.RightAdjunctionData	the ambient adjunction and the target-to-source preservation are genuine geometric inputs, per its docstring
-CategoryTheory	CategoryTheory.Triangulated.MemberwiseBlockShiftData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.FourierMukai.RightAdjunctionHypotheses	the ambient adjunction and the target-to-source preservation are genuine geometric inputs, per its docstring
+CategoryTheory	CategoryTheory.Triangulated.MemberwiseBlockShiftHypotheses	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.OrthogonalExceptionalBlocks	recorded before the reason column existed; reason not yet written
-CategoryTheory	CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.AdjacentExtData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.AdjacentExtHypotheses	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.OrthogonalExceptionalBlocks.ProjectionChainData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.Polishchuk.InducedTStructureDataLarge	recorded before the reason column existed; reason not yet written
-CategoryTheory	CategoryTheory.Triangulated.PrefixBlockEmbeddingData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.PrefixBlockEmbeddingHypotheses	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.QuasiAbelian	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.SlicingOrderPreimageData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.SlopeData	recorded before the reason column existed; reason not yet written
@@ -68,13 +68,13 @@ CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakC
 CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakDedekindHNProblem	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakFamilyChargeConditions	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakFamilyConditions	recorded before the reason column existed; reason not yet written
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakQuotientQuadraticSupportData	recorded before the reason column existed; reason not yet written
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakQuotientQuadraticSupportHypotheses	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakSemistabilityProbe	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.Families.WeakStabilityInFamiliesData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.CategoricalOrdinaryFiberStabilityInFamiliesData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.OrdinaryFiberStabilityInFamiliesData	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families.OrdinaryStabilityInFamiliesData	recorded before the reason column existed; reason not yet written
-CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.ProperDiscontinuityData	external input, per its docstring: proper discontinuity plus the two hypotheses its Hausdorff-local consequences need
+CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.ProperDiscontinuityHypotheses	external input, per its docstring: proper discontinuity plus the two hypotheses its Hausdorff-local consequences need
 CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.StrictAut	recorded before the reason column existed; reason not yet written
 LinearAlgebra	CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Divisorial.DivisorSpace.HodgeIndex	`HodgeDefinite.toHodgeIndex` weakens the definite form to the index inequality, which is the reusable consequence
 CategoryTheory	CategoryTheory.Triangulated.WeakStabilityCondition.SubobjectChain	recorded before the reason column existed; reason not yet written

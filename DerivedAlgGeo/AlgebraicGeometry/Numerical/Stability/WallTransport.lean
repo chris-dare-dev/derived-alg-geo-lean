@@ -15,7 +15,28 @@ supplies the map that makes it one, on the `AlgebraicGeometry` side where both
 halves are visible, and spends Bogomolov–Gieseker to discharge the two
 hypotheses that file declines to assume.
 
-## The normalisation, derived rather than guessed
+## Main definitions
+
+* `Surface.toNumClass` — the transport of a numerical class to `NumClass`.
+* `Surface.toNumClassHom` and `Surface.wallChargeFamily` — the additive
+  pullback that places every polarised surface below the generic wall root.
+* `Examples.k3WallChargeFamily` — the wall family of the K3 model.
+
+## Main results
+
+* The three component lemmas of `Surface.toNumClass`, plus `toNumClass_add`.
+* `Surface.discr_toNumClass` — the identity the bridge turns on.
+* `Surface.toNumClass_ne_zero_of_rank_ne_zero` — nonzero rank suffices.
+* `Surface.charge_ne_zero_of_semistable` — the charge hypothesis, discharged.
+* `Surface.wall_eq_of_meet_of_semistable` — walls disjoint, with no excluded
+  point.
+* `Surface.walls_nested_of_semistable` — walls nested, within a family.
+* `Examples.toNumClass_k3` and `Examples.discr_toNumClass_k3` — the worked
+  instance, with the `∫H² = 2d` factor visible on both sides.
+
+## Implementation notes
+
+### The normalisation, derived rather than guessed
 
 `Basic.lean`'s charge is
 
@@ -38,7 +59,7 @@ rk ↔ ∫H² · rank(E)        deg ↔ ∫c₁(E)·H        ch2 ↔ ∫ch₂(E)
 **The rank slot is weighted by `∫H²`.** That is the content of this file and
 the thing to get right.
 
-## Why the naive reading is wrong
+### Why the naive reading is wrong
 
 Taking `(rank E, ∫c₁·H, ∫ch₂)` does not satisfy the charge formula, and its
 `NumClass.discr` is `(∫c₁·H)² − 2·rank·∫ch₂`, which is **neither** `∫Δ(E)` nor
@@ -46,49 +67,42 @@ anything Bogomolov–Gieseker bounds. Turning it into `∫Δ(E)` would need
 `(∫c₁·H)² = ∫c₁²`, which is equality in Hodge index *together with* `∫H² = 1`.
 
 So `discr_toNumClass` is stated against `Surface.discrH`, **not** against
-`∫Δ(E)`. An earlier draft of this lane claimed the latter; it is false, and it
-fails on this lane's own K3 witness — `4d²c²` against `2dc²`. Recorded here so
-the mistake is not made a third time.
+`∫Δ(E)`. The latter is false: it fails on the K3 witness below — `4d²c²`
+against `2dc²`.
 
 With the weighted reading the identity is exact: `discr` of the transported
 class *is* `Surface.discrH`, and `Surface.discrH_nonneg` supplies its
 nonnegativity for a semistable class.
 
-## The bridge is one-way
+### The bridge is one-way
 
-This is the first module to import the `Walls` lane from `AlgebraicGeometry`,
-and the direction is the permitted one. Nothing under `CategoryTheory/**` is
-edited or added to; if a lemma were needed there it belongs in the wall lane,
-not here, and `scripts/check_layering.py` holds the boundary.
+This module imports the wall theory `Walls/` from `AlgebraicGeometry`, which is
+the permitted direction. A lemma needed about walls themselves belongs under
+`StabilityCondition/Walls/`, not here, and `scripts/check_layering.py` holds the
+boundary.
 
 Every declaration quantifies over `N`. Nothing here says a wall is a wall *for
 an object*, that an object changes semistability across one, or anything about
 mass or `Hom`.
 
-## This is the `H`-slice, not the full wall family
+### This is the `H`-slice, not the full wall family
 
 `toNumClass` keeps only `∫c₁·H`, so on a surface of Picard rank greater than
 one it discards the components of `c₁` orthogonal to `H`. The resulting
 `wallChargeFamily` is the `(s,t)`-plane `B = sH`, `ω = tH` of the divisorial
 family, and nothing more; two classes with different `c₁` but the same
 `H`-degree are indistinguishable here (Altavilla, arXiv:1905.10636, §2.2).
-The arbitrary-`(B,ω)` family lives in `DivisorialWallSlice.lean`, and
+The arbitrary-`(B,ω)` family lives in `Walls/Divisorial/Slice.lean`, and
 `DivisorialWallTransport.lean` proves that this file's family is its rank-one
 reindexing.
 
-## Main results
+## References
 
-* `Surface.toNumClass` and its three component lemmas, plus `toNumClass_add`.
-* `Surface.toNumClassHom` and `Surface.wallChargeFamily` — the additive
-  pullback that places every polarised surface below the generic wall root.
-* `Surface.discr_toNumClass` — the identity the bridge turns on.
-* `Surface.toNumClass_ne_zero_of_rank_ne_zero` — nonzero rank suffices.
-* `Surface.charge_ne_zero_of_semistable` — the charge hypothesis, discharged.
-* `Surface.wall_eq_of_meet_of_semistable` — walls disjoint, with no excluded
-  point.
-* `Surface.walls_nested_of_semistable` — walls nested, within a family.
-* `Examples.toNumClass_k3` and `Examples.discr_toNumClass_k3` — the worked
-  instance, with the `∫H² = 2d` factor visible on both sides.
+* Altavilla, arXiv:1905.10636, §2.2.
+
+## Tags
+
+wall-crossing, tilt stability, Bogomolov–Gieseker inequality, polarised surface, central charge
 -/
 
 open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition
@@ -246,8 +260,9 @@ theorem wall_eq_of_meet_of_semistable {E : N} (B : BogomolovGiesekerData V P)
 
 `walls_nested_of_discr_nonneg` with `0 ≤ discr` supplied by Bogomolov–Gieseker
 instead of hypothesised. The same-family hypothesis is kept: it is load-bearing,
-and the wall lane carries the counterexample that shows so. The `minA ≠ 0` and
-`0 ≤ wallRadiusSq` hypotheses are kept too — nothing here discharges them. -/
+and the wall theory under `Walls/Numerical/` carries the counterexample that shows
+so. The `minA ≠ 0` and `0 ≤ wallRadiusSq` hypotheses are kept too — nothing here
+discharges them. -/
 theorem walls_nested_of_semistable {E : N} (B : BogomolovGiesekerData V P)
     (hI : HodgeIndexStatement V P) (hE : B.Semistable E)
     (hrk : (toNumClass V P E).rk ≠ 0) {w₁ w₂ : Wall.NumClass}

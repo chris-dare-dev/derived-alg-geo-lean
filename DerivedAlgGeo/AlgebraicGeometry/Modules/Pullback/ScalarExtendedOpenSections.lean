@@ -148,8 +148,8 @@ theorem fixedBasePullbackOpenAfterExtension_restrict
   convert hA.symm using 1
   rfl
 
-/-- At the top open, the arbitrary-open scalar-extended unit is the previously
-defined scalar-extended global-section unit. -/
+/-- At the top open, the arbitrary-open scalar-extended unit is the scalar-extended
+global-section unit `fixedBasePullbackTopAfterExtension`. -/
 theorem fixedBasePullbackOpenAfterExtension_top
     (compat : φ ≫ f.appTop = a ≫ ψ) :
     fixedBasePullbackOpenAfterExtension φ f M a ψ ⊤ compat =

@@ -15,9 +15,27 @@ by `S` pulls back to `S` again.  This is the classical correspondence between su
 `E/M` and subobjects of `E` containing `M` — one half of it, in the form the
 Harder--Narasimhan truncation consumes.
 
-## Why this file exists
+## Main definitions
 
-`Abelian/Stability/Uniqueness/SubobjectLattice.lean` already has
+* `CategoryTheory.Abelian.cokernelPullbackIso`: successive quotients of subobjects of `E/M` are
+  isomorphic to the successive quotients of their pullbacks to `E`.
+
+## Main results
+
+* `CategoryTheory.Abelian.le_of_arrow_comp_cokernel_zero`: a subobject that maps trivially to
+  `E/M` is contained in `M`.
+* `CategoryTheory.Abelian.pullback_imageSubobject_eq`: for `M ≤ S`, pulling the image of `S` in
+  `E/M` back along the quotient map recovers `S`.
+* `CategoryTheory.Abelian.shortExact_ofLE_pullbackπ`: `0 → M → (pullback p).obj B → B → 0` is
+  short exact.
+* `CategoryTheory.Abelian.ofLE_pullback_comp_pullbackπ`: pulling back is natural in the
+  subobject.
+
+## Implementation notes
+
+### Why the statement is proved without a charge
+
+`Abelian/Stability/Uniqueness/SubobjectLattice.lean` has
 this statement, as `AbelianHNFiltration.pullback_imageSubobject_eq`.  Its proof, however, runs
 through a **central charge**: it shows the offending cokernel has charge `0` and concludes it
 vanishes, by `semiClosedUpperHalfPlane_ne_zero` — a nonzero object has nonzero charge.
@@ -25,19 +43,17 @@ vanishes, by `semiClosedUpperHalfPlane_ne_zero` — a nonzero object has nonzero
 That implication is exactly what *weak* stability drops, and it fails on exactly the object the
 surface case of Bridgeland's Lemma 6.2 is about: a skyscraper on a surface is nonzero with
 charge `0`.  So the charge proof cannot be reused for the weak Harder--Narasimhan theory, and
-the truncation `tailAt` that depends on it does not port — which is what currently blocks the
-weak torsion pair, and with it the tilt.
+the truncation `tailAt` that depends on it does not port.
 
 The statement, though, has nothing to do with stability.  It is true in any abelian category.
-This file proves it that way, so the weak lane can use it.
+This file proves it that way, so the weak Harder--Narasimhan truncation can use it.
 
-## Method: pseudoelements
+### Method: pseudoelements
 
-The proof is a diagram chase, carried out with `CategoryTheory.Abelian.Pseudoelement`.  This is
-the first use of pseudoelements in this repository, which is a deliberate choice: the
-alternative is an explicit five-lemma argument on the two short exact sequences
-`0 → M → S → S/M → 0` and `0 → M → T → T/M → 0`, and the chase is both shorter and closer to
-the textbook proof.
+The proof is a diagram chase, carried out with `CategoryTheory.Abelian.Pseudoelement`.  That is
+a deliberate choice: the alternative is an explicit five-lemma argument on the two short exact
+sequences `0 → M → S → S/M → 0` and `0 → M → T → T/M → 0`, and the chase is both shorter and
+closer to the textbook proof.
 
 **Pseudoelements are not elements, and two of their failures matter here.**
 
@@ -50,12 +66,20 @@ Nothing below reaches outside `eq_zero_iff`, `pseudo_surjective_of_epi`,
 `pseudo_exact_of_exact` and `sub_of_eq_image`.  A chase that needs more than those is probably
 unsound.
 
-## Relationship to the existing lemma
+### Relationship to the charge-based lemma
 
-The signature of `AbelianHNFiltration.pullback_imageSubobject_eq` is deliberately left alone —
-it takes a `StabilityFunction` argument, and `Uniqueness/Tail.lean` calls it that way.  Dropping
-that argument is a rename across the strict development.  This file supplies the charge-free
-statement under its own name; wiring the existing lemma to delegate is a separate edit.
+`AbelianHNFiltration.pullback_imageSubobject_eq` keeps its `StabilityFunction` argument, and
+`Uniqueness/Tail.lean` calls it that way; dropping that argument would be a rename across the
+strict development.  This file states the charge-free version under its own name, in the
+namespace `CategoryTheory.Abelian`.
+
+## References
+
+Mathlib's `CategoryTheory.Abelian.Pseudoelement` and `Counterexamples/Pseudoelement.lean`.
+
+## Tags
+
+subobject, quotient, correspondence theorem, pseudoelement, diagram chase, abelian category
 -/
 
 noncomputable section
@@ -73,8 +97,8 @@ variable {A : Type u} [Category.{v} A] [Abelian A]
 subobject.
 
 Stated here so this file depends on Mathlib alone; the identical statement in
-`Uniqueness/SubobjectLattice.lean` is charge-free too, but lives under `StabilityCondition`,
-which a `CategoryTheory` leaf must not import. -/
+`Uniqueness/SubobjectLattice.lean` is charge-free too, but lives in the stability theory, which
+this file must not import. -/
 theorem le_of_arrow_comp_cokernel_zero {E : A} {B M : Subobject E}
     (h : B.arrow ≫ cokernel.π M.arrow = 0) : B ≤ M := by
   have hkernel : kernelSubobject (cokernel.π M.arrow) = M := by
@@ -90,7 +114,8 @@ theorem le_of_arrow_comp_cokernel_zero {E : A} {B M : Subobject E}
 /-- The image of `S` in `E/M` pulls back to something containing `S`.
 
 This half is formal — it is the unit of the `exists ⊣ pullback` adjunction, here written out
-through the pullback square — and the existing charge-based proof already had it charge-free. -/
+through the pullback square — and the charge-based proof in `Uniqueness/SubobjectLattice.lean`
+is charge-free on this half too. -/
 theorem le_pullback_imageSubobject {E : A} (M S : Subobject E) :
     S ≤ (Subobject.pullback (cokernel.π M.arrow)).obj
       (imageSubobject (S.arrow ≫ cokernel.π M.arrow)) :=

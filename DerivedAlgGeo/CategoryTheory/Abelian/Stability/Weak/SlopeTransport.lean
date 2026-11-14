@@ -14,15 +14,33 @@ import DerivedAlgGeo.CategoryTheory.Abelian.Stability.Weak.SlopeGeometry
 equivalence `e : A ≌ B` carries it to `WeakSlopeData B` by precomposing with `K₀Ab.congr e`. This
 file does that and records what the transported rank, degree, slope and charge are.
 
-## Why it is needed
+## Main definitions
+
+* `CategoryTheory.Triangulated.WeakSlopeData.congr`: weak slope data transported along an
+  equivalence.
+
+## Main results
+
+* `CategoryTheory.Triangulated.WeakSlopeData.congr_rank_functor`,
+  `CategoryTheory.Triangulated.WeakSlopeData.congr_slope_functor` and
+  `CategoryTheory.Triangulated.WeakSlopeData.congr_topSlope_functor`: the transported data reads
+  the image of an object of `A` as the original data reads the object.
+* `CategoryTheory.Triangulated.WeakSlopeData.congr_topSlope_mapFunctor`: the slope of a
+  transported subobject is the original slope.
+* `CategoryTheory.Triangulated.WeakSlopeData.congr_isSemistable`: semistability transports along
+  an equivalence.
+
+## Implementation notes
+
+### Why it is needed
 
 Numerical data is written on the category the objects live in. The stability machinery is written
 on the heart of a t-structure. `Algebra/Homology/DerivedCategory/Heart.lean` identifies the two for
 the canonical t-structure, and this file is what lets a slope defined on the first be read on the
-second — the concrete case being the μ-slope of the Gieseker lane, which is defined on coherent
-sheaves while the Mukai tilt assembly wants it on a heart.
+second — the concrete case being the μ-slope of coherent sheaves, which is defined on `Coh X`
+while the Mukai tilt assembly wants it on a heart.
 
-## The direction to keep straight
+### The direction to keep straight
 
 `congr` transports *along* `e`, so the transported data on `B` evaluates an object by pulling it
 back through `e.inverse`. Both readings are recorded: `congr_rank` is the one that holds by
@@ -30,18 +48,26 @@ definition, and `congr_rank_functor` is the one a consumer starting from an obje
 Nothing is transported by `rfl` alone — `congr_rank_functor` needs the unit isomorphism, which is
 why it is a theorem and not a `simp` unfolding.
 
-## Semistability
+### Semistability
 
 Semistability is not a statement about a homomorphism: it quantifies over the subobjects of an
 object. It transports because `Subobject.mapEquivalence` is an order isomorphism and in particular
 surjective, so every subobject of the image is the image of a subobject, and its slope is the
 original slope by `mapFunctorIso`.
 
-## What is not here
+### What is not here
 
 The Harder–Narasimhan property itself. A filtration also names the cokernel of each chain step, so
-transporting one needs `Subobject.cokernelOfLEMapFunctorIso` and an isomorphism-invariance lemma
-for filtrations that does not yet exist.
+transporting one needs `Subobject.cokernelOfLEMapFunctorIso` and the isomorphism invariance
+`AbelianWeakHNFiltration.ofIso`; `HNTransport.lean` assembles them.
+
+## References
+
+The library's `K₀Ab.congr`, `Subobject.mapEquivalence` and `WeakSlopeData`.
+
+## Tags
+
+weak slope data, equivalence of categories, transport, Grothendieck group, semistability
 -/
 
 universe v₁ v₂ u₁ u₂

@@ -471,7 +471,7 @@ restriction. This section supplies the other direction, so that finite presentat
 One asymmetry drives the shape of what follows. The forward direction never round-trips:
 `restrictOverIso` is stated at `f.opensRangeEquivalence.functor.obj W` for a `W` taken
 straight from the quasicoherent data, so the object is already in the form it is needed in.
-The reverse direction must round-trip, because the data now lives on `X.Opens` and its cover
+The reverse direction must round-trip, because in it the data lives on `X.Opens` and its cover
 has to be pulled back to `Over f.opensRange`.
 
 That round trip is an *equality* of opens rather than merely an isomorphism —

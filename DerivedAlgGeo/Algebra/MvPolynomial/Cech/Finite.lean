@@ -14,19 +14,45 @@ stated at the monomial denominator `Xᵞ`. A Čech term is the same object at th
 has to be carried across. `powersCongrLinear` is the transport, and it is `k`-linear for the same
 reason its additive form exists at all: it moves nothing but the name of the type.
 
-## Two finiteness facts, both needed
+## Main definitions
+
+* `MvPolynomial.powersCongrLinear`: `DegreeZeroLocalization.powersCongr` as a `k`-linear
+  equivalence.
+* `MvPolynomial.cechBlockSpan`: the full block of a Čech term, as a `k`-subspace.
+
+## Main results
+
+* `MvPolynomial.cechBlockProj_mem_cechBlockSpan`: the full-block projection of a Čech term lands
+  in `cechBlockSpan`.
+* `MvPolynomial.fg_cechBlockSpan`: the full block of one tuple is finitely generated.
+* `MvPolynomial.module_finite_pi_cechBlockSpan`: the full blocks of all tuples of a fixed length
+  together form a finite-dimensional `k`-space.
+
+## Implementation notes
+
+### Two finiteness facts, both needed
 
 `fg_cechBlockSpan` is one tuple: finitely many Laurent exponents can be negative in every variable
 at a fixed total degree. `module_finite_pi_cechBlockSpan` is all tuples at once, and it is a
 different fact: a Čech index has fixed length and `ι` is finite, so there are finitely many of
 them. Neither implies the other, and the top-degree argument needs both — which is why `Fintype ι`
-appears twice over in this lane rather than once.
+enters that argument twice rather than once.
 
-## Scope
+### Scope
 
 The cochain side only. Nothing here mentions the differential, cocycles, or cohomology, and the
 `k`-action used is `degreeZeroLocalizationModule` — matching it against the `cechScalarAction`
 that `module_finite_linearCoherentH_of_cech` consumes is a separate step and is not done here.
+
+## References
+
+The block decomposition of `DerivedAlgGeo.Algebra.MvPolynomial.LaurentFinite` (`blockRep`,
+`fg_blockSpan`) and the Čech block projection `cechBlockProj` of
+`DerivedAlgGeo.Algebra.MvPolynomial.Cech.Homotopy`.
+
+## Tags
+
+Čech complex, Laurent polynomial, homogeneous localization, finite-dimensional
 -/
 
 universe u

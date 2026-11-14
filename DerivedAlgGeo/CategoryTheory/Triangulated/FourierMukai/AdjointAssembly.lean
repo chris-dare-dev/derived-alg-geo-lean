@@ -103,7 +103,7 @@ structure ConstituentRightAdjoints (C : Correspondence 𝒳 𝒴 𝒵) (K : 𝒵
   /-- A right adjoint of `push`. -/
   pushRight : 𝒴 ⥤ 𝒵
   /-- The adjunction, in the role of `Rq_* ⊣ q^!`.  This is the Grothendieck
-  duality slot, and the one a dualizing object would eventually describe. -/
+  duality slot; classically `q^!` is described by a dualizing object. -/
   pushAdj : C.push ⊣ pushRight
 
 /-- Left adjoints for the three functors a transform is built from, mirroring

@@ -1002,7 +1002,7 @@ or exactness was strengthened by relocation.
 
 - Derived base change separated from its K-flat model (2026-09-14): the
   base-change layer of `AlgebraicGeometry/DerivedCategory/Families/` was stated
-  on `KFlatBaseChangeData`, a nine-field bundle of K-flat resolutions and their
+  on `KFlatBaseChangeHypotheses`, a nine-field bundle of K-flat resolutions and their
   acyclicity, quasicoherence and tensor-preservation statements -- 195
   occurrences across 20 modules. That is a *model*, not the concept: it records
   one way to produce derived pullback and tensor, so no second construction
@@ -1014,25 +1014,25 @@ or exactness was strengthened by relocation.
   external product, the perfect generators and their envelope, the
   quasicoherent component `(Dqc)_T`, the bounded component `D_T`, their
   instances and the compactness consequences are all stated there.
-  `KFlatBaseChangeData` keeps its resolutions and becomes the producer, through
-  `KFlatBaseChangeData.toDerivedBaseChangeData`; its eight former
+  `KFlatBaseChangeHypotheses` keeps its resolutions and becomes the producer, through
+  `KFlatBaseChangeHypotheses.toDerivedBaseChangeData`; its eight former
   constructions are reducible abbreviations through it, so the 195 call sites
   are unchanged and definitionally the same terms.
 
   Seven duplicated instances and one duplicated theorem were deleted rather
   than delegated: with the abbreviations reducible, the root's instances fire
-  directly. `KFlatBaseChangeData.derivedTensor` moved from
+  directly. `KFlatBaseChangeHypotheses.derivedTensor` moved from
   `BaseChangeLinearity.lean` to the structure's own definition site, where a
   projection belongs.
 
-  What this unblocks: the first inhabitant. `KFlatBaseChangeData` is
+  What this unblocks: the first inhabitant. `KFlatBaseChangeHypotheses` is
   constructed nowhere in the tree, and the cheapest case is pullback along an
   open immersion, which `OpenImmersionPullback.lean` already proves *exact* --
   so it needs no resolution at all and could not have inhabited the old carrier
   without manufacturing three it does not use. It can now produce a
   `DerivedBaseChangeData` directly.
 
-  Not done here: `KFlatBaseChangeData.PreservesCompactObjects` remains
+  Not done here: `KFlatBaseChangeHypotheses.PreservesCompactObjects` remains
   model-level, bridged to the root's by `toDerivedPreservesCompactObjects`; a
   non-K-flat model states the root's version directly.
 
@@ -2484,7 +2484,7 @@ or exactness was strengthened by relocation.
   by instance search. Data that was reached through the bundle takes the
   field explicitly: `FiniteCohomology k X`, `FiniteDimensionalCohomology k X`,
   `LinearCohomology k X`, `SmoothProperVariety.CanonicalSheafData k X n`,
-  `NumericalData k X n A N`, `SurfaceChernCharacter k X`,
+  `NumericalHypotheses k X n A N`, `SurfaceChernCharacter k X`,
   `ProjectivePresentation k X`, `EulerRealization k X V`, and the relative
   differentials `Variety.relativeDifferentials k X` with their derivation and
   descent API. Projective space carries `instOverProjectiveSpace`,
