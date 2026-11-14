@@ -16,10 +16,27 @@ form Mukai's paper uses and a Fourier–Mukai comparison needs.
 Mukai pairing. That is a different statement: it compares against a formula, this compares against
 the class.
 
-## The sign, stated out loud rather than left to the reader
+## Main definitions
+
+* `AlgebraicGeometry.Numerical.NumericalVarietyData.mukaiDual` — the dual Mukai class
+  `v(E)^∨`.
+* `AlgebraicGeometry.Numerical.K3.mukaiIntegral` — the integral of the dual product
+  `∫_X v(E)^∨·v(F)`.
+
+## Main results
+
+* `AlgebraicGeometry.Numerical.K3.chi₂_eq_mukaiIntegral` — `χ(E,F) = ∫_X v(E)^∨·v(F)`.
+* `AlgebraicGeometry.Numerical.K3.mukaiIntegral_comm` — the integral is symmetric on a K3.
+* `AlgebraicGeometry.Numerical.K3.mukaiIntegral_eq_neg_mukaiPairing` and
+  `AlgebraicGeometry.Numerical.K3.pairing_eq_neg_mukaiIntegral` — the integral is minus the
+  Mukai pairing.
+
+## Implementation notes
+
+### The sign, stated out loud rather than left to the reader
 
 **The headline identity carries no minus sign**, and this is the one thing here that is easy to
-get wrong — a draft of this lane wrote one and propagated it into three further statements.
+get wrong.
 
 The two objects differ by a sign, and conflating them is where a spurious minus comes from:
 
@@ -34,18 +51,28 @@ The diagonal is the cross-check: `chi₂_self` gives `χ(E,E) = 2r² − ∫Δ` 
 gives `⟨v,v⟩ = ∫Δ − 2r²`, so `mukaiIntegral E E = −mukaiSelfPairing E`. If a statement here came
 out with the opposite sign, the error would be in its proof and not in this note.
 
-## The dual, and why it is the literature's involution on a K3
+### The dual, and why it is the literature's involution on a K3
 
 `mukaiDual` uses `chDual`'s convention, `chᵢ(E^∨) = (−1)ⁱchᵢ(E)`, applied to the Mukai components.
 The literature's Mukai involution is `(r,c,s)^∨ = (r,−c,s)`. On a K3 the two agree, because the
 odd component of `√td(X)` vanishes and so `√td(X)` is its own dual.
 
-## Two dimensions only, and why
+### Two dimensions only, and why
 
 `mukaiDual` is defined for every `n`, but nothing relates it to `χ` outside `IsK3`. On a general
 surface `χ(E,F) ≠ ∫ v(E)^∨·v(F)`, because `td₁ ≠ 0` makes `(√td)^∨ ≠ √td`;
 `Surface.chi₂_sub_chi₂_swap` already measures the resulting asymmetry. That is the whole story and
 this file stops there.
+
+## References
+
+The comparison is against the repository's `chi₂_eq_neg_mukaiPairing` and
+`NumericalVarietyData.mukaiClass`; the Mukai pairing convention is Mukai's, as used by
+`EulerPairing.lean`.
+
+## Tags
+
+Mukai vector, Euler pairing, K3 surface, Mukai pairing, sign convention
 -/
 
 universe u v

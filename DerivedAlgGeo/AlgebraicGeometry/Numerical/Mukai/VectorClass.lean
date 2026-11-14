@@ -9,30 +9,57 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.Mukai.SqrtTodd
 
 `v(E) = ch(E)·√td(X)`, component by component, for a numerical variety of any dimension.
 
-Until now the Mukai vector existed in this repository only as a *formula*: `IntegralMukaiData`
-asserts a triple `(rank, c₁, s)` by fiat, and `RiemannRoch/K3.lean` explains in a docstring that
-this triple is what `ch(E)·√td(X)` comes to on a K3. This file makes that a theorem. After it,
-`mukaiS` is a statement *about* `ch(E)·√td(X)` rather than a definition that happens to look
-right.
+`IntegralMukaiData` asserts a triple `(rank, c₁, s)` by fiat, and `RiemannRoch/K3.lean` explains
+in a docstring that this triple is what `ch(E)·√td(X)` comes to on a K3. This file defines the
+class itself, so that `mukaiS` is a statement *about* `ch(E)·√td(X)` rather than a definition
+that happens to look right.
 
-## Why it is defined in every dimension
+## Main definitions
+
+* `AlgebraicGeometry.Numerical.NumericalVarietyData.mukaiComp` — the codimension-`i` component
+  `(ch(E)·√td(X))ᵢ`.
+* `AlgebraicGeometry.Numerical.NumericalVarietyData.mukaiClass` — the Mukai vector as a single
+  class.
+
+## Main results
+
+* `AlgebraicGeometry.Numerical.NumericalVarietyData.mukaiComp_mem` — the `i`-th component lives
+  in codimension `i`.
+* `AlgebraicGeometry.Numerical.NumericalVarietyData.mukaiComp_add` and
+  `AlgebraicGeometry.Numerical.NumericalVarietyData.mukaiClass_add` — additivity.
+* `AlgebraicGeometry.Numerical.NumericalVarietyData.mukaiComp_zero` — `v₀(E) = rank E`.
+* `AlgebraicGeometry.Numerical.NumericalVarietyData.degree_mukaiComp_mul_mukaiComp_eq_zero` — a
+  product of components integrates to zero unless the codimensions add to the dimension.
+
+## Implementation notes
+
+### Why it is defined in every dimension
 
 `mukaiComp` takes an arbitrary `n`. The K3 facts are a section at `n = 2`, not the definition.
-Fourier–Mukai and the higher-dimensional Bridgeland lanes want `v(E)` on a threefold, and defining
-it only where it is currently used would force a rewrite later.
+Fourier–Mukai and higher-dimensional Bridgeland stability want `v(E)` on a threefold, and
+defining it only in dimension two would not serve them.
 
-## What is deliberately not touched
+### What is deliberately not touched
 
-`mukaiS` is **not** redefined as the degree of the top component. The existing definition stays and
+`mukaiS` is **not** redefined as the degree of the top component. That definition stays, and
 `K3.degree_mukaiComp_two` is the comparison theorem. Redefining it would ripple through the Euler
-pairing, the Mukai vector, the transfer and the realization files, which is a restructuring this
-lane must not do. Nothing under `Numerical/Core/**` or `Numerical/GrothendieckGroup/**` is edited.
+pairing, the Mukai vector, the transfer and the realization files.
 
-## The one place the convolution bites
+### The one place the convolution bites
 
 `mukaiComp_mem` needs the summand `chᵢ(E)·√td_{i-j}` to land in codimension `i`, and the grading
 gives it codimension `j + (i - j)`. Those agree only because `j ≤ i` inside the sum, so the index
 arithmetic is `Nat.add_sub_cancel'` and not `rfl`.
+
+## References
+
+The square root of the Todd class is `NumericalVarietyData.sqrtToddComp` from
+`Mukai/SqrtTodd.lean`; the vanishing lemma has the shape of the repository's
+`degree_chComp_mul_chComp_mul_toddComp_eq_zero`.
+
+## Tags
+
+Mukai vector, Chern character, Todd class, intersection ring, numerical variety
 -/
 
 universe u v

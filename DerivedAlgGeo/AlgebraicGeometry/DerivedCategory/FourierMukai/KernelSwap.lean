@@ -12,14 +12,40 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.Autoequivalence
 is the **reversed** correspondence `geometricCorrespondence X X Z q p`.
 `KernelAutoequivalence.DualKernel` needs the **same** correspondence on both
 sides, and for `p ≠ q` those are different values. That mismatch — not any
-remaining duality — is all that stood between the previous file and a dual
+missing duality — is the only obstruction between that datum and a dual
 kernel.
 
-This file closes it. Classically `Z = X × X` and the missing ingredient is the
+This file removes it. Classically `Z = X × X` and the missing ingredient is the
 swap `σ` exchanging the two factors, under which the reversed correspondence
 becomes the original one and the kernel is carried along.
 
-## The derivation, and why the kernel is `Rσ_*Q` rather than `σ^*Q`
+## Main definitions
+
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.HasPullbackSwap` and
+  `AlgebraicGeometry.DerivedCategory.FourierMukai.HasPushforwardSwap` — the two supplied swap
+  comparisons, named by `pullbackSwapIso` and `pushforwardSwapIso`.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.geometricSwapIso` — the reversed transform is
+  the original one with kernel `Rσ_* Q`.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.geometricDualKernelObj` — the dual kernel
+  object `Rσ_*(K^∨ ⊗ ω_q)`.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.geometricDualAdjointKernelData` — a right
+  adjoint kernel against the same correspondence.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.geometricKernelAutoequivalence` and
+  `AlgebraicGeometry.DerivedCategory.FourierMukai.geometricDualKernel` — a kernel
+  autoequivalence from a supplied equivalence, and its dual kernel.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.geometricKernelAutoequivalenceOfAdjoint` and
+  `AlgebraicGeometry.DerivedCategory.FourierMukai.geometricDualKernelOfAdjoint` — the same from
+  invertibility of the assembled adjunction's unit and counit.
+
+## Main results
+
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.geometricDualKernel_dual` and
+  `AlgebraicGeometry.DerivedCategory.FourierMukai.geometricDualKernelOfAdjoint_dual` — the dual
+  kernel is `geometricDualKernelObj`.
+
+## Implementation notes
+
+### The derivation, and why the kernel is `Rσ_*Q` rather than `σ^*Q`
 
 With `q = σ ≫ p` and `p = σ ≫ q`, pullback is contravariant and pushforward
 covariant, so `Lq^* ≅ Lp^* ⋙ Lσ^*` and `Rp_* ≅ Rσ_* ⋙ Rq_*`.  Substituting
@@ -36,7 +62,7 @@ the derivation needs `σ` invertible, and asking for it would be an unconsumed
 hypothesis. `Rσ_*` is what the projection formula hands back, so `Rσ_*` is what
 the kernel is written with.
 
-## The three inputs
+### The three inputs
 
 * `HasPullbackSwap σ p q` — `Lq^* ≅ Lp^* ⋙ Lσ^*`, with `σ ≫ p = q` as a
   **guard**;
@@ -54,7 +80,7 @@ reason `KernelConvolution.lean` already gives about a different pair: that
 isomorphism is stated at the literal `f ≫ g`, so bridging it to `q` would need
 `eqToHom` transport across compound terms.
 
-## What comes out
+### What comes out
 
 `geometricDualAdjointKernelData` is a `RightAdjointKernelData` for the geometric
 correspondence **against itself**, so `DualKernel.ofRightAdjointKernel` applies.
@@ -65,7 +91,7 @@ autoequivalence built on the geometric correspondence, with dual kernel
 
 — the classical `P^∨ ⊗ p^*ω_X[dim X]`, assembled entirely from named contracts.
 
-## What this file does not assert
+### What this file does not assert
 
 * **Nothing constructs a `HasPullbackSwap` or a `HasPushforwardSwap`**, and no
   morphism is shown to admit one. Inhabitant-free, like every ledger below it.
@@ -79,10 +105,20 @@ autoequivalence built on the geometric correspondence, with dual kernel
   `geometricKernelAutoequivalenceOfAdjoint` does not — it derives both from the
   invertibility of one adjunction's unit and counit — but that invertibility is
   itself assumed, and nothing here establishes it. Classically it is the
-  Bondal--Orlov criterion, which needs geometry this repository does not have.
-  So a transform is still never *shown* to be an equivalence; what changed is
-  only the shape of the assumption.
+  Bondal--Orlov criterion, whose geometric input is not formalized here.
+  So a transform is never *shown* to be an equivalence; only the shape of the
+  assumption differs between the two constructions.
 * No Serre duality, no smoothness, no properness, no relative dimension.
+
+## References
+
+The repository's `CategoryTheory.Triangulated.FourierMukai.KernelAutoequivalence.DualKernel`,
+`KernelAutoequivalence.DualKernel.ofRightAdjointKernel` and
+`KernelAutoequivalence.ofRightAdjointKernel`.
+
+## Tags
+
+Fourier--Mukai kernel, dual kernel, swap, projection formula, autoequivalence
 -/
 
 universe u
@@ -209,9 +245,10 @@ noncomputable def geometricDualKernelObj :
 
 /-- **A right adjoint kernel against the same correspondence.**
 
-The previous ledger's datum, transported along the swap. Its opposite
-correspondence is now `geometricCorrespondence X X Z p q` itself, which is what
-`DualKernel` requires. -/
+The datum `geometricRightAdjointKernelData` of `KernelDualizingTwist.lean`,
+transported along the swap. Its opposite correspondence is
+`geometricCorrespondence X X Z p q` itself, which is what `DualKernel`
+requires. -/
 @[reducible] noncomputable def geometricDualAdjointKernelData :
     RightAdjointKernelData (geometricCorrespondence X X Z p q)
       (geometricCorrespondence X X Z p q) K where
@@ -229,8 +266,8 @@ supplied equivalence.
 
 The equivalence and its comparison isomorphism are arguments, exactly as in
 `KernelAutoequivalence` itself. That a geometric Fourier--Mukai transform *is*
-an equivalence is the classical theorem this lane is conditional on, and
-nothing here approaches it. The point of naming this is that its `corr` and
+an equivalence is the classical theorem the Fourier--Mukai development is
+conditional on, and nothing here approaches it. The point of naming this is that its `corr` and
 `kernel` are the geometric ones definitionally, so the dual kernel below
 typechecks against it. -/
 noncomputable def geometricKernelAutoequivalence
@@ -248,13 +285,13 @@ noncomputable def geometricKernelAutoequivalence
 
 /-- **A geometric dual kernel.**
 
-The end of the arc. `DualKernel.ofRightAdjointKernel` at the swapped datum: the
+`DualKernel.ofRightAdjointKernel` at the swapped datum: the
 quasi-inverse of the supplied equivalence is the transform of the same
 correspondence with kernel `Rσ_*(K^∨ ⊗ ω_q)` — the classical
 `P^∨ ⊗ p^*ω_X[dim X]` — and every step from the three constituent adjunctions
 onward is derived rather than supplied.
 
-What is still supplied is the equivalence itself, and the geometric contracts.
+What is supplied is the equivalence itself, and the geometric contracts.
 Nothing here constructs either. -/
 noncomputable def geometricDualKernel
     (equiv : SchemeBoundedCoherentDerivedCategory X.left ≌
@@ -275,28 +312,27 @@ theorem geometricDualKernel_dual
     (geometricDualKernel X Z σ p q K equiv iso).dual =
       geometricDualKernelObj X Z σ q K := rfl
 
-/-! ### The equivalence, no longer supplied
+/-! ### The equivalence from the adjunction
 
 `geometricKernelAutoequivalence` above takes the equivalence as an argument.
 This does not: given that the assembled adjunction's unit and counit are
 invertible, `KernelAutoequivalence.ofRightAdjointKernel` builds the equivalence,
 and the dual kernel comes with it at no further cost.
 
-The invertibility is still an assumption — it is the second half of the layer-3
-work, and classically it is the Bondal--Orlov criterion. What has changed is its
-shape: it is pointwise and checkable, and its two halves are full faithfulness
-and essential surjectivity, which is what a geometric criterion would deliver.
-Nothing here supplies it. -/
+The invertibility is an assumption; classically it is the Bondal--Orlov
+criterion. Its shape is pointwise and checkable, and its two halves are full
+faithfulness and essential surjectivity, which is what a geometric criterion
+would deliver. Nothing here supplies it. -/
 
 /-- **A geometric kernel autoequivalence with no supplied equivalence.**
 
-Everything is now the ledger plus the invertibility of one adjunction's unit and
+Everything is the ledger plus the invertibility of one adjunction's unit and
 counit. Compare `geometricKernelAutoequivalence`, which takes an equivalence and
 a comparison isomorphism outright. -/
 -- `@[reducible]` so that instance search sees `ofRightAdjointKernel` and finds
 -- the six exactness instances stated against it; without this the geometric
 -- equivalence cannot reach `actStabOfDual`. Same reason `trans` and `id` are
--- reducible in `Symmetry/Autoequivalence/FourierMukai`.
+-- reducible in `FourierMukai/Autoequivalence.lean`.
 @[reducible] noncomputable def geometricKernelAutoequivalenceOfAdjoint
     [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.unit.app E)]
     [∀ E, IsIso ((geometricDualAdjointKernelData X Z σ p q K).adj.counit.app E)] :

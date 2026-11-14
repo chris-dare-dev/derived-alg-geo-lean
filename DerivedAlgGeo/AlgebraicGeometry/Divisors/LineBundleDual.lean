@@ -12,28 +12,43 @@ import DerivedAlgGeo.AlgebraicGeometry.Divisors.Dual
 explicit tensor inverse. `dualLine` (in `Divisors.Dual`) produces such an inverse. This file
 is the one place where the two meet.
 
-## Why this is its own file
+## Main definitions
 
-It is the *only* thing in `Divisors.Dual` that ever needed `Divisors.Determinant`: three names
-out of the thirty-seven that file declares, in eleven lines out of seven hundred and forty. That
-one edge put `Dual` downstream of `Determinant`, and so downstream of `ExteriorPower`, which is
-the single most expensive module in the repository. Lifting the edge into a leaf costs one file
-and buys two things:
+* `AlgebraicGeometry.Scheme.Modules.LineBundleData.ofIsInvertible` upgrades an intrinsically
+  invertible sheaf to line-bundle data whose inverse is its sheafified dual.
 
-* the cold-build critical path drops from 1219s to 1041s, because `Dual` no longer waits on
-  `ExteriorPower` and the two elaborate in parallel;
-* a change to `ExteriorPower` rebuilds 271s of downstream work instead of 507s, and a change to
-  `Determinant` 187s instead of 423s.
+## Main results
+
+This file proves no theorems; the invertibility and tensor-inverse fields come from
+`dualLine_isInvertible` and `tensorDualIso`.
+
+## Implementation notes
+
+### Why this is its own file
+
+This declaration is the only point at which the dual-line API needs `Divisors.Determinant`.
+Keeping it in a leaf keeps `Divisors.Dual` independent of `Determinant`, and so of
+`ExteriorPower`, an expensive module to elaborate: `Dual` and `ExteriorPower` then elaborate in
+parallel, and a change to `ExteriorPower` or `Determinant` does not rebuild `Dual`.
 
 Keep this file a leaf. Anything added here that does not genuinely need *both* `Determinant` and
 `Dual` belongs in whichever of them it actually depends on, or the edge comes back.
+
+## References
+
+This combines `AlgebraicGeometry.Scheme.Modules.LineBundleData` with `dualLine`,
+`dualLine_isInvertible` and `tensorDualIso`, built on Mathlib's `SheafOfModules.IsInvertible`.
+
+## Tags
+
+line bundle, invertible sheaf, dual, tensor inverse
 -/
 
 universe u
 
 open CategoryTheory TopologicalSpace Opposite MonoidalCategory
 
--- As in `Divisors.Dual`, from which this declaration came.
+-- As in `Divisors.Dual`, whose declarations this one is built from.
 set_option backward.isDefEq.respectTransparency false
 
 namespace AlgebraicGeometry.Scheme.Modules

@@ -209,8 +209,8 @@ def pullSnd (D : KFlatBaseChangeData X T) :
 
 /-- The K-flat derived tensor on the fibre product underlying a base-change datum.
 
-Moved here from `BaseChangeLinearity.lean`: it is a projection of
-`KFlatBaseChangeData`, so it belongs at the structure's definition site. -/
+It is a projection of `KFlatBaseChangeData`, so it lives at the structure's
+definition site. -/
 noncomputable def derivedTensor (D : KFlatBaseChangeData X T) :
     Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
       Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
@@ -314,7 +314,7 @@ structure PreservesCompactObjects (D : KFlatBaseChangeData X T) : Prop where
   tensor : D.tensorResolution.ResolvedTensorPreservesCompactObjects D.tensorQuasicoherent
 
 /-- **Model-level compactness produces the model-free obligations.** Both
-consequences below now route through the root rather than reproving on the
+consequences below route through the root rather than reproving on the
 resolutions. -/
 theorem toDerivedPreservesCompactObjects (D : KFlatBaseChangeData X T)
     (hD : D.PreservesCompactObjects) :

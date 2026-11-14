@@ -14,45 +14,77 @@ the map that turns a numerical class on a polarised variety into the compressed
 `H`-degrees that the charge consumes, written once for every dimension `n`,
 truncation degree `m` and correction class `κ`.
 
-Before this the transport existed twice: `Surface.toNumClass`
-(`WallTransport.lean`) at `n = 2` and `Threefold.toNumClass`
-(`ThreefoldWallTransport.lean`) at `n = 3`, the second a hand-copy of the first
-at one more codimension. Both are proved below to be this map.
+`Surface.toNumClass` (`WallTransport.lean`) at `n = 2` and `Threefold.toNumClass`
+(`ThreefoldWallTransport.lean`) at `n = 3` are this map at one dimension each;
+`PolarisedWallTransportComparison.lean` proves both equal to it.
 
-## The rank slot carries `∫Hⁿ`
+## Main definitions
+
+* `AlgebraicGeometry.Numerical.Polarised.unitCorr` — the trivial correction class `κ = 1`.
+* `AlgebraicGeometry.Numerical.Polarised.corrComp` — the corrected character `(ch(E)·κ)_k`.
+* `AlgebraicGeometry.Numerical.Polarised.hDegrees` and
+  `AlgebraicGeometry.Numerical.Polarised.hDegreesHom` — the compressed `H`-degree vector, bare
+  and as an additive map.
+* `AlgebraicGeometry.Numerical.Polarised.wallChargeFamily` — the wall family of a polarised
+  variety, the kernel's family pulled back along the transport.
+
+## Main results
+
+* `AlgebraicGeometry.Numerical.Polarised.corrComp_unitCorr` and
+  `AlgebraicGeometry.Numerical.Polarised.corrComp_sqrtToddComp` — `κ = 1` gives the Chern
+  character and `κ = √td` the Mukai vector.
+* `AlgebraicGeometry.Numerical.Polarised.hDegrees_zero` and
+  `AlgebraicGeometry.Numerical.Polarised.hDegrees_one` — slot 0 is `∫Hⁿ · rank E` and slot 1 is
+  `degH`.
+* `AlgebraicGeometry.Numerical.Polarised.slopeH_eq_degree_mul_ratio` and
+  `AlgebraicGeometry.Numerical.Polarised.slopeH_ne_ratio_of_degree_ne_one` — the slope is
+  `∫Hⁿ` times the slot ratio, and not the ratio itself.
+
+## Implementation notes
+
+### The rank slot carries `∫Hⁿ`
 
 Slot `k` is `∫ H^(n-k) · (ch(E)·κ)_k`, so the index is codimension and slot `0`
-is `∫Hⁿ · rk(E)`, not the bare rank. Both existing transports already did this
-and said so in their docstrings, but nothing tied the convention to a root;
-`hDegrees_zero` now does, in every dimension at once.
+is `∫Hⁿ · rk(E)`, not the bare rank. Both dimension-specific transports do this
+and say so in their docstrings; `hDegrees_zero` ties the convention to the root,
+in every dimension at once.
 
 The weight is as easy to get wrong in the other direction. The slope `μ_H` is
 **not** the ratio of slots `d₁/d₀`: that ratio is the slope divided by `∫Hⁿ`.
 `slopeH_eq_degree_mul_ratio` states the true relation, and
 `slopeH_ne_ratio_of_degree_ne_one` records the false one as a negative result,
-because the naive reading was written down during this lane's own design review
-and is wrong on every polarization of degree other than one.
+because the naive reading is tempting and is wrong on every polarization of
+degree other than one.
 
-## `κ` is a pullback, never a coefficient
+### `κ` is a pullback, never a coefficient
 
 The correction class enters through `corrComp`, a convolution in the right-hand
-slot, and nothing else here knows which class it is. Two values matter today:
+slot, and nothing else here knows which class it is. Two values are used:
 `unitCorr`, giving the plain Chern character, and `sqrtToddComp`, giving the
 Mukai vector. `corrComp_sqrtToddComp` is `rfl`, because
-`NumericalVarietyData.mukaiComp` was already this convolution written out, so
+`NumericalVarietyData.mukaiComp` is this convolution written out, so
 the Mukai vector is not a second construction. The two are pullbacks of one
 transport with genuinely different walls and must not be fused into one family.
 
-## What is proved about the existing families
+### Comparison with the dimension-specific families
 
 `surface_toNumClass_eq` and `threefold_toNumClass_eq` are the class-level
 comparisons. `surface_wallChargeFamily_eq` is the family-level one, which is
-the form a consumer actually needs: the existing surface wall family is this
-root's family, reindexed by the surface chart.
+the form a consumer actually needs: the surface wall family of `WallTransport.lean`
+is this root's family, reindexed by the surface chart.
 
 The threefold family-level twin is deliberately absent. It needs a truncation
-map that does not exist yet, which belongs to the tilt slice; inventing a
-second route to it here is exactly what the tilt adjudication exists to stop.
+map that belongs with tilt stability and is not defined here; this file does not
+supply a second route to it.
+
+## References
+
+The exponential charge is the repository's
+`CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Exp.chargeFamily`.
+
+## Tags
+
+wall transport, polarised variety, Chern character, Mukai vector, central charge
 -/
 
 open scoped BigOperators
@@ -129,14 +161,14 @@ def wallChargeFamily (V : NumericalVarietyData n A N) (P : Polarization V.ring)
   (Exp.chargeFamily m).pullback (hDegreesHom V P κ m)
 
 /-- The root family evaluates as the kernel on the transported degrees. The
-accessor the surface leaf has had since `WallTransport.lean:161`; a consumer
+surface leaf in `WallTransport.lean` has the same accessor; a consumer
 that unfolds `pullback` by hand is reaching past this definition. -/
 @[simp]
 theorem wallChargeFamily_charge (V : NumericalVarietyData n A N)
     (P : Polarization V.ring) (κ : ℕ → A) (m : ℕ) (w : ℂ) (E : N) :
     (wallChargeFamily V P κ m).charge w E = Exp.charge m w (hDegrees V P κ m E) := rfl
 
-/-- **PROVED.**  Slot 0 is `∫Hⁿ · rank E`. -/
+/-- Slot 0 is `∫Hⁿ · rank E`. -/
 theorem hDegrees_zero (V : NumericalVarietyData n A N) (P : Polarization V.ring)
     (E : N) :
     V.ring.degree (corrComp V (unitCorr A) E 0 * P.cls ^ (n - 0))
@@ -146,8 +178,8 @@ theorem hDegrees_zero (V : NumericalVarietyData n A N) (P : Polarization V.ring)
   rw [hc, Nat.sub_zero, NumericalRingData.degree_algebraMap_mul]
 
 /-! ###########################################################################
-    (3) N4 — the honest relation between `slopeH` and the root's slots.
-    `slopeH` (Slope.lean:133) is `degH / rank`, while slot 0 is `rank · ∫Hⁿ`.
+    The relation between `slopeH` and the root's slots.
+    `slopeH` (in `Slope.lean`) is `degH / rank`, while slot 0 is `rank · ∫Hⁿ`.
     So the ratio `d₁ / d₀` is NOT the slope: it is the slope divided by `∫Hⁿ`.
     ########################################################################### -/
 
@@ -167,9 +199,9 @@ private theorem ratio_aux (d D r : ℝ) (hD : D ≠ 0) : d / r = D * (d / (r * D
   · simp [h]
   · field_simp
 
-/-- **N4, corrected and proved.**  `μ_H(E) = ∫Hⁿ · (d₁ / d₀)`.
+/-- **The slope from the slots.**  `μ_H(E) = ∫Hⁿ · (d₁ / d₀)`.
 
-The report's §2.6 reading `slopeH = d₁ / d₀` is FALSE whenever `∫Hⁿ ≠ 1`: the
+The reading `slopeH = d₁ / d₀` is FALSE whenever `∫Hⁿ ≠ 1`: the
 rank slot carries the `∫Hⁿ` weight, so the ratio of the root's slots is the
 slope *scaled down* by `∫Hⁿ`.  Note there is no rank hypothesis — at `rank E = 0`
 both sides are Lean's junk `0`, which is the same junk `slopeH` already has. -/
@@ -191,7 +223,7 @@ theorem slopeH_eq_degree_mul_ratio (V : NumericalVarietyData n A N)
   rw [h0, h1, slopeH, Rat.cast_div]
   exact ratio_aux _ _ _ (ne_of_gt hD)
 
-/-- **The falsified reading, recorded as a negative result.**  `slopeH = d₁/d₀`
+/-- **The naive reading, recorded as a negative result.**  `slopeH = d₁/d₀`
 holds exactly when `∫Hⁿ = 1` (or the slope is zero); it is not an identity. -/
 theorem slopeH_ne_ratio_of_degree_ne_one (V : NumericalVarietyData n A N)
     (P : Polarization V.ring) (hn : 1 ≤ n) (E : N)

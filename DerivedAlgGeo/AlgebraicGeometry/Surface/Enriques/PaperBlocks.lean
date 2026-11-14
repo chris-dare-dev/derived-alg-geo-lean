@@ -19,15 +19,45 @@ identified with the already constructed neutral residual component.  A
 inclusion, and `projectedObject` is exactly the paper's
 `S_i := ζ_K^!(L_{i1})`.
 
+## Main definitions
+
+All in the namespace `AlgebraicGeometry.EnriquesSurface.IsotropicCollection`:
+
+* `PaperBlockData` — the partition into exceptional blocks.
+* `PaperResidualProjectionData` — a chosen right-adjoint projection onto the residual category.
+* `PaperBlockData.projectedObject` — the residual projection object `S_i := ζ_K^!(L_{i1})`.
+* `PaperIProjectionClassificationData` and `PaperIIProjectionClassificationData` — the Paper I
+  and Paper II projection statements and classifications, as supplied data.
+
+## Main results
+
+* `PaperBlockData.totalLength_eq_ten` — the block lengths total ten.
+* `PaperIIProjectionClassificationData.projectedObject_dichotomy` — every Paper II projection
+  object is `3`-spherical or `3`-pseudoprojective.
+* The non-vanishing and non-shift consequences of each classification:
+  `projectedObject_not_isZero` and the `…_not_shift` lemmas.
+
+## Implementation notes
+
 The spherical, pseudoprojective, orthogonality, and completeness statements
 remain supplied theorem data: their proofs use mutation triangles and Ext
-computations not yet constructed in the repository.  The new classification
+computations not constructed in the repository.  The classification
 constructors ensure, however, that these theorems concern the actual residual
 projections of the actual block objects, rather than arbitrary candidates.
 
 The chains of `(-2)`-curves appearing in Paper II, Proposition 1.4 and the
 mutation/Ext consequences they feed are recorded in the downstream
 `PaperExtension` module.
+
+## References
+
+* Li, Nuer, Stellari, Zhao, arXiv:1912.04332v2, Setup 4.5 and Lemmas 4.7--4.8.
+* Li, Stellari, Zhao, arXiv:2104.13610v2, Proposition 1.4, Setup 2.5, Lemma 2.4, and
+  Theorem 2.7.
+
+## Tags
+
+Enriques surface, exceptional collection, residual category, spherical object, projection
 -/
 
 universe u t
@@ -194,8 +224,8 @@ variable {B : T.PaperBlockData exceptional semiorthogonal (Fin 10)}
 variable {Q : T.PaperResidualProjectionData exceptional semiorthogonal}
 variable (A : T.PaperIProjectionClassificationData P B Q)
 
-/-- Forget the block/projection realization and recover the previously landed
-Paper I classification interface. -/
+/-- Forget the block/projection realization and recover the Paper I classification
+interface `PaperISphericalClassificationData`. -/
 noncomputable def toSphericalClassificationData :
     T.PaperISphericalClassificationData P where
   candidate := B.projectedObject Q
@@ -273,8 +303,8 @@ variable {B : T.PaperBlockData exceptional semiorthogonal ι}
 variable {Q : T.PaperResidualProjectionData exceptional semiorthogonal}
 variable (A : T.PaperIIProjectionClassificationData P B Q)
 
-/-- Forget the block/projection realization and recover the previously landed
-Paper II mixed classification interface. -/
+/-- Forget the block/projection realization and recover the Paper II mixed
+classification interface `PaperIIObjectClassificationData`. -/
 noncomputable def toMixedClassificationData :
     T.PaperIIObjectClassificationData P ι where
   blockLength := B.blocks.length

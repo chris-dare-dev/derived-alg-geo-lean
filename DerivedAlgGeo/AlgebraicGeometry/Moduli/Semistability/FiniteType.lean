@@ -174,8 +174,8 @@ structure FiniteTypeGeometricConsequences
   relativeHN : HasSchemeRelativeHNFiltrations F classMap sigma
     finiteTypeRegularCurveEligible
 
-/-- Construct every finite-type geometric consequence from the previously
-built bounded-coherent base-change input. -/
+/-- Construct every finite-type geometric consequence from the bounded-coherent
+base-change input `GeometricPreStabilityBaseChangeData`. -/
 theorem GeometricPreStabilityBaseChangeData.finiteTypeConsequences
     (h : GeometricPreStabilityBaseChangeData F R classMap sigma) :
     FiniteTypeGeometricConsequences F classMap sigma where

@@ -768,7 +768,7 @@ noncomputable instance modulesMonoidalCategory : MonoidalCategory X.Modules wher
   pentagon := tensorAssocIso_pentagon
   triangle := tensorAssocIso_triangle
 
-/-- The historical tensor-left functor is the canonical functor of the monoidal
+/-- The tensor-left functor, named; it is the canonical `tensorLeft` of the monoidal
 structure on scheme-module sheaves. -/
 noncomputable abbrev tensorLeftFunctor (L : X.Modules) : X.Modules ⥤ X.Modules :=
   tensorLeft (C := X.Modules) L

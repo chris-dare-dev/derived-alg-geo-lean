@@ -15,7 +15,7 @@ rank-one sublattice `ℤ·H` spanned by one polarisation class with `H² = 2d`, 
 is a legitimate slice because the Enriques lattice is even. Nothing below has
 Picard rank one as a hypothesis or as a conclusion, and no isotropic sequence,
 no rank-ten form and no lattice-theoretic Enriques invariant is visible from
-here. The rank-ten lattice is a separate lane.
+here; the rank-ten lattice is not modelled.
 
 What the slice carries is the Todd class
 
@@ -25,11 +25,27 @@ so that `td₁ = 0` and `∫_Y td₂ = χ(O_Y) = 1` — strictly between the K3'
 and the abelian surface's `0`. Riemann–Roch on this model reads
 `χ(r, c, s) = r + 2ds`.
 
-## What the numerical shadow cannot see
+## Main definitions
+
+* `enriquesNumericalVariety` — the model.
+* `standardEnriquesNumericalVariety` — a named degree-one witness.
+
+## Main results
+
+* `enriquesNumericalVariety_satisfiesHRR` — the presentation satisfies HRR.
+* `enriques_isEnriques` — the model satisfies the numerical Enriques
+  signature.
+* `enriquesChiStructureSheaf` — `∫_Y td₂ = χ(O_Y) = 1`.
+* `enriquesToddComp_one` — `td₁ = 0`: the canonical class is numerically
+  trivial, though not trivial in `Pic`.
+
+## Implementation notes
+
+### What the numerical shadow cannot see
 
 On an Enriques surface `2K_Y = 0` with `K_Y ≠ 0` in `Pic` — the geometric
-formulation is the business of the geometric surface lane, and no bridge from
-this numerical model is claimed in either direction. Torsion dies in the
+formulation belongs to the geometric surface theory under `AlgebraicGeometry/Surface/`,
+and no bridge from this numerical model is claimed in either direction. Torsion dies in the
 numerical quotient, so here `td₁ = -K/2` is *zero*, exactly as it is for the
 abelian surface: `td₁` cannot detect the torsion —
 `enriquesToddComp_one` and `abelianToddComp_one` are the same equation. What
@@ -47,24 +63,14 @@ surface's `0`, so `χ` increases by exactly one when the rank does: `χ` is onto
 `ℤ` here, lands in `2ℤ` on the K3 model, and cannot see the rank at all on
 the abelian one.
 
-## Main definitions
-
-* `enriquesNumericalVariety` — the model.
-* `standardEnriquesNumericalVariety` — a named degree-one witness.
-
-## Main results
-
-* `enriquesNumericalVariety_satisfiesHRR` — the presentation satisfies HRR.
-* `enriques_isEnriques` — the model satisfies the numerical Enriques
-  signature.
-* `enriquesChiStructureSheaf` — `∫_Y td₂ = χ(O_Y) = 1`.
-* `enriquesToddComp_one` — `td₁ = 0`: the canonical class is numerically
-  trivial, though not trivial in `Pic`.
-
 ## References
 
 * Li, Nuer, Stellari, Zhao, *A refined Derived Torelli Theorem for Enriques
   surfaces*, arXiv:1912.04332.
+
+## Tags
+
+Enriques surface, numerical lattice, Todd class, Riemann–Roch, polarisation
 -/
 
 open Polynomial Submodule Set

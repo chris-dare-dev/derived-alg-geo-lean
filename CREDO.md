@@ -99,6 +99,5 @@ what that line names and to nothing else.
   `docs/` for the wiki (§1).
 - `scripts/` holds loop, evidence and receipt tooling with its own fixtures
   and tests (§3).
-- Some Lean comments still narrate history ("this lane", "previously",
-  "cutover"), and some names pass 60 characters (§4).
+- Some names pass 60 characters (§4).
 - Structures that package unproved inputs are named `Data` (Lean rules).

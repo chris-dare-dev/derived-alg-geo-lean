@@ -14,15 +14,30 @@ quasi-coherent module sheaves is again quasi-coherent. This is the half of the
 weak Serre property that does not need extensions, and it is what makes the
 inclusion of quasi-coherent sheaves into all module sheaves exact.
 
-## Why this file exists at this layer
+## Main definitions
 
-The affine case was previously proved inside the moduli lane, in
-`DerivedCategory/Dqc/AffineRealization.lean`, where it was reachable
-only by that lane. Quasi-coherence closure is a general fact about schemes: the
-Serre lane wants it, and `Dqc(X)`'s triangulated structure wants it. So it lives
-here, under `AlgebraicGeometry`, and the moduli lane consumes it.
+This file introduces no new definitions; it registers the closure instances on Mathlib's
+`SheafOfModules.isQuasicoherent`.
 
-## The shape of the argument
+## Main results
+
+* `AlgebraicGeometry.Scheme.Hom.isQuasicoherent_over_iff_restrict`;
+* `AlgebraicGeometry.Scheme.Modules.isQuasicoherent_iff_restrict_affineOpenCover`;
+* `AlgebraicGeometry.Scheme.Modules.isQuasicoherent_kernel` and `isQuasicoherent_cokernel`;
+* `AlgebraicGeometry.quasicoherent_isClosedUnderKernels` and
+  `AlgebraicGeometry.quasicoherent_isClosedUnderCokernels`.
+
+## Implementation notes
+
+### Why this file lives at this layer
+
+Quasi-coherence closure is a general fact about schemes: the weak Serre property and
+`Dqc(X)`'s triangulated structure both use it. So it lives here, under
+`AlgebraicGeometry/Modules`, and the affine derived-category realization
+`DerivedCategory/Dqc/AffineRealization.lean` consumes it rather than proving its own affine
+case.
+
+### The shape of the argument
 
 Exactly the shape `Abelian/Kernels.lean` uses for coherence, with the Noetherian
 hypotheses deleted — quasi-coherence needs none.
@@ -35,13 +50,16 @@ hypotheses deleted — quasi-coherence needs none.
    colimits, and quasi-coherence is affine-local, so the affine case transfers
    along `X.affineOpenCover`.
 
-## Main results
+## References
 
-* `Scheme.Hom.isQuasicoherent_over_iff_restrict`;
-* `Scheme.Modules.isQuasicoherent_iff_restrict_affineOpenCover`;
-* `Scheme.Modules.isQuasicoherent_kernel` and `isQuasicoherent_cokernel`;
-* `Scheme.quasicoherent_isClosedUnderKernels` and
-  `Scheme.quasicoherent_isClosedUnderCokernels`.
+The kernel criterion is `isLocalizedModule_basicOpenRestriction_kernel` from
+`Abelian/Kernels.lean`; the closure interfaces are Mathlib's
+`CategoryTheory.ObjectProperty.IsClosedUnderKernels` and
+`CategoryTheory.ObjectProperty.IsClosedUnderCokernels`.
+
+## Tags
+
+quasi-coherent sheaf, kernel, cokernel, affine-local, weak Serre subcategory
 -/
 
 universe u v

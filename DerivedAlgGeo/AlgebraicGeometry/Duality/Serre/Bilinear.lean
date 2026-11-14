@@ -19,7 +19,28 @@ which specialises at `E = 𝒪` to the above and at `E = F` on a surface with tr
 bundle to `Ext²(E,E) ≃ Hom(E,E)ᵛ`.  That last is what Bridgeland's Lemma 5.1 runs on.  This file
 supplies it, in the same idiom, and proves the consequences.
 
-## Supplied, and why
+## Main definitions
+
+* `AlgebraicGeometry.Duality.Serre.BilinearData` — bilinear coherent Serre duality, as supplied
+  realization data.
+* `AlgebraicGeometry.Duality.Serre.BilinearData.TrivialCanonical` — a trivial canonical bundle,
+  recorded on the realized `Ext` spaces.
+* `AlgebraicGeometry.Duality.Serre.BilinearData.eulerChar` — the categorical Euler
+  characteristic of a pair.
+
+## Main results
+
+* `AlgebraicGeometry.Duality.Serre.BilinearData.finrank_eq` — complementary `Ext` dimensions
+  agree.
+* `AlgebraicGeometry.Duality.Serre.BilinearData.finrank_top_eq_finrank_hom` — with trivial
+  canonical bundle, `Ext^n(E,E)` and `Hom(E,E)` have the same dimension.
+* `AlgebraicGeometry.Duality.Serre.BilinearData.surface_selfEuler_eq` and
+  `AlgebraicGeometry.Duality.Serre.BilinearData.surface_selfEuler_le` — on a surface with
+  trivial canonical bundle, `χ(E,E) = 2·hom(E,E) − ext¹(E,E) ≤ 2·hom(E,E)`.
+
+## Implementation notes
+
+### Supplied, and why
 
 `BilinearData` is **data, not a theorem**, exactly as `DerivedStatement` and `Data` are, and for
 the same upstream reason recorded there: the pinned Mathlib has derived categories and `Ext` but
@@ -32,7 +53,7 @@ it rather than pretending to more.
 bilinear form is stated once, in one place, with its consequences proved from it, instead of being
 re-supplied ad hoc by each consumer that needs `Ext²(E,E) ≃ Hom(E,E)ᵛ`.
 
-## What the consequences sharpen
+### What the consequences sharpen
 
 `surface_selfEuler_eq` computes, on a surface with trivial canonical bundle,
 
@@ -43,10 +64,19 @@ re-supplied ad hoc by each consumer that needs `Ext²(E,E) ≃ Hom(E,E)ᵛ`.
 and `surface_selfEuler_le` drops the middle term to give `χ(E,E) ≤ 2·hom(E,E)`.
 
 That isolates the remaining input for Lemma 5.1 (`χ(E,E) ≤ 2`, hence `v(E)² ≥ −2`) to a single
-fact: **`hom(E,E) = 1` for a stable sheaf.**  Simplicity is still not in this repository, and
-neither is the bilinear Riemann–Roch that would connect this categorical Euler characteristic to
-`NumericalVarietyData.chi₂`.  Both gaps are real and neither is closed here; see
-`ag-lean-handoff/lemma-5-1/SCOPE.md`.
+fact: **`hom(E,E) = 1` for a stable sheaf.**  Neither that simplicity statement nor the bilinear
+Riemann–Roch that would connect this categorical Euler characteristic to
+`NumericalVarietyData.chi₂` is proved here.
+
+## References
+
+* Bridgeland's Lemma 5.1, whose input `χ(E,E) ≤ 2·hom(E,E)` is `surface_selfEuler_le`.
+* The repository's `AlgebraicGeometry.Duality.Serre.Data` and
+  `AlgebraicGeometry.Duality.Serre.DerivedStatement`, whose idiom this file follows.
+
+## Tags
+
+Serre duality, Ext, bilinear pairing, trivial canonical bundle, Euler characteristic
 -/
 
 universe u
@@ -183,7 +213,7 @@ theorem surface_selfEuler_eq (hn : n = 2) (T : S.TrivialCanonical)
 /-- **`χ(E,E) ≤ 2·hom(E,E)`** on such a surface, by dropping `ext¹ ≥ 0`.
 
 This is the shape Bridgeland's Lemma 5.1 needs.  What remains is `hom(E,E) = 1` for a stable
-sheaf — simplicity — which is not in this repository, and the bilinear Riemann–Roch that would
+sheaf — simplicity — which is not proved here, and the bilinear Riemann–Roch that would
 identify this `eulerChar` with `NumericalVarietyData.chi₂`, which is supplied rather than proved
 in `EulerTransfer.lean`. -/
 theorem surface_selfEuler_le (hn : n = 2) (T : S.TrivialCanonical)

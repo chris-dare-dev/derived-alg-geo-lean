@@ -132,7 +132,7 @@ theorem algebraMap_mul_mem {i : ℕ} {x : SurfaceRing} (q : ℚ)
 noncomputable def surfaceDegree (h2 : ℚ) : SurfaceRing →ₗ[ℚ] ℚ := h2 • surfacePB.basis.coord idx2
 
 -- `simp` is the wrong tool here: `PowerBasis.coe_basis` fires first and turns `basis i` into
--- `gen ^ i`, after which `Basis.repr_self` no longer matches. Rewrite by hand.
+-- `gen ^ i`, after which `Basis.repr_self` does not match. Rewrite by hand.
 theorem surfaceDegree_basis_of_ne (h2 : ℚ) (i : Fin surfacePB.dim) (hi : surfaceW i ≠ 2) :
     surfaceDegree h2 (surfacePB.basis i) = 0 := by
   have hne : i ≠ idx2 := fun h => hi (by rw [h]; rfl)
@@ -196,7 +196,8 @@ abbrev SurfaceNum : Type := Fin 3 → ℤ
 /-- Shared Chern-character coordinates for the rank-one surface models: the
 class `(r, c, s)` has `ch = r + c·H + s·H²`.
 
-The historical name is retained even though the construction is not K3-specific. -/
+The `k3` prefix does not make the construction K3-specific: the K3, Enriques and
+abelian surface models share it. -/
 noncomputable def k3ChCoeff (E : SurfaceNum) : ℕ → ℚ
   | 0 => (E 0 : ℚ)
   | 1 => (E 1 : ℚ)

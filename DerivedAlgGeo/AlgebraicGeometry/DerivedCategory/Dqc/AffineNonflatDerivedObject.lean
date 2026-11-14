@@ -179,7 +179,7 @@ instance twoTermResolution_projective_X (n : ℤ) :
 def kProjectiveRepresentative : KProjectiveHomotopyCategory (ModuleCat ℤ) :=
   KProjectiveHomotopyCategory.ofBoundedAboveProjectives twoTermResolution 0
 
-/-- The same concrete complex in the supported bounded-above-projective lane. -/
+/-- The same concrete complex in the bounded-above-projective homotopy category. -/
 def boundedAboveProjectiveRepresentative :
     BoundedAboveProjectiveHomotopyCategory (ModuleCat ℤ) :=
   ⟨(HomotopyCategory.quotient (ModuleCat ℤ) (ComplexShape.up ℤ)).obj twoTermResolution,

@@ -9,17 +9,26 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.Mukai.Integral
 /-!
 # `Z(β,ω)` as a function of a numerical class
 
-Route (A) states the central charge on a lattice vector. This file composes it
+`Mukai.expCharge` states the central charge on a lattice vector. This file composes it
 with the Mukai vector, so it becomes a function of a **numerical class**:
 
 ```
 N --mukaiVectorHom--> MukaiLattice Λ --extendMap--> ℝ × W × ℝ --expCharge--> ℂ
 ```
 
-Every link exists already: `mukaiVectorHom` is the additive Mukai vector,
+Every link is an existing declaration: `mukaiVectorHom` is the additive Mukai vector,
 `extendMap` places the integral lattice in the real extension, and `expCharge`
-is `Z(β,ω)`. What the composition buys is that route (A)'s conclusions become
-statements about classes rather than about a quadratic space:
+is `Z(β,ω)`. What the composition buys is that the lattice-vector conclusions about
+`expCharge` become statements about classes rather than about a quadratic space.
+
+## Main definitions
+
+* `AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.numericalCharge` — `Z(β,ω)` on a
+  numerical class.
+* `AlgebraicGeometry.Numerical.K3.AdditiveMukaiData.numericalChargeHom` — the same charge as a
+  bundled hom `N →+ ℂ`.
+
+## Main results
 
 * `numericalCharge_add` — the charge is additive in the class, by composition.
 * `mukaiForm_neg_of_numericalCharge_eq_zero` — **the support property in
@@ -27,7 +36,9 @@ statements about classes rather than about a quadratic space:
 * `numericalCharge_ne_zero_of_nonneg` — a class of nonnegative Mukai square is
   never killed.
 
-## What is still not here
+## Implementation notes
+
+### What this file does not construct
 
 The Mukai vector of an **object** of `Dᵇ(Coh X)`, and any stability condition.
 `N` is the numerical Grothendieck group and the class map into it is geometry
@@ -35,9 +46,18 @@ that lives elsewhere; nothing below constructs a slicing, a heart, or a
 Harder–Narasimhan filtration.
 
 The compatibility `hf` — that the embedding of `Λ` in its real span carries the
-integral form to the real one — is a hypothesis, as it is throughout the lane;
-for `Λ = NS(X)` it says the intersection form is the restriction of its own real
-extension.
+integral form to the real one — is a hypothesis, as it is throughout the Mukai
+charge API; for `Λ = NS(X)` it says the intersection form is the restriction of
+its own real extension.
+
+## References
+
+The lattice-vector statements are the repository's `Mukai.expCharge`,
+`Mukai.neg_of_expCharge_eq_zero` and `Mukai.expCharge_ne_zero_of_nonneg`.
+
+## Tags
+
+central charge, Mukai vector, K3 surface, numerical class, support property
 -/
 
 open QuadraticMap
@@ -78,11 +98,10 @@ variable (D bR f β ω)
 
 /-- **The charge as a bundled hom**, `N →+ ℂ`.
 
-`numericalCharge` was proved additive and then left unbundled, which is what kept
-the numerical lane from ever meeting the stability-function side: every charge
-there is an `AddMonoidHom`, and an equation is not one.  With this the chain from
-a numerical class to `ℂ` is a composition of homs and nothing along it re-proves
-additivity. -/
+Every charge on the stability-function side is an `AddMonoidHom`, and the
+additivity equation `numericalCharge_add` is not one; bundling it is what lets the
+numerical charge meet that side.  With this the chain from a numerical class to
+`ℂ` is a composition of homs and nothing along it re-proves additivity. -/
 noncomputable def numericalChargeHom : N →+ ℂ :=
   AddMonoidHom.mk' (D.numericalCharge bR f β ω) (fun E F ↦ numericalCharge_add E F)
 
@@ -90,8 +109,7 @@ noncomputable def numericalChargeHom : N →+ ℂ :=
 theorem numericalChargeHom_apply (E : N) :
     D.numericalChargeHom bR f β ω E = D.numericalCharge bR f β ω E := rfl
 
-/-- The charge **kills the zero class** — free once it is a hom, and absent
-before. -/
+/-- The charge **kills the zero class** — free once it is a hom. -/
 @[simp]
 theorem numericalCharge_zero : D.numericalCharge bR f β ω 0 = 0 :=
   (D.numericalChargeHom bR f β ω).map_zero

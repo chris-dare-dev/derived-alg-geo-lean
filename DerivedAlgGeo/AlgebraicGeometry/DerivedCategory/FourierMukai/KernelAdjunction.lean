@@ -21,23 +21,42 @@ adjoint of `push`. Here each becomes a named class on `Dᵇ(Coh)`, and
 `ConstituentRightAdjoints (geometricCorrespondence X Y Z p q) K` from exactly
 those and no others.
 
-## The three contracts, and what each is classically
+## Main definitions
+
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.HasDerivedPullbackAdjunction` — a supplied
+  adjunction `Lf^* ⊣ Rf_*`, named by `derivedPullbackAdjunction`.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.HasKernelDual` — a supplied dual kernel
+  `K^∨` with `(− ⊗ K) ⊣ (− ⊗ K^∨)`, named by `dualKernel` and `kernelDualAdjunction`.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.HasTwistedInversePullback` — a supplied right
+  adjoint `f^!` of derived pushforward, named by `twistedInversePullback` and
+  `twistedInverseAdjunction`.
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.geometricConstituentRightAdjoints` — the three
+  constituent right adjoints of the geometric correspondence, assembled from those classes.
+
+## Main results
+
+* `AlgebraicGeometry.DerivedCategory.FourierMukai.geometricTransform_isLeftAdjoint` — the
+  geometric transform is a left adjoint, conditional on the three contracts.
+
+## Implementation notes
+
+### The three contracts, and what each is classically
 
 * `HasDerivedPullbackAdjunction p` — `Lp^* ⊣ Rp_*`. The standard adjunction,
-  and the one `KernelCorrespondence` explicitly declined to assume. Note that
+  and the one `KernelCorrespondence` explicitly does not assume. Note that
   it needs `HasDerivedPushforward` at **`p`**, not at `q`: the right adjoint of
   pullback along `p` is pushforward along the same `p`, which is a contract the
   correspondence itself never asks for.
 * `HasKernelDual Z K` — `(− ⊗^L K) ⊣ (− ⊗^L K^∨)`. Rigidity of the kernel.
-  This is the "derived duals" layer, and the reason it can be stated now is
-  that it finally has a consumer; the substance is that `K^∨` is again an
+  This is the "derived duals" layer, stated here because the assembly below
+  consumes it; the substance is that `K^∨` is again an
   object of the same category and that the dual twist is *the same bifunctor*
   applied to it.
 * `HasTwistedInversePullback q` — `Rq_* ⊣ q^!`. Grothendieck duality. This is
   where a dualizing object lives, and the class deliberately does **not**
   decompose `q^!`: it names the right adjoint and nothing about its shape.
 
-## What this ledger produces, and what it still does not
+### What this ledger produces, and what it does not
 
 It produces `ConstituentRightAdjoints`, hence — by
 `ConstituentRightAdjoints.adj` — that the geometric transform is left adjoint
@@ -46,20 +65,19 @@ to the composite `q^! ⋙ (− ⊗ K^∨) ⋙ Rp_*`. That composite is a functor
 
 It does **not** produce a `RightAdjointKernelData`, because it does not show
 that composite is again a *transform*. `AdjointAssembly` takes that
-identification as an argument, and supplying it geometrically is the next
+identification as an argument, and supplying it geometrically is a separate
 ledger: it needs `q^!` decomposed as `Lq^*(−) ⊗ ω_q[dim]` and the tensor
 rearranged, which is the projection formula plus a dualizing object. Only then
 does the classical kernel `P^∨ ⊗ p^*ω_X[dim X]` appear. See the closing section.
 
-## Only the right side
+### Only the right side
 
 There is no mirror producing `ConstituentLeftAdjoints`. The left adjoint of
 `Lp^*` is the exceptional `p_!`, a different and much less standard object than
 anything above, and nothing in this repository asks for one. Filing a class for
-it would be a contract with no consumer — the shape this lane's reviews have
-attacked twice.
+it would be a contract with no consumer.
 
-## What this file does not assert
+### What this file does not assert
 
 * **Nothing constructs an instance of any class here**, and no scheme or
   morphism is shown to admit one. Inhabitant-free, like the two ledgers it
@@ -74,6 +92,16 @@ attacked twice.
   double-dual isomorphism `K^∨∨ ≅ K` is asserted.
 * No `DualKernel`, and no claim that any geometric transform is an
   equivalence.
+
+## References
+
+The repository's `CategoryTheory.Triangulated.FourierMukai.ConstituentRightAdjoints`,
+`CategoryTheory.Triangulated.FourierMukai.ConstituentRightAdjoints.adj` and
+`AlgebraicGeometry.DerivedCategory.FourierMukai.geometricCorrespondence`.
+
+## Tags
+
+Fourier--Mukai transform, adjunction, derived pullback, Grothendieck duality, kernel dual
 -/
 
 universe u
@@ -157,8 +185,8 @@ names the right adjoint and asserts nothing about its shape. The classical
 description `f^!(−) ≅ Lf^*(−) ⊗ ω_f[dim]` for a smooth proper `f` is a
 *second* obligation, and separating them is the point — the existence of the
 adjoint is what `ConstituentRightAdjoints` consumes, and the description is
-what a later ledger would need to turn the composite adjoint back into a
-transform. -/
+what turning the composite adjoint back into a transform needs; that is the
+separate contract `HasDualizingTwist` of `KernelDualizingTwist.lean`. -/
 class HasTwistedInversePullback {T U : SchemeBaseChange S} (f : T ⟶ U)
     [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
     [HasDerivedPushforward f] where
@@ -247,10 +275,8 @@ theorem geometricConstituentRightAdjoints_pushRight (p : Z ⟶ X) (q : Z ⟶ Y)
 
 /-- **The geometric transform is a left adjoint**, conditional on the ledger.
 
-The payoff of the assembly, and the first statement in this repository that a
-geometric Fourier--Mukai transform has an adjoint at all. It is still
-conditional on three supplied contracts; what it is not is conditional on an
-opaque adjunction between two transforms. -/
+The payoff of the assembly. It is conditional on three supplied contracts; what
+it is not is conditional on an opaque adjunction between two transforms. -/
 theorem geometricTransform_isLeftAdjoint (p : Z ⟶ X) (q : Z ⟶ Y)
     (K : SchemeBoundedCoherentDerivedCategory Z.left)
     [HasCoherentPullback p] [HasDerivedTensor Z] [HasDerivedPushforward q]
@@ -261,25 +287,27 @@ theorem geometricTransform_isLeftAdjoint (p : Z ⟶ X) (q : Z ⟶ Y)
 
 end Assembly
 
-/-! ## The next ledger, and what is in it
+/-! ## From the composite adjoint to a kernel
 
-What this file leaves undone is precisely the step
+This file does not take the step
 `ConstituentRightAdjoints.toRightAdjointKernelData` takes as an argument: that
 the composite right adjoint `q^! ⋙ (− ⊗ K^∨) ⋙ Rp_*` is again a **transform**,
 namely the transform of the reversed correspondence
 `geometricCorrespondence Y X Z q p` with some kernel `Q`.
 
-Supplying that geometrically needs two things this repository does not have:
+Supplying that geometrically needs two inputs beyond the contracts above:
 
 * a **dualizing object** `ω_q` with `q^!(−) ≅ Lq^*(−) ⊗ ω_q[dim]`, which is the
   decomposition `HasTwistedInversePullback` deliberately refuses to assume;
 * enough **tensor rearrangement** on `Z` to move that twist past `− ⊗ K^∨` and
   collect it into a single kernel `Q ≅ K^∨ ⊗ ω_q[dim]`.
 
-Only once both are named does the classical dual kernel `P^∨ ⊗ p^*ω_X[dim X]`
-appear as `Q`, and only then does a geometric `RightAdjointKernelData` — and
-through `KernelAutoequivalence.DualKernel.ofRightAdjointKernel`, a geometric
-`DualKernel` — become available. Neither is stated here.
+Only with both does the classical dual kernel `P^∨ ⊗ p^*ω_X[dim X]` appear as
+`Q`, and only then is a geometric `RightAdjointKernelData` available.
+`KernelDualizingTwist.lean` names the dualizing object as the contract
+`HasDualizingTwist` and builds that kernel data; a geometric `DualKernel`, through
+`KernelAutoequivalence.DualKernel.ofRightAdjointKernel`, additionally needs the
+swap comparison of `KernelSwap.lean`. Neither is stated here.
 -/
 
 end AlgebraicGeometry.DerivedCategory.FourierMukai
