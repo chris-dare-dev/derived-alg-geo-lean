@@ -20,34 +20,66 @@ unconstrained. This is the distinguished family
 `QuadraticForm/PositiveFrame.lean` says is needed to name Bridgeland's component
 rather than an arbitrary half: take `(expRe, expIm)` as the reference pair.
 
-## Why this is charge construction and not extension algebra
+## Main definitions
+
+* `Mukai.expRe`, `Mukai.expIm` — the real and imaginary parts of
+  `exp(β + iω)` in `RealExtension V`.
+
+## Main results
+
+* `Mukai.realPairing_expRe_expRe`, `Mukai.realPairing_expIm_expIm`,
+  `Mukai.realPairing_expRe_expIm` — the pair is orthogonal with equal square
+  `b ω ω`.
+* `Mukai.realForm_smul_add_smul` — `realForm` on a combination of the pair is
+  `(s ^ 2 + t ^ 2) * b ω ω / 2`.
+* `Mukai.isPositiveFrame_exp` — the exponential chart lands in the period
+  domain once `0 < b ω ω`.
+* `Mukai.pairingDet_exp_self` — the pairing determinant of the pair against
+  itself is `(b ω ω) ^ 2`.
+* `Mukai.mem_positiveFramesPlus_exp` — the exponential pair lies in its own
+  positive half.
+
+## Implementation notes
+
+### Why this is charge construction and not extension algebra
 
 The carrier is not defined here and neither is the frame API. `RealExtension`,
 `realPairing` and `realForm` — with the halving convention that makes
 `⟪δ, δ⟫ = -2` read unchanged — are owned by
 `LinearAlgebra/Lattice/Mukai/RealForm.lean`, and `IsPositiveFrame`,
 `pairingDet` and `positiveFramesPlus` are owned by
-`LinearAlgebra/QuadraticForm/PositiveFrame.lean`. Both stay where they are.
+`LinearAlgebra/QuadraticForm/PositiveFrame.lean`.
 
 What this file adds is a **choice**: one distinguished positive frame out of
 the many the extension admits, singled out because a central charge is wanted.
 That choice is an input to `Z(β,ω)` and to nothing else in the extension
-algebra, which is why the cutover ledger's row 03 puts the chart with the
-numerical central-charge construction rather than with the quadratic extension.
+algebra, which is why the chart lives with the numerical central-charge
+construction rather than with the quadratic extension.
 
-Keeping it here is also what unblocks the split. `RealForm.lean` is upstream of
-the neutral charge root `LinearAlgebra/BilinearForm/HodgeIndex.lean`, whose
+The imports force the same placement. `RealForm.lean` is upstream of the
+neutral charge root `LinearAlgebra/BilinearForm/HodgeIndex.lean`, whose
 transitive closure may contain neither stability conditions nor geometry, so
 the carrier cannot follow the chart; and `Mukai.expCharge` consumes the chart
 while `CentralCharge/Quadratic.lean` consumes `expCharge`, so the chart cannot
-land in `Quadratic.lean` either. A separate module below `CentralCharge/` is
+live in `Quadratic.lean` either. A separate module below `CentralCharge/` is
 the placement both constraints allow.
 
-Per the ledger's first standing decision the namespace does not move: these are
-`Mukai.expRe` and `Mukai.isPositiveFrame_exp` at their new path, exactly as the
-immutable payloads in `exe/RestateHistoricalNames.lean` spell them.
+The declarations keep the `Mukai` namespace rather than one matching the path,
+so that their public names, such as `Mukai.expRe` and
+`Mukai.isPositiveFrame_exp`, are stable.
 
 `V` is an arbitrary real bilinear space; no geometry is asserted.
+
+## References
+
+`Mukai.RealExtension`, `Mukai.realPairing` and `Mukai.realForm` of
+`LinearAlgebra/Lattice/Mukai/RealForm.lean`, and `PeriodDomain.IsPositiveFrame`,
+`PeriodDomain.pairingDet` and `PeriodDomain.positiveFramesPlus` of
+`LinearAlgebra/QuadraticForm/PositiveFrame.lean`.
+
+## Tags
+
+Mukai lattice, exponential chart, positive frame, period domain, central charge
 -/
 
 open QuadraticMap

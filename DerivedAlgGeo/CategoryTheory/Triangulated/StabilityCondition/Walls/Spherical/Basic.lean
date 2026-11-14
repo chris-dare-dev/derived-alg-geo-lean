@@ -29,52 +29,21 @@ H(δ) = { (β, ω) : (℧, δ) ∈ ℝ_{≤0} }
 together with the complement of the union of these loci over classes with
 `⟪δ, δ⟫ = -2` and positive rank.
 
-## What this is a theorem about, and what it is not
+## Main definitions
 
-Everything here is arithmetic in a real vector space carrying a symmetric
-bilinear form. There is **no** K3 surface: no Néron–Severi group, no ample
-cone, no Hodge index theorem, no Mukai vector of an object, no stability
-condition and no `Stab(X)`. `Mukai.RealExtension V` is a triple, not `N(X) ⊗ ℝ`, and
-`signedRayRegularLocus` is not claimed to be the image of anything under a map from a space
-of stability conditions.
-
-In particular the Hodge index theorem is **not** used and not assumed. Where
-the geometric theory would invoke it — to say that `q` is negative definite on
-`ω^⊥` — the statements that need it carry it as an explicit hypothesis, and
-none of the statements *in this file* needs it. That is why this file stops
-where it does: the local-finiteness theorem, which is the first statement that
-genuinely consumes negative-definiteness and lattice discreteness, is deliberately
-left to a follow-up rather than stated here with hypotheses nothing here can
-discharge.
-
-This is the same discipline `Walls/Numerical/Basic.lean` applies to tilt walls
-and `LinearAlgebra/Lattice/Mukai/Basic.lean` applies to the integral Mukai
-extension.
-
-## Not the same loci as `Walls/Numerical`
-
-`Walls/Numerical/Basic.lean` is the **tilt-stability** wall structure: a
-numerical class is a triple of reals `(ch₀, ch₁·H, ch₂)`, the parameter space
-is the `(s, t)` half plane, and the walls are nested conics. This file is a
-different numerical locus: the parameter space is a pair `(β, ω)` of vectors,
-the index set is the spherical classes, and `nonpositiveRayLocus` is a real
-half-space rather than a circle. The two files share no declaration and neither
-imports the other. Do not merge them.
-
-## The real extension is a twin of `Mukai.pairing`, not a generalisation
-
-`Mukai.pairing` is `ℤ`-valued on `ℤ × N × ℤ` for `b : N →ₗ[ℤ] N →ₗ[ℤ] ℤ`. The
-chart lives over `ℝ`, so the formulas below are restated rather than reused.
-Generalising `Mukai/Basic.lean` over a base ring would be the tidier fix and is
-deliberately not done here: it would rewrite three merged modules and their
-audit records for a file that does not yet need the generality.
-
-The two are connected by `IntegralComparison`, which supplies the missing datum
-— an additive map `N →+ V` carrying `b` to `q` — and by
-`isSpherical_map_iff`, which says the two sphericity conditions agree
-across it. Nothing here constructs an `IntegralComparison`; producing one is
-the geometric obligation of exhibiting `NS(X)` with its intersection form, and
-`Mukai/Basic.lean` says the same thing about its own identification.
+* `Spherical.pairing`, `Spherical.selfPairing` — the real Mukai pairing
+  `Mukai.realPairing` and its diagonal.
+* `Spherical.chartRe`, `Spherical.chartIm` — the real and imaginary parts of
+  `exp(β + iω)`, abbreviations for `Mukai.expRe` and `Mukai.expIm`.
+* `Spherical.pairingRe`, `Spherical.pairingIm` — the real and imaginary parts
+  of `(℧, δ)`.
+* `Spherical.IsSpherical`, `Spherical.sphericalPlus` — the condition
+  `⟪δ, δ⟫ = -2`, and the spherical classes of positive rank.
+* `Spherical.nonpositiveRayLocus` — the locus `H(δ)`.
+* `Spherical.signedRayRegularLocus` — the points of the chart on no
+  `nonpositiveRayLocus` of a set of classes.
+* `Spherical.IntegralComparison` — an additive map of middle summands carrying
+  an integral form `b` to `q`.
 
 ## Main results
 
@@ -94,6 +63,66 @@ the geometric obligation of exhibiting `NS(X)` with its intersection form, and
   and the real part is the *affine* expression `q(β,Δ) − s`. This is the
   reason the index set is `Δ⁺` rather than `Δ`, recorded rather than left to
   inference.
+* `isSpherical_map_iff` — the integral and real sphericity conditions agree
+  across an `IntegralComparison`.
+
+## Implementation notes
+
+### What this is a theorem about, and what it is not
+
+Everything here is arithmetic in a real vector space carrying a symmetric
+bilinear form. There is **no** K3 surface: no Néron–Severi group, no ample
+cone, no Hodge index theorem, no Mukai vector of an object, no stability
+condition and no `Stab(X)`. `Mukai.RealExtension V` is a triple, not `N(X) ⊗ ℝ`, and
+`signedRayRegularLocus` is not claimed to be the image of anything under a map from a space
+of stability conditions.
+
+In particular the Hodge index theorem is **not** used and not assumed. Where
+the geometric theory would invoke it — to say that `q` is negative definite on
+`ω^⊥` — the statements that need it carry it as an explicit hypothesis, and
+none of the statements *in this file* needs it. That is why this file stops
+where it does: the local-finiteness theorem, which is the first statement that
+genuinely consumes negative-definiteness and lattice discreteness, is
+deliberately not stated here, since nothing here can discharge its hypotheses.
+
+This is the same discipline `Walls/Numerical/Basic.lean` applies to tilt walls
+and `LinearAlgebra/Lattice/Mukai/Basic.lean` applies to the integral Mukai
+extension.
+
+### Not the same loci as `Walls/Numerical`
+
+`Walls/Numerical/Basic.lean` is the **tilt-stability** wall structure: a
+numerical class is a triple of reals `(ch₀, ch₁·H, ch₂)`, the parameter space
+is the `(s, t)` half plane, and the walls are nested conics. This file is a
+different numerical locus: the parameter space is a pair `(β, ω)` of vectors,
+the index set is the spherical classes, and `nonpositiveRayLocus` is a real
+half-space rather than a circle. The two files share no declaration and neither
+imports the other. Do not merge them.
+
+### The real pairing is `Mukai.pairing` at coefficient ring `ℝ`
+
+`Mukai.pairing` (`LinearAlgebra/BilinearForm/Hyperbolic.lean`) is defined over
+an arbitrary coefficient ring. `Mukai/Basic.lean` uses it at `ℤ` on
+`MukaiLattice N` for `b : N →ₗ[ℤ] N →ₗ[ℤ] ℤ`, and `Spherical.pairing` is
+`Mukai.realPairing`, the same pairing at `ℝ` on `Mukai.RealExtension V`.
+
+The two are connected by `IntegralComparison`, which supplies the missing datum
+— an additive map `N →+ V` carrying `b` to `q` — and by
+`isSpherical_map_iff`, which says the two sphericity conditions agree
+across it. Nothing here constructs an `IntegralComparison`; producing one is
+the geometric obligation of exhibiting `NS(X)` with its intersection form, and
+`Mukai/Basic.lean` says the same thing about its own identification.
+
+## References
+
+`Mukai.pairing` of `LinearAlgebra/BilinearForm/Hyperbolic.lean`,
+`Mukai.realPairing` of `LinearAlgebra/Lattice/Mukai/RealForm.lean`,
+`Mukai.IsSpherical` of `LinearAlgebra/Lattice/Mukai/Basic.lean`, and
+`Mukai.expRe` and `Mukai.expIm` of `CentralCharge/Mukai/Chart.lean`.
+
+## Tags
+
+spherical class, Mukai lattice, exponential chart, signed-ray locus, K3
 -/
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall.Spherical
@@ -106,12 +135,9 @@ variable (q : V →ₗ[ℝ] V →ₗ[ℝ] ℝ)
 /-- The Mukai pairing over `ℝ`, built from a bilinear form `q` on the middle
 summand.
 
-This file used to declare the type and this pairing a second time, as
-`RealMukai` and `pairing`: the same `ℝ × V × ℝ`, the same
-`q c c' - r*s' - r'*s`, the same `[AddCommGroup V] [Module ℝ V]` and the same
-bilinear form as `Mukai.RealExtension` and `Mukai.realPairing`. The two
-docstrings named each other instead of one importing the other. They are now
-one, and what is local to this file is the signed-ray-locus arithmetic below.
+This is `Mukai.realPairing`, not a second definition of it: the carrier is
+`Mukai.RealExtension V = ℝ × V × ℝ` and the value is `q c c' - r*s' - r'*s`.
+What is local to this file is the signed-ray-locus arithmetic below.
 
 Note `Mukai.realForm` is *half* the self-pairing, so sphericality below reads
 `selfPairing q δ = -2` rather than `realForm q δ = -2`. -/
@@ -144,13 +170,11 @@ computed componentwise because the Mukai form is extended `ℂ`-bilinearly. -/
 
 /-- The real part of `exp(β + iω)`.
 
-**This is `Mukai.expRe`, not a second definition of it.**  This file used to
-declare the exponential chart a second time, exactly as it used to declare the
-pairing a second time — the same `(1, β, (q β β - q ω ω)/2)`, in a file that
-already imports `Mukai/RealForm.lean`.  The names are kept because the nonpositiveRayLocus
-statements below read better with them, but they are abbreviations now, so the
-`(β, ω)` chart of this subtree and the exponential chart of the period-domain
-subtree are one object rather than two. -/
+**This is `Mukai.expRe`, not a second definition of it.**  The name `chartRe`
+is used because the `nonpositiveRayLocus` statements below read better with it,
+but it is an abbreviation, so the `(β, ω)` chart of this subtree and the
+exponential chart of the period-domain subtree are one object rather than
+two. -/
 noncomputable abbrev chartRe (β ω : V) : Mukai.RealExtension V :=
   Mukai.expRe q β ω
 

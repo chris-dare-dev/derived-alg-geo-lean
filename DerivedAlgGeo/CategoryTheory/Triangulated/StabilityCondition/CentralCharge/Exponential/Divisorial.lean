@@ -11,12 +11,39 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharg
 
 `CentralCharge/Exponential/Kernel.lean` states the exponential charge once,
 indexed by truncation degree, and `CentralCharge/Exponential/Comparison.lean`
-proves the two compressed `H`-degree families are it. Those families are Picard rank one. This file does
-the case that actually decides whether the kernel is worth having: the
-divisorial charge of `CentralCharge/Divisorial/Charge.lean`, which takes two
-independent classes `B` and `omega` in the full real divisor space.
+proves the two compressed `H`-degree families are it. Those families are
+Picard rank one. This file does the case that actually decides whether the
+kernel is worth having: the divisorial charge of
+`CentralCharge/Divisorial/Charge.lean`, which takes two independent classes `B`
+and `omega` in the full real divisor space.
 
-## Why this is the keystone
+## Main definitions
+
+* `Divisorial.cPair`, `Divisorial.cSelf` — the complex pairings `<w, x>` and
+  `<w, w>` for `w = B + i*omega`.
+* `Divisorial.tripleMoments` — the divisorial moments of a Mukai triple.
+* `Divisorial.moments` — the divisorial moments of a Chern character, through
+  its Mukai triple.
+
+## Main results
+
+* `Divisorial.expCharge_eq_ofMoments` — the keystone: `Z(beta, omega)` on a
+  Mukai triple is `Exp.ofMoments 2` of its divisorial moments.
+* `Divisorial.expCharge_rankOne_eq_charge` — on `B = b*H`, `omega = a*H` the
+  intersection-form charge collapses to the scalar kernel `Exp.charge 2` on the
+  compressed degrees.
+* `Divisorial.centralCharge_eq_expCharge` — the divisorial charge is
+  `Z(beta, omega)` on the Mukai triple of the Chern character.
+* `Divisorial.centralCharge_eq_ofMoments`, `Divisorial.moments_rankOne`,
+  `Divisorial.centralCharge_rankOne_eq_charge` — the same statements in
+  `ChernCharacter` form.
+* `Divisorial.ChargeCoordinates.twistByScalar_eq_exp`,
+  `Divisorial.ChernCharacter.twist_rankOne_eq_exp` — scalar twisting, and
+  twisting along `B = βH`, commute with `Exp.twist 2` on compressed degrees.
+
+## Implementation notes
+
+### Why this is the keystone
 
 The compressed families reach the kernel through a vector of `H`-degrees. The
 divisorial charge cannot: the `H`-compression is not injective once the Picard
@@ -36,27 +63,35 @@ on the nose. That is why `ofMoments` takes a moment sequence rather than a
 vector of degrees: the two sources of moments are siblings under it, and
 neither is a specialization of the other.
 
-Two of the three independent designs of this tree concluded the multi-divisor
-charge was a sibling that is not a child. They were wrong, and this file is the
-proof.
-
-## Stated on the triple
+### Stated on the triple
 
 The keystone is proved on a bare `Mukai.RealExtension D`, not on a
 `ChernCharacter`. That is load-bearing rather than stylistic: `mukaiCharge`
-(`CentralCharge/Divisorial/Mukai.lean`) is the same `expCharge` on a *different* triple,
-so a `ChernCharacter`-level statement could not reach it, and the correction
-class the next slice inhabits is exactly that difference. The
-`ChernCharacter` forms below follow by `toRealExtension`.
+(`CentralCharge/Divisorial/Mukai.lean`) is the same `expCharge` on a
+*different* triple, so a `ChernCharacter`-level statement could not reach it,
+and the Todd correction `SqrtTodd` of that file is exactly that difference.
+The `ChernCharacter` forms below follow by `toRealExtension`.
 
-`centralCharge_eq_expCharge` is the other half and was not previously recorded:
-the divisorial charge and Bridgeland's `Z(beta, omega)` are the same function,
-not two functions that agree in the cases anyone checked.
+`centralCharge_eq_expCharge` is the other half: the divisorial charge and
+Bridgeland's `Z(beta, omega)` are the same function, not two functions that
+agree in the cases anyone checked.
 
-## What is not here
+### What is not here
 
-No correction class, no walls, no tilting. `kappa` arrives with the polarised
-transport, where it belongs, because it is a pullback and not a coefficient.
+No correction class, no walls, no tilting. A polarisation parameter `kappa` is
+not a coefficient of this charge: it enters as a pullback along a polarised
+transport, which this file does not construct.
+
+## References
+
+The kernel `Exp.ofMoments` and `Exp.charge` of
+`CentralCharge/Exponential/Kernel.lean`, the Mukai charge `Mukai.expCharge` of
+`CentralCharge/Mukai/Charge.lean`, and the divisorial charge
+`ChernCharacter.centralCharge` of `CentralCharge/Divisorial/Charge.lean`.
+
+## Tags
+
+central charge, divisorial charge, exponential charge, moments, Mukai vector
 -/
 
 open Complex
@@ -157,8 +192,8 @@ theorem expCharge_rankOne_eq_charge (S : DivisorSpace D) (H : D) (a b : ℝ)
       pow_two, hb H c] <;> ring
 
 /-- The divisorial charge **is** `Z(beta, omega)` on the Mukai triple of the
-Chern character. Both sides were already in the tree; that they are one
-function was not recorded. -/
+Chern character: the two are one function, not two functions that agree on the
+cases checked. -/
 theorem centralCharge_eq_expCharge (ch : ChernCharacter N D) (S : DivisorSpace D)
     (P : StabilityParameters D) (E : N) :
     ch.centralCharge S P E
