@@ -23,15 +23,18 @@ statements, in `Stability/Comparison.lean`.
 * `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.hnFiltration` — a chosen
   Harder–Narasimhan filtration of a nonzero coherent sheaf.
 * `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.muPlus` and
-  `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.muMinus` — its largest and smallest
+  `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.muMinus` — its largest and
+  smallest
   slopes.
 
 ## Main results
 
 * `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.muMinus_le_muPlus`.
-* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.muPlus_ne_top_of_isPure` — `μPlus`
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.muPlus_ne_top_of_isPure` —
+  `μPlus`
   of a pure coherent sheaf is finite.
-* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.exists_shortExact_hnTors_hnFree` —
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.exists_shortExact_hnTors_hnFree`
+  —
   the torsion/torsion-free splitting at a cutoff.
 
 ## Implementation notes

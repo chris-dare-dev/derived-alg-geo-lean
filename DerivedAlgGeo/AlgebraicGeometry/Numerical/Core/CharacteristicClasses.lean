@@ -60,7 +60,8 @@ noncomputable def chernCharacterFour (C : ChernClassData A) : A :=
 
 /-- The Chern-character component selected from the universal formulas through codimension
 four. Components above four are zero because this is the bounded realization API currently
-supported by DerivedAlgGeo; `Variety.NumericalHypotheses` records the corresponding hypothesis `n ≤ 4`. -/
+supported by DerivedAlgGeo; `Variety.NumericalHypotheses` records the corresponding hypothesis `n ≤
+4`. -/
 noncomputable def chernCharacterComponent (C : ChernClassData A) : ℕ → A
   | 0 => chernCharacterZero C
   | 1 => chernCharacterOne C

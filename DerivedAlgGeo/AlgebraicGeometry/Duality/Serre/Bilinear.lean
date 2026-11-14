@@ -21,9 +21,11 @@ supplies it, in the same idiom, and proves the consequences.
 
 ## Main definitions
 
-* `AlgebraicGeometry.Duality.Serre.BilinearHypotheses` — bilinear coherent Serre duality, as supplied
+* `AlgebraicGeometry.Duality.Serre.BilinearHypotheses` — bilinear coherent Serre duality, as
+  supplied
   realization data.
-* `AlgebraicGeometry.Duality.Serre.BilinearHypotheses.TrivialCanonical` — a trivial canonical bundle,
+* `AlgebraicGeometry.Duality.Serre.BilinearHypotheses.TrivialCanonical` — a trivial canonical
+  bundle,
   recorded on the realized `Ext` spaces.
 * `AlgebraicGeometry.Duality.Serre.BilinearHypotheses.eulerChar` — the categorical Euler
   characteristic of a pair.
@@ -42,12 +44,12 @@ supplies it, in the same idiom, and proves the consequences.
 
 ### Supplied, and why
 
-`BilinearHypotheses` is **data, not a theorem**, exactly as `DerivedStatement` and `Data` are, and for
-the same upstream reason recorded there: the pinned Mathlib has derived categories and `Ext` but
+`BilinearHypotheses` is **a supplied input, not a theorem**, as `DerivedStatement` and `Data` are,
+for the same upstream reason recorded there: the pinned Mathlib has derived categories and `Ext` but
 no derived global-sections functor into `D(k)`, no coherent `RHom`, and no Grothendieck-duality
-theorem.  `Duality.Serre.DerivedStatement` is this repository's idiom for "supplied, not proved"
-— `Surface/K3.lean` and `Surface/Spherical.lean` both name it that way — and this structure joins
-it rather than pretending to more.
+theorem. `Duality.Serre.DerivedStatement` is this repository's idiom for "supplied, not proved" —
+`Surface/K3.lean` and `Surface/Spherical.lean` both name it that way — and this structure joins it
+rather than pretending to more.
 
 **It is not an inhabitant of anything and does not claim to be.**  What it buys is that the
 bilinear form is stated once, in one place, with its consequences proved from it, instead of being

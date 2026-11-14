@@ -65,7 +65,8 @@ import the other.
 ## References
 
 This file compares `PolarizedVarietyHypotheses.IsGiesekerSemistable` with the weak slope
-`PolarizedVarietyHypotheses.weakSlopeData` through `WeakStabilityFunctionOn.IsSemistable`, and builds
+`PolarizedVarietyHypotheses.weakSlopeData` through `WeakStabilityFunctionOn.IsSemistable`, and
+builds
 the filtration with `AbelianWeakHNFiltration.ofSemistable`.
 
 ## Tags

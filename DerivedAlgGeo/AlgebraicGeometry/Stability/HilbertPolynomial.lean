@@ -24,7 +24,8 @@ the geometric packaging and the additivity theorem. It creates no new carrier.
   supplied data.
 * `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.hilbertFunction` — the Hilbert
   function `n ↦ χ(F ⊗ L^n)`.
-* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.hilbertHom` — the Hilbert function
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.hilbertHom` — the Hilbert
+  function
   as a homomorphism `K₀(Coh X) → (ℤ → ℤ)`.
 
 ## Main results
@@ -41,7 +42,7 @@ the geometric packaging and the additivity theorem. It creates no new carrier.
 
 ### What is supplied, and why
 
-`PolarizedVarietyHypotheses k X` is the `…Data` idiom for genuinely external input. Its five fields
+`PolarizedVarietyHypotheses k X` packages genuinely external input. Its five fields
 are a line-bundle class `L`, finite coherent cohomology `D`, a linear connecting system `C`,
 a natural number `dim`, and, for every coherent sheaf, a `TwistContext`. Every
 supplied-not-proved field reachable from it is listed here:

@@ -30,7 +30,8 @@ of a smooth proper scheme to the existing sheaf-level bilinear duality data.
   numerical duality in one direction.
 * `GeometricSerreHypotheses.hom_finite_bounded` derives finite-dimensional Hom spaces
   with bounded shift support for the bounded coherent derived category.
-* `AlgebraicGeometry.Duality.Serre.GeometricSerreHypotheses.chiHom_boundedSingleFunctor_obj_eq_eulerChar`
+*
+  `GeometricSerreHypotheses.chiHom_boundedSingleFunctor_obj_eq_eulerChar`
   identifies the Hom-built Euler form on
   embedded sheaves with the sheaf-level Euler characteristic.
 * `AlgebraicGeometry.Duality.Serre.GeometricSerreHypotheses.selfHomShiftTwoDual` and

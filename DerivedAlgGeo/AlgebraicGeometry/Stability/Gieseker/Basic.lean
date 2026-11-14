@@ -15,10 +15,12 @@ multiplicity.
 
 ## Main definitions
 
-* `PolarizedVarietyHypotheses.GiesekerLE`, `PolarizedVarietyHypotheses.GiesekerLT` — the Gieseker order on
+* `PolarizedVarietyHypotheses.GiesekerLE`, `PolarizedVarietyHypotheses.GiesekerLT` — the Gieseker
+  order on
   reduced Hilbert functions, and its strict form.
 * `PolarizedVarietyHypotheses.normalizedCoefficient` — the Hilbert coefficient vector normalized by
-  the multiplicity, with `PolarizedVarietyHypotheses.CoeffLexLE` its lexicographic order from the top.
+  the multiplicity, with `PolarizedVarietyHypotheses.CoeffLexLE` its lexicographic order from the
+  top.
 * `PolarizedVarietyHypotheses.IsGiesekerSemistable`, `PolarizedVarietyHypotheses.IsGiesekerStable` —
   Gieseker semistability and stability of a pure sheaf.
 

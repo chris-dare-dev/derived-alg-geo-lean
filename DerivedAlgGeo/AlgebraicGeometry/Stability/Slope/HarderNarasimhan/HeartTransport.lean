@@ -18,7 +18,8 @@ the two, discharging from geometry a stability-theoretic hypothesis stated for a
 
 * `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.cohHeart` — the heart of the
   canonical t-structure on `D(Coh X)`.
-* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.heartWeakSlopeData` — the μ-slope,
+* `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.heartWeakSlopeData` — the
+  μ-slope,
   read on the heart.
 
 ## Main results
@@ -27,7 +28,8 @@ the two, discharging from geometry a stability-theoretic hypothesis stated for a
   Harder–Narasimhan property on the heart.
 * `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.heartWeakSlopeData_rank_functor`
   and
-  `AlgebraicGeometry.Stability.Gieseker.PolarizedVarietyHypotheses.heartWeakSlopeData_topSlope_functor`
+
+  `PolarizedVarietyHypotheses.heartWeakSlopeData_topSlope_functor`
   — rank and slope on the heart are those of the sheaf.
 
 ## Implementation notes
