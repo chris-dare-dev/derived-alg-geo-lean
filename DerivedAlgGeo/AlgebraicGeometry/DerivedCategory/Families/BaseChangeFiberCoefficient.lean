@@ -31,41 +31,41 @@ open CategoryTheory CategoryTheory.Triangulated AlgebraicGeometry
 universe u w
 
 variable {S : Scheme.{u}} {X T : SchemeBaseChange S}
-  (D : KFlatBaseChangeData X T)
+  (D : KFlatBaseChangeHypotheses X T)
   {ι : Type w} [Preorder ι]
 
 /-- A K-flat construction of the derived tensor on `Dqc(T)`. -/
-structure KFlatFiberTensorData (T : SchemeBaseChange S) where
+structure KFlatFiberTensorHypotheses (T : SchemeBaseChange S) where
   /-- A K-flat replacement on the fibre scheme. -/
   resolution : SchemeKFlatResolution T.left
   /-- Resolved tensor preserves quasicoherent cohomology. -/
   tensorQuasicoherent :
     resolution.ResolvedTensorPreservesQuasicoherentCohomology
 
-namespace KFlatFiberTensorData
+namespace KFlatFiberTensorHypotheses
 
 /-- The derived tensor on `Dqc(T)` selected by the K-flat fibre data. -/
-noncomputable def derivedTensor (K : KFlatFiberTensorData T) :
+noncomputable def derivedTensor (K : KFlatFiberTensorHypotheses T) :
     BaseDqc T.left ⥤ BaseDqc T.left ⥤ BaseDqc T.left :=
   K.resolution.derivedTensorToDqc
     (K.resolution.preservesQuasicoherentCohomology_of_resolvedTensor
       K.tensorQuasicoherent)
 
 @[simp]
-theorem derivedTensor_obj_obj_obj (K : KFlatFiberTensorData T)
+theorem derivedTensor_obj_obj_obj (K : KFlatFiberTensorHypotheses T)
     (E F : BaseDqc T.left) :
     (((K.derivedTensor).obj E).obj F).obj =
       ((K.resolution.derivedTensor.obj E.obj).obj F.obj) :=
   rfl
 
-end KFlatFiberTensorData
+end KFlatFiberTensorHypotheses
 
 /-- Chosen compact duals for the actual K-flat tensor on `Dqc(T)`.
 
 The adjunction records that tensoring on the right by `G⁺` is right adjoint
 to tensoring on the right by `G`. -/
-structure KFlatCompactFiberDualityData
-    (K : KFlatFiberTensorData T) where
+structure KFlatCompactFiberDualityHypotheses
+    (K : KFlatFiberTensorHypotheses T) where
   /-- The chosen compact dual of a compact fibre object. -/
   dual : CompactDqcFiber T → CompactDqcFiber T
   /-- Tensor-duality adjunction for the chosen compact dual. -/
@@ -73,29 +73,29 @@ structure KFlatCompactFiberDualityData
     K.derivedTensor.flip.obj G.obj ⊣
       K.derivedTensor.flip.obj (dual G).obj
 
-namespace KFlatCompactFiberDualityData
+namespace KFlatCompactFiberDualityHypotheses
 
 /-- The explicit fibre coefficient left by dualizing `Gi[a]` against
 `Gj[b]`: tensor `Gj` by the chosen dual of `Gi`, then shift by `b - a`. -/
 noncomputable def coefficient
-    {K : KFlatFiberTensorData T}
-    (V : KFlatCompactFiberDualityData K)
+    {K : KFlatFiberTensorHypotheses T}
+    (V : KFlatCompactFiberDualityHypotheses K)
     (Gi Gj : CompactDqcFiber T) (a b : ℤ) : BaseDqc T.left :=
   ((K.derivedTensor.obj Gj.obj).obj (V.dual Gi).obj)⟦b - a⟧
 
 @[simp]
 theorem coefficient_obj
-    {K : KFlatFiberTensorData T}
-    (V : KFlatCompactFiberDualityData K)
+    {K : KFlatFiberTensorHypotheses T}
+    (V : KFlatCompactFiberDualityHypotheses K)
     (Gi Gj : CompactDqcFiber T) (a b : ℤ) :
     (V.coefficient Gi Gj a b).obj =
       (((K.derivedTensor.obj Gj.obj).obj
         (V.dual Gi).obj)⟦b - a⟧).obj :=
   rfl
 
-end KFlatCompactFiberDualityData
+end KFlatCompactFiberDualityHypotheses
 
-namespace KFlatBaseChangeData
+namespace KFlatBaseChangeHypotheses
 
 /-- The target-side tensor coefficient obtained by pulling back the two
 compact fibre factors separately, tensoring them with the target K-flat
@@ -104,8 +104,8 @@ tensor, and applying the shift left by compact duality.
 This is the intermediate object at which the projection-formula comparison
 and the monoidality of fibre pullback meet. -/
 noncomputable def pulledBackTensorCoefficient
-    (K : KFlatFiberTensorData T)
-    (V : KFlatCompactFiberDualityData K)
+    (K : KFlatFiberTensorHypotheses T)
+    (V : KFlatCompactFiberDualityHypotheses K)
     (Gi Gj : CompactDqcFiber T) (a b : ℤ) : TargetDqc X T :=
   ((D.derivedTensor.obj (D.pullSnd.functor.obj Gj.obj)).obj
     (D.pullSnd.functor.obj (V.dual Gi).obj))⟦b - a⟧
@@ -120,11 +120,11 @@ The first isomorphism is the projection-formula/duality calculation on
 hidden in the final coefficient comparison. -/
 structure KFlatTensorCoefficientComparison
     {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
-    {Q : D.SourceTensorData}
+    {Q : D.SourceTensorHypotheses}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     (P : D.CompactFiberProjectionFormula H Q pushFst)
-    (K : KFlatFiberTensorData T)
-    (V : KFlatCompactFiberDualityData K) where
+    (K : KFlatFiberTensorHypotheses T)
+    (V : KFlatCompactFiberDualityHypotheses K) where
   /-- Projection formula and compact duality identify the source coefficient
   with the pushforward of the separately pulled-back tensor coefficient. -/
   projectionIso (Gi Gj : CompactDqcFiber T) (a b : ℤ) :
@@ -140,11 +140,11 @@ structure KFlatTensorCoefficientComparison
 fibre tensor of the later factor with the dual of the earlier factor. -/
 structure KFlatTensorCoefficientData
     {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
-    {Q : D.SourceTensorData}
+    {Q : D.SourceTensorHypotheses}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     (P : D.CompactFiberProjectionFormula H Q pushFst)
-    (K : KFlatFiberTensorData T)
-    (V : KFlatCompactFiberDualityData K) where
+    (K : KFlatFiberTensorHypotheses T)
+    (V : KFlatCompactFiberDualityHypotheses K) where
   /-- Comparison between the abstract projection coefficient and the
   pushforward of the explicit pulled-back fibre tensor coefficient. -/
   coefficientIso (Gi Gj : CompactDqcFiber T) (a b : ℤ) :
@@ -158,11 +158,11 @@ namespace KFlatTensorCoefficientData
 and comparison. -/
 def toFiberCoefficientData
     {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
-    {Q : D.SourceTensorData}
+    {Q : D.SourceTensorHypotheses}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     {P : D.CompactFiberProjectionFormula H Q pushFst}
-    {K : KFlatFiberTensorData T}
-    {V : KFlatCompactFiberDualityData K}
+    {K : KFlatFiberTensorHypotheses T}
+    {V : KFlatCompactFiberDualityHypotheses K}
     (C : KFlatTensorCoefficientData (D := D) P K V) :
     FiberCoefficientData (D := D) P where
   fiberCoefficient Gi Gj a b := V.coefficient Gi Gj a b
@@ -176,11 +176,11 @@ namespace KFlatTensorCoefficientComparison
 pullback to obtain the coefficient comparison used by faithful base change. -/
 def toKFlatTensorCoefficientData
     {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
-    {Q : D.SourceTensorData}
+    {Q : D.SourceTensorHypotheses}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     {P : D.CompactFiberProjectionFormula H Q pushFst}
-    {K : KFlatFiberTensorData T}
-    {V : KFlatCompactFiberDualityData K}
+    {K : KFlatFiberTensorHypotheses T}
+    {V : KFlatCompactFiberDualityHypotheses K}
     (C : KFlatTensorCoefficientComparison (D := D) P K V) :
     KFlatTensorCoefficientData (D := D) P K V where
   coefficientIso Gi Gj a b :=
@@ -191,11 +191,11 @@ def toKFlatTensorCoefficientData
 consumed by the faithful-base-change argument. -/
 def toFiberCoefficientData
     {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
-    {Q : D.SourceTensorData}
+    {Q : D.SourceTensorHypotheses}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     {P : D.CompactFiberProjectionFormula H Q pushFst}
-    {K : KFlatFiberTensorData T}
-    {V : KFlatCompactFiberDualityData K}
+    {K : KFlatFiberTensorHypotheses T}
+    {V : KFlatCompactFiberDualityHypotheses K}
     (C : KFlatTensorCoefficientComparison (D := D) P K V) :
     FiberCoefficientData (D := D) P :=
   C.toKFlatTensorCoefficientData.toFiberCoefficientData
@@ -212,10 +212,10 @@ theorem perfectComponentsSemiorthogonal_of_kFlatTensorCoefficients
     (hA : A.HasTriangulatedComponents)
     (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
     (H : D.toDerivedBaseChangeData.CompactFiberTensorDuality)
-    (Q : D.SourceTensorData)
-    (B : KFlatBasePullbackData X)
-    (K : KFlatFiberTensorData T)
-    (V : KFlatCompactFiberDualityData K)
+    (Q : D.SourceTensorHypotheses)
+    (B : KFlatBasePullbackHypotheses X)
+    (K : KFlatFiberTensorHypotheses T)
+    (V : KFlatCompactFiberDualityHypotheses K)
     (pushBase : DqcRightDerivedPushforward (toIdentityBaseChange T))
     (pushFst : DqcRightDerivedPushforward (baseChangeFst X T))
     (adj : D.pullFst.functor ⊣ pushFst.functor)
@@ -224,7 +224,7 @@ theorem perfectComponentsSemiorthogonal_of_kFlatTensorCoefficients
     (faithful : D.DqcFaithfulBaseChange B.pullback pushBase pushFst)
     (C : CompactFiberProjectionFormula.KFlatTensorCoefficientData
       (D := D) P K V)
-    (hS : SourceTensorData.KFlatDqcSLinearComponents
+    (hS : SourceTensorHypotheses.KFlatDqcSLinearComponents
       (D := D) Q B A) :
     D.toDerivedBaseChangeData.PerfectComponentsSemiorthogonal A :=
   D.perfectComponentsSemiorthogonal_of_kFlatProjectionFormula_of_faithfulBaseChange
@@ -238,10 +238,10 @@ theorem perfectComponentsSemiorthogonal_of_kFlatTensorCoefficientComparison
     (hA : A.HasTriangulatedComponents)
     (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
     (H : D.toDerivedBaseChangeData.CompactFiberTensorDuality)
-    (Q : D.SourceTensorData)
-    (B : KFlatBasePullbackData X)
-    (K : KFlatFiberTensorData T)
-    (V : KFlatCompactFiberDualityData K)
+    (Q : D.SourceTensorHypotheses)
+    (B : KFlatBasePullbackHypotheses X)
+    (K : KFlatFiberTensorHypotheses T)
+    (V : KFlatCompactFiberDualityHypotheses K)
     (pushBase : DqcRightDerivedPushforward (toIdentityBaseChange T))
     (pushFst : DqcRightDerivedPushforward (baseChangeFst X T))
     (adj : D.pullFst.functor ⊣ pushFst.functor)
@@ -250,13 +250,13 @@ theorem perfectComponentsSemiorthogonal_of_kFlatTensorCoefficientComparison
     (faithful : D.DqcFaithfulBaseChange B.pullback pushBase pushFst)
     (C : CompactFiberProjectionFormula.KFlatTensorCoefficientComparison
       (D := D) P K V)
-    (hS : SourceTensorData.KFlatDqcSLinearComponents
+    (hS : SourceTensorHypotheses.KFlatDqcSLinearComponents
       (D := D) Q B A) :
     D.toDerivedBaseChangeData.PerfectComponentsSemiorthogonal A :=
   D.perfectComponentsSemiorthogonal_of_kFlatTensorCoefficients
     A hA hIso H Q B K V pushBase pushFst adj P faithful
       C.toKFlatTensorCoefficientData hS
 
-end KFlatBaseChangeData
+end KFlatBaseChangeHypotheses
 
 end AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange

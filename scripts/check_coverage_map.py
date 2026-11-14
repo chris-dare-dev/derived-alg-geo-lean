@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Validate a version-pinned coverage map.
 
-Stdlib only, like check_audit.py. Enforces the file's own rules:
+Stdlib only. Enforces the file's own rules:
 
 1. It parses, and `schema` is "coverage-map/1".
 2. The source pin is versioned: arxiv_version is exactly "v4" and the

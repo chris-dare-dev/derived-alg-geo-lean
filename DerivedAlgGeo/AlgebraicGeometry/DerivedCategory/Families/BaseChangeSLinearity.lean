@@ -33,7 +33,7 @@ open CategoryTheory CategoryTheory.Triangulated AlgebraicGeometry
 universe u w
 
 variable {S : Scheme.{u}} {X T : SchemeBaseChange S}
-  (D : KFlatBaseChangeData X T)
+  (D : KFlatBaseChangeHypotheses X T)
   {ι : Type w} [Preorder ι]
 
 /-- The quasicoherent derived category of the base scheme. -/
@@ -44,21 +44,21 @@ abbrev BaseDqc (S : Scheme.{u}) :=
 abbrev CompactBaseDqc (S : Scheme.{u}) :=
   (ObjectProperty.compactObjects.{u} (C := BaseDqc S)).FullSubcategory
 
-namespace KFlatBaseChangeData
+namespace KFlatBaseChangeHypotheses
 
-namespace SourceTensorData
+namespace SourceTensorHypotheses
 
 /-- For a fixed source object, the base-variable action functor: pull back
 from `S` to `X`, then tensor on the right. -/
 noncomputable def dqcBaseActionInBase
-    (Q : D.SourceTensorData)
+    (Q : D.SourceTensorHypotheses)
     (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X))
     (F : SourceDqc X) : BaseDqc S ⥤ SourceDqc X :=
   pullBase.functor ⋙ Q.derivedTensor.obj F
 
 @[simp]
 theorem dqcBaseActionInBase_obj
-    (Q : D.SourceTensorData)
+    (Q : D.SourceTensorHypotheses)
     (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X))
     (F : SourceDqc X) (B : BaseDqc S) :
     (dqcBaseActionInBase (D := D) Q pullBase F).obj B =
@@ -68,14 +68,14 @@ theorem dqcBaseActionInBase_obj
 /-- The action of an arbitrary quasicoherent base object on `Dqc(X)`: pull
 it back along `X → S`, then tensor by it on the right. -/
 noncomputable def dqcBaseAction
-    (Q : D.SourceTensorData)
+    (Q : D.SourceTensorHypotheses)
     (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X))
     (B : BaseDqc S) : SourceDqc X ⥤ SourceDqc X :=
   Q.derivedTensor.flip.obj (pullBase.functor.obj B)
 
 @[simp]
 theorem dqcBaseAction_obj
-    (Q : D.SourceTensorData)
+    (Q : D.SourceTensorHypotheses)
     (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X))
     (B : BaseDqc S) (F : SourceDqc X) :
     (dqcBaseAction (D := D) Q pullBase B).obj F =
@@ -85,14 +85,14 @@ theorem dqcBaseAction_obj
 /-- The action of a compact base object on `Dqc(X)`: pull it back along
 `X → S`, then tensor by it on the right. -/
 noncomputable def baseAction
-    (Q : D.SourceTensorData)
+    (Q : D.SourceTensorHypotheses)
     (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X))
     (B : CompactBaseDqc S) : SourceDqc X ⥤ SourceDqc X :=
   Q.derivedTensor.flip.obj (pullBase.functor.obj B.obj)
 
 @[simp]
 theorem baseAction_obj
-    (Q : D.SourceTensorData)
+    (Q : D.SourceTensorHypotheses)
     (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X))
     (B : CompactBaseDqc S) (F : SourceDqc X) :
     (baseAction (D := D) Q pullBase B).obj F =
@@ -102,7 +102,7 @@ theorem baseAction_obj
 /-- Paper-level `S`-linearity of the source semiorthogonal sequence: every
 component is preserved by the action of every compact object of `Dqc(S)`. -/
 def SLinearComponents
-    (Q : D.SourceTensorData)
+    (Q : D.SourceTensorHypotheses)
     (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X))
     (A : SemiorthogonalSequence (SourceDqc X) ι) : Prop :=
   ∀ ⦃j : ι⦄ (F : SourceDqc X), A.component j F →
@@ -113,7 +113,7 @@ def SLinearComponents
 presentable extension of `S`-linearity used when a projection coefficient on
 the base is quasicoherent but not necessarily compact. -/
 def DqcSLinearComponents
-    (Q : D.SourceTensorData)
+    (Q : D.SourceTensorHypotheses)
     (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X))
     (A : SemiorthogonalSequence (SourceDqc X) ι) : Prop :=
   ∀ ⦃j : ι⦄ (F : SourceDqc X), A.component j F →
@@ -126,8 +126,8 @@ def DqcSLinearComponents
 The base is generated from compact objects by coproducts and extensions, and
 for each fixed source object the action in the base variable is exact and
 preserves the relevant small coproducts. -/
-structure PresentableBaseActionData
-    (Q : D.SourceTensorData)
+structure PresentableBaseActionHypotheses
+    (Q : D.SourceTensorHypotheses)
     (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X)) where
   /-- Compact objects generate `Dqc(S)` under coproducts and extensions. -/
   baseGenerated :
@@ -142,14 +142,14 @@ structure PresentableBaseActionData
   actionCocontinuous (F : SourceDqc X) :
     (dqcBaseActionInBase (D := D) Q pullBase F).PreservesSmallCoproducts.{u}
 
-namespace PresentableBaseActionData
+namespace PresentableBaseActionHypotheses
 
 /-- Perf(S)-linearity extends to Dqc(S)-linearity when compact objects
 generate the base and the base action preserves triangles and coproducts. -/
 theorem dqcSLinearComponents
-    (Q : D.SourceTensorData)
+    (Q : D.SourceTensorHypotheses)
     (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X))
-    (G : PresentableBaseActionData (D := D) Q pullBase)
+    (G : PresentableBaseActionHypotheses (D := D) Q pullBase)
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (hA : A.HasTriangulatedComponents)
     (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
@@ -181,17 +181,17 @@ theorem dqcSLinearComponents
         (by simpa [action, dqcBaseActionInBase, dqcBaseAction] using
           hS F hF (⟨C, hC⟩ : CompactBaseDqc S))) _ hMap
 
-end PresentableBaseActionData
+end PresentableBaseActionHypotheses
 
-end SourceTensorData
+end SourceTensorHypotheses
 
 namespace CompactFiberProjectionFormula
 
 /-- Evidence that all source coefficients in a compact-fibre projection
 formula come by derived pullback from compact objects on the base scheme. -/
-structure BaseCoefficientData
+structure BaseCoefficientHypotheses
     {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
-    {Q : D.SourceTensorData}
+    {Q : D.SourceTensorHypotheses}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     (P : D.CompactFiberProjectionFormula H Q pushFst)
     (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X)) where
@@ -205,11 +205,11 @@ structure BaseCoefficientData
       pullBase.functor.obj (baseCoefficient Gi Gj a b).obj
 
 /-- Evidence that all projection-formula coefficients are pulled back from
-quasicoherent objects on the base. Unlike `BaseCoefficientData`, this does
+quasicoherent objects on the base. Unlike `BaseCoefficientHypotheses`, this does
 not require those objects to be compact. -/
 structure DqcBaseCoefficientData
     {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
-    {Q : D.SourceTensorData}
+    {Q : D.SourceTensorHypotheses}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     (P : D.CompactFiberProjectionFormula H Q pushFst)
     (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X)) where
@@ -222,35 +222,35 @@ structure DqcBaseCoefficientData
     P.coefficient Gi Gj a b ≅
       pullBase.functor.obj (baseCoefficient Gi Gj a b)
 
-namespace BaseCoefficientData
+namespace BaseCoefficientHypotheses
 
 /-- Compact base coefficients can be forgotten to quasicoherent base
 coefficients. -/
 def toDqc
     {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
-    {Q : D.SourceTensorData}
+    {Q : D.SourceTensorHypotheses}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     {P : D.CompactFiberProjectionFormula H Q pushFst}
     {pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X)}
-    (C : BaseCoefficientData (D := D) P pullBase) :
+    (C : BaseCoefficientHypotheses (D := D) P pullBase) :
     DqcBaseCoefficientData (D := D) P pullBase where
   baseCoefficient Gi Gj a b := (C.baseCoefficient Gi Gj a b).obj
   coefficientIso Gi Gj a b := C.coefficientIso Gi Gj a b
 
-end BaseCoefficientData
+end BaseCoefficientHypotheses
 
 /-- Base coefficients and `S`-linearity imply the coefficient-local source
 component preservation required by the projection formula. -/
 theorem preservesSourceComponents_of_sLinear
     {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
-    {Q : D.SourceTensorData}
+    {Q : D.SourceTensorHypotheses}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     (P : D.CompactFiberProjectionFormula H Q pushFst)
     (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X))
-    (C : BaseCoefficientData (D := D) P pullBase)
+    (C : BaseCoefficientHypotheses (D := D) P pullBase)
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
-    (hS : SourceTensorData.SLinearComponents
+    (hS : SourceTensorHypotheses.SLinearComponents
       (D := D) Q pullBase A) :
     PreservesSourceComponents (D := D) P A := by
   intro j Fj Gi Gj a b
@@ -264,14 +264,14 @@ theorem preservesSourceComponents_of_sLinear
 coefficient-local preservation required by the projection formula. -/
 theorem preservesSourceComponents_of_dqcSLinear
     {H : D.toDerivedBaseChangeData.CompactFiberTensorDuality}
-    {Q : D.SourceTensorData}
+    {Q : D.SourceTensorHypotheses}
     {pushFst : DqcRightDerivedPushforward (baseChangeFst X T)}
     (P : D.CompactFiberProjectionFormula H Q pushFst)
     (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X))
     (C : DqcBaseCoefficientData (D := D) P pullBase)
     (A : SemiorthogonalSequence (SourceDqc X) ι)
     (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
-    (hS : SourceTensorData.DqcSLinearComponents
+    (hS : SourceTensorHypotheses.DqcSLinearComponents
       (D := D) Q pullBase A) :
     PreservesSourceComponents (D := D) P A := by
   intro j Fj Gi Gj a b
@@ -291,15 +291,15 @@ theorem perfectComponentsSemiorthogonal_of_projectionFormula_of_sLinear
     (hA : A.HasTriangulatedComponents)
     (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
     (H : D.toDerivedBaseChangeData.CompactFiberTensorDuality)
-    (Q : D.SourceTensorData)
+    (Q : D.SourceTensorHypotheses)
     (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X))
     (pushFst : DqcRightDerivedPushforward (baseChangeFst X T))
     (adj : D.pullFst.functor ⊣ pushFst.functor)
     [D.pullFst.functor.Additive]
     (P : D.CompactFiberProjectionFormula H Q pushFst)
-    (C : CompactFiberProjectionFormula.BaseCoefficientData
+    (C : CompactFiberProjectionFormula.BaseCoefficientHypotheses
       (D := D) P pullBase)
-    (hS : SourceTensorData.SLinearComponents
+    (hS : SourceTensorHypotheses.SLinearComponents
       (D := D) Q pullBase A) :
     D.toDerivedBaseChangeData.PerfectComponentsSemiorthogonal A :=
   D.perfectComponentsSemiorthogonal_of_projectionFormula A hA hIso H Q
@@ -315,7 +315,7 @@ theorem perfectComponentsSemiorthogonal_of_projectionFormula_of_dqcSLinear
     (hA : A.HasTriangulatedComponents)
     (hIso : ∀ j, (A.component j).IsClosedUnderIsomorphisms)
     (H : D.toDerivedBaseChangeData.CompactFiberTensorDuality)
-    (Q : D.SourceTensorData)
+    (Q : D.SourceTensorHypotheses)
     (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X))
     (pushFst : DqcRightDerivedPushforward (baseChangeFst X T))
     (adj : D.pullFst.functor ⊣ pushFst.functor)
@@ -323,7 +323,7 @@ theorem perfectComponentsSemiorthogonal_of_projectionFormula_of_dqcSLinear
     (P : D.CompactFiberProjectionFormula H Q pushFst)
     (C : CompactFiberProjectionFormula.DqcBaseCoefficientData
       (D := D) P pullBase)
-    (hS : SourceTensorData.DqcSLinearComponents
+    (hS : SourceTensorHypotheses.DqcSLinearComponents
       (D := D) Q pullBase A) :
     D.toDerivedBaseChangeData.PerfectComponentsSemiorthogonal A :=
   D.perfectComponentsSemiorthogonal_of_projectionFormula A hA hIso H Q
@@ -331,6 +331,6 @@ theorem perfectComponentsSemiorthogonal_of_projectionFormula_of_dqcSLinear
     (CompactFiberProjectionFormula.preservesSourceComponents_of_dqcSLinear
       (D := D) P pullBase C A hIso hS)
 
-end KFlatBaseChangeData
+end KFlatBaseChangeHypotheses
 
 end AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange

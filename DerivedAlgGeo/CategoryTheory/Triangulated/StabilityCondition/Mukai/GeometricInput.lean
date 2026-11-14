@@ -117,8 +117,8 @@ def HasBoundaryMukaiDecompositionWithMargin
 arbitrary lower bound.**
 
 Every factor is required to have `realForm` at least `-δ`. No stability
-predicate is invented here: once a geometric Jordan--Hölder API exists, its
-stable factors should be used to prove this proposition.
+predicate is invented here: the proposition is meant to be proved from the
+stable factors of a geometric Jordan--Hölder filtration.
 
 The lower bound is parameterized because `-1` is the K3/2-CY value coming from
 the stable-simple self-Ext argument, not part of boundary factorization itself.
@@ -129,12 +129,12 @@ def HasBoundaryMukaiDecompositionWithLowerBound
   HasBoundaryMukaiDecompositionWith m b β ω S fun G ↦
     -δ ≤ Mukai.realForm b ((MukaiChargeData.ofAmbient t m).mukai (K₀Ab.of G))
 
-/-- The historical K3-normalized boundary contract.
+/-- The K3-normalized boundary contract.
 
 This is the `δ = 1` specialization of
-`HasBoundaryMukaiDecompositionWithLowerBound`. It remains as a named wrapper
-so existing K3 consumers keep their API while new surface realizations choose
-their own geometric lower bound explicitly. -/
+`HasBoundaryMukaiDecompositionWithLowerBound`. It is a named wrapper for K3
+consumers; other surface realizations choose their own geometric lower bound
+explicitly. -/
 def HasBoundaryMukaiDecomposition
     (m : K₀ C →+ Mukai.RealExtension V) (b : V →ₗ[ℝ] V →ₗ[ℝ] ℝ)
     (β ω : V) (S : WeakSlopeData t.heart.FullSubcategory) : Prop :=

@@ -97,9 +97,9 @@ cli_case refuse 'umbrella as a module target'     lake build +DerivedAlgGeo
 # The other edge. Refusing any of these breaks gates.sh, ci.yml, or proof work.
 cli_case allow  'lake build DerivedAlgGeo.Development' lake build DerivedAlgGeo.Development
 cli_case allow  'lake build a leaf module'        lake build DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum
-cli_case allow  'lake build the three audits'     lake build AlgebraicGeometryAudit StabilityConditionAudit DGCategoryAudit
+cli_case allow  'lake build two leaf modules'     lake build DerivedAlgGeo.Foo DerivedAlgGeo.Bar
 cli_case allow  'lake build emit'                 lake build emit
-cli_case allow  'lake env lean <file>'            lake env lean scripts/EnumDecls.lean
+cli_case allow  'lake env lean <file>'            lake env lean scripts/EnumInhabitants.lean
 cli_case allow  'lake exe lint-style'             lake exe lint-style
 # `DerivedAlgGeo` appears verbatim here and is NOT a build target. A check that
 # scanned the whole token list instead of `lake build`'s own would kill the
@@ -158,6 +158,18 @@ cli_case allow  'git -C dir show gates.sh'        git -C .. show origin/main:scr
 cli_case allow  'git --no-pager log gates.sh'     git --no-pager log --oneline -- scripts/gates.sh
 cli_case allow  'env -u VAR grep gates.sh'        env -u DAG_ALLOW_LOCAL_BUILD grep -c gate scripts/gates.sh
 hook_case allow 'hook passes reading gates.sh'    'grep -rn "gates.sh" scripts/'
+# Operators split only outside quotes, and a heredoc is data unless a shell
+# reads it. The allows were false refusals; the refusals are the ways the same
+# shapes still run the gate.
+hook_case allow  'hook passes a quoted | in a read'   "grep -nE 'a|b' scripts/gates.sh"
+hook_case allow  'hook passes a heredoc to git'       $'git commit -F - <<\'EOF\'\nscripts/gates.sh\nEOF'
+hook_case refuse 'hook blocks a heredoc to a shell'   $'sh <<\'EOF\'\nscripts/gates.sh\nEOF'
+hook_case refuse 'hook blocks bash -c with a pipe'    "bash -c 'cd x | scripts/gates.sh'"
+hook_case refuse 'hook blocks a quoted substitution'  'echo "$(scripts/gates.sh)"'
+# Staging, committing or listing the file is data; an alias is still a run.
+hook_case allow  'hook passes git add of gates.sh'    'git add scripts/gates.sh lakefile.toml'
+hook_case allow  'hook passes printf of gates.sh'     "printf '%s\n' scripts/gates.sh > paths.txt"
+hook_case refuse 'hook blocks a git alias to gates.sh' "git -c alias.g='!scripts/gates.sh' g"
 
 # The replacement the refusal points at. `precheck.sh` runs the no-build subset
 # and a targeted build; refusing it would leave the skills with no pre-flight at

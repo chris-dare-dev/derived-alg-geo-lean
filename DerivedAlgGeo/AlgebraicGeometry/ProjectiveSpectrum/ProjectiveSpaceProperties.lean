@@ -10,17 +10,32 @@ import Mathlib.AlgebraicGeometry.Noetherian
 /-!
 # Polynomial projective space is locally Noetherian, and is its own projective presentation
 
-`Proj/ProjectiveSpaceVariety.lean` exhibits `Pⁿ = Proj k[Xᵢ]` as a variety over `k` and `O(d)` as an
-object of `Coh Pⁿ`. Those are the only geometric objects this repository constructs, and until
-now nothing said that `Pⁿ` satisfies the two adjectives every consumer of a variety asks for.
-This file supplies both.
+`ProjectiveSpectrum/ProjectiveSpaceVariety.lean` exhibits `Pⁿ = Proj k[Xᵢ]` as a variety over `k`
+and `O(d)` as an object of `Coh Pⁿ`. This file supplies the two adjectives every consumer of a
+variety asks for: `Pⁿ` is locally Noetherian, and it is projective.
 
-## Locally Noetherian
+## Main definitions
+
+* `AlgebraicGeometry.Proj.projectiveSpaceSelfEmbedding` — the identity, read as a map from `Pⁿ`
+  as `Proj` into `Pⁿ` as the variety layer's ambient projective space.
+* `AlgebraicGeometry.Proj.projectiveSpaceSelfPresentation` — `Pⁿ` presented in itself by the
+  identity.
+
+## Main results
+
+* `isLocallyNoetherian_projectiveSpace` — `Pⁿ` is locally Noetherian.
+* `homogeneousZeroRingEquiv_toRingHom_eq_algebraMap` — the two maps onto the degree-zero part
+  agree.
+* `projectiveSpaceToSpec_eq` — the two constructions build the same structure morphism.
+* `isProjective_projectiveSpace` — `Pⁿ` is projective over `k`.
+
+## Implementation notes
+
+### Locally Noetherian
 
 `Coh X` is `Abelian` only for `[IsLocallyNoetherian X]`
-(`CoherentSheaf/Abelian/Basic.lean`), so without this instance the one worked example in the
-repository sat in a category with no kernels — `⊕O(-d) ↠ F` could not even be *stated* about
-`Pⁿ`, and `Dᵇ(Coh Pⁿ)` did not exist.
+(`Modules/Coherent/Abelian/Basic.lean`), so without this instance `Coh Pⁿ` has no kernels —
+`⊕O(-d) ↠ F` could not even be *stated* about `Pⁿ`, and `Dᵇ(Coh Pⁿ)` would not exist.
 
 The proof is a transfer and nothing more: `Spec k` is locally Noetherian because a field is a
 Noetherian ring, the structure morphism is `LocallyOfFiniteType` by
@@ -29,15 +44,15 @@ Noetherian ring, the structure morphism is `LocallyOfFiniteType` by
 the structure morphism of finite type, so it is required here for the same reason it is required
 there.
 
-## Its own projective presentation
+### Its own projective presentation
 
 `Variety.IsProjective` asks for a `ProjectivePresentation` — a closed immersion into some
 `projectiveSpace ι k`. For `Pⁿ` that embedding is the identity, and the only real content is that
-the two lanes' structure morphisms agree.
+the two constructions' structure morphisms agree.
 
 They are built from different maps onto the degree-zero part of the grading:
 `Variety/Projective.lean` uses `homogeneousZeroRingEquiv`, whose forward map is
-`MvPolynomial.C`, and `Proj/ProjectiveSpaceVariety.lean` uses `algebraMap k ↥(𝒜 0)`.
+`MvPolynomial.C`, and `ProjectiveSpectrum/ProjectiveSpaceVariety.lean` uses `algebraMap k ↥(𝒜 0)`.
 `homogeneousZeroRingEquiv_toRingHom_eq_algebraMap` is the statement that these are the same ring
 homomorphism, and it is the mathematical content of this half of the file; everything after it is
 transport.
@@ -47,25 +62,26 @@ The two grading spellings are *not* content: `MvPolynomial.polynomialGrading` is
 `Proj (polynomialGrading ι k)` are the same term and the identity typechecks between
 them without an `eqToHom`.
 
-## What this file does not do
+### What this file does not do
 
 * **It proves nothing about smoothness.** `SmoothProperVariety` and every K3 statement need
   `Smooth (Pⁿ ↘ Spec k)`, which needs the relative cotangent complex of `Proj`; none of that
   is at the pin, and nothing here approaches it.
 * **It exhibits no new sheaf.** The consequences unlocked here are categorical — `Coh Pⁿ` is
-  abelian, `Pⁿ` is projective hence proper — and the objects available on `Pⁿ` are still exactly
+  abelian, `Pⁿ` is projective hence proper — and the file constructs no sheaf on `Pⁿ` beyond
   `O_X` and the twists `O(d)`.
 * **It does not connect to `NumericalVarietyData`.** The realization `K₀(Dᵇ(Coh X)) → N` remains
   data supplied by a caller (`Numerical/GrothendieckGroup/Realization.lean`), so no Chern
   character or Mukai vector of `O(d)` follows from anything here.
 
-## Main results
+## References
 
-* `isLocallyNoetherian_projectiveSpace` — `Pⁿ` is locally Noetherian.
-* `homogeneousZeroRingEquiv_toRingHom_eq_algebraMap` — the two maps onto the degree-zero part
-  agree.
-* `projectiveSpaceSelfPresentation` — `Pⁿ` presented in itself by the identity.
-* `isProjective_projectiveSpace` — `Pⁿ` is projective over `k`.
+Mathlib's `LocallyOfFiniteType.isLocallyNoetherian`; the presentation interface is the
+repository's `AlgebraicGeometry.ProjectivePresentation` and `Variety.IsProjective`.
+
+## Tags
+
+projective space, locally Noetherian, projective variety, projective presentation
 -/
 
 universe u
@@ -103,7 +119,7 @@ theorem homogeneousZeroRingEquiv_toRingHom_eq_algebraMap :
   ext r
   rfl
 
-/-- The two lanes build the same structure morphism `Pⁿ ⟶ Spec k`: the one the variety
+/-- The two constructions build the same structure morphism `Pⁿ ⟶ Spec k`: the one the variety
 layer's `projectiveSpace` carries and the one the `Scheme.Over` instance on `Proj` records. -/
 theorem projectiveSpaceToSpec_eq :
     _root_.AlgebraicGeometry.projectiveSpaceToSpec ι k
@@ -115,8 +131,8 @@ theorem projectiveSpaceToSpec_eq :
       Spec.map (CommRingCat.ofHom (algebraMap k ↥(polynomialGrading ι k 0)))
   rw [homogeneousZeroRingEquiv_toRingHom_eq_algebraMap]
 
-/-- The identity, read as a map from `Pⁿ` as the Proj lane spells it into `Pⁿ` as the variety
-layer's ambient projective space.
+/-- The identity, read as a map from `Pⁿ` as the construction of `Proj` spells it into `Pⁿ` as
+the variety layer's ambient projective space.
 
 No `eqToHom` appears because there is no equation to transport along: the source and target are
 the same term, `polynomialGrading` being an `abbrev` for `MvPolynomial.homogeneousSubmodule`. -/

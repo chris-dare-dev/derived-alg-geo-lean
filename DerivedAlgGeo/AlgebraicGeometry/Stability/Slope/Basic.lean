@@ -21,19 +21,19 @@ then arrives rather than being rebuilt.
 ## Main definitions
 
 * `MuPositivityData` — the two positivity facts a polarization supplies, as geometric input.
-* `MuCurvePositivityData` — the curve form of that input, with the strict inequality.
-* `PolarizedVarietyData.weakSlopeData` — coherent sheaves on a polarized variety as a
+* `MuCurvePositivityHypotheses` — the curve form of that input, with the strict inequality.
+* `PolarizedVarietyHypotheses.weakSlopeData` — coherent sheaves on a polarized variety as a
   `WeakSlopeData`: rank is the Hilbert multiplicity, degree the Hilbert degree coefficient.
-* `PolarizedVarietyData.slopeData` — the curve form, as a `SlopeData`.
+* `PolarizedVarietyHypotheses.slopeData` — the curve form, as a `SlopeData`.
 
 ## Main results
 
-* `PolarizedVarietyData.weakSlopeData_slope` — the weak slope is the ratio of Hilbert
+* `PolarizedVarietyHypotheses.weakSlopeData_slope` — the weak slope is the ratio of Hilbert
   coefficients.
-* `PolarizedVarietyData.weakSlopeData_topSlope_of_multiplicity_pos` and
-  `PolarizedVarietyData.weakSlopeData_topSlope_of_multiplicity_zero` — the slope in
+* `PolarizedVarietyHypotheses.weakSlopeData_topSlope_of_multiplicity_pos` and
+  `PolarizedVarietyHypotheses.weakSlopeData_topSlope_of_multiplicity_zero` — the slope in
   `WithTop ℝ` is that ratio at positive multiplicity and `⊤` at multiplicity zero.
-* `PolarizedVarietyData.toWeakSlopeData_slopeData` — forgetting the curve condition recovers
+* `PolarizedVarietyHypotheses.toWeakSlopeData_slopeData` — forgetting the curve condition recovers
   `weakSlopeData`, definitionally.
 
 ## Implementation notes
@@ -79,8 +79,8 @@ that crosses into the derived category, and it is deliberately a leaf.
 ## References
 
 This file instantiates the abstract `WeakSlopeData` and `SlopeData` with the Hilbert
-coefficient homomorphisms `PolarizedVarietyData.multiplicityHom` and
-`PolarizedVarietyData.degreeHom`.
+coefficient homomorphisms `PolarizedVarietyHypotheses.multiplicityHom` and
+`PolarizedVarietyHypotheses.degreeHom`.
 
 ## Tags
 
@@ -101,7 +101,7 @@ variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 
 /-- **The two positivity facts a polarization supplies.** Both are consequences of ampleness and
 neither is provable at this pin; see the module docstring. -/
-structure MuPositivityData (P : PolarizedVarietyData k X) where
+structure MuPositivityData (P : PolarizedVarietyHypotheses k X) where
   /-- Multiplicity is nonnegative — geometric input. -/
   multiplicity_nonneg : ∀ F : Coh X, 0 ≤ P.multiplicity F
   /-- A nonzero sheaf of multiplicity zero has nonnegative degree coefficient — geometric input,
@@ -112,7 +112,7 @@ structure MuPositivityData (P : PolarizedVarietyData k X) where
 /-- **The curve form of the same input**, with the strict inequality. It is false on a surface,
 where a skyscraper has multiplicity and degree coefficient both zero; see
 `Abelian/Stability/Weak/Slope.lean`. -/
-structure MuCurvePositivityData (P : PolarizedVarietyData k X) where
+structure MuCurvePositivityHypotheses (P : PolarizedVarietyHypotheses k X) where
   /-- Multiplicity is nonnegative — geometric input. -/
   multiplicity_nonneg : ∀ F : Coh X, 0 ≤ P.multiplicity F
   /-- A nonzero sheaf of multiplicity zero has positive degree coefficient — the curve
@@ -121,15 +121,15 @@ structure MuCurvePositivityData (P : PolarizedVarietyData k X) where
     0 < P.hilbertDegreeCoefficient F
 
 /-- Forgetting the strict inequality, exactly as `SlopeData.toWeakSlopeData` does. -/
-theorem MuCurvePositivityData.toMuPositivityData {P : PolarizedVarietyData k X}
-    (h : MuCurvePositivityData P) : MuPositivityData P where
+theorem MuCurvePositivityHypotheses.toMuPositivityData {P : PolarizedVarietyHypotheses k X}
+    (h : MuCurvePositivityHypotheses P) : MuPositivityData P where
   multiplicity_nonneg := h.multiplicity_nonneg
   degree_nonneg_of_multiplicity_zero := fun F hF h0 ↦
     (h.degree_pos_of_multiplicity_zero F hF h0).le
 
-namespace PolarizedVarietyData
+namespace PolarizedVarietyHypotheses
 
-variable (P : PolarizedVarietyData k X)
+variable (P : PolarizedVarietyHypotheses k X)
 
 /-! ### The slope datum -/
 
@@ -197,7 +197,7 @@ theorem weakSlopeData_topSlope_of_multiplicity_zero (h : MuPositivityData P) {F 
 /-! ### The curve case -/
 
 /-- **The curve form of the slope datum**, from the strict positivity input. -/
-noncomputable def slopeData (h : MuCurvePositivityData P) : SlopeData (Coh X) where
+noncomputable def slopeData (h : MuCurvePositivityHypotheses P) : SlopeData (Coh X) where
   rankHom := P.multiplicityHom
   degreeHom := (Int.castAddHom ℝ).comp P.degreeHom
   rank_nonneg := fun F ↦ by
@@ -211,27 +211,27 @@ noncomputable def slopeData (h : MuCurvePositivityData P) : SlopeData (Coh X) wh
 
 /-- **The two presentations agree.** Forgetting the curve condition gives back the surface datum,
 field for field, so rank, degree, charge and slope are literally the same. -/
-theorem toWeakSlopeData_slopeData (h : MuCurvePositivityData P) :
+theorem toWeakSlopeData_slopeData (h : MuCurvePositivityHypotheses P) :
     (P.slopeData h).toWeakSlopeData = P.weakSlopeData h.toMuPositivityData := rfl
 
-theorem slopeData_rank (h : MuCurvePositivityData P) (F : Coh X) :
+theorem slopeData_rank (h : MuCurvePositivityHypotheses P) (F : Coh X) :
     (P.slopeData h).rank F = P.multiplicity F :=
   P.multiplicityHom_of F
 
-theorem slopeData_degree (h : MuCurvePositivityData P) (F : Coh X) :
+theorem slopeData_degree (h : MuCurvePositivityHypotheses P) (F : Coh X) :
     (P.slopeData h).degree F = ((P.hilbertDegreeCoefficient F : ℤ) : ℝ) :=
   weakSlopeData_degree h.toMuPositivityData F
 
-theorem slopeData_charge (h : MuCurvePositivityData P) (F : Coh X) :
+theorem slopeData_charge (h : MuCurvePositivityHypotheses P) (F : Coh X) :
     (P.slopeData h).charge F =
       ⟨-((P.hilbertDegreeCoefficient F : ℤ) : ℝ), ((P.multiplicity F : ℤ) : ℝ)⟩ :=
   weakSlopeData_charge h.toMuPositivityData F
 
-theorem slopeData_slope (h : MuCurvePositivityData P) (F : Coh X) :
+theorem slopeData_slope (h : MuCurvePositivityHypotheses P) (F : Coh X) :
     (P.slopeData h).slope F =
       ((P.hilbertDegreeCoefficient F : ℤ) : ℝ) / ((P.multiplicity F : ℤ) : ℝ) :=
   weakSlopeData_slope h.toMuPositivityData F
 
-end PolarizedVarietyData
+end PolarizedVarietyHypotheses
 
 end AlgebraicGeometry.Stability.Gieseker

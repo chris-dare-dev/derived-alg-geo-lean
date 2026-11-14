@@ -13,17 +13,31 @@ product of those indices over the tuples `x : Fin (n + 1) → ι`, and
 `intCechCochainsDegreewiseAddEquiv` is the corresponding product of comparisons, so degreewise
 linearity is the per-index statement read off one projection at a time.
 
-## The endomorphism, named once
+## Main definitions
 
-The Čech lane takes a presheaf; the scalar action is defined on a sheaf of modules.
-`cechScalarAction` crosses that gap by pushing `varietyScalarAction` through
+* `AlgebraicGeometry.Proj.intTwistScalarHom` is the endomorphism of the twist presheaf induced by
+  a base scalar.
+
+## Main results
+
+* `AlgebraicGeometry.Proj.intCechScalar_proj` reads the induced map on degree `n` at one Čech
+  index.
+* `AlgebraicGeometry.Proj.intCechCochainsDegreewiseAddEquiv_smul` shows that the degreewise
+  comparison is `k`-linear.
+
+## Implementation notes
+
+### The endomorphism, named once
+
+The Čech complex `cechComplexFunctor` takes a presheaf; the scalar action is defined on a sheaf
+of modules. `cechScalarAction` crosses that gap by pushing `varietyScalarAction` through
 `Scheme.Modules.toSheaf` and then `sheafToPresheaf`, and `intTwistScalarHom` is exactly that
 composite named at the twist. Naming it
 is what makes the reconciliation visible: its source and target elaborate as `intTwistPresheaf`,
 which is the presheaf the explicit complex is built from, so no transport is needed between the two
 descriptions of degree `n`.
 
-## What carries the projection
+### What carries the projection
 
 `cechComplexFunctor_map_f_π` says the induced map commutes with the projections, because `evalOp`
 sends a morphism to `Pi.map` componentwise. That is the exact analogue for a morphism of what
@@ -33,14 +47,23 @@ the same shape `intCechCochainsDegreewiseAddEquiv_d` uses.
 The proof is written with `congrArg` and `Eq.trans` rather than `rw`. The projection family in the
 goal is spelled through the Čech nerve (`(rightOp cech).obj ⦋n⦌`) while the general lemma spells it
 through `cechTermFamily`; the two are definitionally equal but not syntactically so, and `rw` will
-not match across that gap while `congrArg` only needs defeq. This is the same obstruction recorded
-for `intCechIndexEquiv_smul`.
+not match across that gap while `congrArg` only needs defeq. The same obstruction appears in
+`intCechIndexEquiv_smul`.
 
-## Scope
+### Scope
 
 Degreewise only. The homology statement, the surjection from the full blocks, and the
 `module_finite_linearCoherentH_of_cech` wiring are in
 `Cohomology/Finiteness/ProjectiveSpaceTopFinite.lean`, which consumes this file.
+
+## References
+
+This builds on `intCechIndexEquiv_smul`, `intCechCochainsDegreewiseAddEquiv`,
+`cechComplexFunctor_map_f_π` and `cechScalarAction`.
+
+## Tags
+
+Čech complex, projective space, twisting sheaf, scalar action, linearity
 -/
 
 universe u
@@ -58,8 +81,9 @@ variable (ι k : Type u) [Field k]
 /-- **The endomorphism of the twist presheaf a base scalar induces.**
 
 This is `varietyScalarAction` carried through the two functors `cechScalarAction` uses. That it
-elaborates with `intTwistPresheaf` on both sides is the reconciliation the Čech lane needs: the
-sheaf-side presheaf and the presheaf the explicit complex is built from are the same object. -/
+elaborates with `intTwistPresheaf` on both sides is the reconciliation the Čech computation
+needs: the sheaf-side presheaf and the presheaf the explicit complex is built from are the same
+object. -/
 noncomputable def intTwistScalarHom (d : ℤ) (r : k) :
     intTwistPresheaf ι k d ⟶ intTwistPresheaf ι k d :=
   (sheafToPresheaf _ _).map ((_root_.AlgebraicGeometry.Scheme.Modules.toSheaf _).map

@@ -378,7 +378,7 @@ Coverage is now expressed concretely: every member of every block occurs in
 the corresponding extension list.  The inequality saying that the list spans
 the total exceptional part is derived from the universal property of the
 block spans. -/
-structure GeneratedBlockExtensionSequenceData
+structure GeneratedBlockExtensionSequenceHypotheses
     {I : Type t} {J : Type t'}
     (B_X : Triangulated.OrthogonalExceptionalBlocks k X I)
     (B_Y : Triangulated.OrthogonalExceptionalBlocks k Y J)
@@ -406,14 +406,14 @@ structure GeneratedBlockExtensionSequenceData
   /-- The total target exceptional part is right admissible. -/
   targetRightAdmissible : B_Y.total.IsRightAdmissible
 
-namespace GeneratedBlockExtensionSequenceData
+namespace GeneratedBlockExtensionSequenceHypotheses
 
 variable {I : Type t} {J : Type t'}
   {B_X : Triangulated.OrthogonalExceptionalBlocks k X I}
   {B_Y : Triangulated.OrthogonalExceptionalBlocks k Y J}
   {corr : Correspondence X Y W}
   {R : ResidualKernelEquivalence B_X B_Y corr}
-variable (A : GeneratedBlockExtensionSequenceData B_X B_Y corr R)
+variable (A : GeneratedBlockExtensionSequenceHypotheses B_X B_Y corr R)
 
 /-- The source extension list contains the total source exceptional part. -/
 theorem sourceCover [IsTriangulated X] :
@@ -466,7 +466,7 @@ noncomputable def toKernelEquivalence [IsTriangulated X]
     [IsTriangulated Y] : KernelEquivalence corr :=
   A.toGeneratedExtensionSequenceData.toKernelEquivalence
 
-end GeneratedBlockExtensionSequenceData
+end GeneratedBlockExtensionSequenceHypotheses
 
 end Stages
 

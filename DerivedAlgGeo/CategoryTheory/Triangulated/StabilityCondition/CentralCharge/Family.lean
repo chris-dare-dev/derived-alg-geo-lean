@@ -13,14 +13,47 @@ This file owns the dimension- and geometry-independent charge-family root.  A
 arbitrary parameter type `P`.  It contains no heart, slicing, support property,
 wall locus, Chern character, or scheme.
 
+## Main definitions
+
+* `ChargeFamily` — a family of additive central charges indexed by `P`.
+* `ChargeFamily.zeroLocus` — the parameters where the charge of one class
+  vanishes.
+* `ChargeFamily.reindex`, `ChargeFamily.pullback` — change of parameters and
+  change of the additive class presentation.
+* `ChargeFamily.re`, `ChargeFamily.im` — real and imaginary parts of a charge.
+* `ChargeFamily.realDet` — the determinant of a real-linear endomorphism of `ℂ`.
+* `ChargeFamily.linearAct`, `ChargeFamily.smul` — real-linear postcomposition
+  and complex rescaling of every charge in a family.
+
+## Main results
+
+* `ChargeFamily.reindex_zeroLocus`, `ChargeFamily.pullback_zeroLocus` — how the
+  charge-zero loci transform under reindexing and pullback.
+* `ChargeFamily.pullback_reindex` — reindexing and pullback commute.
+* `ChargeFamily.map_eq_smul_add_smul` — a real-linear map of `ℂ` is determined
+  by its values on `1` and `I`.
+* `ChargeFamily.realDet_mulLeft` — multiplication by `c` has real determinant
+  `‖c‖²`.
+
+## Implementation notes
+
 `reindex` changes parameters and `pullback` changes the additive class
 presentation. `zeroLocus` names charge vanishing without calling it a wall.
 Real-linear postcomposition and complex rescaling also belong here because they
 act on charges before any wall or phase is considered.
 
-The declarations keep their established `...Wall` namespace so the source
-cutover preserves public names.  The path records the mathematical owner; wall
-equations are downstream in `StabilityCondition/Walls/Alignment.lean`.
+The declarations live in the `...Wall` namespace although the path is
+`CentralCharge/`: the namespace keeps the public names stable, and the path
+records the mathematical owner.  Wall equations are downstream in
+`StabilityCondition/Walls/Alignment.lean`.
+
+## References
+
+Mathlib's `AddMonoidHom` and `LinearMap.mulLeft`.
+
+## Tags
+
+central charge, charge family, reindexing, pullback, zero locus
 -/
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Wall

@@ -12,21 +12,42 @@ import Mathlib.CategoryTheory.Abelian.Basic
 `K₀Ab A` is the free abelian group on the objects of `A` modulo the relations
 `[X₂] = [X₁] + [X₃]` coming from short exact sequences.
 
-## Why this file did not exist, and what it replaces
+## Main definitions
+
+* `CategoryTheory.abelianPresentation`: the objects of `A`, related by its short
+  exact sequences, as a `GrothendieckPresentation`.
+* `CategoryTheory.K₀Ab` and `CategoryTheory.K₀Ab.of`: the Grothendieck group
+  and the class of an object.
+* `CategoryTheory.K₀Ab.lift` and `CategoryTheory.K₀Ab.liftOf`: the universal
+  additive map out of `K₀Ab`, with additivity supplied as an instance or as a
+  proof.
+
+## Main results
+
+* `CategoryTheory.K₀Ab.of_shortExact` — the defining relation;
+* `CategoryTheory.K₀Ab.of_isZero` and `CategoryTheory.K₀Ab.of_iso` — proved, not
+  assumed;
+* `CategoryTheory.K₀Ab.lift_of`, `CategoryTheory.K₀Ab.liftOf_of` and
+  `CategoryTheory.K₀Ab.hom_ext` — the universal property, inherited from
+  `GrothendieckPresentation`.
+
+## Implementation notes
+
+### Why the abelian instantiation
 
 `GrothendieckPresentation` (`Presentation.lean`) is generic in its generator and
-relation types — it mentions no category at all — but it was instantiated only
-once, at distinguished triangles (`Basic.lean`).  The abelian instantiation is
-three lines, and its absence is why the repository grew several hand-rolled
-copies of the same universal property written out longhand: a function on
-objects together with `map_zero`, `map_iso` and `map_additive` fields **is**
-an additive map out of `K₀Ab`, and nothing else.
+relation types — it mentions no category at all.  Its instantiation at
+distinguished triangles is `K₀` (`Triangulated/GrothendieckGroup/Basic.lean`);
+its instantiation at short exact sequences is this file, and it takes three
+lines.  A function on objects together
+with vanishing on zero objects, invariance under isomorphism and additivity on
+short exact sequences **is** an additive map out of `K₀Ab`, and nothing else.
 
-With `K₀Ab` those three fields stop being data.  `of_isZero`, `of_iso` and
+With `K₀Ab` those three properties are not data.  `of_isZero`, `of_iso` and
 `of_shortExact` are theorems here, proved once, and every consumer gets them
 through `AddMonoidHom` instead of restating them.
 
-## Placement
+### Placement
 
 This file and `Presentation.lean` sit under `CategoryTheory/GrothendieckGroup/`
 because neither consumes anything triangulated.  `K₀` itself, built on
@@ -34,15 +55,16 @@ because neither consumes anything triangulated.  `K₀` itself, built on
 
 The rule that places them — *a file belongs under `Triangulated/` only if it
 uses something triangulated* — is the same one that puts `heartDatum` beside the
-class datum it instantiates rather than beside the §14 lane that consumes it.
+class datum it instantiates rather than beside the weak stability conditions
+that consume it.
 
-## Main results
+## References
 
-* `K₀Ab` and `K₀Ab.of`;
-* `K₀Ab.of_shortExact` — the defining relation;
-* `K₀Ab.of_isZero` and `K₀Ab.of_iso` — proved, not assumed;
-* `K₀Ab.lift` / `K₀Ab.hom_ext` — the universal property, inherited from
-  `GrothendieckPresentation`.
+The library's `GrothendieckPresentation`, and Mathlib's `ShortComplex.ShortExact`.
+
+## Tags
+
+Grothendieck group, abelian category, short exact sequence, universal property
 -/
 
 universe v u
@@ -116,10 +138,9 @@ theorem lift_of {G : Type*} [AddCommGroup G] (f : A → G)
 on objects that is additive on short exact sequences induces a hom, with the
 additivity supplied as a proof rather than as an instance.
 
-This is what replaces a `map_zero` / `map_iso` / `additive` field triple. Note
-that only *additivity* is required: `of_isZero` and `of_iso` then give the other
-two for free, so a producer that used to carry three fields now carries one
-proof. -/
+Only *additivity* is required: `of_isZero` and `of_iso` give vanishing on zero
+objects and invariance under isomorphism for free, so a producer supplies one
+proof rather than three fields. -/
 noncomputable def liftOf {G : Type*} [AddCommGroup G] (f : A → G)
     (h : ∀ S : ShortComplex A, S.ShortExact → f S.X₂ = f S.X₁ + f S.X₃) :
     K₀Ab A →+ G :=

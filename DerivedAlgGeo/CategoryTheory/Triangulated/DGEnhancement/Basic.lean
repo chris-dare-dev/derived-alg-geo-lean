@@ -7,12 +7,24 @@ import DerivedAlgGeo.Algebra.Homology.DGCategory.Pretriangulated.H0.Basic
 /-!
 # Dg enhancements: the underlying H⁰ presentation
 
-`dg-enhancements-e6`. `Enhancement` is a pretriangulated dg category together
-with an equivalence `H⁰ A ≌ T` for an ordinary category `T`. Structure carried
-on `A` can be pushed across that equivalence and read off on `T`; this file
-starts that transport with the zero object.
+`Enhancement` is a pretriangulated dg category together with an equivalence
+`H⁰ A ≌ T` for an ordinary category `T`. Structure carried on `A` can be pushed
+across that equivalence and read off on `T`; this file starts that transport
+with the zero object.
 
-## `Enhancement` is an H⁰ presentation, not the literature's enhancement
+## Main definitions
+
+* `CategoryTheory.Enhancement`: a pretriangulated dg category with an
+  equivalence between its `H⁰` and a given category.
+
+## Main results
+
+* `CategoryTheory.Enhancement.hasZeroObject`: an enhanced category has a zero
+  object.
+
+## Implementation notes
+
+### `Enhancement` is an H⁰ presentation, not the literature's enhancement
 
 Read the name as *underlying H⁰ presentation*: `T` is presented as the `H⁰` of a
 dg category, and nothing more is claimed. Bondal--Kapranov and Lunts--Orlov take
@@ -29,23 +41,32 @@ together with a `Functor.CommShift ℤ` on the seam (`Cdg.h0FunctorCommShift`), 
 `Algebra/Homology/HomotopyCategory/DGEnhancement/`, and `Cdg.enhancementExact`
 packages the two.
 
-**The consequence to keep in view.** Nothing proved from this structure today is
-in doubt. But a statement that quantifies over `Enhancement` is not the
-literature's statement when read here. Uniqueness of enhancements
-(`dg-enhancements-e15`) is the case that matters: over a bare equivalence of
-underlying categories it is false, since two dg categories can have equivalent
-`H⁰` as plain categories without being quasi-equivalent. When that lane is
-written, the statement must quantify over `Enhancement.Exact`. No declaration in
-this repository asserts uniqueness of enhancements in either form, and this file
-does not authorize one.
+**The consequence to keep in view.** Nothing proved from this structure is in
+doubt. But a statement that quantifies over `Enhancement` is not the
+literature's statement when read here. Uniqueness of enhancements is the case
+that matters: over a bare equivalence of underlying categories it is false,
+since two dg categories can have equivalent `H⁰` as plain categories without
+being quasi-equivalent. A uniqueness statement must quantify over
+`Enhancement.Exact`. No declaration in this repository asserts uniqueness of
+enhancements in either form, and this file does not authorize one.
 
-## What is transported here, and what is not
+### What is transported here, and what is not
 
 `HasZeroObject (H0 C)` is intrinsic to the dg category and belongs to the
 definition owner: it is `H0.hasZeroObject` in
 `Algebra/Homology/DGCategory/Pretriangulated/H0/Basic.lean`. What is here is the
 half that needs `T` and the equivalence -- `Enhancement.hasZeroObject` -- which
 is the shape of every transport in this subtree.
+
+## References
+
+The notion of enhancement is Bondal--Kapranov's; Lunts--Orlov use its exact
+form. The file builds on the library's `DGCategory`, `IsPretriangulated` and
+`H0`, and Mathlib's `IsZero.of_full_of_faithful_of_isZero`.
+
+## Tags
+
+dg enhancement, H⁰ presentation, pretriangulated dg category, zero object
 -/
 
 set_option autoImplicit false
@@ -69,8 +90,8 @@ costs.
 
 The dg category is bundled rather than a parameter because the interesting
 statements quantify over enhancements of a fixed `T` -- uniqueness of
-enhancements, in `dg-enhancements-e15`, is a statement about two inhabitants of
-this type, and is not proved anywhere in this repository.
+enhancements is a statement about two inhabitants of this type, and is not
+proved anywhere in this repository.
 
 `u` and `v` occur only together because `DGCategory.{v}` fixes the universe of
 the Hom-complexes' abelian groups while `u` fixes the objects, and the

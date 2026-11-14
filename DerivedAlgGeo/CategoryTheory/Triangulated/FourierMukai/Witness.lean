@@ -8,21 +8,38 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.FourierMukai.AdjointAssembly
 # Satisfiability witnesses for the Fourier--Mukai interfaces
 
 `Correspondence`, `ConstituentRightAdjoints` and `ConstituentLeftAdjoints` are
-supplied data that nothing in this repository discharges, and until now nothing
-inhabited them either.  An interface with no inhabitant at all is one nobody has
-checked for consistency: a structure whose fields cannot be simultaneously
-satisfied looks exactly like a structure nobody has tried.  This file supplies
-the missing check.
+supplied data that nothing in this repository discharges.  An interface with no
+inhabitant at all is one nobody has checked for consistency: a structure whose
+fields cannot be simultaneously satisfied looks exactly like a structure nobody
+has tried.  This file supplies that check.
 
 Following `Triangulated/GrothendieckGroup/HomFiniteWitness.lean`, which does the
 same for `HomFiniteBounded` and labels itself "satisfiability only".
 
-## The witness, and how little it says
+## Main definitions
+
+* `CategoryTheory.Triangulated.FourierMukai.trivialCorrespondence`: the
+  correspondence whose pull, push and twists are all the identity.
+* `CategoryTheory.Triangulated.FourierMukai.trivialRightAdjointKernelData` and
+  `CategoryTheory.Triangulated.FourierMukai.trivialLeftAdjointKernelData`: its
+  own kernel as an adjoint kernel on either side.
+* `CategoryTheory.Triangulated.FourierMukai.trivialConstituentRightAdjoints` and
+  `CategoryTheory.Triangulated.FourierMukai.trivialConstituentLeftAdjoints`: the
+  three identity adjunctions on either side.
+
+## Main results
+
+* `CategoryTheory.Triangulated.FourierMukai.trivialCorrespondence_transform`:
+  the transform of the trivial correspondence is the identity, by `rfl`.
+
+## Implementation notes
+
+### The witness, and how little it says
 
 `trivialCorrespondence C` takes `pull`, `push` and every twist to be the
 identity functor of `C`.  Its transform is then the identity **definitionally**
-— `transform_eq` is `rfl` — so `Adjunction.id` discharges every adjunction field
-below with no transport at all.
+— `trivialCorrespondence_transform` is `rfl` — so `Adjunction.id` discharges
+every adjunction field below with no transport at all.
 
 **This shows the interfaces are consistent.  It shows nothing else.**  In
 particular it does *not* show that any geometric Fourier--Mukai transform
@@ -35,16 +52,25 @@ A trivial witness is also not evidence that the interface is *useful*: it is
 evidence that it is not vacuous.  Those are different claims, and only the
 second is made.
 
-## What this file does not assert
+### What this file does not assert
 
 * No claim that the trivial correspondence is interesting, canonical, or the
   only degenerate one.
 * Nothing is an `instance`.  A global `Correspondence` instance would put the
   trivial one in front of every instance search that mentions the structure,
   which is precisely the wrong trade for a witness whose only job is to exist.
-* No witness for `CoherentConvolutionData`, which needs a `MonoidalCategory`
+* No witness for `CoherentConvolutionHypotheses`, which needs a `MonoidalCategory`
   presentation of the kernel category, or for `ConvolutionData`, which already
   has inhabitants.
+
+## References
+
+The library's `Correspondence`, `RightAdjointKernelData`, `LeftAdjointKernelData`
+and `ConstituentRightAdjoints`, and Mathlib's `Adjunction.id`.
+
+## Tags
+
+Fourier--Mukai transform, satisfiability witness, adjunction, kernel
 -/
 
 namespace CategoryTheory.Triangulated.FourierMukai
@@ -111,7 +137,7 @@ This is the only inhabitant of `ConstituentLeftAdjoints` in the repository, and
 that is deliberate rather than an omission: `KernelAdjunction.lean` builds no
 geometric left-adjoint ledger because nothing consumes one — the left adjoint of
 `Lp^*` is the exceptional `p_!`, which nothing here asks for. So the structure
-stays at one inhabitant, and stays listed as thin. -/
+has one inhabitant. -/
 def trivialConstituentLeftAdjoints (K : C) :
     ConstituentLeftAdjoints (trivialCorrespondence C) K where
   pullLeft := 𝟭 C

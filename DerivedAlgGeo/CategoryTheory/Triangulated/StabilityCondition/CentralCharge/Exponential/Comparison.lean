@@ -9,39 +9,61 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.CentralCharg
 /-!
 # The surface and threefold charges are one kernel
 
-`CentralCharge/Exponential/Kernel.lean` states the exponential charge once, indexed by
-truncation degree. This file proves that the two charges already in the tree
-are that kernel at `m = 2` and `m = 3`, so neither is a root any more.
+`CentralCharge/Exponential/Kernel.lean` states the exponential charge once,
+indexed by truncation degree. This file proves that the surface charge of
+`CentralCharge/Numerical/SurfaceFamily.lean` and the Bayer--Macrì--Toda charge
+of `CentralCharge/Numerical/Threefold.lean` are that kernel at `m = 2` and
+`m = 3`, so neither is an independent root.
 
-The separation is the point. The kernel imports `CentralCharge/Family.lean` and
-Mathlib and nothing else, so it imports no leaf; this file may import both
-leaves because it is the comparison and not the root. Putting the comparisons
-in the kernel would have made the root depend on the things it parents.
+## Main definitions
 
-## What is proved
+* `surfaceVec` — the additive equivalence between the surface tuple carrier
+  `NumClass` and the compressed degree vectors `Exp.HDeg 2`.
 
-* `stCharge_eq_exp` — the surface charge (`CentralCharge/Numerical/SurfaceFamily.lean`)
-  is the kernel at `m = 2`, `w = s + tI`.
-* `threefold_charge_eq_exp` — the Bayer--Macrì--Toda charge
-  (`CentralCharge/Numerical/Threefold.lean`) is the same kernel at `m = 3`, `w = β + αI`.
-* the two family-level statements, which is the form a consumer needs: each
-  existing `ChargeFamily` is a `reindex` of `Exp.chargeFamily` along its chart,
+## Main results
+
+* `stCharge_eq_exp` — the surface charge is the kernel at `m = 2`,
+  `w = s + tI`.
+* `threefold_charge_eq_exp` — the Bayer--Macrì--Toda charge is the same kernel
+  at `m = 3`, `w = β + αI`.
+* `stChargeFamily_eq`, `threefold_chargeFamily_eq` — the two family-level
+  statements, which is the form a consumer needs: each of the two
+  `ChargeFamily` values is a `reindex` of `Exp.chargeFamily` along its chart,
   pulled back along the coordinate identification.
 
-## The coordinate identifications are equivalences, not projections
+## Implementation notes
+
+### The comparison is downstream of the kernel
+
+The kernel imports `CentralCharge/Family.lean` and Mathlib and nothing else, so
+it imports no leaf; this file may import both leaves because it is the
+comparison and not the root. Putting the comparisons in the kernel would make
+the root depend on the things it parents.
+
+### The coordinate identifications are equivalences, not projections
 
 `surfaceVec` and `threefoldVec` are `≃+`, not one-way maps. The compressed
 degree vectors and the tuple carriers hold the same data in the same order, so
 nothing is lost passing between them, and stating them as equivalences is what
-lets a later slice push wall theory in either direction. This is in contrast to
-the divisorial lane, where the `H`-compression genuinely loses information once
-the Picard rank exceeds one.
+lets wall theory be pushed in either direction. This is in contrast to the
+divisorial charge of `CentralCharge/Exponential/Divisorial.lean`, where the
+`H`-compression genuinely loses information once the Picard rank exceeds one.
 
-## What this does not claim
+### What this does not claim
 
 That the two families have the same walls, or that either is a stability
 condition. A charge is one datum of a stability condition; the heart, the
 slicing and the support property are elsewhere and are untouched.
+
+## References
+
+The kernel `Exp.charge` and `Exp.chargeFamily` of
+`CentralCharge/Exponential/Kernel.lean`, and `ChargeFamily.reindex` and
+`ChargeFamily.pullback` of `CentralCharge/Family.lean`.
+
+## Tags
+
+central charge, exponential charge, surface charge, threefold charge
 -/
 
 open Complex
@@ -50,8 +72,8 @@ namespace CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.
 
 noncomputable section
 
-/-- The surface lane's tuple carrier and the kernel's compressed degrees hold
-the same three reals, in the same order. -/
+/-- The surface charge's tuple carrier `NumClass` and the kernel's compressed
+degrees hold the same three reals, in the same order. -/
 def surfaceVec : NumClass ≃+ Exp.HDeg 2 where
   toFun v := ![v.1, v.2.1, v.2.2]
   invFun d := (d 0, d 1, d 2)

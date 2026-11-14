@@ -20,7 +20,7 @@ replacements and constructs the genuine left-derived pullback universal property
 from them.
 
 Quasicoherence and compactness are reduced to the resolved complex-level pullback. Thus the
-base-change construction no longer needs independently supplied functors on derived categories:
+base-change construction needs no independently supplied functors on derived categories:
 all categorical structure descends from one K-flat replacement and explicit geometric evidence.
 
 ## Main definitions

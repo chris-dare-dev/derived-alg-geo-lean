@@ -95,8 +95,6 @@ The rules that bite most often in unattended runs:
   you noticed something; note it for step 6 instead.
 - Foundational subject modules must remain independent of specialized consumers.
 - Export the new leaf through its nearest subsystem umbrella.
-- Add every new public theorem to `scripts/AlgebraicGeometryAudit.lean`,
-  `scripts/StabilityConditionAudit.lean`, or `scripts/DGCategoryAudit.lean`.
 - Write the module docstring and declaration docstrings **as you go**, to the
   standard in the style reference: say why the hypothesis is needed and what the
   proof idea is, not what the signature already says.
@@ -133,12 +131,9 @@ the skill calls its definition of done — and no iteration ever got a verdict.
 `DAG_ALLOW_LOCAL_BUILD=1` is for a genuinely unavailable runner and nothing
 else; using it is a reportable event, so say so in the PR body.
 
-Before pushing, do the one thing precheck cannot do for you: **add every new
-public declaration to its audit** (`scripts/AlgebraicGeometryAudit.lean`,
-`scripts/StabilityConditionAudit.lean`, `scripts/DGCategoryAudit.lean`). The
-audits and the completeness ratchet need the library elaborated, so they run on
-the runner only, and a missing record is the most common way an otherwise
-finished iteration comes back red.
+The axiom audit needs the library elaborated, so it runs on the runner only:
+CI emits the environment and refuses any axiom outside `propext`,
+`Classical.choice` and `Quot.sound`. Nothing has to be listed by hand.
 
 A failing check is the iteration's work, not a reason to weaken it.
 

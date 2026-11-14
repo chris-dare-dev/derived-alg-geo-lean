@@ -97,7 +97,7 @@ variable {V : NumericalVarietyData 2 A (K₀Ab (Coh X))}
 /-- Grothendieck's boundedness lemma in the exact form needed for μ-HN
 filtrations.  This is the only part of `MuHNInput` that remains supplied on a
 Noetherian scheme. -/
-def SlopeBoundedness (P : PolarizedVarietyData k X) : Prop :=
+def SlopeBoundedness (P : PolarizedVarietyHypotheses k X) : Prop :=
   ∀ F : Coh X, ∃ μ₀ : ℝ, ∀ B : Subobject F, ¬IsZero (B : Coh X) →
     0 < P.multiplicity (B : Coh X) →
       (P.hilbertDegreeCoefficient (B : Coh X) : ℝ) /
@@ -105,7 +105,7 @@ def SlopeBoundedness (P : PolarizedVarietyData k X) : Prop :=
 
 /-- Noetherianity of coherent sheaves discharges the first `MuHNInput` field;
 only Grothendieck slope boundedness is retained. -/
-theorem muHNInput [IsNoetherian X] {P : PolarizedVarietyData k X}
+theorem muHNInput [IsNoetherian X] {P : PolarizedVarietyHypotheses k X}
     {hμ : MuPositivityData P} (hbounded : SlopeBoundedness P) : MuHNInput P hμ :=
   MuHNInput.ofSlopeBoundedness hbounded
 
@@ -116,7 +116,7 @@ For the usual Hilbert polynomial of a polarized K3, `scale` is `H²` and
 `shift` is `H² / 2`.  They remain explicit because the geometric
 reconstruction and Gieseker packages do not prove that comparison. -/
 structure SlopeNormalization
-    (P : PolarizedVarietyData k X)
+    (P : PolarizedVarietyHypotheses k X)
     (R : Numerical.Surface.NumericalRealization V.ring (D := W))
     (ω : W) where
   /-- Positive integral scaling between numerical rank and multiplicity. -/
@@ -136,7 +136,7 @@ structure SlopeNormalization
 
 namespace SlopeNormalization
 
-variable {P : PolarizedVarietyData k X}
+variable {P : PolarizedVarietyHypotheses k X}
 variable {R : Numerical.Surface.NumericalRealization V.ring (D := W)}
 variable {ω : W}
 
@@ -264,7 +264,7 @@ abbrev boundedCohHeart :=
 
 namespace SlopeNormalization
 
-variable {P : PolarizedVarietyData k X}
+variable {P : PolarizedVarietyHypotheses k X}
 variable {R : Numerical.Surface.NumericalRealization V.ring (D := W)}
 variable {ω : W}
 
@@ -342,7 +342,7 @@ theorem derivedMukaiClass_isAmbient :
 
 namespace SlopeNormalization
 
-variable {P : PolarizedVarietyData k X}
+variable {P : PolarizedVarietyHypotheses k X}
 variable {R : Numerical.Surface.NumericalRealization V.ring (D := W)}
 variable {ω : W}
 
@@ -404,7 +404,7 @@ def HasDimensionZeroMukaiClasses (ω : W) : Prop :=
 
 namespace SlopeNormalization
 
-variable {P : PolarizedVarietyData k X}
+variable {P : PolarizedVarietyHypotheses k X}
 variable {R : Numerical.Surface.NumericalRealization V.ring (D := W)}
 variable {β ω : W}
 
@@ -453,7 +453,7 @@ end SlopeNormalization
 
 namespace SlopeNormalization
 
-variable {P : PolarizedVarietyData k X}
+variable {P : PolarizedVarietyHypotheses k X}
 variable {R : Numerical.Surface.NumericalRealization V.ring (D := W)}
 variable {β ω : W}
 variable [FiniteDimensional ℝ W]

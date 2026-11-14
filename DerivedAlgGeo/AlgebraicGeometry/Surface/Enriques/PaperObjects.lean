@@ -57,20 +57,20 @@ The ambient field is the formal content of the statement that `D^b(Y)` is a
 `2`-Enriques category.  The residual field is kept separate: the papers give
 the right orthogonal its own Serre autoequivalence, but do not assert that the
 residual category is itself `2`-Enriques. -/
-structure PaperCategoryData (exceptional : T.ExceptionalityData)
-    (semiorthogonal : T.SemiorthogonalityData) where
+structure PaperCategoryHypotheses (exceptional : T.ExceptionalityHypotheses)
+    (semiorthogonal : T.SemiorthogonalityHypotheses) where
   /-- The ambient derived category is `2`-Enriques. -/
-  ambientEnriques : TwoEnriquesCategoryData k (DerivedCat Y)
+  ambientEnriques : TwoEnriquesCategoryHypotheses k (DerivedCat Y)
   /-- The chosen Serre autoequivalence of the residual category. -/
   residualSerre :
     SerreCategoryData k (T.ResidualCategory exceptional semiorthogonal)
 
-namespace PaperCategoryData
+namespace PaperCategoryHypotheses
 
 variable {T}
-variable {exceptional : T.ExceptionalityData}
-  {semiorthogonal : T.SemiorthogonalityData}
-  (P : T.PaperCategoryData exceptional semiorthogonal)
+variable {exceptional : T.ExceptionalityHypotheses}
+  {semiorthogonal : T.SemiorthogonalityHypotheses}
+  (P : T.PaperCategoryHypotheses exceptional semiorthogonal)
 
 /-- Objectwise ambient relation `S_Y²(E) ≅ E[4]`. -/
 noncomputable def ambientSerreSquareObjIso (E : DerivedCat Y) :
@@ -83,23 +83,23 @@ theorem residualSerreIsEquivalence :
     P.residualSerre.serre.S.IsEquivalence :=
   P.residualSerre.serreIsEquivalence
 
-end PaperCategoryData
+end PaperCategoryHypotheses
 
 /-- Paper I, Proposition 4.10, specialized to the residual category of the
 isotropic 10-collection: ten `3`-spherical candidates, pairwise distinct up to
 shift, classify all `3`-spherical objects. -/
 abbrev PaperISphericalClassificationData
-    {exceptional : T.ExceptionalityData}
-    {semiorthogonal : T.SemiorthogonalityData}
-    (P : T.PaperCategoryData exceptional semiorthogonal) :=
+    {exceptional : T.ExceptionalityHypotheses}
+    {semiorthogonal : T.SemiorthogonalityHypotheses}
+    (P : T.PaperCategoryHypotheses exceptional semiorthogonal) :=
   SphericalClassificationData P.residualSerre.serre 3 (Fin 10)
 
 namespace PaperISphericalClassificationData
 
 variable {T}
-variable {exceptional : T.ExceptionalityData}
-  {semiorthogonal : T.SemiorthogonalityData}
-  {P : T.PaperCategoryData exceptional semiorthogonal}
+variable {exceptional : T.ExceptionalityHypotheses}
+  {semiorthogonal : T.SemiorthogonalityHypotheses}
+  {P : T.PaperCategoryHypotheses exceptional semiorthogonal}
   (A : T.PaperISphericalClassificationData P)
 
 /-- Exact Paper I classification: a residual object is `3`-spherical exactly
@@ -121,17 +121,17 @@ end PaperISphericalClassificationData
 track of the exceptional blocks and `blockLength` separates length-one
 spherical candidates from longer pseudoprojective candidates. -/
 abbrev PaperIIObjectClassificationData
-    {exceptional : T.ExceptionalityData}
-    {semiorthogonal : T.SemiorthogonalityData}
-    (P : T.PaperCategoryData exceptional semiorthogonal) (ι : Type t) :=
+    {exceptional : T.ExceptionalityHypotheses}
+    {semiorthogonal : T.SemiorthogonalityHypotheses}
+    (P : T.PaperCategoryHypotheses exceptional semiorthogonal) (ι : Type t) :=
   MixedClassificationData P.residualSerre.serre 3 ι
 
 namespace PaperIIObjectClassificationData
 
 variable {T}
-variable {exceptional : T.ExceptionalityData}
-  {semiorthogonal : T.SemiorthogonalityData}
-  {P : T.PaperCategoryData exceptional semiorthogonal}
+variable {exceptional : T.ExceptionalityHypotheses}
+  {semiorthogonal : T.SemiorthogonalityHypotheses}
+  {P : T.PaperCategoryHypotheses exceptional semiorthogonal}
   {ι : Type t}
   (A : T.PaperIIObjectClassificationData P ι)
 

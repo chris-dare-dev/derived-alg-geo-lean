@@ -70,7 +70,7 @@ back out of reach.
 `gᵢ` is inverted on `D₊(gᵢ)` and nowhere else, and `D₊(gᵢ)` is the only open where the extension
 `tᵢ` is asked to say anything. Raising by a fraction with a *different* denominator would produce
 a statement that still typechecks — the fraction is a legitimate section wherever its denominator
-is invertible — but that vanishes somewhere on `D₊(gᵢ)`, and the raised family would no longer
+is invertible — but that vanishes somewhere on `D₊(gᵢ)`, and the raised family would fail to
 extend `s`. The denominator here is fixed by the chart, not chosen.
 
 ### Scope

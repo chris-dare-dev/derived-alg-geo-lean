@@ -8,20 +8,42 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.Aut
 /-!
 # A twist-shaped autoequivalence acts on stability conditions by the reflection
 
-This connects the lattice half of the spherical-twist lane to the stability machinery: an
-autoequivalence whose action on `K₀` is the twist `τ_E` becomes a group element acting on
-`WithClassMap C v`, and that action is transport along the Mukai reflection `ρ_{v(E)}`.
+This connects the lattice side of the spherical twist — its action `τ_E` on `K₀` and the Mukai
+reflection `ρ_{v(E)}` — to the stability machinery: an autoequivalence whose action on `K₀` is the
+twist `τ_E` becomes a group element acting on `WithClassMap C v`, and that action is transport
+along the Mukai reflection `ρ_{v(E)}`.
 
-It is the precise form of "the spherical twist acts on `Stab(X)` through the reflection" that is
-available **before** the twist is constructed.
+It is the precise form of "the spherical twist acts on `Stab(X)` through the reflection" that
+needs no construction of the twist.
 
-## Nothing here constructs a twist
+## Main definitions
+
+* `CategoryTheory.Triangulated.SphericalTwist.TwistShaped`: an autoequivalence whose action on
+  `K₀` is `twistK₀`, as supplied data.
+* `CategoryTheory.Triangulated.SphericalTwist.TwistShaped.lam`: the Mukai reflection in `v(E)`.
+* `CategoryTheory.Triangulated.SphericalTwist.TwistShaped.toAutPair`: the pair as a group element
+  acting on stability conditions.
+
+## Main results
+
+All in the namespace `CategoryTheory.Triangulated.SphericalTwist.TwistShaped`:
+
+* `map_inverse_eq`: the inverse acts on `K₀` by the twist too.
+* `compat`: `v ∘ K₀(Φ⁻¹) = ρ ∘ v`, the compatibility `AutPair` asks for.
+* `act_eq`, `act_slicing` and `act_Z`: the action is transport along the reflection; the slicing
+  moves by the autoequivalence and the charge is precomposed with the reflection.
+* `lam_lam`: the lattice part of the square of the group element is the identity.
+
+## Implementation notes
+
+### Nothing here constructs a twist
 
 `TwistShaped` is supplied data and is named to say so. It carries an autoequivalence together with
-the hypothesis that its `K₀` action *is* `twistK₀`. That is the property `T_E` will have once it
-exists; building `T_E` is a separate lane, and no inhabitant of `TwistShaped` is produced here.
+the hypothesis that its `K₀` action *is* `twistK₀`. That is the property `T_E` has
+(`SphericalTwistData.map_eq_twistK₀`); `Autoequivalence.lean` turns a supplied autoequivalence
+statement into a `TwistShaped`, and no inhabitant of `TwistShaped` is produced here.
 
-## Two things not to conclude
+### Two things not to conclude
 
 **The quotient is not `Aut(D)`.** `AutPairQuot` quotients by a bare natural isomorphism of
 underlying functors, leaving the `CommShift` datum unconstrained, so it is a priori *coarser* than
@@ -33,12 +55,20 @@ an involution, so the class of a twist-shaped pair squares to one whose lattice 
 identity. It does **not** follow that `T_E` has order two in any automorphism group — it does not;
 `T_E` has infinite order. `τ_E` being an involution on `K₀` says nothing about the functor.
 
-## Why `[IsTriangulated C]` is in the variable block
+### Why `[IsTriangulated C]` is in the variable block
 
 `GroupAction.AutPair` is declared under a section carrying it, so it does not arrive from the
 sphericity hypotheses: `chiK₀` and `twistK₀` need only the pretriangulated structure, and
 `EulerForm.lean`'s variable list omits it. Leaving it out makes `AutPair` fail to elaborate here
 for a reason that looks unrelated to the mathematics.
+
+## References
+
+The library's `GroupAction.AutPair`, `AutPairQuot`, `Mukai.reflectEquiv` and `twistK₀`.
+
+## Tags
+
+spherical twist, Mukai reflection, stability condition, group action, autoequivalence
 -/
 
 universe w v u

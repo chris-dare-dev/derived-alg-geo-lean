@@ -233,8 +233,8 @@ lemma SpecIso_hom_toSpecZero (R : CommRingCat.{u}) :
   exact tensorIso_hom_toSpecZero n R
 
 /-- **Agreement with the field-level model.** Over a field, `SpecIso` identifies `ℙ(n; Spec k)`
-with `projectiveSpace n k` over `Spec k`, so the field-level `Proj` model the Čech lane computes
-with is reached from `ℙ(n; S)` by a proved comparison. -/
+with `projectiveSpace n k` over `Spec k`, so the field-level `Proj` model the Čech computation
+of its cohomology uses is reached from `ℙ(n; S)` by a proved comparison. -/
 theorem SpecIso_hom_comp_projectiveSpaceToSpec (k : Type u) [Field k] :
     (SpecIso n (CommRingCat.of k)).hom ≫ projectiveSpaceToSpec n k =
       ℙ(n; Spec (CommRingCat.of k)) ↘ Spec (CommRingCat.of k) :=

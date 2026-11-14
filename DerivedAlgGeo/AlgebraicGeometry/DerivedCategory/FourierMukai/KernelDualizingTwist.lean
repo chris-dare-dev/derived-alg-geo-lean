@@ -259,7 +259,7 @@ theorem geometricRightAdjoint_isKernelFunctor :
 
 end Assembly
 
-/-! ## The next ledger, and what is in it
+/-! ## From an adjoint kernel to a dual kernel
 
 What stands between this file and a geometric `DualKernel` is not another
 adjunction. It is that `DualKernel` requires the quasi-inverse as a transform

@@ -290,7 +290,7 @@ Without it the action is opaque at a use site: `coe_smul` moves the problem into
 
 The proof is the one already inside `IsDegreeZero.smul`, which constructs exactly
 this `NumDenSameDeg` in order to show the action stays degree zero; naming the
-computation separately means a caller no longer has to re-derive it.
+computation separately spares a caller from re-deriving it.
 
 **Not `@[simp]`.** Its right-hand side is stated with `a.num` and `a.den`, the
 representative `HomogeneousLocalization` chooses, which is the *less* usable

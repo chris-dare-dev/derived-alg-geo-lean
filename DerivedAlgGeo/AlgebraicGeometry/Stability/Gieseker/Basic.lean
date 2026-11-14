@@ -15,22 +15,24 @@ multiplicity.
 
 ## Main definitions
 
-* `PolarizedVarietyData.GiesekerLE`, `PolarizedVarietyData.GiesekerLT` — the Gieseker order on
+* `PolarizedVarietyHypotheses.GiesekerLE`, `PolarizedVarietyHypotheses.GiesekerLT` — the Gieseker
+  order on
   reduced Hilbert functions, and its strict form.
-* `PolarizedVarietyData.normalizedCoefficient` — the Hilbert coefficient vector normalized by
-  the multiplicity, with `PolarizedVarietyData.CoeffLexLE` its lexicographic order from the top.
-* `PolarizedVarietyData.IsGiesekerSemistable`, `PolarizedVarietyData.IsGiesekerStable` —
+* `PolarizedVarietyHypotheses.normalizedCoefficient` — the Hilbert coefficient vector normalized by
+  the multiplicity, with `PolarizedVarietyHypotheses.CoeffLexLE` its lexicographic order from the
+  top.
+* `PolarizedVarietyHypotheses.IsGiesekerSemistable`, `PolarizedVarietyHypotheses.IsGiesekerStable` —
   Gieseker semistability and stability of a pure sheaf.
 
 ## Main results
 
 * `eventually_nonneg_binomial_iff` — an integer binomial sum is eventually nonnegative exactly
   when its coefficient vector is lexicographically nonnegative from the top.
-* `PolarizedVarietyData.giesekerLE_iff_coeffLexLE` — on sheaves of positive multiplicity the
+* `PolarizedVarietyHypotheses.giesekerLE_iff_coeffLexLE` — on sheaves of positive multiplicity the
   Gieseker order is the lexicographic order on normalized coefficients.
-* `PolarizedVarietyData.giesekerLE_total` — the Gieseker order is total on sheaves of positive
+* `PolarizedVarietyHypotheses.giesekerLE_total` — the Gieseker order is total on sheaves of positive
   multiplicity.
-* `PolarizedVarietyData.normalizedCoefficient_pred_le_of_giesekerLE` — the Gieseker comparison
+* `PolarizedVarietyHypotheses.normalizedCoefficient_pred_le_of_giesekerLE` — the Gieseker comparison
   always drops to the index below the top, which is the slope.
 
 ## Implementation notes
@@ -256,9 +258,9 @@ theorem eventually_nonneg_binomial_total (a : ℕ → ℤ) (d : ℕ) :
 variable {k : Type u} [Field k]
 variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 
-namespace PolarizedVarietyData
+namespace PolarizedVarietyHypotheses
 
-variable (P : PolarizedVarietyData k X)
+variable (P : PolarizedVarietyHypotheses k X)
 
 /-! ### The Gieseker order -/
 
@@ -503,6 +505,6 @@ theorem IsGiesekerStable.of_iso {F G : Coh X} (h : P.IsGiesekerStable F) (e : F 
   refine ⟨P.giesekerLE_trans hlt.1 (P.giesekerLE_of_iso e), fun hcon ↦ ?_⟩
   exact hlt.2 (P.giesekerLE_trans (P.giesekerLE_of_iso e) hcon)
 
-end PolarizedVarietyData
+end PolarizedVarietyHypotheses
 
 end AlgebraicGeometry.Stability.Gieseker

@@ -102,7 +102,7 @@ Category
 │        ·                               five entries below it are the shift-dependent
 │        ·                               refinements, under Triangulated/SerreFunctor/
 │        ├─ SerreCategoryData            chosen Serre autoequivalence
-│        │  └─ EnriquesCategoryData      square-to-shift refinement
+│        │  └─ EnriquesCategoryHypotheses      square-to-shift refinement
 │        ├─ IsSphericalObject            two-degree self-Hom profile
 │        ├─ IsPseudoprojectiveObject     interval self-Hom profile
 │        ├─ Ext profiles / transport     Serre-compatible equivalences

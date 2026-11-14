@@ -7,15 +7,52 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mass.Subaddi
 /-!
 # Named inequality targets and the heart short-exact bridge
 
-This file owns the statement-level interface of the subadditivity milestone --
-the `Prop`-valued named targets -- together with the bridge between a short
-exact sequence in the canonical heart and the distinguished triangle it
-generates.  It converts an abelian Harder--Narasimhan filtration into an
-ambient tower of the same mass and proves the phase-one boundary-heart
-inequality.
+This file owns the statement-level interface of mass subadditivity -- the
+`Prop`-valued named targets -- together with the bridge between a short exact
+sequence in the canonical heart and the distinguished triangle it generates.
+It converts an abelian Harder--Narasimhan filtration into an ambient tower of
+the same mass and proves the phase-one boundary-heart inequality.
+
+## Main definitions
+
+* `StabilityMassBoundaryHeartInequality` — for a short exact sequence
+  `0 ⟶ A ⟶ B ⟶ C ⟶ 0` in the canonical heart with `C ∈ P(1)`, the mass of `A`
+  is at most the combined mass of `B` and `C`.
+* `StabilityMassSemistableLeftTriangleInequality` — mass subadditivity for a
+  distinguished triangle whose first object is semistable.
+* `StabilityMassHeartShortExactInequality` — mass subadditivity for every short
+  exact sequence in the canonical heart `P((0, 1])`.
+
+## Main results
+
+* `stabilityMassTriangleInequality_of_semistable_obj₁` — the semistable-left
+  inequality implies the unrestricted triangle inequality, by octahedral
+  induction on an HN filtration of the first object.
+* `heartShortExact_exists_distinguished_triangle` — a short exact sequence in
+  the canonical heart is induced by a distinguished triangle.
+* `phaseOne_endpoints_of_heart_shortExact` — if the middle object of a heart
+  short exact sequence lies on the phase-one ray, so do both endpoints.
+* `AbelianHNFiltration.mass_eq_stabilityMass_toReal` — the factor-norm mass of
+  an abelian HN filtration in the canonical heart is the ambient
+  `stabilityMass`.
+* `stabilityMassBoundaryHeartInequality` — the phase-one boundary-heart mass
+  inequality.
+
+## Implementation notes
 
 Definitions of the targets are kept above their proofs so that a consumer may
-depend on the statement without the proof's import surface.
+depend on the statement without the proof's import surface. Each target is a
+named proof target, not an installed premise.
+
+## References
+
+The boundary-cut HN polygon comparison of
+`Mass/Subadditivity/HNPolygonComparison.lean`, the ambient mass
+`stabilityMass` of `Mass/Basic.lean`, and Mathlib's `Triangulated.someOctahedron`.
+
+## Tags
+
+mass, subadditivity, heart, short exact sequence, Harder--Narasimhan filtration
 -/
 
 set_option backward.defeqAttrib.useBackward true
@@ -40,8 +77,8 @@ variable {C : Type u} [Category.{w} C] [HasZeroObject C] [HasShift C ℤ]
   [IsTriangulated C]
 variable {Λ : Type u'} [AddCommGroup Λ] {v : K₀ C →+ Λ}
 
-/-- The first major mass-triangle milestone, in its phase-one boundary-heart
-form.  For a short exact sequence `0 ⟶ A ⟶ B ⟶ C ⟶ 0` in the
+/-- The mass-triangle inequality in its phase-one boundary-heart form.  For a
+short exact sequence `0 ⟶ A ⟶ B ⟶ C ⟶ 0` in the
 canonical heart with `C ∈ P(1)`, the mass of `A` is at most the combined
 mass of `B` and `C`.
 
@@ -54,8 +91,8 @@ def StabilityMassBoundaryHeartInequality : Prop :=
         (stabilityMass σ S.X₂.obj).toReal +
           (stabilityMass σ S.X₃.obj).toReal
 
-/-- The second paper-level mass-triangle milestone: subadditivity for a
-distinguished triangle whose first object is semistable. -/
+/-- Mass subadditivity for a distinguished triangle whose first object is
+semistable. -/
 def StabilityMassSemistableLeftTriangleInequality : Prop :=
   ∀ (σ : StabilityCondition.WithClassMap C v) (T : Triangle C),
     T ∈ distTriang C →
@@ -64,7 +101,7 @@ def StabilityMassSemistableLeftTriangleInequality : Prop :=
         (stabilityMass σ T.obj₁).toReal +
           (stabilityMass σ T.obj₃).toReal
 
-/-- The arbitrary-left octahedral milestone.  Once the triangle inequality is
+/-- The arbitrary-left octahedral reduction.  Once the triangle inequality is
 known for semistable first objects, split an HN filtration of the first object
 into its head and tail.  The octahedron produces one semistable-left triangle
 and a shorter arbitrary-left triangle, so induction proves the unrestricted
@@ -126,8 +163,8 @@ theorem stabilityMassTriangleInequality_of_semistable_obj₁
             omega)
         linarith
 
-/-- The first remaining polygonal milestone: mass subadditivity for every
-short exact sequence in the canonical heart `P((0, 1])`. -/
+/-- Mass subadditivity for every short exact sequence in the canonical heart
+`P((0, 1])`. -/
 def StabilityMassHeartShortExactInequality : Prop :=
   ∀ (σ : StabilityCondition.WithClassMap C v)
     (S : ShortComplex σ.slicing.toTStructure.heart.FullSubcategory),

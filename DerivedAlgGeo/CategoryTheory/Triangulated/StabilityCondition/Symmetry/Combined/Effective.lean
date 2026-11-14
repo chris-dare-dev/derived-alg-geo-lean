@@ -52,7 +52,7 @@ set_option backward.isDefEq.respectTransparency false in
 
 **`scoped`, deliberately.** The underlying reusable structure is explicit so
 that it cannot silently compete with another `CommShift` choice.  This wrapper
-keeps the historical stability-action instance local to this namespace. -/
+keeps the stability-action instance local to this namespace. -/
 noncomputable scoped instance shiftFunctorCommShift (n : ℤ) :
     (shiftFunctor C n).CommShift ℤ :=
   Pretriangulated.shiftFunctorUnsignedCommShift C n

@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
-"""Check that the emission covers every tracked Lean module, and carries no sorry.
+"""The axiom audit: every tracked module is emitted, and every emitted constant
+depends on no axiom but `propext`, `Classical.choice` and `Quot.sound`.
 
-Stdlib only, like check_audit.py and check_coverage_map.py.
+Stdlib only, like check_coverage_map.py.
 
-`lake exe emit` is the repository's `sorry` gate: it imports the sweep umbrella's
-`.olean`s, calls `collectAxioms` on every constant of every in-scope module, and
-exits 1 when any closure contains `sorryAx`. That check is complete over the
-environment it sweeps -- and that is the whole problem this script exists for,
-because *which* environment it sweeps is a property of one import line.
+`lake exe emit` imports the sweep umbrella's `.olean`s and calls `collectAxioms`
+on every constant of every in-scope module, private and auto-generated ones
+included, and writes each closure into the emission. This script reads that
+record and fails on any axiom outside the three above -- `sorryAx`, a declared
+`axiom`, `Lean.ofReduceBool` from `native_decide` -- so the audit is produced
+from the compiled environment by one program and no file lists declarations by
+hand (CREDO.md, Lean rules). That check is complete over the environment the
+emitter sweeps -- and the rest of this script exists because *which*
+environment it sweeps is a property of one import line.
 
 `MathFormalContract.emitToFileForRootsImpl` builds its environment with
 `importModules #[{module := rootLib}]`. The `additionalRoots` argument widens the
@@ -43,11 +48,15 @@ from check_umbrella_coverage import CoverageError, lean_header_imports
 
 DEFAULT_EMISSION = Path("attest/lean-emission.json")
 
+# Lean's three standard axioms. Anything else in a closure is a hole in the
+# library's trust boundary, whichever constant carries it.
+ALLOWED_AXIOMS = frozenset({"propext", "Classical.choice", "Quot.sound"})
+
 # Paths whose `.lean` files are not library modules of the swept environment.
 #
-# `.claude/` is agent configuration and historical review fixtures; `scripts/`
-# holds the hand-maintained audits and is elaborated by its own CI steps, each of
-# which fails on `sorryAx` directly. `exe/` roots cannot appear in an emission
+# `.claude/` is agent configuration; `scripts/` holds checker probes such as
+# EnumInhabitants.lean, which declare nothing the library exports and are
+# elaborated by their own CI steps. `exe/` roots cannot appear in an emission
 # built from their own imports, so CI elaborates them individually -- see the
 # "No declaration uses sorry" step in .github/workflows/ci.yml. Widening this
 # tuple reduces what is gated; do not add to it without saying what else gates
@@ -154,27 +163,30 @@ def main(argv: list[str]) -> int:
 
     tracked = tracked_modules()
     missing = sorted(set(tracked) - emitted)
-    # Re-check `sorryAx` here rather than trusting the exit code alone: the
-    # artifact is what is uploaded and read later, so the claim should be
-    # checkable from the artifact.
-    sorried = sorted(
-        c["name"] for c in constants if "sorryAx" in c.get("axioms", [])
+    # Read from the artifact rather than trusting the emitter's exit code alone:
+    # the artifact is what is uploaded and read later, so the claim should be
+    # checkable from it. `axioms` absent is a malformed row, not a clean one.
+    offending = sorted(
+        (c["name"], sorted(set(c.get("axioms") or ["<no axioms field>"]) - ALLOWED_AXIOMS))
+        for c in constants
+        if "axioms" not in c or set(c["axioms"]) - ALLOWED_AXIOMS
     )
 
     for module in missing:
         print(f"error: {tracked[module]} declares module {module}, which the "
               f"emission does not cover -- import it into DerivedAlgGeoSweep.lean",
               file=sys.stderr)
-    for name in sorried:
-        print(f"error: {name} depends on sorryAx", file=sys.stderr)
+    for name, extra in offending:
+        print(f"error: {name} depends on {', '.join(extra)}", file=sys.stderr)
 
-    if missing or sorried:
-        print(f"FAIL: {len(missing)} uncovered module(s), {len(sorried)} "
-              f"sorry-backed constant(s)", file=sys.stderr)
+    if missing or offending:
+        print(f"FAIL: {len(missing)} uncovered module(s), {len(offending)} "
+              f"constant(s) outside {sorted(ALLOWED_AXIOMS)}", file=sys.stderr)
         return 1
 
     print(f"ok: {len(tracked)} tracked module(s) covered by {len(emitted)} "
-          f"emitted module(s); no constant depends on sorryAx")
+          f"emitted module(s); all {len(constants)} constants depend only on "
+          f"{', '.join(sorted(ALLOWED_AXIOMS))}")
     return 0
 
 

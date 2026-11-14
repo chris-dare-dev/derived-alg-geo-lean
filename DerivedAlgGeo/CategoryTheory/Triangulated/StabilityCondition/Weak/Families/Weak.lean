@@ -132,7 +132,7 @@ private local instance quotientSubmoduleClosed (V₀ : Submodule ℝ V) :
 
 /-- The actual one-fiber charge, zero-class, and quotient-quadratic-support
 package. -/
-structure WeakQuotientQuadraticSupportData {t : TStructure C}
+structure WeakQuotientQuadraticSupportHypotheses {t : TStructure C}
     (W : WeakStabilityFunction t) (v : K₀ C →+ V)
     (V₀ : Submodule ℝ V) (Zlin : V →ₗ[ℝ] ℂ)
     (hV₀ : V₀ ≤ LinearMap.ker Zlin) : Prop where

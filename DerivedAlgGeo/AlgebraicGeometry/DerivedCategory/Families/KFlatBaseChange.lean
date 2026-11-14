@@ -171,7 +171,7 @@ theorem kFlatPerfectBaseChangeEnvelope_le_compact
 /-- The K-flat resolutions and resolved representative-level facts needed to construct all three
 operations in the base-change external product. In particular, the two derived pullbacks are not
 supplied as independent functors: they are constructed from `fstResolution` and `sndResolution`. -/
-structure KFlatBaseChangeData where
+structure KFlatBaseChangeHypotheses where
   /-- A K-flat replacement on `X`, used to derive pullback along `X_T ⟶ X`. -/
   fstResolution : SchemeKFlatResolution X.left
   /-- Pullback along `X_T ⟶ X` is acyclic on the chosen replacements. -/
@@ -191,27 +191,27 @@ structure KFlatBaseChangeData where
   /-- Resolved tensor on the fibre product preserves quasicoherent cohomology. -/
   tensorQuasicoherent : tensorResolution.ResolvedTensorPreservesQuasicoherentCohomology
 
-namespace KFlatBaseChangeData
+namespace KFlatBaseChangeHypotheses
 
 variable {X T : SchemeBaseChange S}
 
 /-- The `Dqc` pullback along `X_T ⟶ X` constructed from the first K-flat resolution. -/
-def pullFst (D : KFlatBaseChangeData X T) :
+def pullFst (D : KFlatBaseChangeHypotheses X T) :
     DqcLeftDerivedPullback (baseChangeFst X T) :=
   kFlatDqcLeftDerivedPullback D.fstResolution (baseChangeFst X T)
     D.fstAcyclic D.fstQuasicoherent
 
 /-- The `Dqc` pullback along `X_T ⟶ T` constructed from the second K-flat resolution. -/
-def pullSnd (D : KFlatBaseChangeData X T) :
+def pullSnd (D : KFlatBaseChangeHypotheses X T) :
     DqcLeftDerivedPullback (baseChangeSnd X T) :=
   kFlatDqcLeftDerivedPullback D.sndResolution (baseChangeSnd X T)
     D.sndAcyclic D.sndQuasicoherent
 
 /-- The K-flat derived tensor on the fibre product underlying a base-change datum.
 
-Moved here from `BaseChangeLinearity.lean`: it is a projection of
-`KFlatBaseChangeData`, so it belongs at the structure's definition site. -/
-noncomputable def derivedTensor (D : KFlatBaseChangeData X T) :
+It is a projection of `KFlatBaseChangeHypotheses`, so it lives at the structure's
+definition site. -/
+noncomputable def derivedTensor (D : KFlatBaseChangeHypotheses X T) :
     Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
       Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left ⥤
         Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left :=
@@ -220,7 +220,7 @@ noncomputable def derivedTensor (D : KFlatBaseChangeData X T) :
       D.tensorQuasicoherent)
 
 @[simp]
-theorem derivedTensor_obj_obj_obj (D : KFlatBaseChangeData X T)
+theorem derivedTensor_obj_obj_obj (D : KFlatBaseChangeHypotheses X T)
     (E F : Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left) :
     (((D.derivedTensor.obj E).obj F).obj) =
       ((D.tensorResolution.derivedTensor.obj E.obj).obj F.obj) :=
@@ -229,10 +229,10 @@ theorem derivedTensor_obj_obj_obj (D : KFlatBaseChangeData X T)
 /-- **The K-flat resolutions produce model-free base-change data.**
 
 This is the one-way adapter from the model to the root: everything below is
-stated on `DerivedBaseChangeData` and reaches `KFlatBaseChangeData` through
+stated on `DerivedBaseChangeData` and reaches `KFlatBaseChangeHypotheses` through
 here, so a second construction of the same three operations inherits the whole
 API without copying it. -/
-def toDerivedBaseChangeData (D : KFlatBaseChangeData X T) :
+def toDerivedBaseChangeData (D : KFlatBaseChangeHypotheses X T) :
     DerivedBaseChangeData X T where
   pullFst := D.pullFst
   pullSnd := D.pullSnd
@@ -240,7 +240,7 @@ def toDerivedBaseChangeData (D : KFlatBaseChangeData X T) :
 
 /-- The base-change external product with both pullbacks and tensor constructed from the bundled
 K-flat resolutions. -/
-noncomputable abbrev externalProduct (D : KFlatBaseChangeData X T)
+noncomputable abbrev externalProduct (D : KFlatBaseChangeHypotheses X T)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left)) :
     SourcePerfectPartCategory X P ⥤
       (CompactDqcFiber T ⥤
@@ -249,14 +249,14 @@ noncomputable abbrev externalProduct (D : KFlatBaseChangeData X T)
 
 /-- The external-product generators associated to the bundled K-flat
 construction. -/
-abbrev perfectGenerators (D : KFlatBaseChangeData X T)
+abbrev perfectGenerators (D : KFlatBaseChangeHypotheses X T)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left)) :
     ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left) :=
   D.toDerivedBaseChangeData.perfectGenerators P
 
 /-- The K-flat external-product generators together with all their shifts and
 isomorphic copies. -/
-abbrev shiftedPerfectGenerators (D : KFlatBaseChangeData X T)
+abbrev shiftedPerfectGenerators (D : KFlatBaseChangeHypotheses X T)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left)) :
     ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left) :=
   D.toDerivedBaseChangeData.shiftedPerfectGenerators P
@@ -264,7 +264,7 @@ abbrev shiftedPerfectGenerators (D : KFlatBaseChangeData X T)
 /-- Every shift of a concrete K-flat external product belongs to the shifted
 generator property. -/
 theorem externalProduct_shift_mem_shiftedPerfectGenerators
-    (D : KFlatBaseChangeData X T)
+    (D : KFlatBaseChangeHypotheses X T)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (F : SourcePerfectPartCategory X P) (G : CompactDqcFiber T) (n : ℤ) :
     D.shiftedPerfectGenerators P
@@ -273,40 +273,40 @@ theorem externalProduct_shift_mem_shiftedPerfectGenerators
     P F G n
 
 /-- The perfect base-change envelope obtained entirely from the bundled K-flat resolutions. -/
-abbrev perfectEnvelope (D : KFlatBaseChangeData X T)
+abbrev perfectEnvelope (D : KFlatBaseChangeHypotheses X T)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left)) :
     ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left) :=
   D.toDerivedBaseChangeData.perfectEnvelope P
 
 /-- The quasicoherent base-change component `(Dqc)_T` obtained entirely from the bundled K-flat
 resolutions. -/
-abbrev quasicoherentComponent (D : KFlatBaseChangeData X T)
+abbrev quasicoherentComponent (D : KFlatBaseChangeHypotheses X T)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left)) :
     ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory (X ⨯ T).left) :=
   D.toDerivedBaseChangeData.quasicoherentComponent P
 
 /-- The full quasicoherent base-change category `(Dqc)_T` constructed from the bundled K-flat
 resolutions. -/
-abbrev QuasicoherentCategory (D : KFlatBaseChangeData X T)
+abbrev QuasicoherentCategory (D : KFlatBaseChangeHypotheses X T)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left)) :=
   (D.quasicoherentComponent P).FullSubcategory
 
 /-- The bounded base-change component `D_T` obtained entirely from the bundled K-flat
 resolutions. -/
-abbrev boundedComponent (D : KFlatBaseChangeData X T)
+abbrev boundedComponent (D : KFlatBaseChangeHypotheses X T)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left)) :
     ObjectProperty (Dqc.SchemeBoundedCoherentDqcCategory (X ⨯ T).left) :=
   D.toDerivedBaseChangeData.boundedComponent P
 
 /-- The full bounded base-change category `D_T` constructed from the bundled K-flat
 resolutions. -/
-abbrev BoundedCategory (D : KFlatBaseChangeData X T)
+abbrev BoundedCategory (D : KFlatBaseChangeHypotheses X T)
   (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left)) :=
   (D.boundedComponent P).FullSubcategory
 
 /-- Representative-level compactness conditions for the three K-flat operations bundled in
-`KFlatBaseChangeData`. -/
-structure PreservesCompactObjects (D : KFlatBaseChangeData X T) : Prop where
+`KFlatBaseChangeHypotheses`. -/
+structure PreservesCompactObjects (D : KFlatBaseChangeHypotheses X T) : Prop where
   fst : KFlatResolvedPullbackPreservesCompactObjects
     D.fstResolution (baseChangeFst X T) D.fstQuasicoherent
   snd : KFlatResolvedPullbackPreservesCompactObjects
@@ -314,9 +314,9 @@ structure PreservesCompactObjects (D : KFlatBaseChangeData X T) : Prop where
   tensor : D.tensorResolution.ResolvedTensorPreservesCompactObjects D.tensorQuasicoherent
 
 /-- **Model-level compactness produces the model-free obligations.** Both
-consequences below now route through the root rather than reproving on the
+consequences below route through the root rather than reproving on the
 resolutions. -/
-theorem toDerivedPreservesCompactObjects (D : KFlatBaseChangeData X T)
+theorem toDerivedPreservesCompactObjects (D : KFlatBaseChangeHypotheses X T)
     (hD : D.PreservesCompactObjects) :
     D.toDerivedBaseChangeData.PreservesCompactObjects where
   fst := kFlatDqcLeftDerivedPullback_preservesCompactObjects D.fstResolution
@@ -328,7 +328,7 @@ theorem toDerivedPreservesCompactObjects (D : KFlatBaseChangeData X T)
 
 /-- Under representative-level compactness for the three resolutions, every external-product
 generator produced by the fully K-flat construction is compact. -/
-theorem externalProduct_obj_isCompact (D : KFlatBaseChangeData X T)
+theorem externalProduct_obj_isCompact (D : KFlatBaseChangeHypotheses X T)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (hD : D.PreservesCompactObjects)
     (F : SourcePerfectPartCategory X P) (G : CompactDqcFiber T) :
@@ -338,14 +338,14 @@ theorem externalProduct_obj_isCompact (D : KFlatBaseChangeData X T)
 
 /-- Under representative-level compactness for the three resolutions, the whole fully K-flat
 perfect envelope consists of compact objects. -/
-theorem perfectEnvelope_le_compact (D : KFlatBaseChangeData X T)
+theorem perfectEnvelope_le_compact (D : KFlatBaseChangeHypotheses X T)
     (P : ObjectProperty (Dqc.SchemeQuasicoherentDerivedCategory X.left))
     (hD : D.PreservesCompactObjects) :
     D.perfectEnvelope P ≤ ObjectProperty.compactObjects.{u} :=
   D.toDerivedBaseChangeData.perfectEnvelope_le_compact P
     (D.toDerivedPreservesCompactObjects hD)
 
-end KFlatBaseChangeData
+end KFlatBaseChangeHypotheses
 
 end
 

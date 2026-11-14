@@ -12,17 +12,31 @@ import DerivedAlgGeo.CategoryTheory.Sites.Sheaves.CohomologyShortExact
 # Quasi-coherence is closed under extensions
 
 With the kernel and cokernel closure of
-`CoherentSheaf/Quasicoherent/Kernels.lean`, this completes the **weak Serre
+`Modules/Quasicoherent/Kernels.lean`, this completes the **weak Serre
 property** for quasi-coherent sheaves on an arbitrary scheme — what `Dqc(X)`
 needs before it can carry a triangulated structure.
 
 Through the **five-term** homology long exact sequence, closure under cones
 needs closure under kernels, cokernels and extensions — not under subobjects and
 quotients, which quasi-coherence does not have.  See
-`CategoryTheory/Abelian/SerreClass/Weak.lean`; an earlier version of this paragraph
-claimed the stronger closure, and it is not what the argument uses.
+`CategoryTheory/Abelian/SerreClass/Weak.lean`.
 
-## Why cohomology, when the coherent case needed none
+## Main definitions
+
+* `AlgebraicGeometry.affineΓ` — global sections on `Spec R`, retyped over `(Spec R).Modules`.
+* `AlgebraicGeometry.fromTildeΓShortComplexHom` — the comparison `Γ(−)~ ⟶ −` as a morphism
+  of short complexes.
+
+## Main results
+
+* `AlgebraicGeometry.tilde_preservesFiniteLimits`;
+* `AlgebraicGeometry.shortExact_map_affineΓ`;
+* `AlgebraicGeometry.isQuasicoherent_middle_affine` and `isQuasicoherent_middle`;
+* `AlgebraicGeometry.quasicoherent_isClosedUnderExtensions`.
+
+## Implementation notes
+
+### Why cohomology, when the coherent case needed none
 
 `Abelian/Extensions.lean` proves the finite-presentation analogue with a
 horseshoe and no cohomology at all. That route does not survive here: its
@@ -31,7 +45,7 @@ horseshoe and no cohomology at all. That route does not survive here: its
 arbitrarily many do not. Quasi-coherent presentations have arbitrary index sets.
 So this file takes the classical route and pays the cohomological price once.
 
-## The argument
+### The argument
 
 On `Spec R`, for `0 ⟶ M₁ ⟶ M₂ ⟶ M₃ ⟶ 0` with `M₁` and `M₃` quasi-coherent:
 
@@ -48,21 +62,25 @@ On `Spec R`, for `0 ⟶ M₁ ⟶ M₂ ⟶ M₃ ⟶ 0` with `M₁` and `M₃` qua
 
 Then `isQuasicoherent_iff_restrict_affineOpenCover` transports it to any scheme.
 
-## On `Γ`
+### On `Γ`
 
 Written `affineΓ R = moduleSpecSectionsFunctor R ⊤`, not `moduleSpecΓFunctor`.
 The two are defeq, but only the first has domain `(Spec R).Modules`, which is
 where the geometry lives, and an instance proved for one is not found for the
-other. `Abelian/Kernels.lean` already had this functor and kept it `private`; it
-is public as of this change. `Modules/Affine/Equivalence.lean` records the same
-wrapper problem for `Scheme.Modules` itself.
+other. `Abelian/Kernels.lean` uses the same functor, spelled out.
+`Modules/Affine/Equivalence.lean` records the same wrapper problem for
+`Scheme.Modules` itself.
 
-## Main results
+## References
 
-* `AlgebraicGeometry.tilde_preservesFiniteLimits`;
-* `AlgebraicGeometry.shortExact_map_affineΓ`;
-* `AlgebraicGeometry.isQuasicoherent_middle_affine` and `isQuasicoherent_middle`;
-* `AlgebraicGeometry.quasicoherent_isClosedUnderExtensions`.
+The affine input is `tilde.functor`, its adjunction `tilde.adjunction` and `tildeEquiv`; the
+vanishing is `Cohomology.modules_H_subsingleton_of_isQuasicoherent`, the gluing is
+`isQuasicoherent_iff_restrict_affineOpenCover`, and the closure interface is Mathlib's
+`CategoryTheory.ObjectProperty.IsClosedUnderExtensions`.
+
+## Tags
+
+quasi-coherent sheaf, extension, weak Serre subcategory, affine scheme, tilde
 -/universe u
 
 open CategoryTheory CategoryTheory.Limits Opposite
@@ -265,9 +283,9 @@ noncomputable instance quasicoherent_containsZero (X : Scheme.{u}) :
 
 /-- **The weak Serre property, assembled.**
 
-Kernels and cokernels come from `CoherentSheaf/Quasicoherent/Kernels.lean`,
+Kernels and cokernels come from `Modules/Quasicoherent/Kernels.lean`,
 extensions and the zero object from this file. Stated as a check rather than a
-definition: the point is that all four now resolve by instance search on an
+definition: the point is that all four resolve by instance search on an
 arbitrary scheme, with no noetherian or quasi-compactness hypothesis, which is
 exactly what `Dqc(X)`'s triangulated structure asks for. -/
 example (X : Scheme.{u}) :

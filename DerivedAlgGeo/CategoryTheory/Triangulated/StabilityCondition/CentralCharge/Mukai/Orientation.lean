@@ -14,14 +14,34 @@ says plainly that reference-independence is a further statement — the
 projection-sign cocycle, whose usual proof runs through connectedness of the
 Grassmannian of positive planes.
 
-This file proves the case route (A) actually needs, and proves it by a path
+This file proves the case the exponential chart needs, and proves it by a path
 rather than by the cocycle: **if `ω` and `ω'` lie in the same component of the
 positive cone, the exponential pairs at `ω` and at `ω'` are similarly
 oriented.** So the half named by `exp(β + iω)` is the half named by
 `exp(β' + iω')`, and `P⁺` is well defined by the cone rather than by a choice
 inside it.
 
-## Why a path works here and not in general
+## Main definitions
+
+* `Mukai.segment` — the straight-line family between two exponential data.
+* `Mukai.pathDet` — the pairing determinant along the segment, as a function
+  of `t`.
+
+## Main results
+
+* `Mukai.continuous_bilin` — a bilinear form on a finite-dimensional real
+  normed space is jointly continuous.
+* `Mukai.pairingDet_exp` — the pairing determinant of two exponential pairs, in
+  terms of `b` alone.
+* `Mukai.pos_segment` — the positive cone is convex along the segment.
+* `Mukai.mem_positiveFramesPlus_exp_of_sameCone` — the half named by `ω` is the
+  half named by any `ω'` in the same cone.
+* `Mukai.mem_positiveFramesPlus_exp_of_sameCone_of_sigPos` — the same statement
+  resting on the Hodge index hypotheses alone.
+
+## Implementation notes
+
+### Why a path works here and not in general
 
 The segment from `ω` to `ω'` stays in the positive cone — that is one line of
 bilinear algebra once `0 < b ω ω'` says the two are in the *same* component —
@@ -31,28 +51,40 @@ never vanishes (`pairingDet_ne_zero`). It is positive at `t = 0`, so the
 intermediate value theorem makes it positive at `t = 1`.
 
 The general cocycle has no such path handed to it: three arbitrary positive
-planes are not joined by a distinguished family. That statement remains open as
-its own issue, and nothing here should be read as settling it.
+planes are not joined by a distinguished family. That statement is not proved
+here, and nothing here should be read as settling it.
 
-## Scope
+### Scope
 
 `β` is carried along the path and is otherwise unconstrained; the positivity
 condition is on `ω` alone, exactly as in `isPositiveFrame_exp`.
 
-## Why this path, and one declaration that does not belong to it
+### Why this path, and one declaration that does not belong to it
 
 The subject is a comparison between two charts: the half named by
 `exp(β + iω)` against the half named by `exp(β' + iω')`. That is chart
-vocabulary, so it followed the chart out of `LinearAlgebra/Lattice/Mukai/`.
+vocabulary, so it lives with the chart under `CentralCharge/Mukai/` rather than
+in `LinearAlgebra/Lattice/Mukai/`.
 
-`continuous_bilin` is the exception and is recorded rather than moved. It says a
-bilinear form on a finite-dimensional real normed space is jointly continuous;
-it mentions no Mukai extension, no chart and no charge, and its neutral owner is
-`QuadraticForm/Continuous.lean`. Re-homing it there is a separate change:
-`Continuous.lean` is one of the neutral charge roots rule 8 pins, whose
-transitive closure may contain neither stability conditions nor geometry, and
-moving a declaration into a pinned root deserves its own justification rather
-than a ride on a path cutover.
+`continuous_bilin` is the exception. It says a bilinear form on a
+finite-dimensional real normed space is jointly continuous; it mentions no
+Mukai extension, no chart and no charge, and its neutral owner is
+`QuadraticForm/Continuous.lean`. It is not in that file because
+`Continuous.lean` is one of the neutral charge roots the layering gate pins,
+whose transitive closure may contain neither stability conditions nor
+geometry, and adding a declaration to a pinned root needs its own
+justification.
+
+## References
+
+`PeriodDomain.positiveFramesPlus` and `PeriodDomain.pairingDet_ne_zero` of
+`LinearAlgebra/QuadraticForm/PositiveFrame.lean`, `Mukai.hasSignatureTwo_realForm`
+of `LinearAlgebra/Lattice/Mukai/RealFormSignature.lean`, and Mathlib's
+`intermediate_value_Icc'`.
+
+## Tags
+
+positive cone, orientation, exponential chart, period domain, Mukai lattice
 -/
 
 open QuadraticMap Set
@@ -175,8 +207,9 @@ theorem pathDet_one : pathDet b β ω β' ω' 1 =
 The determinant along the segment is continuous and never zero, and it starts
 positive, so the intermediate value theorem keeps it positive at the far end.
 
-`hsig` is not a new assumption: route (A) supplies it from the Hodge index
-signature of `V` (`hasSignatureTwo_realForm`). -/
+`hsig` is not a new assumption: `hasSignatureTwo_realForm` supplies it from the
+Hodge index signature of `V`, as in
+`mem_positiveFramesPlus_exp_of_sameCone_of_sigPos`. -/
 theorem mem_positiveFramesPlus_exp_of_sameCone
     (hsig : PeriodDomain.HasSignatureTwo (realForm b)) (hb : ∀ x y : V, b x y = b y x)
     (hω : 0 < b ω ω) (hω' : 0 < b ω' ω') (hcone : 0 < b ω ω') :

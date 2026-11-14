@@ -45,8 +45,8 @@ private lemma freeAbelianYonedaPresheafMap_app_injective {U V : Opens X} (i : U 
     Function.Injective ((freeAbelianYonedaPresheafMap i).app (op W)) := by
   rw [← AddCommGrpCat.mono_iff_injective]
   dsimp [freeAbelianYonedaPresheafMap]
-  -- Hom-sets in `Opens X` are subsingletons, so post-composition with `i` is injective; the
-  -- instance search no longer finds this by itself on Lean 4.35.
+  -- Hom-sets in `Opens X` are subsingletons, so post-composition with `i` is injective;
+  -- instance search does not find this by itself.
   haveI : Mono (TypeCat.ofHom fun g : W ⟶ U => g ≫ i) :=
     (mono_iff_injective _).2 fun _ _ _ => Subsingleton.elim _ _
   infer_instance
