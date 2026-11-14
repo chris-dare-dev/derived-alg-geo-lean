@@ -195,7 +195,7 @@ below.
    - What you will build and where it lives, what you rejected, and what you
      will not do.
 2. **Build.**
-   - Implement by the rules in AGENTS.md: placement, audits, umbrellas, and no
+   - Implement by the rules in AGENTS.md: placement, umbrellas, and no
      `sorry`, `admit` or new axioms.
    - Check with targeted builds
      (`LEAN_NUM_THREADS=2 ~/.elan/bin/lake build <Module>`) and with
