@@ -92,8 +92,6 @@ The repository does not meet these yet. A line is deleted when it becomes
 true. Until then the older rule in `AGENTS.md` or `CONTRIBUTING.md` applies to
 what that line names and to nothing else.
 
-- Public declarations are listed by hand in the audit files under `scripts/`,
-  and a gate requires it (Lean rules).
 - `docs/`, `.claude/decisions/` and `.claude/roadmap/` are in the tree, and
   `AGENTS.md`, `scripts/check_layering.py` and `scripts/check_roadmap.py`
   read them (§1).

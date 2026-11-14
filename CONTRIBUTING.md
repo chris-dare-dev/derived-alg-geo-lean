@@ -127,14 +127,10 @@ mathematical hypotheses and structure fields are acceptable; proof holes are
 not. Keep conditional geometry honest by recording the exact hypothesis that a
 later realization must supply.
 
-Public declarations belong in the appropriate hand-maintained axiom audit:
-
-- `scripts/AlgebraicGeometryAudit.lean`
-- `scripts/StabilityConditionAudit.lean`
-- `scripts/DGCategoryAudit.lean`
-
-The completeness ratchet rejects growth in unaudited public declarations. When
-the ratchet improves, lower its ceiling; never raise one to make a change pass.
+The axiom audit needs nothing from you. CI emits the compiled environment
+(`exe/Emit.lean`) and `scripts/check_emission_coverage.py` fails when any
+constant, private ones included, depends on an axiom other than `propext`,
+`Classical.choice` and `Quot.sound`. No file lists declarations by hand.
 
 Every gate script under `scripts/` prints through `scripts/_output.py`: a new
 `scripts/check_*.py` must `from _output import force_utf8_output` and call
@@ -189,7 +185,7 @@ reachability, coherent families, coverage map, pin, nolints,
 roadmap, and the two hook tests — then a targeted `lake build` of the modules
 you changed. About a minute plus that build, against twenty minutes or more for
 CI. It is a cheap green, not a green: the
-library build, the audits, the ratchets, the linters and the emitter all need
+library build, the ratchets, the linters and the emitter's axiom audit all need
 the library elaborated and run on the runners.
 
 ### Unattended issue loops
@@ -248,8 +244,7 @@ summarises them.
 1. #A <title>
 2. #B <title>: needs #A
 3. #C <title>: independent of #B
-Shared files: `<umbrella>` and `<audit slice>` are created by #A; later issues
-append.
+Shared files: `<umbrella>` is created by #A; later issues append.
 
 **Out of scope.** <Each excluded result, and where it lives or why it cannot be
 done at the pin.>
@@ -317,10 +312,9 @@ The full gate includes:
 
 - Mathlib-style and environment linting for `DerivedAlgGeo`, including the
   `scripts/style-baseline.json` ratchet;
-- all three axiom audits and the audit-completeness ratchet;
 - source-independence, pin, paper-coverage, and no-lint checks;
 - roadmap/tracker agreement, when `gh` is available;
-- repository-wide emission and `sorryAx` coverage checks.
+- the repository-wide emission, its module coverage and its axiom allowlist.
 
 **Neither list contains the other.** This file used to say the containment ran
 one way — "every gate in the script also runs in CI" — and that was false in
@@ -354,15 +348,6 @@ after its issue closed reddened CI on `main` and on every open pull request
 while `scripts/gates.sh` stayed green on all of them; the `roadmap` gate closed
 that hole. Both times the gap was invisible because a summary sentence claimed
 coverage the files did not have. Verify the list before citing it.
-
-For a focused audit run:
-
-```bash
-lake build AlgebraicGeometryAudit StabilityConditionAudit DGCategoryAudit
-lake env lean scripts/StabilityConditionAudit.lean \
-  > /tmp/stability-condition-audit.txt 2>&1
-python3 scripts/check_audit.py /tmp/stability-condition-audit.txt
-```
 
 ## Review evidence
 

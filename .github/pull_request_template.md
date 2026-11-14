@@ -19,6 +19,5 @@ See `docs/architecture/placement.md` and `docs/architecture/abstraction-tree.md`
 ## Trust and verification
 
 - [ ] No `sorry`, `admit`, or hidden axiom was added.
-- [ ] New public declarations are in the appropriate axiom audit.
 - [ ] Focused build and relevant fast gates pass.
 - [ ] Full verification is delegated to the repository runners before merge.

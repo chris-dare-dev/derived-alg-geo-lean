@@ -43,7 +43,7 @@ root, extending a known mixed module, or moving declarations.
   kernel negativity/full support, and ordinary H⁰ presentations/exact
   enhancements. Use the precise boundaries in the ownership policy.
 - Use its compact decision record in the issue or PR. Update imports,
-  umbrellas, audits, registry/source-owner paths, documentation and relevant
+  umbrellas, registry/source-owner paths, documentation and relevant
   gates in the source cutover; preserve historical names through the existing
   executable-only mechanism, without retired-path import shims. A loop run
   never edits AGENTS.md or CLAUDE.md: it lists each line its cutover makes
@@ -309,7 +309,7 @@ umbrella. Document each exact umbrella/child exception and register it in
 `scripts/check_umbrella_coverage.py` in the source cutover, preserving another
 stable export/build route for the omitted child. A module that defines the
 object studied by its same-named directory is not necessarily an umbrella.
-Update imports, audits, declaration routing, documentation and affected
+Update imports, declaration routing, documentation and affected
 gates/CI paths together; do not silently omit a child or relax coverage globally.
 
 ## Editing rules
@@ -328,7 +328,6 @@ gates/CI paths together; do not silently omit a child or relax coverage globally
   and do not extend the misplaced block in place or create a competing root.
 - Preserve explicit trust boundaries; do not use `sorry`, `admit`, or a
   hidden axiom to cross an unfinished mathematical seam.
-- Add every new public declaration to the relevant audit.
 - Do not edit generated build artifacts by hand.
 - Do not alter unrelated work in a dirty tree.
 - Add no review, handoff, note, loop specification or change proposal as a
@@ -345,10 +344,8 @@ renders every record the base has added since the fork as a DELETION the pull
 request never made. This is an artifact of the two-dot diff GitHub shows, not a
 change anyone wrote.
 
-It matters most for the audit record slices, where a real deletion is a defect.
-`check_audit.py` and `check_audit_complete.py` judge the merged tree in `ci`, so
-a phantom deletion cannot reach `main`; the incidents are in
-`docs/architecture/verification-history.md`.
+It matters most for record files such as the style and single-instantiation
+baselines, where a real deletion is a defect.
 
 ## Required verification
 
@@ -537,7 +534,6 @@ Useful focused commands are:
 
 ```bash
 PATH="$PWD/.loop-tools/bin:$PATH" scripts/precheck.sh  # gates plus targeted build
-lake build AlgebraicGeometryAudit StabilityConditionAudit DGCategoryAudit
 lake exe runLinter DerivedAlgGeo
 lake exe lint-style
 python3 scripts/check_source_independence.py
@@ -546,10 +542,9 @@ python3 scripts/check_umbrella_coverage.py
 python3 scripts/check_coverage_map.py
 ```
 
-New public declarations must be added to the relevant audit. The declaration
-sweep in `scripts/EnumDecls.lean` and
-`scripts/check_audit_complete.py` guards the opposite direction, so renames
-must update both the source declaration and its audit record.
+The axiom audit is the emission: CI emits the compiled environment and
+`scripts/check_emission_coverage.py` refuses any axiom outside `propext`,
+`Classical.choice` and `Quot.sound`. No declaration is listed by hand.
 
 `DerivedAlgGeoSweep.lean` is verification-only. It imports the stable root and
 development probes for full emitter coverage; do not treat it as a public

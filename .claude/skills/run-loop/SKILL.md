@@ -461,7 +461,7 @@ Never:
 - Do not change the loop's own tooling and instructions during a run unless the
   owner put that work in the queue. That means `.claude/` (except
   `.claude/roadmap/`), `.agents/`, `.codex/`, `.github/`,
-  `AGENTS.md`, `CLAUDE.md`, and `scripts/` (except the audit and census
+  `AGENTS.md`, `CLAUDE.md`, and `scripts/` (except the baseline and census
   records). If the tooling gets in your way, work around it or park the issue,
   and describe the problem in the final report.
 - Do not create OpenSpec changes, loop manifests or review ledgers. The PR

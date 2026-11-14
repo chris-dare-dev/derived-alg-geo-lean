@@ -165,18 +165,13 @@ unavailable runner and nothing else; using it is a reportable event, so say so
 in the verdict comment if you do.
 
 **What `precheck.sh` cannot tell you**, and what therefore has to come from the
-runners in step 5: the library build, all three axiom audits, the
-audit-completeness ratchet, `runLinter`/`lint-style`, the warning ratchet, the
-emitter and its coverage check, the `exe` sorry sweep, and the `mfc` contract
-tooling. A clean precheck is a *cheap* green, not a green.
+runners in step 5: the library build, `runLinter`/`lint-style`, the warning
+ratchet, the emitter with its coverage and axiom-allowlist check, the `exe`
+sorry sweep, and the `mfc` contract tooling. A clean precheck is a *cheap* green, not a green.
 
 A failing check is the iteration's work, not a reason to weaken it. Historical
 examples include:
 
-- a new public theorem missing from `scripts/StabilityConditionAudit.lean`,
-  `scripts/AlgebraicGeometryAudit.lean`, or `scripts/DGCategoryAudit.lean`
-  — **CI only**, so read the branch diff for new `theorem`/`def` lines and add
-  the records before you push rather than waiting for the PR CI run;
 - `check_source_independence.py` rejecting a retired or external source root
   — precheck catches this;
 - convention errors the edit hook would have caught had the branch been written

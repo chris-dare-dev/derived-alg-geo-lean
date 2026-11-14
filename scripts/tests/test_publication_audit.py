@@ -267,15 +267,17 @@ class PublicationAuditTest(unittest.TestCase):
             self.assertNotEqual(deleted, git("write-tree"))
 
     def test_linux_executable_audit_script(self):
-        path = Path(__file__).resolve().parents[1] / "check_audit_complete.py"
+        path = Path(__file__).resolve().parents[1] / "check_emission_coverage.py"
         self.assertTrue(os.access(path, os.X_OK))
         mode = subprocess.check_output(["git", "ls-files", "--stage", str(path)], text=True)
         self.assertTrue(mode.startswith("100755 "))
-        result = subprocess.run([str(path)], capture_output=True, text=True)
-        # No sweep file was supplied: the gate documents usage and exits 1.
-        # Reaching that branch proves the Linux kernel invoked this file.
+        with tempfile.TemporaryDirectory() as tmp:
+            missing = Path(tmp) / "absent-emission.json"
+            result = subprocess.run([str(path), str(missing)], capture_output=True, text=True)
+        # The emission it was pointed at does not exist: the gate says so and
+        # exits 1. Reaching that branch proves the Linux kernel invoked this file.
         self.assertEqual(result.returncode, 1)
-        self.assertIn("Usage:", result.stderr)
+        self.assertIn("no emission at", result.stderr)
 
     def test_github_client_rejects_incomplete_check_page(self):
         prefix = f"https://api.github.com/repos/{REPO}/"

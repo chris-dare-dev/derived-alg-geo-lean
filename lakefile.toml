@@ -51,22 +51,6 @@ name = "DerivedAlgGeoSweep"
 name = "RestateHistoricalNames"
 srcDir = "exe"
 
-# Subsystem audits remain independent so their historical declaration lists
-# and truncation checks stay meaningful.
-[[lean_lib]]
-name = "AlgebraicGeometryAudit"
-srcDir = "scripts"
-globs = ["AlgebraicGeometryAudit.+"]
-
-[[lean_lib]]
-name = "StabilityConditionAudit"
-srcDir = "scripts"
-globs = ["StabilityConditionAudit.+"]
-
-[[lean_lib]]
-name = "DGCategoryAudit"
-srcDir = "scripts"
-
 [[lean_exe]]
 name = "emit"
 root = "Emit"
