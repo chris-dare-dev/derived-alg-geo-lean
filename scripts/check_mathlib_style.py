@@ -121,7 +121,7 @@ PROVENANCE_RES = (
     ("a date", re.compile(r"\b20\d\d-[01]\d-[0-3]\d\b")),
     ("a review tag", re.compile(r"\bP[0-3]-\d+\b|\bfinding \d+\b")),
     ("a path into the process records",
-     re.compile(r"(?<![\w/.])(?:docs|openspec|notes)/[\w.-]|\.claude/")),
+     re.compile(r"(?:(?<![\w/.])|(?<=\.\./))(?:docs|openspec|notes)/[\w.-]|\.claude/")),
     ("the name of an agent", re.compile(r"\b(?:Claude|Codex|ChatGPT|Copilot)\b")),
 )
 

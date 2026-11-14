@@ -3,7 +3,7 @@ r"""Refuse whole-library Lean builds on the developer's machine.
 
 Lean builds for this repository belong on a runner. In this repository
 `ci.yml` runs every event on `ubuntu-latest`; the owner's self-hosted runners
-serve a private mirror instead (`docs/ci/owner-lane.md`). Since 2026-09-19
+serve a private mirror instead (https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/CI-Owner-Lane). Since 2026-09-19
 `push` fires on `main` alone, so the way to get a verdict on a branch is to
 OPEN THE PULL REQUEST -- or to dispatch `ci.yml` on it by hand -- not to run
 `lake` locally.
@@ -91,7 +91,7 @@ lets a running image be unlinked and replaced, so there is no relink failure
 left to cause. A bare `lake` here resolves to your own elan, or to nothing.
 
 WHAT REMAINS is narrower, and is still worth refusing: naming a runner's shim
-EXPLICITLY, by path. `docs/ci/ubuntu-runners.md` makes each runner's tree its
+EXPLICITLY, by path. https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/CI-Ubuntu-Runners makes each runner's tree its
 own state -- "no writable cache or package symlinks between runners or into
 developer checkouts" -- and a build driven through one of those shims writes
 into that runner's `.elan` and competes for its cgroup budget while a job may
@@ -696,7 +696,7 @@ def main() -> int:
         "\n"
         "Lean builds for this repository run on a runner (`ci.yml` runs on\n"
         "ubuntu-latest here; the owner's runners serve a private mirror, see\n"
-        "docs/ci/owner-lane.md).\n"
+        "https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/CI-Owner-Lane).\n"
         "\n"
         "`push` triggers on `main` alone, so for a verdict on a branch OPEN THE\n"
         "PULL REQUEST, or dispatch CI on the pushed branch:\n"

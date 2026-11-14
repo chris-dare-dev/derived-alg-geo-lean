@@ -6,8 +6,7 @@ gate that prints a non-ASCII character raises `UnicodeEncodeError` *inside its
 own reporting path*, so it dies with a `charmap` traceback instead of the
 finding it had already computed. That is the worst failure a reporting gate
 has: the diagnosis is correct, and then thrown away in the act of displaying
-it. #868 fixed it in `check_roadmap.py`, whose findings quote roadmap titles;
-#869 is the observation that every other gate prints declaration names, and
+it. Every gate prints declaration names, and
 Lean names routinely carry `δ`, `₁`, `₂`, `Γ`, `ω`, `χ`. It stopped being
 hypothetical on 2026-09-11, when `check_audit_complete.py` crashed printing
 `BilinearRiemannRochStatement.chi₂_eq` on PR #1158.

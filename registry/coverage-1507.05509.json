@@ -1,6 +1,6 @@
 {
   "_readme": [
-    "Coverage map for arXiv:1507.05509v5 -- 'Uniqueness of dg enhancements for the derived category of a Grothendieck category', Canonaco, Stellari. Created for the dg-enhancements track (.claude/roadmap/dg-enhancements.yaml, item dg-enhancements-e0, GitHub #328).",
+    "Coverage map for arXiv:1507.05509v5 -- 'Uniqueness of dg enhancements for the derived category of a Grothendieck category', Canonaco, Stellari. Created for the dg-enhancements track (https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Roadmap-Dg-Enhancements, item dg-enhancements-e0, GitHub #328).",
     "",
     "THIS IS NOT A TRUST RECORD AND NOT A MINT SURFACE. It is a zero-claim map of the paper's structure onto statuses. formalization.yaml's `source` remains the Bridgeland 2007 record, and registry/bridgeland2007.json remains the only mint surface; nothing in this file changes either, and nothing in this file may be cited as theorem coverage. The only status that ever counts as coverage is 'formalized'.",
     "",
@@ -16,7 +16,7 @@
   "schema": "coverage-map/1",
   "created": "2026-08-13",
   "issue": "https://github.com/chris-dare-dev/derived-alg-geo-lean/issues/328",
-  "roadmap": ".claude/roadmap/dg-enhancements.yaml",
+  "roadmap": "https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Roadmap-Dg-Enhancements",
   "source": {
     "title": "Uniqueness of dg enhancements for the derived category of a Grothendieck category",
     "authors": [

@@ -16,6 +16,10 @@ open-set site. This file refines that cover to basic opens. Mathlib v4.32.1 supp
 quasi-coherent affine comparison; this local refinement remains a separate presentation-cover
 result.
 
+## Main definitions
+
+None: this file proves existence results about Mathlib's `SheafOfModules.Presentation`.
+
 ## Main results
 
 * `AlgebraicGeometry.Scheme.Modules.exists_basicOpen_presentation_cover_of_quasicoherentData`
@@ -41,8 +45,6 @@ that upstream proof.
 
 * [Stacks, Tag 01IA](https://stacks.math.columbia.edu/tag/01IA), for the affine quasi-coherent
   comparison context.
-* See the [affine and projective spectrum placement map](../../../../docs/architecture/placement.md)
-  for the pinned source of the basic-open cover criterion.
 
 ## Tags
 

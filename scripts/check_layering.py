@@ -186,7 +186,7 @@ STRONG_PRESTABILITY_EXTENDS = re.compile(
 #
 # Narrowing further is MO1.05, MO1.06 and MO1.13 work, not a free edit: each
 # entry below still contains modules that do NOT reach stability, and the
-# remaining queue is recorded in docs/architecture/cutover-ledger.md.
+# remaining queue is recorded in https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Cutover-Ledger.
 STABILITY_CONSUMING_GEOMETRY = (
     # The Dqc/families lane: base change of pre-stability data and the
     # geometric Fourier--Mukai action.
@@ -1339,7 +1339,7 @@ def _rule_mo1_07(
         failures.append(
             f"missing {yoneda_root.relative_to(ROOT)}: it owns the linear "
             "Yoneda representability block; see "
-            "docs/architecture/cutover-ledger.md"
+            "https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Cutover-Ledger"
         )
     else:
         yoneda_module = module_of(yoneda_root)
@@ -1375,7 +1375,7 @@ def _rule_mo1_07(
     if not serre_root_dir.is_dir():
         failures.append(
             f"missing {serre_root_dir.relative_to(ROOT)}: it owns the k-linear "
-            "Serre duality data; see docs/architecture/cutover-ledger.md"
+            "Serre duality data; see https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Cutover-Ledger"
         )
     else:
         serre_root_module = module_of(serre_root_dir.with_suffix(".lean"))
@@ -1421,7 +1421,7 @@ def _rule_mo1_08(
         if not (SOURCE_ROOT / entry).is_file():
             failures.append(
                 f"missing MO1.08 owner {entry}; see "
-                "docs/architecture/cutover-ledger.md"
+                "https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Cutover-Ledger"
             )
 
     # No module below AlgebraicGeometry/Stability/ may buy back the rule 3
@@ -1583,7 +1583,7 @@ def _rule_mo1_10(
             failures.append(
                 f"missing {entry}: it owns a general derived operation "
                 "extracted from Fourier--Mukai; see "
-                "docs/architecture/cutover-ledger.md row 10"
+                "https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Cutover-Ledger row 10"
             )
             continue
         owner_module = module_of(
@@ -1624,7 +1624,7 @@ def _rule_mo1_11(
             failures.append(
                 f"missing {entry}: it owns a flatness or relative-perfection "
                 "predicate extracted from the moduli consumer; see "
-                "docs/architecture/cutover-ledger.md row 11"
+                "https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Cutover-Ledger row 11"
             )
             continue
         # The forbidden import edges themselves are checked in
@@ -1678,7 +1678,7 @@ def _rule_mo1_12(
         if not (owner.is_dir() or owner.is_file()):
             failures.append(
                 f"missing {owner.relative_to(ROOT)}: it owns {what}; see "
-                "docs/architecture/cutover-ledger.md row 08"
+                "https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Cutover-Ledger row 08"
             )
 
     # (a) The action adapter did NOT follow the group out. Its block names the
@@ -1758,7 +1758,7 @@ def _rule_mo1_13(
             f"missing {ANALYSIS_ROOT}: it owns the neutral planar core -- the "
             "polygonal-path carrier, the real continuous linear functionals on "
             "the complex plane, and the Euclidean perimeter comparison; see "
-            "docs/architecture/cutover-ledger.md"
+            "https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Cutover-Ledger"
         )
     for module in analysis_modules:
         reached = sorted(
@@ -2229,7 +2229,7 @@ def main() -> int:
             if restored:
                 failures.append(
                     f"retired path restored: {candidate.relative_to(ROOT)}; "
-                    "see docs/architecture/cutover-ledger.md for its owner"
+                    "see https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Cutover-Ledger for its owner"
                 )
     for path in SOURCE_ROOT.rglob("*"):
         parts = path.relative_to(SOURCE_ROOT).parts
@@ -2273,7 +2273,7 @@ def main() -> int:
     if not op_root.is_file():
         failures.append(
             f"missing {op_root.relative_to(ROOT)}: it owns the ObjectProperty "
-            "lift block; see docs/architecture/cutover-ledger.md"
+            "lift block; see https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Cutover-Ledger"
         )
     else:
         op_module = module_of(op_root)
@@ -2308,7 +2308,7 @@ def main() -> int:
     if not div_dir.is_dir():
         failures.append(
             f"missing {div_dir.relative_to(ROOT)}: it owns the divisorial "
-            "charge block; see docs/architecture/cutover-ledger.md"
+            "charge block; see https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Cutover-Ledger"
         )
     else:
         div_declared: set[str] = set()

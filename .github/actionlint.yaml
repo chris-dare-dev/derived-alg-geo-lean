@@ -1,6 +1,6 @@
 self-hosted-runner:
   labels:
-    # The owner lane's routing label (docs/ci/owner-lane.md). Every owner
+    # The owner lane's routing label (https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/CI-Owner-Lane). Every owner
     # runner carries it; the runners are registered to the private mirror,
     # never to this repository.
     - owner-ci

@@ -71,7 +71,7 @@ Perry–Stellari–Zhao) for issue #211 (transferred from source issue #141).
 Section 3.4 has a `mapped` candidate binding with its required evidence; all
 other coordinates remain `target`. Neither status is theorem coverage. The
 dependency and issue workflow lives in
-`.claude/roadmap/projective-families.yaml`; the coverage map remains the
+https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Roadmap-Projective-Families; the coverage map remains the
 version-pinned source ledger and is never inferred from roadmap progress.
 Validate it
 with:
@@ -118,7 +118,7 @@ python scripts/check_coverage_map.py registry/coverage-1607.01262.json
 
 ## The five dg-enhancement coverage maps — zero-claim skeletons
 
-`.claude/roadmap/dg-enhancements.yaml` reads five Canonaco–Stellari-school
+https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Roadmap-Dg-Enhancements reads five Canonaco–Stellari-school
 papers, and issue #328 pins each of them before any issue body cites a section
 by memory. Every part and every near-term coordinate in all five is `target`;
 none of them has ever held another status.
@@ -201,7 +201,7 @@ same commit that introduces it**. Four are in use:
   open before you do.
 - **Discharging needs a named human.** `discharged_by` requires
   `discharged_by_reviewer`, and per
-  [`ADR-0005`](../.claude/decisions/ADR-0005-trust-axes.md) an agent may not
+  [`ADR-0005`](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Decision-ADR-0005-Trust-Axes) an agent may not
   fill it. A machine review may correct a false `statement`; it may not close
   the item. This is why `gltilde-universal-cover` sat corrected-but-open from
   2026-08-06 to 2026-08-07: the review that found it false was not entitled to

@@ -14,7 +14,7 @@
 - [ ] Any rejected generalization is recorded with its counterexample.
 - [ ] The structural cutover ledger is updated for completed or newly confirmed lanes.
 
-See `docs/architecture/placement.md` and `docs/architecture/abstraction-tree.md`.
+See https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Placement and https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Abstraction-Tree.
 
 ## Trust and verification
 
