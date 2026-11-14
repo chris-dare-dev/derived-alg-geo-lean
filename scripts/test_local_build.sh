@@ -158,6 +158,14 @@ cli_case allow  'git -C dir show gates.sh'        git -C .. show origin/main:scr
 cli_case allow  'git --no-pager log gates.sh'     git --no-pager log --oneline -- scripts/gates.sh
 cli_case allow  'env -u VAR grep gates.sh'        env -u DAG_ALLOW_LOCAL_BUILD grep -c gate scripts/gates.sh
 hook_case allow 'hook passes reading gates.sh'    'grep -rn "gates.sh" scripts/'
+# Operators split only outside quotes, and a heredoc is data unless a shell
+# reads it. The allows were false refusals; the refusals are the ways the same
+# shapes still run the gate.
+hook_case allow  'hook passes a quoted | in a read'   "grep -nE 'a|b' scripts/gates.sh"
+hook_case allow  'hook passes a heredoc to git'       $'git commit -F - <<\'EOF\'\nscripts/gates.sh\nEOF'
+hook_case refuse 'hook blocks a heredoc to a shell'   $'sh <<\'EOF\'\nscripts/gates.sh\nEOF'
+hook_case refuse 'hook blocks bash -c with a pipe'    "bash -c 'cd x | scripts/gates.sh'"
+hook_case refuse 'hook blocks a quoted substitution'  'echo "$(scripts/gates.sh)"'
 
 # The replacement the refusal points at. `precheck.sh` runs the no-build subset
 # and a targeted build; refusing it would leave the skills with no pre-flight at
