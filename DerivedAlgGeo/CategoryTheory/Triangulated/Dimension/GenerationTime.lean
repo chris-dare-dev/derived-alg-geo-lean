@@ -14,7 +14,12 @@ retracts and at most `n` extensions -- that is, the least `n` with `Q ≤ P.tria
 -- and `⊤` when there is no such `n`. It is the numerical layer on top of Mathlib's
 `ObjectProperty.triangEnvelopeIter`, and it introduces no new closure operation.
 
-## The order API
+## Main definitions
+
+* `CategoryTheory.ObjectProperty.generationTime`: the least number of extensions needed to reach
+  `Q` from `P`, in `ℕ∞`.
+
+## Main results
 
 * `generationTime_le_coe_iff`: `P.generationTime Q ≤ n ↔ Q ≤ P.triangEnvelopeIter n`. The
   reverse direction is `sInf_le`; the forward direction uses that `ℕ∞` is well-ordered, so a
@@ -29,7 +34,9 @@ retracts and at most `n` extensions -- that is, the least `n` with `Q ≤ P.tria
   `P.generationTime ⊤ ≠ ⊤` (`isStrongTriangulatedGenerator_iff_generationTime_ne_top`), and then
   it is a classical one (`isClassicalTriangulatedGenerator_of_generationTime_ne_top`).
 
-## No side conditions
+## Implementation notes
+
+### No side conditions
 
 Nothing here carries a `P.ContainsZero` or `P.Nonempty` hypothesis. Mathlib's
 `monotone'_triangEnvelopeIter` has none at the pin -- it discharges the degenerate case
@@ -37,7 +44,7 @@ internally -- and carrying one would weaken every lemma downstream, including th
 dimension characterisations, which instantiate at `ObjectProperty.singleton G`, a property that
 is *not* `ContainsZero`.
 
-## Generation time is not subadditive
+### Generation time is not subadditive
 
 The bound `P.generationTime R ≤ P.generationTime Q + Q.generationTime R` is **false**, and the
 shape of `triangEnvelopeIter_add` is not evidence for it. Reaching `R` from `P` through `Q` does
@@ -47,8 +54,18 @@ by a `P.triangEnvelopeIter m`, with `n = n' + 1`, so the count is off by one at 
 and the honest law is multiplicative in the `⟨-⟩`-index of Bondal--Van den Bergh, where
 `⟨P⟩_{n + 1}` is `P.triangEnvelopeIter n`: composing `⟨-⟩_a` with `⟨-⟩_b` lands in `⟨-⟩_{a b}`
 (Stacks 0FXA), which in extension counts reads `((a + 1) * (b + 1)) - 1`, not `a + b`. That
-composition law is the deliverable of the follow-up issue on composition of iterated envelopes
-and is not proved here; do not re-derive an additive bound from `triangEnvelopeIter_add`.
+composition law is not proved here; do not re-derive an additive bound from
+`triangEnvelopeIter_add`.
+
+## References
+
+* Bondal--Van den Bergh, the `⟨-⟩`-index of generation.
+* The Stacks Project, Tag 0FXA.
+* Mathlib's `ObjectProperty.triangEnvelopeIter` and `monotone'_triangEnvelopeIter`.
+
+## Tags
+
+generation time, triangulated generator, Rouquier dimension, extension closure
 -/
 
 universe v u

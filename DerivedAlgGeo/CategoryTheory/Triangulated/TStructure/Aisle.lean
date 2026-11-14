@@ -77,8 +77,8 @@ variable {U : ObjectProperty C}
 cones lie in the right orthogonal.
 
 This is the exactness step between Brown representability's map-level output
-and the aisle constructor.  In particular, callers no longer have to supply a
-chosen cone or assert its orthogonality. -/
+and the aisle constructor.  In particular, callers do not supply a chosen
+cone or assert its orthogonality: both are constructed here. -/
 theorem ofApproximationMaps
     (hshift : U ≤ U.shift (1 : ℤ))
     (happrox : ∀ A : C, Nonempty (ApproximationMap U A)) :

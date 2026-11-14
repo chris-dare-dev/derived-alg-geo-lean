@@ -13,7 +13,47 @@ destabilizing quotient and the short exact sequence they form, and the extremal
 phase functions `phiPlus` and `phiMinus` with the characterisation of
 semistability as their equality.
 
-This is the module a consumer of the uniqueness milestone should import.
+## Main definitions
+
+All in the namespace `CategoryTheory.Triangulated.StabilityFunction`:
+
+* `maxDestabilizingSubobject`: the first nonzero term of a chosen HN filtration
+  of a nonzero object.
+* `destabilizingQuotient`: the quotient by the maximally destabilizing
+  subobject.
+* `destabilizingShortComplex`: the short complex from the maximally
+  destabilizing subobject through the object to the destabilizing quotient.
+* `phiPlus` and `phiMinus`: the highest and lowest HN phases of a nonzero
+  object.
+
+## Main results
+
+* `maxDestabilizingSubobject_eq_filtration`: the maximally destabilizing
+  subobject agrees with the first nonzero term of every HN filtration.
+* `destabilizingShortComplex_shortExact`: the destabilizing short complex is
+  short exact.
+* `le_maxDestabilizingSubobject_of_semistable_phase_eq_phiPlus`: every
+  semistable subobject of highest phase lies in the maximally destabilizing
+  subobject.
+* `isSemistable_iff_phiPlus_eq_phiMinus`: a nonzero object is semistable exactly
+  when its extremal phases agree.
+
+## Implementation notes
+
+The choices are made once, with `Classical.choice` on `HasHNProperty`, and the
+`_eq_filtration` lemmas show that they do not depend on the filtration chosen.
+This is the module that downstream users of the uniqueness of HN filtrations
+import; the other files under `Uniqueness/` support it.
+
+## References
+
+The library's `StabilityFunction.HasHNProperty`, `AbelianHNFiltration` and
+`AbelianHNFiltration.chain_one_eq`.
+
+## Tags
+
+Harder–Narasimhan filtration, maximally destabilizing subobject, phase,
+semistability
 -/
 
 noncomputable section

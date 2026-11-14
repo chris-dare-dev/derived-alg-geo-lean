@@ -13,15 +13,38 @@ isomorphism compatible with both duality isomorphisms is unique. The argument is
 represents `B ↦ Dual (A ⟶ B)`, representing objects are unique up to unique isomorphism, and
 naturality in `A` promotes the pointwise isomorphisms to a natural isomorphism of functors.
 
-## The representability step has its own owner
+## Main definitions
+
+* `CategoryTheory.SerreFunctor.SerreFunctorData.compareEquiv`: the comparison of two duality
+  isomorphisms at a fixed pair of objects.
+* `CategoryTheory.SerreFunctor.SerreFunctorData.uniqueIsoApp`: the comparison isomorphism at an
+  object.
+* `CategoryTheory.SerreFunctor.SerreFunctorData.uniqueIso`: the natural isomorphism between two
+  Serre functors.
+
+## Main results
+
+* `CategoryTheory.SerreFunctor.SerreFunctorData.uniqueIso_compat`: `uniqueIso` is compatible with
+  both duality isomorphisms.
+* `CategoryTheory.SerreFunctor.SerreFunctorData.uniqueIso_unique`: it is the only natural
+  transformation that is.
+* `CategoryTheory.SerreFunctor.SerreFunctorData.uniqueIso_refl`,
+  `CategoryTheory.SerreFunctor.SerreFunctorData.uniqueIso_trans` and
+  `CategoryTheory.SerreFunctor.SerreFunctorData.uniqueIso_symm`: the comparisons are coherent.
+* `CategoryTheory.SerreFunctor.SerreFunctorData.exists_uniqueIso`: any two Serre functors are
+  naturally isomorphic.
+
+## Implementation notes
+
+### The representability step has its own owner
 
 `isoOfLinearYonedaIso`, its `mapIso` computation and `hom_ext_of_linearYoneda` are stated on
-`linearYoneda` alone and proved **without reference to `SerreFunctorData`**, because a downstream
-lane needs them on a functor that is not a Serre functor. They now live in
+`linearYoneda` alone and proved **without reference to `SerreFunctorData`**, because they are
+also needed for a functor that is not a Serre functor. They live in
 `CategoryTheory/Linear/Yoneda.lean`, which this file imports; see that module for why the argument
 runs on `linearYoneda` rather than `linearCoyoneda`.
 
-## Trap: which variable the Yoneda argument runs in
+### Trap: which variable the Yoneda argument runs in
 
 `Hom(A,B)` is contravariant in `A` and covariant in `B`, and the dual flips both — so
 `Dual (A ⟶ B)` is **covariant in `A`** and **contravariant in `B`**, matching `Hom(B, S A)`.
@@ -32,12 +55,21 @@ separate step, and it is what promotes the pointwise isomorphisms to a natural t
 Concretely: `yonedaIso` below is natural in `B` by `naturality_right`, and `uniqueIso` is natural
 in `A` by `naturality_left`. Two different fields of `SerreFunctorData`, for two different reasons.
 
-## No shift, no triangulation
+### No shift, no triangulation
 
 Neither this file nor `Basic` mentions a shift or a distinguished triangle, which is why both live
 under `CategoryTheory/Linear/`. Ext profiles, shift relations, the Enriques refinement and every
 triangulated compatibility stay in `CategoryTheory/Triangulated/SerreFunctor/`, which imports this
 root.
+
+## References
+
+The library's `SerreFunctorData`, `isoOfLinearYonedaIso` and `hom_ext_of_linearYoneda`, and
+Mathlib's `linearYoneda`.
+
+## Tags
+
+Serre functor, uniqueness, Yoneda lemma, linear category
 -/
 
 universe w v u

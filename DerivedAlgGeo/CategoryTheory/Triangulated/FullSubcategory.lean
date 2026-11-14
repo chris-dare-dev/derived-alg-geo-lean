@@ -54,9 +54,7 @@ noncomputable def liftTriangle (T : Triangle C) (hT : P.OnTriangle T) :
 -- The three squares of this comparison are closed by `simp` only when the
 -- elaborator may unfold `liftTriangle`'s `let`-bound vertices while checking
 -- the `Triangle.isoMk` fields, which is what these two options restore.  They
--- are needed here and nowhere else in the lane: the five uses that used to sit
--- in `DGEnhancement/H0/Functor.lean` were removed once that block moved out of
--- `H0/Triangle.lean`, and its proofs go through at the default settings.
+-- are scoped to this one declaration.
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
 /-- The canonical comparison from the image of a lifted triangle to its

@@ -9,10 +9,34 @@ import DerivedAlgGeo.CategoryTheory.Abelian.Stability.PhaseGeometry
 
 `SlopeData` is the **curve** case, and its own docstring says so: its field
 `degree_pos_of_rank_zero` is false on a surface, where a skyscraper has `c₁ = 0`
-and hence degree `0`. This file supplies the structure a surface lane may
-instantiate.
+and hence degree `0`. This file supplies the structure that slope data on a
+surface instantiates.
 
-## The single difference
+## Main definitions
+
+* `CategoryTheory.Triangulated.WeakSlopeData`: rank and degree homomorphisms out
+  of `K₀Ab A`, with nonnegative rank and nonnegative degree on nonzero objects of
+  rank zero.
+* `CategoryTheory.Triangulated.WeakSlopeData.charge`: the charge
+  `-degree + i * rank`.
+* `CategoryTheory.Triangulated.WeakSlopeData.toWeakStabilityFunction`: the charge
+  as a `WeakStabilityFunctionOn (abelianDatum A)`.
+* `CategoryTheory.Triangulated.WeakSlopeData.slope` and
+  `CategoryTheory.Triangulated.WeakSlopeData.phase`: the slope `degree / rank`
+  and the normalised argument of the charge.
+
+## Main results
+
+* `CategoryTheory.Triangulated.WeakSlopeData.charge_mem_closedUpperHalfPlane`: a
+  nonzero object has its charge in the closed upper half-plane.
+* `CategoryTheory.Triangulated.WeakSlopeData.phaseCross_charge`: the cross
+  product of two charges is `rank E * degree F - degree E * rank F`.
+* `CategoryTheory.Triangulated.WeakSlopeData.phase_le_iff_slope_le`: on objects
+  of positive rank the phase order is the slope order.
+
+## Implementation notes
+
+### The single difference
 
 ```
 SlopeData      degree_pos_of_rank_zero    : … → 0 < degree E
@@ -29,7 +53,7 @@ is therefore a `WeakStabilityFunctionOn (abelianDatum A)` and not a
 is a genuine weakening with the curve case as an instance, not a second parallel
 structure.
 
-## The order bridge survives
+### The order bridge survives
 
 `phase_le_iff_slope_le` carries a **positive-rank** hypothesis on both objects,
 and at positive rank the charge lies in the *open* upper half-plane, where the
@@ -38,7 +62,7 @@ touches the degree hypothesis: it goes through `phaseCross` and the sign of
 `rank E * degree F - degree E * rank F`. So the order bridge is stated once here,
 and `SlopeData` inherits it through `toWeakSlopeData`.
 
-## What breaks, and why that is the content rather than a defect
+### What breaks, and why that is the content rather than a defect
 
 `SlopeCutoff.lean`'s chain does **not** survive. `phase_eq_one_of_rank_zero` and
 `mem_hnTors_of_rank_zero` both derive from `degree_pos_of_rank_zero`: a rank-zero
@@ -53,7 +77,7 @@ theory (`WeakAbelianHNFiltration`, `Weak/HarderNarasimhan/Heart.lean`) exists. O
 a K3 surface the skyscrapers are precisely the objects the surface case is about,
 so a hypothesis excluding them would exclude the subject.
 
-## What is supplied and what is proved
+### What is supplied and what is proved
 
 `rank_nonneg` and `degree_nonneg_of_rank_zero` are **fields**: they are the
 geometric input, unprovable here because `A` is an arbitrary abelian category.
@@ -61,10 +85,21 @@ Everything else in this file is proved. Unlike `SlopeData`'s
 `degree_pos_of_rank_zero`, both fields *do* hold on a polarised surface, so the
 structure has geometric inhabitants.
 
-This file delivers the charge and the slope order on a surface. It does **not**
-deliver a cutoff to read them against: `hnTorsProperty`, `hnFreeProperty` and
-`hnTorsionPair` are all defined on the strict `StabilityFunction`, and there are
-no weak counterparts yet.
+This file supplies the charge and the slope order on a surface, not a cutoff to
+read them against. The strict `hnTorsProperty`, `hnFreeProperty` and
+`hnTorsionPair` are defined on `StabilityFunction`; the weak cutoff by a slope is
+`WeakStabilityFunctionOn.hnTors` and `WeakStabilityFunctionOn.hnFree` in
+`Weak/Cutoff.lean`.
+
+## References
+
+The library's `WeakStabilityFunctionOn`, `K₀Ab`, `closedUpperHalfPlane` and
+`phaseCross`.
+
+## Tags
+
+slope stability, weak stability function, surface, skyscraper sheaf, rank,
+degree, phase
 -/
 
 noncomputable section

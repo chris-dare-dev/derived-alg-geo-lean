@@ -13,7 +13,21 @@ and supplies the adapter from the classical convention. No downstream file
 should re-derive the flip when *constructing* a sequence; it calls
 `ofReverse` or `ofReverseFin`.
 
-## The two conventions, side by side
+## Main definitions
+
+* `SemiorthogonalSequence.ofReverse` — a classically-ordered family, as a
+  sequence indexed by the order dual.
+* `SemiorthogonalSequence.ofReverseFin` — the finite case, indexed by `Fin n`
+  again by reversal.
+
+## Main results
+
+* `SemiorthogonalSequence.ofReverse_hom_eq_zero` — the vanishing read in the
+  classical direction; the lemma consumers cite.
+
+## Implementation notes
+
+### The two conventions, side by side
 
 Mathlib's definition, written out so the argument order can be checked:
 
@@ -33,18 +47,6 @@ The two differ by reversing the index order, not by swapping an orthogonal:
 `ofReverse` reindexes along `OrderDual` and forgets nothing, and
 `ofReverseFin` lands the finite case back on `Fin n` through the root's own
 `reindex` along `OrderDual.toDual ∘ Fin.rev`.
-
-## Main definitions
-
-* `SemiorthogonalSequence.ofReverse` — a classically-ordered family, as a
-  sequence indexed by the order dual.
-* `SemiorthogonalSequence.ofReverseFin` — the finite case, landed back on
-  `Fin n` by reversal.
-
-## Main results
-
-* `SemiorthogonalSequence.ofReverse_hom_eq_zero` — the vanishing read in the
-  classical direction; the lemma consumers cite.
 
 ## References
 
@@ -96,7 +98,7 @@ lemma ofReverse_hom_eq_zero (component : ι → ObjectProperty C)
   (ofReverse component h).hom_eq_zero
     (show OrderDual.toDual j < OrderDual.toDual i from hij) hX hY f
 
-/-- The finite classical case, landed back on `Fin n`: component `i` of the
+/-- The finite classical case, indexed by `Fin n` again: component `i` of the
 result is the classical component `i.rev`. Built through the root's own
 `reindex` along `OrderDual.toDual ∘ Fin.rev` — strict monotonicity into the
 dual is exactly strict antitonicity of `Fin.rev`, the core lemma

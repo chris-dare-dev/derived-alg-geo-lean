@@ -17,18 +17,24 @@ asserted**.
   `h : IsSphericalObject k 2 E`: a triangulated autoequivalence `Φ`, with its inverse and the
   instances of both (`TriEquiv`), and a natural isomorphism `Φ ≅ T`. Nothing constructs an
   inhabitant, and no axiom stands in for one.
-* `AutoequivalenceStatement.toTwistShaped` closes the circle of the lane: a supplied statement turns
-  a `SphericalTwistData` into a `TwistShaped` of `StabilityAction.lean`, so the supplied twist acts
-  on stability conditions by the Mukai reflection `ρ_{v(E)}`. The `K₀` action of `Φ` is `twistK₀`
-  because `Φ ≅ T` and `K₀.map T = twistK₀` is `SphericalTwistData.map_eq_twistK₀`, proved.
+* `AutoequivalenceStatement.toTwistShaped` connects the twist to its action on stability
+  conditions: a supplied statement turns a `SphericalTwistData` into a `TwistShaped` of
+  `StabilityAction.lean`, so the supplied twist acts on stability conditions by the Mukai
+  reflection `ρ_{v(E)}`. The `K₀` action of `Φ` is `twistK₀` because `Φ ≅ T` and
+  `K₀.map T = twistK₀` is `SphericalTwistData.map_eq_twistK₀`, proved.
 
-## Main definitions and results
+## Main definitions
 
 * `AutoequivalenceStatement` — the supplied conclusion, for a given `d` and `h`.
 * `AutoequivalenceStatement.toTwistShaped` — the supplied twist is twist-shaped.
+
+## Main results
+
 * `AutoequivalenceStatement.act_Z` — it acts on stability conditions through `ρ_{v(E)}`.
 
-## What an inhabitant claims
+## Implementation notes
+
+### What an inhabitant claims
 
 `SphericalTwistData` records no more than a cone-like triangulated functor with the right `K₀`
 shadow: nothing ties its `copower` and `ev` to `Hom^•(E,-) ⊗ E` and the evaluation map. So
@@ -38,7 +44,7 @@ realizations of `ObjectTwistData.lean` are. Padding a genuine datum by the trian
 class of the copower, but adds the summands `F⟦1⟧ ⊕ F⟦2⟧` to `T F`, which an autoequivalence cannot
 have. An inhabitant is a claim about the specific `d`.
 
-## What the hypothesis is, and is not
+### What the hypothesis is, and is not
 
 The hypothesis `h` is `IsSphericalObject k 2 E` of `Basic.lean`: the Ext profile alone, with no
 Serre-functor clause and none of the finiteness clauses of Seidel--Thomas' Definition 2.9. This is
@@ -48,7 +54,7 @@ theorem in general: `AlgebraicGeometry/Surface/Spherical.lean` records a surface
 profile on which `T_E` is not an autoequivalence. So the statement must be supplied only where the
 full hypothesis of Seidel--Thomas holds, and its inhabitant is a claim about that case.
 
-## What the isomorphism does not record
+### What the isomorphism does not record
 
 `iso` is a natural isomorphism of underlying functors. Seidel--Thomas work with exact functors,
 that is functors with their shift isomorphisms, up to graded natural isomorphism, and compatibility
@@ -68,6 +74,10 @@ their Definition 2.9 (a bounded complex of injectives with finite-dimensional Ho
 and a nondegenerate pairing); Definition 2.14 transfers that notion to `Dᵇ(S')`, and Lemma 3.1
 identifies it on a smooth projective `X` with `E ⊗ ω_X ≅ E`. Huybrechts, *Fourier--Mukai
 transforms in algebraic geometry*, Proposition 8.6, is the same statement.
+
+## Tags
+
+spherical twist, autoequivalence, Seidel--Thomas, Mukai reflection, stability condition
 -/
 
 universe w v u

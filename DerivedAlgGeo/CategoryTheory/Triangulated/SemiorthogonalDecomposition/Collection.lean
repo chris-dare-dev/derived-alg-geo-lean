@@ -258,7 +258,7 @@ section Fin
 
 variable {n : ℕ} (F : ExceptionalCollection k C (Fin n))
 
-/-- The finite case, landed back on `Fin n` through `Orientation.lean`'s
+/-- The finite case, indexed by `Fin n` again through `Orientation.lean`'s
 `ofReverseFin`: component `i` of the result is the collection's component
 `i.rev`. -/
 def toSemiorthogonalSequenceFin : SemiorthogonalSequence C (Fin n) :=

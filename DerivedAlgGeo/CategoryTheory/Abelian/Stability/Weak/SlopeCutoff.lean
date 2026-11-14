@@ -157,8 +157,9 @@ end WeakSlopeData
 
 /-! ## The curve case inherits
 
-`SlopeData.toWeakSlopeData` forgets `0 < degree` to `0 ≤ degree`, so a curve lane
-gets the `WithTop ℝ` slope and everything above without a second development. -/
+`SlopeData.toWeakSlopeData` forgets `0 < degree` to `0 ≤ degree`, so slope data
+on a curve gets the `WithTop ℝ` slope and everything above without a second
+development. -/
 
 namespace SlopeData
 

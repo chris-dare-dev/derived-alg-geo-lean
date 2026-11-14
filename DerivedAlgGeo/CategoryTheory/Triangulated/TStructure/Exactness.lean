@@ -492,7 +492,8 @@ theorem isGE_iff_of_reflectsZeroObjects
     exact (t.isGE_iff_isZero_truncLT_obj n X).2 (hzero _ hMapped)
 
 /-- Boundedness descends along a t-exact zero-reflecting functor. This is the
-categorical boundedness argument in Step 4 of A.17. -/
+categorical boundedness argument in the fourth step of the proof of
+Theorem A.17. -/
 theorem isBounded_of_target
     (hzero : ∀ E : C, IsZero (F.obj E) → IsZero E)
     (hbounded : TStructure.IsBounded t') : TStructure.IsBounded t := by
