@@ -12,20 +12,50 @@ positive-multiplicity subsheaves are bounded above. This file identifies the exa
 geometric statement: the codimension-one Hilbert coefficients of the corresponding quotients
 are bounded below.
 
+## Main definitions
+
+This file introduces no new definitions.
+
+## Main results
+
+* `Gieseker.PolarizedVarietyHypotheses.hilbertDegreeCoefficient_eq_add_cokernel`: the
+  codimension-one Hilbert coefficient of a sheaf is the sum of those of a subobject and its
+  canonical quotient.
+* `Gieseker.PolarizedVarietyHypotheses.slope_bddAbove_iff_quotientDegree_bddBelow`: the slopes
+  of the positive-multiplicity subobjects of `F` are bounded above if and only if the
+  codimension-one Hilbert coefficients of their quotients are bounded below.
+* `Gieseker.MuHNInput.ofQuotientDegreeLowerBound`: on a Noetherian scheme, a uniform lower bound
+  for quotient degree coefficients supplies the input for sheaf-level μ-Harder--Narasimhan
+  filtrations.
+
+## Implementation notes
+
+### The reduction is an equivalence
+
 The reduction is an equivalence, not a weakening of `MuHNInput`. Additivity writes
 `degree(F) = degree(B) + degree(F/B)`. In one direction, a lower bound for `degree(F/B)` bounds
 the numerator of the slope of `B`; in the other, the already-proved bound
 `multiplicity(B) ≤ multiplicity(F)` turns a slope bound into a numerator bound and hence a lower
 bound for `degree(F/B)`.
 
-## The remaining geometric obligation
+### The remaining geometric obligation
 
-Nothing in the current `PolarizedVarietyHypotheses` API says that `P.L` is ample, and the tree has no
-uniform Castelnuovo--Mumford regularity theorem or equivalent graded-submodule estimate.
-Consequently this file does not claim Grothendieck boundedness. It isolates it as the sharp
-reusable obligation `quotientDegree_bddBelow` accepted by
+`PolarizedVarietyHypotheses` is a package of supplied inputs, and nothing in it says that
+`P.L` is ample; the tree has no uniform Castelnuovo--Mumford regularity theorem or equivalent
+graded-submodule estimate. Consequently this file does not claim Grothendieck boundedness. It
+isolates it as the sharp reusable obligation `quotientDegree_bddBelow` accepted by
 `MuHNInput.ofQuotientDegreeLowerBound`: for each ambient sheaf, uniformly lower-bound the
 codimension-one Hilbert coefficient of every quotient whose kernel has positive multiplicity.
+
+## References
+
+The reduction builds on `Gieseker.PolarizedVarietyHypotheses.hilbertDegreeCoefficient_shortExact`,
+`Gieseker.PolarizedVarietyHypotheses.multiplicity_subobject_le` and
+`Gieseker.MuHNInput.ofSlopeBoundedness`.
+
+## Tags
+
+slope stability, Harder-Narasimhan filtration, boundedness, Hilbert polynomial, coherent sheaf
 -/
 
 universe u

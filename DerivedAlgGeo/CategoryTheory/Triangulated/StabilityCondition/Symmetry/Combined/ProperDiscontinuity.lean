@@ -15,32 +15,70 @@ discontinuous.  At the generality of `StabilityCondition.WithClassMap C v`,
 that input is not a theorem: it is packaged explicitly in
 `ProperDiscontinuityHypotheses`.
 
-From the supplied data we derive finite point stabilizers, the standard local
-neighbourhood consequences, Hausdorff separation of the orbit space, and the
-covering-map statement over the image of the free locus.  The last result is
-deliberately restricted.  Proper discontinuity makes point stabilizers finite,
-but does not make the action free, so it does not imply an unrestricted
-covering map.
+From the supplied hypotheses we derive finite point stabilizers, the standard
+local neighbourhood consequences, Hausdorff separation of the orbit space, and
+the covering-map statement over the image of the free locus.
 
-The finite-stabilizer theorem below takes only the first field's Mathlib class.
+## Main definitions
+
+* `GroupAction.ProperDiscontinuityHypotheses`: proper discontinuity of the
+  compatible-autoequivalence action, surjectivity of the class map, and local
+  compactness of the stability space, as supplied inputs.
+
+## Main results
+
+* `GroupAction.finite_stabilizer_of_properlyDiscontinuousSMul` and
+  `GroupAction.ProperDiscontinuityHypotheses.finite_stabilizer`: point
+  stabilizers are finite.
+* `GroupAction.ProperDiscontinuityHypotheses.exists_nhds_image_smul_eq_self` and
+  `GroupAction.ProperDiscontinuityHypotheses.exists_nhds_disjoint_image`: the
+  local neighbourhood consequences.
+* `GroupAction.ProperDiscontinuityHypotheses.t2Space_autPairOrbitSpace`: the
+  orbit space is Hausdorff.
+* `GroupAction.ProperDiscontinuityHypotheses.isCoveringMapOn_autPairOrbitMap`:
+  the orbit projection is a covering map over the image of the free locus.
+
+## Implementation notes
+
+### Restricted covering statement
+
+The covering result is deliberately restricted.  Proper discontinuity makes
+point stabilizers finite, but does not make the action free, so it does not
+imply an unrestricted covering map.
+
+### Which hypotheses each result uses
+
+The finite-stabilizer theorem takes only the first field's Mathlib class.
 The local and quotient consequences install the surjectivity-derived Hausdorff
 instance and local compactness, while consuming the canonical continuous
 constant-action instance from the combined-topology layer; keeping that split
 visible prevents an accidental strengthening of the supplied geometric
 interface.
 
-## Missing geometric input
+### Missing geometric input
 
-No inhabitant of `ProperDiscontinuityHypotheses` is constructed here.  A geometric
-construction would require arithmetic control of the image of compatible
-autoequivalences in lattice isometries, local finiteness for the corresponding
-walls on the stability space, and finite-dimensionality sufficient to deduce
-local compactness.  Those inputs are absent from the generic stability API.
+No inhabitant of `ProperDiscontinuityHypotheses` is constructed here.  A
+geometric construction would require arithmetic control of the image of
+compatible autoequivalences in lattice isometries, local finiteness for the
+corresponding walls on the stability space, and finite-dimensionality
+sufficient to deduce local compactness.  Those inputs are absent from the
+generic stability API.
 
 Proper discontinuity here gives finite stabilizers of individual stability
 conditions, but does not by itself give finiteness of a chamber's setwise
 stabilizer.  A chamber-level statement needs a specified chamber action and
 additional control of that action; none is asserted here.
+
+## References
+
+Mathlib's `ProperlyDiscontinuousSMul` and the covering-map results of
+`Mathlib.Topology.Covering.Quotient`, with this library's
+`CategoryTheory.Triangulated.t2Space_withClassMap`.
+
+## Tags
+
+stability condition, autoequivalence, group action, proper discontinuity,
+orbit space, covering map
 -/
 
 open CategoryTheory.Triangulated
@@ -86,8 +124,8 @@ theorem finite_stabilizer_of_properlyDiscontinuousSMul
   letI := h
   exact ProperlyDiscontinuousSMul.finite_stabilizer σ
 
-/-- Compatibility wrapper for clients that already hold the complete external
-data bundle.  Use `finite_stabilizer_of_properlyDiscontinuousSMul` when only
+/-- Compatibility wrapper for clients that already hold the complete hypothesis
+bundle.  Use `finite_stabilizer_of_properlyDiscontinuousSMul` when only
 proper discontinuity is available. -/
 theorem ProperDiscontinuityHypotheses.finite_stabilizer
     (d : ProperDiscontinuityHypotheses v)

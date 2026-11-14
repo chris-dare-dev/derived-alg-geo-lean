@@ -12,31 +12,45 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition.Exc
 Li--Nuer--Stellari--Zhao, arXiv:1912.04332v2, Proposition 3.5, use
 `Extⁿ(L,L) ≅ Hⁿ(Y,O_Y)` and the vanishing of `H¹(Y,O_Y)` and `H²(Y,O_Y)`
 to show that every line bundle on an Enriques surface is exceptional.
+This file formalizes that reduction: from explicit comparison inputs,
+exceptionality is proved rather than stored.
 
-This file formalizes that reduction against the APIs available at the current
-pin. `IsEnriquesSurface` already contains the degree-one vanishing. The
-degree-two vanishing, the self-Ext/cohomology comparisons, the endomorphism
-comparison, and the out-of-range Ext vanishing are supplied as explicit
-`Prop`-valued data: Serre duality and the required derived Ext comparison are
-not theorems in the repository yet. From those inputs, exceptionality is
-proved rather than stored.
+## Main definitions
+
+* `EnriquesSurface.DerivedCat` -- `Dᵇ(Coh Y)` in the Enriques namespace.
+* `EnriquesSurface.ExtComparison` -- the precise self-Ext comparison boundary
+  for one line bundle.
+* `EnriquesSurface.IsotropicCollection.ExceptionalityHypotheses` -- the common
+  degree-two vanishing and the ten comparison witnesses.
+
+## Main results
+
+* `EnriquesSurface.isExceptional_of_extComparison` -- the exceptionality
+  reduction.
+* `EnriquesSurface.IsotropicCollection.ExceptionalityHypotheses.bundle_isExceptional`
+  -- every member of a supplied isotropic collection is exceptional.
+
+## Implementation notes
+
+### Supplied inputs
+
+The reduction is stated against the APIs available at the pinned revision.
+`IsEnriquesSurface` already contains the degree-one vanishing. The degree-two
+vanishing, the self-Ext/cohomology comparisons, the endomorphism comparison,
+and the out-of-range Ext vanishing are supplied as explicit `Prop`-valued
+hypotheses: Serre duality and the required derived Ext comparison are not
+theorems in the repository yet.
 
 No Enriques surface, line bundle, comparison, or exceptional collection is
 constructed here.
 
-## Main definitions
+## References
 
-* `DerivedCat` -- `Dᵇ(Coh Y)` in the Enriques namespace.
-* `ExtComparison` -- the precise self-Ext comparison boundary for one line
-  bundle.
-* `IsotropicCollection.ExceptionalityHypotheses` -- the common degree-two
-  vanishing and the ten comparison witnesses.
+* Li--Nuer--Stellari--Zhao, arXiv:1912.04332v2, Proposition 3.5.
 
-## Main results
+## Tags
 
-* `isExceptional_of_extComparison` -- the exceptionality reduction.
-* `IsotropicCollection.ExceptionalityHypotheses.bundle_isExceptional` -- every
-  member of a supplied isotropic collection is exceptional.
+Enriques surface, exceptional object, line bundle, Ext group, derived category
 -/
 
 universe u

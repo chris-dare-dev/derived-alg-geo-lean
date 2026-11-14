@@ -19,20 +19,54 @@ section of these stalkwise quotients that is locally represented by one nonzero 
 function. This is the usual local-equations definition of a Cartier divisor on an integral
 scheme, expressed without a sheaf quotient.
 
-The construction provides:
+## Main definitions
 
-* the abelian group `Scheme.CartierDivisor X`;
-* principal divisors and the explicit quotient `CartierDivisor.ClassGroup X`;
-* codimension-one coefficients through Mathlib's `Scheme.ord`;
-* pullback from explicit function-field data that carries local units to local units.
+* `Scheme.localUnits`, `Scheme.LocalCartierClass` and `Scheme.localCartierClass`: the local
+  units in `K(X)ˣ`, the local Cartier group at a point, and the class of a rational function in it.
+* `Scheme.IsCartier`, `Scheme.cartierDivisor` and `Scheme.CartierDivisor`: locally representable
+  families of local classes, as an additive subgroup and as the abelian group of Cartier divisors.
+* `Scheme.CartierDivisor.principal`, `Scheme.CartierDivisor.ofRationalFunction` and
+  `Scheme.CartierDivisor.principalDivisors`: principal divisors.
+* `Scheme.CartierDivisor.ClassGroup` and `Scheme.CartierDivisor.toClass`: the explicit quotient by
+  principal divisors and its quotient map.
+* `Scheme.CartierDivisor.localOrder` and `Scheme.CartierDivisor.coefficient`: the order of
+  vanishing on local classes and the codimension-one coefficient of a divisor, through Mathlib's
+  `Scheme.ord`.
+* `Scheme.CartierPullbackHypotheses`: a supplied function-field map carrying local units to local
+  units along a morphism, with `Scheme.CartierPullbackHypotheses.pullback` the induced additive
+  pullback of Cartier divisors.
 
-## Deliberate boundaries
+## Main results
+
+* `Scheme.CartierDivisor.exists_localEquation`: every Cartier divisor has a rational local
+  equation around every point.
+* `Scheme.CartierDivisor.toClass_eq_iff_exists`: two divisors have the same class exactly when
+  their difference is principal.
+* `Scheme.CartierDivisor.coefficient_add`, `Scheme.CartierDivisor.coefficient_principal` and
+  `Scheme.CartierDivisor.coefficient_eq_zero_of_coheight_ne_one`: the coefficient is additive,
+  is the order of vanishing on principal divisors, and vanishes away from codimension one.
+* `Scheme.CartierPullbackHypotheses.pullback_principal`: pullback sends a principal divisor to
+  the principal divisor of the mapped function.
+
+## Implementation notes
+
+### Deliberate boundaries
 
 Mathlib v4.32.1 does not construct a function-field map for an arbitrary morphism of integral
-schemes, so this file does not claim an unconditional pullback. `CartierPullbackHypotheses` states the
-exact missing hypotheses. Likewise, `coefficient` is not packaged as an `AlgebraicCycle`: the
-upstream order-of-vanishing API does not yet prove local finiteness of its support. No cycle
-infrastructure is duplicated here.
+schemes, so this file does not claim an unconditional pullback. `CartierPullbackHypotheses`
+states the exact missing hypotheses. Likewise, `coefficient` is not packaged as an
+`AlgebraicCycle`: the upstream order-of-vanishing API does not yet prove local finiteness of its
+support. No cycle infrastructure is duplicated here.
+
+## References
+
+Mathlib's `AlgebraicGeometry.Scheme.functionField` and `AlgebraicGeometry.Scheme.ord`, from
+`Mathlib.AlgebraicGeometry.OrderOfVanishing`.
+
+## Tags
+
+Cartier divisor, integral scheme, function field, principal divisor, divisor class group,
+order of vanishing
 -/
 
 open Additive CategoryTheory Order TopologicalSpace
@@ -276,11 +310,12 @@ section Pullback
 
 variable {X Y : Scheme.{u}} [IsIntegral X] [IsIntegral Y] (f : X ⟶ Y)
 
-/-- Data sufficient to pull Cartier divisors back along a scheme morphism.
+/-- Supplied inputs sufficient to pull Cartier divisors back along a scheme morphism.
 
 The field map and the condition that it carries local units to local units are explicit because
 Mathlib v4.32.1 provides no such map for an arbitrary scheme morphism. -/
 structure CartierPullbackHypotheses where
+  /-- The map on the unit groups of the function fields that the pullback acts by. -/
   fieldMap : Additive Y.functionFieldˣ →+ Additive X.functionFieldˣ
   map_localUnits : ∀ x, localUnits Y (f x) ≤ (localUnits X x).comap fieldMap
 

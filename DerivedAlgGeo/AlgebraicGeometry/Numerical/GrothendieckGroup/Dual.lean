@@ -13,26 +13,38 @@ Hirzebruch–Riemann–Roch into its bilinear form `χ(E,F) = ∫_X ch(E)^∨ ·
 so it is the last piece of Layer A that Bridgeland stability needs: the central charge
 factors through `N(X)` modulo the radical of that pairing.
 
-## Why a separate data bundle
-
-`NumericalRingDualHypotheses R` is an explicit extension of one selected presentation
-`R : NumericalRingData n A`, not a field of every numerical ring and not an independent
-bundle with another path back to `R`.
-A ring that has no chosen dual needs no placeholder, while two choices can coexist without
-instance search selecting between them.
-
 ## Main definitions
 
-* `NumericalRingDualHypotheses R` — the involution, as data plus the axiom that it acts by
-  `(-1)^i` on `piece i`.
-* `chDual E` — `ch(E)^∨`, written directly as `Σᵢ (-1)ⁱ chᵢ(E)` rather than as `dual (ch E)`.
+* `Numerical.NumericalRingDualHypotheses R` — the supplied involution, a `ℚ`-algebra map
+  together with the axiom that it acts by `(-1)^i` on `piece i`.
+* `Numerical.NumericalVarietyData.chDual E` — `ch(E)^∨`, written directly as
+  `Σᵢ (-1)ⁱ chᵢ(E)` rather than as `dual (ch E)`.
 
 ## Main results
 
-* `dual_ch` — the two descriptions of `ch(E)^∨` agree.
-* `dual_involutive_of_mem_piece` — `(-)^∨` is an involution on each graded piece.
+* `Numerical.NumericalVarietyData.dual_ch` — the two descriptions of `ch(E)^∨` agree.
+* `Numerical.NumericalRingDualHypotheses.dual_involutive_of_mem_piece` — `(-)^∨` is an
+  involution on each graded piece.
+* `Numerical.NumericalRingDualHypotheses.dual_mem_piece` and
+  `Numerical.NumericalRingDualHypotheses.dual_algebraMap` — `(-)^∨` preserves each graded
+  piece and fixes scalars.
+* `Numerical.NumericalVarietyData.dual_chComp` and `Numerical.NumericalVarietyData.dual_toddComp`
+  — the involution on Chern-character and Todd components.
+* `Numerical.NumericalVarietyData.ch_add` and `Numerical.NumericalVarietyData.chDual_add` — `ch`
+  and `ch(-)^∨` are additive.
 
-## Deliberately not stated
+## Implementation notes
+
+### Why a separate hypotheses bundle
+
+`NumericalRingDualHypotheses R` is an explicit extension of one selected presentation
+`R : NumericalRingData n A`, not a field of every numerical ring and not an independent
+bundle with another path back to `R`. It is a supplied input because `NumericalRingData` does
+not expose the graded projections, so there is nothing to define the involution from at this
+layer. A ring that has no chosen dual needs no placeholder, while two choices can coexist
+without instance search selecting between them.
+
+### Deliberately not stated
 
 `dual (dual x) = x` for *arbitrary* `x`, and `degree (dual x) = (-1)^n · degree x`. Both are
 true, and both need the graded decomposition of `x` — `NumericalRingData.isInternal` — rather
@@ -40,6 +52,15 @@ than just membership in a single piece. Nothing downstream needs them: every con
 reaches `dual` through `chComp` and `toddComp`, which are graded by construction, so the
 component-wise lemmas suffice. Adding the general versions means importing
 `DirectSum.IsInternal` machinery for no current gain.
+
+## References
+
+This file extends `Numerical.NumericalRingData` and `Numerical.NumericalVarietyData`, and uses
+Mathlib's `AlgHom`.
+
+## Tags
+
+numerical intersection ring, dual involution, Chern character, Todd class, Euler pairing
 -/
 
 universe u v
@@ -52,7 +73,7 @@ open NumericalRingData Finset
 acting on codimension `i` by `(-1)^i`.
 
 Geometrically this is `E ↦ E^∨` read through the Chern character: `chᵢ(E^∨) = (-1)ⁱchᵢ(E)`.
-It is carried as data because `NumericalRingData` does not expose the graded projections, so
+It is a supplied input because `NumericalRingData` does not expose the graded projections, so
 there is nothing to define it *from* at this layer. -/
 structure NumericalRingDualHypotheses {n : ℕ} {A : Type u} [CommRing A] [Algebra ℚ A]
     (R : NumericalRingData n A) where

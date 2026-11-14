@@ -11,30 +11,80 @@ import DerivedAlgGeo.AlgebraicGeometry.Moduli.Semistability.LocusProbes
 # Finite-type openness and relative HN consequences
 
 This file discharges the scheme-facing openness and relative-HN interfaces
-from the geometric bounded-coherent base-change witness.
+from the geometric bounded-coherent base-change witness.  The input is
+`GeometricPreStabilityBaseChangeHypotheses`: supplied hypotheses on the genuine
+bounded coherent pullback, including the phase-indexed output of the Appendix A
+inducing theorem.  No openness proposition or relative-HN existence proposition
+is an input.
+
+## Main definitions
+
+* `Semistability.FiniteTypeSchemeSemistableLocusIndex` and
+  `Semistability.FiniteTypeSchemeGenericSemistableLocusIndex`: semistable-locus
+  and generic-locus indices whose actual base change is of finite type.
+* `Semistability.finiteTypeRegularCurveEligible`: a regular curve base change
+  whose structure morphism is of finite type.
+* `Semistability.finiteTypeSchemeRelativeHNFiltration`: the relative HN
+  filtration of one object over an eligible regular finite-type curve.
+* `Semistability.FiniteTypeGeometricConsequences`: the three finite-type
+  conclusions packaged together as an output.
+
+## Main results
+
+* `Semistability.finiteTypeSchemeSemistableLocus_isOpen` and
+  `Semistability.universalFiniteTypeSchemeSemistableOpenness`: every semistable
+  locus on an actual finite-type base change is Zariski open.
+* `Semistability.finiteTypeSchemeGenericSemistabilityProbe_isGenericallyOpen` and
+  `Semistability.universalFiniteTypeSchemeGenericSemistabilityOpenness`: generic
+  openness from the same open loci.
+* `Semistability.hasFiniteTypeSchemeRelativeHNFiltrations` and
+  `Semistability.integratesAfterFiniteTypeRegularCurveBaseChange`: objectwise
+  relative HN existence on every regular finite-type curve base change, and its
+  integration after that base change.
+* `Semistability.GeometricPreStabilityBaseChangeHypotheses.finiteTypeConsequences`:
+  all three conclusions from the geometric base-change hypotheses.
+
+## Implementation notes
+
+### The finite-type condition
 
 The finite-type condition is the standard scheme-theoretic one: a structure
 morphism is locally of finite type and quasi-compact.  It is recorded on the
 actual object of `Over S`, not as a caller-chosen eligibility label.
 
-The input is `GeometricPreStabilityBaseChangeHypotheses`, constructed from genuine
-bounded coherent pullback and the phase-indexed output of the owned Appendix-A
-inducing theorem.  Its exported phase equivalence has two consequences.
+### Consequences of the phase equivalence
+
+The exported phase equivalence of `GeometricPreStabilityBaseChangeHypotheses`
+has two consequences.
 
 * Residue-fiber phase membership is independent of the point, so each actual
   semistable locus is either the whole finite-type base change or empty and is
   Zariski open.  Generic openness uses the same open locus.
 * The HN filtration supplied by the slicing over a regular curve base pulls
   to every residue fiber.  This constructs `SchemeRelativeHNFiltration`
-  objectwise, including its existing length, phase, factor, and further
-  base-change compatibility.
+  objectwise, including its length, phase, factor, and further base-change
+  compatibility.
 
-No openness proposition or relative-HN existence proposition is an input.
+### Scope
+
 The finite-type proofs are not needed after restricting the quantifiers,
 because the geometric phase equivalence proves the stronger all-base-change
 statement. This is a consequence of the deliberately strong pseudofunctorial
 family interface; it is not a formalization of semistable reduction, a
 moduli-space construction, or Theorem 22.2 of arXiv:1902.08184v4.
+
+## References
+
+* arXiv:1902.08184v4, Theorem 22.2, which this file does not formalize.
+
+The proofs use `GeometricPreStabilityBaseChangeHypotheses.toFiberPreStabilityBaseChangeData`,
+`Semistability.schemeSemistableLocus_isOpen` and
+`HarderNarasimhan.SchemeRelativeHNFiltration.ofBaseChangeWitness`.
+
+## Tags
+
+semistable locus, openness, finite type, relative Harder-Narasimhan filtration,
+base change, stability condition
 -/
 
 attribute [local instance] HasDerivedCategory.standard

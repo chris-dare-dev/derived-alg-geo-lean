@@ -15,22 +15,66 @@ Section 4 of arXiv:1902.08184 calls a t-structure on `𝒟` **`S`-local** when
 every quasi-compact open `U ⊆ S` carries a t-structure on `𝒟_U` making
 restriction t-exact. `TStructure/Local.lean` supplies the one-functor half of
 that sentence -- `RestrictsAlong` -- and observes that the restricted
-t-structure is determined by its aisle. This file takes the quantifier.
+t-structure is determined by its aisle. This file takes the quantifier, and
+states the noetherian-locality and filtration-lifting statements of that section
+against it.
 
-Three things make the quantifier cheap to state.
+## Main definitions
+
+* `SchemeBaseChange.OpenRestrictionFamily`: K-flat base-change hypotheses for
+  `X` over each quasi-compact open of the base, with a restriction functor from
+  the base-change category over `S`.
+* `SchemeBaseChange.OpenRestrictionFamily.IsSLocal`: the t-structure restricts
+  along every restriction functor of the family.
+* `SchemeBaseChange.OpenRestrictionFamily.SLocalData`: a chosen restricted
+  t-structure at every quasi-compact open.
+* `SchemeBaseChange.OpenRestrictionFamily.NoetherianLocalityHypotheses`: the
+  supplied inputs for Lemma 4.15 -- local data, the global-to-local implication,
+  and a finite family of restrictions that preserve heart monomorphisms and
+  jointly reflect isomorphisms.
+* `SchemeBaseChange.OpenRestrictionFamily.Filtration`: an `ℕ`-indexed chain of
+  monomorphisms.
+* `SchemeBaseChange.OpenRestrictionFamily.FiltrationLiftHypotheses`: supplied
+  lifts of local heart filtrations to the global heart, with comparison
+  isomorphisms.
+
+## Main results
+
+* `SchemeBaseChange.OpenRestrictionFamily.SLocalData.isSLocal`: chosen
+  restrictions witness `S`-locality.
+* `SchemeBaseChange.OpenRestrictionFamily.SLocalData.tStructure_eq_of_le_eq` and
+  `SchemeBaseChange.OpenRestrictionFamily.SLocalData.ext_of_le_eq`: the
+  categorical part of Remark 4.6(1); two choices agree once their aisles do.
+* `SchemeBaseChange.OpenRestrictionFamily.isNoetherian_of_restrictions_isNoetherian`:
+  a finite family of mono-preserving, jointly conservative heart restrictions
+  with noetherian targets makes the global t-structure noetherian.
+* `SchemeBaseChange.OpenRestrictionFamily.NoetherianLocalityHypotheses.isNoetherian_iff`:
+  Lemma 4.15, with its local-to-global half
+  `SchemeBaseChange.OpenRestrictionFamily.NoetherianLocalityHypotheses.local_to_global`
+  proved from the finite detector.
+* `SchemeBaseChange.OpenRestrictionFamily.exists_filtration_lift`: the
+  filtration-lifting conclusion of Lemma 4.16(3) from supplied lifts.
+
+## Implementation notes
+
+### Why the quantifier is cheap to state
 
 * `𝒟` is already a base-change category. It is `𝒟_S` at `identityBaseChange S`,
   the terminal object of `Over S`, so no separate source category is needed and
   restriction is an ordinary base-change pullback.
 * An open is already an object of `Over S`, by `opensBaseChange`.
 * Base change is already functorial in the index, by
-  `KFlatBaseChangeHypotheses.quasicoherentPullback`.
+  `DerivedBaseChangeData.quasicoherentPullback`.
 
-What is *not* cheap, and is therefore an explicit input, is the base-change data
-over each open. The repository's base change consumes bundled K-flat
-resolutions, not just a morphism, so a family of them is what `S`-locality has
-to quantify over; `OpenRestrictionFamily` is that family, and it carries the
-restriction functors with it rather than deriving them.
+### The family is an explicit input
+
+What is *not* cheap, and is therefore an explicit input, is the base-change
+input over each open. The repository's base change consumes bundled K-flat
+resolutions, not just a morphism, so a family of `KFlatBaseChangeHypotheses` is
+what `S`-locality has to quantify over; `OpenRestrictionFamily` is that family,
+and it carries the restriction functors with it rather than deriving them.
+
+### Scope
 
 The family and its component t-exactness remain geometric inputs. The formal
 Families layer does, however, provide adapters for the affine Remark A.20
@@ -39,6 +83,15 @@ phase-level slicing quantifier lives in the geometric stability layer, so that
 the Families layer does not import stability conditions. All adapters expose
 their remaining base-change hypotheses rather than manufacturing them from
 the word `affine`.
+
+## References
+
+* arXiv:1902.08184, §4: the definition of an `S`-local t-structure,
+  Remark 4.6(1), Lemma 4.15 and Lemma 4.16(3); Remark A.20.
+
+## Tags
+
+t-structure, S-local, base change, open restriction, noetherian heart, filtration
 -/
 
 noncomputable section
@@ -172,7 +225,7 @@ theorem isNoetherian_of_restrictions_isNoetherian {ι : Type w} [Finite ι]
     (fun i ↦ hlocal i _)
     (fun f hf ↦ hreflect f hf)
 
-/-- Owner data for the noetherian-locality equivalence of Lemma 4.15.
+/-- Supplied inputs for the noetherian-locality equivalence of Lemma 4.15.
 
 The finite family below is intended to come from a quasi-compact open cover.
 Since `OpenRestrictionFamily` carries abstract functors, a topological cover
@@ -235,7 +288,8 @@ structure Filtration (C : Type*) [Category C] where
 arXiv:1902.08184. -/
 structure FiltrationLiftHypotheses (L : SLocalData R t) where
   /-- Lifts a filtration in the heart restricted to `U` to one in the global
-  heart. It is owner data, not a construction: nothing here builds the lift. -/
+  heart. It is a supplied input, not a construction: nothing here builds the
+  lift. -/
   lift (U : S.Opens) (hU : CompactSpace U.toScheme)
       (F : Filtration ((L.restriction U hU).tStructure.heart.FullSubcategory)) :
       Filtration (t.heart.FullSubcategory)

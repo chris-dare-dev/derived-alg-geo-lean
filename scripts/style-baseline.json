@@ -308,12 +308,6 @@
  [
   "DerivedAlgGeo/AlgebraicGeometry/Variety/Numerical.lean",
   "LONG",
-  "the numerical half. Its source is a genuine a variety over `k` and coherent sheaves on its underlying",
-  1
- ],
- [
-  "DerivedAlgGeo/AlgebraicGeometry/Variety/Numerical.lean",
-  "LONG",
   "variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] {n : ℕ} {A : Type u} {N : Type v}",
   1
  ],
@@ -339,12 +333,6 @@
   "DerivedAlgGeo/CategoryTheory/Sites/SheafCohomology/Cech/Comparison.lean",
   "LONG",
   "`DerivedAlgGeo.CategoryTheory.Sites.SheafCohomology.Cech.SmallSiteResolution` restates this interface",
-  1
- ],
- [
-  "DerivedAlgGeo/CategoryTheory/Triangulated/StabilityCondition/CentralCharge/Exponential/Divisorial.lean",
-  "LONG",
-  "proves the two compressed `H`-degree families are it. Those families are Picard rank one. This file does",
   1
  ],
  [

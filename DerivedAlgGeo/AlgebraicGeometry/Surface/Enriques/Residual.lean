@@ -11,18 +11,8 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.SemiorthogonalDecomposition.Col
 The refined derived Torelli papers arXiv:1912.04332v2 and
 arXiv:2104.13610v2 study the right orthogonal to exceptional line-bundle
 collections on Enriques surfaces. This file builds the repository's formal
-counterpart from an isotropic 10-collection, its exceptionality data, and
+counterpart from an isotropic 10-collection, its exceptionality hypotheses, and
 supplied pairwise semiorthogonality witnesses.
-
-The output is deliberately neutral. `residualComponent` is the right
-orthogonal to the union of the ten generated components, and
-`ResidualCategory` is its full subcategory. No fullness, admissibility,
-mutation, Torelli theorem, or equivalence with the papers' Kuznetsov
-component is asserted.
-
-The pairwise vanishing remains supplied geometric data: proving it from the
-intersection equations needs the effectiveness and line-bundle cohomology
-arguments that are not available at the current pin.
 
 ## Main definitions
 
@@ -32,18 +22,54 @@ arguments that are not available at the current pin.
   `ExceptionalCollection`.
 * `IsotropicCollection.collectionSequence` -- the associated finite
   semiorthogonal sequence.
-* `IsotropicCollection.residualComponent` and `ResidualCategory` -- its
-  right orthogonal and the corresponding full subcategory.
+* `IsotropicCollection.residualComponent` and
+  `IsotropicCollection.ResidualCategory` -- its right orthogonal and the
+  corresponding full subcategory.
 
 ## Main results
 
-* `bundle_mem_collectionSequence_component` -- each bundle lies in its
-  designated (order-reversed) component.
-* `residualComponent_isTriangulated` -- the residual is triangulated.
-* `bundle_hom_residualCategory_eq_zero` -- maps from any selected bundle to
-  a residual object vanish.
-* `bundle_not_mem_residualComponent` -- no selected exceptional bundle lies
-  in the residual.
+* `IsotropicCollection.bundle_mem_collectionSequence_component` -- each bundle
+  lies in its designated (order-reversed) component.
+* `IsotropicCollection.residualComponent_isTriangulated` -- the residual is
+  triangulated.
+* `IsotropicCollection.bundle_hom_residual_eq_zero` and
+  `IsotropicCollection.bundle_hom_residualCategory_eq_zero` -- maps from any
+  selected bundle to a residual object vanish.
+* `IsotropicCollection.bundle_not_mem_residualComponent` -- no selected
+  exceptional bundle lies in the residual.
+
+## Implementation notes
+
+### A neutral output
+
+The output is deliberately neutral. `residualComponent` is the right
+orthogonal to the union of the ten generated components, and
+`ResidualCategory` is its full subcategory. No fullness, admissibility,
+mutation, Torelli theorem, or equivalence with the papers' Kuznetsov
+component is asserted.
+
+### Supplied inputs
+
+Exceptionality of each bundle is proved from `ExceptionalityHypotheses`. The
+pairwise vanishing remains a supplied geometric hypothesis,
+`SemiorthogonalityHypotheses`: proving it from the intersection equations
+needs the effectiveness and line-bundle cohomology arguments that are not
+available at the pinned revision.
+
+### Orientation
+
+The root convention of `SemiorthogonalSequence` is opposite to the classical
+collection convention, so component `i` of `collectionSequence` is generated
+by bundle `i.rev`.
+
+## References
+
+* arXiv:1912.04332v2 and arXiv:2104.13610v2.
+
+## Tags
+
+Enriques surface, exceptional collection, semiorthogonal decomposition,
+residual category, Kuznetsov component
 -/
 
 universe u

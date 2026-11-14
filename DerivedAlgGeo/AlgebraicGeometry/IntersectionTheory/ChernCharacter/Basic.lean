@@ -10,18 +10,72 @@ import Mathlib.LinearAlgebra.Lagrange
 # Numerical Chern-character reconstruction from twist polynomials
 
 This file is the bounded, no-Chow reconstruction layer between Snapper polynomials and the
-components consumed by `NumericalVarietyData`.  There are two deliberately separate steps.
+components consumed by `NumericalVarietyData`.  It extracts rational homogeneous coefficients
+from Picard Euler polynomials, represents them in a chosen numerical ring under explicit
+hypotheses, and recovers Chern-character components from them through codimension four.
 
-First, `homogeneousPicardCoefficient` extracts the ordinary rational homogeneous coefficient of
-a Picard Euler polynomial.  Raw finite differences below top degree are not sufficient: they
-mix the desired term with higher-degree terms.  We remove that mixing by interpolating the
-scaled mixed coefficient and taking its lowest possible ordinary coefficient.
+## Main definitions
 
-Second, `PairingContext` and `ReconstructionHypotheses` state exactly when those divisor-tested
+* `ChernCharacter.homogeneousPicardCoefficient`: the ordinary rational homogeneous coefficient
+  of a Picard Euler polynomial, through `ChernCharacter.scaledPicardCoefficient` and
+  `ChernCharacter.interpolatingPolynomial`.
+* `ChernCharacter.divisorProduct`: the product of the degree-one realizations of Picard classes.
+* `ChernCharacter.PairingContext`: a chosen numerical ring realization of the divisor
+  intersection theory, with divisor products separating graded pieces as the field
+  `divisorPairing_ext`.
+* `ChernCharacter.PairingContext.twistPairing`: the divisor-tested rational functional of a
+  coherent sheaf's twist polynomial.
+* `ChernCharacter.PairingContext.ReconstructionHypotheses`: supplied existence of
+  representatives for every Todd-weighted component of one coherent sheaf, with
+  `ChernCharacter.PairingContext.ReconstructionHypotheses.tauComponent` the chosen
+  representative.
+* `ChernCharacter.toddComponent` and `ChernCharacter.chernCharacterComponent`: the reconstructed
+  Todd components and Chern-character components through degree four.
+* `ChernCharacter.expComponent`, `ChernCharacter.lineTauCandidate` and
+  `ChernCharacter.LineBundleComparison`: the line-bundle candidate and the coefficient-level
+  comparison that identifies a reconstruction with it.
+* `ChernCharacter.toChernClassData`: Chern classes whose universal formulas give the
+  reconstructed character through codimension four.
+
+## Main results
+
+* `ChernCharacter.homogeneousPicardCoefficient_add` and
+  `ChernCharacter.homogeneousPicardCoefficient_eq_of_perm`: the coefficient is additive in the
+  Euler polynomial and symmetric in the Picard classes.
+* `ChernCharacter.PairingContext.ReconstructionHypotheses.tauComponent_eq_of_eulerPic_eq` and
+  `ChernCharacter.PairingContext.ReconstructionHypotheses.tauComponent_add`: the represented
+  components depend only on the Euler polynomial and are additive in it.
+* `ChernCharacter.chernCharacterComponent_mem` and
+  `ChernCharacter.chernCharacterComponent_eq_zero_of_dimension_lt`: each component lies in its
+  graded piece and vanishes above the dimension.
+* `ChernCharacter.tauComponent_one_eq` through `ChernCharacter.tauComponent_four_eq`: the
+  triangular identities `tau_i(F) = sum_{a+b=i} ch_a(F) * td_b(X)`.
+* `ChernCharacter.chernCharacterComponent_iso` and `ChernCharacter.chernCharacterComponent_add`:
+  isomorphism invariance and exact-sequence additivity under explicit rank and Euler-polynomial
+  comparisons.
+* `ChernCharacter.chernCharacterComponent_lineBundle`: with `td₀ = 1`, a line-bundle comparison
+  gives `ch = exp(c₁)` through degree four.
+* `ChernCharacter.degree_chernCharacterComponent_two_eq_surface`: the degree of the reconstructed
+  `ch₂` on a surface is the degree-level `chernCharacterTwoDegree`, under explicit comparisons.
+
+## Implementation notes
+
+### Homogeneous coefficients
+
+`homogeneousPicardCoefficient` extracts the ordinary rational homogeneous coefficient of a
+Picard Euler polynomial.  Raw finite differences below top degree are not sufficient: they mix
+the desired term with higher-degree terms.  We remove that mixing by interpolating the scaled
+mixed coefficient and taking its lowest possible ordinary coefficient.
+
+### Representability is a hypothesis
+
+`PairingContext` and `ReconstructionHypotheses` state exactly when those divisor-tested
 functionals are represented by elements of a chosen `NumericalRingData`.  Representability gives
 existence; `divisorPairing_ext` gives uniqueness.  Neither is inferred from the intersection
 numbers.  In particular, on a higher-dimensional variety products of divisors need not separate
 all middle-codimension numerical classes.
+
+### Triangular recovery
 
 The represented Todd-weighted components are denoted `tauComponent`.  The structure-sheaf
 components supply the reconstructed Todd class, and Chern-character components are recovered by
@@ -29,11 +83,22 @@ the triangular identities
 
 `tau_i(F) = sum_{a+b=i} ch_a(F) * td_b(X)`.
 
-The formulas are implemented through codimension four, the current bound of
-`AlgebraicGeometry/Numerical/Core/CharacteristicClasses.lean`.  Isomorphism and
-exact-sequence results use explicit
-rank and Euler-polynomial comparisons.  The line-bundle theorem uses an explicit coefficient
-comparison rather than silently assuming a perfect intersection pairing or Riemann--Roch.
+### Bounds and comparisons
+
+The formulas are implemented through codimension four, the bound of
+`AlgebraicGeometry/Numerical/Core/CharacteristicClasses.lean`.  Isomorphism and exact-sequence
+results use explicit rank and Euler-polynomial comparisons.  The line-bundle theorem uses an
+explicit coefficient comparison rather than silently assuming a perfect intersection pairing or
+Riemann--Roch.
+
+## References
+
+Mathlib's `Lagrange.interpolate`, and this library's `Numerical.NumericalRingData`,
+`Numerical.ChernClassData` and `ChernCharacterSurface.chernCharacterTwoDegree`.
+
+## Tags
+
+Chern character, Todd class, Snapper polynomial, numerical ring, interpolation, line bundle
 -/
 
 universe u v
@@ -183,12 +248,15 @@ noncomputable def twistPairing {F : Coh X}
     (T : TwistContext D F d) (_i : ℕ) (classes : List (Pic X)) : ℚ :=
   homogeneousPicardCoefficient d classes T.eulerPic
 
-/-- Existence data for representatives of all Todd-weighted components of one coherent sheaf.
+/-- Supplied existence of representatives for all Todd-weighted components of one coherent
+sheaf.
 
 This is separate from `PairingContext.divisorPairing_ext`: existence and uniqueness are distinct
 hypotheses. -/
 structure ReconstructionHypotheses (F : Coh X) where
+  /-- The twisted Euler pairings of `F` that the components are read off from. -/
   twists : TwistContext D F d
+  /-- The rank of `F`: the degree-zero Chern-character component. -/
   rank : ℤ
   representable : ∀ (i : ℕ), i ≤ d → ∃ x : A,
     x ∈ P.ring.piece i ∧

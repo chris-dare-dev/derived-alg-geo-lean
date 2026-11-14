@@ -224,9 +224,13 @@ end DeterminantData
 The comparison is explicit: constructing it geometrically is precisely compatibility of
 top exterior powers with direct sums. -/
 structure DirectSumDeterminantHypotheses (E F : X.Modules) where
+  /-- Determinant data of the first summand. -/
   left : DeterminantData E
+  /-- Determinant data of the second summand. -/
   right : DeterminantData F
+  /-- Determinant data of the direct sum. -/
   sum : DeterminantData (E ⊞ F)
+  /-- The determinant line of the sum is the tensor product of the summands' lines. -/
   lineIso : sum.line ≅ tensorObj left.line right.line
 
 namespace DirectSumDeterminantHypotheses
@@ -392,9 +396,13 @@ two-term finite locally free resolutions. -/
 structure PerfectShortExactDeterminantHypotheses [IsLocallyNoetherian X]
     (S : ShortComplex (Coh X)) where
   shortExact : S.ShortExact
+  /-- A two-term locally free determinant presentation of the left term. -/
   left : TwoTermPerfectDeterminantData S.X₁
+  /-- A two-term locally free determinant presentation of the middle term. -/
   middle : TwoTermPerfectDeterminantData S.X₂
+  /-- A two-term locally free determinant presentation of the right term. -/
   right : TwoTermPerfectDeterminantData S.X₃
+  /-- The middle determinant line is the tensor product of the outer two. -/
   lineIso : middle.determinantLine.line ≅
     Scheme.Modules.tensorObj left.determinantLine.line right.determinantLine.line
 

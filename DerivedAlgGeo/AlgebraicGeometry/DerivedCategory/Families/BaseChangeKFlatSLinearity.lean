@@ -7,14 +7,62 @@ import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.BaseChangeSLinea
 /-!
 # K-flat base-scheme action for base-change semiorthogonality
 
-This file removes the last abstract pullback from the `S`-linearity route to
-perfect-component semiorthogonality. A `KFlatBasePullbackHypotheses X` constructs
-the derived pullback `Dqc(S) ⥤ Dqc(X)` from a K-flat resolution on `S`, its
-pullback-acyclicity along `X → S`, and resolved quasicoherence preservation.
+On the `S`-linearity route to perfect-component semiorthogonality, this file
+constructs the base pullback instead of taking it as an abstract input. A
+`KFlatBasePullbackHypotheses X` supplies a K-flat resolution on `S`, its
+pullback-acyclicity along `X → S`, and resolved quasicoherence preservation; the
+derived pullback `Dqc(S) ⥤ Dqc(X)` is built from them.
 
 The resulting aliases and end-to-end theorems state both compact and
 quasicoherent base-coefficient/`S`-linearity inputs entirely in terms of this
 constructed pullback.
+
+## Main definitions
+
+* `SchemeBaseChange.KFlatBasePullbackHypotheses`: the supplied K-flat resolution
+  on the base, with acyclicity and quasicoherence preservation along `X → S`.
+* `SchemeBaseChange.KFlatBasePullbackHypotheses.pullback`: the `Dqc` pullback
+  along `X → S` built from those inputs.
+* `KFlatBaseChangeHypotheses.SourceTensorHypotheses.KFlatSLinearComponents` and
+  `KFlatBaseChangeHypotheses.SourceTensorHypotheses.KFlatDqcSLinearComponents`:
+  compact and quasicoherent `S`-linearity of the components, using the
+  constructed pullback.
+* `KFlatBaseChangeHypotheses.CompactFiberProjectionFormula.KFlatBaseCoefficientHypotheses`
+  and `KFlatBaseChangeHypotheses.CompactFiberProjectionFormula.KFlatDqcBaseCoefficientData`:
+  compact and quasicoherent base coefficients represented through the
+  constructed pullback.
+
+## Main results
+
+Both theorems are in the `SchemeBaseChange.KFlatBaseChangeHypotheses` namespace.
+
+* `perfectComponentsSemiorthogonal_of_kFlatProjectionFormula_of_sLinear`:
+  compact-fibre duality, a first-projection formula with compact base
+  coefficients, and `S`-linearity give perfect-component semiorthogonality.
+* `perfectComponentsSemiorthogonal_of_kFlatProjectionFormula_of_dqcSLinear`:
+  the same conclusion from quasicoherent base coefficients and
+  `Dqc(S)`-linearity.
+
+## Implementation notes
+
+The resolution in `KFlatBasePullbackHypotheses` lives on `S`, the source
+category of the contravariant pullback, and the other two fields are exactly the
+hypotheses `kFlatDqcLeftDerivedPullback` consumes. The two theorems are the
+generic `S`-linearity theorems of `BaseChangeSLinearity.lean` specialized to
+`KFlatBasePullbackHypotheses.pullback`; they add no hypothesis of their own.
+
+## References
+
+This file specializes
+`KFlatBaseChangeHypotheses.perfectComponentsSemiorthogonal_of_projectionFormula_of_sLinear`
+and
+`KFlatBaseChangeHypotheses.perfectComponentsSemiorthogonal_of_projectionFormula_of_dqcSLinear`
+to the pullback built by `SchemeBaseChange.kFlatDqcLeftDerivedPullback`.
+
+## Tags
+
+base change, K-flat resolution, derived pullback, S-linearity, semiorthogonal
+decomposition
 -/
 
 noncomputable section

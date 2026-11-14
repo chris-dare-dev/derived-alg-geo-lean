@@ -15,14 +15,63 @@ codimension-zero and codimension-one terms are the expected explicit classes
 
 `td₀ = 1`,  `td₁ = -K_X / 2`.
 
-The top component is not postulated.  It is the representative reconstructed from the
-structure-sheaf twist polynomial, and its degree is proved to be the geometric Euler
-characteristic `χ(O_X)`.  Representability of the twist functional remains explicit through
-`PairingContext.ReconstructionHypotheses`; no global Chow group or hidden existence instance is used.
+The top component is the representative reconstructed from the structure-sheaf twist
+polynomial, and its degree is proved to be the geometric Euler characteristic `χ(O_X)`.
+
+## Main definitions
+
+* `ToddData.Data`: a structure-sheaf reconstruction of rank one whose Euler function is that
+  of the intersection context, together with the Serre symmetry of the surface pairing.
+* `ToddData.numericalCanonicalClass`: the canonical divisor class in the chosen numerical
+  intersection ring.
+* `ToddData.toddZero`, `ToddData.toddOne` and `ToddData.toddTwo`, assembled into
+  `ToddData.toddComponent`: the surface Todd components, extended by zero above dimension two.
+* `ToddData.NumericalVarietyComparison`: a Layer A `NumericalVarietyData` whose ring and Todd
+  components are these.
+
+## Main results
+
+* `ToddData.homogeneousPicardCoefficient_nil` and
+  `ToddData.homogeneousPicardCoefficient_singleton`: with no Picard class the homogeneous
+  coefficient is the value at `1`; in one direction, for degree two, it is computed from the
+  values at the first three powers.
+* `ToddData.toddComponent_mem` and `ToddData.toddComponent_eq_zero_of_two_lt`: the Todd
+  components are graded and vanish above dimension two.
+* `ToddData.degree_toddTwo_eq_structureSheafEulerCharacteristic`: `∫td₂ = χ(O_X)`.
+* `ToddData.degree_toddOne_mul_divisorClass`: `td₁ = -K_X/2`, tested against every divisor
+  class.
+* `ToddData.structureToddOne_eq_toddOne`: `-K_X/2` is the degree-one representative
+  reconstructed from the structure-sheaf twist polynomial.
+* `ToddData.toddOne_eq_zero` and `ToddData.degree_toddTwo_eq_two`: the K3 normalizations under a
+  trivial canonical class and `χ(O_X) = 2`.
+* `ToddData.NumericalVarietyComparison.toIsK3`: geometric K3 hypotheses give a Layer A
+  `K3.IsK3` witness for any compared `NumericalVarietyData`.
+
+## Implementation notes
+
+### The top component is not postulated
+
+The top component is reconstructed, and its degree is derived from the structure-sheaf twist
+polynomial rather than supplied as a Todd axiom.  Representability of the twist functional
+remains explicit through `PairingContext.ReconstructionHypotheses`; no global Chow group or
+hidden existence instance is used.  Serre symmetry is part of `ToddData.Data` because it is
+what identifies the linear Todd term with `-K_X/2`.
+
+### Comparison with Layer A
 
 The resulting component family carries the grading and normalization statements expected by
-`NumericalVarietyData`. A final comparison theorem turns geometric K3 hypotheses into a Layer A
-`K3.IsK3` witness for any proposed `NumericalVarietyData` using these components.
+`NumericalVarietyData`.  `NumericalVarietyComparison` asks that a proposed Layer A variety use
+these components; it is then the source of the K3 witness.
+
+## References
+
+This file builds on `ChernCharacter.PairingContext.ReconstructionHypotheses`,
+`RiemannRoch.Surface.eulerPic_eq` and `Numerical.K3.IsK3`, and on Mathlib's
+`Lagrange.interpolate`.
+
+## Tags
+
+Todd class, surface, Riemann-Roch, canonical class, Euler characteristic, K3 surface
 -/
 
 universe u v w

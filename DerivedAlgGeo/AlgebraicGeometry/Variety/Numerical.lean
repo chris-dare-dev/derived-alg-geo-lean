@@ -12,28 +12,77 @@ import DerivedAlgGeo.AlgebraicGeometry.Numerical.Core.Definitions
 /-!
 # Realizing a geometric variety numerically
 
-`Variety.NumericalHypotheses` is the first explicit bridge from the geometric half of DerivedAlgGeo to
-the numerical half. Its source is a genuine a variety over `k` and coherent sheaves on its underlying
-scheme. Its target is a numerical intersection ring `A`, a numerical Grothendieck group `N`,
-and ultimately a `NumericalVarietyData n A N`.
+`Variety.NumericalHypotheses` is the first explicit bridge from the geometric half of
+DerivedAlgGeo to the numerical half. Its source is a genuine variety over `k` and coherent
+sheaves on its underlying scheme. Its target is a numerical intersection ring `A`, a numerical
+Grothendieck group `N`, and ultimately a `NumericalVarietyData n A N`.
+
+## Main definitions
+
+* `Variety.NumericalHypotheses`: the supplied realization inputs -- a numerical ring
+  presentation, a class map out of `K₀Ab (Coh X)`, rank, Chern classes of numerical classes and
+  of coherent sheaves, tangent Chern classes, and an Euler characteristic, with their
+  compatibilities.
+* `Variety.NumericalHypotheses.SatisfiesHRR`: Hirzebruch--Riemann--Roch, kept as a separate
+  property.
+* `Variety.NumericalHypotheses.toNumericalVariety`: the `NumericalVarietyData` whose
+  Chern-character and Todd components are the universal expressions in the supplied Chern
+  classes.
+* `Variety.NumericalHypotheses.classOf` and
+  `Variety.NumericalHypotheses.coherentEulerCharacteristic`: the numerical class and the
+  geometric Euler characteristic of a coherent sheaf.
+
+## Main results
+
+* `Variety.NumericalHypotheses.toNumericalVariety_satisfiesHRR`: a geometric HRR proof gives
+  the numerical HRR witness.
+* `Variety.NumericalHypotheses.toNumericalVariety_chComp_two` through `_four` and
+  `Variety.NumericalHypotheses.toNumericalVariety_toddComp_two` through `_four`: the explicit
+  component formulas.
+* `Variety.NumericalHypotheses.classOf_iso` and `Variety.NumericalHypotheses.classOf_shortExact`:
+  the numerical class is isomorphism invariant and additive in short exact sequences.
+* `Variety.NumericalHypotheses.chernCharacter_classOf` and
+  `Variety.NumericalHypotheses.chi_classOf`: the numerical Chern character and Euler
+  characteristic of a coherent sheaf are its geometric ones.
+* `Variety.NumericalHypotheses.coherentChernCharacter_shortExact` and
+  `Variety.NumericalHypotheses.coherentEulerCharacteristic_shortExact`, with their `_iso`
+  companions: the geometric invariants descend through the Grothendieck group.
+
+## Implementation notes
+
+### Direction of construction
 
 The important direction of construction is encoded in the fields:
 
-* coherent sheaves map to numerical classes, invariant under isomorphism and additive in
-  short exact sequences;
-* Chern classes are primary data;
+* coherent sheaves map to numerical classes through `K₀Ab (Coh X)`, hence invariant under
+  isomorphism and additive in short exact sequences;
+* Chern classes are primary inputs;
 * `chComp` is computed from those Chern classes by the universal formulas in
   `AlgebraicGeometry/Numerical/Core/CharacteristicClasses.lean`;
 * `toddComp` is computed from the Chern classes of the tangent bundle;
 * geometric Chern classes and Euler characteristics agree with their numerical descendants.
 
+### What remains to be proved
+
 The remaining hard mathematics is visible rather than hidden. A realization must still prove
 gradedness, additivity of the computed Chern character, and Hirzebruch--Riemann--Roch. Those
-proofs will be supplied by the future geometric Chern-class and Riemann--Roch developments.
+proofs need geometric Chern-class and Riemann--Roch theories that this file does not provide.
 
-The current characteristic-class API is complete through codimension four, so this first
-constructor records `n ≤ 4`. Extending the universal power-series implementation removes that
-bound without changing the realization structure conceptually.
+### The codimension bound
+
+The characteristic-class API is complete through codimension four, so this structure records
+`n ≤ 4`. Extending the universal power-series implementation removes that bound without
+changing the realization structure conceptually.
+
+## References
+
+This file targets `Numerical.NumericalVarietyData` and uses `Numerical.ChernClassData`,
+`CategoryTheory.K₀Ab` and `Cohomology.FiniteCohomology.eulerCharacteristic`.
+
+## Tags
+
+numerical variety, Chern class, Chern character, Todd class, Grothendieck group,
+Hirzebruch-Riemann-Roch
 -/
 
 universe u v
@@ -49,7 +98,7 @@ open Numerical Numerical.NumericalRingData
 variable {k : Type u} [Field k]
 
 variable (k) in
-/-- Certified data exhibiting how a geometric variety descends to a numerical variety.
+/-- Supplied hypotheses exhibiting how a geometric variety descends to a numerical variety.
 
 `NumericalRingData n A` is an input because constructing the numerical intersection ring is a
 separate geometric task. This structure then derives the numerical Chern character and Todd
@@ -63,10 +112,9 @@ structure NumericalHypotheses (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))
   dimension_le_four : n ≤ 4
   /-- The numerical class, as a hom out of the Grothendieck group of `Coh X`.
 
-  This was a function together with `classOf_iso` and `classOf_shortExact`. Those
-  two laws say exactly that the function factors through `K₀Ab`, so they are not
-  data: they are `K₀Ab.of_iso` and `K₀Ab.of_shortExact` composed with this hom,
-  and they survive as theorems of the same names and argument shapes below. -/
+  Isomorphism invariance and short-exact additivity of the numerical class are
+  not separate inputs: they are `K₀Ab.of_iso` and `K₀Ab.of_shortExact` composed
+  with this hom, proved below as `classOf_iso` and `classOf_shortExact`. -/
   classOfHom : K₀Ab (Coh X) →+ N
   /-- Rank on the numerical Grothendieck group. -/
   rank : N →+ ℤ
@@ -106,7 +154,7 @@ namespace NumericalHypotheses
 variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] {n : ℕ} {A : Type u} {N : Type v}
 variable [CommRing A] [Algebra ℚ A] [AddCommGroup N]
 
-/-- Hirzebruch--Riemann--Roch as a property of geometric numerical data, kept
+/-- Hirzebruch--Riemann--Roch as a property of the supplied numerical hypotheses, kept
 separate from the selected realization. -/
 structure SatisfiesHRR (D : NumericalHypotheses k X n A N) : Prop where
   eq : ∀ E : N, (D.chi E : ℚ) = D.ring.degree
@@ -123,9 +171,8 @@ noncomputable abbrev coherentEulerCharacteristic (D : NumericalHypotheses k X n 
 
 /-- Construct the numerical variety certified by geometric `NumericalHypotheses`.
 
-Unlike the original direct model definitions, the Chern-character and Todd components are not
-independent fields here: they are definitionally the universal expressions in the supplied
-Chern classes. -/
+The Chern-character and Todd components are not independent fields here: they are
+definitionally the universal expressions in the supplied Chern classes. -/
 @[reducible]
 noncomputable def toNumericalVariety (D : NumericalHypotheses k X n A N) : NumericalVarietyData n A N where
   ring := D.ring
@@ -218,11 +265,10 @@ theorem classOfHom_of_shortExact (D : NumericalHypotheses k X n A N)
       D.classOfHom (K₀Ab.of S.X₁) + D.classOfHom (K₀Ab.of S.X₃) := by
   rw [K₀Ab.of_shortExact S hS, map_add]
 
-/-! ### The two formal laws, now theorems
+/-! ### The two formal laws of the numerical class
 
-`classOf_iso` and `classOf_shortExact` were fields. They are `K₀Ab.of_iso` and
-`K₀Ab.of_shortExact` composed with `classOfHom`, so they are proved here and the
-names and argument shapes are unchanged. -/
+`classOf_iso` and `classOf_shortExact` are `K₀Ab.of_iso` and `K₀Ab.of_shortExact`
+composed with `classOfHom`. -/
 
 theorem classOf_iso (D : NumericalHypotheses k X n A N) {F G : Coh X} (e : F ≅ G) :
     D.classOf F = D.classOf G := by
