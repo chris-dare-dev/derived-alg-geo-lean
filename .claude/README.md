@@ -1,16 +1,14 @@
-# `.claude/` — repository decisions and roadmaps
+# `.claude/` — what agents run on
 
-This directory records why the repository and its formalization tracks are
-shaped the way they are. It is not user documentation; `README.md` and
-`CONTRIBUTING.md` cover that. Everything here is a decision, a roadmap, or the
-evidence behind one.
+This directory holds the agent definitions, skills, settings and references
+that agent sessions load. It is not user documentation; `README.md` and
+`CONTRIBUTING.md` cover that. Decision records, roadmaps and architecture notes
+live in the [wiki](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki).
 
 ## Layout
 
 | Path | What it is |
 |---|---|
-| `decisions/ADR-*.md` | One architectural decision each. Status is `accepted`, `open`, or `superseded`. An `open` ADR names the person who must decide and what changes either way. |
-| `roadmap/*.yaml` | Track registries for milestones, epics, and their GitHub numbers. |
 | `references/mathlib-style.md` | The Mathlib conventions this repo holds itself to, and the deltas it keeps on purpose. The spec `agents/mathlib-reviewer.md` enforces. |
 | `agents/` | Repo-local agent specifications. One per file. |
 | `skills/` | Repo-local skills, one directory each. `run-loop` works issues or a milestone to merged PRs; `formalize-issue` and `land-pr` are single iterations, not for loop runs. |
@@ -103,13 +101,13 @@ reparsed on the next `sync`; absent output evidence is unknown, not a merge.
 ## Reading order for an agent picking this up cold
 
 For public API ownership and structural moves, `AGENTS.md` points to the
-versioned [mathematical ownership policy](../docs/architecture/mathematical-ownership.md)
-and [placement procedure](../docs/architecture/placement.md). Read those before
+versioned [mathematical ownership policy](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Mathematical-Ownership)
+and [placement procedure](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Placement). Read those before
 using a dated note or issue path as a placement rule. The cutover ledger
 distinguishes existing source from proposed destinations.
 
 1. `AGENTS.md` (the working rules, which `CLAUDE.md` imports — they are load-bearing and override defaults)
-2. `decisions/` in numeric order (~10 min, and it is the whole design)
+2. The wiki's [decision records](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Home#decision-records), in numeric order
 
 ## Dates in this directory are UTC
 

@@ -92,11 +92,7 @@ The repository does not meet these yet. A line is deleted when it becomes
 true. Until then the older rule in `AGENTS.md` or `CONTRIBUTING.md` applies to
 what that line names and to nothing else.
 
-- `docs/`, `.claude/decisions/` and `.claude/roadmap/` are in the tree, and
-  `AGENTS.md`, `scripts/check_layering.py` and `scripts/check_roadmap.py`
-  read them (§1).
-- `AGENTS.md` is over 200 lines: its subject-ownership rules leave with
-  `docs/` for the wiki (§1).
+- `AGENTS.md` is over 200 lines (§1).
 - `scripts/` holds loop, evidence and receipt tooling with its own fixtures
   and tests (§3).
 - Some names pass 60 characters (§4).

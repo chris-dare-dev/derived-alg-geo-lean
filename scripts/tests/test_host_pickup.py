@@ -193,7 +193,7 @@ class HostPickupTests(unittest.TestCase):
 
     def test_runner_registers_to_private_mirror_with_owner_lane_label(self) -> None:
         # The public repository must keep ZERO runner registrations: a pull
-        # request there can edit its own `runs-on` (docs/ci/owner-lane.md).
+        # request there can edit its own `runs-on` (wiki page CI-Owner-Lane).
         self.assertNotEqual(host_pickup.REPOSITORY, "chris-dare-dev/derived-alg-geo-lean")
         with tempfile.TemporaryDirectory() as directory:
             base, _, _ = fixture(Path(directory))

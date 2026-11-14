@@ -13,11 +13,15 @@
 overrides this file; for a rule on its "Not yet met" list, this file still
 applies. [`CONTRIBUTING.md`](CONTRIBUTING.md) owns the human-facing workflow and
 the verified table of local and CI gates.
+Architecture notes, CI notes, decision records and roadmaps live in the
+[wiki](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki); an agent
+reads a page as markdown at
+`https://raw.githubusercontent.com/wiki/chris-dare-dev/derived-alg-geo-lean/<Page>.md`.
 
 ## Mathematical ownership
 
-Read the [ownership policy](docs/architecture/mathematical-ownership.md) and the
-[placement procedure](docs/architecture/placement.md) before adding a public
+Read the [ownership policy](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Mathematical-Ownership) and the
+[placement procedure](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Placement) before adding a public
 root, extending a known mixed module, or moving declarations.
 
 - A direct extension of a Mathlib API follows that API's pinned owner; a new
@@ -48,7 +52,7 @@ root, extending a known mixed module, or moving declarations.
   executable-only `exe/RestateHistoricalNames.lean`, never through import shims
   at retired paths. A loop run never edits `AGENTS.md` or `CLAUDE.md`; it lists
   each line its change makes stale in the pull request and its final report.
-- The [cutover ledger](docs/architecture/cutover-ledger.md) records current and
+- The [cutover ledger](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Cutover-Ledger) records current and
   target owners. A pending move is not an implemented path, and a passing gate
   does not certify a new boundary: add focused checks with each move.
 
@@ -79,10 +83,11 @@ under `DerivedAlgGeo/`, in that API's namespace. Nothing else decides it: not
 the abstraction level, the weakest vocabulary in the signature, the motivation,
 the first consumer or the proof technique. An instance of a Mathlib class for a
 Mathlib object lives with the object (`Abelian X.Modules` with `X.Modules`).
-The Tier 1 table in `docs/architecture/placement.md` lists the extended APIs.
+The Tier 1 table on the [placement page](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Placement) lists
+the extended APIs.
 
 **Tier 2.** A subject Mathlib lacks follows the nearest Mathlib precedent (the
-Tier 2 table in `placement.md`):
+Tier 2 table on the placement page):
 - a structure on an abstract triangulated category goes to
   `CategoryTheory/Triangulated/<Name>/`;
 - a weakened or strengthened variant goes to a child directory named by the
@@ -191,7 +196,7 @@ Lean enforces acyclicity. `scripts/check_layering.py` enforces these edges:
 
 ## Stacks and moduli
 
-The [stacks and moduli decision record](.claude/decisions/ADR-0014-stacks-and-moduli-ownership.md)
+The [stacks and moduli decision record](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Decision-ADR-0014-Stacks-And-Moduli-Ownership)
 fixes these; cite it rather than re-deciding them.
 
 - Every stack is a `CategoryTheory.StackInGroupoids`; fibred categories are
@@ -223,7 +228,7 @@ child; never relax coverage globally.
 - Prefer the narrowest import and the nearest umbrella; use Mathlib's namespace
   for an extension of a Mathlib API.
 - Before introducing a public structure, class, quotient carrier or category,
-  follow [`abstraction-tree.md`](docs/architecture/abstraction-tree.md): one
+  follow [abstraction tree](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Abstraction-Tree): one
   canonical root, reached by an instance, projection, abbreviation or proved
   comparison.
 - Split a file that mixes a foundation, its application and their comparison

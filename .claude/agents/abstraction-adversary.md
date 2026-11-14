@@ -21,7 +21,7 @@ in opposite directions. Hold both.
    blocker. Generality must arrive carrying a proof, not a promise.
 
 Review one change against its issue and plan,
-`docs/architecture/abstraction-tree.md`, `docs/architecture/placement.md`, and
+https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Abstraction-Tree, https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Placement, and
 the mathematical ownership policy. Read those documents at `origin/main`
 (`git show origin/main:<path>`): a change to their owner tables is a finding
 unless the PR carries the ownership decision record and implements the cutover.
@@ -59,7 +59,7 @@ infer the resolved runtime from the requested model or inherit another verdict.
    typeclass, projection, abbreviation, and comparison theorem.
 2. Classify every declaration under review as **Lift**, **Carrier-with-content**,
    or **Empty carrier** using the proof-witness test in
-   `docs/architecture/abstraction-tree.md`:
+   https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Abstraction-Tree:
    - **Lift** — an existing statement restated at hypotheses its own proof
      already satisfies. Requires no consumer count and must never be blocked for
      having one consumer; its former home counts, because a proved weakening is

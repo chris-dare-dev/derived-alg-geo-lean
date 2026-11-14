@@ -42,7 +42,7 @@ HOST_MEMORY_HEADROOM = 8 * GIB
 HOST_DISK_HEADROOM = 8 * GIB
 # Owner runners register to the PRIVATE mirror, never to the public repository:
 # a pull request there can edit its own `runs-on`, so any runner registered
-# there is reachable by untrusted code. See docs/ci/owner-lane.md.
+# there is reachable by untrusted code. See https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/CI-Owner-Lane.
 REPOSITORY = "chris-dare-dev/derived-alg-geo-lean-ci"
 # Every owner runner carries this label; the mirror's OWNER_CI_RUNS_ON variable
 # routes `ci.yml` to it.

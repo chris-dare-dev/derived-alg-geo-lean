@@ -60,9 +60,7 @@ not an upper bound. -->
 - Not taken as a field, instance or hypothesis: <the result itself, existence, preservation, descent, algebraicity>
 
 ## Dependencies
-- Blocked by #n: <what it supplies>. On a roadmap-owned milestone, open the
-  matching `.claude/roadmap/*.yaml` PR as soon as you add the GitHub blocked-by
-  link; CI's `roadmap` job fails every open PR until they agree.
+- Blocked by #n: <what it supplies>. Add it as a GitHub blocked-by link too.
 - Independent of #m: <why, where it might look dependent>
 - Consumed by #k
 

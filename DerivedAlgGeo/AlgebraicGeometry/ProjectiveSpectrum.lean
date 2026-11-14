@@ -11,9 +11,7 @@ import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.StructureSections
 
 Mathlib supplies `AlgebraicGeometry.Proj` as a scheme, its standard affine charts, their affine
 cover, and the structure map to `AlgebraicGeometry.Spec` of the degree-zero ring. This library
-develops further geometric and module-sheaf results on those charts. See the
-[affine and projective spectrum placement map](../../docs/architecture/placement.md) for the
-pinned owners and the concrete connection to the affine module API.
+develops further geometric and module-sheaf results on those charts.
 
 ## Main definitions
 
@@ -48,8 +46,6 @@ ordinary localization at the homogeneous element.
 * [Stacks, Tag 01M3: Proj of a graded ring, standard affine charts, and the map to
   `Spec A₀`](https://stacks.math.columbia.edu/tag/01M3).
 * [nLab: projective schemes](https://ncatlab.org/nlab/show/projective+scheme).
-* See the [affine and projective spectrum placement map](../../docs/architecture/placement.md)
-  for pinned Mathlib source links.
 
 ## Tags
 

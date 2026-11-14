@@ -43,7 +43,7 @@ not on `master`, and that is the point of a release tag, not a defect.
 
 The reachability test needs `gh` and the network. Without either it prints
 NOT_RUN and says why; it does not print PASS. `--require-api` turns that into
-exit 1, and CI passes it, matching `check_roadmap.py`. A definite negative is a
+exit 1, and CI passes it. A definite negative is a
 FAIL either way: being told "this commit is not on the trunk" is an answer, not
 a failure to look.
 

@@ -230,7 +230,6 @@ gate coherent-families python3 scripts/check_coherent_families.py
 gate coverage-map python3 scripts/check_coverage_map.py
 # No `--require-api`, matching gates.sh: offline this reports NOT_RUN and
 # passes, which is the script's documented local contract. CI passes the flag.
-gate roadmap python3 scripts/check_roadmap.py
 
 # Everything above is a gate borrowed from scripts/gates.sh by name. Snapshot the
 # list before adding the two that are precheck's own.
