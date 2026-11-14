@@ -5,13 +5,13 @@ Algebra	CategoryTheory.DGFunctor.IsQuasiEquivalence	recorded before the reason c
 Algebra	CategoryTheory.DGFunctor.PreservesConeTriangles	the weak exactness seam; `preservesConeTriangles_of_preservesChosenCones` derives it from the strong split-cone witness, as its docstring states
 Algebra	CategoryTheory.DerivedCategory.OppositeComparison	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.Enhancement	recorded before the reason column existed; reason not yet written
-Algebra	CategoryTheory.HasCopowers	a Mathlib-style mere-existence capability (abstraction-tree.md:220), discharged by a consumer's dg category rather than instantiated here; the `AddCommGrp` tower it heads serves object twists, distinct from the `ModuleCat k` tower under `HasLinearCopowers`
-Algebra	CategoryTheory.HasEvaluationData	`hasEvaluationDataOfHasCopowers` is the derivation from the stronger capability; abstraction-tree.md calls it the narrower capability object twists need
+Algebra	CategoryTheory.HasCopowers	a Mathlib-style mere-existence capability (per the wiki's abstraction tree), discharged by a consumer's dg category rather than instantiated here; the `AddCommGrp` tower it heads serves object twists, distinct from the `ModuleCat k` tower under `HasLinearCopowers`
+Algebra	CategoryTheory.HasEvaluationData	`hasEvaluationDataOfHasCopowers` is the derivation from the stronger capability; the wiki's abstraction tree calls it the narrower capability object twists need
 Algebra	CategoryTheory.HasLinearCopowers	`Cdg (ModuleCat k)` is the one concrete dg category model so far; a second model would supply a second [adoption pending, tracked in the single-instantiation follow-up]
 Algebra	CategoryTheory.HasLinearEvaluationData	the k-linear counterpart, derived by `hasLinearEvaluationDataOfHasLinearCopowers`
 Algebra	CategoryTheory.IsCopowerOf	characterises the copower rather than building it; `copowerIsCopower` is the selector's witness
 Algebra	CategoryTheory.KFlatResolution	the K-flat model #1348 deliberately separated from derived base change; supplied at schemes as the `SchemeKFlatResolution` abbrev
-Algebra	CategoryTheory.LinearCopowerData	the k-linear enrichment of `CopowerData` over `ModuleCat k` cochains, per abstraction-tree.md; `linearCopowerData` is its selector
+Algebra	CategoryTheory.LinearCopowerData	the k-linear enrichment of `CopowerData` over `ModuleCat k` cochains, per the wiki's abstraction tree; `linearCopowerData` is its selector
 CategoryTheory	CategoryTheory.MonoidalCategory.IsCompatibleWithTriangulation	recorded before the reason column existed; reason not yet written
 CategoryTheory	CategoryTheory.ObjectProperty.OnTriangle	a three-field spelling of `P` on all three vertices; built inline at `liftTriangle` call sites, and named at one geometric site so far [adoption pending, tracked in the single-instantiation follow-up]
 CategoryTheory	CategoryTheory.Pretriangulated.Axioms	recorded before the reason column existed; reason not yet written

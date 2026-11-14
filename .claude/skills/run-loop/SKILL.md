@@ -101,15 +101,15 @@ below.
       handoff, and a parked draft PR is an earlier attempt: continue on its
       branch with its open findings.
    2. Dependencies. Resolve native blocked-by links, "blocked by" and "depends
-      on" prose, and roadmap ids (`.claude/roadmap/*.yaml`) to issue numbers and
-      their states.
+      on" prose, and roadmap ids (the wiki's Roadmap pages) to issue numbers
+      and their states.
    3. Paths and names. Every `DerivedAlgGeo/...` path the issue names exists on
       `origin/main` (`git cat-file -e origin/main:<path>`) unless the issue
       creates it. Every Mathlib path and declaration it says exists is at the
       pin. Every declaration it asks you to create does not exist yet.
    4. Placement. Its files and namespaces agree with the placement rules in
-      AGENTS.md, the owner tables in `docs/architecture/placement.md` and the
-      owners in `docs/architecture/cutover-ledger.md`.
+      AGENTS.md, the owner tables in https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Placement and the
+      owners in https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Cutover-Ledger.
    5. Kind of work. If the definition of done needs an owner-only decision, or
       targets tooling `main` has retired (OpenSpec changes, loop manifests, review
       ledgers, the manifest controller), it is false as written. Land any part that is
@@ -222,8 +222,6 @@ below.
    - Push the branch after each commit. After the first push, bring in
      `origin/main` by merging, never by rebasing. A push starts no CI until the
      PR exists.
-   - If the issue has an entry under `.claude/roadmap/`, advance it in the same
-     change. CI's `roadmap` job requires this.
 3. **Review.** Commit, update the PR description draft (the plan, what changed,
    every decision, every claim), and dispatch four reviewers on that commit:
    `mathematics-adversary`, `repository-boundary-adversary`,
@@ -459,8 +457,8 @@ Never:
 ## Stay on the issues
 
 - Do not change the loop's own tooling and instructions during a run unless the
-  owner put that work in the queue. That means `.claude/` (except
-  `.claude/roadmap/`), `.agents/`, `.codex/`, `.github/`,
+  owner put that work in the queue. That means `.claude/`, `.agents/`,
+  `.codex/`, `.github/`,
   `AGENTS.md`, `CLAUDE.md`, and `scripts/` (except the baseline and census
   records). If the tooling gets in your way, work around it or park the issue,
   and describe the problem in the final report.

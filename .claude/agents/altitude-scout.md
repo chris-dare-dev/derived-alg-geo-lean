@@ -69,10 +69,9 @@ useful; an uncapped one that never finishes is not.
 
 ## Output
 
-Append one row per candidate to `docs/architecture/generalization-backlog.md`
+Append one row per candidate to https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Generalization-Backlog
 in the schema that file defines, with state `UNVERIFIED`, `found by:
-altitude-scout`, and the pin line above. You may also add one `assumptions:`
-entry to the owning `.claude/roadmap/<slug>.yaml`.
+altitude-scout`, and the pin line above.
 
 Then return a short summary: the candidates, their pin status, and the sources
 you worked. No verdict. No severity. Nothing that reads like a gate.

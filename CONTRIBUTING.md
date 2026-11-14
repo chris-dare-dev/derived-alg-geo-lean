@@ -12,9 +12,9 @@ libraries or restore retired repository roots; a new top-level subject must be
 a Mathlib subject and is added to `scripts/check_layering.py` by name.
 
 The placement rule has two tiers, stated in full in
-[placement.md](docs/architecture/placement.md). The subject/application
+[placement](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Placement). The subject/application
 boundaries and compact issue/PR decision record are maintained in
-[mathematical-ownership.md](docs/architecture/mathematical-ownership.md).
+[mathematical ownership](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Mathematical-Ownership).
 `AGENTS.md`, which `CLAUDE.md` imports, summarizes the same rules for coding
 agents.
 
@@ -66,7 +66,7 @@ existing umbrellas. A neutral core may omit an application only with a
 documented exact exception in the coverage gate and another stable export/build
 route for that application. Check transitive imports through umbrellas.
 
-The dependency contract is `docs/architecture/layers.md`: only
+The dependency contract is https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Layers: only
 `AlgebraicGeometry/` and `Development/` import geometry, `Development/` is a
 leaf, geometry outside the eight subcomponents that exist to consume stability
 never reaches the stability tree, weak stability never imports Bridgeland
@@ -94,12 +94,12 @@ this repository extends it under `Algebra/Homology/DerivedCategory/`, geometry
 proves `Abelian (Coh X)` and defines `Dᵇ(Coh X)` as an abbreviation under
 `AlgebraicGeometry/DerivedCategory/`. Keep the bounded-coherent and
 compact/perfect identifications in `Dqc.lean` as explicit propositions, and
-read the perfect-complex ledger in `docs/architecture/placement.md` before
+read the perfect-complex ledger in https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Placement before
 relating perfect notions.
 
 ## Choose the common root before the leaf
 
-Read [the canonical-root policy](docs/architecture/abstraction-tree.md) before
+Read [the canonical-root policy](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Abstraction-Tree) before
 adding a public structure, class, quotient carrier, category, or parallel
 presentation of an existing object.  The pull request must name the canonical
 root and explain how the specialization projects or compares to it.
@@ -215,13 +215,10 @@ in loop runs:
 Before filing, check what the run's readiness step will check: dependencies
 resolve to issue numbers, every path and name the issue cites exists at the pin
 (or is marked absent), and the placement agrees with
-`docs/architecture/placement.md`. The filing agent does this, not the owner.
+https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Placement. The filing agent does this, not the owner.
 
-On a roadmap-owned milestone, a new issue needs its `.claude/roadmap/*.yaml`
-entry, and a native blocked-by link must match its entry's `blocked_by`. CI's
-`roadmap` job reads the live tracker (RM-05, RM-06) and fails every open pull
-request until the two agree, so open the roadmap PR immediately after filing
-or linking, and merge it first.
+Roadmaps live in the [wiki](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki); GitHub blocked-by links are the
+authoritative dependency record, and a roadmap page follows them.
 
 Labels never gate a loop run. `blocked` follows the blocked-by links;
 `research` means the first deliverable is a written verdict in the issue
@@ -237,7 +234,7 @@ fill it in:
 **Source.** <Versioned reference(s), sections and theorem range, conventions
 every issue shares.> Pins: the Mathlib revision in `lake-manifest.json`.
 
-**Roadmap.** `.claude/roadmap/<file>.yaml`, entry `<id>` (or "none").
+**Roadmap.** The wiki Roadmap page and entry (or "none").
 
 **Issues.** GitHub blocked-by links decide the order; this list only
 summarises them.
@@ -376,11 +373,8 @@ dates.
 
 Prose in the tree is limited to the files `CREDO.md` lists. Reviews, handoffs,
 loop specifications and change proposals go in the issue or the pull request,
-not in a file. Architecture notes and decision records are moving to the wiki.
-Until `CREDO.md` drops that line from "Not yet met", change
-`docs/architecture/` and `.claude/decisions/` only in the pull request that
-changes the code they describe; a decision with no code yet stays in its
-issue.
+not in a file. Architecture notes, CI notes, decision records and roadmaps live
+in the [wiki](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki); a decision with no code yet stays in its issue.
 
 Build generated API documentation through the nested package:
 
@@ -398,7 +392,7 @@ checkout — not when a local `scripts/gates.sh` goes green, which is neither
 permitted here nor sufficient.
 
 Mark completed and newly confirmed ownership defects in
-`docs/architecture/cutover-ledger.md`. Do not use the ledger as an exception:
+https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Cutover-Ledger. Do not use the ledger as an exception:
 new declarations must go directly to their canonical owner.
 
 Identify each path as current, confirmed target or proposed split. Use the

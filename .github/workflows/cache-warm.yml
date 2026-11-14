@@ -30,7 +30,6 @@ on:
       - 'docs/**'
       - 'notes/**'
       - 'openspec/**'
-      - '.claude/roadmap/**'
       - '.claude/**/*.md'
       - '*.md'
   workflow_dispatch:

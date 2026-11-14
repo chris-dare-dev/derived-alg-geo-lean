@@ -79,6 +79,6 @@ production reuse. The complete-graph and complete-change flags are caller
 assertions, not validated graph or diff provenance. This tooling does not edit
 workflows, caches or checks.
 
-The dated [CI baseline](../../docs/ci/performance-baseline-2026-09-27.md)
-and [bounded audit batch probe](../../docs/ci/audit-batch-probe-2026-09-27.md)
+The dated [CI baseline](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/CI-Performance-Baseline-2026-09-27)
+and [bounded audit batch probe](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/CI-Audit-Batch-Probe-2026-09-27)
 give the measured context and remaining cold/full parity obligation for #1440.

@@ -54,7 +54,7 @@ infer the resolved runtime from the requested model or inherit another verdict.
    source isolation, pin discipline, generated-code ownership, and
    whether new declarations are reachable from the intended umbrella module.
    Judge placement against
-   `git show origin/main:docs/architecture/placement.md`; a change to its owner
+   `git show origin/main:https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Placement`; a change to its owner
    tables is a finding unless the PR carries the ownership decision record and
    implements the cutover.
 3. Check the local gates at the reviewed commit: the `GATE` lines of
