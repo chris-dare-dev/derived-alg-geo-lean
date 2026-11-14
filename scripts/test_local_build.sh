@@ -166,6 +166,10 @@ hook_case allow  'hook passes a heredoc to git'       $'git commit -F - <<\'EOF\
 hook_case refuse 'hook blocks a heredoc to a shell'   $'sh <<\'EOF\'\nscripts/gates.sh\nEOF'
 hook_case refuse 'hook blocks bash -c with a pipe'    "bash -c 'cd x | scripts/gates.sh'"
 hook_case refuse 'hook blocks a quoted substitution'  'echo "$(scripts/gates.sh)"'
+# Staging, committing or listing the file is data; an alias is still a run.
+hook_case allow  'hook passes git add of gates.sh'    'git add scripts/gates.sh lakefile.toml'
+hook_case allow  'hook passes printf of gates.sh'     "printf '%s\n' scripts/gates.sh > paths.txt"
+hook_case refuse 'hook blocks a git alias to gates.sh' "git -c alias.g='!scripts/gates.sh' g"
 
 # The replacement the refusal points at. `precheck.sh` runs the no-build subset
 # and a targeted build; refusing it would leave the skills with no pre-flight at

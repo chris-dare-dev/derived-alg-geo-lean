@@ -265,8 +265,8 @@ def threads_offence(value: str | None) -> str | None:
 # command word that mentions `gates.sh` is still refused, which is the safe
 # direction for a check whose job is refusing things.
 READERS = {
-    "awk", "bat", "cat", "cut", "diff", "egrep", "fgrep", "file",
-    "grep", "head", "less", "ls", "md5sum", "more", "nl", "rg", "sed",
+    "awk", "bat", "cat", "cut", "diff", "echo", "egrep", "fgrep", "file",
+    "grep", "head", "less", "ls", "md5sum", "more", "nl", "printf", "rg", "sed",
     "sha256sum", "shellcheck", "sort", "stat", "tail", "uniq", "wc",
 }
 
@@ -275,10 +275,12 @@ READERS = {
 # the worst version of the thing this gate refuses, and `git rebase --exec`,
 # `git submodule foreach` and `git filter-branch` all execute too. An allow-list
 # of subcommands keeps the probe in .claude/skills/land-pr working without
-# opening that door.
+# opening that door. The index and history commands from `add` on take a path
+# as data -- staging, committing or deleting `scripts/gates.sh` runs nothing.
 GIT_READ_SUBCOMMANDS = {
     "blame", "cat-file", "diff", "grep", "log", "ls-files", "ls-tree",
     "rev-parse", "show", "status",
+    "add", "checkout", "commit", "mv", "reset", "restore", "rm", "stash",
 }
 
 # A leading `VAR=value` is an environment assignment, not the command.
