@@ -16,16 +16,12 @@ is proved unconditionally, and the equivalence is derived from one named input,
 
 ## Main definitions
 
-* `CategoryTheory.Cdg.HasKInjectiveResolutions`: every cochain complex has a
-  quasi-isomorphism to a K-injective one.
 * `CategoryTheory.Cdg.derivedSeamFunctor`: the comparison `H⁰(D^dg A) ⥤ D(A)`.
 * `CategoryTheory.Cdg.derivedSeam`: the equivalence `H⁰(D^dg A) ≌ D(A)`, given
   resolutions.
 
 ## Main results
 
-* `CategoryTheory.Cdg.hasKInjectiveResolutions_of_isGrothendieckAbelian`:
-  resolutions exist in a Grothendieck abelian category.
 * `CategoryTheory.Cdg.derivedSeamFunctor_map_bijective`: the comparison is
   bijective on morphisms, unconditionally.
 * `CategoryTheory.Cdg.derivedSeamFunctor_essSurj`: it is essentially surjective,
@@ -67,7 +63,10 @@ instance for module sheaves on a scheme.
 ### The input, and the line it must not cross
 
 `HasKInjectiveResolutions` asks exactly for the existence of resolutions:
-every cochain complex admits a quasi-isomorphism to a K-injective one. It is a
+every cochain complex admits a quasi-isomorphism to a K-injective one. The class
+and its Grothendieck instance live in
+`Algebra/Homology/HomotopyCategory/KInjective/Resolution.lean`, outside the dg
+subtree, so that consumers without dg material can use them. It is a
 real statement about `A`, proved for Grothendieck abelian categories, and a
 caller supplying it for another category is asserting a theorem, not a
 convenience.
@@ -114,29 +113,6 @@ variable {A : Type u} [Category.{v} A] [Abelian A]
 complexes, as a dg functor. -/
 abbrev ddgInclusion : DGFunctor (Ddg A) (Cdg A) :=
   DGFullSubcategory.iota (IsKInjectiveObj (A := A))
-
-variable (A) in
-/-- **Every cochain complex admits a K-injective resolution.**
-
-The one input of this file. Mathlib proves it only for bounded-below
-complexes; for Grothendieck abelian categories it is the instance
-`hasKInjectiveResolutions_of_isGrothendieckAbelian`, Spaltenstein's
-construction.
-
-Stated as a quasi-isomorphism into a K-injective complex — the mathematics —
-rather than as any claim about the comparison functor below. See the module
-docstring on why that distinction is load-bearing. -/
-class HasKInjectiveResolutions : Prop where
-  /-- Every cochain complex has a quasi-isomorphism to a K-injective one. -/
-  exists_kInjective_quasiIso (K : CochainComplex A ℤ) :
-    ∃ (L : CochainComplex A ℤ) (_ : L.IsKInjective) (f : K ⟶ L), QuasiIso f
-
-/-- **K-injective resolutions exist in a Grothendieck abelian category** (Stacks,
-Theorem 19.12.6, Tag 079P): `CochainComplex.kInjectiveResolution`. -/
-instance hasKInjectiveResolutions_of_isGrothendieckAbelian [IsGrothendieckAbelian.{w} A] :
-    HasKInjectiveResolutions A where
-  exists_kInjective_quasiIso K :=
-    ⟨_, inferInstance, (kInjectiveResolutionι A).app K, inferInstance⟩
 
 variable [HasDerivedCategory.{v} A]
 
