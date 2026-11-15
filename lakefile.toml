@@ -37,6 +37,9 @@ rev = "5ddf2536e5e57097e568b63b9de06ec00fc8930d"
 
 [[lean_lib]]
 name = "DerivedAlgGeo"
+# Measurement only, not for merge: every Mathlib standard-set linter on, with the
+# 1500-line file limit Mathlib sets for itself, so the warning log counts each one.
+leanOptions = { weak.linter.mathlibStandardSet = true, weak.linter.style.longFile = 1500 }
 
 # Sweep umbrella for `lake exe emit`. Separate from the stable umbrella because
 # the sorry gate must cover development probes that the public umbrella
