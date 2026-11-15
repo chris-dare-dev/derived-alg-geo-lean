@@ -20,7 +20,7 @@ injective objects such that every morphism `E i ⟶ I` is null-homotopic is
 K-injective (Stacks, Lemma 19.12.3, Tag 079L).
 
 The family is a parameter. A family of bounded-above acyclic complexes of
-bounded size with this detecting property is Stacks, Lemma 19.12.1 (Tag 079J),
+bounded size with this detecting property is Stacks, Lemma 19.12.2 (Tag 079K),
 and the literal form of 079L follows by specializing to it.
 
 ## Main definitions
