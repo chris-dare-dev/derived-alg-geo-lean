@@ -216,11 +216,11 @@ fixes these; cite it rather than re-deciding them.
 
 ## Umbrellas
 
-Every non-leaf directory normally has a same-named umbrella re-exporting its
-direct children, and a neutral core never imports applications through it.
-Register each exact umbrella/child exception in
-`scripts/check_umbrella_coverage.py`, with another stable route for the omitted
-child; never relax coverage globally.
+Every non-leaf directory has a same-named umbrella re-exporting its direct
+children, unless a child imports that file, which then owns what they build on;
+the gate reads owners from the import graph. A neutral core never imports
+applications through an umbrella. The one umbrella/child exception is pinned in
+`scripts/check_umbrella_coverage.py`; never relax coverage globally.
 
 ## Editing rules
 
