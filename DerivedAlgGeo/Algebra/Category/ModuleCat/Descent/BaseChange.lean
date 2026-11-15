@@ -2,7 +2,6 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import Batteries.Tactic.OpenPrivate
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Pseudofunctor
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.DescentDataAsCoalgebra
 import Mathlib.Algebra.Category.Ring.Constructions
@@ -38,7 +37,8 @@ None.
 
 ## Implementation notes
 
-The components of `Pseudofunctor.baseChange` are first rewritten into extension and restriction
+The components of `Pseudofunctor.baseChange`, given by
+`Pseudofunctor.baseChange_toNatTrans_app`, are first rewritten into extension and restriction
 of scalars, with the compositors of the pseudofunctor replaced by named components of
 `ModuleCat.extendScalarsComp`. Naming these components keeps the kernel from unfolding them when
 it compares the two descriptions. The resulting map is then evaluated on `1 ⊗ m`, which
@@ -54,35 +54,10 @@ determines it by `R₁`-linearity.
 module, base change, pushout, extension of scalars, Beck–Chevalley
 -/
 
-universe v' v u' u
+universe v u' u
 
 open CategoryTheory Bicategory Opposite Limits ModuleCat
 open scoped TensorProduct ChangeOfRings
-
-namespace CategoryTheory.Pseudofunctor
-
-open private baseChangeApp twist adjOfCat pushforward from
-  DerivedAlgGeo.CategoryTheory.Sites.Descent.DescentDataAsCoalgebra
-
-variable {C : Type u} [Category.{v} C] (F : LocallyDiscrete Cᵒᵖ ⥤ᵖ Adj Cat.{v', u'})
-  {X₁ X₂ S : C} {f₁ : X₁ ⟶ S} {f₂ : X₂ ⟶ S} (h : ChosenPullback f₁ f₂)
-
-/-- The components of `Pseudofunctor.baseChange`. -/
-private lemma baseChange_toNatTrans_app (M : (F.obj (.mk (op X₂))).obj) :
-    (F.baseChange h).toNatTrans.app M =
-      (Adjunction.ofCat (F.map h.p₁.op.toLoc).adj).unit.app _ ≫
-        (F.map h.p₁.op.toLoc).r.toFunctor.map
-          ((((F.comp Adj.forget₁).mapComp' f₁.op.toLoc h.p₁.op.toLoc h.p.op.toLoc
-              (by rw [← Quiver.Hom.comp_toLoc, ← op_comp, h.hp₁])).inv.toNatTrans.app _ ≫
-            ((F.comp Adj.forget₁).mapComp' f₂.op.toLoc h.p₂.op.toLoc h.p.op.toLoc
-              (by rw [← Quiver.Hom.comp_toLoc, ← op_comp, h.hp₂])).hom.toNatTrans.app _) ≫
-            ((F.comp Adj.forget₁).map h.p₂.op.toLoc).toFunctor.map
-              ((Adjunction.ofCat (F.map f₂.op.toLoc).adj).counit.app M)) := by
-  dsimp only [Pseudofunctor.baseChange]
-  unfold baseChangeApp twist adjOfCat pushforward
-  rfl
-
-end CategoryTheory.Pseudofunctor
 
 namespace CommRingCat
 
