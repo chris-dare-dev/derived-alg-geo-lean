@@ -96,10 +96,9 @@ excluded point of `wall_eq_of_meet`.
 
 The `(s, t)` half plane, the twisted charge, and the wall and chamber structure
 are Macrì–Schmidt, *Lectures on Bridgeland Stability* (`arXiv:1607.01262v3`),
-§6.4 — there in the `(α, β)` coordinates. The manuscript is pinned as
-`registry/coverage-1607.01262.json`, **at status `target` throughout**: naming
-it here says where a reader can find the surrounding theory, and asserts no
-correspondence between any declaration below and any statement of it.
+§6.4 — there in the `(α, β)` coordinates. Naming it here says where a reader
+can find the surrounding theory, and asserts no correspondence between any
+declaration below and any statement of it.
 
 The primary artifacts stay primary. For the surface construction that is
 Arcara–Bertram and, on a K3, Bridgeland `math/0307164` §6; the nested-wall
