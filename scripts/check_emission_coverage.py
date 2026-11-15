@@ -18,10 +18,8 @@ environment it sweeps is a property of one import line.
 `importModules #[{module := rootLib}]`. The `additionalRoots` argument widens the
 scope filter, not the import. So a library root that no import reaches is not
 "partially covered" or "reported missing": it contributes zero constants, the
-emitter finds zero sorries in it, and the run is green. Measured on 2026-08-14
-before #361, the emission covered 406 of 419 tracked modules -- the dg-category
-subsystem, development probes, and the former vendor umbrella were absent, with
-nothing in CI saying so. The vendor root has since been retired.
+emitter finds zero sorries in it, and the run is green, with nothing in CI
+saying a whole subsystem was never looked at.
 
 A gate that can shrink to nothing while still passing is the vacuous pass this
 repository's attestation design exists to make impossible. This script is the

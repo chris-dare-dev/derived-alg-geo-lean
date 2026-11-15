@@ -1,23 +1,24 @@
 #!/usr/bin/env python3
-"""Require same-named umbrellas to import every direct child.
+"""Every umbrella re-exports all of its direct children.
 
-Every file beside a same-named directory is an umbrella by default. Genuine
-declaration owners (whose children contain consequences, not exports) need an
-explicit, source-pinned witness below. A changed owner is reviewed again before
-its SHA-256 is updated; the gate never guesses ownership from source regexes.
+The file `Foo.lean` beside a directory `Foo/` is that directory's umbrella,
+unless one of `Foo/*.lean` imports it, directly or not. Then Lean's acyclicity
+forbids the re-export, `Foo.lean` owns declarations its children build on, and
+`check_root_reachability.py` makes sure those children are still reached from
+the public root. Nothing lists the owners; the import graph decides. One
+umbrella/child boundary is explicit, and the gate pins it exactly.
 
 Imports come from the pinned Lean executable's ``--deps-json --stdin`` header
 parser, not a Python approximation of Lean comments, strings, or interpolation.
 Only records marked ``isExported`` count: under a ``module`` header a plain
 ``import`` is available locally but does not re-export the child.
-All candidate paths are parsed in one invocation, and any parser error or
+All library modules are parsed in one invocation, and any parser error or
 unexpected JSON shape fails the gate. This checks *header imports*, not Lean
-elaboration or transitive reachability.
+elaboration.
 """
 
 from __future__ import annotations
 
-import hashlib
 import json
 import pathlib
 import subprocess
@@ -29,64 +30,6 @@ from _output import force_utf8_output
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
-
-class OwnerWitness(NamedTuple):
-    # One manually reviewed source declaration, plus the complete source digest.
-    # The digest makes removal or movement of the declaration fail closed until
-    # the exception is re-reviewed. A textual line alone is not a Lean lexer.
-    line: int
-    declaration: str
-    sha256: str
-
-
-# Complete reviewed exception list at f4c5af5f. Each witness is a code line,
-# not doc text. Re-review any changed source before refreshing its digest.
-DECLARATION_OWNERS: dict[str, OwnerWitness] = {
-    "DerivedAlgGeo.Algebra.Homology.DGCategory.FullSubcategory": OwnerWitness(
-        67, "def DGFullSubcategory {C : Type u} (P : C → Prop) : Type u := {X : C // P X}",
-        "39c54497bfb0fbf27ed16a96ab4f0b327e1ba9c7b2225eeb7bbc6d841532923e",
-    ),
-    "DerivedAlgGeo.Algebra.Homology.DerivedCategory.BoundedAboveProjective": OwnerWitness(
-        29, "def boundedAboveProjectiveHomotopy",
-        "ea9403b114a6ceb02a0fdefbd57d4d566709302083a158daafe63ad7be730a88",
-    ),
-    "DerivedAlgGeo.Algebra.Homology.DerivedCategory.CohomologyObjectProperty": OwnerWitness(
-        63, "def cohomologyIn (P : ObjectProperty A) : ObjectProperty (DerivedCategory A) :=",
-        "f6b638dcf86abf6c283430e653c272d8fd954ab8505861b8e4427c71db040572",
-    ),
-    "DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor": OwnerWitness(
-        68, "noncomputable def Adjunction.mapHomologicalComplex {F : A ⥤ B} {G : B ⥤ A}",
-        "34a6eada3b3f4c38e7dbc028d121c29e488d800d85c3539ec1655ae79f51f7c7",
-    ),
-    "DerivedAlgGeo.Algebra.Homology.DerivedCategory.GrothendieckGroup": OwnerWitness(
-        39, "noncomputable abbrev boundedHomologyFunctor (n : ℤ) : Bounded A ⥤ A :=",
-        "9512f4eb76fceff99bfa01d62b407c6802d97b44c0978e757173f8c083baf928",
-    ),
-    "DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc": OwnerWitness(
-        121, "def schemeQuasicoherentCohomology (X : Scheme.{u}) :",
-        "aca78a7474af4863f040c5f164f0953afeb24cbc4173959f181c8988a139d4b3",
-    ),
-    "DerivedAlgGeo.AlgebraicGeometry.Modules.ExteriorPower": OwnerWitness(
-        38, "noncomputable def exteriorPower (E : X.Modules) (n : ℕ) : X.Modules :=",
-        "19290a0c4f31c13adce63d9f0383a3befa8d39f15059bdd4db594a6301f3c9a6",
-    ),
-    "DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids": OwnerWitness(
-        73, "structure StackInGroupoids (C : Type u) [Category.{v} C]",
-        "8131106ea52b25b007e8bf4ec6a46c2af9a7b9ddfc15668c94104a43ce258879",
-    ),
-    "DerivedAlgGeo.CategoryTheory.Triangulated.CompactlyGenerated": OwnerWitness(
-        62, "inductive coprodClosure (P : ObjectProperty C) : ObjectProperty C",
-        "efed94e7b7375f09146d24476030591e43597717a12ca78fc7cda3207d7055ef",
-    ),
-    "DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing": OwnerWitness(
-        37, "structure HNFiltration (P : ℝ → ObjectProperty C) (E : C)",
-        "25bf8a6514b3969583fded99bc645bf5d0e52ae2691aca048f493245da34a554",
-    ),
-    "DerivedAlgGeo.Topology.Sheaves.ModuleTensor": OwnerWitness(
-        29, "lemma W_whiskerLeft_of_isIso_stalk",
-        "100432a9057017e6746e5b6f771a71a67c744a1cb52fa096f345f17c081a53d9",
-    ),
-}
 
 # Exact umbrella/child boundary. The top-level AlgebraicGeometry umbrella
 # exports this Stability child; the layering gate checks the neutral direction.
@@ -178,86 +121,90 @@ def lean_header_imports(paths: list[pathlib.Path]) -> dict[pathlib.Path, HeaderI
     return imports_by_path
 
 
+def direct_children(directory: pathlib.Path, root: pathlib.Path = ROOT) -> dict[str, pathlib.Path]:
+    # `Foo/*.lean` includes `Foo/Bar.lean`, the file beside each subdirectory.
+    return {module_name(path, root): path for path in sorted(directory.glob("*.lean"))}
+
+
+def import_closure(imports: dict[str, set[str]]) -> dict[str, set[str]]:
+    """Every library module each module reaches through its imports."""
+    closure: dict[str, set[str]] = {}
+    for start in imports:
+        if start in closure:
+            continue
+        on_path = {start}
+        stack = [(start, iter(sorted(imports[start])))]
+        while stack:
+            module, pending = stack[-1]
+            for i in pending:
+                if i in imports and i not in closure:
+                    if i in on_path:
+                        raise CoverageError(f"import cycle through {i}")
+                    on_path.add(i)
+                    stack.append((i, iter(sorted(imports[i]))))
+                    break
+            else:
+                closure[module] = set().union(
+                    *({i} | closure[i] for i in imports[module] if i in imports)
+                )
+                on_path.discard(module)
+                stack.pop()
+    return closure
+
+
 def check_coverage(
     root: pathlib.Path = ROOT,
-    owners: dict[str, OwnerWitness] = DECLARATION_OWNERS,
     child_boundaries: dict[str, set[str]] = EXPLICIT_CHILD_BOUNDARIES,
     export_route: tuple[str, str, str] | None = STABILITY_EXPORT_ROUTE,
 ) -> tuple[int, list[str]]:
     source_root = root / "DerivedAlgGeo"
     if not source_root.is_dir():
         raise CoverageError(f"missing Lean source root: {source_root}")
+    modules = {module_name(path, root): path for path in sorted(source_root.rglob("*.lean"))}
     candidates = {
-        module_name(umbrella, root): (umbrella, directory)
-        for directory in source_root.rglob("*")
-        if directory.is_dir()
-        for umbrella in [directory.with_suffix(".lean")]
-        if umbrella.is_file()
+        name: (path, path.with_suffix(""))
+        for name, path in modules.items()
+        if path.with_suffix("").is_dir()
     }
     if not candidates:
         raise CoverageError(f"no same-named file/directory candidates below {source_root}")
+    headers = lean_header_imports(list(modules.values()))
+    imports = {name: headers[path] for name, path in modules.items()}
+    closure = import_closure({name: header.all for name, header in imports.items()})
     failures: list[str] = []
-    for name, witness in sorted(owners.items()):
-        if name not in candidates:
-            failures.append(f"stale declaration-owner exception: {name} has no sibling directory")
-            continue
-        path = candidates[name][0]
-        source = path.read_bytes()
-        try:
-            lines = source.decode("utf-8").splitlines()
-        except UnicodeDecodeError as exc:
-            raise CoverageError(f"{path}: invalid UTF-8 in declaration owner") from exc
-        if not 1 <= witness.line <= len(lines) or lines[witness.line - 1] != witness.declaration:
-            failures.append(f"{path.relative_to(root)}: declaration-owner witness line changed")
-        if hashlib.sha256(source).hexdigest() != witness.sha256:
-            failures.append(f"{path.relative_to(root)}: declaration-owner digest changed; re-review")
 
     for name, omitted in sorted(child_boundaries.items()):
-        if name not in candidates or name in owners:
+        if name not in candidates:
             failures.append(f"stale umbrella/child exception: {name} is not a checked umbrella")
             continue
-        directory = candidates[name][1]
-        direct = {module_name(path, root) for path in directory.glob("*.lean")}
-        direct.update(
-            module_name(sub.with_suffix(".lean"), root)
-            for sub in directory.iterdir()
-            if sub.is_dir() and sub.with_suffix(".lean").is_file()
-        )
+        children = direct_children(candidates[name][1], root)
         for child in sorted(omitted):
-            if child not in direct:
+            if child not in children:
                 failures.append(f"stale umbrella/child exception: {name} / {child}")
 
-    imports = lean_header_imports([pair[0] for _, pair in sorted(candidates.items())])
     if export_route is not None:
         neutral, child, outer = export_route
         if child_boundaries != {neutral: {child}}:
             failures.append(f"umbrella/child boundary must remain exact: {neutral} / {child}")
         if neutral not in candidates:
             failures.append(f"missing neutral umbrella for boundary: {neutral}")
-        elif child in imports[candidates[neutral][0]].all:
+        elif child in imports[neutral].all:
             failures.append(f"{neutral}: must not import omitted child {child}")
         if outer not in candidates:
             failures.append(f"missing public export umbrella for boundary: {outer}")
-        elif child not in imports[candidates[outer][0]].exported:
+        elif child not in imports[outer].exported:
             failures.append(f"{outer}: must publicly re-export omitted child {child}")
 
     checked = 0
     for name, (umbrella, directory) in sorted(candidates.items()):
-        if name in owners:
+        children = direct_children(directory, root)
+        if any(name in closure[child] for child in children):
             continue
         checked += 1
-        declared = imports[umbrella].exported
+        exported = imports[name].exported
         omitted = child_boundaries.get(name, set())
-        # Direct children only. A file beside a same-named directory is
-        # reached by both loops, so deduplicate its missing-import message.
-        children = {module_name(path, root): path for path in directory.glob("*.lean")}
-        children.update(
-            (module_name(sub.with_suffix(".lean"), root), sub.with_suffix(".lean"))
-            for sub in directory.iterdir()
-            if sub.is_dir() and sub.with_suffix(".lean").is_file()
-        )
-        for child, path in sorted(children.items()):
-            if child not in declared and child not in omitted:
+        for child, path in children.items():
+            if child not in exported and child not in omitted:
                 failures.append(
                     f"{umbrella.relative_to(root)}: does not re-export {path.relative_to(root)}"
                 )
@@ -274,7 +221,7 @@ def main() -> int:
         print("umbrella coverage gate failed:")
         for failure in failures:
             print(f"  - {failure}")
-        print("Add the child import, or explicitly review a genuine declaration owner.")
+        print("Import the child from its umbrella.")
         return 1
     print(f"ok: {checked} umbrella(s) re-export their whole directory")
     return 0

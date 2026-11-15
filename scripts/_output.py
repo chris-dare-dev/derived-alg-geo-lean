@@ -1,20 +1,17 @@
 #!/usr/bin/env python3
 """Console encoding for the gate scripts, and the check that they all use it.
 
-WHY THIS EXISTS. On the self-hosted Windows runner `sys.stdout` is cp1252. A
-gate that prints a non-ASCII character raises `UnicodeEncodeError` *inside its
-own reporting path*, so it dies with a `charmap` traceback instead of the
-finding it had already computed. That is the worst failure a reporting gate
-has: the diagnosis is correct, and then thrown away in the act of displaying
-it. #868 fixed it in `check_roadmap.py`, whose findings quote roadmap titles;
-#869 is the observation that every other gate prints declaration names, and
-Lean names routinely carry `δ`, `₁`, `₂`, `Γ`, `ω`, `χ`. It stopped being
-hypothetical on 2026-09-11, when `check_audit_complete.py` crashed printing
-`BilinearRiemannRochStatement.chi₂_eq` on PR #1158.
+WHY THIS EXISTS. On a console whose `sys.stdout` is not UTF-8 (cp1252 on
+Windows, for one), a gate that prints a non-ASCII character raises
+`UnicodeEncodeError` *inside its own reporting path*, so it dies with a
+`charmap` traceback instead of the finding it had already computed. That is the
+worst failure a reporting gate has: the diagnosis is correct, and then thrown
+away in the act of displaying it. Every gate prints declaration names, and Lean
+names routinely carry `δ`, `₁`, `₂`, `Γ`, `ω`, `χ`.
 
-ONE IMPLEMENTATION. Every `scripts/check_*.py` (and `pr_queue.py`, which prints
-pull-request titles) calls `force_utf8_output()` as the first statement of its
-`if __name__ == "__main__":` block. Sixteen pasted copies would drift; this
+ONE IMPLEMENTATION. Every `scripts/check_*.py` calls `force_utf8_output()` as
+the first statement of its `if __name__ == "__main__":` block. Pasted copies
+would drift; this
 module is the one copy, and `python3 scripts/_output.py` is the gate that keeps
 every script on it -- structurally, by reading each script, and behaviourally,
 by reproducing the crash in a subprocess and confirming the helper prevents it.
@@ -33,10 +30,9 @@ from pathlib import Path
 
 SCRIPTS = Path(__file__).resolve().parent
 
-#: The scripts that must route their console output through this module.
-#: `check_*.py` is every gate; `pr_queue.py` prints pull-request titles, which
-#: carry the same characters.
-CALLERS = sorted(SCRIPTS.glob("check_*.py")) + [SCRIPTS / "pr_queue.py"]
+#: The scripts that must route their console output through this module:
+#: `check_*.py` is every gate.
+CALLERS = sorted(SCRIPTS.glob("check_*.py"))
 
 #: A declaration-name-shaped probe: Greek, a subscript, a superscript, an arrow.
 PROBE = "Foo.δ.stepX₂.Hⁱ → Γ"
@@ -47,8 +43,8 @@ def force_utf8_output() -> None:
 
     Every finding a gate prints may quote a Lean declaration name or a roadmap
     title, and those contain non-ASCII: subscripts, superscripts, Greek, arrows,
-    dashes. On the self-hosted Windows runner `sys.stdout` defaults to cp1252,
-    so printing one of those raises `UnicodeEncodeError` *inside* the reporting
+    dashes. On a Windows console `sys.stdout` defaults to cp1252, so printing
+    one of those raises `UnicodeEncodeError` *inside* the reporting
     path, and the gate dies with a traceback instead of reporting the finding it
     had already made.
 
@@ -68,12 +64,9 @@ def force_utf8_output() -> None:
 
 
 IMPORT_RE = re.compile(r"^from _output import force_utf8_output$", re.MULTILINE)
-#: Either the first statement of the entry-point block, or -- for a flat script
-#: with no such block, `check_pin.py` -- the module-level statement right after
-#: the import.
+#: The first statement of the entry-point block.
 CALL_RE = re.compile(
-    r'^if __name__ == "__main__":\n[ \t]+force_utf8_output\(\)\n'
-    r'|^from _output import force_utf8_output\n\nforce_utf8_output\(\)\n', re.MULTILINE)
+    r'^if __name__ == "__main__":\n[ \t]+force_utf8_output\(\)\n', re.MULTILINE)
 
 
 def structural_findings() -> list[str]:
@@ -86,8 +79,7 @@ def structural_findings() -> list[str]:
             out.append(f"{rel}: does not import force_utf8_output from scripts/_output.py")
         if not CALL_RE.search(text):
             out.append(f"{rel}: force_utf8_output() is not the first statement of its "
-                       f"`if __name__ == \"__main__\":` block (or, for a flat script, "
-                       f"the statement right after its import)")
+                       f"`if __name__ == \"__main__\":` block")
     return out
 
 

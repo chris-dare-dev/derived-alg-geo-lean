@@ -47,7 +47,7 @@ runs the whole gate on `ubuntu-latest`; since 2026-09-19 a push on its own no
 longer does, and `gh workflow run ci.yml --ref <branch>` dispatches the same
 gate on hosted Ubuntu for a branch with no pull request. The owner's
 self-hosted runners serve a private mirror, not this repository; see
-`docs/ci/owner-lane.md`. A bare `lake build`
+https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/CI-Owner-Lane. A bare `lake build`
 and `scripts/gates.sh` are refused locally by a `PreToolUse` hook.
 For the local pre-flight the hook allows — every gate that needs no Lean build,
 plus a targeted build of what you changed, in seconds — run:
@@ -63,7 +63,7 @@ is neither a subset nor a superset of CI; that section has the verified table.
 
 The source tree mirrors Mathlib's subject hierarchy, so a file extending a
 Mathlib API sits where that API sits in Mathlib. `CLAUDE.md` states the
-placement rule and `docs/architecture/layers.md` the dependency contract.
+placement rule and https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Layers the dependency contract.
 
 - `DerivedAlgGeo/AlgebraicGeometry` — schemes and everything stated about
   them: coherent sheaves, cohomology, scheme-derived categories and `Dqc`,
@@ -93,7 +93,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for placement, proof, audit, and review
 requirements.
 
 The enforced dependency contract is documented in
-[docs/architecture/layers.md](docs/architecture/layers.md).
+[https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Layers](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Layers).
 
 ## License
 

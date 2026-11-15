@@ -1,16 +1,16 @@
 ---
 name: Formalization issue
-about: One unit of Lean work a loop run can take to a merged PR without asking anyone
+about: One unit of Lean work that can be taken to a merged PR without asking anyone
 title: '<CODE>.<n>: <the result, in words>'
 labels: []
 ---
 
-<!-- This body is the specification a loop run works from. Write WHAT and WHY,
-never HOW: no review rounds, OpenSpec, manifests, controllers, CI platforms or
-merge steps. The run-loop skill owns process, and process text goes stale.
+<!-- This body is the specification the work starts from. Write WHAT and WHY,
+never HOW: no review rounds, CI platforms or merge steps. Process text goes
+stale.
 Check every name, path and line at the pins below, and write "absent at the pin"
 rather than guessing. Dependencies are GitHub issue numbers, never roadmap ids.
-The run records progress in a loop-state comment, not in this body.
+Progress goes in comments and the pull request, not in this body.
 From the command line: copy this file, fill it in, delete the front matter
 above this comment, and run
 gh issue create --title '<title>' --body-file <file>
@@ -60,9 +60,7 @@ not an upper bound. -->
 - Not taken as a field, instance or hypothesis: <the result itself, existence, preservation, descent, algebraicity>
 
 ## Dependencies
-- Blocked by #n: <what it supplies>. On a roadmap-owned milestone, open the
-  matching `.claude/roadmap/*.yaml` PR as soon as you add the GitHub blocked-by
-  link; CI's `roadmap` job fails every open PR until they agree.
+- Blocked by #n: <what it supplies>. Add it as a GitHub blocked-by link too.
 - Independent of #m: <why, where it might look dependent>
 - Consumed by #k
 

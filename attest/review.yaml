@@ -224,7 +224,7 @@ reviews:
                 (@SubNegMonoid.toAddMonoid.{u'} Λ
                   (@AddGroup.toSubNegMonoid.{u'} Λ (@AddCommGroup.toAddGroup.{u'} Λ inst_7))))))
         (g :
-          @CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2 inst_3
+          @CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2 inst_3
             inst_4 inst_5 Λ inst_7 v)
         (σ τ :
           @CategoryTheory.Triangulated.StabilityCondition.WithClassMap.{u, w, u'} C inst inst_1 inst_2 inst_3 inst_4 inst_5 Λ
@@ -232,91 +232,91 @@ reviews:
         @Eq.{1} ENNReal
           (@CategoryTheory.Triangulated.stabilityDist.{w, u, u'} C inst inst_1 inst_2 inst_3 inst_4 inst_5 Λ inst_7 v
             (@HSMul.hSMul.{max (max u u') w, max u u', max u u'}
-              (@CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2 inst_3
+              (@CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2 inst_3
                 inst_4 inst_5 Λ inst_7 v)
               (@CategoryTheory.Triangulated.StabilityCondition.WithClassMap.{u, w, u'} C inst inst_1 inst_2 inst_3 inst_4
                 inst_5 Λ inst_7 v)
               (@CategoryTheory.Triangulated.StabilityCondition.WithClassMap.{u, w, u'} C inst inst_1 inst_2 inst_3 inst_4
                 inst_5 Λ inst_7 v)
               (@instHSMul.{max (max u u') w, max u u'}
-                (@CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2
+                (@CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2
                   inst_3 inst_4 inst_5 Λ inst_7 v)
                 (@CategoryTheory.Triangulated.StabilityCondition.WithClassMap.{u, w, u'} C inst inst_1 inst_2 inst_3 inst_4
                   inst_5 Λ inst_7 v)
                 (@SemigroupAction.toSMul.{max (max u u') w, max u u'}
-                  (@CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2
+                  (@CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2
                     inst_3 inst_4 inst_5 Λ inst_7 v)
                   (@CategoryTheory.Triangulated.StabilityCondition.WithClassMap.{u, w, u'} C inst inst_1 inst_2 inst_3 inst_4
                     inst_5 Λ inst_7 v)
                   (@Monoid.toSemigroup.{max (max u u') w}
-                    (@CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2
+                    (@CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2
                       inst_3 inst_4 inst_5 Λ inst_7 v)
                     (@DivInvMonoid.toMonoid.{max (max u u') w}
-                      (@CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2
+                      (@CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2
                         inst_3 inst_4 inst_5 Λ inst_7 v)
                       (@Group.toDivInvMonoid.{max (max u u') w}
-                        (@CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1
+                        (@CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1
                           inst_2 inst_3 inst_4 inst_5 Λ inst_7 v)
-                        (@CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.group.{w, u, u'} C inst
+                        (@CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.group.{w, u, u'} C inst
                           inst_1 inst_2 inst_3 inst_4 inst_5 Λ inst_7 v))))
                   (@MulAction.toSemigroupAction.{max (max u u') w, max u u'}
-                    (@CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2
+                    (@CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2
                       inst_3 inst_4 inst_5 Λ inst_7 v)
                     (@CategoryTheory.Triangulated.StabilityCondition.WithClassMap.{u, w, u'} C inst inst_1 inst_2 inst_3
                       inst_4 inst_5 Λ inst_7 v)
                     (@DivInvMonoid.toMonoid.{max (max u u') w}
-                      (@CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2
+                      (@CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2
                         inst_3 inst_4 inst_5 Λ inst_7 v)
                       (@Group.toDivInvMonoid.{max (max u u') w}
-                        (@CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1
+                        (@CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1
                           inst_2 inst_3 inst_4 inst_5 Λ inst_7 v)
-                        (@CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.group.{w, u, u'} C inst
+                        (@CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.group.{w, u, u'} C inst
                           inst_1 inst_2 inst_3 inst_4 inst_5 Λ inst_7 v)))
-                    (@CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.mulAction.{w, u, u'} C inst
+                    (@CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.mulAction.{w, u, u'} C inst
                       inst_1 inst_2 inst_3 inst_4 inst_5 inst_6 Λ inst_7 v))))
               g σ)
             (@HSMul.hSMul.{max (max u u') w, max u u', max u u'}
-              (@CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2 inst_3
+              (@CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2 inst_3
                 inst_4 inst_5 Λ inst_7 v)
               (@CategoryTheory.Triangulated.StabilityCondition.WithClassMap.{u, w, u'} C inst inst_1 inst_2 inst_3 inst_4
                 inst_5 Λ inst_7 v)
               (@CategoryTheory.Triangulated.StabilityCondition.WithClassMap.{u, w, u'} C inst inst_1 inst_2 inst_3 inst_4
                 inst_5 Λ inst_7 v)
               (@instHSMul.{max (max u u') w, max u u'}
-                (@CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2
+                (@CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2
                   inst_3 inst_4 inst_5 Λ inst_7 v)
                 (@CategoryTheory.Triangulated.StabilityCondition.WithClassMap.{u, w, u'} C inst inst_1 inst_2 inst_3 inst_4
                   inst_5 Λ inst_7 v)
                 (@SemigroupAction.toSMul.{max (max u u') w, max u u'}
-                  (@CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2
+                  (@CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2
                     inst_3 inst_4 inst_5 Λ inst_7 v)
                   (@CategoryTheory.Triangulated.StabilityCondition.WithClassMap.{u, w, u'} C inst inst_1 inst_2 inst_3 inst_4
                     inst_5 Λ inst_7 v)
                   (@Monoid.toSemigroup.{max (max u u') w}
-                    (@CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2
+                    (@CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2
                       inst_3 inst_4 inst_5 Λ inst_7 v)
                     (@DivInvMonoid.toMonoid.{max (max u u') w}
-                      (@CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2
+                      (@CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2
                         inst_3 inst_4 inst_5 Λ inst_7 v)
                       (@Group.toDivInvMonoid.{max (max u u') w}
-                        (@CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1
+                        (@CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1
                           inst_2 inst_3 inst_4 inst_5 Λ inst_7 v)
-                        (@CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.group.{w, u, u'} C inst
+                        (@CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.group.{w, u, u'} C inst
                           inst_1 inst_2 inst_3 inst_4 inst_5 Λ inst_7 v))))
                   (@MulAction.toSemigroupAction.{max (max u u') w, max u u'}
-                    (@CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2
+                    (@CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2
                       inst_3 inst_4 inst_5 Λ inst_7 v)
                     (@CategoryTheory.Triangulated.StabilityCondition.WithClassMap.{u, w, u'} C inst inst_1 inst_2 inst_3
                       inst_4 inst_5 Λ inst_7 v)
                     (@DivInvMonoid.toMonoid.{max (max u u') w}
-                      (@CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2
+                      (@CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1 inst_2
                         inst_3 inst_4 inst_5 Λ inst_7 v)
                       (@Group.toDivInvMonoid.{max (max u u') w}
-                        (@CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1
+                        (@CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.{w, u, u'} C inst inst_1
                           inst_2 inst_3 inst_4 inst_5 Λ inst_7 v)
-                        (@CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.group.{w, u, u'} C inst
+                        (@CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.group.{w, u, u'} C inst
                           inst_1 inst_2 inst_3 inst_4 inst_5 Λ inst_7 v)))
-                    (@CategoryTheory.Triangulated.StabilityCondition.GroupAction.AutPairQuot.mulAction.{w, u, u'} C inst
+                    (@CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot.mulAction.{w, u, u'} C inst
                       inst_1 inst_2 inst_3 inst_4 inst_5 inst_6 Λ inst_7 v))))
               g τ))
           (@CategoryTheory.Triangulated.stabilityDist.{w, u, u'} C inst inst_1 inst_2 inst_3 inst_4 inst_5 Λ inst_7 v σ τ)
@@ -345,7 +345,7 @@ reviews:
   # This is the GLTilde naming question #178 predicted, and it is the reason the
   # verdict is divergent while the relation stays no_claim.
   - key: stmt:a520a8d4f877:bridgeland2007.lem-8.2
-    decl: CategoryTheory.Triangulated.StabilityCondition.GroupAction.gltildeSlicingMulAction
+    decl: CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.gltildeSlicingMulAction
     reviewer:
       name: Chris Dare
     reviewed_at: '2026-08-19'
@@ -362,11 +362,11 @@ reviews:
                       @CategoryTheory.Functor.Additive.{v, u, v, u} C C inst inst inst_3 inst_3
                         (@CategoryTheory.shiftFunctor.{v, u, 0} C Int inst Int.instAddMonoid inst_2 n)] →
                   [inst_5 : @CategoryTheory.Pretriangulated.{v, u} C inst inst_1 inst_2 inst_3 inst_4] →
-                    @MulAction.{0, u} CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTilde
+                    @MulAction.{0, u} CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTilde
                       (@CategoryTheory.Triangulated.Slicing.{u, v} C inst inst_1 inst_2 inst_3 inst_4 inst_5)
-                      (@DivInvMonoid.toMonoid.{0} CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTilde
-                        (@Group.toDivInvMonoid.{0} CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTilde
-                          CategoryTheory.Triangulated.StabilityCondition.GroupAction.GLTilde.group))
+                      (@DivInvMonoid.toMonoid.{0} CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTilde
+                        (@Group.toDivInvMonoid.{0} CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTilde
+                          CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.GLTilde.group))
     reviewed_quote_sha256: a82c3230040fd724ffad1d6655c190b00b99321d3fc1ab5eb74dafdfe8c38d1f
     reviewed_env_digest: ba5fd9e4d276facbe68631efad7f4186896dcbb789eee0fa15e39b18eb8612c8
     faithfulness: divergent

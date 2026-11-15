@@ -9,11 +9,44 @@ import Mathlib.CategoryTheory.Bicategory.FunctorBicategory.Pseudo
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids
 
 /-!
-# Morphisms and representable fibers of stacks in groupoids
+# Morphisms and pointwise-represented fibers of stacks in groupoids
 
-Stack morphisms, their fiber categories, and representability by an object of
-an arbitrary site are generic category theory.  Geometric properties of the
-representing morphism remain in the corresponding geometric consumer layer.
+Stack morphisms, their fiber categories, and pointwise representability by an
+object of an arbitrary site are generic category theory.  Geometric properties
+of the representing morphism remain in the corresponding geometric consumer
+layer.
+
+## Main definitions
+
+* `StackMorphism` — a strong transformation between the underlying
+  pseudofunctors, with `StackMorphism.app`, `StackMorphism.pullbackIso`,
+  `StackMorphism.id`, `StackMorphism.comp` and `StackMorphism.Modification`.
+* `StackMorphism.FiberCategory` — the groupoid fiber over a test object and a
+  target object.
+* `StackMorphism.PointwiseFiberRepresentation` — a representing object and,
+  for each test object separately, an equivalence with the fiber.
+* `StackMorphism.IsPointwiseRepresentable` — every fiber has a
+  `PointwiseFiberRepresentation`.
+
+## Main results
+
+None; this file only defines the vocabulary.
+
+## Implementation notes
+
+Pointwise representability chooses an equivalence with the fiber for each test
+object separately, with no compatibility along maps of test objects.  The
+docstring of `StackMorphism.PointwiseFiberRepresentation` explains why that is
+weaker than representability of the 2-fibre product, and gives a non-smooth
+morphism that is pointwise smooth and surjective.
+
+## References
+
+* [Stacks Project, Tag 02Y4](https://stacks.math.columbia.edu/tag/02Y4)
+
+## Tags
+
+stack in groupoids, stack morphism, fiber category, pointwise representability
 -/
 
 namespace CategoryTheory
@@ -72,20 +105,34 @@ abbrev FiberCategory (f : StackMorphism F G) {S : C}
     ((G.presheaf.map T.hom.op.toLoc).toFunctor.obj y)
     (f.app T.left))
 
-/-- An object of the site representing one fiber of a stack morphism. -/
-structure FiberRepresentation (f : StackMorphism F G) {S : C}
+/-- A representation of one fibre of a stack morphism, pointwise in the test
+object: an object `representing` over `S` and, for each test object `T`
+separately, an equivalence `Discrete (T ⟶ representing) ≌ f.FiberCategory y T`.
+
+Nothing relates `fiberEquivalence T` to `fiberEquivalence T'` along a map
+`T' ⟶ T`, as the `homEquiv_comp` field of Mathlib's `Functor.RepresentableBy`
+would. So this is weaker than representability of the 2-fibre product (Stacks
+Project, Tag 02Y4). For an infinite field `k`, the Hom-sets from any `k`-scheme
+`T` to `X = Spec k[ε]/(ε²) ×ₖ 𝔸¹` and to `𝔸¹` have the same cardinality, namely
+that of `Γ(T, 𝒪_T)`. Bijections chosen test object by test object therefore make
+the stack morphism induced by `X ⟶ Spec k` `IsPointwiseSmoothSurjective`, with
+the pullback of `𝔸¹` as representing object, although `X ⟶ Spec k` is not
+smooth. Representability natural in the test object is not defined here. -/
+structure PointwiseFiberRepresentation (f : StackMorphism F G) {S : C}
     (y : G.presheaf.obj (.mk (op S))) where
   /-- The representing object over `S`. -/
   representing : Over S
-  /-- The Yoneda comparison on every test object over `S`. -/
+  /-- The comparison at the test object `T` alone; nothing ties it to the
+  comparison at another test object. -/
   fiberEquivalence (T : Over S) :
     Discrete (T ⟶ representing) ≌ f.FiberCategory y T
 
-/-- A stack morphism is representable when every fiber over a test object has
-a representing object of the site. -/
-class IsRepresentable (f : StackMorphism F G) : Prop where
+/-- A stack morphism is pointwise representable when every fiber over a test
+object has a `PointwiseFiberRepresentation`. That structure's docstring explains
+why this is weaker than representability by the 2-fibre product. -/
+class IsPointwiseRepresentable (f : StackMorphism F G) : Prop where
   representation {S : C} (y : G.presheaf.obj (.mk (op S))) :
-    Nonempty (f.FiberRepresentation y)
+    Nonempty (f.PointwiseFiberRepresentation y)
 
 end StackMorphism
 
