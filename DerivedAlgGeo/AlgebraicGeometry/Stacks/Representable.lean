@@ -27,23 +27,23 @@ universe u
 /-- The big-Zariski stack represented by a scheme `X`. -/
 abbrev representableZariskiStack (X : Scheme.{u}) :
     StackInGroupoids Scheme.{u} Scheme.zariskiTopology :=
-  StackInGroupoids.representable Scheme.zariskiTopology X
+  StackInGroupoids.representable.{u, u} Scheme.zariskiTopology X
 
 /-- The big-fppf stack represented by a scheme `X`. Its subcanonicity follows
 from fpqc descent for representable presheaves. -/
 abbrev representableFppfStack (X : Scheme.{u}) :
     StackInGroupoids Scheme.{u} Scheme.fppfTopology :=
-  StackInGroupoids.representable Scheme.fppfTopology X
+  StackInGroupoids.representable.{u, u} Scheme.fppfTopology X
 
 /-- The big-étale stack represented by a scheme `X`. -/
 abbrev representableEtaleStack (X : Scheme.{u}) :
     StackInGroupoids Scheme.{u} Scheme.etaleTopology :=
-  StackInGroupoids.representable Scheme.etaleTopology X
+  StackInGroupoids.representable.{u, u} Scheme.etaleTopology X
 
 -- Representability on a slice site needs no scheme-specific stack constructor.
 example (S : Scheme.{u}) (T : Over S) :
     StackInGroupoids (Over S) (Scheme.fppfTopology.over S) :=
-  StackInGroupoids.representable (Scheme.fppfTopology.over S) T
+  StackInGroupoids.representable.{u, u} (Scheme.fppfTopology.over S) T
 
 /-- The stack represented by `X` has effective Čech descent for every big
 Zariski covering family. -/
@@ -56,13 +56,12 @@ def representableZariskiCechDescentEquivalence
 `X` over `T`. -/
 def representableZariskiObject {X T : Scheme.{u}} (f : T ⟶ X) :
     (representableZariskiStack X).presheaf.obj (.mk (op T)) :=
-  Discrete.mk f
+  StackInGroupoids.representableObj _ f
 
 /-- The representable stack remembers its scheme morphisms faithfully. -/
 theorem representableZariskiObject_injective {X T : Scheme.{u}} :
-    Function.Injective (representableZariskiObject (X := X) (T := T)) := by
-  intro f g h
-  exact congrArg Discrete.as h
+    Function.Injective (representableZariskiObject (X := X) (T := T)) :=
+  StackInGroupoids.representableObj_injective _
 
 end
 

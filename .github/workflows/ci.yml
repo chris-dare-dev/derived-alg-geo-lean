@@ -54,9 +54,7 @@ jobs:
   # The prose list is the set of paths that no step in `build` reads.
   # `scripts/`, `.github/`,
   # `registry/`, `attest/` and every Lean file stay out of it on purpose.
-  # `.claude/roadmap/` is in it because its only judge is the `roadmap` job,
-  # which always runs. cache-warm.yml ignores the same paths; change the two
-  # together.
+  # cache-warm.yml ignores the same paths; change the two together.
   changes:
     runs-on: ${{ vars.OWNER_CI_RUNS_ON && fromJSON(vars.OWNER_CI_RUNS_ON) || 'ubuntu-latest' }}
     timeout-minutes: 10
@@ -78,7 +76,7 @@ jobs:
           PUSH_BEFORE: ${{ github.event.before }}
         run: |
           set -euo pipefail
-          prose='^((docs|\.claude/roadmap)/.*|([^/]+|\.claude/.*)\.md)$'
+          prose='^(docs/.*|([^/]+|\.claude/.*)\.md)$'
           base=""
           case "$EVENT_NAME" in
             pull_request) base="$PR_BASE" ;;
@@ -497,15 +495,14 @@ jobs:
           # `lake env lean` does not build; it only sets LEAN_PATH, so build
           # what the exe roots import here rather than depending on what an
           # earlier step happened to leave behind: the sweep umbrella, which is
-          # not a default target, and RestateHistoricalNames, an executable-only
-          # library outside both umbrellas.
+          # not a default target.
           #
-          # The LIBRARIES, not the executables. Linking an executable compiles
+          # The LIBRARY, not the executable. Linking an executable compiles
           # every transitively imported module to a native object -- thousands
           # of Mathlib `:c.o` targets, under .lake/packages where the
           # `.lake/build` cache does not reach -- and nothing here needs one:
           # `lake env lean` reads oleans.
-          lake build DerivedAlgGeoSweep RestateHistoricalNames
+          lake build DerivedAlgGeoSweep
           : > lean-source-check.txt
           for f in exe/*.lean; do
             lake env lean "$f" 2>&1 | tee -a lean-source-check.txt
@@ -1005,123 +1002,8 @@ jobs:
             attest/restate.json
           if-no-files-found: warn
 
-  # ---------------------------------------------------------------------------
-  # The roadmap-vs-tracker gate, in its own job because nothing it reads comes
-  # out of the build.
-  #
-  # Routed exactly like `build`: ubuntu-latest here, the owner's runners in the
-  # private mirror. This job has no reason to want a warm `.lake`; it follows
-  # `build` only because a hosted job in a PRIVATE repository bills minutes.
-  roadmap:
-    runs-on: ${{ vars.OWNER_CI_RUNS_ON && fromJSON(vars.OWNER_CI_RUNS_ON) || 'ubuntu-latest' }}
-    # Seconds of work. The cap is here so a hung `gh` call cannot hold the
-    # merge open for the default six hours.
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          # `--scope-to-diff=origin/main` resolves a merge base, so the
-          # default single-commit checkout will not do.
-          fetch-depth: 0
-
-      - name: Roadmap and tracker agree
-        env:
-          # For scripts/check_roadmap.py's `gh` calls. Read-only issue
-          # metadata; the default token's scope is sufficient.
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          # The interpreter is CHOSEN, not inherited. The roadmap checker has
-          # declared dependencies, so this isolated venv installs its
-          # requirements rather than borrowing whatever the image ships, and an
-          # image bump cannot change what runs.
-          python3 -m venv .roadmap-venv
-          VENV_PY=.roadmap-venv/bin/python
-          "$VENV_PY" -m pip install --quiet --disable-pip-version-check -r scripts/requirements-loop.txt
-          "$VENV_PY" -c 'import sys, yaml; from importlib.metadata import version; print("repository Python tools: python", sys.version.split()[0], "/ PyYAML", yaml.__version__, "/ markdown-it-py", version("markdown-it-py"))'
-
-          # `--require-api` is deliberate. Without `gh` the script prints
-          # NOT_RUN and exits 0, so a contributor with no `gh` is not blocked
-          # from running the offline gates -- but CI is the one environment
-          # guaranteed to have the API, and a check that silently skips there
-          # passes vacuously.
-          #
-          # RM-07 judges a file in the branch against LIVE tracker state, so any
-          # merge that closes an issue and advances its entry on `main` would
-          # turn every branch that forked earlier red, on an entry that branch
-          # never touched. On a pull request, scope RM-07 to the entries the
-          # branch actually changed since it forked. Inherited disagreements
-          # still PRINT, as notes; they are `main`'s to fix, and the unscoped
-          # line below judges them in full on `main` and in the merge queue.
-          # Never pass the flag there: the merge base is the thing being judged,
-          # so scoping would judge nothing and pass vacuously.
-          #
-          # `--pr` is passed for the opposite reason. Scoping stops OTHER
-          # people's staleness reddening this branch; RM-08 stops THIS branch
-          # creating staleness for everyone else, by refusing a pull request
-          # that closes an issue without advancing its entry. RM-07 cannot do
-          # that job: while the pull request is open the issue it closes is
-          # still open.
-          #
-          # BOTH flags key on "is there an open pull request for this ref", not
-          # on the event name, so a `workflow_dispatch` on a branch scopes
-          # correctly too. If the lookup finds nothing -- no pull request, or no
-          # `gh` -- PR_NUM stays empty and the unscoped invocation runs, which
-          # is the strict direction.
-          #
-          # `--repo` names the tracker rather than letting `gh` infer it from
-          # the checkout. In the private owner mirror the checkout's remote is
-          # the mirror, which has no pull requests, so the lookup would always
-          # come back empty and judge every entry. scripts/check_roadmap.py
-          # hard-codes the same repository.
-          PR_NUM=""
-          case "${GITHUB_EVENT_NAME}" in
-            pull_request)
-              PR_NUM="${{ github.event.pull_request.number }}"
-              ;;
-            push)
-              if [ "${GITHUB_REF_NAME}" != "main" ]; then
-                PR_NUM="$(gh pr list --repo chris-dare-dev/derived-alg-geo-lean \
-                  --head "${GITHUB_REF_NAME}" \
-                  --state open --json number --jq '.[].number' \
-                  2>/dev/null | head -1 || true)"
-              fi
-              ;;
-          esac
-          if [ -n "$PR_NUM" ]; then
-            # merge-base needs the base branch present. The checkout above is
-            # fetch-depth: 0, which fetches all history, but not necessarily a
-            # remote-tracking ref for `main` -- fetch it by name. If this
-            # fails, the script resolves no base and judges everything, which
-            # is the safe direction.
-            git fetch --no-tags --depth=0 origin main >/dev/null 2>&1 || true
-            echo "roadmap: scoping RM-07 to pull request #${PR_NUM}"
-            "$VENV_PY" scripts/check_roadmap.py --require-api \
-              --scope-to-diff=origin/main \
-              --pr="${PR_NUM}"
-          else
-            echo "roadmap: no open pull request for this ref; judging every entry"
-            "$VENV_PY" scripts/check_roadmap.py --require-api
-          fi
-
-  # ---------------------------------------------------------------------------
-  # The single required status check.
-  #
-  # Branch protection can only require a check by NAME, and a rule that names a
-  # check nothing produces does not fail -- it waits, or is bypassed. So the
-  # moment `build` is split into several jobs, a rule requiring `build` silently
-  # stops protecting anything. This job exists so the required check is a name
-  # that survives every future change to the job graph: split `build` in two,
-  # add a job, rename one, and the only edit needed is the `needs` list here. It
-  # must therefore be the ONLY required context.
-  #
-  # Only jobs that must pass belong in `needs`. Cache warming is a separate
-  # workflow (.github/workflows/cache-warm.yml) precisely so it cannot appear
-  # here: it is skipped on every event except a push to `main`, a skip has to
-  # read as a failure below, and it gates nothing by design -- `build` on the
-  # same commit makes the correctness claim.
   ci:
-    needs: [changes, build, roadmap]
+    needs: [changes, build]
     # This job must still run when `build` FAILED -- without that, a failed
     # build would leave `ci` skipped, and a skipped required check does not
     # block a merge. That is the whole mechanism, and it is why the obvious
@@ -1148,7 +1030,7 @@ jobs:
     # cancelled run: a green `ci` over a build that never finished is strictly
     # worse than a skip.
     if: ${{ !cancelled() }}
-    # Routed like `build` and `roadmap`, for the same private-minutes reason.
+    # Routed like `build`, for the same private-minutes reason.
     runs-on: ${{ vars.OWNER_CI_RUNS_ON && fromJSON(vars.OWNER_CI_RUNS_ON) || 'ubuntu-latest' }}
     steps:
       - name: Every required job succeeded
@@ -1164,7 +1046,6 @@ jobs:
           CHANGES: ${{ needs.changes.result }}
           BUILD_NEEDED: ${{ needs.changes.outputs.build }}
           BUILD: ${{ needs.build.result }}
-          ROADMAP: ${{ needs.roadmap.result }}
         run: |
           set -euo pipefail
           # Enumerate rather than pattern-match. `contains(needs.*.result,
@@ -1177,14 +1058,12 @@ jobs:
           # `changes` succeeded AND wrote `build=false`. The skip is then a
           # verdict that nothing in the change is the build's to check, not a
           # job that never ran.
-          echo "changes=${CHANGES} build_needed=${BUILD_NEEDED} build=${BUILD} roadmap=${ROADMAP}"
+          echo "changes=${CHANGES} build_needed=${BUILD_NEEDED} build=${BUILD}"
           rc=0
-          for pair in "changes=${CHANGES}" "roadmap=${ROADMAP}"; do
-            if [ "${pair#*=}" != "success" ]; then
-              echo "::error::${pair%%=*} did not succeed (result: ${pair#*=})"
-              rc=1
-            fi
-          done
+          if [ "$CHANGES" != "success" ]; then
+            echo "::error::changes did not succeed (result: ${CHANGES})"
+            rc=1
+          fi
           if [ "$BUILD" = "success" ]; then
             :
           elif [ "$BUILD" = "skipped" ] && [ "$CHANGES" = "success" ] \
