@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 r"""Refuse whole-library Lean builds on the developer's machine.
 
-Lean builds for this repository belong on a runner. In this repository
-`ci.yml` runs every event on `ubuntu-latest`; the owner's self-hosted runners
-serve a private mirror instead (https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/CI-Owner-Lane). Since 2026-09-19
-`push` fires on `main` alone, so the way to get a verdict on a branch is to
-OPEN THE PULL REQUEST -- or to dispatch `ci.yml` on it by hand -- not to run
-`lake` locally.
+Lean builds for this repository belong on a runner. `ci.yml` runs every event
+here on `ubuntu-latest`, and `push` fires on `main` alone, so the way to get a
+verdict on a branch is to OPEN THE PULL REQUEST -- or to dispatch `ci.yml` on
+it by hand -- not to run `lake` locally.
 
 ## What is refused, and what is not
 
@@ -15,9 +13,7 @@ Refused:
   * `lake build` with no target -- the whole library;
   * `lake build DerivedAlgGeo` / `lake build DerivedAlgGeoSweep` -- naming an
     all-library umbrella is the same whole-library build, because
-    `lakefile.toml` sets `defaultTargets = ["DerivedAlgGeo"]`. Until #837 this
-    passed, and on 2026-08-27 it ran for over an hour in a worktree that DID
-    have the hook;
+    `lakefile.toml` sets `defaultTargets = ["DerivedAlgGeo"]`;
   * `scripts/gates.sh`, in any mode, because its `build` gate is that same
     whole-library build. RUNNING it, that is -- see READERS below;
   * `lake build <Target>` without `LEAN_NUM_THREADS`, or with it above
@@ -28,12 +24,11 @@ Refused:
 Allowed, deliberately:
 
   * `scripts/precheck.sh` -- the subset of `gates.sh` that needs no Lean build
-    at all, plus a targeted build of the modules the branch changed. It exists
-    because refusing `gates.sh` without offering anything in its place left
-    every agent skill with no local pre-flight whatsoever;
-  * `lake build <Target>` for any target below an umbrella, including the three
-    audits and `DerivedAlgGeo.Development` (which `gates.sh` and `ci.yml` both
-    build by name), as long as it declares its concurrency;
+    at all, plus a targeted build of the modules the branch changed, so that
+    refusing `gates.sh` still leaves a local pre-flight;
+  * `lake build <Target>` for any target below an umbrella, including
+    `DerivedAlgGeo.Development` (which `gates.sh` and `ci.yml` both build by
+    name), as long as it declares its concurrency;
   * `lake env lean <file>` -- the seconds-long probe that interactive proof work
     depends on. Routing those through CI would make each attempt a ~12 minute
     round trip and stop anyone from writing a proof at all;
@@ -43,18 +38,16 @@ Allowed, deliberately:
     CONTRIBUTING.md tells contributors to read it to know what CI will check.
 
 The distinction is cost, not principle. A targeted build on a warm cache is
-seconds; the whole library from cold is hours, and on 2026-08-27 an agent spent
-three of them rebuilding a cache that a machine-wide cleanup had deleted --
-work a runner would have done off the developer's machine entirely.
+seconds; the whole library from cold is hours of the developer's machine, work
+a runner does off it entirely.
 
 ## Width, not just size
 
 Refusing big builds is only half of a resource rule. A permitted `lake build
 DerivedAlgGeo.Foo` still takes one `lean` process per core unless
-`LEAN_NUM_THREADS` says otherwise, and on this 16-core host, shared by dozens of
-agent worktrees and four self-hosted runners, that is how the machine runs out
-of COMMIT rather than CPU. See `MAX_LOCAL_THREADS` for what that cost on
-2026-09-15.
+`LEAN_NUM_THREADS` says otherwise, and on a host shared by many agent worktrees
+and the self-hosted runners that is how the machine runs out of COMMIT rather
+than CPU. See `MAX_LOCAL_THREADS`.
 
 So a targeted build must declare its concurrency, and the ceiling is enforced
 rather than documented. `DAG_ALLOW_LOCAL_BUILD=1` overrides this rule too,
@@ -64,63 +57,22 @@ answer to "I need more threads" is a smaller number, not a bypass.
 ## Whose lake
 
 Every rule above is about what a build COSTS. This one is about which `lake`
-runs it.
+runs it. Each self-hosted runner owns its HOME, `.elan`, `_work` and caches,
+and a build driven through one of those shims by path writes into that
+runner's `.elan` and competes for its cgroup budget while a job may be using
+it. So naming a runner's shim explicitly is refused.
 
-ON WINDOWS THIS WAS AUTOMATIC, which is why the rule exists. Each of the four
-runners kept an elan under `C:\actions-runner\<runner>\.elan`, and those `bin`
-directories sat on the developer's own PATH, AHEAD of `~/.elan/bin`, because
-`lean-action` invokes `elan-init` with no `--no-modify-path` and
-`run-runner.cmd` pointed HOME at the runner directory -- so every CI job
-re-persisted its own shim directory into the user environment, and removing
-the entries did not hold. A plain `lake` in an agent shell therefore executed
-a RUNNER's `lake.exe`; Windows will not replace a running image, so the next
-job on that runner could not relink its shims and died about a second in with
-
-    error: could not create link from 'elan.exe' to 'lake.exe'
-
-On 2026-09-16 that held `main` red across three consecutive runs (bc973621,
-6217d770, b9e18832) behind ONE local build that broke none of the other rules
-here: named target, `LEAN_NUM_THREADS=2`, this gate green.
-
-THE OWNER RETIRED WINDOWS ON 2026-09-21 (#1443), and both halves of that
-mechanism went with it. The four Ubuntu runners under
-`~/.local/share/github-runners/<runner>/` each own their HOME, `.elan`, `_work`
-and caches, and their services run a minimal PATH that never reaches the
-developer's shell, so no runner shim lands on your PATH by itself; and POSIX
-lets a running image be unlinked and replaced, so there is no relink failure
-left to cause. A bare `lake` here resolves to your own elan, or to nothing.
-
-WHAT REMAINS is narrower, and is still worth refusing: naming a runner's shim
-EXPLICITLY, by path. https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/CI-Ubuntu-Runners makes each runner's tree its
-own state -- "no writable cache or package symlinks between runners or into
-developer checkouts" -- and a build driven through one of those shims writes
-into that runner's `.elan` and competes for its cgroup budget while a job may
-be using it. So the check is kept and matched against the current layout as
-well as the historical one, with a smaller claim behind it: state isolation
-now, not image locking.
-
-What this does NOT cost is correctness, and the distinction matters because the
-two have very different blast radii. On 2026-09-16 the same declaration sweep
-was run twice on this host, once through runner-3's shim and once through
-`~/.elan/bin/lake`: the outputs were byte-identical (14589 rows, `diff -q`
-clean) and audit-completeness reported the same numbers both ways. These shims
-are all the same elan, and they resolve the same toolchain content; what differs
-is whose tree the executing file lives in. So a result already produced through
-a runner's shim does not need re-running. This gate exists to stop the
-CONTENTION -- one process holding a file another process must relink -- not to
-cast doubt on a build that has already finished.
+The concern is state isolation, not correctness. Every shim is the same elan
+and resolves the same toolchain, so a result already produced through one does
+not need re-running.
 
 ## What this gate does NOT say
 
-It does not say that CI is a superset of `gates.sh`. It is not, and the text
-here used to claim otherwise ("CI runs every gate in it, and more"). Four gates
-in `scripts/gates.sh` have no counterpart in any workflow: `workflows`,
-`local-build`, `mathlib-style`, and `single-instantiation`. The
-first three are local by construction -- they test hooks, or a pre-push linter
-that cannot run after the file reaches GitHub. `single-instantiation` was not,
-and the cost of the false claim is on the record: it ran nowhere for agents,
-and 24 names drifted past its baseline unseen until `bb8a1278` recorded them.
-PR #1355 wires it into `ci.yml`.
+It does not say that CI is a superset of `gates.sh`. Two gates there have no
+counterpart in any workflow: `workflows`, and the `--diff-only` pass of
+`mathlib-style`. Both are local by construction: a workflow too invalid to
+parse cannot run the job that would check it, and a pre-push linter judges
+lines before they reach GitHub.
 
 ## Override
 
@@ -159,10 +111,9 @@ SEPARATORS = re.compile(r"\|\||&&|[;|&\n()]")
 UMBRELLAS = {"DerivedAlgGeo", "DerivedAlgGeoSweep"}
 
 # A `lake` living inside a self-hosted runner's tree, in either layout a shell
-# might hand us: the retired Windows one (`C:\actions-runner\<runner>\`) and the
-# current Ubuntu one (`~/.local/share/github-runners/<runner>/`). Matching only
-# the first left this check dead from the 2026-09-21 migration (#1443) onward.
-# See "Whose lake" in the module docstring for what each layout can do.
+# might hand us: `actions-runner/<runner>/` or
+# `~/.local/share/github-runners/<runner>/`. See "Whose lake" in the module
+# docstring.
 RUNNER_TREE = re.compile(r"[\\/](?:actions-runner|github-runners)[\\/]", re.IGNORECASE)
 
 # Lake's concurrency, and the ceiling a targeted build may use on this host.
@@ -172,22 +123,12 @@ RUNNER_TREE = re.compile(r"[\\/](?:actions-runner|github-runners)[\\/]", re.IGNO
 # Lake takes one `lean` process per core, and each one can hold several GB. On
 # the 16-core host this repository is developed on that is up to 16 heavyweight
 # processes from a single `lake build DerivedAlgGeo.Foo` -- which the size rule
-# above deliberately permits.
+# above deliberately permits. Across agent worktrees and self-hosted runners on
+# one host that exhausts the commit limit, and the failures land elsewhere: CI
+# jobs dying with no step records, `lean` dying with `std::bad_alloc`.
 #
-# That is not hypothetical. On 2026-09-15 the host ran ~60 concurrent `lean`
-# processes across agent worktrees and self-hosted runners, the commit limit
-# collapsed to 2.9 GB free, and the consequences were: CI `build` jobs dying
-# with zero step records ("the self-hosted runner lost communication") on five
-# branches; `lean` dying mid-build with `std::bad_alloc` / exit code 3221226505;
-# and `elan` failing to relink `lake.exe` behind a crashed job's processes.
-#
-# `CLAUDE.md` has required `LEAN_NUM_THREADS=2` for local builds for some time,
-# and `~/.claude/settings.json` sets it per agent session. Both are advice: the
-# variable is absent in any shell that does not inherit that file, which
-# `CLAUDE.md` says in as many words ("set it explicitly if you are building from
-# a shell that does not inherit that"). Advice is what failed on 2026-08-27 for
-# the size rule, and the fix there was to enforce it. This is the same fix for
-# the width rule.
+# Agent settings export the variable, but a shell that does not inherit them
+# runs uncapped, so the rule is enforced here rather than advised.
 #
 # The ceiling is 4 rather than the documented 2 so that someone who has thought
 # about it has room; it is not 16, because 16 is the failure.
@@ -251,15 +192,11 @@ def threads_offence(value: str | None) -> str | None:
     return None
 
 
-# Commands that can only READ a file named on their command line.
-#
-# Until 2026-09-16 this check scanned every token of every segment, so any
-# command that so much as MENTIONED `gates.sh` was refused -- `cat`, `grep`,
-# `diff`, and `git ls-tree origin/main --name-only scripts/gates.sh`, which is
-# the tooling probe `.claude/skills/land-pr` runs in its own first step. A gate
-# whose purpose is "do not spend three hours of the developer's machine" has no
-# business refusing a read, and CONTRIBUTING.md §"Local workflow" tells you to
-# read that file to know what CI will check.
+# Commands that can only READ a file named on their command line. A gate whose
+# purpose is "do not spend hours of the developer's machine" has no business
+# refusing `cat`, `grep`, `diff` or `git ls-tree` over `gates.sh`, and
+# CONTRIBUTING.md §"Local workflow" tells you to read that file to know what CI
+# will check.
 #
 # The list is an allow-list rather than a deny-list on purpose: an unrecognised
 # command word that mentions `gates.sh` is still refused, which is the safe
@@ -274,8 +211,8 @@ READERS = {
 # `git bisect run scripts/gates.sh` runs the script once per revision, which is
 # the worst version of the thing this gate refuses, and `git rebase --exec`,
 # `git submodule foreach` and `git filter-branch` all execute too. An allow-list
-# of subcommands keeps the probe in .claude/skills/land-pr working without
-# opening that door. The index and history commands from `add` on take a path
+# of subcommands keeps reads such as `git ls-tree` working without opening that
+# door. The index and history commands from `add` on take a path
 # as data -- staging, committing or deleting `scripts/gates.sh` runs nothing.
 GIT_READ_SUBCOMMANDS = {
     "blame", "cat-file", "diff", "grep", "log", "ls-files", "ls-tree",
@@ -288,8 +225,7 @@ ASSIGNMENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
 
 # `env` flags that swallow the following token. Without these, `env -u FOO grep
 # ... gates.sh` reports its command word as `FOO`, which is in no allow-list, so
-# a read would be refused -- and `env -u DAG_ALLOW_LOCAL_BUILD` is exactly how
-# scripts/test_local_build.sh invokes this checker.
+# a read would be refused.
 ENV_FLAGS_WITH_ARG = {"-u", "--unset", "-C", "--chdir", "-S", "--split-string"}
 
 
@@ -586,9 +522,8 @@ def lake_interpreter_offence(token: str) -> str | None:
     return (
         f"`{token}` resolves to `{resolved}`, a self-hosted runner's elan shim "
         "rather than your own. It writes into that runner's isolated .elan and "
-        "competes for its cgroup budget while a job may be using it; on the "
-        "retired Windows lane it also held `lake.exe` open and took `main` red "
-        "three times on 2026-09-16. Name your own elan instead: "
+        "competes for its cgroup budget while a job may be using it. Name your "
+        "own elan instead: "
         "`~/.elan/bin/lake build <Target>`."
     )
 
@@ -695,8 +630,7 @@ def main() -> int:
         f"  {reason}\n"
         "\n"
         "Lean builds for this repository run on a runner (`ci.yml` runs on\n"
-        "ubuntu-latest here; the owner's runners serve a private mirror, see\n"
-        "https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/CI-Owner-Lane).\n"
+        "ubuntu-latest here; the owner's runners serve a private mirror).\n"
         "\n"
         "`push` triggers on `main` alone, so for a verdict on a branch OPEN THE\n"
         "PULL REQUEST, or dispatch CI on the pushed branch:\n"
@@ -708,9 +642,9 @@ def main() -> int:
         "`lake exe runLinter`, `lake exe lint-style`, the python checkers,\n"
         "and READING gates.sh.\n"
         "\n"
-        "CI is NOT a superset of gates.sh: `workflows`, `local-build`,\n"
-        "`mathlib-style` and `single-instantiation` have no ci.yml\n"
-        "counterpart. `precheck.sh` runs the first three.\n"
+        "CI is NOT a superset of gates.sh: `workflows` and the `--diff-only`\n"
+        "pass of `mathlib-style` have no ci.yml counterpart, and\n"
+        "`precheck.sh` runs both.\n"
         "\n"
         "If the runner is genuinely unavailable, set DAG_ALLOW_LOCAL_BUILD=1 for\n"
         "the command -- and say so in your report.",

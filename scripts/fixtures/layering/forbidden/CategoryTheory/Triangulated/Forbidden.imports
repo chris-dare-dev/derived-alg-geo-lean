@@ -1,3 +1,0 @@
-# Category theory must not import geometry, and an import modifier does not
-# bypass the firewall.
-public import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Coherent

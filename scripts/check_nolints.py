@@ -29,7 +29,7 @@ from _output import force_utf8_output
 NOLINTS = Path("scripts/nolints.json")
 BASELINE_REF = "origin/main"
 
-# The backlog as measured when the algebraic-geometry gate was first wired, 2026-08-14.
+# The ceiling on the whole backlog.
 # Lower it whenever the real count drops -- `--relax` does that for you. It is
 # never raised: a change that needs a new exception needs a human argument for
 # that exception, in review, not a bumped constant.
@@ -90,8 +90,8 @@ def main(argv: list[str]) -> int:
 
     # Identity, not just count: a count-level ratchet lets a change bless one
     # NEW violation by retiring one old entry of the same linter -- totals
-    # unchanged, gate green (2026-08-18 adversarial review, finding P2-8).
-    # Diffing entry identities against the committed baseline on origin/main
+    # unchanged, gate green. Diffing entry identities against the committed
+    # baseline on origin/main
     # closes that: any entry present here and absent there is a new
     # suppression, and a new suppression needs a human argument in review, not
     # a swap. CI checks out with fetch-depth 0, so the ref is available there;
@@ -104,7 +104,7 @@ def main(argv: list[str]) -> int:
         # than it looks: the UnicodeDecodeError is raised on subprocess's
         # reader THREAD, so nothing propagates here, `.stdout` comes back None,
         # and the traceback a reader actually sees is a TypeError from
-        # json.loads three lines down. Observed on a Windows runner 2026-08-23.
+        # json.loads three lines down.
         baseline_raw = subprocess.run(
             ["git", "show", f"{BASELINE_REF}:{NOLINTS.as_posix()}"],
             capture_output=True, text=True, check=True, encoding="utf-8",

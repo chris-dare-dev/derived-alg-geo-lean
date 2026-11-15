@@ -37,6 +37,3 @@ TODO.md
 # Python bytecode from the gate scripts (scripts/_output.py is imported, so it compiles).
 __pycache__/
 *.pyc
-
-# Local loop ledgers, which scripts/loop_tokens.py reads.
-/.loop-runs/

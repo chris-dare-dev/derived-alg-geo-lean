@@ -45,7 +45,7 @@ in `CategoryTheory/Abelian/Stability/HNPolygon.lean`.
 The perimeter comparison built on this carrier is the sibling
 `ComplexPolygonalPath/Perimeter.lean`.
 
-`Analysis/` is a top-level subject, registered in `KNOWN_SUBJECTS` in
+`Analysis/` is a top-level subject, registered in `SUBJECTS` in
 `scripts/check_layering.py`. The pinned Mathlib revision has no polygonal-chain
 length and no perimeter at all (`Mathlib.Geometry.Polygon.Basic` supplies a
 vertex tuple with edges and a boundary, and stops there), so there is no

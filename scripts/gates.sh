@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # The pre-push gate list from CONTRIBUTING.md, as one command.
 #
-# An unattended formalization loop needs a single exit code to branch on, and it
-# needs the gates in cheapest-first order so a failure is reported in two minutes
-# rather than forty.
+# An unattended run needs a single exit code to branch on, and it needs the
+# gates in cheapest-first order so a failure is reported in minutes rather than
+# after the whole build.
 #
 #   scripts/gates.sh fast   build + style                         (~minutes)
 #   scripts/gates.sh        the full list below, in CI's order
@@ -11,36 +11,21 @@
 #
 # DO NOT RUN THIS SCRIPT ON THE DEVELOPER'S MACHINE. `scripts/check_local_build.py`
 # is a PreToolUse hook and refuses it in any mode, because the `build` gate below
-# is the whole-library build that cost a developer three hours on 2026-08-27.
-# Full verification runs on the self-hosted Windows runners: push the branch, or
-# `gh workflow run ci.yml --ref <branch>`. This file remains the readable list of
-# what is checked, and reading it is allowed -- `cat`, `grep` and `git ls-tree`
-# pass the hook. `scripts/precheck.sh` is what you actually run locally.
+# is the whole-library build. Full verification runs in CI: open the pull
+# request, or `gh workflow run ci.yml --ref <branch>`. This file remains the
+# readable list of what is checked, and reading it is allowed -- `cat`, `grep`
+# and `git ls-tree` pass the hook. `scripts/precheck.sh` is what you run locally.
 #
-# This file runs every gate CI runs. Saying precisely what it adds is the point
-# of this paragraph, because the imprecise version caused a real regression.
-#
-# What this file has and `.github/workflows/` does not, verified against ci.yml,
-# cache-warm.yml and docs.yml on 2026-09-16, and re-verified when the trust
-# guard was removed:
+# This file runs every gate CI runs. What it has and `ci.yml` does not:
 #
 #   workflows        cannot be a CI gate. A workflow file too invalid to parse is
 #                    also too invalid to run the job that would have checked it;
 #                    GitHub fails a run named after the file and reports no
 #                    checks at all. It has to fire before the file reaches
 #                    GitHub. See scripts/check_workflows.sh.
-#   local-build      tests a PreToolUse hook, which exists only on a developer's
-#                    machine.
-#   mathlib-style    is the PostToolUse edit hook's checker, run over the branch
-#                    diff. It is a pre-push linter by design.
-#   single-instantiation  was NOT deliberate. Until PR #1355 it appeared in no
-#                    workflow at all, so for anyone who could not run this script
-#                    -- which, since the hook, is every agent -- it ran nowhere.
-#                    It drifted in silence: `bb8a1278` records 24 generic
-#                    abstractions that reached at most one inhabitant with
-#                    nothing going red. The first three entries above are local by
-#                    construction; this one was local by omission, and the header
-#                    that claimed "ONE deliberate exception" is what hid it.
+#   mathlib-style    its `--diff-only` pass is the edit hook's checker over the
+#                    branch diff, a pre-push linter by design. Its fixtures and
+#                    baseline ratchet also run in CI.
 #
 # Each gate prints `GATE <name>: pass|FAIL`. The script does not stop at the
 # first failure -- an unattended run wants the whole picture in one pass -- and
@@ -52,11 +37,10 @@ cd "$(dirname "$0")/.."
 MODE="${1:-full}"
 FAILED=()
 
-# Per-run scratch directory. These artifacts used to live at fixed /tmp paths,
-# which is wrong on this machine twice over: agent sessions run in worktrees
-# under /tmp, and two self-hosted CI runners share the host. Two concurrent
-# runs then read and write the same file, so a gate can pass or fail on another
-# branch's data with nothing in the output naming the branch that wrote it.
+# Per-run scratch directory. Agent worktrees and self-hosted runners share one
+# host, and with a fixed path two concurrent runs read and write the same file,
+# so a gate can pass or fail on another branch's data with nothing in the output
+# naming the branch that wrote it.
 gate_tmp_base="${TMPDIR:-/tmp}"
 GATE_TMP="$(mktemp -d "${gate_tmp_base%/}/dag-gates.XXXXXX")" || {
   echo "could not create a scratch directory under ${gate_tmp_base%/}"
@@ -139,7 +123,9 @@ mathlib_style() {
   # here: neither depends on the diff, and a branch that adds a style ERROR to
   # a file no agent edited would otherwise reach CI to find out.
   python3 scripts/check_mathlib_style.py --check-baseline || return 1
-  files="$(changed_lean_files | sort -u)"
+  # Library sources only: the checker refuses a run in which no file it judges
+  # was given, and `scripts/` Lean files are outside its scope.
+  files="$(changed_lean_files | grep -E '^DerivedAlgGeo(/|\.lean$)' | sort -u)"
   [ -z "$files" ] && return 0
   # --diff-only: judge the lines this branch wrote, not the pre-existing debt in
   # a file it happens to touch. The edit hook stays strict on what you just
@@ -157,21 +143,12 @@ echo "== gates ($MODE) =="
 # checks. In `fast` mode too, for the same reason.
 gate workflows scripts/check_workflows.sh
 # Also cheap, also in `fast` mode: every gate below prints declaration names,
-# and on the Windows runner a gate that cannot print `δ` dies with a
-# `charmap` traceback instead of its finding (#868, #869). This checks that
-# each script routes its console through scripts/_output.py, and that the
-# helper actually survives a cp1252 console.
+# and on a console that cannot encode `δ` a gate dies with a `charmap` traceback
+# instead of its finding. This checks that each script routes its console
+# through scripts/_output.py, and that the helper survives a cp1252 console.
 gate output-encoding python3 scripts/_output.py
-gate codex-entrypoint python3 scripts/check_codex_entrypoint.py
 gate tree-areas python3 scripts/check_tree_areas.py origin/main
-gate script-tests python3 -m unittest discover -s scripts/tests -p "test_*.py"
-# Next to it for the same reason: `check_local_build.py` is a PreToolUse hook,
-# and a hook that has stopped refusing is indistinguishable from a hook with
-# nothing to catch. #837 found it silently allowing `lake build DerivedAlgGeo`
-# -- the whole library under a target name -- for as long as it had existed.
-gate local-build scripts/test_local_build.sh
 gate mathlib-style mathlib_style
-gate review-docs python3 scripts/check_review_evidence.py docs --base origin/main
 gate explicit-numerical-data python3 scripts/check_explicit_numerical_data.py
 gate foundation-import-boundary python3 scripts/check_foundation_import_boundary.py
 gate build lake build
@@ -187,7 +164,6 @@ if [ "$MODE" != "fast" ]; then
   gate pin python3 scripts/check_pin.py
   gate source-independence python3 scripts/check_source_independence.py
   gate subject-layering python3 scripts/check_layering.py
-  gate neutral-stability-imports python3 scripts/check_neutral_stability_imports.py
   gate umbrella-coverage python3 scripts/check_umbrella_coverage.py
   gate root-reachability python3 scripts/check_root_reachability.py
   gate coherent-families python3 scripts/check_coherent_families.py

@@ -2,7 +2,7 @@
 """Invariant: every tracked file lies in an area that CREDO.md lists.
 
 AREAS is the "In this repository" table of CREDO.md written as path patterns:
-product, authored records, prose and tooling. A file in none of them is a
+product, prose, tooling and exceptions lists. A file in none of them is a
 plan, a review, a run log, a generated listing or some other thing the tree
 refuses. LEGACY names the files outside every area that the tree still holds.
 They may be deleted or shortened, never added to, and LEGACY only shrinks.
@@ -32,9 +32,6 @@ AREAS = {
         r"lakefile\.toml",
         r"lean-toolchain",
         r"lake-manifest\.json",
-    ),
-    "authored record": (
-        r"pins\.json",
     ),
     "prose": (
         r"(README|CONTRIBUTING|CREDO|AGENTS|CLAUDE|LICENSE)\.md",
@@ -69,15 +66,8 @@ AREAS = {
 
 # An entry ending in / names a directory; any other names one file.
 LEGACY = (
-    ".claude/README.md",
-    ".claude/references/",
     "scripts/fixtures/",
     "scripts/private-reader.git/",
-    "scripts/test_local_build.sh",
-    "scripts/test_private_alias_scan.py",
-    "scripts/test_private_package_cache.py",
-    "scripts/test_private_source_contract.py",
-    "scripts/tests/",
 )
 
 PATTERNS = [(area, re.compile(p)) for area, ps in AREAS.items() for p in ps]
