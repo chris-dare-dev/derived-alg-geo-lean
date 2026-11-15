@@ -294,10 +294,10 @@ items:
     kind: task
     parent: stacks-and-moduli-mo2
     title: "MO2.2: A layering rule keeps generic stacks and moduli out of the stability tree"
-    status: planned
+    status: done
     priority: must
     size: S
-    summary: "A layering rule, registered in MILESTONE_RULES under the key \"MO2.2\", makes ADR-0014's dependency direction mechanical: the site-generic stack, neutral moduli and pseudofunctor subjects (CategoryTheory/Sites/Descent, CategoryTheory/Moduli, CategoryTheory/Bicategory) reach no module of the stability tree;"
+    summary: "Rows of the layering tables in scripts/check_layering.py make ADR-0014's dependency direction mechanical: the stability tree has a closed list of consumers, so site-generic stacks, neutral moduli and pseudofunctor subjects reach no module of it, and AlgebraicGeometry/Sites and AlgebraicGeometry/Stacks reach no moduli problem."
     labels: [area:governance, arch:layering, type:infra, area:moduli, prerequisite, gate:owner]
     blocked_by: [1624]
   - id: stacks-and-moduli-mo2-4
