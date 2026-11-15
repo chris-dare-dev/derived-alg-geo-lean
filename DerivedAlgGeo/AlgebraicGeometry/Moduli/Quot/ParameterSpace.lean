@@ -7,51 +7,54 @@ import DerivedAlgGeo.AlgebraicGeometry.Moduli.PerfectComplex.Boundedness
 import DerivedAlgGeo.AlgebraicGeometry.Moduli.Quot.Basic
 
 /-!
-# Representable quotient problems and the zero parameter space
+# Represented presheaves over a base and the zero parameter space
 
-A quotient problem is represented only when its functor of points is
-isomorphic to a Yoneda functor.  This is the universal property that prevents
-an arbitrary scheme from being called a Quot scheme.
+A `RepresentedPresheafOver S` is a presheaf of types on schemes over `S`
+together with a representing `S`-scheme and its Yoneda isomorphism.  Nothing
+ties the presheaf to quotients of a module sheaf, so this is not a Quot
+functor, and no Quot functor is claimed representable here.
 
 At the current Mathlib pin no general Quot-scheme or Grassmannian
 representability theorem is available.  The supported construction here is
-the zero quotient: its functor has exactly one quotient over every test
-scheme and is represented by the terminal object `S ⟶ S` of `Over S`.  The
-parameter is finite type and its zero complex realizes the finite-type
-boundedness witness `zeroFiniteTypeBoundednessWitness`.
+the zero quotient: its functor has exactly one point over every test scheme
+and is represented by the terminal object `S ⟶ S` of `Over S`.  The parameter
+is finite type and its zero complex realizes the pointwise finite-type cover
+`zeroPointwiseFiniteTypeCover`.
 
 ## Main definitions
 
-* `RepresentableQuotientProblem` — a quotient problem over `S` with a representing scheme
-  and the full Yoneda universal property; `RepresentableQuotientProblem.universal` is its
-  universal element.
-* `FiniteTypeQuotientParameterSpace` — a representable quotient problem whose parameter
-  morphism is of finite type.
-* `zeroQuotientProblem`, `zeroQuotientRepresentation`, `zeroFiniteTypeQuotientParameterSpace`
-  — the zero quotient functor, its representation by the identity scheme over `S`, and the
-  resulting finite-type parameter space.
+* `RepresentedPresheafOver` — a presheaf on schemes over `S` with a
+  representing scheme and the full Yoneda universal property;
+  `RepresentedPresheafOver.universal` is its universal element.
+* `FiniteTypeRepresentedPresheafOver` — a represented presheaf whose
+  representing morphism is of finite type.
+* `zeroQuotientProblem`, `zeroQuotientRepresentation`,
+  `zeroFiniteTypeQuotientParameterSpace` — the zero quotient functor, its
+  representation by the identity scheme over `S`, and the resulting finite-type
+  represented presheaf.
 * `zeroQuotientToRelativePerfect`, `zeroQuotientRelativePerfectModuliProblem`,
-  `zeroQuotientFiniteTypeBoundednessWitness` — the zero quotient mapped to the
-  relative-perfect moduli fiber, problem and boundedness witness.
+  `zeroQuotientPointwiseFiniteTypeCover` — the zero quotient mapped to the
+  relative-perfect moduli fiber, problem and pointwise finite-type cover.
 
 ## Main results
 
-* `zeroQuotient_universal_eq` — the universal element of the zero parameter space is the
-  unique zero-quotient point.
-* `zeroQuotient_isGeometricallyBounded` — the zero Quot construction is geometrically
-  bounded.
+* `zeroQuotient_universal_eq` — the universal element of the zero parameter
+  space is the unique zero-quotient point.
+* `zeroQuotient_hasPointwiseCover` — the zero Quot construction has a
+  pointwise finite-type cover.
 
 ## Implementation notes
 
-Only the zero quotient is constructed. Representability of a general Quot functor is not
-claimed: a `RepresentableQuotientProblem` must be supplied with its Yoneda isomorphism, and the
-zero problem is the one case where that isomorphism is built here.
+Only the zero quotient is constructed. Representability of a general Quot
+functor is not claimed: a `RepresentedPresheafOver` must be supplied with its
+Yoneda isomorphism, and the zero problem is the one case where that
+isomorphism is built here.
 
 ## References
 
 This file builds on `Mathlib.CategoryTheory.Yoneda`, on `ModuleQuotient` of
-`Moduli/Quot/Basic.lean`, and on `relativePerfectGeometricBoundednessProblem` and
-`FiniteTypeBoundednessWitness` of `Moduli/PerfectComplex/Boundedness.lean`.
+`Moduli/Quot/Basic.lean`, and on `relativePerfectPointwiseCoverProblem` and
+`PointwiseFiniteTypeCover` of `Moduli/PerfectComplex/Boundedness.lean`.
 
 ## Tags
 
@@ -72,32 +75,39 @@ noncomputable section
 
 universe u
 
-/-- A quotient problem on schemes over `S`, together with a representing
-scheme and the full Yoneda universal property. -/
-structure RepresentableQuotientProblem (S : Scheme.{u}) where
-  /-- The functor of quotient families. -/
+/-- A presheaf of types on schemes over `S` with a chosen representing
+`S`-scheme and the full Yoneda universal property.
+
+Nothing ties `problem` to quotients of a module sheaf (`ModuleQuotient`), so
+this is not a Quot functor; the Quot functor of flat, finitely presented
+quotients is not defined here. -/
+structure RepresentedPresheafOver (S : Scheme.{u}) where
+  /-- The represented presheaf. -/
   problem : (SchemeBaseChange S)ᵒᵖ ⥤ Type u
-  /-- The representing parameter scheme over `S`. -/
+  /-- The representing scheme over `S`. -/
   parameter : SchemeBaseChange S
-  /-- The universal property of the parameter scheme. -/
+  /-- The universal property of the representing scheme. -/
   representation : yoneda.obj parameter ≅ problem
 
-namespace RepresentableQuotientProblem
+namespace RepresentedPresheafOver
 
 variable {S : Scheme.{u}}
 
-/-- The universal quotient-family element, obtained from the identity of the
-representing scheme by Yoneda. -/
-def universal (Q : RepresentableQuotientProblem S) :
+/-- The universal element, obtained from the identity of the representing
+scheme by Yoneda. -/
+def universal (Q : RepresentedPresheafOver S) :
     Q.problem.obj (Opposite.op Q.parameter) :=
   Q.representation.hom.app (Opposite.op Q.parameter) (𝟙 Q.parameter)
 
-end RepresentableQuotientProblem
+end RepresentedPresheafOver
 
-/-- A representable quotient problem whose actual parameter morphism is of
-finite type. -/
-structure FiniteTypeQuotientParameterSpace (S : Scheme.{u})
-    extends RepresentableQuotientProblem S where
+/-- A represented presheaf over `S` whose representing morphism is of finite
+type.
+
+Like `RepresentedPresheafOver`, this is unrelated to quotients of a module
+sheaf: no Quot functor is claimed representable. -/
+structure FiniteTypeRepresentedPresheafOver (S : Scheme.{u})
+    extends RepresentedPresheafOver S where
   /-- The structure morphism is locally of finite type and quasi-compact. -/
   finiteType : IsFiniteTypeBaseChange parameter
 
@@ -128,9 +138,9 @@ def zeroQuotientRepresentation (S : Scheme.{u}) :
       ext
       rfl)
 
-/-- The finite-type parameter space representing the zero quotient problem. -/
+/-- The finite-type represented presheaf of the zero quotient problem. -/
 def zeroFiniteTypeQuotientParameterSpace (S : Scheme.{u}) :
-    FiniteTypeQuotientParameterSpace S where
+    FiniteTypeRepresentedPresheafOver S where
   problem := zeroQuotientProblem S
   parameter := identityRelativePerfectBaseChange S
   representation := zeroQuotientRepresentation S
@@ -147,7 +157,7 @@ def zeroQuotientRealization {S : Scheme.{u}} (T : SchemeBaseChange S)
 /-- The universal element classified by the representing identity scheme is
 the unique zero-quotient point. -/
 theorem zeroQuotient_universal_eq (S : Scheme.{u}) :
-    (zeroFiniteTypeQuotientParameterSpace S).toRepresentableQuotientProblem.universal =
+    (zeroFiniteTypeQuotientParameterSpace S).toRepresentedPresheafOver.universal =
       PUnit.unit :=
   rfl
 
@@ -166,20 +176,20 @@ def zeroQuotientRelativePerfectModuliProblem
     RelativePerfectModuliProblem S PUnit :=
   identityRelativePerfectModuliProblem (identityRelativePerfectBaseChange S)
 
-/-- The finite-type zero Quot parameter realizes the honest boundedness
-witness `zeroFiniteTypeBoundednessWitness`, including geometric-point coverage. -/
-def zeroQuotientFiniteTypeBoundednessWitness
+/-- The finite-type zero Quot parameter realizes the pointwise finite-type
+cover `zeroPointwiseFiniteTypeCover`. -/
+def zeroQuotientPointwiseFiniteTypeCover
     (S : Scheme.{u}) :
-    FiniteTypeBoundednessWitness (zeroRelativePerfectModuliSelector S) :=
-  zeroFiniteTypeBoundednessWitness S
+    PointwiseFiniteTypeCover (zeroRelativePerfectModuliSelector S) :=
+  zeroPointwiseFiniteTypeCover S
 
-/-- Consequently the supported zero Quot construction inhabits the geometric
-boundedness predicate of `relativePerfectGeometricBoundednessProblem`. -/
-theorem zeroQuotient_isGeometricallyBounded
+/-- Consequently the supported zero Quot construction inhabits the pointwise
+cover predicate of `relativePerfectPointwiseCoverProblem`. -/
+theorem zeroQuotient_hasPointwiseCover
     (S : Scheme.{u}) :
-    (relativePerfectGeometricBoundednessProblem S).IsBounded
+    (relativePerfectPointwiseCoverProblem S).IsBounded
       (zeroRelativePerfectModuliSelector S) :=
-  ⟨zeroQuotientFiniteTypeBoundednessWitness S⟩
+  ⟨zeroQuotientPointwiseFiniteTypeCover S⟩
 
 end
 
