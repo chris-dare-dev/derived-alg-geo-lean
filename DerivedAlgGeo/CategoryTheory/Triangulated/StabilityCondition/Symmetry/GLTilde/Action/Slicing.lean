@@ -5,7 +5,6 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.Slicing
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Foundation.IntervalCategory
 import DerivedAlgGeo.LinearAlgebra.Matrix.GeneralLinearGroup.UniversalCover.Basic
-import MathFormalContract
 
 /-!
 # The lifted linear action on slicings
@@ -97,9 +96,10 @@ theorem smul_slicing_P (f : NormalizedShift) (s : Slicing C) (φ : ℝ) :
 /-- `G̃L⁺(2, ℝ)` acts on slicings through its phase-relabelling factor.
 
 The matrix factor is not involved — it acts on the central charge, which is
-handled by the prestability action. -/
-@[cites "stmt:a520a8d4f877:bridgeland2007.lem-8.2" (relation := no_claim)
-        (note := "A COMPONENT of the Lemma 8.2 action, not a weaker version of it: the paper states an action on Stab(D), and says nothing about GLTilde acting on slicings alone. Neither statement implies the other, so no_claim rather than one_way.")]
+handled by the prestability action.
+
+Compare Lemma 8.2 of arXiv:math/0212237, which states an action on `Stab(D)`. This action on
+slicings is a component of it, and neither statement implies the other. -/
 instance gltildeSlicingMulAction : MulAction GLTilde (Slicing C) :=
   MulAction.compHom _ GLTilde.toShiftHom
 

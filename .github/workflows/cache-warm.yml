@@ -91,13 +91,6 @@ jobs:
       # `lake build` above covers `defaultTargets`, which is `DerivedAlgGeo`
       # alone. The gates in `ci.yml` need more than that, and a cache that omits
       # them leaves the hosted lane paying for them from cold every time.
-      #
-      # `emit` is in this list although `ci.yml` does not build it. Linking the
-      # executable compiles every transitively imported module to a native
-      # object, which is why the per-pull-request path runs the emitter
-      # interpreted. Keeping it HERE, off the critical path where nothing waits
-      # on it, is what still proves once per merge that the executable links on
-      # Linux at all.
       - name: Build the targets the gates add
         run: |
           set -euo pipefail
@@ -106,8 +99,7 @@ jobs:
             DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Surface \
             DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Threefold \
             DerivedAlgGeo.AlgebraicGeometry.Numerical.Specializations.Fourfold \
-            DerivedAlgGeoSweep \
-            emit
+            DerivedAlgGeoSweep
 
       # Refuse to publish a partial cache. `--no-build` exits non-zero the
       # moment a listed target is not already up to date, so this fails if the
@@ -119,8 +111,7 @@ jobs:
           lake build --no-build \
             DerivedAlgGeo \
             DerivedAlgGeo.Development \
-            DerivedAlgGeoSweep \
-            emit
+            DerivedAlgGeoSweep
 
       - name: Save build output
         uses: actions/cache/save@v4

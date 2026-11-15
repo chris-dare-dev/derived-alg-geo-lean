@@ -45,10 +45,8 @@ root, extending a known mixed module, or moving declarations.
   destabilization loci; frames and planes; kernel negativity and full support;
   ordinary `H⁰` presentations and exact enhancements.
 - Record the decision in the issue or pull request. A structural change
-  updates imports, umbrellas, registry and source-owner paths, documentation
-  and gates together. A rename leaves no alias or import shim. If it changes a
-  name `attest/review.yaml` records, it edits only that name in the recorded
-  statement and `decl`, and CI's restate step checks the edit.
+  updates imports, umbrellas and source-owner paths, documentation and gates
+  together. A rename leaves no alias or import shim.
 - The [cutover ledger](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Cutover-Ledger) records current and
   target owners. A pending move is not an implemented path, and a passing gate
   does not certify a new boundary: add focused checks with each move.
@@ -224,10 +222,10 @@ applications through an umbrella. The one umbrella/child exception is pinned in
 - Split a file that mixes a foundation, its application and their comparison
   at those boundaries, the comparison downstream of both. A deferred split is
   recorded in the cutover ledger; do not extend the misplaced block.
-- No `sorry`, `admit` or hidden axiom across an unfinished seam. The axiom
-  audit is the emission: CI emits the compiled environment and
-  `scripts/check_emission_coverage.py` refuses any axiom outside `propext`,
-  `Classical.choice` and `Quot.sound`. Nothing is listed by hand.
+- No `sorry`, `admit` or hidden axiom across an unfinished seam.
+  `scripts/AxiomAudit.lean` reads the compiled environment and refuses any
+  axiom outside `propext`, `Classical.choice` and `Quot.sound`. Nothing is
+  listed by hand.
 - Do not edit generated build artifacts or alter unrelated work in a dirty tree.
 - Add no review, handoff, note, loop specification or change proposal as a
   file, and keep provenance (issue, pull request, milestone or decision
@@ -263,4 +261,4 @@ for a local run. `lake env lean scratch.lean` is unrestricted. A fresh worktree
 seeds its build cache with `bash scripts/seed_worktree_cache.sh` (about 10 GB,
 its own copy); keep worktrees out of `/tmp`, which is RAM-backed.
 `DerivedAlgGeoSweep.lean` is verification-only: it imports the stable root and
-the development probes for the emitter.
+the development probes for the axiom audit.

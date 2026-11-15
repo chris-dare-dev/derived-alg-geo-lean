@@ -52,8 +52,7 @@ jobs:
   # or one path outside the list all leave `build=true`.
   #
   # The prose list is the set of paths that no step in `build` reads.
-  # `scripts/`, `.github/`,
-  # `registry/`, `attest/` and every Lean file stay out of it on purpose.
+  # `scripts/`, `.github/` and every Lean file stay out of it on purpose.
   # cache-warm.yml ignores the same paths; change the two together.
   changes:
     runs-on: ${{ vars.OWNER_CI_RUNS_ON && fromJSON(vars.OWNER_CI_RUNS_ON) || 'ubuntu-latest' }}
@@ -170,11 +169,7 @@ jobs:
       # `clean: false` ALONE IS NOT SAFE HERE and this step is not optional
       # tidiness. Two things break without it:
       #
-      #   * Untracked leftovers survive between runs, and `mfc build`/`seal`
-      #     refuse to attest a dirty worktree -- "the worktree has uncommitted
-      #     changes, so these measurements describe bytes that <sha> does not
-      #     contain". `mfc-lint-report.txt` is written by the Contract gates
-      #     step and is NOT gitignored, so it alone would fail every second run.
+      #   * Untracked leftovers from an earlier run would survive into this one.
       #   * checkout's clean also does `git reset --hard`; skipping it would let
       #     a modified tracked file survive from a previous branch.
       #
@@ -186,50 +181,6 @@ jobs:
           git reset --hard
           git clean -ffdx -e .lake
           echo "kept: $(du -sh .lake 2>/dev/null | cut -f1 || echo 'no .lake yet')"
-
-      # Path scoping: each linter pass is gated on the tree it judges.
-      #
-      # FAIL-OPEN BY DESIGN: if the diff base cannot be resolved, or if anything
-      # structural changed, `scope` is `all` and every gate runs. A gate is
-      # skipped only when this step has positively established that no file it
-      # could possibly judge has changed. Never invert that default -- a gate
-      # that silently does not run is worse than a slow one.
-      - name: What changed
-        id: changed
-        run: |
-          set -euo pipefail
-          base=""
-          case "${{ github.event_name }}" in
-            pull_request) base="${{ github.event.pull_request.base.sha }}" ;;
-            push) base="${{ github.event.before }}" ;;
-            # merge_group is deliberately absent. `github.event.merge_group.base_sha`
-            # exists and would let this step scope a queue entry too -- and it
-            # should not. The queue is the last thing that runs before `main`
-            # moves, and it is the one place where two independently-green
-            # branches meet for the first time; scoping there would reintroduce
-            # exactly the hole the queue was added to close. Falling through
-            # leaves `base` empty, which the check below turns into `scope=all`.
-          esac
-          if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ] \
-             || ! git cat-file -e "$base^{commit}" 2>/dev/null; then
-            echo "scope=all" >> "$GITHUB_OUTPUT"
-            echo "no usable diff base -- running every gate"
-            exit 0
-          fi
-          # Three-dot: diff from the MERGE BASE, so commits that landed on the
-          # base branch after this one forked are not counted as ours.
-          files=$(git diff --name-only "$base...HEAD")
-          echo "$files" | sed 's/^/  /'
-          if printf '%s\n' "$files" | grep -qE '^(lakefile\.toml|lean-toolchain|lake-manifest\.json|\.github/|scripts/|exe/)'; then
-            echo "scope=all" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          echo "scope=partial" >> "$GITHUB_OUTPUT"
-          if printf '%s\n' "$files" | grep -qE '^DerivedAlgGeo(/|\.lean$)'; then
-            echo "library=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "library=false" >> "$GITHUB_OUTPUT"
-          fi
 
       - name: Foundation import boundary
         run: python3 scripts/check_foundation_import_boundary.py
@@ -268,11 +219,9 @@ jobs:
       #
       # lake's traces rebuild anything out of date, but lake never deletes the
       # artifacts of a source that is gone, so a `.lake/build` restored from
-      # `main`, or kept on a self-hosted runner, holds `.ilean` files for
-      # modules this branch does not have. `mfc check-ilean-coverage` reads
-      # exactly those files, so it reports them as "built by lake, absent from
-      # the emission" and fails I-03/I-04 -- a red run caused by the cache
-      # rather than by the diff.
+      # `main`, or kept on a self-hosted runner, holds `.olean` and `.ilean`
+      # files for modules this branch does not have, which anything reading
+      # `.lake/build` as a description of what exists would then see.
       #
       # Deleting `.lake/build` outright would fix it and throw away the cache.
       # So prune the orphans instead -- an artifact whose `.lean` no longer
@@ -280,9 +229,7 @@ jobs:
       # effect is a rebuild, not a wrong answer.
       #
       # Scoped to `DerivedAlgGeo/`, where the artifact path maps to the source
-      # path directly. The `exe/` libraries' `.ilean` files come from their own
-      # srcDir, so a root-relative existence test would prune them wrongly; they
-      # are left alone. Runs on both lanes: a persistent `.lake` accumulates
+      # path directly. Runs on both lanes: a persistent `.lake` accumulates
       # orphans the same way a restored one does.
       - name: Prune orphaned build artifacts
         run: |
@@ -334,7 +281,7 @@ jobs:
           # that forbids `sorry` outright.
           nanoda-allow-sorry: false
 
-      - name: Pin and coverage records
+      - name: Pin records
         id: pin
         continue-on-error: true
         env:
@@ -350,11 +297,6 @@ jobs:
           # without `gh` is not blocked; here a check that could not look must
           # not pass.
           python3 scripts/check_pin.py --require-api
-          # Every coverage record, by glob rather than a hand-kept list, so a
-          # new record cannot land unvalidated.
-          for f in registry/coverage-*.json; do
-            python3 scripts/check_coverage_map.py "$f"
-          done
 
       - name: Single instantiation
         id: single_instantiation
@@ -362,9 +304,12 @@ jobs:
         run: |
           set -euo pipefail
           # The single-instantiation check: a generic abstraction written for N
-          # cases, instantiated once, and never adopted. It reuses the build the
-          # step above already did, and it runs here because a check that runs
-          # only locally drifts unseen.
+          # cases, instantiated once, and never adopted. It runs here because a
+          # check that runs only locally drifts unseen. `EnumInhabitants.lean`
+          # imports `DerivedAlgGeo.Development`, which the default target does
+          # not build and a cold cache does not hold, and `lake env lean` does
+          # not build.
+          lake build DerivedAlgGeo.Development
           lake env lean scripts/EnumInhabitants.lean > enum-inhabitants.txt 2>&1 || {
             echo "::error::scripts/EnumInhabitants.lean failed to elaborate"
             cat enum-inhabitants.txt
@@ -429,11 +374,6 @@ jobs:
         # what says the checker still rejects what it is meant to reject.
         run: python3 scripts/check_mathlib_style.py --self-test
 
-      - name: Emitter source reachability and eligibility
-        id: emission_sources
-        continue-on-error: true
-        run: python3 scripts/check_emission_coverage.py --source-only
-
       - name: Mathlib-style baseline ratchet
         id: style_ratchet
         continue-on-error: true
@@ -474,431 +414,15 @@ jobs:
         continue-on-error: true
         run: python3 scripts/check_explicit_numerical_data.py
 
-      - name: No declaration uses sorry
-        id: sorry_gate
+      - name: Axiom audit
+        id: axiom_audit
         continue-on-error: true
+        # `lake env lean` does not build, and the sweep umbrella is not a
+        # default target, so build it here rather than rely on an earlier step.
         run: |
           set -euo pipefail
-          # The emitter below is the repository-wide sorry gate, and it reads
-          # the environment, not the text a `set_option ... in` evasion hides
-          # in. An `lean_exe` root cannot appear in an emission built from its
-          # own imports, so exe/ is exactly what the emitter cannot reach and
-          # exactly what this loop covers. Keep the two in agreement:
-          # scripts/check_emission_coverage.py excludes exe/ on the strength of
-          # this step existing.
-          #
-          # `lake env lean` does not build; it only sets LEAN_PATH, so build
-          # what the exe roots import here rather than depending on what an
-          # earlier step happened to leave behind: the sweep umbrella, which is
-          # not a default target.
-          #
-          # The LIBRARY, not the executable. Linking an executable compiles
-          # every transitively imported module to a native object -- thousands
-          # of Mathlib `:c.o` targets, under .lake/packages where the
-          # `.lake/build` cache does not reach -- and nothing here needs one:
-          # `lake env lean` reads oleans.
           lake build DerivedAlgGeoSweep
-          : > lean-source-check.txt
-          for f in exe/*.lean; do
-            lake env lean "$f" 2>&1 | tee -a lean-source-check.txt
-          done
-          if grep -q "declaration uses 'sorry'" lean-source-check.txt; then
-            echo "::error::a declaration uses sorry"
-            exit 1
-          fi
-
-      - name: Emit combined environment
-        id: emit
-        continue-on-error: true
-        run: |
-          set -euo pipefail
-          # INTERPRETED, not compiled. `lake exe emit` needs the executable
-          # linked, and linking one compiles every transitively imported module
-          # to a native object and then links a binary of a few hundred MB. None
-          # of it is cached -- those objects live under
-          # .lake/packages/*/.lake/build/ir, and the `.lake/build` cache covers
-          # only the root package. The interpreter reads the oleans the build
-          # already restored, and is faster end to end because it never loads
-          # that binary.
-          #
-          # Both paths emit the same artifact apart from `emitted_at`, and exit
-          # codes propagate through `--run`, which is load-bearing: the non-zero
-          # exit BELOW IS the repository-wide sorry gate. If it stopped
-          # propagating, this gate would pass vacuously forever.
-          #
-          # `lake build emit` still runs in the cache-warm workflow, so the
-          # executable is still proved to link on Linux once per merge to main;
-          # it is only off the per-pull-request path.
-          lake build DerivedAlgGeoSweep
-          # Non-zero when any constant's axiom closure contains sorryAx. This is
-          # the repository-wide sorry gate; the artifact is written either way.
-          lake env lean --run exe/Emit.lean --out attest/lean-emission.json
-          # ...and this is what keeps that gate from silently shrinking to a
-          # scope where the claim is vacuously true. See the script's docstring.
-          python3 scripts/check_emission_coverage.py attest/lean-emission.json
-          python3 - <<'PY'
-          import json
-          d = json.load(open("attest/lean-emission.json", encoding="utf-8"))
-          n = len(d["constants"])
-          if n == 0:
-              raise SystemExit("::error::empty emission -- the vacuous pass")
-          print(f"ok: {n} constants, {d['counts']['in_scope']} in scope, "
-                f"{sum(1 for c in d['constants'] if c['cites'])} cited")
-          PY
-
-
-      # The save half of this cache is the `Cache warm` workflow, in
-      # .github/workflows/cache-warm.yml: the writer has to be a runner of the
-      # platform the cache is for.
-
-      # The mfc contract gates, run against this repository's own emission
-      # rather than against fixtures.
-      - name: Contract gates
-        id: contract_gates
-        continue-on-error: true
-        # Skipped rather than run when the emitter failed: this step reads
-        # attest/lean-emission.json, and a missing-input traceback is not a
-        # verdict about the repository. `emit` already reports that failure.
-        if: steps.emit.outcome == 'success'
-        run: |
-          set -euo pipefail
-          # Its own venv, in the workspace, so this step never touches a
-          # self-hosted runner's system Python.
-          #
-          # The interpreter is CHOSEN, not inherited. `mfc` needs 3.11+ because
-          # `mfc env` reads lakefile.toml with `tomllib`, and an older inherited
-          # `python3` fails only on the runner that has it, after a full build,
-          # while the same commit is green elsewhere.
-          PY311=""
-          for c in python3.13 python3.12 python3.11 python3; do
-            if command -v "$c" >/dev/null 2>&1 && \
-               "$c" -c 'import sys; raise SystemExit(0 if sys.version_info >= (3,11) else 1)'; then
-              PY311="$c"; break
-            fi
-          done
-          if [ -z "$PY311" ]; then
-            echo "::error::no python >= 3.11 on this runner. mfc needs tomllib," \
-                 "which is stdlib from 3.11; python3 here is $(python3 -V 2>&1)."
-            exit 1
-          fi
-          echo "using $PY311 ($("$PY311" -V 2>&1))"
-          # Delete it first. On a self-hosted runner the workspace persists, and
-          # `python -m venv` over an existing directory does NOT reinstall what
-          # is already there. `pip install "mfc @ git+...@<sha>"` then compares
-          # by name and version, not by URL, so a pin bump that leaves the
-          # version string alone is treated as already satisfied and the OLD mfc
-          # survives the bump -- silently, and for as long as the runner lives.
-          rm -rf .mfc-venv
-          "$PY311" -m venv .mfc-venv
-
-          # A venv puts its executables in `bin` on Unix and in `Scripts` on
-          # Windows.
-          #
-          # Every consumer of the venv is INSIDE THIS STEP -- the later `python`
-          # invocations are the same `run:` block -- so these stay plain shell
-          # variables. $GITHUB_ENV publishes only to SUBSEQUENT steps, never to
-          # the step doing the writing.
-          VENV_BIN=".mfc-venv/bin"
-          [ -d "$VENV_BIN" ] || VENV_BIN=".mfc-venv/Scripts"
-          [ -d "$VENV_BIN" ] || { echo "::error::venv has neither bin/ nor Scripts/"; exit 1; }
-
-          # The interpreter inside the venv is NOT reliably called `python`. A
-          # venv names it after the base executable, and on Windows that can
-          # leave `.mfc-venv/Scripts/python` absent. Resolve it explicitly and
-          # fail loudly if no spelling exists. On Unix `bin/python` is present
-          # and wins first.
-          VENV_PY=""
-          for cand in "$VENV_BIN/python" "$VENV_BIN/python3" \
-                      "$VENV_BIN/python.exe" "$VENV_BIN/python3.exe"; do
-            if [ -x "$cand" ]; then VENV_PY="$cand"; break; fi
-          done
-          [ -n "$VENV_PY" ] || { echo "::error::no interpreter in $VENV_BIN"; exit 1; }
-          echo "using venv interpreter $VENV_PY"
-
-          "$VENV_BIN/pip" install --quiet \
-            "mfc[yaml] @ git+https://github.com/chris-dare-dev/math-formal-contract-lean@5ddf2536e5e57097e568b63b9de06ec00fc8930d#subdirectory=contract"
-          MFC="$VENV_BIN/mfc"
-
-          # Assert the installed schema is the one the emitter writes against.
-          #
-          # When these disagree under `additionalProperties: false`, the symptom
-          # is one near-identical error per constant, none of which names the
-          # cause. This check is cheap, and it is the difference between one
-          # line that names the missing fields and thousands that name every
-          # constant in the library.
-          "$VENV_PY" -c 'import json,os,sys,mfc; p=os.path.join(os.path.dirname(mfc.__file__),"schema","emission-1.0.schema.json"); d=json.load(open(p,encoding="utf-8")); missing=({"discharges","doc","scope"}-set(d["$defs"]["constant"]["properties"]))|({"external","foreign"}-set(d["properties"]["counts"]["properties"])); sys.exit(0) if not missing else (print("::error::installed mfc emission schema is stale: it rejects "+", ".join(sorted(missing))+", which the emitter emits."), sys.exit(1))'
-          echo "emission schema accepts the emitter field set"
-
-          "$MFC" validate attest/lean-emission.json
-
-          "$MFC" env --repo . --out attest/environment.json \
-            --axiom-allowlist propext,Quot.sound,Classical.choice \
-            --emitter-version mfc-emit/1.1.0
-          "$MFC" validate attest/environment.json
-
-          "$MFC" bundle --emission attest/lean-emission.json \
-                        --environment attest/environment.json \
-                        --out attest/declarations.json
-
-          # --registry runs E-04, E-05 and E-12 against the minted registry.
-          # E-09 and E-11 still need a closed-lanes config this repo has not
-          # minted, so the EXACT expected not_run set is asserted below: any
-          # silent widening of it -- a malformed registry, a schema drift
-          # demoting more rules -- fails the step instead of printing a smaller
-          # green table.
-          "$MFC" lint --emission attest/lean-emission.json \
-                      --environment attest/environment.json \
-                      --registry registry/bridgeland2007.json \
-            | tee mfc-lint-report.txt
-          actual_not_run=$(grep -oE '^not_run  E-[0-9]+' mfc-lint-report.txt \
-            | awk '{print $2}' | sort | paste -sd, -)
-          if [ "$actual_not_run" != "E-09,E-11" ]; then
-            echo "::error::mfc lint not_run set is '$actual_not_run', expected" \
-                 "'E-09,E-11'. A rule stopped running (or started); update this" \
-                 "assertion only with the config change that explains it."
-            exit 1
-          fi
-
-          # BOTH roots. The emitter sweeps DerivedAlgGeoSweep plus DerivedAlgGeo
-          # (exe/Emit.lean). With one `--lib`, coverage scopes to that root
-          # alone and the check passes having compared nothing.
-          "$MFC" check-ilean-coverage --emission attest/lean-emission.json \
-            --lib DerivedAlgGeoSweep --lib DerivedAlgGeo
-
-          # Runs when there is a resolution.json to run it on, and says so when
-          # there is not.
-          if [ -f attest/resolution.json ]; then
-            "$MFC" check-resolution attest/resolution.json
-          else
-            echo "::notice::check-resolution did NOT run: no attest/resolution.json yet"
-          fi
-
-          # ------------------------------------------------------------------
-          # build.json, and the honest size of what it measured.
-          #
-          # There is no cheap route to project-wide NDJSON, and the obvious
-          # wirings are worse than nothing because THEY LOOK CLEAN:
-          #
-          #   - `lake env lean --json` on a root import file prints NOTHING.
-          #     Imports are served from oleans and never re-reported, so this
-          #     step would emit error_count 0, warning_count 0,
-          #     sorry_diagnostic_count 0 having elaborated no library module --
-          #     and `mfc seal` would accept it as the build/v1 predicate C-12
-          #     requires. A vacuous pass wearing a passing bundle.
-          #   - `moreLeanArgs = ["--json"]` is consumed by lake, which
-          #     re-renders every message in its own text format.
-          #   - lake persists no structured log: .hash, .trace, .olean, .ilean.
-          #   - per-module invocation pays a full Mathlib import load each time,
-          #     which over the whole library is hours, not a per-commit step.
-          #
-          # So this covers the two ROOT modules and says so. `--covers` is what
-          # puts `measured: {modules, in_scope_modules}` in the artifact, and
-          # `mfc build` prints "PARTIAL diagnostics cover 2 of N" on stderr
-          # every run. The number is meant to look small. It is small.
-          #
-          # THE REPOSITORY-WIDE SORRY GATE IS NOT THIS. It is the emission step
-          # above: `lake env lean --run exe/Emit.lean` exits non-zero when any
-          # constant's axiom closure contains sorryAx, over every constant in
-          # the environment, and it is strictly stronger than any build-log
-          # count because it cannot be defeated by declaration syntax.
-          #
-          # `set +e` around the sweep for the same reason as the exit capture
-          # below: a root module that will not elaborate is exactly when the
-          # diagnostics are worth having, and dying here would discard them
-          # before build.json is written. Only stdout is captured -- lean writes
-          # its JSON messages there, and anything lake says on stderr would not
-          # parse as NDJSON.
-          : > attest/lake-build.ndjson
-          set +e
-          for m in DerivedAlgGeo DerivedAlgGeoSweep; do
-            lake env lean --json "$m.lean" >> attest/lake-build.ndjson
-          done
-          set -e
-
-          # RECORDED, NEVER THE GATE -- on this toolchain a build whose only
-          # defect is a sorry exits 0. Captured rather than assumed, so the
-          # field says what happened.
-          #
-          # `set +e` and not `|| true`: with `|| true` the pipeline succeeds and
-          # $? is 0 no matter what lake returned, which would record a clean
-          # exit for a failed build -- the field lying in the one direction that
-          # matters. The step must not die here either; the artifact has to
-          # exist and be honest especially when the answer is bad.
-          set +e
-          lake build DerivedAlgGeoSweep > attest/lake-build.log 2>&1
-          LAKE_EXIT=$?
-          set -e
-          # 0 when lake printed no job line, which is what a fully cached
-          # no-op build looks like. `minimum: 0` in the schema permits it.
-          LAKE_JOBS=$(sed -n 's/.*Build completed successfully (\([0-9]*\) jobs).*/\1/p' \
-                        attest/lake-build.log | tail -1)
-          LAKE_JOBS=${LAKE_JOBS:-0}
-
-          "$MFC" build --ndjson attest/lake-build.ndjson \
-                       --environment attest/environment.json \
-                       --emission attest/lean-emission.json \
-                       --covers DerivedAlgGeo --covers DerivedAlgGeoSweep \
-                       --lake-exit "$LAKE_EXIT" --lake-jobs "$LAKE_JOBS" \
-                       --out attest/build.json
-
-          # The in-toto Statement, and then the twelve conformance rules over
-          # it.
-          #
-          # `seal` REFUSES to omit a required predicate and refuses a dirty
-          # worktree. attest/review.yaml is the one file here that is committed
-          # rather than regenerated -- see the .gitignore negation. When it
-          # exists the bundle carries a human-review predicate and C-10 runs;
-          # when it does not, seal is called without it and C-10 says so out
-          # loud. `--review-produced-by` is read FROM the file rather than
-          # hardcoded here, so the bundle names whoever actually signed the
-          # review instead of whoever wrote this workflow.
-          SEAL_REVIEW=()
-          if [ -f attest/review.yaml ]; then
-            REVIEWER=$("$VENV_PY" -c "import yaml,sys; \
-              print(yaml.safe_load(open('attest/review.yaml'))['reviews'][0]['reviewer']['name'])")
-            SEAL_REVIEW=(--review attest/review.yaml
-                         --review-produced-by "human:$REVIEWER")
-            echo "::notice::sealing with human review by $REVIEWER"
-          else
-            echo "::notice::no attest/review.yaml; C-10 will report not_run"
-          fi
-
-          "$MFC" seal --root . \
-                      --environment attest/environment.json \
-                      --registry registry/bridgeland2007.json \
-                      --declarations attest/declarations.json \
-                      --build attest/build.json \
-                      "${SEAL_REVIEW[@]}" \
-                      --out attest/bundle.json
-
-          # ------------------------------------------------------------------
-          # restate: does the human review survive the environment it is in?
-          #
-          # env_digest hashes every package revision, so ONE dependency bump
-          # rotates it while the mathematics sits still, and C-10 then reports
-          # every review as belonging to another environment, with its statement
-          # digest byte-identical on both sides.
-          #
-          # Without this, every review needs a re-read on every bump. With it,
-          # `restated` carries the review forward on evidence and NOTHING ELSE
-          # does: `changed` means the statement moved, and `not_checkable` means
-          # nobody knows, which is not a pass either.
-          #
-          # The plan step exists because Lean cannot read YAML and this package
-          # is forbidden dependencies -- so the reviews cross the boundary as
-          # JSON. Elaboration is Lean's; reading the verdict is mfc's.
-          if [ -f attest/review.yaml ]; then
-            # RV-01 first, before anything reads the review. A review whose
-            # reviewed_statement_pp is null passes `mfc validate`, has a
-            # reviewer, a date, a verdict and three digests, and is SILENTLY
-            # un-carryable: restate returns not_checkable, so C-10 fails at the
-            # next dependency bump. Nothing about it looks wrong until then.
-            #
-            # It runs ahead of restate-plan deliberately. Downstream the same
-            # defect appears as `not_checkable`, which is also what a genuine
-            # tooling failure looks like; here it appears as what it is, with
-            # the entry named and the remedy in the message.
-            "$MFC" check-review attest/review.yaml
-
-            "$MFC" restate-plan --review attest/review.yaml \
-                                --out attest/restate-plan.json
-            # Interpreted, like the emitter: linking the executable compiles
-            # every transitively imported module and none of it is cached.
-            lake env lean --run exe/Restate.lean \
-              --plan attest/restate-plan.json --out attest/restate.json
-            "$MFC" validate attest/restate.json
-            # T-01/T-02 need the review; without it they print not_run and this
-            # step would assert nothing about the entries it just checked.
-            "$MFC" restate-check attest/restate.json --review attest/review.yaml
-            RESTATE_ARG="--restate attest/restate.json"
-          else
-            RESTATE_ARG=""
-            echo "::notice::restate did NOT run: no attest/review.yaml"
-          fi
-
-          # C-08 alone prints not_run: there is no resolution.json. That is NOT
-          # a pass, and the summary line says so on every run. As with lint
-          # above, the exact expected not_run set is asserted so it cannot widen
-          # silently.
-          #
-          # C-10 runs because attest/review.yaml exists and the bundle carries a
-          # human-review predicate. It must not return to not_run: that would
-          # mean the review stopped being sealed into the bundle -- most likely
-          # review.yaml going missing, which the .gitignore negation exists to
-          # prevent.
-          # $RESTATE_ARG unquoted on purpose: it is empty when there is no
-          # review, and "" would pass conformance an empty argument.
-          # shellcheck disable=SC2086
-          "$MFC" conformance --bundle attest/bundle.json \
-                             --emission attest/lean-emission.json \
-                             $RESTATE_ARG \
-            | tee mfc-conformance-report.txt
-          actual_not_run=$(grep -oE '^not_run  C-[0-9]+' mfc-conformance-report.txt \
-            | awk '{print $2}' | sort | paste -sd, -)
-          if [ "$actual_not_run" != "C-08" ]; then
-            echo "::error::mfc conformance not_run set is '$actual_not_run'," \
-                 "expected 'C-08'. A rule stopped running (or started);" \
-                 "update this assertion only with the config change that" \
-                 "explains it."
-            exit 1
-          fi
-
-      # The determinism assertion: two runs over an unchanged environment must
-      # be byte-identical except for `emitted_at`. It is what makes
-      # `builds_clean` mean something a second machine could reproduce, and it
-      # costs a second interpreted sweep -- which is why it is here, after the
-      # artifact everything else needs has already been produced.
-      #
-      # It does not run on every event. Determinism is a property of the
-      # EMITTER, of the toolchain, and of the pinned contract revision, not of
-      # the topic commit under test, so re-proving it on a branch that touched
-      # only DerivedAlgGeo/ re-proves it about inputs that did not move. The
-      # three conditions below are the three ways that property can change, and
-      # between them they cover every path by which a commit reaches `main`:
-      #
-      #   * `refs/heads/main` -- every merge is checked, so the determinism
-      #     claim attached to a main-branch attestation is always freshly
-      #     measured rather than inherited from a branch run.
-      #   * `merge_group` -- the last gate before `main` moves, and the one
-      #     place two independently-green branches first meet.
-      #   * `scope == 'all'` -- the "What changed" step sets this when the diff
-      #     touches lakefile.toml, lean-toolchain, lake-manifest.json,
-      #     .github/, scripts/ or exe/. That set is a SUPERSET of
-      #     this gate's determinism inputs, so any pull request that could move
-      #     the needle still runs it.
-      #
-      # The residual hole: a library-only pull request that introduces a
-      # declaration whose own pretty-printing is unstable is caught in the merge
-      # queue, before `main` moves, rather than on the pull request.
-      #
-      # `attest/lean-emission-2.json` is written and read by this step alone, so
-      # skipping it leaves nothing downstream short of an input.
-      - name: Emitter reproducibility
-        id: emitter_reproducibility
-        continue-on-error: true
-        # The `steps.emit` clause is not part of the gating rule above: it reads
-        # the same artifact `Contract gates` does.
-        if: >-
-          steps.emit.outcome == 'success'
-          && (github.ref == 'refs/heads/main'
-          || github.event_name == 'merge_group'
-          || steps.changed.outputs.scope == 'all')
-        run: |
-          set -euo pipefail
-          lake env lean --run exe/Emit.lean --out attest/lean-emission-2.json
-          python3 - <<'PY'
-          import json
-          a = json.load(open("attest/lean-emission.json", encoding="utf-8"))
-          b = json.load(open("attest/lean-emission-2.json", encoding="utf-8"))
-          # `emitted_at` is the ONLY field permitted to differ, and it is named
-          # rather than filtered by pattern: a second volatile field appearing
-          # later must fail here, loudly, instead of being absorbed.
-          a.pop("emitted_at"); b.pop("emitted_at")
-          if a != b:
-              differing = sorted(k for k in set(a) | set(b) if a.get(k) != b.get(k))
-              raise SystemExit(f"::error::emitter is not deterministic; fields differ: {differing}")
-          print("ok: two sweeps byte-identical modulo emitted_at")
-          PY
+          lake env lean scripts/AxiomAudit.lean
 
       # ---------------------------------------------------------------------
       # EVERY GATE REPORTS. This step is what makes the job fail, not the gates.
@@ -917,13 +441,10 @@ jobs:
       # to `success` for exactly these steps -- reading it here would make this
       # check pass on every failure, which is the trap this pattern comes with.
       #
-      # SKIPPED IS REPORTED, NOT FAILED, and the distinction is narrow on
-      # purpose. Only `Contract gates` and `Emitter reproducibility` can skip,
-      # and only when `emit` failed or when the reproducibility rule excludes
-      # this event -- in the first case `emit` itself is already `failure` and
-      # this step fails on it, in the second the gate was never owed. A gate
-      # that skips for any other reason would be a hole, so the list below
-      # prints the skips rather than passing over them.
+      # SKIPPED IS REPORTED, NOT FAILED. No gate here is conditional, so a gate
+      # skips only when a fail-fast step before it failed, and that failure
+      # already fails the job. The list below prints skips rather than passing
+      # over them.
       #
       # The build step ITSELF stays fail-fast. A library that did not compile
       # makes every gate after it meaningless, and running twenty checks to say
@@ -939,17 +460,13 @@ jobs:
             console_encoding=${{ steps.console_encoding.outcome }}
             style_fixtures=${{ steps.style_fixtures.outcome }}
             style_ratchet=${{ steps.style_ratchet.outcome }}
-            emission_sources=${{ steps.emission_sources.outcome }}
             source_independence=${{ steps.source_independence.outcome }}
             subject_layering=${{ steps.subject_layering.outcome }}
             umbrella_coverage=${{ steps.umbrella_coverage.outcome }}
             root_reachability=${{ steps.root_reachability.outcome }}
             coherent_families=${{ steps.coherent_families.outcome }}
             numerical_data=${{ steps.numerical_data.outcome }}
-            sorry_gate=${{ steps.sorry_gate.outcome }}
-            emit=${{ steps.emit.outcome }}
-            contract_gates=${{ steps.contract_gates.outcome }}
-            emitter_reproducibility=${{ steps.emitter_reproducibility.outcome }}
+            axiom_audit=${{ steps.axiom_audit.outcome }}
         run: |
           set -euo pipefail
           failed=""
@@ -977,24 +494,6 @@ jobs:
             exit 1
           fi
           echo "all gates passed"
-
-      - name: Upload trust artifacts
-        # Gated on checkout, and named by commit, so a persistent self-hosted
-        # workspace can never upload a previous run's attest/ as this run's:
-        # `always()` alone would attach it whenever checkout failed before
-        # cleaning.
-        if: always() && steps.checkout.outcome == 'success'
-        uses: actions/upload-artifact@v4
-        with:
-          name: trust-artifacts-${{ github.sha }}
-          path: |
-            attest/lean-emission.json
-            attest/environment.json
-            attest/declarations.json
-            attest/build.json
-            attest/bundle.json
-            attest/restate.json
-          if-no-files-found: warn
 
   ci:
     needs: [changes, build]

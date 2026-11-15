@@ -9,29 +9,45 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Tilting
 # The tilting property (Definition 14.12)
 
 The tilting property from Definition 14.12 of arXiv:1902.08184v4, on the
-reviewed abstract layer.  A weak prestability condition already carries its
-Harder--Narasimhan slicing, so the paper's condition `muPlus F < +infinity`
-is phrased here as `phiPlus F < 1`: for an object of the slicing heart these
-say that the largest HN factor is off the real-axis boundary.  This is the
-same phase-language convention as
+reviewed abstract layer.
+
+## Main definitions
+
+* `IsNoetherianTorsionSubcategory`: the torsion class of a
+  `NoetherianTorsionSubcategory`, with its class parameter exposed;
+* `zeroCharge`: the zero-charge subcategory `A0` of the slicing heart;
+* `HasFiniteMaxSlope`: the phase form of `muPlus F < +infinity`;
+* `HasTiltingEnvelope`: the envelope of Definition 14.12(2);
+* `HasPhaseTiltingEnvelope`: an envelope whose middle term lies in a phase cut;
+* `TiltingProperty`: Definition 14.12.
+
+## Main results
+
+* `HasPhaseTiltingEnvelope.hasTiltingEnvelope`: forgetting the phase cut gives
+  a Definition 14.12 envelope;
+* `TiltingProperty.hasTiltingEnvelope_of_phaseFree`: the tilting property
+  supplies envelopes for phase-free objects.
+
+## Implementation notes
+
+A weak prestability condition already carries its Harder--Narasimhan slicing, so
+the paper's condition `muPlus F < +infinity` is phrased here as `phiPlus F < 1`:
+for an object of the slicing heart these say that the largest HN factor is off
+the real-axis boundary.  This is the same phase-language convention as
 `WeakStabilityCondition/Tilting/TorsionPair/Slope.lean`.  The normalized
 slope--phase ray identity is formalized downstream in
 `WeakStabilityCondition/Basic/ChargeRay.lean`, and the exact finite-slope
-adapter is provided by `Tilting/TorsionPair/SourceSlope.lean`.  The coverage
-coordinate remains `mapped`; review and owner-gated promotion are separate
-governance steps.
+adapter is provided by `Tilting/TorsionPair/SourceSlope.lean`.
 
 The short exact sequence `F -> Ftilde -> F0` in part (2) is a distinguished
 triangle whose three vertices lie in the heart, following the convention of
 `Basic.lean` and `Noetherian.lean`.  The condition
 `Hom(A0, Ftilde[1]) = 0` is stated literally as vanishing of every such map.
 
-## Downstream source theorem
-
 The categorical work is assembled in the `Tilting` modules: heart
 cohomology, the semistable classification, termination of zero-charge chains,
 the HN recursion, support transport, and reverse slicing.  The exact
-source-facing statements now live in `Tilting/Source`:
+source-facing statements live in `Tilting/Source`:
 
 * `slopeTorsionPair` is display (14.1) with its finite weak-slope parameter;
 * `sourceTiltWeakStabilityFunction_isSemistable_iff_classification` is the
@@ -39,8 +55,13 @@ source-facing statements now live in `Tilting/Source`:
 * `sourceTiltConclusion` packages Proposition 14.16 with charge `Z/(I-b)`,
   support, and the noetherian zero-charge torsion conclusion.
 
-Those declarations do not by themselves promote the coverage registry past
-`mapped`; source review evidence and owner signoff remain required.
+## References
+
+* Definition 14.12, Proposition 14.16 and Lemma 14.17 of arXiv:1902.08184v4.
+
+## Tags
+
+tilting, torsion pair, weak stability condition, noetherian heart
 -/
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition

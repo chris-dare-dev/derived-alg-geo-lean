@@ -4,7 +4,6 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.SlicingDistance
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.Autoequivalence.Stability.ClassMap
-import MathFormalContract
 
 /-!
 # The `Aut` action preserves the phase distance
@@ -181,9 +180,11 @@ theorem mapEquiv_phiMinus (s : Slicing C) (E : C)
 isometry clause.
 
 No finiteness hypothesis: both sides live in `ℝ≥0∞` and the equality holds when
-they are `⊤`. -/
-@[cites "stmt:a520a8d4f877:bridgeland2007.lem-8.2" (relation := no_claim)
-        (note := "The ISOMETRY clause of Lemma 8.2, for a DIFFERENT distance, so neither statement implies the other. The paper's d is a sup of THREE quantities; this library's slicingDist carries the two phase discrepancies and omits |log(m2/m1)|, the mass ratio -- the only term that sees the central charge, hence the only one Z-composed-with-lam could move. A sup of three being preserved does not give that each term is, so isometry for d does NOT imply this; and preserving slicingDist plainly does not imply isometry for d. Separately, slicingDist is a distance on Slicing C, not on Stab(D). Downstream files construct a three-coordinate envelope distance, but this phase-only theorem remains distinct.")]
+they are `⊤`.
+
+Compare the isometry clause of Lemma 8.2 of arXiv:math/0212237. Neither statement implies the
+other: Bridgeland's distance is the supremum of three terms, and `slicingDist` keeps the
+two phase terms and drops the mass ratio `|log(m₂/m₁)|`. -/
 theorem mapEquiv_slicingDist (s₁ s₂ : Slicing C) :
     slicingDist C (s₁.mapEquiv Φ) (s₂.mapEquiv Φ) = slicingDist C s₁ s₂ := by
   apply le_antisymm
@@ -245,9 +246,10 @@ variable {Λ : Type u'} [AddCommGroup Λ] (v : K₀ C →+ Λ)
 Note what does **not** appear on either side: `lam`. The class-lattice datum
 moves the central charge and nothing else, and `slicingDist` does not see the
 central charge — which is exactly why the mass term, which does, is out of
-scope here. -/
-@[cites "stmt:a520a8d4f877:bridgeland2007.lem-8.2" (relation := no_claim)
-        (note := "Same non-implication as mapEquiv_slicingDist: the distance is slicingDist, not Bridgeland's d, and d omits nothing while slicingDist omits the mass ratio. What this adds over that theorem is only the carrier -- the statement is now about stability conditions rather than bare slicings, matching the paper's Stab(D). It is still not the paper's isometry claim.")]
+scope here.
+
+Compare Lemma 8.2 of arXiv:math/0212237. As for `mapEquiv_slicingDist`, the distance is
+`slicingDist`, not Bridgeland's, so neither statement implies the other. -/
 theorem actStabAut_slicingDist (lam : Λ →+ Λ)
     (hlam : ∀ x : K₀ C, v (K₀.map Φ.inverse x) = lam (v x))
     (σ τ : StabilityCondition.WithClassMap C v) :
@@ -261,9 +263,11 @@ preserves `slicingDist` on the underlying slicings.
 
 `_root_.Quotient.inductionOn` is safe here without a well-definedness side goal: the
 statement is an equation between two `ℝ≥0∞`s, so it is a `Prop` and proof
-irrelevance discharges the descent. -/
-@[cites "stmt:a520a8d4f877:bridgeland2007.lem-8.2" (relation := no_claim)
-        (note := "The closest this repo gets to 'Aut(D) acts by isometries', and still not it, for two independent reasons already recorded elsewhere in this repo. (1) The distance is slicingDist, not Bridgeland's d -- see mapEquiv_slicingDist's note; neither statement implies the other. (2) AutPairQuot v is NOT Aut(D): its elements are pairs (Phi, lam), and the forgetful map to AutQuot C is proved neither injective nor surjective. Cite this as 'the group of autoequivalences carrying a compatible class-lattice automorphism preserves the phase distance'.")]
+irrelevance discharges the descent.
+
+Compare Lemma 8.2 of arXiv:math/0212237. This is not its isometry statement: the distance is
+`slicingDist` (see `mapEquiv_slicingDist`), and the forgetful map from `AutPairQuot v`
+to `AutQuot C` is proved neither injective nor surjective. -/
 theorem AutPairQuot_smul_slicingDist
     (g : CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot v)
     (σ τ : StabilityCondition.WithClassMap C v) :

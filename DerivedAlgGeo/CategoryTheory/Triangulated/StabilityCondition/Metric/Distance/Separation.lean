@@ -210,9 +210,11 @@ theorem stabilityConditionDist_eq_zero
     {σ τ : StabilityCondition C} (hd : stabilityDist σ τ = 0) : σ = τ :=
   stabilityDist_eq_zero (Function.surjective_id) hd
 
-/-- Identity of indiscernibles for ordinary stability conditions. -/
-@[simp, cites "stmt:a520a8d4f877:bridgeland2007.prop-8.1" (relation := no_claim)
-        (note := "The identity-of-indiscernibles clause for the literal finite HN-mass distance on ordinary stability conditions. The comparison between the distance-induced topology and the Section 6 topology remains unproved, so the complete proposition is not claimed.")]
+/-- Identity of indiscernibles for ordinary stability conditions.
+
+This is the identity-of-indiscernibles clause of Proposition 8.1 of arXiv:math/0212237, for the
+finite HN-mass distance. -/
+@[simp]
 theorem stabilityConditionDist_eq_zero_iff
     {σ τ : StabilityCondition C} : stabilityDist σ τ = 0 ↔ σ = τ := by
   constructor

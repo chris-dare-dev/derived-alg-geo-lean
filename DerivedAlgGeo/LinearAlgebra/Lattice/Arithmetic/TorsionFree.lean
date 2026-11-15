@@ -28,7 +28,7 @@ theorem eq_zero_of_zsmul_eq_zero {n : ℤ} (hn : n ≠ 0) {x : Λ} (h : n • x 
 /-- `2 • x = 0 → x = 0`.
 
 This is the article's §8 step "`2[E] = 0` in a torsion-free lattice, hence
-`[E] = 0`" — the smallest genuinely load-bearing target in the registry. -/
+`[E] = 0`". -/
 theorem eq_zero_of_two_zsmul_eq_zero {x : Λ} (h : (2 : ℤ) • x = 0) : x = 0 :=
   eq_zero_of_zsmul_eq_zero (by norm_num) h
 

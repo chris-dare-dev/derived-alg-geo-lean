@@ -2,22 +2,19 @@
 """Invariant: every pin of a dependency names one revision, and that revision
 is on the dependency's trunk.
 
-`lake-manifest.json` is the source of truth. Three things can disagree with it,
+`lake-manifest.json` is the source of truth. Two things can disagree with it,
 and each is a hard failure (exit 1):
 
-1. The mfc CLI that `ci.yml` installs by pip must be the commit Lake pins for
-   `MathFormalContract`. The Lean emitter and the Python validator read one
-   schema, so two revisions of that repository cannot both be in use.
-2. `docbuild/lake-manifest.json` must pin every package it shares with the
+1. `docbuild/lake-manifest.json` must pin every package it shares with the
    root manifest at the same revision. It shares the root's `packagesDir`, so
    a stale entry there compiles the docs against a library that never built.
-3. A package pinned to a bare 40-hex commit must have that commit reachable
+2. A package pinned to a bare 40-hex commit must have that commit reachable
    from its repository's default branch. A pull-request tip has no owner: once
    that branch is rebased or deleted the pin stops resolving, and nothing fails
    until the next clean clone. A tag or branch name in `inputRev` is a
    maintained target and is not asked about.
 
-Check 3 needs `gh` and the network. Without them it prints NOT_RUN instead of
+Check 2 needs `gh` and the network. Without them it prints NOT_RUN instead of
 passing, and `--require-api` (which CI passes) turns NOT_RUN into a failure.
 
 Usage:  python3 scripts/check_pin.py [--require-api] [repo_root]
@@ -34,26 +31,10 @@ import sys
 from _output import force_utf8_output
 
 SHA40 = re.compile(r"\A[0-9a-f]{40}\Z")
-MFC_PACKAGE = "MathFormalContract"
-MFC_PIP_PIN = re.compile(r"math-formal-contract-lean@([0-9a-f]{40})")
 
 
 def manifest_revs(path: pathlib.Path) -> dict[str, dict]:
     return {p["name"]: p for p in json.loads(path.read_text())["packages"]}
-
-
-def mfc_cli_findings(root: pathlib.Path, packages: dict[str, dict]) -> list[str]:
-    cli_pins = set(MFC_PIP_PIN.findall((root / ".github/workflows/ci.yml").read_text()))
-    lake_rev = (packages.get(MFC_PACKAGE) or {}).get("rev")
-    if not cli_pins:
-        return ["ci.yml no longer installs the mfc CLI from a pinned commit"]
-    if lake_rev is None:
-        return [f"ci.yml installs the mfc CLI but {MFC_PACKAGE} is not in lake-manifest.json"]
-    if cli_pins != {lake_rev}:
-        return [f"ci.yml installs the mfc CLI at {sorted(cli_pins)} but lake-manifest.json "
-                f"pins {MFC_PACKAGE} at {lake_rev!r}; the emitter and the validator would "
-                "read different schemas"]
-    return []
 
 
 def docbuild_findings(root: pathlib.Path, packages: dict[str, dict]) -> list[str]:
@@ -142,15 +123,14 @@ def main(argv: list[str]) -> int:
     paths = [a for a in argv if not a.startswith("--")]
     root = pathlib.Path(paths[0]).resolve() if paths else pathlib.Path(__file__).resolve().parent.parent
     packages = manifest_revs(root / "lake-manifest.json")
-    failures = (mfc_cli_findings(root, packages) + docbuild_findings(root, packages)
-                + trunk_findings(packages, require_api))
+    failures = docbuild_findings(root, packages) + trunk_findings(packages, require_api)
     if failures:
         print(f"FAIL  pin coherence ({len(failures)} problem(s)):")
         for f in failures:
             print(f"  - {f}")
         return 1
-    print(f"OK    {len(packages)} pinned packages agree across lake-manifest.json, "
-          "docbuild and ci.yml")
+    print(f"OK    {len(packages)} pinned packages agree across lake-manifest.json "
+          "and docbuild")
     return 0
 
 

@@ -26,26 +26,6 @@ TODO.md
 *.orig
 *.rej
 
-# Environment-emission artifacts are attached to releases or CI runs, not
-# committed as potentially stale trust records.
-#
-# `/attest/*` and not `/attest/`, because git CANNOT re-include a file whose
-# parent directory is excluded -- and exactly one file in here must be
-# committed. `review.yaml` is the only contract artifact no machine produces or
-# regenerates: CI rebuilds every other attest/ file from scratch on each run,
-# so a human review left ignored would vanish on the next clone and C-10 would
-# report not_run forever. It is human-authored evidence, not a stale
-# measurement, and the reasoning above does not apply to it.
-/attest/*
-!/attest/review.yaml
-
-# CI scratch, ignored so `worktree_dirty` in environment.json means what it
-# says. `mfc env` reads `git status --porcelain`, and `mfc seal` REFUSES a dirty
-# tree -- the subject attests a gitCommit, and uncommitted changes make every
-# digest in the bundle a true statement about a tree nobody can fetch. Before
-# this block the workflow's own venv and audit logs made every CI run "dirty",
-# which is a measurement of the workflow rather than of the repository.
-/.mfc-venv/
 # Local Python environment for the loop controller, parser and test suite.
 /.loop-tools/
 # The `roadmap` job's venv for the repository Python tests.
