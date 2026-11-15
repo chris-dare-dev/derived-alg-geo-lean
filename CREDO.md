@@ -98,8 +98,7 @@ true. Until then the older rule in `AGENTS.md` or `CONTRIBUTING.md` applies to
 what that line names and to nothing else.
 
 - `docs/`, `.claude/decisions/` and `.claude/roadmap/` are in the tree, and
-  `AGENTS.md`, `scripts/check_layering.py` and `scripts/check_roadmap.py`
-  read them (§1).
+  `AGENTS.md` and `scripts/check_roadmap.py` read them (§1).
 - `AGENTS.md` is over 200 lines: its subject-ownership rules leave with
   `docs/` for the wiki (§1).
 - Files outside the areas above are in the tree. `LEGACY` in
