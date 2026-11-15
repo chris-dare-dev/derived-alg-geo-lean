@@ -22,9 +22,10 @@ of which the pullback of `F` is flat.
 ## Main results
 
 * `AlgebraicGeometry.Scheme.Modules.exists_dense_isFlatOver`: generic flatness over a reduced
-  locally Noetherian base (Stacks 052B, EGA IV 6.9.1).
+  locally Noetherian base (Stacks 052B; EGA IV 6.9.1 over an integral base).
 * `AlgebraicGeometry.Scheme.Modules.exists_flatStratification`: the generic flatness
-  stratification over a Noetherian base (EGA IV 6.9.3, the Noetherian case of Stacks 0ASY).
+  stratification over a Noetherian base, with reduced strata (EGA IV 6.9.3; compare Stacks
+  0ASY, whose strata need not be reduced).
 
 ## Proof
 
@@ -372,15 +373,15 @@ private theorem exists_flatStratification_closeds [IsNoetherian S] [LocallyOfFin
     · exact isFlatOver_pullback_comp p i U F hflat
     · exact hflat' j
 
-/-- **The generic flatness stratification** (EGA IV 6.9.3; the Noetherian case of Stacks
-0ASY). Let `S` be a Noetherian scheme, `p : X ⟶ S` quasi-compact and locally of finite type,
-and `F` a coherent sheaf on `X`. Then `S` is the disjoint union of the images of finitely many
-immersions `ι j : W j ⟶ S` of reduced schemes, and the pullback of `F` to `X ×_S W j` is flat
-over `W j` for every `j`.
+/-- **The generic flatness stratification** (EGA IV 6.9.3; compare Stacks 0ASY). Let `S` be a
+Noetherian scheme, `p : X ⟶ S` quasi-compact and locally of finite type, and `F` a coherent
+sheaf on `X`. Then `S` is the disjoint union of the images of finitely many immersions
+`ι j : W j ⟶ S` of reduced schemes, and the pullback of `F` to `X ×_S W j` is flat over `W j`
+for every `j`.
 
 The strata are reduced, and need to be: for `S = X = Spec k[ε]/(ε²)` and `F = k`, the only
-non-reduced stratum available is `S` itself, over which `F` is not flat. Noetherianity of `S` makes
-the induction on closed subsets terminate, so that there are finitely many strata.
+non-reduced stratum available is `S` itself, over which `F` is not flat. Noetherianity of `S`
+makes the induction on closed subsets terminate, so that there are finitely many strata.
 
 This is the sheaf input to Lemma 8.3(2) of Li, Liu, Liu, Macrì, Perry, Stellari and Zhao
 (arXiv:2607.28411), which applies Stacks 052B repeatedly to the cohomology sheaves of an

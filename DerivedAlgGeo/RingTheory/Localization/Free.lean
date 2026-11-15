@@ -44,8 +44,8 @@ The base case, `M` finite over `R`, is Mathlib's
 `Module.FinitePresentation.exists_free_localizedModule_powers`: `M` is finitely presented since
 `R` is Noetherian, and `M_p` is free since `R_p` is a field.
 
-This route avoids Noether normalization and dimension theory, which the proof in the Stacks
-Project uses.
+This route avoids the Noether normalization and the induction on dimension that the proofs in
+the Stacks Project, EGA and Nitsure use.
 
 ## Hypotheses
 
@@ -53,10 +53,10 @@ Project uses.
   and to make the intermediate subalgebras Noetherian, so that the kernels stabilize. Stacks
   Lemma 051S removes it under finite presentation, by descending to a finitely generated
   `ℤ`-subalgebra of `R`; that is not done here.
-* That `R_p` is a field cannot be dropped. Over `R = k[t]` and `p = (t)`, the module `k[t]/(t)`
-  is nonzero and torsion after inverting any `f ∉ p`, so it is never free. Over `R = k[ε]/(ε²)`
-  and its only prime, `M = k` is not free over any localization `R_f`, `f ∉ p`, as `f` is then
-  a unit.
+* That `R_p` is a field cannot be dropped; take `S = R` in both examples. Over `R = k[t]` and
+  `p = (t)`, the module `M = k[t]/(t)` is nonzero and torsion after inverting any `f ∉ p`, so it
+  is never free. Over `R = k[ε]/(ε²)` and its only prime, `M = k` is not free over any `R_f` with
+  `f ∉ p`, as `f` is then a unit.
 
 ## References
 
