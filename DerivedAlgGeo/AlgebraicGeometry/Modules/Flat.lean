@@ -45,6 +45,11 @@ flat over `S'`.
   affine opens implies flatness over the base, for every module sheaf.
 * `AlgebraicGeometry.Scheme.Modules.isFlatOver_iff_affine` — for a quasi-coherent module sheaf,
   flatness over the base is flatness of sections over compatible affine opens.
+* `AlgebraicGeometry.Scheme.Modules.flat_stalk_of_isLocalizedModule` — for a quasi-coherent
+  module sheaf, flatness of the stalk at a point follows from flatness of a localization of the
+  sections over one affine chart.
+* `AlgebraicGeometry.Scheme.Modules.flat_stalk_of_isPullback` — base change of flatness at a point,
+  for any pullback square.
 * `AlgebraicGeometry.Scheme.Modules.isFlatOver_pullback` — flatness over the base is stable under
   base change.
 
@@ -87,7 +92,8 @@ the germ map `Γ(U, M) ⟶ M_x` a localization at the prime of `x` for affine
 
 ### Base change
 
-`isFlatOver_pullback` is proved stalkwise and needs no quasi-coherence. At a
+`flat_stalk_of_isPullback` is proved stalkwise, for any `IsPullback` square, and needs no
+quasi-coherence; `isFlatOver_pullback` applies it to the chosen pullback at every point. At a
 point `z` of the fibre product `P`, `pullbackStalkIso` identifies the stalk of
 the pullback with `𝒪_{P,z} ⊗ M_y`. Over affine opens `U`, `V`, `V'` around the
 images of `z`, the sections of `P` over `W = fst⁻¹ U ∩ snd⁻¹ V'` form the
@@ -630,24 +636,74 @@ theorem isFlatOver_iff_affine {Y T : Scheme.{u}} (q : Y ⟶ T) (M : Y.Modules)
           (germ_stalkMap_eq_appLE_germ q hUV _ (hpt P) (hUV (hpt P)))).symm }
   exact Module.Flat.of_linearEquiv e
 
-/-- **Flatness over the base is stable under base change.** For `q : Y ⟶ T` and `h : T' ⟶ T`,
-if `M` is flat over `T` then its pullback along the projection `Y ×_T T' ⟶ Y` is flat over
-`T'` through the other projection.
+/-- **Flatness at a point from one affine chart.** Let `M` be quasi-coherent, `U ⊆ Y` and
+`V ⊆ T` affine opens with `q(U) ⊆ V`, and `x ∈ U`. If some localization `N` of `Γ(U, M)` at a
+submonoid of `Γ(Y, U)` that does not vanish at `x` is flat over `Γ(T, V)`, through
+`q.appLE V U`, then the stalk `M_x` is flat over `𝒪_{T, q x}`.
 
-No quasi-coherence is assumed. The proof is stalkwise: the stalk of the pullback is
-`𝒪_{P,z} ⊗ M_y` (`pullbackStalkIso`), and over affine opens the local ring `𝒪_{P,z}` is a
-localization of the pushout `Γ(U) ⊗_{Γ(V)} Γ(V')` of sections
-(`isIso_pushoutSection_of_isAffineOpen`). -/
-@[stacks 01U8]
-theorem isFlatOver_pullback {Y T T' : Scheme.{u}} (q : Y ⟶ T) (h : T' ⟶ T) (M : Y.Modules)
-    (hM : IsFlatOver q M) :
-    IsFlatOver (Limits.pullback.snd q h)
-      ((Scheme.Modules.pullback (Limits.pullback.fst q h)).obj M) := by
-  intro z
-  let fst := Limits.pullback.fst q h
-  let snd := Limits.pullback.snd q h
+The stalk `M_x` localizes `N` further at the prime of `x`, as quasi-coherence makes the germ map
+`Γ(U, M) ⟶ M_x` a localization there. The submonoid `{1}`, with `N = Γ(U, M)`, gives flatness
+at every point of `U` from flatness of the sections. -/
+theorem flat_stalk_of_isLocalizedModule {Y T : Scheme.{u}} (q : Y ⟶ T) (M : Y.Modules)
+    [M.IsQuasicoherent] {U : Y.Opens} {V : T.Opens} (hU : IsAffineOpen U) (hV : IsAffineOpen V)
+    (hUV : U ≤ q ⁻¹ᵁ V) {x : Y} (hx : x ∈ U) (Sm : Submonoid Γ(Y, U))
+    (hSm : ∀ s ∈ Sm, x ∈ Y.basicOpen s) {N : Type u} [AddCommGroup N] [Module Γ(Y, U) N]
+    (g : Γ(M, U) →ₗ[Γ(Y, U)] N) [IsLocalizedModule Sm g]
+    (hN : Module.Flat Γ(T, V) ((ModuleCat.restrictScalars (q.appLE V U hUV).hom).obj
+      (ModuleCat.of Γ(Y, U) N))) :
+    Module.Flat (T.presheaf.stalk (q x))
+      ((ModuleCat.restrictScalars (q.stalkMap x).hom).obj ((moduleStalkFunctor Y x).obj M)) := by
+  obtain ⟨y, rfl⟩ : ∃ y : PrimeSpectrum Γ(Y, U), hU.fromSpec y = x :=
+    ⟨_, hU.fromSpec_primeIdealOf ⟨x, hx⟩⟩
+  have hle : Sm ≤ y.asIdeal.primeCompl := fun s hs ↦
+    (mem_basicOpen_fromSpec_iff hU y s).mp (hSm s hs)
+  have := isLocalizedModule_stalkGerm M hU y hx
+  let ℓ := IsLocalizedModule.liftOfLE Sm y.asIdeal.primeCompl hle g (stalkGermLinearMap M U _ hx)
+  let : Algebra Γ(T, V) Γ(Y, U) := (q.appLE V U hUV).hom.toAlgebra
+  let : Module Γ(T, V) N := Module.compHom N (algebraMap Γ(T, V) Γ(Y, U))
+  have : IsScalarTower Γ(T, V) Γ(Y, U) N := IsScalarTower.of_algebraMap_smul fun _ _ ↦ rfl
+  have : Module.Flat Γ(T, V) N := hN
+  let Mx := (ModuleCat.restrictScalars (Y.presheaf.germ U _ hx).hom).obj
+    ((moduleStalkFunctor Y (hU.fromSpec y)).obj M)
+  let : Module Γ(T, V) Mx := Module.compHom Mx (algebraMap Γ(T, V) Γ(Y, U))
+  have : IsScalarTower Γ(T, V) Γ(Y, U) Mx := IsScalarTower.of_algebraMap_smul fun _ _ ↦ rfl
+  have : Module.Flat Γ(T, V) Mx := flat_of_isLocalizedModule_of_flat y.asIdeal.primeCompl ℓ
+  refine (flat_stalk_iff q M _ hV (hUV hx)).mpr ?_
+  let e : (ModuleCat.restrictScalars
+      (T.presheaf.germ V _ (hUV hx) ≫ q.stalkMap (hU.fromSpec y)).hom).obj
+        ((moduleStalkFunctor Y (hU.fromSpec y)).obj M) ≃ₗ[Γ(T, V)] Mx :=
+    { toFun := fun m ↦ m
+      invFun := fun m ↦ m
+      left_inv := fun _ ↦ rfl
+      right_inv := fun _ ↦ rfl
+      map_add' := fun _ _ ↦ rfl
+      map_smul' := fun a m ↦ by
+        change (T.presheaf.germ V _ (hUV hx) ≫ q.stalkMap (hU.fromSpec y)).hom a • m =
+          Y.presheaf.germ U _ hx (q.appLE V U hUV a) • m
+        exact congrArg (· • m) (congrArg (fun φ ↦ φ.hom a)
+          (germ_stalkMap_eq_appLE_germ q hUV _ hx (hUV hx))) }
+  exact Module.Flat.of_linearEquiv e
+
+/-- **Base change of flatness, at a point.** For a pullback square `P = Y ×_T T'` with
+projections `fst : P ⟶ Y` and `snd : P ⟶ T'`, if the stalk of `M` at `fst z` is flat over
+`𝒪_{T, q (fst z)}`, then the stalk at `z` of the pullback of `M` along `fst` is flat over
+`𝒪_{T', snd z}`.
+
+No quasi-coherence is assumed. The stalk of the pullback is `𝒪_{P,z} ⊗ M_y`
+(`pullbackStalkIso`), and over affine opens the local ring `𝒪_{P,z}` is a localization of the
+pushout `Γ(U) ⊗_{Γ(V)} Γ(V')` of sections (`isIso_pushoutSection_of_isAffineOpen`). The square
+is any `IsPullback` square, not only the chosen pullback, so that restriction to an open of the
+base and pasting of pullbacks need no comparison of fibre products. -/
+theorem flat_stalk_of_isPullback {P Y T T' : Scheme.{u}} {fst : P ⟶ Y} {snd : P ⟶ T'}
+    {q : Y ⟶ T} {h : T' ⟶ T} (H : IsPullback fst snd q h) (M : Y.Modules) (z : P)
+    (hM : Module.Flat (T.presheaf.stalk (q (fst z)))
+      ((ModuleCat.restrictScalars (q.stalkMap (fst z)).hom).obj
+        ((moduleStalkFunctor Y (fst z)).obj M))) :
+    Module.Flat (T'.presheaf.stalk (snd z))
+      ((ModuleCat.restrictScalars (snd.stalkMap z).hom).obj
+        ((moduleStalkFunctor P z).obj ((Scheme.Modules.pullback fst).obj M))) := by
   have hcond : q (fst z) = h (snd z) := by
-    rw [← Scheme.Hom.comp_apply, Limits.pullback.condition, Scheme.Hom.comp_apply]
+    rw [← Scheme.Hom.comp_apply, H.w, Scheme.Hom.comp_apply]
   obtain ⟨V, hV, hyV, -⟩ :=
     Opens.isBasis_iff_nbhd.mp T.isBasis_affineOpens (Opens.mem_top (q (fst z)))
   obtain ⟨U, hU, hyU, hUV⟩ :=
@@ -656,7 +712,6 @@ theorem isFlatOver_pullback {Y T T' : Scheme.{u}} (q : Y ⟶ T) (h : T' ⟶ T) (
     (show snd z ∈ h ⁻¹ᵁ V from (show h (snd z) ∈ V by rw [← hcond]; exact hyV))
   let W := fst ⁻¹ᵁ U ⊓ snd ⁻¹ᵁ V'
   have hzW : z ∈ W := ⟨hyU, hzV'⟩
-  have H := IsPullback.of_hasPullback q h
   have hpush := (isIso_pushoutSection_iff H hV'V hUV (UY := W) rfl).mp
     (isIso_pushoutSection_of_isAffineOpen H hV'V hUV rfl hV hV' hU)
   have hW : IsAffineOpen W := by
@@ -669,38 +724,38 @@ theorem isFlatOver_pullback {Y T T' : Scheme.{u}} (q : Y ⟶ T) (h : T' ⟶ T) (
   -- The pushout square of sections `Γ(V) → Γ(U), Γ(V') → Γ(W)`.
   let : Algebra Γ(T, V) Γ(Y, U) := (q.appLE V U hUV).hom.toAlgebra
   let : Algebra Γ(T, V) Γ(T', V') := (h.appLE V V' hV'V).hom.toAlgebra
-  let : Algebra Γ(Y, U) Γ(Limits.pullback q h, W) := (fst.appLE U W hUW).hom.toAlgebra
-  let : Algebra Γ(T', V') Γ(Limits.pullback q h, W) := (snd.appLE V' W hV'W).hom.toAlgebra
-  let : Algebra Γ(T, V) Γ(Limits.pullback q h, W) :=
+  let : Algebra Γ(Y, U) Γ(P, W) := (fst.appLE U W hUW).hom.toAlgebra
+  let : Algebra Γ(T', V') Γ(P, W) := (snd.appLE V' W hV'W).hom.toAlgebra
+  let : Algebra Γ(T, V) Γ(P, W) :=
     (q.appLE V U hUV ≫ fst.appLE U W hUW).hom.toAlgebra
-  have : IsScalarTower Γ(T, V) Γ(Y, U) Γ(Limits.pullback q h, W) :=
+  have : IsScalarTower Γ(T, V) Γ(Y, U) Γ(P, W) :=
     IsScalarTower.of_algebraMap_eq' rfl
-  have : IsScalarTower Γ(T, V) Γ(T', V') Γ(Limits.pullback q h, W) :=
+  have : IsScalarTower Γ(T, V) Γ(T', V') Γ(P, W) :=
     IsScalarTower.of_algebraMap_eq' (congrArg CommRingCat.Hom.hom hpush.w)
-  have : Algebra.IsPushout Γ(T, V) Γ(T', V') Γ(Y, U) Γ(Limits.pullback q h, W) :=
+  have : Algebra.IsPushout Γ(T, V) Γ(T', V') Γ(Y, U) Γ(P, W) :=
     (CommRingCat.isPushout_iff_isPushout.mp hpush).symm
   -- The local rings at `fst z` and `z` localize `Γ(U)` and `Γ(W)`.
   let : Algebra Γ(Y, U) (Y.presheaf.stalk (fst z)) :=
     TopCat.Presheaf.algebra_section_stalk Y.presheaf ⟨fst z, hyU⟩
   have := hU.isLocalization_stalk ⟨fst z, hyU⟩
-  let : Algebra Γ(Limits.pullback q h, W) ((Limits.pullback q h).presheaf.stalk z) :=
+  let : Algebra Γ(P, W) ((P).presheaf.stalk z) :=
     TopCat.Presheaf.algebra_section_stalk _ ⟨z, hzW⟩
   have := hW.isLocalization_stalk ⟨z, hzW⟩
-  let : Algebra (Y.presheaf.stalk (fst z)) ((Limits.pullback q h).presheaf.stalk z) :=
+  let : Algebra (Y.presheaf.stalk (fst z)) ((P).presheaf.stalk z) :=
     (fst.stalkMap z).hom.toAlgebra
-  let : Algebra Γ(Y, U) ((Limits.pullback q h).presheaf.stalk z) :=
+  let : Algebra Γ(Y, U) ((P).presheaf.stalk z) :=
     (Y.presheaf.germ U (fst z) hyU ≫ fst.stalkMap z).hom.toAlgebra
   have : IsScalarTower Γ(Y, U) (Y.presheaf.stalk (fst z))
-      ((Limits.pullback q h).presheaf.stalk z) :=
+      ((P).presheaf.stalk z) :=
     IsScalarTower.of_algebraMap_eq' rfl
-  have : IsScalarTower Γ(Y, U) Γ(Limits.pullback q h, W)
-      ((Limits.pullback q h).presheaf.stalk z) :=
+  have : IsScalarTower Γ(Y, U) Γ(P, W)
+      ((P).presheaf.stalk z) :=
     IsScalarTower.of_algebraMap_eq'
       (congrArg CommRingCat.Hom.hom (germ_stalkMap_eq_appLE_germ fst hUW z hzW hyU))
-  let : Algebra Γ(T', V') ((Limits.pullback q h).presheaf.stalk z) :=
+  let : Algebra Γ(T', V') ((P).presheaf.stalk z) :=
     (T'.presheaf.germ V' (snd z) hzV' ≫ snd.stalkMap z).hom.toAlgebra
-  have : IsScalarTower Γ(T', V') Γ(Limits.pullback q h, W)
-      ((Limits.pullback q h).presheaf.stalk z) :=
+  have : IsScalarTower Γ(T', V') Γ(P, W)
+      ((P).presheaf.stalk z) :=
     IsScalarTower.of_algebraMap_eq'
       (congrArg CommRingCat.Hom.hom (germ_stalkMap_eq_appLE_germ snd hV'W z hzW hzV'))
   -- The stalk `M_y`, flat over `Γ(V)`.
@@ -713,7 +768,7 @@ theorem isFlatOver_pullback {Y T T' : Scheme.{u}} (q : Y ⟶ T) (h : T' ⟶ T) (
     IsScalarTower.of_algebraMap_smul fun _ _ ↦ rfl
   have : IsScalarTower Γ(T, V) Γ(Y, U) My := IsScalarTower.of_algebraMap_smul fun _ _ ↦ rfl
   have : Module.Flat Γ(T, V) My := by
-    have := (flat_stalk_iff q M (fst z) hV hyV).mp (hM (fst z))
+    have := (flat_stalk_iff q M (fst z) hV hyV).mp hM
     let e : My ≃ₗ[Γ(T, V)] (ModuleCat.restrictScalars
         (T.presheaf.germ V (q (fst z)) hyV ≫ q.stalkMap (fst z)).hom).obj My :=
       { toFun := fun m ↦ m
@@ -728,8 +783,8 @@ theorem isFlatOver_pullback {Y T T' : Scheme.{u}} (q : Y ⟶ T) (h : T' ⟶ T) (
             (germ_stalkMap_eq_appLE_germ q hUV _ hyU hyV)).symm }
     exact Module.Flat.of_linearEquiv e
   have := flat_tensor_of_isPushout (A := Γ(T, V)) (A' := Γ(T', V')) (B := Γ(Y, U))
-    (C := Γ(Limits.pullback q h, W)) (L := Y.presheaf.stalk (fst z))
-    (D := (Limits.pullback q h).presheaf.stalk z) (hU.primeIdealOf ⟨fst z, hyU⟩).asIdeal.primeCompl
+    (C := Γ(P, W)) (L := Y.presheaf.stalk (fst z))
+    (D := (P).presheaf.stalk z) (hU.primeIdealOf ⟨fst z, hyU⟩).asIdeal.primeCompl
     (hW.primeIdealOf ⟨z, hzW⟩).asIdeal.primeCompl My
   -- The stalk of the pullback is `𝒪_{P,z} ⊗ M_y`.
   refine (flat_stalk_iff snd _ z hV' hzV').mpr ?_
@@ -737,7 +792,7 @@ theorem isFlatOver_pullback {Y T T' : Scheme.{u}} (q : Y ⟶ T) (h : T' ⟶ T) (
     snd.stalkMap z).hom).mapIso ((pullbackStalkIso fst z).app M)).toLinearEquiv
   let e₂ : (ModuleCat.restrictScalars (T'.presheaf.germ V' (snd z) hzV' ≫
       snd.stalkMap z).hom).obj ((ModuleCat.extendScalars (fst.stalkMap z).hom).obj My) ≃ₗ[Γ(T', V')]
-        (Limits.pullback q h).presheaf.stalk z ⊗[Y.presheaf.stalk (fst z)] My :=
+        (P).presheaf.stalk z ⊗[Y.presheaf.stalk (fst z)] My :=
     { toFun := fun m ↦ m
       invFun := fun m ↦ m
       left_inv := fun _ ↦ rfl
@@ -745,6 +800,18 @@ theorem isFlatOver_pullback {Y T T' : Scheme.{u}} (q : Y ⟶ T) (h : T' ⟶ T) (
       map_add' := fun _ _ ↦ rfl
       map_smul' := fun _ _ ↦ rfl }
   exact Module.Flat.of_linearEquiv (e₁.trans e₂)
+
+
+/-- **Flatness over the base is stable under base change.** For `q : Y ⟶ T` and `h : T' ⟶ T`,
+if `M` is flat over `T` then its pullback along the projection `Y ×_T T' ⟶ Y` is flat over
+`T'` through the other projection. No quasi-coherence is assumed; see
+`flat_stalk_of_isPullback`, which this applies at every point. -/
+@[stacks 01U8]
+theorem isFlatOver_pullback {Y T T' : Scheme.{u}} (q : Y ⟶ T) (h : T' ⟶ T) (M : Y.Modules)
+    (hM : IsFlatOver q M) :
+    IsFlatOver (Limits.pullback.snd q h)
+      ((Scheme.Modules.pullback (Limits.pullback.fst q h)).obj M) := fun z ↦
+  flat_stalk_of_isPullback (IsPullback.of_hasPullback q h) M z (hM _)
 
 end Scheme.Modules
 
