@@ -10,6 +10,8 @@ import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Discrete
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Morphism
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Representable
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.ULift
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.ULift
 
 /-!
 # Descent and stacks
@@ -26,7 +28,10 @@ its directory, so this umbrella imports the children directly.
   and descent data along one morphism as coalgebras for the comonad of
   `f^* ⊣ f_*` when two base change morphisms are isomorphisms.
 * `StackInGroupoids.lean` and its children: stacks in groupoids, discrete
-  stacks from sheaves, stack morphisms, and site-object representability.
+  stacks from sheaves, stack morphisms, site-object representability, and
+  universe lifts of stacks.
+* `ULift.lean`: descent data of the universe lift `Pseudofunctor.ulift` are
+  equivalent to those of the original pseudofunctor.
 
 ## Main results
 
@@ -36,6 +41,7 @@ its directory, so this umbrella imports the children directly.
   comonadicity of its pullback functor, under the base change hypotheses.
 * `DescentDataPrime.lean`: effective descent along one morphism is unchanged by
   reindexing along a functor that preserves the pullbacks involved.
+* `ULift.lean`: a pseudofunctor is a prestack (a stack) exactly when its universe lift is.
 
 ## Implementation notes
 

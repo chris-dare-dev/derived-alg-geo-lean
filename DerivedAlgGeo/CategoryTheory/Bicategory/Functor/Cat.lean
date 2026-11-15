@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.FiberProduct
 import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.ObjectProperty
 import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.Transport
+import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.ULift
 
 /-!
 # Cat-valued pseudofunctors
@@ -23,6 +24,8 @@ This umbrella introduces no definitions. It exports:
 * `Cat/Transport.lean`: transport of a Cat-valued pseudofunctor presentation
   through objectwise equivalences, `Pseudofunctor.equivalenceTransportFunctor`
   with its compositor and unitor;
+* `Cat/ULift.lean`: the universe lift `Pseudofunctor.ulift` of a pseudofunctor on a locally
+  discrete base, with fibres `ULiftHom (ULift (F.obj X))`, built by that transport;
 * `Cat/FiberProduct.lean`: the 2-fibre product `Pseudofunctor.fiberProduct` of
   pseudofunctors on a locally discrete base, fibrewise Mathlib's categorical
   pullback, with its projections, lifts, the relative diagonal and the

@@ -417,7 +417,7 @@ items:
     kind: task
     parent: stacks-and-moduli-stk1
     title: "STK1.7: Universe lifts of stacks, and representable stacks in every fibre universe"
-    status: planned
+    status: done
     priority: must
     size: M
     summary: "Every Cat-valued pseudofunctor F on a locally discrete base has a universe lift F.ulift.{w₁, w₂}, with fibres ULiftHom.{w₁} (ULift.{w₂} (F.obj X)). The lift is a stack exactly when F is. So every stack in groupoids can be lifted to larger fibre universes."

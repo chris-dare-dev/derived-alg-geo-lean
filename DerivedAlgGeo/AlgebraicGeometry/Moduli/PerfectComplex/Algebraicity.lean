@@ -217,10 +217,10 @@ private noncomputable instance identityFiberArrowUnique {S : Scheme.{u}}
 private def identityStackFiberEquivPUnit {S : Scheme.{u}}
     (T : SchemeBaseChange S) :
     (representableZariskiStackMap (𝟙 S)).FiberCategory
-        (Discrete.mk T.hom) (Over.mk (𝟙 T.left)) ≌
+        (representableZariskiObject T.hom) (Over.mk (𝟙 T.left)) ≌
       Discrete PUnit.{u + 1} := by
   let R := RepresentableZariskiStackMap.fiberRepresentation
-    (𝟙 S) (Discrete.mk T.hom)
+    (𝟙 S) (representableZariskiObject T.hom)
   letI : Unique (Over.mk (𝟙 T.left) ⟶ R.representing) := by
     change Unique (Over.mk (𝟙 T.left) ⟶
       Over.mk (pullback.snd (𝟙 S) T.hom))
