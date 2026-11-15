@@ -3,17 +3,37 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.Algebra.Homology.DerivedCategory.KInjective
+import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.KInjective.Resolution
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.KInjective
 import DerivedAlgGeo.Algebra.Homology.HomotopyCategory.DGEnhancement.Seam
 
 /-!
 # The derived seam: `H⁰(D^dg A)` and `DerivedCategory A`
 
-`dg-enhancements-e9`, the theorem the DG track was opened for. The comparison
-functor is built here, its full faithfulness is proved unconditionally, and the
-equivalence is derived from one named external input.
+The comparison functor `H⁰(D^dg A) ⥤ D(A)` is built here, its full faithfulness
+is proved unconditionally, and the equivalence is derived from one named input,
+`HasKInjectiveResolutions A`, which every Grothendieck abelian category satisfies.
 
-## The route
+## Main definitions
+
+* `CategoryTheory.Cdg.HasKInjectiveResolutions`: every cochain complex has a
+  quasi-isomorphism to a K-injective one.
+* `CategoryTheory.Cdg.derivedSeamFunctor`: the comparison `H⁰(D^dg A) ⥤ D(A)`.
+* `CategoryTheory.Cdg.derivedSeam`: the equivalence `H⁰(D^dg A) ≌ D(A)`, given
+  resolutions.
+
+## Main results
+
+* `CategoryTheory.Cdg.hasKInjectiveResolutions_of_isGrothendieckAbelian`:
+  resolutions exist in a Grothendieck abelian category.
+* `CategoryTheory.Cdg.derivedSeamFunctor_map_bijective`: the comparison is
+  bijective on morphisms, unconditionally.
+* `CategoryTheory.Cdg.derivedSeamFunctor_essSurj`: it is essentially surjective,
+  given resolutions.
+
+## Implementation notes
+
+### The route
 
 `D^dg A` is the full dg subcategory of `C^dg A` on the K-injective complexes
 (`dg-enhancements-e8`). So the comparison factors through work that already
@@ -28,27 +48,28 @@ The first is `H⁰` of the inclusion dg functor, and it is fully faithful becaus
 the inclusion acts as `AddMonoidHom.id` on Hom-complexes. Only the last arrow
 carries new content, and it is where K-injectivity is spent.
 
-## What is unconditional, and what is not
+### What is unconditional, and what is not
 
 **Full faithfulness is unconditional.** Mathlib's
 `CochainComplex.IsKInjective.Qh_map_bijective` says `Qh` is bijective on
 morphisms *into* a K-injective complex. Both objects here are K-injective, so
 that applies directly and nothing further is assumed.
 
-**Essential surjectivity is not, and cannot be at this pin.** It asks that
-every object of `D(A)` be represented by a K-injective complex, i.e. that
-K-injective resolutions exist. That is Spaltenstein's theorem, and **Mathlib
-does not have it**: `Mathlib/Algebra/Homology/HomotopyCategory/KInjective.lean`
-cites [spaltenstein1998] in its references and proves no existence statement,
-and there is no `EnoughKInjectives`, no `kInjectiveResolution` and no
-`HasKInjective` anywhere in the library at `mathlib_rev`.
+**Essential surjectivity needs resolutions.** It asks that every object of
+`D(A)` be represented by a K-injective complex, i.e. that K-injective
+resolutions exist. Mathlib proves this only for bounded-below complexes. For a
+Grothendieck abelian category it is Spaltenstein's theorem,
+`CochainComplex.exists_isKInjective_quasiIso` (Stacks, Tag 079P), and
+`hasKInjectiveResolutions_of_isGrothendieckAbelian` makes it an instance. So
+`derivedSeam` needs no further input when `A` is Grothendieck abelian, for
+instance for module sheaves on a scheme.
 
-## The input, and the line it must not cross
+### The input, and the line it must not cross
 
-`HasKInjectiveResolutions` asks exactly for the missing mathematics: every
-cochain complex admits a quasi-isomorphism to a K-injective one. It is a real,
-externally checkable statement about `A` — true for Grothendieck abelian
-categories — and a caller supplying it is asserting a theorem, not a
+`HasKInjectiveResolutions` asks exactly for the existence of resolutions:
+every cochain complex admits a quasi-isomorphism to a K-injective one. It is a
+real statement about `A`, proved for Grothendieck abelian categories, and a
+caller supplying it for another category is asserting a theorem, not a
 convenience.
 
 What it deliberately is **not** is a field asserting that the comparison
@@ -58,22 +79,28 @@ resolution theorem represented by a caller-supplied conclusion field. The
 distinction is the whole design of this file: the input is upstream of the
 theorem and the theorem is derived from it.
 
-When someone formalizes Spaltenstein's construction, this class becomes an
-instance and `derivedSeam` becomes unconditional with no change to any
-consumer. That is the seam the design is protecting.
+For Grothendieck abelian categories the class is an instance, proved from
+Spaltenstein's construction, and no consumer statement mentions the
+construction. That is the seam the design is protecting.
 
 ## References
 
 * N. Spaltenstein, *Resolutions of unbounded complexes*, Compositio Math. 65
-  (1988) — the existence theorem `HasKInjectiveResolutions` stands in for.
+  (1988) — the existence theorem `HasKInjectiveResolutions` states.
+* [The Stacks project, Tag 079P](https://stacks.math.columbia.edu/tag/079P) —
+  the same theorem for Grothendieck abelian categories.
 * `Mathlib/Algebra/Homology/DerivedCategory/KInjective.lean` — the full
   faithfulness half, which Mathlib does supply.
+
+## Tags
+
+derived category, dg enhancement, K-injective resolution, homotopy category
 -/
 
 set_option autoImplicit false
 set_option relaxedAutoImplicit false
 
-universe v u
+universe w v u
 
 namespace CategoryTheory
 
@@ -91,18 +118,25 @@ abbrev ddgInclusion : DGFunctor (Ddg A) (Cdg A) :=
 variable (A) in
 /-- **Every cochain complex admits a K-injective resolution.**
 
-The one external input of this file, and the exact statement Mathlib lacks at
-`mathlib_rev`. It holds for Grothendieck abelian categories by Spaltenstein's
+The one input of this file. Mathlib proves it only for bounded-below
+complexes; for Grothendieck abelian categories it is the instance
+`hasKInjectiveResolutions_of_isGrothendieckAbelian`, Spaltenstein's
 construction.
 
 Stated as a quasi-isomorphism into a K-injective complex — the mathematics —
 rather than as any claim about the comparison functor below. See the module
 docstring on why that distinction is load-bearing. -/
 class HasKInjectiveResolutions : Prop where
-  /-- Every cochain complex receives a quasi-isomorphism from a K-injective
-  one. -/
+  /-- Every cochain complex has a quasi-isomorphism to a K-injective one. -/
   exists_kInjective_quasiIso (K : CochainComplex A ℤ) :
     ∃ (L : CochainComplex A ℤ) (_ : L.IsKInjective) (f : K ⟶ L), QuasiIso f
+
+/-- **K-injective resolutions exist in a Grothendieck abelian category** (Stacks,
+Theorem 19.12.6, Tag 079P): `CochainComplex.kInjectiveResolution`. -/
+instance hasKInjectiveResolutions_of_isGrothendieckAbelian [IsGrothendieckAbelian.{w} A] :
+    HasKInjectiveResolutions A where
+  exists_kInjective_quasiIso K :=
+    ⟨_, inferInstance, (kInjectiveResolutionι A).app K, inferInstance⟩
 
 variable [HasDerivedCategory.{v} A]
 
@@ -227,6 +261,10 @@ Full faithfulness is unconditional; only essential surjectivity consumes
 noncomputable def derivedSeam [HasKInjectiveResolutions A] :
     H0 (Ddg A) ≌ DerivedCategory A :=
   (derivedSeamFunctor (A := A)).asEquivalence
+
+/-- For a Grothendieck abelian category the seam takes no resolution input. -/
+noncomputable example [IsGrothendieckAbelian.{v} A] : H0 (Ddg A) ≌ DerivedCategory A :=
+  derivedSeam
 
 end Cdg
 
