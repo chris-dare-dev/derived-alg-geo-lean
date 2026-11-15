@@ -13,7 +13,7 @@
 #     in type or presence.
 #
 # Do not rename keys to taste. Closing these divergences is tracked as
-# .claude/roadmap/contract-v1.yaml -> contract-v1-e1 (GitHub #140).
+# https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Roadmap-Contract-V1 -> contract-v1-e1 (GitHub #140).
 #
 # Every field is a claim. If a field cannot be filled honestly, it says
 # "none" or "pending" -- never a flattering guess.
@@ -1663,7 +1663,7 @@ fidelity:
     and exits 0, so a sorryAx-backed declaration would build green here; the
     allowlist verdict above comes from reading the output, not from the exit
     code. A real gate requires an emitter that sweeps Environment.constants
-    (.claude/roadmap/contract-v1.yaml -> contract-v1-e4).
+    (https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Roadmap-Contract-V1 -> contract-v1-e4).
 
     No human has reviewed any statement for faithfulness to a source.
   source_mapping: >

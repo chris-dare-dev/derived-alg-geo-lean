@@ -8,25 +8,58 @@ import DerivedAlgGeo.AlgebraicGeometry.Moduli.PerfectComplex.Boundedness
 import DerivedAlgGeo.AlgebraicGeometry.Stacks.Algebraic
 
 /-!
-# Big-Zariski presentations of selected relative-perfect moduli problems
+# Pointwise big-Zariski presentations of selected relative-perfect moduli problems
 
-This file connects the SF8 relative-perfect and boundedness layers to the
-SF9 stack-presentation layer without postulating an Artin representability
-theorem.  A presentation contains big-Zariski stack data over the base and
-equivalences from its geometric fibers to the selected full subgroupoids of
-universally-gluable relative-perfect complexes.  It is not an algebraic-stack
-structure: fppf or étale descent has not yet been proved.
+This file connects the relative-perfect and pointwise finite-type cover layers
+to the pointwise stack-presentation layer without postulating an Artin
+representability theorem.  A `PointwiseRelativePerfectZariskiPresentation`
+contains pointwise big-Zariski stack data over the base and equivalences from
+its geometric fibers to the selected full subgroupoids of universally-gluable
+relative-perfect complexes.  The fibre identifications and the presentation
+are pointwise, so it is not an algebraic-stack structure, and the algebraicity
+of the moduli of universally gluable relative-perfect complexes is not claimed.
 
-The bounded refinement turns the universal family of an SF8 finite-type
-boundedness witness into an actual object of the corresponding stack fiber.
-Open relative-perfect presentations retain an actual representable open
-immersion and a commuting structural triangle.
+The covered refinement `PointwiseCoveredRelativePerfectZariskiPresentation`
+turns the universal family of a `PointwiseFiniteTypeCover` into an actual
+object of the corresponding stack fiber.  Pointwise open relative-perfect
+presentations retain an actual pointwise open immersion and a commuting
+structural triangle.
+
+## Main definitions
+
+* `PointwiseRelativePerfectZariskiPresentation` — a pointwise big-Zariski
+  presentation whose fibers are identified with the selected relative-perfect
+  moduli groupoids.
+* `PointwiseCoveredRelativePerfectZariskiPresentation` — such a presentation
+  together with a `PointwiseFiniteTypeCover`.
+* `PointwiseRelativePerfectOpenZariskiPresentation` — an ambient and an open
+  presentation with a pointwise open immersion between them.
+* `zeroPointwiseRelativePerfectZariskiPresentation`,
+  `zeroPointwiseCoveredRelativePerfectZariskiPresentation` — the supported zero
+  subproblem.
+
+## Main results
+
+* `PointwiseRelativePerfectZariskiPresentation.pointwiseLocallyOfFinitePresentation`
+  — the structure morphism of a presentation is pointwise locally of finite
+  presentation.
+
+## Implementation notes
 
 The supported zero subproblem is constructed explicitly: the identity stack
 over a locally Noetherian base has contractible fibers, as does the full
-groupoid of zero relative-perfect objects.  This is a genuine bounded
+groupoid of zero relative-perfect objects.  This is a genuine pointwise covered
 big-Zariski presentation, but it is not claimed to be an algebraic stack or
 the full relative-perfect moduli stack.
+
+## References
+
+This file builds on `Moduli/PerfectComplex/Boundedness.lean` and
+`Stacks/Algebraic.lean`.
+
+## Tags
+
+relative-perfect complex, moduli, stack presentation, Zariski topology
 -/
 
 attribute [local instance] HasDerivedCategory.standard
@@ -63,28 +96,34 @@ instance fiber_isGroupoid (P : RelativePerfectModuliSelector S)
 
 end RelativePerfectModuliSelector
 
-namespace FiniteTypeBoundednessWitness
+namespace PointwiseFiniteTypeCover
 
 variable {S : Scheme.{u}} {P : RelativePerfectModuliSelector S}
 
-/-- Regard the universal family in a boundedness witness as an object of the
-selected full moduli subgroupoid. -/
-def universalObject (W : FiniteTypeBoundednessWitness P) : P.Fiber W.parameter :=
+/-- Regard the universal family of a pointwise finite-type cover as an object
+of the selected full moduli subgroupoid. -/
+def universalObject (W : PointwiseFiniteTypeCover P) : P.Fiber W.parameter :=
   ⟨W.universalFamily, W.universalFamily_mem⟩
 
-end FiniteTypeBoundednessWitness
+end PointwiseFiniteTypeCover
 
-/-- A big-Zariski presentation of a selected relative-perfect moduli problem.
+/-- A pointwise big-Zariski presentation of a selected relative-perfect moduli
+problem.
 
 For every locally Noetherian base change `T ⟶ S`, the fiber of the actual
 structure morphism over that map is equivalent to the selected full
 subgroupoid of universally-gluable relative-perfect complexes on `T`.
 Restricting this field to the currently supported locally Noetherian locus
-keeps the unresolved arbitrary-scheme Dqc comparison visible. -/
-structure RelativePerfectZariskiPresentation (S : Scheme.{u})
+keeps the unresolved arbitrary-scheme Dqc comparison visible.
+
+The fibre identifications and the presentation are pointwise, so this is not
+an algebraicity statement for the moduli of universally gluable
+relative-perfect complexes. -/
+structure PointwiseRelativePerfectZariskiPresentation (S : Scheme.{u})
     (P : RelativePerfectModuliSelector S) where
-  /-- The big-Zariski presentation locally of finite presentation over `S`. -/
-  presentation : ZariskiStackPresentationOver S
+  /-- The pointwise big-Zariski presentation locally of finite presentation
+  over `S`. -/
+  presentation : PointwiseZariskiStackPresentationOver S
   /-- Identification of each supported stack fiber with the selected
   relative-perfect moduli groupoid. -/
   fiberEquivalence (T : SchemeBaseChange S) [IsLocallyNoetherian T.left] :
@@ -92,70 +131,78 @@ structure RelativePerfectZariskiPresentation (S : Scheme.{u})
         (representableZariskiObject T.hom) (Over.mk (𝟙 T.left)) ≌
       P.Fiber T
 
-namespace RelativePerfectZariskiPresentation
+namespace PointwiseRelativePerfectZariskiPresentation
 
 variable {S : Scheme.{u}} {P : RelativePerfectModuliSelector S}
 
-/-- The big-Zariski stack presentation underlying a relative-perfect
-presentation. -/
-abbrev stack (A : RelativePerfectZariskiPresentation S P) :
-    ZariskiStackPresentation :=
-  A.presentation.toZariskiStackPresentation
+/-- The pointwise big-Zariski stack presentation underlying a pointwise
+relative-perfect presentation. -/
+abbrev stack (A : PointwiseRelativePerfectZariskiPresentation S P) :
+    PointwiseZariskiStackPresentation :=
+  A.presentation.toPointwiseZariskiStackPresentation
 
-/-- The actual locally-finitely-presented structure morphism underlying a
-relative-perfect big-Zariski presentation. -/
-theorem locallyOfFinitePresentation
-    (A : RelativePerfectZariskiPresentation S P) :
-    StackMorphism.IsLocallyOfFinitePresentation
+/-- The structure morphism underlying a pointwise relative-perfect big-Zariski
+presentation is pointwise locally of finite presentation. -/
+theorem pointwiseLocallyOfFinitePresentation
+    (A : PointwiseRelativePerfectZariskiPresentation S P) :
+    StackMorphism.IsPointwiseLocallyOfFinitePresentation
       A.presentation.structureMorphism :=
-  A.presentation.locallyOfFinitePresentation
+  A.presentation.pointwiseLocallyOfFinitePresentation
 
-end RelativePerfectZariskiPresentation
+end PointwiseRelativePerfectZariskiPresentation
 
-/-- A bounded big-Zariski presentation co-locates an actual finite-type SF8
-boundedness witness with the SF9 stack presentation of the same selected
-relative-perfect moduli problem. -/
-structure BoundedRelativePerfectZariskiPresentation (S : Scheme.{u})
+/-- A pointwise covered big-Zariski presentation co-locates a
+`PointwiseFiniteTypeCover` with the pointwise stack presentation of the same
+selected relative-perfect moduli problem.
+
+The fibre identifications, the presentation and the cover are all pointwise,
+so this is neither an algebraicity nor a boundedness statement for the moduli
+of universally gluable relative-perfect complexes. -/
+structure PointwiseCoveredRelativePerfectZariskiPresentation (S : Scheme.{u})
     (P : RelativePerfectModuliSelector S)
-    extends RelativePerfectZariskiPresentation S P where
-  /-- The actual finite-type parameter scheme and its universal family. -/
-  boundedness : FiniteTypeBoundednessWitness P
+    extends PointwiseRelativePerfectZariskiPresentation S P where
+  /-- The finite-type parameter scheme and its universal family. -/
+  cover : PointwiseFiniteTypeCover P
 
-namespace BoundedRelativePerfectZariskiPresentation
+namespace PointwiseCoveredRelativePerfectZariskiPresentation
 
 variable {S : Scheme.{u}} {P : RelativePerfectModuliSelector S}
-  (A : BoundedRelativePerfectZariskiPresentation S P)
+  (A : PointwiseCoveredRelativePerfectZariskiPresentation S P)
 
-/-- The SF8 universal family, lifted through the proved fiber equivalence to
-an actual object of the SF9 big-Zariski stack over the parameter scheme. -/
-def universalStackObject [IsLocallyNoetherian A.boundedness.parameter.left] :
+/-- The universal family of the cover, lifted through the fiber equivalence to
+an actual object of the big-Zariski stack over the parameter scheme. -/
+def universalStackObject [IsLocallyNoetherian A.cover.parameter.left] :
     A.presentation.structureMorphism.FiberCategory
-      (representableZariskiObject A.boundedness.parameter.hom)
-      (Over.mk (𝟙 A.boundedness.parameter.left)) :=
-  (A.fiberEquivalence A.boundedness.parameter).inverse.obj
-    A.boundedness.universalObject
+      (representableZariskiObject A.cover.parameter.hom)
+      (Over.mk (𝟙 A.cover.parameter.left)) :=
+  (A.fiberEquivalence A.cover.parameter).inverse.obj
+    A.cover.universalObject
 
-/-- The lifted stack object realizes precisely the boundedness witness's
-universal relative-perfect family. -/
-def universalFamilyIso [IsLocallyNoetherian A.boundedness.parameter.left] :
-    (A.fiberEquivalence A.boundedness.parameter).functor.obj
+/-- The lifted stack object realizes precisely the cover's universal
+relative-perfect family. -/
+def universalFamilyIso [IsLocallyNoetherian A.cover.parameter.left] :
+    (A.fiberEquivalence A.cover.parameter).functor.obj
         A.universalStackObject ≅
-      A.boundedness.universalObject :=
-  (A.fiberEquivalence A.boundedness.parameter).counitIso.app
-    A.boundedness.universalObject
+      A.cover.universalObject :=
+  (A.fiberEquivalence A.cover.parameter).counitIso.app
+    A.cover.universalObject
 
-end BoundedRelativePerfectZariskiPresentation
+end PointwiseCoveredRelativePerfectZariskiPresentation
 
-/-- An open relative-perfect presentation keeps both moduli interpretations,
-an actual representable open immersion of their big-Zariski stacks, and the
-commuting triangle over the base. `familyLocus_le` states that the open
-fiberwise locus selects only objects of the ambient problem. -/
-structure RelativePerfectOpenZariskiPresentation (S : Scheme.{u})
+/-- A pointwise open relative-perfect presentation keeps both moduli
+interpretations, a pointwise open immersion of their big-Zariski stacks, and
+the commuting triangle over the base. `familyLocus_le` states that the open
+fiberwise locus selects only objects of the ambient problem.
+
+The fibre identifications, the presentations and the open immersion are
+pointwise, so this is not an algebraicity statement for the moduli of
+universally gluable relative-perfect complexes. -/
+structure PointwiseRelativePerfectOpenZariskiPresentation (S : Scheme.{u})
     (ambientProblem openProblem : RelativePerfectModuliSelector S) where
-  /-- Big-Zariski presentation of the ambient selected problem. -/
-  ambient : RelativePerfectZariskiPresentation S ambientProblem
-  /-- Big-Zariski presentation of the open selected problem. -/
-  openPresentation : RelativePerfectZariskiPresentation S openProblem
+  /-- Pointwise big-Zariski presentation of the ambient selected problem. -/
+  ambient : PointwiseRelativePerfectZariskiPresentation S ambientProblem
+  /-- Pointwise big-Zariski presentation of the open selected problem. -/
+  openPresentation : PointwiseRelativePerfectZariskiPresentation S openProblem
   /-- The open family locus is contained in the ambient fiberwise locus. -/
   familyLocus_le {T : SchemeBaseChange S} {E : RelativePerfectModuliFiber T} :
     openProblem.familyLocus T E → ambientProblem.familyLocus T E
@@ -163,15 +210,15 @@ structure RelativePerfectOpenZariskiPresentation (S : Scheme.{u})
   inclusion : StackMorphism
     openPresentation.stack.toStackInGroupoids
     ambient.stack.toStackInGroupoids
-  /-- Every scheme representing a fiber of the inclusion is an open
+  /-- Every scheme pointwise representing a fiber of the inclusion is an open
   subscheme of the test scheme. -/
-  isOpenImmersion : StackMorphism.IsOpenImmersion inclusion
+  isPointwiseOpenImmersion : StackMorphism.IsPointwiseOpenImmersion inclusion
   /-- The inclusion commutes with the actual structure morphisms to `S`. -/
   overBase (T : Scheme.{u}) :
     inclusion.app T ⋙ ambient.presentation.structureMorphism.app T ≅
       openPresentation.presentation.structureMorphism.app T
 
-/-! ## The supported zero presentation -/
+/-! ## The supported zero pointwise presentation -/
 
 set_option backward.isDefEq.respectTransparency false in
 set_option backward.defeqAttrib.useBackward true in
@@ -217,10 +264,10 @@ private noncomputable instance identityFiberArrowUnique {S : Scheme.{u}}
 private def identityStackFiberEquivPUnit {S : Scheme.{u}}
     (T : SchemeBaseChange S) :
     (representableZariskiStackMap (𝟙 S)).FiberCategory
-        (Discrete.mk T.hom) (Over.mk (𝟙 T.left)) ≌
+        (representableZariskiObject T.hom) (Over.mk (𝟙 T.left)) ≌
       Discrete PUnit.{u + 1} := by
-  let R := RepresentableZariskiStackMap.fiberRepresentation
-    (𝟙 S) (Discrete.mk T.hom)
+  let R := RepresentableZariskiStackMap.pointwiseFiberRepresentation
+    (𝟙 S) (representableZariskiObject T.hom)
   letI : Unique (Over.mk (𝟙 T.left) ⟶ R.representing) := by
     change Unique (Over.mk (𝟙 T.left) ⟶
       Over.mk (pullback.snd (𝟙 S) T.hom))
@@ -256,34 +303,35 @@ private def zeroRelativePerfectFiberEquivPUnit {S : Scheme.{u}}
       exact E.property.eq_of_src _ _
     exact ⟨@uniqueOfSubsingleton _ homSubsingleton f⟩
 
-/-- The zero relative-perfect subproblem has an actual big-Zariski
+/-- The zero relative-perfect subproblem has a pointwise big-Zariski
 presentation: the identity stack over `S`.  Its fibers and the groupoids of
 selected zero objects are both proved contractible. -/
-def zeroRelativePerfectZariskiPresentation (S : Scheme.{u}) :
-    RelativePerfectZariskiPresentation S
+def zeroPointwiseRelativePerfectZariskiPresentation (S : Scheme.{u}) :
+    PointwiseRelativePerfectZariskiPresentation S
       (zeroRelativePerfectModuliSelector S) where
-  presentation := representableZariskiStackPresentationOver (𝟙 S)
+  presentation := representablePointwiseZariskiStackPresentationOver (𝟙 S)
   fiberEquivalence T :=
     (identityStackFiberEquivPUnit T).trans
       (zeroRelativePerfectFiberEquivPUnit T).symm
 
-/-- The identity parameter scheme and universal zero family make the supported
-zero big-Zariski presentation genuinely finite-type bounded. -/
-def zeroBoundedRelativePerfectZariskiPresentation
+/-- The identity parameter scheme and universal zero family give the supported
+zero pointwise big-Zariski presentation a pointwise finite-type cover. -/
+def zeroPointwiseCoveredRelativePerfectZariskiPresentation
     (S : Scheme.{u}) :
-    BoundedRelativePerfectZariskiPresentation S
+    PointwiseCoveredRelativePerfectZariskiPresentation S
       (zeroRelativePerfectModuliSelector S) where
-  toRelativePerfectZariskiPresentation :=
-    zeroRelativePerfectZariskiPresentation S
-  boundedness := zeroFiniteTypeBoundednessWitness S
+  toPointwiseRelativePerfectZariskiPresentation :=
+    zeroPointwiseRelativePerfectZariskiPresentation S
+  cover := zeroPointwiseFiniteTypeCover S
 
 /-- A concrete positive-dimensional supported case: `Spec ℤ` carries the
-bounded big-Zariski presentation of its zero relative-perfect subproblem. -/
-def integerZeroBoundedRelativePerfectZariskiPresentation :
-    BoundedRelativePerfectZariskiPresentation
+pointwise covered big-Zariski presentation of its zero relative-perfect
+subproblem. -/
+def integerZeroPointwiseCoveredRelativePerfectZariskiPresentation :
+    PointwiseCoveredRelativePerfectZariskiPresentation
       (Spec (.of ℤ))
       (zeroRelativePerfectModuliSelector (Spec (.of ℤ))) :=
-  zeroBoundedRelativePerfectZariskiPresentation (Spec (.of ℤ))
+  zeroPointwiseCoveredRelativePerfectZariskiPresentation (Spec (.of ℤ))
 
 end
 

@@ -7,21 +7,52 @@ import DerivedAlgGeo.CategoryTheory.Moduli.Boundedness
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.FiniteType
 
 /-!
-# Finite-type boundedness witnesses for relative-perfect complexes
+# Pointwise finite-type covers for relative-perfect complexes
 
-This file replaces a caller-selected boundedness proposition by geometric
-data.  A witness consists of an actual scheme over the base whose structure
-morphism is locally of finite type and quasi-compact, a universally-gluable
-relative-perfect family on that scheme, and geometric fibers covering the
-chosen subproblem up to isomorphism.
+A `PointwiseFiniteTypeCover` consists of an actual scheme over the base whose
+structure morphism is locally of finite type and quasi-compact, a
+universally-gluable relative-perfect family on that scheme, and objects
+chosen over the residue fields of its points, covering the selected geometric
+objects up to isomorphism.
 
-The current derived-pullback API does not yet construct the geometric fiber
-of every relative-perfect family along every residue-field morphism.  Thus a
-witness records those fibers explicitly and its coverage statement compares
-objects only after an equality of the actual residue-field base changes.  The
-zero family below inhabits this interface without postulating a general
-base-change theorem.  General semistable-object boundedness and Quot
-parameter spaces remain later results.
+## Main definitions
+
+* `RelativePerfectModuliSelector` — the admitted families and the selected
+  geometric objects of a relative-perfect moduli problem.
+* `PointwiseFiniteTypeCover` — a finite-type parameter scheme with a universal
+  family, and chosen objects over its residue fields covering the selected
+  geometric objects.
+* `relativePerfectPointwiseCoverProblem` — the predicate that a selector has a
+  `PointwiseFiniteTypeCover`.
+* `zeroRelativePerfectModuliSelector`, `zeroPointwiseFiniteTypeCover` — the
+  supported zero selector and its cover.
+
+## Main results
+
+* `zeroRelativePerfectModuliSelector_hasPointwiseCover` — the zero selector has
+  a pointwise finite-type cover.
+* `universalBoundedness_zeroRelativePerfectPointwiseCoverProblem` — the zero
+  model satisfies its pointwise cover problem.
+
+## Implementation notes
+
+The chosen objects are not tied to the family: the current derived-pullback
+API does not construct the fiber of a relative-perfect family along a
+non-flat residue-field morphism.  So a cover is not boundedness in the sense
+of Definition 9.4 of arXiv:1902.08184v4, which asks every selected object to
+be a fiber of one family on a finite-type scheme, and nothing here
+discharges the boundedness clause of Definition 21.15(5) there.  The zero
+family below inhabits this interface without postulating a base-change
+theorem.  Bounded families, semistable-object boundedness and Quot parameter
+spaces are not defined here.
+
+## References
+
+* arXiv:1902.08184v4, Definition 9.4 and Definition 21.15
+
+## Tags
+
+relative-perfect complex, moduli, finite type, residue field
 -/
 
 attribute [local instance] HasDerivedCategory.standard
@@ -40,10 +71,10 @@ noncomputable section
 
 universe u
 
-/-- Two fiberwise, replete loci used to state a relative-perfect boundedness
-problem. `familyLocus` specifies which total families are admitted, while
-`geometricLocus` specifies the objects that a finite-type parameter family
-must cover.
+/-- Two fiberwise, replete loci used to state a relative-perfect pointwise
+cover problem. `familyLocus` specifies which total families are admitted,
+while `geometricLocus` specifies the objects that a finite-type cover must
+reach.
 
 This is deliberately a selector, not a subprestack: it supplies neither an
 ambient pseudofunctor nor preservation under restriction. A genuine
@@ -77,7 +108,7 @@ instance geometricLocus_isClosedUnderIsomorphisms
     (P.geometricLocus T).IsClosedUnderIsomorphisms :=
   P.geometricLocus_iso T
 
-/-- Data sufficient to transport a boundedness witness from `P` to `Q`.
+/-- Data sufficient to transport a pointwise finite-type cover from `P` to `Q`.
 Admissible families may be enlarged, while the geometric target may be
 shrunk. -/
 structure MonotoneTo (P Q : RelativePerfectModuliSelector S) : Prop where
@@ -98,9 +129,19 @@ def castRelativePerfectModuliObject {S : Scheme.{u}}
   subst h
   exact E
 
-/-- An actual finite-type parameter family covering a selected relative-
-perfect moduli boundedness problem. -/
-structure FiniteTypeBoundednessWitness {S : Scheme.{u}}
+/-- A finite-type parameter scheme with a universal family, and an object
+chosen over the residue field of each of its points, such that every selected
+geometric object is isomorphic to one of the chosen objects.
+
+The fields impose no relation between `universalFamily` and `geometricFiber`:
+`covers` holds whenever `geometricFiber x` is chosen to be the selected object
+over `parameter.residue x`, whatever `universalFamily` is. This is not
+boundedness in the sense of arXiv:1902.08184v4, Definition 9.4, which asks
+every selected object to be a fibre of one family on a finite-type scheme.
+Tying `geometricFiber x` to `universalFamily` needs derived pullback along
+non-flat residue maps, which is not available; bounded families are not
+defined here. -/
+structure PointwiseFiniteTypeCover {S : Scheme.{u}}
     (P : RelativePerfectModuliSelector S) where
   /-- The parameter scheme with its structure morphism to `S`. -/
   parameter : SchemeBaseChange S
@@ -110,25 +151,26 @@ structure FiniteTypeBoundednessWitness {S : Scheme.{u}}
   universalFamily : RelativePerfectModuliFiber parameter
   /-- The universal family belongs to the selected family locus. -/
   universalFamily_mem : P.familyLocus parameter universalFamily
-  /-- A chosen geometric fiber over every point of the parameter scheme. -/
+  /-- An object chosen over the residue field of every point of the parameter
+  scheme, unrelated to `universalFamily`. -/
   geometricFiber (x : parameter.left) :
     RelativePerfectModuliFiber (parameter.residue x)
-  /-- Every selected geometric object occurs as one of the chosen fibers, up
+  /-- Every selected geometric object occurs as one of the chosen objects, up
   to an isomorphism in the relative-perfect moduli groupoid. -/
   covers {T : SchemeBaseChange S} (E : RelativePerfectModuliFiber T) :
     P.geometricLocus T E →
       ∃ (x : parameter.left) (h : T = parameter.residue x),
         Nonempty (castRelativePerfectModuliObject h E ≅ geometricFiber x)
 
-namespace FiniteTypeBoundednessWitness
+namespace PointwiseFiniteTypeCover
 
 variable {S : Scheme.{u}}
   {P Q : RelativePerfectModuliSelector S}
 
-/-- Boundedness is monotone under enlargement of the allowed family class
-and restriction of the geometric target. -/
-def monotone (W : FiniteTypeBoundednessWitness P)
-    (h : P.MonotoneTo Q) : FiniteTypeBoundednessWitness Q where
+/-- Pointwise finite-type covers are monotone under enlargement of the
+allowed family class and restriction of the geometric target. -/
+def monotone (W : PointwiseFiniteTypeCover P)
+    (h : P.MonotoneTo Q) : PointwiseFiniteTypeCover Q where
   parameter := W.parameter
   finiteType := W.finiteType
   universalFamily := W.universalFamily
@@ -136,22 +178,27 @@ def monotone (W : FiniteTypeBoundednessWitness P)
   geometricFiber := W.geometricFiber
   covers E hE := W.covers E (h.geometricLocus hE)
 
-end FiniteTypeBoundednessWitness
+end PointwiseFiniteTypeCover
 
-/-- The geometric boundedness problem attached to relative-perfect moduli
-selectors. Its predicate is existence of actual finite-type parameter
-data, rather than a caller-chosen proposition. -/
-def relativePerfectGeometricBoundednessProblem (S : Scheme.{u}) :
+/-- The pointwise cover problem attached to relative-perfect moduli selectors:
+its predicate is existence of a `PointwiseFiniteTypeCover`.
+
+This is not boundedness in the sense of Definition 9.4 of
+arXiv:1902.08184v4, which Definition 21.15(5) there requires. -/
+def relativePerfectPointwiseCoverProblem (S : Scheme.{u}) :
     BoundednessProblem (RelativePerfectModuliSelector S) where
-  IsBounded P := Nonempty (FiniteTypeBoundednessWitness P)
+  IsBounded P := Nonempty (PointwiseFiniteTypeCover P)
 
-/-- Finite-type witnesses for every selected locus selector discharge the
-boundedness clause of Definition 21.15(5). -/
-theorem universalRelativePerfectBoundedness_of_witnesses
+/-- Pointwise finite-type covers for every selector give universal
+satisfaction of the pointwise cover problem.
+
+Definition 21.15(5) of arXiv:1902.08184v4 requires boundedness in the sense
+of Definition 9.4 there, which this does not provide. -/
+theorem universalRelativePerfectPointwiseCover_of_covers
     (S : Scheme.{u})
     (h : ∀ P : RelativePerfectModuliSelector S,
-      Nonempty (FiniteTypeBoundednessWitness P)) :
-    UniversalBoundedness (relativePerfectGeometricBoundednessProblem S) :=
+      Nonempty (PointwiseFiniteTypeCover P)) :
+    UniversalBoundedness (relativePerfectPointwiseCoverProblem S) :=
   h
 
 /-! ## A nonempty finite-type model: the zero family -/
@@ -196,10 +243,10 @@ def zeroRelativePerfectGeometricFiber (S : Scheme.{u}) (x : S) :
   relativePerfectZeroObject
     ((identityRelativePerfectBaseChange S).residue x)
 
-/-- The identity parameter scheme and zero universal family form an actual
-finite-type boundedness witness. -/
-def zeroFiniteTypeBoundednessWitness (S : Scheme.{u}) :
-    FiniteTypeBoundednessWitness (zeroRelativePerfectModuliSelector S) where
+/-- The identity parameter scheme and zero universal family form a pointwise
+finite-type cover of the zero selector. -/
+def zeroPointwiseFiniteTypeCover (S : Scheme.{u}) :
+    PointwiseFiniteTypeCover (zeroRelativePerfectModuliSelector S) where
   parameter := identityRelativePerfectBaseChange S
   finiteType := by
     change LocallyOfFiniteType (𝟙 S) ∧ QuasiCompact (𝟙 S)
@@ -228,37 +275,39 @@ def zeroFiniteTypeBoundednessWitness (S : Scheme.{u}) :
       (schemeUniversallyGluableRelativePerfect
         ((identityRelativePerfectBaseChange S).residue x).hom) eDqc
 
-/-- The zero selector is geometrically bounded by an inhabited finite-type
-witness, not by a constant-true predicate. -/
-theorem zeroRelativePerfectModuliSelector_isBounded
+/-- The zero selector has a pointwise finite-type cover, inhabited rather than
+given by a constant-true predicate. -/
+theorem zeroRelativePerfectModuliSelector_hasPointwiseCover
     (S : Scheme.{u}) :
-    (relativePerfectGeometricBoundednessProblem S).IsBounded
+    (relativePerfectPointwiseCoverProblem S).IsBounded
       (zeroRelativePerfectModuliSelector S) :=
-  ⟨zeroFiniteTypeBoundednessWitness S⟩
+  ⟨zeroPointwiseFiniteTypeCover S⟩
 
-/-- The supported zero boundedness construction is available after every
-change of base.  This deliberately does
-not claim a general pullback theorem for nonzero universal families. -/
-theorem zeroRelativePerfectBoundedness_afterBaseChange
+/-- The supported zero pointwise cover is available after every change of
+base.  This deliberately does not claim a general pullback theorem for
+nonzero universal families. -/
+theorem zeroRelativePerfectPointwiseCover_afterBaseChange
     {S S' : Scheme.{u}} (_ : S' ⟶ S) :
-    (relativePerfectGeometricBoundednessProblem S').IsBounded
+    (relativePerfectPointwiseCoverProblem S').IsBounded
       (zeroRelativePerfectModuliSelector S') :=
-  zeroRelativePerfectModuliSelector_isBounded S'
+  zeroRelativePerfectModuliSelector_hasPointwiseCover S'
 
-/-- The Definition 21.15(5) adapter for the single supported zero
-subproblem. -/
-def zeroRelativePerfectBoundednessProblem (S : Scheme.{u}) :
+/-- The pointwise cover problem of the single supported zero subproblem.
+
+Definition 21.15(5) of arXiv:1902.08184v4 requires boundedness in the sense
+of Definition 9.4 there, which this problem does not express. -/
+def zeroRelativePerfectPointwiseCoverProblem (S : Scheme.{u}) :
     BoundednessProblem PUnit where
   IsBounded _ :=
-    (relativePerfectGeometricBoundednessProblem S).IsBounded
+    (relativePerfectPointwiseCoverProblem S).IsBounded
       (zeroRelativePerfectModuliSelector S)
 
-/-- The supported zero model unconditionally satisfies its honest geometric
-boundedness problem. -/
-theorem universalBoundedness_zeroRelativePerfect
+/-- The supported zero model unconditionally satisfies its pointwise cover
+problem. -/
+theorem universalBoundedness_zeroRelativePerfectPointwiseCoverProblem
     (S : Scheme.{u}) :
-    UniversalBoundedness (zeroRelativePerfectBoundednessProblem S) :=
-  fun _ ↦ zeroRelativePerfectModuliSelector_isBounded S
+    UniversalBoundedness (zeroRelativePerfectPointwiseCoverProblem S) :=
+  fun _ ↦ zeroRelativePerfectModuliSelector_hasPointwiseCover S
 
 end
 

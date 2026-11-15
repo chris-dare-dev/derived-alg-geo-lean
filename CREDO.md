@@ -97,21 +97,16 @@ The repository does not meet these yet. A line is deleted when it becomes
 true. Until then the older rule in `AGENTS.md` or `CONTRIBUTING.md` applies to
 what that line names and to nothing else.
 
-- `docs/`, `.claude/decisions/` and `.claude/roadmap/` are in the tree, and
-  `AGENTS.md`, `scripts/check_layering.py` and `scripts/check_roadmap.py`
-  read them (§1).
-- `AGENTS.md` is over 200 lines: its subject-ownership rules leave with
-  `docs/` for the wiki (§1).
+- `AGENTS.md` is over 200 lines (§1).
 - Files outside the areas above are in the tree. `LEGACY` in
   `scripts/check_tree_areas.py` names them; they may shrink or go, never grow
   (§1).
 - `scripts/fixtures/` holds known-answer fixtures for the style and layering
   checks (§3).
 - Comments in `exe/`, `formalization.yaml`, `registry/` and the scripts
-  `check_layering.py`, `check_mathlib_style.py`, `check_roadmap.py`,
-  `check_pin.py` and `check_umbrella_coverage.py` carry dates, issue numbers
-  and the history of changes. The provenance check reads only `DerivedAlgGeo/`
-  (§4).
+  `check_layering.py`, `check_mathlib_style.py` and `check_pin.py` carry dates,
+  issue numbers and the history of changes. The provenance check reads only
+  `DerivedAlgGeo/` (§4).
 - `pins.json` restates `lean-toolchain`, `lakefile.toml` and
   `lake-manifest.json`, and records where and when it was written (§1, §4).
 - Some names pass 60 characters (§4).
