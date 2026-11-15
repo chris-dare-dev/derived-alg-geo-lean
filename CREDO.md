@@ -110,7 +110,5 @@ what that line names and to nothing else.
 - Comments in `exe/`, `scripts/`, `.github/workflows/`, `formalization.yaml`
   and `registry/` carry dates, issue numbers and the history of changes. The
   provenance check reads only `DerivedAlgGeo/` (§4).
-- `pins.json` restates `lean-toolchain`, `lakefile.toml` and
-  `lake-manifest.json`, and records where and when it was written (§1, §4).
 - Some names pass 60 characters (§4).
 - Structures that package unproved inputs are named `Data` (Lean rules).

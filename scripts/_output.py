@@ -68,12 +68,9 @@ def force_utf8_output() -> None:
 
 
 IMPORT_RE = re.compile(r"^from _output import force_utf8_output$", re.MULTILINE)
-#: Either the first statement of the entry-point block, or -- for a flat script
-#: with no such block, `check_pin.py` -- the module-level statement right after
-#: the import.
+#: The first statement of the entry-point block.
 CALL_RE = re.compile(
-    r'^if __name__ == "__main__":\n[ \t]+force_utf8_output\(\)\n'
-    r'|^from _output import force_utf8_output\n\nforce_utf8_output\(\)\n', re.MULTILINE)
+    r'^if __name__ == "__main__":\n[ \t]+force_utf8_output\(\)\n', re.MULTILINE)
 
 
 def structural_findings() -> list[str]:
@@ -86,8 +83,7 @@ def structural_findings() -> list[str]:
             out.append(f"{rel}: does not import force_utf8_output from scripts/_output.py")
         if not CALL_RE.search(text):
             out.append(f"{rel}: force_utf8_output() is not the first statement of its "
-                       f"`if __name__ == \"__main__\":` block (or, for a flat script, "
-                       f"the statement right after its import)")
+                       f"`if __name__ == \"__main__\":` block")
     return out
 
 

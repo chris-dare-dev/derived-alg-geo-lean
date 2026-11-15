@@ -333,7 +333,7 @@ jobs:
           # base branch after this one forked are not counted as ours.
           files=$(git diff --name-only "$base...HEAD")
           echo "$files" | sed 's/^/  /'
-          if printf '%s\n' "$files" | grep -qE '^(lakefile\.toml|lean-toolchain|lake-manifest\.json|pins\.json|\.github/|scripts/|exe/)'; then
+          if printf '%s\n' "$files" | grep -qE '^(lakefile\.toml|lean-toolchain|lake-manifest\.json|\.github/|scripts/|exe/)'; then
             echo "scope=all" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -1137,7 +1137,7 @@ jobs:
       #     place two independently-green branches first meet.
       #   * `scope == 'all'` -- the "What changed" step sets this when the diff
       #     touches lakefile.toml, lean-toolchain, lake-manifest.json,
-      #     pins.json, .github/, scripts/ or exe/. That set is a SUPERSET of
+      #     .github/, scripts/ or exe/. That set is a SUPERSET of
       #     this gate's determinism inputs, so any pull request that could move
       #     the needle still runs it. (This is that output's first consumer; it
       #     was computed and unread before.)
