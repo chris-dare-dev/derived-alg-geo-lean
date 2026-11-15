@@ -30,7 +30,7 @@ Vistoli proves the reduction through his Lemma 4.26 (`F ∅` is equivalent to th
 one object and one morphism) and Lemma 4.27 (`F (∐ U i)` is equivalent to `∏ F (U i)`), and
 Mathlib's sheaf version through the preservation of products by Zariski sheaves; neither is
 needed here. In particular, no finiteness of the family is assumed, and the empty family is
-included: then `∐ X i` is the empty scheme and so is `S`.
+included, with `∐ X i` the empty scheme.
 
 ## References
 
@@ -52,8 +52,8 @@ variable {F : LocallyDiscrete Scheme.{u}ᵒᵖ ⥤ᵖ Cat.{v', u'}} [F.IsStack S
 
 /-- A stack for the big Zariski topology has effective descent along a `u`-small family of
 morphisms `f i : X i ⟶ S` if and only if it has effective descent along the induced morphism
-`Sigma.desc f : ∐ X i ⟶ S`. This is the stack analogue of Mathlib's
-`Presieve.isSheafFor_sigmaDesc_iff` for Zariski sheaves; no finiteness is needed. -/
+`Sigma.desc f : ∐ X i ⟶ S`. Mathlib's `Scheme.Cover.isSheafFor_sigma_iff` is the analogue for
+Zariski sheaves of types and finite covers; here no finiteness is needed. -/
 lemma isStackFor_singleton_sigmaDesc_iff {S : Scheme.{u}} {ι : Type v} [Small.{u} ι]
     {X : ι → Scheme.{u}} (f : ∀ i, X i ⟶ S) :
     F.IsStackFor (.singleton (Sigma.desc f)) ↔ F.IsStackFor (.ofArrows X f) := by

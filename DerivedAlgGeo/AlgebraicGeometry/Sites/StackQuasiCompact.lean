@@ -72,8 +72,8 @@ variable {P : MorphismProperty Scheme.{u}} [P.IsStableUnderBaseChange]
 
 /-- A pseudofunctor is a prestack for the `P`-qc topology if and only if it is a prestack for
 the Zariski topology and for every single object covering `{ Spec S ⟶ Spec R }` by a surjective
-`P`-morphism. This is Step 1 of the proof of Vistoli's Lemma 4.25. The subcanonicity
-hypothesis is an artifact of the proof. -/
+`P`-morphism. For the fpqc topology, the implication from right to left is Step 1 of the proof
+of Vistoli's Lemma 4.25. The subcanonicity hypothesis is an artifact of the proof. -/
 theorem isPrestack_propQCTopology_iff [P.IsMultiplicative] [IsZariskiLocalAtSource P]
     [(propQCTopology P).Subcanonical] (F : LocallyDiscrete Scheme.{u}ᵒᵖ ⥤ᵖ Cat.{v', u'}) :
     F.IsPrestack (propQCTopology P) ↔
@@ -110,8 +110,8 @@ variable [IsZariskiLocalAtSource P]
 
 omit [P.IsStableUnderBaseChange] in
 /-- Effective descent along a quasi-compact `P`-cover of an affine scheme, from effective
-descent along single surjective `P`-morphisms of affine schemes. These are Steps 2 to 4 of the
-proof of Vistoli's Lemma 4.25. -/
+descent along single surjective `P`-morphisms of affine schemes. This corresponds to Steps 2
+to 4 of the proof of Vistoli's Lemma 4.25. -/
 private lemma isStackFor_ofArrows_of_isAffine [F.IsStack zariskiTopology]
     [F.IsPrestack (propQCTopology P)]
     (hF : ∀ ⦃R S : CommRingCat.{u}⦄ (f : R ⟶ S), P (Spec.map f) → Surjective (Spec.map f) →
@@ -131,13 +131,15 @@ private lemma isStackFor_ofArrows_of_isAffine [F.IsStack zariskiTopology]
     refine hψ ▸ hF ψ (hψ ▸ ?_) (hψ ▸ ?_)
     · exact IsZariskiLocalAtSource.comp (IsZariskiLocalAtSource.sigmaDesc 𝒱.cover.map_prop) _
     · infer_instance
-  refine (F.IsStackFor_generate_iff _).1 (Pseudofunctor.IsStackFor.of_le F hV (J := propQCTopology P)
-    (Cover.mem_propQCTopology 𝒱.cover) ?_)
+  refine (F.IsStackFor_generate_iff _).1
+    (Pseudofunctor.IsStackFor.of_le F hV (J := propQCTopology P)
+      (Cover.mem_propQCTopology 𝒱.cover) ?_)
   rintro _ _ ⟨j⟩
   exact ⟨_, φ.h₀ j, 𝒰.f (φ.s₀ j), ⟨_⟩, φ.w₀ j⟩
 
 /-- Effective descent along a quasi-compact `P`-cover, from effective descent along single
-surjective `P`-morphisms of affine schemes. -/
+surjective `P`-morphisms of affine schemes, by reduction to affine targets. This is Step 5 of
+the proof of Vistoli's Lemma 4.25. -/
 private lemma isStackFor_ofArrows [F.IsStack zariskiTopology]
     [F.IsPrestack (propQCTopology P)]
     (hF : ∀ ⦃R S : CommRingCat.{u}⦄ (f : R ⟶ S), P (Spec.map f) → Surjective (Spec.map f) →
@@ -151,7 +153,7 @@ private lemma isStackFor_ofArrows [F.IsStack zariskiTopology]
   rw [← Sieve.pullbackArrows_comm, ← Presieve.ofArrows_pullback, F.IsStackFor_generate_iff]
   exact isStackFor_ofArrows_of_isAffine hF (𝒰.pullback₂ (T.affineCover.f i))
 
-variable (P) [P.IsMultiplicative] in
+variable [P.IsMultiplicative] in
 /-- A pseudofunctor is a stack for the `P`-qc topology if and only if it is a stack for the
 Zariski topology and has effective descent along every single object covering
 `{ Spec S ⟶ Spec R }` by a surjective `P`-morphism.
@@ -191,7 +193,7 @@ theorem isStack_fpqcTopology_iff (F : LocallyDiscrete Scheme.{u}ᵒᵖ ⥤ᵖ Ca
         F.IsStackFor (.singleton (Spec.map f)) := by
   have : (propQCTopology @Flat).Subcanonical := fpqcTopology_eq_propQCTopology ▸ inferInstance
   rw [fpqcTopology_eq_propQCTopology]
-  exact isStack_propQCTopology_iff _ F
+  exact isStack_propQCTopology_iff F
 
 set_option backward.isDefEq.respectTransparency.types false in
 /-- A pseudofunctor is a stack for the fppf topology if and only if it is a stack for the
@@ -220,6 +222,6 @@ theorem isStack_etaleTopology_iff (F : LocallyDiscrete Scheme.{u}ᵒᵖ ⥤ᵖ C
         F.IsStackFor (.singleton (Spec.map f)) := by
   have : (propQCTopology @Etale).Subcanonical := etaleTopology_eq_propQCTopology ▸ inferInstance
   rw [etaleTopology_eq_propQCTopology]
-  exact isStack_propQCTopology_iff _ F
+  exact isStack_propQCTopology_iff F
 
 end AlgebraicGeometry
