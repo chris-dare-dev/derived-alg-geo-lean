@@ -623,15 +623,10 @@ jobs:
         continue-on-error: true
         run: python3 scripts/check_source_independence.py
 
-      - name: Subject ownership layering
+      - name: Import layering
         id: subject_layering
         continue-on-error: true
         run: python3 scripts/check_layering.py
-
-      - name: Neutral derived-category Stability import closure
-        id: neutral_stability_imports
-        continue-on-error: true
-        run: python3 scripts/check_neutral_stability_imports.py
 
       - name: Umbrella coverage
         id: umbrella_coverage
@@ -1220,7 +1215,6 @@ jobs:
             emission_sources=${{ steps.emission_sources.outcome }}
             source_independence=${{ steps.source_independence.outcome }}
             subject_layering=${{ steps.subject_layering.outcome }}
-            neutral_stability_imports=${{ steps.neutral_stability_imports.outcome }}
             umbrella_coverage=${{ steps.umbrella_coverage.outcome }}
             root_reachability=${{ steps.root_reachability.outcome }}
             coherent_families=${{ steps.coherent_families.outcome }}

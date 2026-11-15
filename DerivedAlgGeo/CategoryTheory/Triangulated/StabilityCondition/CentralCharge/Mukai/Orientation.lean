@@ -70,10 +70,9 @@ in `LinearAlgebra/Lattice/Mukai/`.
 finite-dimensional real normed space is jointly continuous; it mentions no
 Mukai extension, no chart and no charge, and its neutral owner is
 `QuadraticForm/Continuous.lean`. It is not in that file because
-`Continuous.lean` is one of the neutral charge roots the layering gate pins,
-whose transitive closure may contain neither stability conditions nor
-geometry, and adding a declaration to a pinned root needs its own
-justification.
+`Continuous.lean` is a neutral root: the layering check keeps everything under
+`LinearAlgebra/` free of stability conditions and geometry, transitively, and
+adding a declaration to a neutral root needs its own justification.
 
 ## References
 

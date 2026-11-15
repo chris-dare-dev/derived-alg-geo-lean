@@ -56,7 +56,7 @@ finite-type openness, and relative HN filtrations live under
 There are no `Instances/` directories below a generic subject. The former
 `CategoryTheory/<source>/Instances/AlgebraicGeometry/` leaves are retired;
 their contents live with the geometric objects they were about, and the
-layering gate rejects any path of that shape.
+layering check rejects the geometry import such a leaf would need.
 
 Use Mathlib's established namespace when extending a Mathlib concept. A
 declaration in a geometric file may keep the namespace of the categorical
@@ -86,8 +86,8 @@ quadratic bounds and Hodge input live under `LinearAlgebra/`; additive charge
 families and exponential/numerical/divisorial constructors live under
 `CategoryTheory/Triangulated/StabilityCondition/CentralCharge/`; `Walls/`
 contains the downstream loci, `Support/` the support predicates, and
-`AlgebraicGeometry/Numerical/` the geometric realizations. The layering gate
-checks these import closures and retired owner paths.
+`AlgebraicGeometry/Numerical/` the geometric realizations. The layering check
+holds these import closures.
 
 Derived-category theory is built once: Mathlib constructs `DerivedCategory C`,
 this repository extends it under `Algebra/Homology/DerivedCategory/`, geometry

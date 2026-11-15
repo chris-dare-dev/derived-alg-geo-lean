@@ -83,8 +83,8 @@ placement rule and `docs/architecture/layers.md` the dependency contract.
 - `DerivedAlgGeo/Analysis` — the upper half-planes of `ℂ`, their argument
   geometry, and finite polygonal paths with the perimeter comparison under
   containment of vertex hulls. Neutral: nothing below it reaches a category, a
-  scheme or a stability condition, and `scripts/check_layering.py` rule 13
-  keeps it that way.
+  scheme or a stability condition, and `scripts/check_layering.py` keeps it
+  that way.
 - `DerivedAlgGeo/Development` — exploratory code outside the stable umbrella.
 
 Generated API documentation is published at

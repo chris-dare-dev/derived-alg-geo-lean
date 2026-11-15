@@ -62,6 +62,7 @@ all-library umbrella `DerivedAlgGeo.lean`.
 | `Algebra/` | rings, modules, polynomials, graded algebra, exact sequences; `Category/ModuleCat/Sheaf/` (Mathlib's `SheafOfModules` on any ringed site); `Homology/` (derived and homotopy categories, spectral sequences, the dg category on `HomComplex`) |
 | `AlgebraicGeometry/` | schemes and everything stated about them: `Modules/`, `ProjectiveSpectrum/`, `Cohomology/`, `DerivedCategory/`, `Divisors/`, `Duality/`, `IntersectionTheory/`, `Numerical/`, `RiemannRoch/`, `Moduli/`, `Stacks/`, `Surface/`, `Variety/` |
 | `AlgebraicTopology/` | simplicial constructions |
+| `Analysis/` | upper half-planes of `ℂ`, finite polygonal paths and their perimeter comparison |
 | `CategoryTheory/` | abelian, bicategorical, limit, linear, localization, monoidal, object-property, preadditive, shift and site theory; `Triangulated/` (t-structures, stability conditions, dg enhancements, K₀, Fourier--Mukai kernels, semiorthogonal decompositions, compact generation) |
 | `LinearAlgebra/` | lattices, quadratic forms, exterior powers, graded bases |
 | `RingTheory/` | prime spectra |
@@ -113,40 +114,32 @@ Consequences:
 ## Dependency direction
 
 Mathlib's subjects interleave, so there is no rank order between subjects;
-Lean enforces acyclicity. `scripts/check_layering.py` enforces these edges:
+Lean rejects cycles. `scripts/check_layering.py` holds the policy edges in two
+tables, checked over the transitive import graph:
 
-- **Geometry firewall.** Only modules under `AlgebraicGeometry/` and
-  `Development/` import `DerivedAlgGeo.AlgebraicGeometry` or
-  `Mathlib.AlgebraicGeometry`, or declare into the `AlgebraicGeometry`
-  namespace.
-- **`Development/` is a leaf.** No stable module imports it.
-- **Stability-neutral geometry.** Geometry reaches the stability tree only from
-  `DerivedCategory/Stability/`, `Moduli/{HarderNarasimhan,Semistability}/`,
-  `Numerical/Stability/`, `Numerical/Examples/{Surface,Threefold,Fourfold}/` and
-  `Numerical/GrothendieckGroup/CategoricalChargeK3.lean`; everything else under
-  `AlgebraicGeometry/`, `Stability/` included, is stability-neutral,
-  transitively. A same-named umbrella over one of those subcomponents is exempt
-  as an umbrella. The `AlgebraicGeometry/DerivedCategory` umbrella omits
-  `Stability`; the top-level `AlgebraicGeometry` umbrella imports it. So
-  `Dᵇ(Coh X)`, `Dqc`, coherent sheaves and cohomology import without Bridgeland
-  stability.
-- **A numerical model is not a demonstration.** `Numerical/Models/` owns the
-  formal models (ring, grading, degree map, Chern and Todd coefficients);
-  `Numerical/Examples/` owns the realizations, charges and walls on them and
-  imports `Models/`, never the reverse. The named surface models share
-  `Models/Surface/RankOne.lean` and import no sibling; the
-  arbitrary-divisor-rank charge is a sibling input of the exponential kernel.
-- **A covering group is not its action.** The universal cover of `GL⁺(2, ℝ)`
-  lives at `LinearAlgebra/Matrix/GeneralLinearGroup/UniversalCover/`, with
-  `Algebra/Order/NormalizedShift/`, `Topology/Covering/` and
-  `LinearAlgebra/Complex/` beside it; none reaches stability or geometry. The
-  action on slicings, charges and stability conditions stays at
-  `StabilityCondition/Symmetry/GLTilde/Action/`. That `GLTilde` is a universal
-  cover is the proved `GLTilde.universalCoverData` and `exact_deckHom_toMatHom`.
-- **Weak stability is independent of Bridgeland stability**;
-  `PreStabilityCondition` structurally extends `WeakPreStabilityCondition`.
-- Retired paths stay retired (the gate carries the list), and a new top-level
-  subject is added to the gate's `KNOWN_SUBJECTS` by name.
+- **Reached only from.** Geometry (`AlgebraicGeometry/` and
+  `Mathlib.AlgebraicGeometry`) is reached only from `AlgebraicGeometry/` and
+  `Development/`, and `Development/` from no stable module. The stability tree
+  has a closed list of consumers: `DerivedCategory/Stability/`,
+  `Moduli/{HarderNarasimhan,Semistability}/`, `Numerical/Stability/`,
+  `Numerical/Examples/{Surface,Threefold,Fourfold}/`, the two K3 charge
+  adapters in `Numerical/GrothendieckGroup/`, the spherical-twist stability
+  action and `Development/`. So `Dᵇ(Coh X)`, `Dqc`, sheaves, stacks, cohomology
+  and the neutral algebra beneath them import without Bridgeland stability.
+  `Numerical/Examples/` is a leaf: models, transport and charges never import a
+  demonstration. An umbrella above a listed source may re-export it, except
+  `AlgebraicGeometry/DerivedCategory.lean`, which omits its `Stability` child.
+- **Never reaches.** Weak stability never reaches the rest of
+  `StabilityCondition/`; `CentralCharge/` never reaches `Walls/`, and the
+  arbitrary-divisor-rank charge never reaches the `H`-degree compression;
+  `CategoryTheory/{Abelian,Linear}/` never reach `Triangulated/`; `Analysis/`
+  never reaches `CategoryTheory/`; the dg root never reaches either
+  `DGEnhancement/`; derived tensor and pushforward never reach Fourier--Mukai;
+  perfectness and flatness never reach `Moduli/`; slope and Gieseker stability
+  never reach each other; sites and stacks never reach `Moduli/`.
+- A new top-level subject is added to `SUBJECTS` by name. A move that renames a
+  path a rule names updates that rule, and the check fails until it does. A
+  deleted path needs no record: an import of it fails in Lean.
 
 ## Derived categories, dg categories and stability
 
@@ -206,7 +199,7 @@ fixes these; cite it rather than re-deciding them.
   arbitrary `Prop` parameters.
 - Site-generic stacks, neutral moduli interfaces, algebraic stacks and spaces,
   and moduli problems reach no stability module; stacks reach no moduli
-  problem. `AlgebraicSpace/`, `Stacks/{ModuliSpace,Test}/`,
+  problem (the layering tables hold both). `AlgebraicSpace/`, `Stacks/{ModuliSpace,Test}/`,
   `Moduli/StabilityCondition/` and `CategoryTheory/FiberedCategory/` are
   targets: do not import them.
 
