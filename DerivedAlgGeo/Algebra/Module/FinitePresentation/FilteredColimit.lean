@@ -126,7 +126,8 @@ private lemma exists_rTensor_eq (P : Type*) [AddCommMonoid P] [Module A P] (x : 
 omit [IsFilteredOrEmpty I] in
 /-- `finsuppScalarRight` is natural in the left factor. -/
 private lemma finsuppScalarRight_rTensor {M M' : Type*} [AddCommMonoid M] [Module A M]
-    [AddCommMonoid M'] [Module A M'] (X : Type*) [DecidableEq X] (f : M →ₗ[A] M') (y : M ⊗[A] (X →₀ A)) :
+    [AddCommMonoid M'] [Module A M'] (X : Type*) [DecidableEq X] (f : M →ₗ[A] M')
+    (y : M ⊗[A] (X →₀ A)) :
     TensorProduct.finsuppScalarRight A A M' X (f.rTensor _ y) =
       Finsupp.mapRange.linearMap f (TensorProduct.finsuppScalarRight A A M X y) := by
   have : (TensorProduct.finsuppScalarRight A A M' X).toLinearMap ∘ₗ f.rTensor _ =
@@ -263,7 +264,7 @@ private lemma stageCocone_ι_stageOne {j : J} (s : Under j) :
 
 /-- The transition maps of `stage j`, tensored with `P`, send `1 ⊗ m` to `1 ⊗ m`. -/
 private lemma rTensor_stage_map_stageOne {j : J} {s t : Under j} (g : s ⟶ t) {P : Type*}
-    [AddCommGroup P] [Module (R.obj j) P] (m : P) :
+    [AddCommMonoid P] [Module (R.obj j) P] (m : P) :
     ((stage (R := R) j).map g).hom.rTensor P (stageOne s ⊗ₜ m) = stageOne t ⊗ₜ m := by
   rw [LinearMap.rTensor_tmul, stage_map_stageOne]
 
@@ -355,11 +356,11 @@ Finite presentation of `M` cannot be weakened to finite generation. Over a field
 `R.obj n = k[x₁, …, xₙ]` along the inclusions, so that `c.pt = k[x₁, x₂, …]`, and let
 `M = c.pt ⧸ (x₁, x₂, …)`. Then `M` is cyclic but not finitely presented, while an extension of
 scalars of a finitely presented module is finitely presented. -/
-theorem exists_extended (M : ModuleCat.{u} c.pt) [Module.FinitePresentation c.pt M] :
-    ∃ (j : J) (N : ModuleCat.{u} (R.obj j)), Module.FinitePresentation (R.obj j) N ∧
+theorem exists_extended (M : ModuleCat.{max v u} c.pt) [Module.FinitePresentation c.pt M] :
+    ∃ (j : J) (N : ModuleCat.{max v u} (R.obj j)), Module.FinitePresentation (R.obj j) N ∧
       Nonempty ((extendScalars (c.ι.app j).hom).obj N ≅ M) := by
   classical
-  obtain ⟨pres, _, _⟩ : ∃ pres : Module.Presentation.{0, 0} c.pt M,
+  obtain ⟨pres, _, _⟩ : ∃ pres : Module.Presentation.{max v u, max v u} c.pt M,
       Finite pres.G ∧ Finite pres.R :=
     Module.finitePresentation_iff_exists_presentation.mp inferInstance
   have := Fintype.ofFinite pres.G
@@ -449,7 +450,7 @@ all `i`. Take `j = 0`, `N = R.obj 0 ⧸ (y₁, y₂, …)` and `N' = R.obj 0`. T
 `c.pt ⧸ (y₁, y₂, …) ⟶ c.pt` with `1 ↦ t` is well defined and nonzero. At a stage `n`, the
 element `yₙ₊₁` is a nonzerodivisor of `R.obj n`, so the only map
 `R.obj n ⧸ (y₁, y₂, …) ⟶ R.obj n` is zero. -/
-theorem exists_linearMap_extended {j : J} (N N' : ModuleCat.{max v u} (R.obj j))
+theorem exists_linearMap_extended {j : J} {N N' : ModuleCat.{max v u} (R.obj j)}
     [Module.FinitePresentation (R.obj j) N]
     (φ : (extendScalars (c.ι.app j).hom).obj N ⟶ (extendScalars (c.ι.app j).hom).obj N') :
     ∃ (j' : J) (f : j ⟶ j')

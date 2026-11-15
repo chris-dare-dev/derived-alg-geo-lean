@@ -30,7 +30,7 @@ the legs `R.map f ≫ c.ι.app j' = c.ι.app j` of a cocone.
 module, extension of scalars, base change
 -/
 
-universe v u
+universe v u u₁ u₂
 
 open CategoryTheory
 open scoped TensorProduct ChangeOfRings
@@ -53,9 +53,10 @@ lemma extendScalarsComp'_eq_extendScalarsComp :
 
 set_option backward.isDefEq.respectTransparency false in
 /-- In an extension of scalars, `s ⊗ m = s • (1 ⊗ m)`. -/
-private lemma tmul_eq_smul_one_tmul {R S : Type u} [CommRing R] [CommRing S] (f : R →+* S)
-    {M : ModuleCat.{max v u} R} (s : S) (m : M) :
-    (s ⊗ₜ[R, f] m : (extendScalars f).obj M) = s • ((1 : S) ⊗ₜ[R, f] m : (extendScalars f).obj M) := by
+private lemma tmul_eq_smul_one_tmul {R : Type u₁} {S : Type u₂} [CommRing R] [CommRing S]
+    (f : R →+* S) {M : ModuleCat.{v} R} (s : S) (m : M) :
+    (s ⊗ₜ[R, f] m : (extendScalars f).obj M) =
+      s • ((1 : S) ⊗ₜ[R, f] m : (extendScalars f).obj M) := by
   rw [ExtendScalars.smul_tmul, mul_one]
 
 set_option backward.isDefEq.respectTransparency false in
