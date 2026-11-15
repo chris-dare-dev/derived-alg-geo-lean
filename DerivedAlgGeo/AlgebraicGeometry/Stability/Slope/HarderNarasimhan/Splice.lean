@@ -284,3 +284,5 @@ noncomputable def splice (h : MuPositivityData P) {F : Coh X} {B : Subobject F}
         (G.factor_semistable j')
 
 end PolarizedVarietyHypotheses
+
+end AlgebraicGeometry.Stability.Gieseker

@@ -555,3 +555,5 @@ instance isTExact_id : Functor.IsTExact (𝟭 C) t t :=
 end Id
 
 end Functor
+
+end CategoryTheory

@@ -137,8 +137,8 @@ lemma hom_eq_zero_of_finite_support (s : Finset I)
 end ChosenDecidableEq
 
 section ClassicalProjection
-open scoped Classical
 
+open scoped Classical in
 /-- Specialize `CategoryTheory.Limits.Sigma.sum_π_ι_eq_id_of_isZero_all` using
 classical equality so callers need not supply a decidability instance; the
 universal theorem supplies the coproduct-inclusion argument. -/
@@ -147,6 +147,7 @@ lemma sum_π_ι_eq_id_of_isZero (s : Finset I)
     ∑ i ∈ s, Sigma.π f i ≫ Sigma.ι f i = 𝟙 (∐ f) :=
   sum_π_ι_eq_id_of_isZero_all f s hz
 
+open scoped Classical in
 /-- Specialize
 `CategoryTheory.Limits.Sigma.isZero_of_sum_π_ι_eq_id_of_not_mem_all` using
 classical equality. The universal converse supplies the omitted-summand
@@ -156,6 +157,7 @@ lemma isZero_of_sum_π_ι_eq_id_of_not_mem (s : Finset I)
     (j : I) (hj : j ∉ s) : IsZero (f j) :=
   isZero_of_sum_π_ι_eq_id_of_not_mem_all f s hid j hj
 
+open scoped Classical in
 /-- Specialize `CategoryTheory.Limits.Sigma.sum_π_ι_eq_id_iff_isZero_all` using
 classical equality; the universal characterization contains the
 omitted-summand obstruction. -/

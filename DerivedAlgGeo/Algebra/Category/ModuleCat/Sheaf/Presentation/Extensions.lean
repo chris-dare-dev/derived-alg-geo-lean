@@ -150,8 +150,8 @@ lemma unitToPushforwardObjUnit_over [HasBinaryProducts C] (U : C) :
   ext X
   rfl
 
-omit [J.HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat.{u})] in
 set_option maxHeartbeats 1600000 in
+omit [J.HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat.{u})] in
 lemma freeHomEquiv_mapFree_over [HasBinaryProducts C]
     {N : SheafOfModules.{u} R} {I : Type u}
     (p : free (R := R) I ⟶ N) (i : I) (U : C)
@@ -199,8 +199,8 @@ noncomputable def localLift {M N : SheafOfModules.{u} R}
         ((s i).1 (.op a.1)) a.2.f
         (simultaneousImageCover_mem f s a.1 a.2 i)
 
-omit [J.HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat.{u})] in
 set_option maxHeartbeats 3200000 in
+omit [J.HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat.{u})] in
 lemma localLift_comp {M N : SheafOfModules.{u} R}
     (f : M ⟶ N) [Epi f] {I : Type u} [Finite I]
     (s : I → N.sections)
@@ -299,8 +299,8 @@ lemma relationMap_presentationOfIsCokernelFree {ι σ : Type u}
       kernel.ι (generatorsOfIsCokernelFree f g H H').π = f
   rw [Equiv.symm_apply_apply, kernel.lift_ι]
 
-omit [J.HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat.{u})] in
 set_option maxHeartbeats 800000 in
+omit [J.HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat.{u})] in
 lemma relationMap_mapOver [HasBinaryProducts C]
     {M : SheafOfModules.{u} R} (P : M.Presentation) (U : C)
     [(J.over U).HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat.{u})]
@@ -539,8 +539,8 @@ noncomputable def extensionKernelOfRightRelationsToLeftRelations :
       apply (cancel_mono S.f).1
       simpa [p₁, Category.assoc] using hl)
 
-omit [J.HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat.{u})] in
 set_option maxHeartbeats 800000 in
+omit [J.HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat.{u})] in
 lemma extensionKernelOfRightRelationsToLeftRelations_comp :
     extensionKernelOfRightRelationsToLeftRelations S hS P₁ P₃ h hh ≫
       extensionLeftRelationsToKernel S P₁ P₃ h =
@@ -614,9 +614,9 @@ lemma epi_extensionKernelToRightRelations
   epi_of_epi_fac
     (extensionRelationRight_comp_kernelToRightRelations S hS P₁ P₃ h hh k hk)
 
+set_option maxHeartbeats 800000 in
 omit [J.HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat.{u})] in
 include hS hh hk in
-set_option maxHeartbeats 800000 in
 lemma epi_extensionRelationsMap :
     Epi (extensionRelationsMap S hS P₁ P₃ h hh k hk) := by
   let q := extensionGeneratorsMap S P₁ P₃ h
@@ -708,8 +708,8 @@ lemma ShortExact.map_over [HasBinaryProducts C]
 
 namespace Presentation
 
-omit [J.HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat.{u})] in
 set_option maxHeartbeats 1600000 in
+omit [J.HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat.{u})] in
 lemma correction_mapOver [HasBinaryProducts C]
     {S : ShortComplex (SheafOfModules.{u} R)} (hS : S.ShortExact)
     (P₃ : S.X₃.Presentation)
@@ -756,8 +756,8 @@ lemma correction_mapOver [HasBinaryProducts C]
 
 end Presentation
 
-omit [J.HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat.{u})] in
 set_option maxHeartbeats 1600000 in
+omit [J.HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat.{u})] in
 lemma mapOver_lift_comp [HasBinaryProducts C]
     {S : ShortComplex (SheafOfModules.{u} R)}
     (P₃ : S.X₃.Presentation)
@@ -776,8 +776,8 @@ lemma mapOver_lift_comp [HasBinaryProducts C]
   rw [← Functor.map_comp, hh]
   exact (Presentation.map_π_eq P₃ (overFunctor R U) (overUnitIso U)).symm
 
-omit [J.HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat.{u})] in
 set_option maxHeartbeats 1600000 in
+omit [J.HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat.{u})] in
 lemma localLift_comp_mapOver [HasBinaryProducts C]
     {M N : SheafOfModules.{u} R} (f : M ⟶ N) [Epi f]
     (P : N.Presentation) [P.IsFinite]
@@ -791,8 +791,8 @@ lemma localLift_comp_mapOver [HasBinaryProducts C]
   (localLift_comp f P.generators.s a).trans <|
     (Presentation.map_π_eq P (overFunctor R a.2.Y) (overUnitIso a.2.Y)).symm
 
-omit [J.HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat.{u})] in
 set_option maxHeartbeats 1600000 in
+omit [J.HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat.{u})] in
 lemma localLift_mapOver_generators_comp [HasBinaryProducts C]
     {M : SheafOfModules.{u} R} (P : M.Presentation)
     {I : Type u} [Finite I] (s : I → M.sections)
@@ -843,9 +843,9 @@ variable [HasBinaryProducts C] [HasPullbacks C]
 local instance (X : C) : HasBinaryProducts (Over X) :=
   Over.ConstructProducts.over_binaryProduct_of_pullback
 
+set_option maxHeartbeats 3200000 in
 omit [J.HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat.{u})]
   hasSheafComposeOverOver in
-set_option maxHeartbeats 3200000 in
 /-- After the quotient generators have been lifted, one further finite cover lifts the
 correction relations and produces a finite presentation of the middle term. -/
 theorem IsFinitePresentation.middle_of_presentations_of_generatorLift
@@ -900,8 +900,8 @@ theorem IsFinitePresentation.middle_of_presentations_of_generatorLift
       infer_instance
   exact IsFinitePresentation.of_presentation P
 
-omit [J.HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat.{u})] in
 set_option maxHeartbeats 3200000 in
+omit [J.HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat.{u})] in
 /-- The middle term of a short exact sequence has finite presentation when both endpoints
 have finite global presentations. -/
 theorem IsFinitePresentation.middle_of_presentations
@@ -931,9 +931,9 @@ theorem IsFinitePresentation.middle_of_presentations
       (Presentation.mapOver_isFinite P₁ a.2.Y)
       (Presentation.mapOver_isFinite P₃ a.2.Y) h hh
 
+set_option maxHeartbeats 9600000 in
 omit [J.HasSheafCompose (forget₂ RingCat.{u} AddCommGrpCat.{u})]
   hasSheafComposeOver in
-set_option maxHeartbeats 9600000 in
 /-- Finite presentation of sheaves of modules is closed under extensions. -/
 theorem IsFinitePresentation.middle_of_shortExact
     {S : ShortComplex (SheafOfModules.{u} R)} (hS : S.ShortExact)
