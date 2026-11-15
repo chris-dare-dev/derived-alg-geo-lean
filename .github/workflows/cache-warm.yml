@@ -28,7 +28,6 @@ on:
     # prose list of `changes` in ci.yml; change the two together.
     paths-ignore:
       - 'docs/**'
-      - '.claude/roadmap/**'
       - '.claude/**/*.md'
       - '*.md'
   workflow_dispatch:

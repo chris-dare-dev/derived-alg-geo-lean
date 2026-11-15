@@ -48,9 +48,8 @@ TODO.md
 /.mfc-venv/
 # Local Python environment for the loop controller, parser and test suite.
 /.loop-tools/
-# The `roadmap` job's venv (PyYAML for scripts/check_roadmap.py), and the same
-# venv when the gate is run by hand.
-/.roadmap-venv/
+# The `roadmap` job's venv for the repository Python tests.
+/.tests-venv/
 /enum-inhabitants.txt
 /lean-source-check.txt
 /lean-warnings.log

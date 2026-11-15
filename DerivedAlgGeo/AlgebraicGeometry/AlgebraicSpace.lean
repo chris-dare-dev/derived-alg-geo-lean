@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.AlgebraicSpace.Basic
 import DerivedAlgGeo.AlgebraicGeometry.AlgebraicSpace.FiberProduct
+import DerivedAlgGeo.AlgebraicGeometry.AlgebraicSpace.GlobalFunctions
 
 /-!
 # Algebraic spaces
@@ -13,20 +14,23 @@ representable by schemes and an étale surjective atlas by a scheme.
 
 ## Main definitions
 
-None: this umbrella re-exports its children, among them `AlgebraicGeometry.isAlgebraicSpace` and
-the category `AlgebraicGeometry.AlgebraicSpace`.
+None: this umbrella re-exports its children, among them `AlgebraicGeometry.isAlgebraicSpace`,
+the category `AlgebraicGeometry.AlgebraicSpace` and its global functions
+`AlgebraicGeometry.AlgebraicSpace.globalFunctions`.
 
 ## Main results
 
 None; this module re-exports its children, among them `AlgebraicGeometry.isAlgebraicSpace_yoneda`
-(schemes are algebraic spaces, Stacks 025Z) and `AlgebraicGeometry.isAlgebraicSpace_pullback`
-(fibre products, Stacks 04T9).
+(schemes are algebraic spaces, Stacks 025Z), `AlgebraicGeometry.isAlgebraicSpace_pullback`
+(fibre products, Stacks 04T9) and `AlgebraicGeometry.AlgebraicSpace.homSpecEquiv` (morphisms to
+affine schemes, Stacks 05Z1).
 
 ## Implementation notes
 
 `AlgebraicSpace/Basic.lean` holds the definition, schemes as algebraic spaces, the underlying sheaf
 and stack, and the universe conventions; `AlgebraicSpace/FiberProduct.lean` holds fibre products
-and the terminal object. Nothing here imports algebraic stacks, moduli problems or stability
+and the terminal object; `AlgebraicSpace/GlobalFunctions.lean` holds global functions and morphisms
+to affine schemes. Nothing here imports algebraic stacks, moduli problems or stability
 conditions.
 
 ## References

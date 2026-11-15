@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Sites.SheafCohomology
 import DerivedAlgGeo.CategoryTheory.Sites.CoversTop
+import DerivedAlgGeo.CategoryTheory.Sites.LocallySurjective
 import DerivedAlgGeo.CategoryTheory.Sites.Over
 import DerivedAlgGeo.CategoryTheory.Sites.Sheaves
 import DerivedAlgGeo.CategoryTheory.Sites.Descent
