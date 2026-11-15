@@ -575,7 +575,7 @@ items:
     kind: task
     parent: stacks-and-moduli-asp1
     title: "ASP1.1: Algebraic spaces over a scheme, and schemes as algebraic spaces (025Y, 025Z)"
-    status: planned
+    status: done
     priority: must
     size: M
     summary: "Algebraic spaces over a base scheme S, in the sense of Stacks 025Y. An algebraic space over S is a presheaf of sets F on Over S such that: - F is an fppf sheaf; - its diagonal is representable (by schemes), in the sense of Mathlib's Functor.relativelyRepresentable yoneda; - some scheme U over S admits a map yoneda U ⟶ F whose base changes to schemes are étale and surjective. This is Mathlib's MorphismProperty.presheaf for (@Etale ⊓ @Surjective).over."
