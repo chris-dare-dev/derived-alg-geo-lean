@@ -46,7 +46,7 @@ def main() -> int:
                 "Foundation.PreStabilityCondition or "
                 "Foundation.StabilityCondition, the heart adapter "
                 "Foundation.HeartDatum, or -- for the abelian stability "
-                "functions MO1.08 moved out of this tree -- a narrow "
+                "functions that live outside this tree -- a narrow "
                 "CategoryTheory.Abelian.Stability leaf)"
             )
 

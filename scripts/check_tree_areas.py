@@ -73,19 +73,9 @@ AREAS = {
 
 # An entry ending in / names a directory; any other names one file.
 LEGACY = (
-    ".claude/README.md",
-    ".claude/decisions/",
-    ".claude/references/",
-    ".claude/roadmap/",
-    "docs/",
     "registry/README.md",
     "scripts/fixtures/",
     "scripts/private-reader.git/",
-    "scripts/test_local_build.sh",
-    "scripts/test_private_alias_scan.py",
-    "scripts/test_private_package_cache.py",
-    "scripts/test_private_source_contract.py",
-    "scripts/tests/",
 )
 
 PATTERNS = [(area, re.compile(p)) for area, ps in AREAS.items() for p in ps]

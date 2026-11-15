@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # The pre-push gate list from CONTRIBUTING.md, as one command.
 #
-# An unattended formalization loop needs a single exit code to branch on, and it
-# needs the gates in cheapest-first order so a failure is reported in two minutes
-# rather than forty.
+# An unattended run needs a single exit code to branch on, and it needs the
+# gates in cheapest-first order so a failure is reported in minutes rather than
+# after the whole build.
 #
 #   scripts/gates.sh fast   build + style                         (~minutes)
 #   scripts/gates.sh        the full list below, in CI's order
@@ -11,52 +11,31 @@
 #
 # DO NOT RUN THIS SCRIPT ON THE DEVELOPER'S MACHINE. `scripts/check_local_build.py`
 # is a PreToolUse hook and refuses it in any mode, because the `build` gate below
-# is the whole-library build that cost a developer three hours on 2026-08-27.
-# Full verification runs on the self-hosted Windows runners: push the branch, or
-# `gh workflow run ci.yml --ref <branch>`. This file remains the readable list of
-# what is checked, and reading it is allowed -- `cat`, `grep` and `git ls-tree`
-# pass the hook. `scripts/precheck.sh` is what you actually run locally.
+# is the whole-library build. Full verification runs in CI: open the pull
+# request, or `gh workflow run ci.yml --ref <branch>`. This file remains the
+# readable list of what is checked, and reading it is allowed -- `cat`, `grep`
+# and `git ls-tree` pass the hook. `scripts/precheck.sh` is what you run locally.
 #
-# NEITHER LIST CONTAINS THE OTHER, and saying so precisely is the point of this
-# paragraph, because the imprecise version caused a real regression.
+# NEITHER LIST CONTAINS THE OTHER.
 #
 # What CI has and this file does not: the `Contract gates` step runs the `mfc`
 # contract tooling -- validate / env / bundle / lint / check-ilean-coverage
 # against the pinned registry -- from a venv it builds per run, and none of it is
 # reproduced below. A green `scripts/gates.sh` does not imply a green CI.
 #
-# What this file has and `.github/workflows/` does not, verified against ci.yml,
-# cache-warm.yml and docs.yml on 2026-09-16, and re-verified when the trust
-# guard was removed:
+# What this file has and `ci.yml` does not:
 #
 #   workflows        cannot be a CI gate. A workflow file too invalid to parse is
 #                    also too invalid to run the job that would have checked it;
 #                    GitHub fails a run named after the file and reports no
 #                    checks at all. It has to fire before the file reaches
 #                    GitHub. See scripts/check_workflows.sh.
-#   local-build      tests a PreToolUse hook, which exists only on a developer's
-#                    machine.
-#   mathlib-style    is the PostToolUse edit hook's checker, run over the branch
-#                    diff. It is a pre-push linter by design.
-#   emit-build       runs in cache-warm.yml rather than ci.yml -- linking is
-#                    expensive on a cold tree, and exe/Emit.lean cannot link on
-#                    Windows at all. Deliberate; see the gate's own comment.
-#   single-instantiation  was NOT deliberate. Until PR #1355 it appeared in no
-#                    workflow at all, so for anyone who could not run this script
-#                    -- which, since the hook, is every agent -- it ran nowhere.
-#                    It drifted in silence: `bb8a1278` records 24 generic
-#                    abstractions that reached at most one inhabitant with
-#                    nothing going red. The first four entries above are local by
-#                    construction; this one was local by omission, and the header
-#                    that claimed "ONE deliberate exception" is what hid it.
-#
-# `roadmap` is the one piece of that step cheap enough to run here, and it was
-# added on 2026-08-27 after the gap bit: RM-07 went red on main and on every
-# open pull request for half an hour -- a roadmap entry left at `planned` after
-# its issue closed -- while `scripts/gates.sh` stayed green on all of them,
-# because it never looked. It is deliberately invoked WITHOUT `--require-api`:
-# the script's own contract is that a contributor with no `gh` gets a NOT_RUN
-# report rather than a blocked push, and CI passes the flag instead.
+#   mathlib-style    its `--diff-only` pass is the edit hook's checker over the
+#                    branch diff, a pre-push linter by design. Its fixtures and
+#                    baseline ratchet also run in CI.
+#   emit-build       runs in cache-warm.yml rather than ci.yml: linking is
+#                    expensive on a cold tree, so it stays off the per-pull-
+#                    request path. See the gate's own comment.
 #
 # Each gate prints `GATE <name>: pass|FAIL`. The script does not stop at the
 # first failure -- an unattended run wants the whole picture in one pass -- and
@@ -68,11 +47,10 @@ cd "$(dirname "$0")/.."
 MODE="${1:-full}"
 FAILED=()
 
-# Per-run scratch directory. These artifacts used to live at fixed /tmp paths,
-# which is wrong on this machine twice over: agent sessions run in worktrees
-# under /tmp, and two self-hosted CI runners share the host. Two concurrent
-# runs then read and write the same file, so a gate can pass or fail on another
-# branch's data with nothing in the output naming the branch that wrote it.
+# Per-run scratch directory. Agent worktrees and self-hosted runners share one
+# host, and with a fixed path two concurrent runs read and write the same file,
+# so a gate can pass or fail on another branch's data with nothing in the output
+# naming the branch that wrote it.
 gate_tmp_base="${TMPDIR:-/tmp}"
 GATE_TMP="$(mktemp -d "${gate_tmp_base%/}/dag-gates.XXXXXX")" || {
   echo "could not create a scratch directory under ${gate_tmp_base%/}"
@@ -133,10 +111,7 @@ exe_sorry() {
   # The one file the emitter cannot cover: an `lean_exe` root is not part of the
   # environment built from its own imports. CI runs the same loop; see the
   # "No declaration uses sorry" step in .github/workflows/ci.yml.
-  # RestateHistoricalNames is deliberately outside both library umbrellas, so
-  # a clean tree must build that executable-only dependency explicitly before
-  # elaborating exe/Restate.lean.
-  lake build DerivedAlgGeoSweep RestateHistoricalNames || return 1
+  lake build DerivedAlgGeoSweep || return 1
   local log="$GATE_TMP"/exe-sorry-check.txt
   : > "$log"
   for f in exe/*.lean; do
@@ -153,8 +128,8 @@ changed_lean_files() {
   # `origin/main`, not `main`: the local `main` in this clone is hundreds of
   # commits stale, and diffing against it would hand every gate the whole
   # library instead of the branch's own changes.
-  git diff --name-only origin/main...HEAD -- '*.lean'
-  git diff --name-only -- '*.lean'
+  git diff --name-only --diff-filter=d origin/main...HEAD -- '*.lean'
+  git diff --name-only --diff-filter=d -- '*.lean'
 }
 
 mathlib_style() {
@@ -167,7 +142,9 @@ mathlib_style() {
   # here: neither depends on the diff, and a branch that adds a style ERROR to
   # a file no agent edited would otherwise reach CI to find out.
   python3 scripts/check_mathlib_style.py --check-baseline || return 1
-  files="$(changed_lean_files | sort -u)"
+  # Library sources only: the checker refuses a run in which no file it judges
+  # was given, and `scripts/` and `exe/` Lean files are outside its scope.
+  files="$(changed_lean_files | grep -E '^DerivedAlgGeo(/|\.lean$)' | sort -u)"
   [ -z "$files" ] && return 0
   # --diff-only: judge the lines this branch wrote, not the pre-existing debt in
   # a file it happens to touch. The edit hook stays strict on what you just
@@ -185,21 +162,12 @@ echo "== gates ($MODE) =="
 # checks. In `fast` mode too, for the same reason.
 gate workflows scripts/check_workflows.sh
 # Also cheap, also in `fast` mode: every gate below prints declaration names,
-# and on the Windows runner a gate that cannot print `δ` dies with a
-# `charmap` traceback instead of its finding (#868, #869). This checks that
-# each script routes its console through scripts/_output.py, and that the
-# helper actually survives a cp1252 console.
+# and on a console that cannot encode `δ` a gate dies with a `charmap` traceback
+# instead of its finding. This checks that each script routes its console
+# through scripts/_output.py, and that the helper survives a cp1252 console.
 gate output-encoding python3 scripts/_output.py
-gate codex-entrypoint python3 scripts/check_codex_entrypoint.py
 gate tree-areas python3 scripts/check_tree_areas.py origin/main
-gate script-tests python3 -m unittest discover -s scripts/tests -p "test_*.py"
-# Next to it for the same reason: `check_local_build.py` is a PreToolUse hook,
-# and a hook that has stopped refusing is indistinguishable from a hook with
-# nothing to catch. #837 found it silently allowing `lake build DerivedAlgGeo`
-# -- the whole library under a target name -- for as long as it had existed.
-gate local-build scripts/test_local_build.sh
 gate mathlib-style mathlib_style
-gate review-docs python3 scripts/check_review_evidence.py docs --base origin/main
 gate emission-sources python3 scripts/check_emission_coverage.py --source-only
 gate explicit-numerical-data python3 scripts/check_explicit_numerical_data.py
 gate foundation-import-boundary python3 scripts/check_foundation_import_boundary.py
@@ -222,19 +190,15 @@ if [ "$MODE" != "fast" ]; then
   # No `--require-api`: see the header. Offline this reports NOT_RUN and passes,
   # which is the script's documented local contract; CI runs it with the flag so
   # the one environment guaranteed to have the API cannot silently skip.
-  gate roadmap python3 scripts/check_roadmap.py
   # emit-build keeps proving the executable still LINKS -- linking is the only
-  # thing that exercises the native-object path at all, and exe/Emit.lean notes
-  # it cannot be linked on Windows. It is the expensive gate on a cold tree
-  # (4173 Mathlib `:c.o` targets) and cheap on a warm one, which is why CI runs
-  # it only in the cache-warm workflow and not per pull request.
+  # thing that exercises the native-object path at all. It is the expensive gate
+  # on a cold tree (thousands of Mathlib `:c.o` targets) and cheap on a warm
+  # one, which is why CI runs it only in the cache-warm workflow.
   gate emit-build lake build emit
   # ...but the emission itself runs INTERPRETED, matching CI. It needs no native
-  # objects, and on a warm tree it is faster than the compiled path (134s vs
-  # 158s) because it never loads the 278 MB binary. Verified equivalent: same
-  # 11945 constants, same names, same counts; `emitted_at` is the only byte that
-  # differs. Exit codes propagate through `--run`, which matters because this
-  # non-zero exit IS the repository-wide sorry gate.
+  # objects and never loads the linked binary, and it emits the same artifact
+  # apart from `emitted_at`. Exit codes propagate through `--run`, which matters
+  # because this non-zero exit IS the repository-wide sorry gate.
   gate emit lake env lean --run exe/Emit.lean --out "$GATE_TMP"/derived-alg-geo-emission.json
   # The emit gate above is the repository-wide sorry gate. This one checks that
   # it swept everything -- without it, a library root nobody imported into

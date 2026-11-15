@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Validate the GitHub Actions workflow files with actionlint.
 #
-# WHY THIS EXISTS. On 2026-08-15 a single wrong character in ci.yml -- a double
-# quote inside a `${{ }}` expression, where workflow expressions accept only
-# single quotes -- made the file invalid. GitHub answers an invalid workflow
-# with a failed run NAMED AFTER THE FILE: no annotation, no job, and no checks
-# reported at all. `gh pr checks` said "no checks reported on the branch",
-# which is indistinguishable from "CI has not started yet", and PR #408 sat for
-# an hour looking like it was still building. actionlint names it exactly:
+# WHY THIS EXISTS. A single wrong character in a workflow -- a double quote
+# inside a `${{ }}` expression, where workflow expressions accept only single
+# quotes -- makes the file invalid, and GitHub answers an invalid workflow with
+# a failed run NAMED AFTER THE FILE: no annotation, no job, and no checks
+# reported at all. `gh pr checks` then says "no checks reported on the branch",
+# which is indistinguishable from "CI has not started yet". actionlint names it
+# exactly:
 #
 #   got unexpected character '"' while lexing expression [...] only single
 #   quotes are available for string delimiter

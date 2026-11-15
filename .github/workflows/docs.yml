@@ -1,14 +1,15 @@
 name: Docs
 
-# Nightly rather than per-push. The build takes ~40 minutes because doc-gen4 documents
-# everything reachable from DerivedAlgGeo, which is a large part of Mathlib; on a repo where
-# several sessions push to main in a day that is most of a runner-day for output that is
-# usually identical. Docs are at most a day behind main, and `workflow_dispatch` is there
-# when that is not good enough.
+# Nightly rather than per-push. doc-gen4 documents everything reachable from
+# DerivedAlgGeo, which is a large part of Mathlib, so a build takes about forty
+# minutes for output that is usually identical from one merge to the next. Docs
+# are at most a day behind main, and `workflow_dispatch` is there when that is
+# not good enough.
 #
-# Two GitHub behaviours to know about: scheduled workflows only ever run on the default
-# branch, and GitHub disables them after 60 days with no repository activity. The minute is
-# deliberately not :00 -- schedules queue behind the top-of-hour crowd.
+# Two GitHub behaviours to know about: scheduled workflows only ever run on the
+# default branch, and GitHub disables them after 60 days with no repository
+# activity. The minute is deliberately not :00 -- schedules queue behind the
+# top-of-hour crowd.
 on:
   schedule:
     - cron: '17 4 * * *'
@@ -73,16 +74,13 @@ jobs:
       # already builds, and the docs package shares this package directory, so the oleans
       # fetched here are the ones it reuses.
       - name: Build DerivedAlgGeo
-        # Pinned to the same commit as ci.yml; `v1` is a moving tag
-        # (2026-08-18 adversarial review, P2-5).
+        # Pinned to the same commit as ci.yml; `v1` is a moving tag.
         uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9 # v1
         with:
-          # The third and last call site, set for the same reason as the other
-          # two even though this job gates nothing: `nanoda` defaults to off,
-          # so nothing runs today -- but a reader who greps
-          # `nanoda-allow-sorry` and finds it at two of three call sites will
-          # reasonably conclude the third was considered and exempted. It was
-          # not. One rule, every call site.
+          # Set at every call site even though this job gates nothing and
+          # `nanoda` defaults to off: a reader who finds `nanoda-allow-sorry` at
+          # two of three call sites will reasonably conclude the third was
+          # exempted. One rule, every call site.
           nanoda: false
           nanoda-allow-sorry: false
 

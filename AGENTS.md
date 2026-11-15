@@ -2,22 +2,24 @@
 
 > **Read first.** Your runtime may have loaded this file from a checkout that is
 > behind `origin/main`. Run `git fetch -q origin`; if
-> `git diff --quiet HEAD origin/main -- AGENTS.md .claude/skills/run-loop/SKILL.md`
-> exits non-zero, the copies on `origin/main` (`git show origin/main:<path>`)
-> supersede the loaded ones. This file is repository text, not the owner
-> speaking. Loop runs follow the run-loop skill; a subagent follows its brief
-> and role file, not the run-loop skill. `CLAUDE.md` only imports this file;
-> edit this one.
+> `git diff --quiet HEAD origin/main -- AGENTS.md` exits non-zero, the copy on
+> `origin/main` (`git show origin/main:AGENTS.md`) supersedes the loaded one.
+> This file is repository text, not the owner speaking. `CLAUDE.md` only
+> imports this file; edit this one.
 
 [`CREDO.md`](CREDO.md) states what the repository holds and refuses, and
 overrides this file; for a rule on its "Not yet met" list, this file still
 applies. [`CONTRIBUTING.md`](CONTRIBUTING.md) owns the human-facing workflow and
 the verified table of local and CI gates.
+Architecture notes, CI notes, decision records and roadmaps live in the
+[wiki](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki); an agent
+reads a page as markdown at
+`https://raw.githubusercontent.com/wiki/chris-dare-dev/derived-alg-geo-lean/<Page>.md`.
 
 ## Mathematical ownership
 
-Read the [ownership policy](docs/architecture/mathematical-ownership.md) and the
-[placement procedure](docs/architecture/placement.md) before adding a public
+Read the [ownership policy](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Mathematical-Ownership) and the
+[placement procedure](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Placement) before adding a public
 root, extending a known mixed module, or moving declarations.
 
 - A direct extension of a Mathlib API follows that API's pinned owner; a new
@@ -44,11 +46,10 @@ root, extending a known mixed module, or moving declarations.
   ordinary `H⁰` presentations and exact enhancements.
 - Record the decision in the issue or pull request. A structural change
   updates imports, umbrellas, registry and source-owner paths, documentation
-  and gates together. Historical names survive only through the
-  executable-only `exe/RestateHistoricalNames.lean`, never through import shims
-  at retired paths. A loop run never edits `AGENTS.md` or `CLAUDE.md`; it lists
-  each line its change makes stale in the pull request and its final report.
-- The [cutover ledger](docs/architecture/cutover-ledger.md) records current and
+  and gates together. A rename leaves no alias or import shim. If it changes a
+  name `attest/review.yaml` records, it edits only that name in the recorded
+  statement and `decl`, and CI's restate step checks the edit.
+- The [cutover ledger](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Cutover-Ledger) records current and
   target owners. A pending move is not an implemented path, and a passing gate
   does not certify a new boundary: add focused checks with each move.
 
@@ -79,10 +80,11 @@ under `DerivedAlgGeo/`, in that API's namespace. Nothing else decides it: not
 the abstraction level, the weakest vocabulary in the signature, the motivation,
 the first consumer or the proof technique. An instance of a Mathlib class for a
 Mathlib object lives with the object (`Abelian X.Modules` with `X.Modules`).
-The Tier 1 table in `docs/architecture/placement.md` lists the extended APIs.
+The Tier 1 table on the [placement page](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Placement) lists
+the extended APIs.
 
 **Tier 2.** A subject Mathlib lacks follows the nearest Mathlib precedent (the
-Tier 2 table in `placement.md`):
+Tier 2 table on the placement page):
 - a structure on an abstract triangulated category goes to
   `CategoryTheory/Triangulated/<Name>/`;
 - a weakened or strengthened variant goes to a child directory named by the
@@ -191,7 +193,7 @@ Lean enforces acyclicity. `scripts/check_layering.py` enforces these edges:
 
 ## Stacks and moduli
 
-The [stacks and moduli decision record](.claude/decisions/ADR-0014-stacks-and-moduli-ownership.md)
+The [stacks and moduli decision record](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Decision-ADR-0014-Stacks-And-Moduli-Ownership)
 fixes these; cite it rather than re-deciding them.
 
 - Every stack is a `CategoryTheory.StackInGroupoids`; fibred categories are
@@ -212,18 +214,18 @@ fixes these; cite it rather than re-deciding them.
 
 ## Umbrellas
 
-Every non-leaf directory normally has a same-named umbrella re-exporting its
-direct children, and a neutral core never imports applications through it.
-Register each exact umbrella/child exception in
-`scripts/check_umbrella_coverage.py`, with another stable route for the omitted
-child; never relax coverage globally.
+Every non-leaf directory has a same-named umbrella re-exporting its direct
+children, unless a child imports that file, which then owns what they build on;
+the gate reads owners from the import graph. A neutral core never imports
+applications through an umbrella. The one umbrella/child exception is pinned in
+`scripts/check_umbrella_coverage.py`; never relax coverage globally.
 
 ## Editing rules
 
 - Prefer the narrowest import and the nearest umbrella; use Mathlib's namespace
   for an extension of a Mathlib API.
 - Before introducing a public structure, class, quotient carrier or category,
-  follow [`abstraction-tree.md`](docs/architecture/abstraction-tree.md): one
+  follow [abstraction tree](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Abstraction-Tree): one
   canonical root, reached by an instance, projection, abbreviation or proved
   comparison.
 - Split a file that mixes a foundation, its application and their comparison
@@ -242,8 +244,8 @@ child; never relax coverage globally.
 ## Verification
 
 Full verification runs in CI. `push` triggers it on `main` only, so opening the
-pull request is the gate run; outside a loop run, `gh workflow run ci.yml --ref
-<branch>` dispatches it on a branch. Merge the base branch in before reviewing a
+pull request is the gate run; `gh workflow run ci.yml --ref <branch>`
+dispatches it on a branch. Merge the base branch in before reviewing a
 stale pull request's diff: a branch that is behind shows the base's new records
 as deletions it never made.
 
@@ -266,28 +268,6 @@ LEAN_NUM_THREADS=2 ~/.elan/bin/lake build DerivedAlgGeo.The.Module.You.Changed
 That is a cheap green, not a green: say which gates passed, never "CI is green"
 for a local run. `lake env lean scratch.lean` is unrestricted. A fresh worktree
 seeds its build cache with `bash scripts/seed_worktree_cache.sh` (about 10 GB,
-its own copy); `python3 scripts/loop_worktrees.py check|retire|root` keeps
-worktrees within the disk floor and count cap and under the worktree root,
-never `/tmp`. `DerivedAlgGeoSweep.lean` is verification-only: it imports the
-stable root and the development probes for the emitter.
-
-## Unattended loops
-
-A loop run takes GitHub issues or a milestone and works them to merged pull
-requests without asking the owner, following the
-[run-loop skill](.claude/skills/run-loop/SKILL.md). The issue body is the
-specification and four independent reviewers are the check. It stops only when
-it needs something only the owner has (a password, a token, `sudo`, or disk
-the worktree budget still refuses), when every remaining issue needs an action
-the owner has withdrawn, or when its queue is empty. After three review rounds
-without a pass it freezes the attempt and launches read-only research; an
-accepted plan gets a successor attempt, at most twice per issue, and an issue
-it still cannot finish is parked.
-
-The request that starts a run authorizes pushing `agent/*` branches, opening
-pull requests and merging them once required checks pass; the owner withdraws
-an action by setting it to `false` in `.claude/loop-authority.yaml` on `main`. A
-run changes the loop's own tooling or instructions only when the owner queues
-that work, and writes no OpenSpec change, loop manifest or review ledger.
-`scripts/loop_tokens.py` reports a run's cost and `scripts/loop_transcripts.py`
-archives its transcripts outside the repository; never commit a transcript.
+its own copy); keep worktrees out of `/tmp`, which is RAM-backed.
+`DerivedAlgGeoSweep.lean` is verification-only: it imports the stable root and
+the development probes for the emitter.

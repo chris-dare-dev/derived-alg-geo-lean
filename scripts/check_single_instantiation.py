@@ -7,11 +7,7 @@ instantiates it once, at the case in front of them; and never migrates the other
 N-1. The abstraction then sits at zero adoption while the duplicates it was
 meant to absorb keep accruing, and nothing anywhere notices.
 
-Three instances of it are on the record. `GrothendieckPresentation` was generic
-in its generator and relation types and instantiated once, at distinguished
-triangles, until #760. `ClassDatum` was introduced by #764 to serve two
-theories, said so in its own docstring, and shipped with one instantiation until
-#784. `Enhancement` still has one, which is correct -- see below.
+`Enhancement` has one inhabitant, which is correct -- see below.
 
 ## Why a baseline rather than a rule
 
@@ -29,16 +25,13 @@ The historical records stay in `single_instantiation_baseline.txt`; new ones
 go to `single_instantiation_records/<source-module-subject>.txt`. A strict
 reader checks the union for duplicate names and conflicting owners.
 
-The reason used to live in the pull request instead, and that did not hold. A
-pull request is not readable from the tree, and `--relax` used to rewrite the
-file from scratch, so a regenerated baseline was indistinguishable from a reviewed one.
-Between 2026-09-08 and 2026-09-14, 29 names drifted in that way -- against 80
-recorded -- while this gate ran only in `scripts/gates.sh` and never in CI. The
-reason now lives in each record, `--relax` preserves the reasons already there and
-returns nonzero for any name it had to write a `TODO` for, and a `TODO` for a
-current thin abstraction fails the gate. `--relax` can record a name; it cannot
-bless one. The 80 entries that predate the column carry a visible legacy marker
-rather than a silent pass, so the back-fill stays countable.
+The reason lives in each record, because a pull request is not readable from
+the tree and a regenerated baseline must not be indistinguishable from a
+reviewed one. `--relax` preserves the reasons already there and returns nonzero
+for any name it had to write a `TODO` for, and a `TODO` for a current thin
+abstraction fails the gate. `--relax` can record a name; it cannot bless one.
+Entries that predate the column carry a visible legacy marker rather than a
+silent pass, so the back-fill stays countable.
 `--relax` adds records without pruning stale ones; stale-record triage is a
 separate review decision.
 
@@ -47,8 +40,8 @@ separate review decision.
 `scripts/EnumInhabitants.lean` decides, from the elaborated environment: a
 declaration whose type, after stripping every leading binder, has the structure
 as the head of its conclusion. That distinguishes a producer from a consumer,
-which no amount of grepping over source can do -- the first attempt at this
-counted `def IsPositive (D : ClassDatum O G) : Prop` as an instantiation of
+which no amount of grepping over source can do -- a grep counts
+`def IsPositive (D : ClassDatum O G) : Prop` as an instantiation of
 `ClassDatum`.
 """
 

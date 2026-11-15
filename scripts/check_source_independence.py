@@ -24,8 +24,8 @@ from _output import force_utf8_output
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 # Lean's module system prefixes imports with `public`, `private`, or `meta`,
-# and `import all` re-exports; a plain `^import` regex missed every one of
-# those forms (2026-08-18 adversarial review, finding P2-2).
+# and `import all` re-exports; a plain `^import` regex would miss every one of
+# those forms.
 IMPORT = re.compile(
     r"^\s*(?:(?:public|private|meta)\s+)*import\s+(?:all\s+)?(\S+)"
 )
@@ -70,18 +70,18 @@ def lean_sources(
 ) -> Iterator[pathlib.Path]:
     """Yield this checkout's Lean sources, skipping build output.
 
-    Local working trees live under `.claude/worktrees/`, and a worktree of any
-    pre-#372 branch still holds the retired `CohLean/` and `DGLean/` layouts.
+    Local working trees live under `.claude/worktrees/`, and a worktree of an
+    old branch can still hold the retired `CohLean/` and `DGLean/` layouts.
     Those are a different checkout's tracked files, so counting them makes this
     gate -- and therefore `scripts/gates.sh` -- permanently red in any clone
     that has one, while CI stays green because CI checks out clean. A gate that
     only ever fails locally teaches people to ignore it; `.claude` is therefore
     in SKIP_DIRS wholesale.
 
-    A nested `.git` entry anywhere ELSE is no longer silently pruned: silent
-    pruning meant a directory with a stub `.git` file hid a live copy from the
-    import scan entirely (2026-08-18 adversarial review, finding P2-2). Such a
-    directory is now recorded and the caller fails the gate naming it.
+    A nested `.git` entry anywhere ELSE is not silently pruned: a directory
+    with a stub `.git` file would hide a live copy from the import scan
+    entirely. Such a directory is recorded and the caller fails the gate
+    naming it.
     """
     for dirpath, dirnames, filenames in os.walk(root):
         here = pathlib.Path(dirpath)

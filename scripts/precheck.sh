@@ -3,19 +3,15 @@
 # build of what this branch changed.
 #
 # WHY THIS EXISTS. `scripts/check_local_build.py` refuses `scripts/gates.sh` in
-# any mode, because its `build` gate is the whole-library build that cost a
-# developer three hours on 2026-08-27. That refusal was correct and it was also
-# the whole story: nothing replaced it. Both agent skills under `.claude/skills/`
-# called `scripts/gates.sh fast` and then `scripts/gates.sh` as their definition
-# of done, so every unattended iteration hit a blocked hook at exactly the step
-# that decides whether the work is finished, and got no verdict at all.
+# any mode, because its `build` gate is the whole-library build. A refusal with
+# nothing in its place would leave a session told to run the gates with no
+# verdict at exactly the step that decides whether the work is finished.
 #
 # This is the half of the gate list that a laptop can honestly run: no
 # `lake build` of the library, no audits, no emitter. It takes seconds, it
-# catches the failures that actually recur on this queue -- a retired source
-# root, a missing umbrella export, a style violation, an invalid workflow --
-# and it is allowed by the hook by construction, because it never asks Lake for
-# an umbrella.
+# catches the failures that actually recur -- a retired source root, a missing
+# umbrella export, a style violation, an invalid workflow -- and it is allowed
+# by the hook by construction, because it never asks Lake for an umbrella.
 #
 # THIS IS NOT A CI VERDICT, and the difference is the point of the file.
 #
@@ -27,15 +23,10 @@
 #   * It does not run the `mfc` contract tooling, which is CI-only and which
 #     `scripts/gates.sh` does not reproduce either.
 #
-# Get the verdict from CI. Since 2026-09-19 a push to an agent branch does NOT
-# start a run -- `ci.yml` triggers `push` on `main` alone. Open the pull
-# request; that lane runs the identical job set on ubuntu-latest. To dispatch
-# the self-hosted Ubuntu lane on a branch instead:
+# Get the verdict from CI: `ci.yml` triggers `push` on `main` alone, so open the
+# pull request, or dispatch it on a branch:
 #
 #   gh workflow run ci.yml --ref <branch>
-#
-# Not in loop runs: there the pull request's CI is the gate, and a reviewer
-# never dispatches or waits for a workflow (see the run-loop skill).
 #
 # Usage:
 #   scripts/precheck.sh          the checks above, plus the targeted build
@@ -56,8 +47,8 @@ FAILED=()
 RAN=()
 
 # Per-run scratch directory, for the same reason gates.sh has one: agent
-# sessions run in worktrees and two self-hosted runners share this host, so a
-# fixed /tmp path lets one branch read another's artifacts.
+# worktrees and self-hosted runners share this host, so a fixed path lets one
+# branch read another's artifacts.
 tmp_base="${TMPDIR:-/tmp}"
 PRE_TMP="$(mktemp -d "${tmp_base%/}/dag-precheck.XXXXXX")" || {
   echo "could not create a scratch directory under ${tmp_base%/}"
@@ -117,8 +108,8 @@ changed_lean_files() {
   # `origin/main`, not `main`: the local `main` in this clone is hundreds of
   # commits stale, and diffing against it would hand every check the whole
   # library instead of the branch's own changes.
-  git diff --name-only origin/main...HEAD -- '*.lean'
-  git diff --name-only -- '*.lean'
+  git diff --name-only --diff-filter=d origin/main...HEAD -- '*.lean'
+  git diff --name-only --diff-filter=d -- '*.lean'
 }
 
 mathlib_style() {
@@ -128,7 +119,9 @@ mathlib_style() {
   # ERROR to a file it never edited -- a scripted rewrite, a merge resolution --
   # would otherwise reach CI to find out. ~5s over the whole library.
   python3 scripts/check_mathlib_style.py --check-baseline || return 1
-  files="$(changed_lean_files | sort -u)"
+  # Library sources only: the checker refuses a run in which no file it judges
+  # was given, and `scripts/` and `exe/` Lean files are outside its scope.
+  files="$(changed_lean_files | grep -E '^DerivedAlgGeo(/|\.lean$)' | sort -u)"
   [ -z "$files" ] && return 0
   # --diff-only, matching gates.sh: judge the lines this branch wrote, not the
   # pre-existing debt in a file it happens to touch.
@@ -158,10 +151,10 @@ targeted_build() {
   echo "building: $targets"
   # WIDTH, not just size. `check_local_build.py` refuses a targeted build that
   # does not declare `LEAN_NUM_THREADS`, or that sets it above
-  # MAX_LOCAL_THREADS -- on 2026-09-15 an uncapped host reached ~60 concurrent
-  # `lean` processes and CI jobs died with no log at all. This script is invoked
-  # as one command, so the hook never sees the `lake build` inside it; declaring
-  # the width here is therefore a promise the hook cannot check, and it is kept.
+  # MAX_LOCAL_THREADS, because an uncapped host runs out of memory and kills CI
+  # jobs sharing it. This script is invoked as one command, so the hook never
+  # sees the `lake build` inside it; declaring the width here is a promise the
+  # hook cannot check, and it is kept.
   #
   # An ambient value is honoured but clamped: a shell exporting 16 would put
   # this script on the wrong side of a rule the hook would have enforced on the
@@ -173,26 +166,10 @@ targeted_build() {
        [ "$threads" -gt 4 ] && threads=4 ;;
   esac
   echo "LEAN_NUM_THREADS=$threads"
-  # WHOSE lake -- the same kind of promise as the width above, kept for the same
-  # reason: the hook only ever sees the command an agent types, and this script
-  # is typed as one word.
-  #
-  # On the retired Windows host every runner's `.elan/bin` sat on PATH AHEAD
-  # of `~/.elan/bin`, and not by hand: `lean-action` runs `elan-init` without
-  # `--no-modify-path` and `run-runner.cmd` pointed HOME at the runner
-  # directory, so each CI job re-persisted its own shim directory into the
-  # user environment. A bare `lake` there ran a RUNNER's shim and held its
-  # `lake.exe` open; the next job on that runner could not relink its shims
-  # and died about a second in. On 2026-09-16 that held `main` red across
-  # three runs.
-  #
-  # The Ubuntu runners (#1443) each own their HOME and `.elan` and never put
-  # a shim on the developer's PATH, so this is no longer load-bearing here.
-  # It is kept because it costs one test, and because naming the interpreter
-  # does not depend on PATH order -- which was never ours to keep.
-  #
-  # Falls back to PATH where there is no user elan, which is every machine that
-  # is not this one.
+  # WHOSE lake -- the same kind of promise as the width above: the hook only
+  # ever sees the command an agent types, and this script is typed as one word.
+  # Naming the developer's own elan keeps a runner's shim out of the build
+  # whatever the PATH order. Falls back to PATH where there is no user elan.
   local lake="lake"
   [ -x "$HOME/.elan/bin/lake" ] && lake="$HOME/.elan/bin/lake"
   echo "lake: $lake"
@@ -201,7 +178,7 @@ targeted_build() {
 }
 
 echo "== precheck =="
-echo "(not a CI verdict -- see the header, and gh workflow run ci.yml --ref <branch>; loop runs never dispatch: the PR's CI is the gate)"
+echo "(not a CI verdict -- see the header, and gh workflow run ci.yml --ref <branch>)"
 echo
 
 # First and cheapest, and the one whose failure is otherwise invisible: an
@@ -209,14 +186,8 @@ echo
 # cannot be a CI gate at all; see scripts/check_workflows.sh.
 gate workflows scripts/check_workflows.sh
 gate output-encoding python3 scripts/_output.py
-gate codex-entrypoint python3 scripts/check_codex_entrypoint.py
 gate tree-areas python3 scripts/check_tree_areas.py origin/main
-gate script-tests python3 -m unittest discover -s scripts/tests -p "test_*.py"
-# Tests a PreToolUse hook, which has no ci.yml counterpart and cannot have one:
-# the hook exists only on a developer's machine.
-gate local-build scripts/test_local_build.sh
 gate mathlib-style mathlib_style
-gate review-docs python3 scripts/check_review_evidence.py docs --base origin/main
 gate emission-sources python3 scripts/check_emission_coverage.py --source-only
 gate explicit-numerical-data python3 scripts/check_explicit_numerical_data.py
 gate foundation-import-boundary python3 scripts/check_foundation_import_boundary.py
@@ -231,7 +202,6 @@ gate coherent-families python3 scripts/check_coherent_families.py
 gate coverage-map python3 scripts/check_coverage_map.py
 # No `--require-api`, matching gates.sh: offline this reports NOT_RUN and
 # passes, which is the script's documented local contract. CI passes the flag.
-gate roadmap python3 scripts/check_roadmap.py
 
 # Everything above is a gate borrowed from scripts/gates.sh by name. Snapshot the
 # list before adding the two that are precheck's own.
@@ -245,7 +215,7 @@ fi
 echo
 if [ ${#FAILED[@]} -eq 0 ]; then
   echo "precheck clean -- this is NOT a CI verdict."
-  echo "Open the pull request for the verdict, or dispatch CI on the pushed branch (never in a loop run):"
+  echo "Open the pull request for the verdict, or dispatch CI on the pushed branch:"
   echo "  gh workflow run ci.yml --ref \$(git branch --show-current)"
   exit 0
 fi

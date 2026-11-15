@@ -12,9 +12,9 @@ libraries or restore retired repository roots; a new top-level subject must be
 a Mathlib subject and is added to `scripts/check_layering.py` by name.
 
 The placement rule has two tiers, stated in full in
-[placement.md](docs/architecture/placement.md). The subject/application
+[placement](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Placement). The subject/application
 boundaries and compact issue/PR decision record are maintained in
-[mathematical-ownership.md](docs/architecture/mathematical-ownership.md).
+[mathematical ownership](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Mathematical-Ownership).
 `AGENTS.md`, which `CLAUDE.md` imports, summarizes the same rules for coding
 agents.
 
@@ -66,7 +66,7 @@ existing umbrellas. A neutral core may omit an application only with a
 documented exact exception in the coverage gate and another stable export/build
 route for that application. Check transitive imports through umbrellas.
 
-The dependency contract is `docs/architecture/layers.md`: only
+The dependency contract is https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Layers: only
 `AlgebraicGeometry/` and `Development/` import geometry, `Development/` is a
 leaf, geometry outside the eight subcomponents that exist to consume stability
 never reaches the stability tree, weak stability never imports Bridgeland
@@ -94,12 +94,12 @@ this repository extends it under `Algebra/Homology/DerivedCategory/`, geometry
 proves `Abelian (Coh X)` and defines `Dᵇ(Coh X)` as an abbreviation under
 `AlgebraicGeometry/DerivedCategory/`. Keep the bounded-coherent and
 compact/perfect identifications in `Dqc.lean` as explicit propositions, and
-read the perfect-complex ledger in `docs/architecture/placement.md` before
+read the perfect-complex ledger in https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Placement before
 relating perfect notions.
 
 ## Choose the common root before the leaf
 
-Read [the canonical-root policy](docs/architecture/abstraction-tree.md) before
+Read [the canonical-root policy](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Abstraction-Tree) before
 adding a public structure, class, quotient carrier, category, or parallel
 presentation of an existing object.  The pull request must name the canonical
 root and explain how the specialization projects or compares to it.
@@ -182,22 +182,20 @@ It runs every gate in `scripts/gates.sh` that needs no Lean build — workflows,
 `--diff-only` style on your own lines, source-independence, layering, the
 neutral derived-category Stability import closure, umbrella coverage, root
 reachability, coherent families, coverage map, pin, nolints,
-roadmap, tree areas, and the two hook tests — then a targeted `lake build` of the modules
+roadmap and tree areas — then a targeted `lake build` of the modules
 you changed. About a minute plus that build, against twenty minutes or more for
 CI. It is a cheap green, not a green: the
 library build, the ratchets, the linters and the emitter's axiom audit all need
 the library elaborated and run on the runners.
 
-### Unattended issue loops
+### Writing issues
 
-An unattended run takes GitHub issues or a milestone and follows
-[the run-loop skill](.claude/skills/run-loop/SKILL.md) to merged PRs without
-owner input. The issue body is its specification, so write issues so that
-works. Use the [formalization issue template](.github/ISSUE_TEMPLATE/formalization.md);
+The issue body is the specification of the work, so write it to be worked from
+without asking. Use the [formalization issue template](.github/ISSUE_TEMPLATE/formalization.md);
 an agent fills in a copy, deletes its front matter, and files it with
 `gh issue create --title <title> --body-file <file>`, because
-`gh issue create --body` ignores templates. Each field prevents a failure seen
-in loop runs:
+`gh issue create --body` ignores templates. Each field prevents a known
+failure:
 
 | Field | What it prevents |
 | --- | --- |
@@ -212,18 +210,15 @@ in loop runs:
 | Known traps | repeating a failed route |
 | No process text | runs reverting to retired process |
 
-Before filing, check what the run's readiness step will check: dependencies
+Before filing, check that dependencies
 resolve to issue numbers, every path and name the issue cites exists at the pin
 (or is marked absent), and the placement agrees with
-`docs/architecture/placement.md`. The filing agent does this, not the owner.
+https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Placement. The filing agent does this, not the owner.
 
-On a roadmap-owned milestone, a new issue needs its `.claude/roadmap/*.yaml`
-entry, and a native blocked-by link must match its entry's `blocked_by`. CI's
-`roadmap` job reads the live tracker (RM-05, RM-06) and fails every open pull
-request until the two agree, so open the roadmap PR immediately after filing
-or linking, and merge it first.
+Roadmaps live in the [wiki](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki); GitHub blocked-by links are the
+authoritative dependency record, and a roadmap page follows them.
 
-Labels never gate a loop run. `blocked` follows the blocked-by links;
+Labels gate nothing. `blocked` follows the blocked-by links;
 `research` means the first deliverable is a written verdict in the issue
 thread; `in-progress` expires when no PR is open.
 
@@ -237,7 +232,7 @@ fill it in:
 **Source.** <Versioned reference(s), sections and theorem range, conventions
 every issue shares.> Pins: the Mathlib revision in `lake-manifest.json`.
 
-**Roadmap.** `.claude/roadmap/<file>.yaml`, entry `<id>` (or "none").
+**Roadmap.** The wiki Roadmap page and entry (or "none").
 
 **Issues.** GitHub blocked-by links decide the order; this list only
 summarises them.
@@ -254,32 +249,11 @@ that look droppable but are not.>
 
 **Done when.** <All issues closed, plus any milestone-level statement.>
 
-**State.** Not kept here. Each issue's loop-state comment, and the latest run
-report on the tracking issue (#<n>, if any), hold it. Put no dated baselines,
-SHAs or "run X before Y" instructions in this description.
+**State.** Not kept here; the issues and their pull requests hold it. Put no
+dated baselines, SHAs or "run X before Y" instructions in this description.
 ```
 
-Start a run with one line: "Run the run-loop skill from origin/main on
-<milestone URL, or issues #a #b>." The runtime re-sends the kickoff message
-after every compaction, so keep rules and state out of it.
-
-The run researches each issue and writes its plan into the PR description.
-Four independent reviewers must pass it on the same commit, with at most three
-rounds per attempt. After an attempt exhausts them, the run freezes it as a
-draft PR, starts a separate read-only research examination and has the changed
-plan reviewed independently; an accepted plan gets a successor attempt on the
-same issue that inherits every finding, at most twice per issue. A renamed PR
-or branch cannot reset that history. The issue's loop-state comment carries it
-between contexts. The run merges once the required `ci` check passes on the
-PR's head, then takes the next issue; an issue it still cannot finish is
-parked as a draft PR with its open findings, and dependent issues wait.
-
-The request that starts a run authorizes its pushes, PRs and merges. The owner
-withdraws any of these with an explicit `false` in `.claude/loop-authority.yaml`
-on the default branch. A run changes the loop's own tooling or instructions
-only when the owner puts that work in its queue, and it uses no OpenSpec
-change, loop manifest or review ledger. Issue closure for code work requires a
-merged PR.
+Issue closure for code work requires a merged PR.
 
 This section previously read "Build the stable root while developing:
 `lake build`", and told you to run the fast gate before review and the full gate
@@ -325,45 +299,24 @@ contract tooling — `validate`, `env`, `bundle`, `lint`, and
 per run, and the script reproduces none of it. Expect to learn about those
 failures from CI. A green `scripts/gates.sh` is not a green CI.
 
-The script has what no workflow does. Verified against `ci.yml`,
-`cache-warm.yml` and `docs.yml`:
+The script has gates `ci.yml` does not:
 
-| Gate | Why it is not in CI |
+| Gate | Why it is not in `ci.yml` |
 | --- | --- |
 | `workflows` | a workflow too invalid to parse is too invalid to run the job that would check it |
-| `local-build` | tests a `PreToolUse` hook, which exists only on a developer's machine |
-| `mathlib-style` | **only partly.** Its `--self-test` fixtures and, since #1371, its `--check-baseline` ratchet both run in `ci.yml`; what stays local is the `--diff-only` pass over the branch diff, which is a pre-push linter by design |
-| `emit-build` | runs in `cache-warm.yml` instead; linking is expensive cold and cannot happen on Windows at all |
-| `single-instantiation` | **omission, not design.** Fixed by PR #1355 |
+| `mathlib-style` | **only partly.** Its `--self-test` fixtures and its `--check-baseline` ratchet both run in `ci.yml`; what stays local is the `--diff-only` pass over the branch diff, which is a pre-push linter by design |
+| `emit-build` | runs in `cache-warm.yml` instead; linking is expensive on a cold tree |
 
-The first four are local by construction and `scripts/precheck.sh` runs three
-of them. `single-instantiation` was local by accident, and the cost of the wrong
-sentence above is on the record: once the hook made `scripts/gates.sh`
-unrunnable, that gate ran nowhere for anyone, and `bb8a1278` records 24 generic
-abstractions that drifted to at most one inhabitant with nothing going red.
+`scripts/precheck.sh` runs the first two. A summary sentence that claims
+coverage the files do not have hides a gate that runs nowhere, so verify the
+list before citing it.
 
-The same failure shape has now happened twice. A roadmap entry left at `planned`
-after its issue closed reddened CI on `main` and on every open pull request
-while `scripts/gates.sh` stayed green on all of them; the `roadmap` gate closed
-that hole. Both times the gap was invisible because a summary sentence claimed
-coverage the files did not have. Verify the list before citing it.
+## Emitter sources
 
-## Review evidence
-
-Local precheck and CI run `review-docs` (primary docstrings on new modules with
-commands and required sections in added or revised module docstrings) and
-`emission-sources` (tracked obligations, sweep imports,
-and emitter eligibility using pinned Lean's header parser). The latter is a
-source check; the emitted artifact and axiom verdict still require CI.
-
-Loop PR drafts carry a Claim evidence table distinguishing definition owners,
-re-exports, hypotheses, versioned source statements, and executable witnesses.
-Run `scripts/check_review_evidence.py inventory` over the changed documentation
-and draft before review, classify non-declaration spans with reasons, and
-compile the generated `probe` in ignored scratch. Keep permanent probes in
-Development with its verification export route. A reference check establishes
-existence and type, not novelty, an equivalence, or a literature attribution.
-The run-loop skill and `.claude/README.md` document the complete commands.
+Local precheck and CI run `emission-sources` (tracked obligations, sweep
+imports, and emitter eligibility using pinned Lean's header parser). It is a
+source check; the emitted artifact and axiom verdict still require CI. Keep
+permanent probes in Development with its verification export route.
 
 ## Documentation
 
@@ -373,13 +326,10 @@ such as “the old CohLean version”; Git already records that history. The
 same holds for names and comments: no issue or pull-request numbers and no
 dates.
 
-Prose in the tree is limited to the files `CREDO.md` lists. Reviews, handoffs,
-loop specifications and change proposals go in the issue or the pull request,
-not in a file. Architecture notes and decision records are moving to the wiki.
-Until `CREDO.md` drops that line from "Not yet met", change
-`docs/architecture/` and `.claude/decisions/` only in the pull request that
-changes the code they describe; a decision with no code yet stays in its
-issue.
+Prose in the tree is limited to the files `CREDO.md` lists. Reviews, handoffs
+and change proposals go in the issue or the pull request,
+not in a file. Architecture notes, CI notes, decision records and roadmaps live
+in the [wiki](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki); a decision with no code yet stays in its issue.
 
 Build generated API documentation through the nested package:
 
@@ -397,7 +347,7 @@ checkout — not when a local `scripts/gates.sh` goes green, which is neither
 permitted here nor sufficient.
 
 Mark completed and newly confirmed ownership defects in
-`docs/architecture/cutover-ledger.md`. Do not use the ledger as an exception:
+https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Cutover-Ledger. Do not use the ledger as an exception:
 new declarations must go directly to their canonical owner.
 
 Identify each path as current, confirmed target or proposed split. Use the
