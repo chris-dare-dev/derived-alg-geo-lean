@@ -44,10 +44,11 @@ root, extending a known mixed module, or moving declarations.
   ordinary `H⁰` presentations and exact enhancements.
 - Record the decision in the issue or pull request. A structural change
   updates imports, umbrellas, registry and source-owner paths, documentation
-  and gates together. Historical names survive only through the
-  executable-only `exe/RestateHistoricalNames.lean`, never through import shims
-  at retired paths. A loop run never edits `AGENTS.md` or `CLAUDE.md`; it lists
-  each line its change makes stale in the pull request and its final report.
+  and gates together. A rename leaves no alias or import shim. If it changes a
+  name `attest/review.yaml` records, it edits only that name in the recorded
+  statement and `decl`, and CI's restate step checks the edit. A loop run never
+  edits `AGENTS.md` or `CLAUDE.md`; it lists each line its change makes stale in
+  the pull request and its final report.
 - The [cutover ledger](docs/architecture/cutover-ledger.md) records current and
   target owners. A pending move is not an implemented path, and a passing gate
   does not certify a new boundary: add focused checks with each move.
