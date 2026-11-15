@@ -255,8 +255,7 @@ def threads_offence(value: str | None) -> str | None:
 #
 # Until 2026-09-16 this check scanned every token of every segment, so any
 # command that so much as MENTIONED `gates.sh` was refused -- `cat`, `grep`,
-# `diff`, and `git ls-tree origin/main --name-only scripts/gates.sh`, which is
-# the tooling probe `.claude/skills/land-pr` runs in its own first step. A gate
+# `diff`, and `git ls-tree origin/main --name-only scripts/gates.sh`. A gate
 # whose purpose is "do not spend three hours of the developer's machine" has no
 # business refusing a read, and CONTRIBUTING.md §"Local workflow" tells you to
 # read that file to know what CI will check.
@@ -274,8 +273,8 @@ READERS = {
 # `git bisect run scripts/gates.sh` runs the script once per revision, which is
 # the worst version of the thing this gate refuses, and `git rebase --exec`,
 # `git submodule foreach` and `git filter-branch` all execute too. An allow-list
-# of subcommands keeps the probe in .claude/skills/land-pr working without
-# opening that door. The index and history commands from `add` on take a path
+# of subcommands keeps reads such as `git ls-tree` working without opening that
+# door. The index and history commands from `add` on take a path
 # as data -- staging, committing or deleting `scripts/gates.sh` runs nothing.
 GIT_READ_SUBCOMMANDS = {
     "blame", "cat-file", "diff", "grep", "log", "ls-files", "ls-tree",

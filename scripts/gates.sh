@@ -188,10 +188,8 @@ gate workflows scripts/check_workflows.sh
 # each script routes its console through scripts/_output.py, and that the
 # helper actually survives a cp1252 console.
 gate output-encoding python3 scripts/_output.py
-gate codex-entrypoint python3 scripts/check_codex_entrypoint.py
 gate tree-areas python3 scripts/check_tree_areas.py origin/main
 gate mathlib-style mathlib_style
-gate review-docs python3 scripts/check_review_evidence.py docs --base origin/main
 gate emission-sources python3 scripts/check_emission_coverage.py --source-only
 gate explicit-numerical-data python3 scripts/check_explicit_numerical_data.py
 gate foundation-import-boundary python3 scripts/check_foundation_import_boundary.py

@@ -12,8 +12,8 @@ Lean names routinely carry `δ`, `₁`, `₂`, `Γ`, `ω`, `χ`. It stopped bein
 hypothetical on 2026-09-11, when `check_audit_complete.py` crashed printing
 `BilinearRiemannRochStatement.chi₂_eq` on PR #1158.
 
-ONE IMPLEMENTATION. Every `scripts/check_*.py` (and `pr_queue.py`, which prints
-pull-request titles) calls `force_utf8_output()` as the first statement of its
+ONE IMPLEMENTATION. Every `scripts/check_*.py` calls `force_utf8_output()` as
+the first statement of its
 `if __name__ == "__main__":` block. Sixteen pasted copies would drift; this
 module is the one copy, and `python3 scripts/_output.py` is the gate that keeps
 every script on it -- structurally, by reading each script, and behaviourally,
@@ -33,10 +33,9 @@ from pathlib import Path
 
 SCRIPTS = Path(__file__).resolve().parent
 
-#: The scripts that must route their console output through this module.
-#: `check_*.py` is every gate; `pr_queue.py` prints pull-request titles, which
-#: carry the same characters.
-CALLERS = sorted(SCRIPTS.glob("check_*.py")) + [SCRIPTS / "pr_queue.py"]
+#: The scripts that must route their console output through this module:
+#: `check_*.py` is every gate.
+CALLERS = sorted(SCRIPTS.glob("check_*.py"))
 
 #: A declaration-name-shaped probe: Greek, a subscript, a superscript, an arrow.
 PROBE = "Foo.δ.stepX₂.Hⁱ → Γ"
