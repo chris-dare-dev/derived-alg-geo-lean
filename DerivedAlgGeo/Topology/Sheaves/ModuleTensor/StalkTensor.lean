@@ -194,7 +194,7 @@ lemma germTmul_congr {U U' V V' : Opens X} (hxU : x ∈ U) (hxU' : x ∈ U')
   congr 1
 
 /-- Over a single neighbourhood, `PresheafOfModules.germTmul` is just the germ of the pure tensor.
-  -/
+-/
 lemma germTmul_self {U : Opens X} (hxU : x ∈ U)
     (m : M.obj (op U)) (p : P.obj (op U)) :
     germTmul M P x hxU hxU m p
@@ -256,7 +256,7 @@ lemma germ_smul_germTmul {W U V : Opens X} (hxW : x ∈ W) (hxU : x ∈ U) (hxV 
     rfl
 
 /-- `PresheafOfModules.germTmul` is additive in the `M` slot, over a fixed pair of neighbourhoods.
-  -/
+-/
 lemma germTmul_add_left {U V : Opens X} (hxU : x ∈ U) (hxV : x ∈ V)
     (m m' : M.obj (op U)) (p : P.obj (op V)) :
     germTmul M P x hxU hxV (m + m') p
@@ -274,7 +274,7 @@ lemma germTmul_add_left {U V : Opens X} (hxU : x ∈ U) (hxV : x ∈ V)
   exact (congrArg _ h2).trans (map_add _ _ _)
 
 /-- `PresheafOfModules.germTmul` is additive in the `P` slot, over a fixed pair of neighbourhoods.
-  -/
+-/
 lemma germTmul_add_right {U V : Opens X} (hxU : x ∈ U) (hxV : x ∈ V)
     (m : M.obj (op U)) (p p' : P.obj (op V)) :
     germTmul M P x hxU hxV m (p + p')
@@ -356,7 +356,7 @@ lemma germTmulRight_add (U : Opens X) (hxU : x ∈ U) (m m' : M.obj (op U))
 /-- The outer cocone, in the `M` variable: legs additive by `PresheafOfModules.germTmulRight_add`,
   natural by
 `PresheafOfModules.germTmulRight_res_left`. Its point is the additive maps out of the stalk of `P`.
-  -/
+-/
 noncomputable def germTmulCoconeLeft :
     Limits.Cocone ((OpenNhds.inclusion x).op ⋙ M.presheaf) where
   pt := AddCommGrpCat.of (ToType (TopCat.Presheaf.stalk P.presheaf x) →+
