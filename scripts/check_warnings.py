@@ -2,18 +2,17 @@
 """Keep the compiler-warning backlog a ratchet, and keep deprecations at zero.
 
 `lake exe runLinter` gates Batteries' *linters* against `scripts/nolints.json`.
-Nothing gated the warnings Lean itself emits during elaboration, so they only
-ever accumulated: 93 of them by 2026-09-13, in which a Mathlib deprecation with
-a real deadline was indistinguishable from twenty `simpa` nags.
+Ungated, the warnings Lean itself emits during elaboration only accumulate,
+and a Mathlib deprecation with a real deadline becomes indistinguishable from
+twenty `simpa` nags.
 
 Two rules, for two different kinds of debt.
 
 **Deprecations are not allowed at all in code this repository owns.** A
 deprecated Mathlib declaration is removed a few releases later, so every one of
-these is a build break with a date on it. `DerivedAlgGeo/` and `scripts/` were
-brought to zero when this gate was wired; a dependency's own deprecations are
-listed in the baseline and only counted, because the fix for those is upstream
-and a pin bump.
+these is a build break with a date on it. `DerivedAlgGeo/` and `scripts/` are
+held at zero; a dependency's own deprecations are listed in the baseline and
+only counted, because the fix for those is upstream and a pin bump.
 
 **Everything else may shrink, never grow.** The baseline records each
 `(file, message)` with how many times it occurs, so adding a fourth unused simp

@@ -107,9 +107,11 @@ what that line names and to nothing else.
   (§1).
 - `scripts/fixtures/` holds known-answer fixtures for the style and layering
   checks (§3).
-- Comments in `exe/`, `scripts/`, `.github/workflows/`, `formalization.yaml`
-  and `registry/` carry dates, issue numbers and the history of changes. The
-  provenance check reads only `DerivedAlgGeo/` (§4).
+- Comments in `exe/`, `formalization.yaml`, `registry/` and the scripts
+  `check_layering.py`, `check_mathlib_style.py`, `check_roadmap.py`,
+  `check_pin.py` and `check_umbrella_coverage.py` carry dates, issue numbers
+  and the history of changes. The provenance check reads only `DerivedAlgGeo/`
+  (§4).
 - `pins.json` restates `lean-toolchain`, `lakefile.toml` and
   `lake-manifest.json`, and records where and when it was written (§1, §4).
 - Some names pass 60 characters (§4).

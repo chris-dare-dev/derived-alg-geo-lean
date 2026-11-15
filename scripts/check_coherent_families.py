@@ -24,11 +24,10 @@ GEOMETRIC_FOURIER_MUKAI = (
 )
 
 # Class-name tokens, not binder substrings: `[i : HasDerivedTensorAssoc D]`, a
-# qualified name, or a line-wrapped binder must all count. The 2026-08-18
-# adversarial review demonstrated that the previous literal `[Has... ` match
-# was evadable by exactly those forms, and that scanning only the geometric
-# families subtree left every other directory free to consume the legacy
-# classes unchecked.
+# qualified name, or a line-wrapped binder must all count, since a literal
+# `[Has... ` match is evaded by exactly those forms. The whole library is
+# scanned, not only the geometric families subtree, so no other directory can
+# consume the legacy classes unchecked.
 LEGACY_CLASSES = re.compile(
     r"\b(HasDerivedTensorAssoc|HasDerivedPullbackTensor|"
     r"HasUnitPullbackRightUnitor|HasUnitPullbackLeftUnitor)\b"
