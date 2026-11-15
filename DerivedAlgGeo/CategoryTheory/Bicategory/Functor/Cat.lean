@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.Core
 import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.FiberProduct
 import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.ObjectProperty
 import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.Transport
@@ -17,9 +18,14 @@ Extensions of Mathlib's `CategoryTheory/Bicategory/Functor/Cat/`, where
 
 This umbrella introduces no definitions. It exports:
 
+* `Cat/Core.lean`: the core `Pseudofunctor.core` of a pseudofunctor on a locally
+  discrete base, fibrewise the maximal groupoid, with its inclusion
+  `Pseudofunctor.coreι`;
 * `Cat/ObjectProperty.lean`: replete and restriction-stable fiberwise loci and
   their full subpseudofunctors, with the universally stable closure
-  `Pseudofunctor.ObjectProperty.universallyStable`;
+  `Pseudofunctor.ObjectProperty.universallyStable`, the restriction
+  `Pseudofunctor.ObjectProperty.core` to the core, and the inclusions
+  `Pseudofunctor.ObjectProperty.ιOfLE`;
 * `Cat/Transport.lean`: transport of a Cat-valued pseudofunctor presentation
   through objectwise equivalences, `Pseudofunctor.equivalenceTransportFunctor`
   with its compositor and unitor;
@@ -47,5 +53,5 @@ children cite their sources.
 
 ## Tags
 
-pseudofunctor, Cat, object property, 2-fibre product
+pseudofunctor, Cat, object property, core, 2-fibre product
 -/

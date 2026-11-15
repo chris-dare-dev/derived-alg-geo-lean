@@ -7,10 +7,8 @@ the owner's self-hosted Ubuntu runner and the 12 most recent `pull_request`
 runs on GitHub-hosted Ubuntu (8 successful, 4 cancelled). Every run is attempt
 1. The archived raw run, job and step responses, analysis code and logs are in
 `~/.loop-runs/transcripts/analysis/2026-09-27-m54-recovery/probes/1440-performance/`
-on the owner's machine. The read-only collector in
-`scripts/ci_performance/collect_actions.py` can recapture each run ID, and
-`profile_actions.py profile-bundle` normalizes its attempt. The archive is
-local evidence, while the run links below are provider evidence.
+on the owner's machine. The archive is local evidence, while the run links
+below are provider evidence.
 
 | Lane | Successful build jobs | Median build wall | Range | Median full run |
 | --- | ---: | ---: | ---: | ---: |
@@ -27,12 +25,8 @@ Sample run IDs (each resolves at
   36317471576, 36319461934, 36321356380, 36324696907, 36325066707.
   Cancelled: 36314870334, 36325549451, 36326273568, 36326329164.
 
-For a reproduction, capture a run with `collect_actions.py --repository
-chris-dare-dev/derived-alg-geo-lean --run-id <id> --output <new-file>` and
-profile it with the `ci-job-needs.json` map after checking the workflow at
-that run's SHA. The captured JSON and sidecar retain run, attempt, SHA, event,
-job labels, timestamps, steps and conclusions. GitHub's Actions API has no
-per-run memory, CPU, cache-hit, or cold/warm field. This sample's cache state
+GitHub's Actions API has no per-run memory, CPU, cache-hit, or cold/warm
+field. This sample's cache state
 and host pressure are therefore **unknown**; the runner's documented 3 CPU
 thread cap and 12 GiB memory reservation are configuration, not utilization
 measurements. A slow `lean-action` step does not establish a cold build.
