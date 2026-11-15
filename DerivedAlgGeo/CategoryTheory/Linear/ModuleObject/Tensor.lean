@@ -3,28 +3,33 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Linear.ModuleObject.Basic
+import Mathlib.Algebra.Category.CommAlgCat.Basic
 import Mathlib.Algebra.Category.ModuleCat.ChangeOfRings
 import Mathlib.Algebra.Module.RingHom
-import Mathlib.Algebra.Category.CommAlgCat.Basic
 import Mathlib.CategoryTheory.Adjunction.CompositionIso
 import Mathlib.CategoryTheory.Adjunction.Limits
 import Mathlib.CategoryTheory.Adjunction.Parametrized
 import Mathlib.CategoryTheory.Bicategory.Adjunction.Adj
 import Mathlib.CategoryTheory.Bicategory.Adjunction.Cat
 import Mathlib.CategoryTheory.Bicategory.Functor.LocallyDiscrete
-import Mathlib.CategoryTheory.Linear.Yoneda
 import Mathlib.CategoryTheory.Limits.Preserves.Filtered
 import Mathlib.CategoryTheory.Limits.Shapes.Equalizers
 import Mathlib.CategoryTheory.Limits.Shapes.Products
+import Mathlib.CategoryTheory.Linear.Yoneda
 
 /-!
-# Tensor products of modules with module objects
+# The tensor action of modules and base change of module objects
 
 Let `A` be a `k`-linear category with coproducts indexed by `Type w` (the universe of its
-morphisms) and coequalizers, and let `E` be an `R`-module object of `A`. For an `R`-module `M`
-the object `M ⊗_R E` of `A` is characterized by
-`Hom_A(M ⊗_R E, F) ≃ Hom_R(M, Hom_A(E, F))` [AHLH, (7.2)]. It is the coequalizer of the two maps
-`∐_{relations} E ⇉ ∐_M E` imposing `ι (m + m') = ι m + ι m'` and `ι (r • m) = r • ι m`.
+morphisms) and coequalizers; together these give all colimits indexed by `Type w`. For an
+`R`-module object `E` of `A` and an `R`-module `M`, the object `M ⊗_R E` of `A` is
+characterized by `Hom_A(M ⊗_R E, F) ≃ Hom_R(M, Hom_A(E, F))`. It is the coequalizer of the two
+maps `∐_{relations} E ⇉ ∐_M E` imposing `ι (m + m') = ι m + ι m'` and
+`ι (r • m) = E.act r ≫ ι m`.
+
+For `R = k` this is the tensor action `M ⊗_k E` of `k`-modules on `A` [AHLH, (7.2)]. For a
+morphism of `k`-algebras `φ : R₁ →ₐ[k] R₂`, the `R₁`-module `R₂` gives base change
+`φ^* = R₂ ⊗_{R₁} (-)`, left adjoint to restriction `φ_*` [AHLH, §7.1, citing AZ, Prop. B3.16].
 
 ## Main definitions
 
@@ -34,11 +39,28 @@ the object `M ⊗_R E` of `A` is characterized by
 * `ModuleObject.tensorHomEquiv`: the bijection `(M ⊗_R E ⟶ F) ≃ (M ⟶ Hom_A(E, F))`.
 * `ModuleObject.tensorAdj E`: the adjunction `(-) ⊗_R E ⊣ Hom_A(E, -)`.
 * `ModuleObject.tensor k A R`: the bifunctor `(M, E) ↦ M ⊗_R E`.
+* `moduleTensor k A : ModuleCat k ⥤ A ⥤ A`: the tensor action, with `moduleTensorHomEquiv` and
+  the adjunction with a parameter `moduleTensorAdj₂` to `linearCoyoneda k A` [AHLH, (7.2)].
+* `IsFlatObject k A E`: `(-) ⊗_k E` is exact [AHLH, Definition 7.2].
+* `ModuleObject.extend A φ`: base change `R₂ ⊗_{R₁} (-)`, with
+  `ModuleObject.extendRestrictAdj φ : extend A φ ⊣ restrict φ`.
+* `ModuleObject.pseudofunctor k A`: `R ↦ A_R` as a pseudofunctor from commutative `k`-algebras
+  to the bicategory of adjunctions.
+
+## Main results
+
+* `M ⊗_k (-)` preserves all colimits, and `(-) ⊗_k E` is a left adjoint, so the tensor action is
+  right exact and commutes with filtered colimits in each variable [AHLH, §7.1].
+
+The numbering of [AZ] is quoted from [AHLH, §7.1] and has not been checked against the text of
+[AZ].
 
 ## References
 
 * [AHLH] J. Alper, D. Halpern-Leistner, J. Heinloth, *Existence of moduli spaces for algebraic
   stacks*, arXiv:1812.01128v5, §7.1.
+* [AZ] M. Artin, J. J. Zhang, *Abstract Hilbert schemes*, Algebr. Represent. Theory 4 (2001),
+  305–394.
 -/
 
 universe u v w u₁ u₂
