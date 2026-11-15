@@ -36,9 +36,9 @@ which descends finitely presented algebras and their morphisms.
 ## Implementation notes
 
 The colimit hypothesis is `IsColimit ((forget CommRingCat).mapCocone c)`, the form the proofs
-use. For a small index category it follows from `hc : IsColimit c` as
-`isColimitOfPreserves (forget CommRingCat) hc`, since `forget CommRingCat` preserves filtered
-colimits. The index category is only assumed `IsFilteredOrEmpty`.
+use. When `J` is filtered and small in the universe of the rings, it follows from
+`hc : IsColimit c` as `isColimitOfPreserves (forget CommRingCat) hc`, since `forget CommRingCat`
+preserves filtered colimits. The index category is only assumed `IsFilteredOrEmpty`.
 
 The proofs are elementwise. The stages under `j` are the rings `R.obj k` for `j ⟶ k`, as
 `R.obj j`-modules indexed by the filtered category `Under j`. Tensoring with an `R.obj j`-module
@@ -306,9 +306,9 @@ extension of scalars to `c.pt` agree after extension of scalars to some `R.obj j
 `j ⟶ j'`. As in Stacks 05LI (1), the target `N'` is arbitrary.
 
 Finiteness of `N` cannot be dropped. Over a field `k`, let `R₀ = k[z₁, z₂, …]` and
-`R.obj n = R₀ ⧸ (z₁, …, zₙ)`, so that `c.pt = k`. Take `j = 0`, `N = ℕ →₀ R₀`, `N' = R₀`,
-`ψ₁ eₙ = zₙ` and `ψ₂ = 0`. They agree after extension to `k`, but after extension to `R.obj n`
-they differ on `eₙ₊₁`. -/
+`R.obj n = R₀ ⧸ (z₁, …, zₙ)`, so that `c.pt = k`. Take `j = 0`, `N` free on `e₁, e₂, …`,
+`N' = R₀`, `ψ₁ eₙ = zₙ` and `ψ₂ = 0`. They agree after extension to `k`, but after extension to
+`R.obj n` they differ on `eₙ₊₁`. -/
 theorem eventually_eq_of_extended_eq {j : J} {N N' : ModuleCat.{max v u} (R.obj j)}
     [Module.Finite (R.obj j) N] {ψ₁ ψ₂ : N ⟶ N'}
     (h : (extendScalars (c.ι.app j).hom).map ψ₁ = (extendScalars (c.ι.app j).hom).map ψ₂) :
@@ -449,7 +449,7 @@ Finite presentation of `N` cannot be weakened to finite generation. Over a field
 all `i`. Take `j = 0`, `N = R.obj 0 ⧸ (y₁, y₂, …)` and `N' = R.obj 0`. The map
 `c.pt ⧸ (y₁, y₂, …) ⟶ c.pt` with `1 ↦ t` is well defined and nonzero. At a stage `n`, the
 element `yₙ₊₁` is a nonzerodivisor of `R.obj n`, so the only map
-`R.obj n ⧸ (y₁, y₂, …) ⟶ R.obj n` is zero. -/
+`R.obj n ⧸ (y₁, y₂, …) ⟶ R.obj n` is zero and `φ` does not descend. -/
 theorem exists_linearMap_extended {j : J} {N N' : ModuleCat.{max v u} (R.obj j)}
     [Module.FinitePresentation (R.obj j) N]
     (φ : (extendScalars (c.ι.app j).hom).obj N ⟶ (extendScalars (c.ι.app j).hom).obj N') :
