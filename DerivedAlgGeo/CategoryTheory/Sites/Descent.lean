@@ -7,9 +7,11 @@ import DerivedAlgGeo.CategoryTheory.Sites.Descent.DescentDataAsCoalgebra
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.DescentDataPrime
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.IsStack
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.Local
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.ObjectProperty
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Discrete
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Morphism
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.ObjectProperty
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Representable
 
 /-!
@@ -26,8 +28,11 @@ its directory, so this umbrella imports the children directly.
 * `DescentDataAsCoalgebra.lean`: the base change morphism of a chosen pullback,
   and descent data along one morphism as coalgebras for the comonad of
   `f^* ⊣ f_*` when two base change morphisms are isomorphisms.
+* `ObjectProperty.lean`: local object properties and the equivalence between
+  descent data of the core and the core of descent data.
 * `StackInGroupoids.lean` and its children: stacks in groupoids, discrete
-  stacks from sheaves, stack morphisms, and site-object representability.
+  stacks from sheaves, stack morphisms, site-object representability, and
+  the moduli of objects `StackInGroupoids.ofObjectProperty`.
 
 ## Main results
 
@@ -40,6 +45,8 @@ its directory, so this umbrella imports the children directly.
 * `Local.lean`: effective descent along a covering sieve can be checked on the
   members of a covering family of a second topology for which the pseudofunctor is a
   stack.
+* `ObjectProperty.lean`: the core of a stack is a stack, and a local object
+  property closed under isomorphisms cuts out a substack.
 
 ## Implementation notes
 

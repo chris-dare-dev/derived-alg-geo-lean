@@ -395,7 +395,7 @@ items:
     kind: task
     parent: stacks-and-moduli-stk1
     title: "STK1.5: A local, pullback-stable object property of a stack cuts out a substack"
-    status: planned
+    status: done
     priority: must
     size: M
     summary: "Let F : LocallyDiscrete Cᵒᵖ ⥤ᵖ Cat be a stack of categories for J, and let P : F.ObjectProperty be closed under isomorphisms and local for J. Local means stable under pullback, and such that an object whose pullbacks along a covering sieve satisfy P satisfies P. Then: P.fullsubcategory is a stack. This is the Mathlib TODO at Mathlib/CategoryTheory/Bicategory/Functor/Cat/ObjectProperty.lean:19. The core (maximal sub-groupoid) of a stack of categories is a stack in groupoids."
@@ -551,7 +551,7 @@ items:
     kind: task
     parent: stacks-and-moduli-stk2
     title: "STK2.10: Finite presentation and flatness over a third ring descend along faithfully flat ring maps"
-    status: planned
+    status: done
     priority: must
     size: S
     summary: "Two statements of commutative algebra that the fpqc-locality of #1650 reduces to. Both are absent at the pin, and both are natural additions beside Mathlib's Module.Finite.of_finite_tensorProduct_of_faithfullyFlat."
@@ -575,7 +575,7 @@ items:
     kind: task
     parent: stacks-and-moduli-asp1
     title: "ASP1.1: Algebraic spaces over a scheme, and schemes as algebraic spaces (025Y, 025Z)"
-    status: planned
+    status: done
     priority: must
     size: M
     summary: "Algebraic spaces over a base scheme S, in the sense of Stacks 025Y. An algebraic space over S is a presheaf of sets F on Over S such that: - F is an fppf sheaf; - its diagonal is representable (by schemes), in the sense of Mathlib's Functor.relativelyRepresentable yoneda; - some scheme U over S admits a map yoneda U ⟶ F whose base changes to schemes are étale and surjective. This is Mathlib's MorphismProperty.presheaf for (@Etale ⊓ @Surjective).over."
@@ -843,7 +843,7 @@ items:
     kind: task
     parent: stacks-and-moduli-pj1
     title: "PJ1.1b: Proj of a surjective graded map is a closed immersion; hyperplane sections of Proj"
-    status: planned
+    status: done
     priority: must
     size: M
     summary: "Proj of a surjective graded map is a closed immersion, and hyperplane sections of Proj. For a surjective graded ring map ψ : 𝒜 →+*ᵍ ℬ, Mathlib's Proj.map ψ : Proj ℬ ⟶ Proj 𝒜 is a closed immersion (Stacks 01N0 (2)). When 𝒜 is generated over 𝒜₀ by elements of degree one, it pulls 𝒪(d) back to 𝒪(d) (Stacks 01N1). For a general surjection θ is only surjective (01N0 (3))."

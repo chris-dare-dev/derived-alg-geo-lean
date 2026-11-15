@@ -182,7 +182,7 @@ It runs every gate in `scripts/gates.sh` that needs no Lean build — workflows,
 `--diff-only` style on your own lines, source-independence, layering, the
 neutral derived-category Stability import closure, umbrella coverage, root
 reachability, coherent families, coverage map, pin, nolints,
-roadmap, and the two hook tests — then a targeted `lake build` of the modules
+roadmap, tree areas, and the two hook tests — then a targeted `lake build` of the modules
 you changed. About a minute plus that build, against twenty minutes or more for
 CI. It is a cheap green, not a green: the
 library build, the ratchets, the linters and the emitter's axiom audit all need
@@ -278,9 +278,8 @@ The request that starts a run authorizes its pushes, PRs and merges. The owner
 withdraws any of these with an explicit `false` in `.claude/loop-authority.yaml`
 on the default branch. A run changes the loop's own tooling or instructions
 only when the owner puts that work in its queue, and it uses no OpenSpec
-change, loop manifest or review ledger.
-The manifest controller that preceded the run-loop skill has been deleted. Issue closure
-for code work requires a merged PR.
+change, loop manifest or review ledger. Issue closure for code work requires a
+merged PR.
 
 This section previously read "Build the stable root while developing:
 `lake build`", and told you to run the fast gate before review and the full gate

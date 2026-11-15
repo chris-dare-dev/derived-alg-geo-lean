@@ -1,6 +1,7 @@
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.AssociatedSheaf
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.Frac
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.Finiteness
+import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.Hyperplane
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.MapPullback
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.ProjectiveSpace
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules.StructureModule

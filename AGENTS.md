@@ -236,7 +236,8 @@ child; never relax coverage globally.
 - Do not edit generated build artifacts or alter unrelated work in a dirty tree.
 - Add no review, handoff, note, loop specification or change proposal as a
   file, and keep provenance (issue, pull request, milestone or decision
-  numbers, dates) out of names and comments; CI refuses it in Lean.
+  numbers, dates) out of names and comments. CI refuses a file outside the
+  areas `CREDO.md` lists, and provenance in Lean.
 
 ## Verification
 
