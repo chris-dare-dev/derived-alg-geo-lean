@@ -6,5 +6,6 @@ import DerivedAlgGeo.AlgebraicGeometry.Stacks.Representable
 import DerivedAlgGeo.AlgebraicGeometry.Stacks.Descent
 import DerivedAlgGeo.AlgebraicGeometry.Stacks.Algebraic
 import DerivedAlgGeo.AlgebraicGeometry.Stacks.AlgebraicStack
+import DerivedAlgGeo.AlgebraicGeometry.Stacks.Fibrewise
 
 /-! # Stacks in algebraic geometry -/
