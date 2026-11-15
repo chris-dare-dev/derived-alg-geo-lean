@@ -9,6 +9,7 @@ import DerivedAlgGeo.CategoryTheory.Sites.Descent.FiberProduct
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.IsStack
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.Local
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.ObjectProperty
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.SheafOver
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Discrete
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Fibered
@@ -58,6 +59,9 @@ its directory, so this umbrella imports the children directly.
   stack.
 * `ObjectProperty.lean`: the core of a stack is a stack, and a local object
   property closed under isomorphisms cuts out a substack.
+* `SheafOver.lean`: sheaves on the slices of a site form a prestack for every coefficient
+  category, and sheaves of types form a stack when covering sieves contain small covering
+  families.
 * `ULift.lean`: a pseudofunctor is a prestack (a stack) exactly when its universe lift is.
 * `StackInGroupoids/Fibered.lean`: the Grothendieck construction of a stack in
   groupoids is a category fibred in groupoids (`StackInGroupoids.isStronglyCartesian`).
