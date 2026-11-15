@@ -48,10 +48,11 @@ root, extending a known mixed module, or moving declarations.
   ordinary `H⁰` presentations and exact enhancements.
 - Record the decision in the issue or pull request. A structural change
   updates imports, umbrellas, registry and source-owner paths, documentation
-  and gates together. Historical names survive only through the
-  executable-only `exe/RestateHistoricalNames.lean`, never through import shims
-  at retired paths. A loop run never edits `AGENTS.md` or `CLAUDE.md`; it lists
-  each line its change makes stale in the pull request and its final report.
+  and gates together. A rename leaves no alias or import shim. If it changes a
+  name `attest/review.yaml` records, it edits only that name in the recorded
+  statement and `decl`, and CI's restate step checks the edit. A loop run never
+  edits `AGENTS.md` or `CLAUDE.md`; it lists each line its change makes stale in
+  the pull request and its final report.
 - The [cutover ledger](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Cutover-Ledger) records current and
   target owners. A pending move is not an implemented path, and a passing gate
   does not certify a new boundary: add focused checks with each move.
@@ -217,11 +218,11 @@ fixes these; cite it rather than re-deciding them.
 
 ## Umbrellas
 
-Every non-leaf directory normally has a same-named umbrella re-exporting its
-direct children, and a neutral core never imports applications through it.
-Register each exact umbrella/child exception in
-`scripts/check_umbrella_coverage.py`, with another stable route for the omitted
-child; never relax coverage globally.
+Every non-leaf directory has a same-named umbrella re-exporting its direct
+children, unless a child imports that file, which then owns what they build on;
+the gate reads owners from the import graph. A neutral core never imports
+applications through an umbrella. The one umbrella/child exception is pinned in
+`scripts/check_umbrella_coverage.py`; never relax coverage globally.
 
 ## Editing rules
 
