@@ -89,8 +89,6 @@ local bridges is in `AlgebraicGeometry.Modules.Restriction.OpenImmersion`.
 ## References
 
 * [Stacks, Tag 01IA](https://stacks.math.columbia.edu/tag/01IA).
-* See the [affine and projective spectrum placement map](../../../../docs/architecture/placement.md)
-  for pinned Mathlib source links.
 
 ## Tags
 

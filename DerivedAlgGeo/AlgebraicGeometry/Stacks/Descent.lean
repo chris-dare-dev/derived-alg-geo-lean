@@ -136,7 +136,7 @@ theorem representableZariskiStack_eq_ofLE (X : Scheme.{u}) :
 The fiber categories are literally those of the Zariski layer. -/
 def representableFppfObject {X T : Scheme.{u}} (f : T ⟶ X) :
     (representableFppfStack X).presheaf.obj (.mk (op T)) :=
-  Discrete.mk f
+  StackInGroupoids.representableObj _ f
 
 @[simp]
 theorem representableFppfObject_eq {X T : Scheme.{u}} (f : T ⟶ X) :

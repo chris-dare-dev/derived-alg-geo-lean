@@ -74,10 +74,7 @@ AREAS = {
 # An entry ending in / names a directory; any other names one file.
 LEGACY = (
     ".claude/README.md",
-    ".claude/decisions/",
     ".claude/references/",
-    ".claude/roadmap/",
-    "docs/",
     "registry/README.md",
     "scripts/fixtures/",
     "scripts/private-reader.git/",

@@ -48,14 +48,6 @@
 #                    construction; this one was local by omission, and the header
 #                    that claimed "ONE deliberate exception" is what hid it.
 #
-# `roadmap` is the one piece of that step cheap enough to run here, and it was
-# added on 2026-08-27 after the gap bit: RM-07 went red on main and on every
-# open pull request for half an hour -- a roadmap entry left at `planned` after
-# its issue closed -- while `scripts/gates.sh` stayed green on all of them,
-# because it never looked. It is deliberately invoked WITHOUT `--require-api`:
-# the script's own contract is that a contributor with no `gh` gets a NOT_RUN
-# report rather than a blocked push, and CI passes the flag instead.
-#
 # Each gate prints `GATE <name>: pass|FAIL`. The script does not stop at the
 # first failure -- an unattended run wants the whole picture in one pass -- and
 # exits 1 if any gate failed.
@@ -131,10 +123,7 @@ exe_sorry() {
   # The one file the emitter cannot cover: an `lean_exe` root is not part of the
   # environment built from its own imports. CI runs the same loop; see the
   # "No declaration uses sorry" step in .github/workflows/ci.yml.
-  # RestateHistoricalNames is deliberately outside both library umbrellas, so
-  # a clean tree must build that executable-only dependency explicitly before
-  # elaborating exe/Restate.lean.
-  lake build DerivedAlgGeoSweep RestateHistoricalNames || return 1
+  lake build DerivedAlgGeoSweep || return 1
   local log="$GATE_TMP"/exe-sorry-check.txt
   : > "$log"
   for f in exe/*.lean; do
@@ -214,7 +203,6 @@ if [ "$MODE" != "fast" ]; then
   # No `--require-api`: see the header. Offline this reports NOT_RUN and passes,
   # which is the script's documented local contract; CI runs it with the flag so
   # the one environment guaranteed to have the API cannot silently skip.
-  gate roadmap python3 scripts/check_roadmap.py
   # emit-build keeps proving the executable still LINKS -- linking is the only
   # thing that exercises the native-object path at all, and exe/Emit.lean notes
   # it cannot be linked on Windows. It is the expensive gate on a cold tree
