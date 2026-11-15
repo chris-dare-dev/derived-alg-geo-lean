@@ -1,5 +1,6 @@
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.BaseChange
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.BasicOpenLemmas
+import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Functor
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Integral
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.ProjectiveSpaceProperties
@@ -31,10 +32,12 @@ pinned owners and the concrete connection to the affine module API.
   chart.
 * `AlgebraicGeometry.Proj.isPullback_map_baseChange` shows that `Proj` commutes with base change
   of the graded ring.
+* `AlgebraicGeometry.Proj.isClosedImmersion_map` shows that `Proj` of a surjective graded ring
+  map is a closed immersion.
 
 ## Implementation notes
 
-This umbrella re-exports `BaseChange`, `BasicOpenLemmas`, `Integral`, `Modules`,
+This umbrella re-exports `BaseChange`, `BasicOpenLemmas`, `Functor`, `Integral`, `Modules`,
 `ProjectiveSpaceProperties`, `ProjectiveSpaceVariety`, and `StructureSections`. The local
 module-chart path is
 `ProjectiveSpectrum/Modules/ChartExtension.lean` →

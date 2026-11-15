@@ -843,7 +843,7 @@ items:
     kind: task
     parent: stacks-and-moduli-pj1
     title: "PJ1.1b: Proj of a surjective graded map is a closed immersion; hyperplane sections of Proj"
-    status: planned
+    status: done
     priority: must
     size: M
     summary: "Proj of a surjective graded map is a closed immersion, and hyperplane sections of Proj. For a surjective graded ring map ψ : 𝒜 →+*ᵍ ℬ, Mathlib's Proj.map ψ : Proj ℬ ⟶ Proj 𝒜 is a closed immersion (Stacks 01N0 (2)). When 𝒜 is generated over 𝒜₀ by elements of degree one, it pulls 𝒪(d) back to 𝒪(d) (Stacks 01N1). For a general surjection θ is only surjective (01N0 (3))."
