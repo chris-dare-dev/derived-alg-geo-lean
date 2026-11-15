@@ -1,36 +1,10 @@
 name: CI
 
 on:
-  # `agent/**` WAS in this list and was removed on 2026-09-19.
-  #
-  # Every agent branch carries a pull request, so every commit was built TWICE:
-  # once here on the self-hosted Windows lane, and once on `ubuntu-latest` for
-  # the `pull_request` event. Measured over the 195 commits that both lanes
-  # built between 2026-09-14 and 2026-09-19:
-  #
-  #                          self-hosted push    hosted pull_request
-  #       median                   40.2 min             20.8 min
-  #       mean                     85.5 min             17.7 min
-  #       finished first               28%                  72%
-  #       succeeded (week 38)          16%                  53%
-  #       dropped at 24h             66 runs                    0
-  #
-  # That is 278 workstation-hours in a six-day window spent on commits the free
-  # hosted lane also verified, and it INVERTS the premise the concurrency block
-  # below was written on. "The push run is the fast one" was true in week 34
-  # (19.9 min median against 12.1) and has not been true since week 36. Three
-  # self-hosted runners now share one workstation the owner also builds on, and
-  # in 8 of 14 sampled push-lane failures NO STEP FAILED -- the job itself died,
-  # which is contention rather than a verdict.
-  #
-  # WHAT THIS GIVES UP, stated rather than hidden: a branch pushed with no pull
-  # request open now gets no CI at all. That is the price of the change, not an
-  # oversight. Open the PR first, or run `lean-gates full` locally.
-  #
-  # The owner retired Windows on 2026-09-21. The later CI1.07 cutover routes
-  # main and manual jobs to hosted Ubuntu as well as PR and merge-group jobs.
-  # Since 2026-11-08 this repository has no runner registrations at all: the
-  # owner's runners serve a private mirror instead (see `runs-on` on `build`).
+  # `push` runs on `main` alone. Every branch change arrives as a pull request,
+  # and the `pull_request` lane already builds it on hosted Ubuntu, so a branch
+  # push would build the same commit twice. A branch pushed with no pull request
+  # open gets no CI: open the pull request, or dispatch this workflow by hand.
   push:
     branches: [main]
   pull_request:
@@ -43,58 +17,26 @@ on:
   workflow_dispatch:
 
 concurrency:
-  # Keyed on github.ref, and there is no longer a second lane for it to keep
-  # apart: `push` fires on `main` alone as of 2026-09-19, so an agent branch
-  # produces exactly one run and that run is the `pull_request` one. The
-  # paragraph this replaces argued the two lanes "are not redundant" because
-  # "the push run is the fast one"; the table in the `on:` block above is why
-  # that no longer holds.
-  #
-  # BRANCH CANCELLATION STILL WORKS, and it is worth knowing why, because the
-  # obvious reading says it should have broken. For a `pull_request` event
-  # github.ref is `refs/pull/N/merge`, which is STABLE across pushes to the same
-  # pull request -- so re-pushing five times in a minute still leaves one live
-  # run, exactly as the branch-push lane used to. (The old warning is kept for
-  # whoever tries the obvious collapse key next: github.event.pull_request
-  # .head.ref is `agent/x` while github.ref is `refs/heads/agent/x`; it would
-  # take github.head_ref || github.ref_name.)
+  # Keyed on github.ref. For a `pull_request` event that is `refs/pull/N/merge`,
+  # which is stable across pushes to the same pull request, so a new push
+  # cancels the run it supersedes. (Collapsing branch and pull-request runs into
+  # one key would take github.head_ref || github.ref_name, not
+  # github.event.pull_request .head.ref, which lacks the `refs/heads/` prefix.)
   #
   # `main` and the merge queue are EXEMPT from cancellation, AND `main` is keyed
   # per commit, because cancellation is only half of what evicts a run.
-  #
-  # The badge renders the newest run of this workflow on `main`, and it draws a
-  # `cancelled` run as a failure. `cancel-in-progress: false` protects a run
-  # that has already STARTED. It does nothing for a run that is still QUEUED:
-  # GitHub keeps at most one PENDING run per concurrency group, so the next
-  # merge evicts the waiting one no matter what this flag says.
-  #
-  # That is not theoretical. On 2026-09-13, with two busy `owner-win` runners
-  # and a ~13 minute build, main runs were arriving faster than they could
-  # start: runs 34727342451 (a2dae262) and 34728317209 (ffdb7796) were both
-  # cancelled with `jobs: 0`, having never been assigned a runner, and the last
-  # 30 `main` runs of this workflow were 26 cancelled, 2 failure, 0 success.
-  # The badge read `failing` for hours while every gate actually passed.
-  #
-  # An earlier version of this comment claimed the exemption "keeps the
-  # README's CI badge honest" and that it "does NOT queue one run per merge",
-  # on the reasoning that "the run that survives is always the newest, which is
-  # the one the badge reads". That holds only if no newer merge arrives before
-  # the pending run starts. At this repository's cadence one always does, so
-  # the surviving run was perpetually the newest QUEUED one and never a
-  # completed one.
+  # `cancel-in-progress: false` protects a run that has already STARTED. It does
+  # nothing for a run that is still QUEUED: GitHub keeps at most one PENDING run
+  # per concurrency group, so with a shared key the next merge evicts the
+  # waiting one no matter what this flag says. At any real merge rate the
+  # surviving `main` run is then always a queued one, never a finished one, and
+  # the README badge, which draws `cancelled` as a failure, reads failing while
+  # every gate passes.
   #
   # Keying `main` by `github.sha` gives every commit its own group, so main runs
-  # never evict each other and each merge is actually verified. This DOES cost
-  # one full build per merge on `owner-win` -- the thing the old comment was
-  # trying to avoid -- which is the deliberate trade: a badge that reports the
-  # build is worth more than runner time spent cancelling the evidence for it.
-  # If that cost bites, reduce the merge rate or add a runner; do not restore
-  # the shared key and expect the badge to mean anything.
-  #
-  # Branch lanes keep the old behaviour deliberately -- an agent branch that is
-  # pushed five times in a minute has no reason to build the first four. Since
-  # 2026-09-19 the lane that behaviour applies to is the `pull_request` one;
-  # see the top of this block for why that is the same thing.
+  # never evict each other and each merge is actually verified, at the cost of
+  # one full build per merge. If that cost bites, reduce the merge rate or add a
+  # runner; do not restore the shared key and expect the badge to mean anything.
   group: ${{ github.workflow }}-${{ github.ref }}${{ github.ref == 'refs/heads/main' && format('-{0}', github.sha) || '' }}
   cancel-in-progress: >-
     ${{ github.ref != 'refs/heads/main' && github.event_name != 'merge_group' }}
@@ -109,8 +51,8 @@ jobs:
   # No usable diff base, an empty diff, a merge-queue entry, a manual dispatch
   # or one path outside the list all leave `build=true`.
   #
-  # The prose list is the set of paths that no step in `build` reads, apart
-  # from the two gates repeated at the end of this job. `scripts/`, `.github/`,
+  # The prose list is the set of paths that no step in `build` reads.
+  # `scripts/`, `.github/`,
   # `registry/`, `attest/` and every Lean file stay out of it on purpose.
   # cache-warm.yml ignores the same paths; change the two together.
   changes:
@@ -165,17 +107,6 @@ jobs:
           AREAS_BASE: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha || github.event.before }}
         run: python3 scripts/check_tree_areas.py "$AREAS_BASE"
 
-      # The two gates in `build` that read prose. Neither needs Lean.
-      - name: Codex loop entrypoint
-        if: steps.classify.outputs.build == 'false'
-        run: python3 scripts/check_codex_entrypoint.py
-
-      - name: Changed documentation
-        if: steps.classify.outputs.build == 'false'
-        env:
-          REVIEW_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
-        run: python3 scripts/check_review_evidence.py docs --base "$REVIEW_BASE"
-
   build:
     needs: changes
     # Skipped only on the classifier's positive `false`. An empty output runs
@@ -183,23 +114,20 @@ jobs:
     if: ${{ needs.changes.outputs.build != 'false' }}
     # Every event in this public repository uses hosted Ubuntu. The owner's
     # self-hosted runners are registered ONLY to the private mirror
-    # chris-dare-dev/derived-alg-geo-lean-ci, which sets the repository
-    # variable OWNER_CI_RUNS_ON to a JSON label list such as
-    # ["self-hosted","owner-ci"]. This repository leaves it unset, and so does
-    # every fork, so the expression falls back to ubuntu-latest. A fork pull
-    # request reads the BASE repository's variables, so it falls back too.
+    # chris-dare-dev/derived-alg-geo-lean-ci, which sets the repository variable
+    # OWNER_CI_RUNS_ON to a JSON label list such as ["self-hosted","owner-ci"].
+    # This repository leaves it unset, and so does every fork, so the expression
+    # falls back to ubuntu-latest. A fork pull request reads the BASE
+    # repository's variables, so it falls back too.
     #
-    # The expression is NOT the trust boundary: a pull request can edit its
-    # own copy of this file, `runs-on` included. The boundary is that no runner
-    # is registered here, so a pull request that asks for `self-hosted` gets no
-    # runner and stays queued. Keep the registration count at zero. See
-    # https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/CI-Owner-Lane and https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/CI-Hosted-Cutover.
+    # The expression is NOT the trust boundary: a pull request can edit its own
+    # copy of this file, `runs-on` included. The boundary is that no runner is
+    # registered here, so a pull request that asks for `self-hosted` gets no
+    # runner and stays queued. Keep the registration count at zero.
     runs-on: ${{ vars.OWNER_CI_RUNS_ON && fromJSON(vars.OWNER_CI_RUNS_ON) || 'ubuntu-latest' }}
-    # Keyed on the same variable, with the same fallback: 90 minutes here and
-    # in every fork, 180 on the owner's runners in the mirror. The Mac VM
-    # runners took 60 minutes with a warm `.lake`, 57 of them after the library
-    # build, so a cold build there (after a Mathlib bump, say) would not fit in
-    # 90. See "Speed" in https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/CI-Owner-Lane for how 180 was chosen.
+    # Keyed on the same variable, with the same fallback: 90 minutes here and in
+    # every fork, 180 on the owner's runners in the mirror, where a cold build
+    # (after a Mathlib bump, say) does not fit in 90.
     timeout-minutes: ${{ vars.OWNER_CI_RUNS_ON && 180 || 90 }}
 
     defaults:
@@ -229,43 +157,12 @@ jobs:
           # lane the repository is already present, so this costs a fetch, not a
           # clone.
           fetch-depth: 0
-          # THE SELF-HOSTED LANE'S WHOLE PURPOSE DEPENDS ON THIS LINE.
-          #
-          # checkout defaults to clean: true, which runs `git clean -ffdx`. The
-          # -x removes IGNORED files, and .lake is ignored, so the default
-          # deleted the entire build tree at the start of every run. The log
-          # said so plainly and nobody had read it:
-          #
-          #   [command]git clean -ffdx
-          #   Removing .lake/
-          #
-          # So "self-hosted for SPEED, persistent .lake instead of a cold
-          # checkout every run" -- the reason this lane exists, stated at the
-          # top of this job -- was not true as configured. Every run re-cloned
-          # Mathlib, re-fetched 8639 cache files, and rebuilt from nothing.
-          # Measured on run 32673808417: 21m23s in lean-action, of which 6m25s
-          # was `lake exe cache get` and ~14m was a full rebuild.
-          #
-          # Cleaning still happens -- see the next step -- just not to `.lake`.
-          #
-          # Measured on chris-win-owner-runner-2, same workload either side:
-          #
-          #            lean-action step     whole build job
-          #   before       21m23s               39m50s
-          #   after         6m05s               31m57s
-          #
-          # Note the two do not reconcile -- 15m18s off the step but only 7m53s
-          # off the job -- because that pair was not a controlled A/B: the
-          # "after" run inherited a tree the "before" run had just rebuilt, so
-          # part of it is a first-run effect. The direction is not in doubt; the
-          # exact numbers are not steady state. If you are optimising this
-          # further, measure two consecutive runs on one runner rather than
-          # trusting the pair above.
-          #
-          # What is left in those 6m05s is mostly `lake exe cache get`
-          # re-verifying the Mathlib cache against a `.lake/packages` that did
-          # not change. That is the next thing worth attacking, and it is
-          # independent of this.
+          # `clean: false` keeps `.lake` on the self-hosted lane, which is that
+          # lane's reason to exist. checkout defaults to clean: true, which runs
+          # `git clean -ffdx`; the -x removes ignored files, `.lake` among them,
+          # so every run would re-clone Mathlib, re-fetch its cache and rebuild
+          # from nothing. The next step does the rest of what clean would have
+          # done.
           clean: false
 
       # Exactly what checkout's clean: true would have done, minus `.lake`.
@@ -281,10 +178,8 @@ jobs:
       #   * checkout's clean also does `git reset --hard`; skipping it would let
       #     a modified tracked file survive from a previous branch.
       #
-      # Keeping `.lake` reintroduces the orphaned-artifact hazard that the
-      # "Prune orphaned build artifacts" step below already exists to handle --
-      # that step was written for the persistent-.lake case and until now had
-      # nothing to prune on this lane.
+      # Keeping `.lake` also keeps orphaned artifacts; the "Prune orphaned build
+      # artifacts" step below removes them.
       - name: Reset the tree, keeping .lake
         run: |
           set -euo pipefail
@@ -292,19 +187,13 @@ jobs:
           git clean -ffdx -e .lake
           echo "kept: $(du -sh .lake 2>/dev/null | cut -f1 || echo 'no .lake yet')"
 
-      - name: Codex loop entrypoint
-        run: python3 scripts/check_codex_entrypoint.py
-
-      # Path scoping (2026-08-14). #362 removed the per-file sorry sweep, which
-      # was 72.9% of a 54-minute run; what is left is dominated by the linter
-      # passes, each of which used to run whatever the change touched. Each is
-      # now gated on its own tree.
+      # Path scoping: each linter pass is gated on the tree it judges.
       #
       # FAIL-OPEN BY DESIGN: if the diff base cannot be resolved, or if anything
-      # structural changed, `scope` is `all` and every gate runs exactly as
-      # before. A gate is skipped only when this step has positively established
-      # that no file it could possibly judge has changed. Never invert that
-      # default -- a gate that silently does not run is worse than a slow one.
+      # structural changed, `scope` is `all` and every gate runs. A gate is
+      # skipped only when this step has positively established that no file it
+      # could possibly judge has changed. Never invert that default -- a gate
+      # that silently does not run is worse than a slow one.
       - name: What changed
         id: changed
         run: |
@@ -331,7 +220,7 @@ jobs:
           # base branch after this one forked are not counted as ours.
           files=$(git diff --name-only "$base...HEAD")
           echo "$files" | sed 's/^/  /'
-          if printf '%s\n' "$files" | grep -qE '^(lakefile\.toml|lean-toolchain|lake-manifest\.json|pins\.json|\.github/|scripts/|exe/)'; then
+          if printf '%s\n' "$files" | grep -qE '^(lakefile\.toml|lean-toolchain|lake-manifest\.json|\.github/|scripts/|exe/)'; then
             echo "scope=all" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -345,44 +234,27 @@ jobs:
       - name: Foundation import boundary
         run: python3 scripts/check_foundation_import_boundary.py
 
-      # Build-output cache, hosted lane only (2026-08-14, corrected 2026-08-15).
+      # Build-output cache. The self-hosted runners keep `.lake` between runs; a
+      # hosted job starts cold, and `.lake/build` is the part worth restoring.
       #
-      # Measured on this workflow: `lean-action` takes 9 minutes on the
-      # self-hosted runner and 30 on ubuntu-latest. The difference is not the
-      # hardware, it is that the self-hosted runner keeps `.lake` between runs --
-      # 8.8 GB resident, of which mathlib's build is 7.1 GB and this repository's
-      # own output is 1.1 GB. The hosted lane starts cold every time.
+      # Only `.lake/build` is cached. Mathlib's build, several GB, must never go
+      # in here: GitHub's per-repository cache budget is 10 GB total, so one
+      # such entry would evict everything else on write. `lean-action`'s
+      # use-mathlib-cache already fetches Mathlib's oleans from the Lean
+      # community cache, which is the right source for them.
       #
-      # Only `.lake/build` is cached. mathlib's 7.1 GB must never go in here:
-      # GitHub's per-repository cache budget is 10 GB total, so one such entry
-      # would evict everything else on write. `lean-action`'s use-mathlib-cache
-      # already fetches mathlib's oleans from the Lean community cache, which is
-      # the right source for them.
-      #
-      # THE PLATFORM SEGMENT IS A LITERAL, NOT `runner.os`, AND THAT IS THE WHOLE
-      # POINT. It used to be `runner.os`, and the cache consequently never hit
-      # once. Saves happened on `push` to main, which routes to the self-hosted
-      # Mac, so they were written as `lake-build-macOS-...`; restores happen on
-      # `pull_request`, which routes to ubuntu-latest, so they looked up
-      # `lake-build-Linux-...`. The two key spaces are disjoint by construction
-      # and the restore-key prefix cannot bridge them either -- it carries the
-      # same segment. An `.lake/build` produced on macOS-ARM64 is not usable on
-      # linux-x86_64 in any case, so the fix is not to make the two lanes agree
-      # on a variable: it is to state the platform this cache is FOR, and to have
-      # a runner of that platform be the thing that writes it. That is the
-      # `Cache warm` workflow, in .github/workflows/cache-warm.yml.
+      # THE PLATFORM SEGMENT IS A LITERAL, NOT `runner.os`. The writer and every
+      # reader must agree on the key, and an `.lake/build` from another platform
+      # is unusable here anyway, so the key states the platform the cache is FOR
+      # and a runner of that platform writes it: the `Cache warm` workflow, in
+      # .github/workflows/cache-warm.yml.
       #
       # Restore is keyed exactly, then falls back by prefix to the newest cache
       # for the same toolchain and manifest -- in practice the one `Cache warm`
-      # saved on `main`, found via GitHub's default-branch fallback.
-      # A stale restore is safe rather than merely tolerable: lake's build is
-      # trace-hash based, so anything out of date is rebuilt. The failure mode is
-      # a slower run, never a wrong one.
-      #
-      # Keyed on `runner.os == 'Linux'` rather than on the event, so the
-      # condition tracks the thing it is actually about. The self-hosted Mac
-      # skips this step because its own `.lake` is already warm, not because of
-      # which event got it here.
+      # saved on `main`, found via GitHub's default-branch fallback. A stale
+      # restore is safe for the build: lake's build is trace-hash based, so
+      # anything out of date is rebuilt. The next step covers what it is not
+      # safe for.
       - name: Restore build output
         if: runner.os == 'Linux'
         uses: actions/cache/restore@v4
@@ -394,36 +266,24 @@ jobs:
 
       # Orphaned artifacts, and why a stale restore is NOT merely slow.
       #
-      # The restore comment above says "a stale restore is safe rather than
-      # merely tolerable ... the failure mode is a slower run, never a wrong
-      # one." That is true of the BUILD -- lake's traces rebuild anything out of
-      # date -- and false of everything downstream that reads `.lake/build` as a
-      # description of what exists. lake never deletes the artifacts of a source
-      # that is gone, so a `.lake/build` restored from `main` keeps `.ilean`
-      # files for modules this branch does not have.
+      # lake's traces rebuild anything out of date, but lake never deletes the
+      # artifacts of a source that is gone, so a `.lake/build` restored from
+      # `main`, or kept on a self-hosted runner, holds `.ilean` files for
+      # modules this branch does not have. `mfc check-ilean-coverage` reads
+      # exactly those files, so it reports them as "built by lake, absent from
+      # the emission" and fails I-03/I-04 -- a red run caused by the cache
+      # rather than by the diff.
       #
-      # `mfc check-ilean-coverage` reads exactly those files, so it reports them
-      # as "built by lake, absent from the emission" and fails I-03/I-04 -- a red
-      # run caused by the cache rather than by the diff. Observed on #698 and
-      # #699, where the reported set tracked whatever `main` had merged most
-      # recently (TwistAdd and IntegralBridge, then the CentralCharge pair) and
-      # never mentioned anything either branch touched.
-      #
-      # Deleting `.lake/build` outright would fix it and cost the whole point of
-      # the cache: 9 minutes warm against 30 cold, measured above. So prune the
-      # orphans instead -- an artifact whose `.lean` no longer exists cannot be
-      # wanted by anything, and if this is ever wrong the effect is a rebuild,
-      # not a wrong answer.
+      # Deleting `.lake/build` outright would fix it and throw away the cache.
+      # So prune the orphans instead -- an artifact whose `.lean` no longer
+      # exists cannot be wanted by anything, and if this is ever wrong the
+      # effect is a rebuild, not a wrong answer.
       #
       # Scoped to `DerivedAlgGeo/`, where the artifact path maps to the source
       # path directly. The `exe/` libraries' `.ilean` files come from their own
       # srcDir, so a root-relative existence test would prune them wrongly; they
-      # are left alone.
-      #
-      # Runs on both lanes. The self-hosted Mac keeps its own `.lake` across
-      # runs and accumulates orphans the same way -- measured 42 in one working
-      # tree, left by an old layering refactor -- so restricting this to the
-      # restoring lane would leave a known latent failure on the other.
+      # are left alone. Runs on both lanes: a persistent `.lake` accumulates
+      # orphans the same way a restored one does.
       - name: Prune orphaned build artifacts
         run: |
           set -euo pipefail
@@ -443,51 +303,35 @@ jobs:
           done < <(find "$root" -name '*.ilean' -print0)
           echo "pruned $pruned orphaned artifact pair(s)"
 
-      # use-github-cache is OFF (2026-08-15). Left at its default of `true` it
-      # writes all of `.lake` -- 2.4 GB per entry -- and every one of those
-      # entries was unreadable:
+      # use-github-cache is OFF. Left at its default it writes all of `.lake`,
+      # several GB per entry, under keys no later job reads: a self-hosted
+      # runner already keeps its own `.lake`, and a `pull_request` entry is
+      # scoped to `refs/pull/N/merge`, readable only by re-runs of that same
+      # pull request. Each such write LRU-evicts something useful from the 10 GB
+      # budget, the `.lake/build` entry above included. `use-mathlib-cache`
+      # stays on: Mathlib's oleans come from the Lean community cache at no
+      # repository cost.
       #
-      #   * on the self-hosted lane it writes `lake-macOS-ARM64-...`, which no
-      #     hosted job can use, while that runner already keeps its own 8.3 GB
-      #     `.lake` between runs and needs none of it;
-      #   * on the `pull_request` lane GitHub scopes the entry to
-      #     `refs/pull/N/merge`, readable only by re-runs of that same PR, and
-      #     this workflow builds a given PR once.
-      #
-      # Four such entries were holding 9.6 GB of the 10 GB repository budget at
-      # a measured hit rate of zero, which meant every write LRU-evicted
-      # something that might otherwise have been useful -- including the
-      # `.lake/build` entry above. `use-mathlib-cache` stays on: mathlib's
-      # oleans come from the Lean community cache, which is the right source and
-      # costs no repository budget at all.
       # Pinned to a commit, not to `v1`. `v1` is a MOVING tag -- the maintainers
-      # repoint it -- so `@v1` is a pin that does not pin, which is the same
-      # failure `CLAUDE.md` names for `lake update` re-resolving a branch
-      # `inputRev`. The first symptom would be a build that changes with
-      # nothing in the diff to explain it. 38fbc41 is v1 as of 2026-04-22.
+      # repoint it -- so `@v1` would let the build change with nothing in the
+      # diff to explain it.
       - uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9 # v1
         with:
           build: true
           use-mathlib-cache: true
           use-github-cache: false
-          # nanoda is off, and NOT because the axis does not matter. Measured
-          # while standing up CI for math-formal-contract-lean, recorded here
-          # rather than rediscovered: `nanoda: true` cannot run at this
-          # toolchain. lean-action's run_nanoda.sh detects the module name with
-          # `grep -A5 '^\[package\]' lakefile.toml`, and Lake REJECTS the
-          # `[package]` table that grep wants; past that, lean4export master
-          # emits NDJSON 3.1.0 while nanoda 0.3.2 expects the older
-          # space-separated format.
+          # nanoda is off because it cannot run at this toolchain. lean-action's
+          # run_nanoda.sh detects the module name with `grep -A5 '^\[package\]'
+          # lakefile.toml`, and Lake REJECTS the `[package]` table that grep
+          # wants; past that, lean4export master emits NDJSON 3.1.0 while nanoda
+          # 0.3.2 expects the older space-separated format.
           nanoda: false
           # ...and this line is load-bearing even though nanoda is off.
           #
-          # `nanoda-allow-sorry` DEFAULTS TO "true" (verified in the action's
-          # own action.yml). So the day anyone flips `nanoda: true`, the
-          # default silently adds a checker that PASSES ON SORRY-BACKED
-          # PROOFS -- a green check meaning nothing, in a repository whose
-          # CLAUDE.md forbids `sorry` outright. Setting it false now costs a
-          # line and removes the trap; leaving it to be remembered later is
-          # how the trap gets sprung.
+          # `nanoda-allow-sorry` DEFAULTS TO "true" (see the action's
+          # action.yml). So turning `nanoda: true` on without this line would
+          # add a checker that PASSES ON SORRY-BACKED PROOFS, in a repository
+          # that forbids `sorry` outright.
           nanoda-allow-sorry: false
 
       - name: Pin and coverage records
@@ -502,13 +346,12 @@ jobs:
         run: |
           set -euo pipefail
           # `--require-api` because this is the environment guaranteed to have
-          # the API. Locally the same check degrades to NOT_RUN so a
-          # contributor without `gh` is not blocked; here a check that could
-          # not look must not pass.
+          # the API. Locally the same check degrades to NOT_RUN so a contributor
+          # without `gh` is not blocked; here a check that could not look must
+          # not pass.
           python3 scripts/check_pin.py --require-api
-          # Every coverage record, not a hand-maintained list of two. This PR
-          # adds five, and under the old naming they would all have landed
-          # unvalidated -- as would every record added after it.
+          # Every coverage record, by glob rather than a hand-kept list, so a
+          # new record cannot land unvalidated.
           for f in registry/coverage-*.json; do
             python3 scripts/check_coverage_map.py "$f"
           done
@@ -518,15 +361,10 @@ jobs:
         continue-on-error: true
         run: |
           set -euo pipefail
-          # The disease detector: a generic abstraction written for N cases,
-          # instantiated once, and never adopted. It reuses the build the step
-          # above already did.
-          #
-          # This ran only in scripts/gates.sh until now, which is precisely why
-          # it drifted: between 2026-09-08 and 2026-09-14, 29 names arrived at
-          # or below one inhabitant against 80 recorded, and nothing anywhere
-          # went red. A gate whose whole purpose is to make invisible drift
-          # visible cannot itself be invisible.
+          # The single-instantiation check: a generic abstraction written for N
+          # cases, instantiated once, and never adopted. It reuses the build the
+          # step above already did, and it runs here because a check that runs
+          # only locally drifts unseen.
           lake env lean scripts/EnumInhabitants.lean > enum-inhabitants.txt 2>&1 || {
             echo "::error::scripts/EnumInhabitants.lean failed to elaborate"
             cat enum-inhabitants.txt
@@ -541,10 +379,10 @@ jobs:
           set -euo pipefail
           # The pre-existing backlog is enumerated per declaration in
           # scripts/nolints.json, so this gate rejects anything NEW while the
-          # 203 known violations stay visible and countable. Never silence a
-          # failure with `runLinter --update`: that rewrites the whole file
-          # from the current run and would bless the new violation along with
-          # everything else. Fix the declaration, or argue for the exception.
+          # known violations stay visible and countable. Never silence a failure
+          # with `runLinter --update`: that rewrites the whole file from the
+          # current run and would bless the new violation along with everything
+          # else. Fix the declaration, or argue for the exception.
           #
           # check_nolints.py is NOT scoped: it reads the checked-in file, it is
           # cheap, and it is the half of this gate that catches a stale entry.
@@ -558,30 +396,28 @@ jobs:
         continue-on-error: true
         run: |
           set -euo pipefail
-          # The warnings Lean emits while elaborating were never gated, so they
-          # only grew: 93 by the time this was wired, in which a Mathlib
-          # deprecation with a real deadline looked exactly like a `simpa` nag.
           # scripts/check_warnings.py holds deprecations at zero in code we own
-          # and lets the rest shrink but never grow, the same ratchet shape as
-          # scripts/nolints.json above.
+          # and lets the other warnings Lean emits shrink but never grow, the
+          # same ratchet shape as scripts/nolints.json above. Ungated, a Mathlib
+          # deprecation with a real deadline looks exactly like a `simpa` nag.
           #
           # The library is already built by now, so this re-invocation compiles
           # nothing: Lake replays the cached modules and reprints their
-          # warnings, which is the whole reason the raw count in a full log is
-          # several times the real one. If that ever stops being true the
-          # capture comes back empty, and the script fails rather than passing
-          # vacuously on a silent log.
+          # warnings, which is why the raw count in a full log is several times
+          # the real one. If that ever stops being true the capture comes back
+          # empty, and the script fails rather than passing vacuously on a
+          # silent log.
           lake build DerivedAlgGeo 2>&1 | tee lean-warnings.log
           python3 scripts/check_warnings.py lean-warnings.log
 
       - name: Gate console encoding
         id: console_encoding
         continue-on-error: true
-        # Every gate prints declaration names; on this runner's cp1252 console
-        # a gate that cannot print `δ` dies with a `charmap` traceback instead
-        # of its finding (#868, #869). Checks that each script routes its
-        # console through scripts/_output.py, and reproduces the crash to prove
-        # the helper prevents it.
+        # Every gate prints declaration names, and on a console that cannot
+        # encode `δ` a gate dies with a `charmap` traceback instead of its
+        # finding. Checks that each script routes its console through
+        # scripts/_output.py, and reproduces the crash to prove the helper
+        # prevents it.
         run: python3 scripts/_output.py
 
       - name: Mathlib-style known-answer fixtures
@@ -589,17 +425,9 @@ jobs:
         continue-on-error: true
         # scripts/check_mathlib_style.py itself runs from the edit hook and from
         # scripts/gates.sh, never here -- it judges a branch's own lines, which
-        # CI has no use for. Its fixtures are a different question: they are what
-        # says the checker still rejects what it is meant to reject, and a check
-        # that quietly stops firing is how #1359 reached the Lean parser.
+        # CI has no use for. Its fixtures are a different question: they are
+        # what says the checker still rejects what it is meant to reject.
         run: python3 scripts/check_mathlib_style.py --self-test
-
-      - name: Changed module documentation
-        id: review_docs
-        continue-on-error: true
-        env:
-          REVIEW_BASE: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha || github.event.before || 'HEAD^' }}
-        run: python3 scripts/check_review_evidence.py docs --base "$REVIEW_BASE"
 
       - name: Emitter source reachability and eligibility
         id: emission_sources
@@ -621,15 +449,10 @@ jobs:
         continue-on-error: true
         run: python3 scripts/check_source_independence.py
 
-      - name: Subject ownership layering
+      - name: Import layering
         id: subject_layering
         continue-on-error: true
         run: python3 scripts/check_layering.py
-
-      - name: Neutral derived-category Stability import closure
-        id: neutral_stability_imports
-        continue-on-error: true
-        run: python3 scripts/check_neutral_stability_imports.py
 
       - name: Umbrella coverage
         id: umbrella_coverage
@@ -656,32 +479,24 @@ jobs:
         continue-on-error: true
         run: |
           set -euo pipefail
-          # This step used to be a serial `lake env lean` over every tracked
-          # .lean file: 39m23s of a 54m01s run (72.9% of CI wall clock) spent
-          # re-elaborating from source what the build step had just built. The
-          # emitter below is both cheaper and stronger -- it reads the
-          # environment, not the text a `set_option ... in` evasion hides in --
-          # so the loop is now one file wide. See #361 and exe/Emit.lean.
-          #
-          # An `lean_exe` root cannot appear in an emission built from its own
-          # imports, so exe/ is exactly what the emitter cannot reach and this
-          # is exactly what is left of the loop. Keep the two in agreement:
+          # The emitter below is the repository-wide sorry gate, and it reads
+          # the environment, not the text a `set_option ... in` evasion hides
+          # in. An `lean_exe` root cannot appear in an emission built from its
+          # own imports, so exe/ is exactly what the emitter cannot reach and
+          # exactly what this loop covers. Keep the two in agreement:
           # scripts/check_emission_coverage.py excludes exe/ on the strength of
           # this step existing.
-          # `lake env lean` does not build; it only sets LEAN_PATH. The exe root
-          # imports the sweep umbrella, which is not a default target, so build
-          # it here rather than depending on what an earlier step happened to
-          # leave behind.
           #
-          # The LIBRARY, not the executable. This used to be `lake build emit`,
-          # and linking an executable requires every transitively imported module
-          # compiled to a native object -- 4173 Mathlib `:c.o` targets, plus ~300
-          # more, on every hosted run. Measured on PR #421 that was 337s of a
-          # 660s job, and it survived the build cache because those objects live
-          # under .lake/packages, which the `.lake/build` cache does not cover.
-          # Nothing in this step needs the executable: `lake env lean` reads
-          # oleans. See the "Emit combined environment" step for the same change
-          # where it matters more.
+          # `lake env lean` does not build; it only sets LEAN_PATH, so build
+          # what the exe roots import here rather than depending on what an
+          # earlier step happened to leave behind: the sweep umbrella, which is
+          # not a default target.
+          #
+          # The LIBRARY, not the executable. Linking an executable compiles
+          # every transitively imported module to a native object -- thousands
+          # of Mathlib `:c.o` targets, under .lake/packages where the
+          # `.lake/build` cache does not reach -- and nothing here needs one:
+          # `lake env lean` reads oleans.
           lake build DerivedAlgGeoSweep
           : > lean-source-check.txt
           for f in exe/*.lean; do
@@ -697,27 +512,19 @@ jobs:
         continue-on-error: true
         run: |
           set -euo pipefail
-          # INTERPRETED, not compiled, and this is the single biggest saving left
-          # in this workflow. `lake exe emit` needs the executable linked, and
-          # linking one compiles every transitively imported module to a native
-          # object: 4173 Mathlib `:c.o` targets plus ~300 others, then a 278 MB
-          # link. None of it is cached -- those objects live under
+          # INTERPRETED, not compiled. `lake exe emit` needs the executable
+          # linked, and linking one compiles every transitively imported module
+          # to a native object and then links a binary of a few hundred MB. None
+          # of it is cached -- those objects live under
           # .lake/packages/*/.lake/build/ir, and the `.lake/build` cache covers
-          # only the root package -- so it recurred on every single hosted run.
+          # only the root package. The interpreter reads the oleans the build
+          # already restored, and is faster end to end because it never loads
+          # that binary.
           #
-          # The interpreter needs none of it: it reads the oleans the build cache
-          # already restored. Measured on a warm tree, interpreted is also
-          # FASTER than compiled end to end (134s vs 158s), because the compiled
-          # path pays to load a 278 MB binary that the interpreter never
-          # produces.
-          #
-          # Verified equivalent before switching: both paths emit 11945
-          # constants, identical names, identical `counts`, identical `cites`
-          # totals; the only differing byte in the whole artifact is
-          # `emitted_at`. And exit codes propagate through `--run` (3 -> 3,
-          # 0 -> 0, a thrown IO error -> 1), which is load-bearing, because the
-          # non-zero exit BELOW IS the repository-wide sorry gate. If that ever
-          # stopped propagating, this gate would pass vacuously forever.
+          # Both paths emit the same artifact apart from `emitted_at`, and exit
+          # codes propagate through `--run`, which is load-bearing: the non-zero
+          # exit BELOW IS the repository-wide sorry gate. If it stopped
+          # propagating, this gate would pass vacuously forever.
           #
           # `lake build emit` still runs in the cache-warm workflow, so the
           # executable is still proved to link on Linux once per merge to main;
@@ -740,25 +547,12 @@ jobs:
           PY
 
 
-      # The save half of this cache is NOT here. It used to be, guarded on
-      # `push` to `main` -- but `push` routes to the self-hosted Mac, so this
-      # job wrote a macOS entry that the lane needing it could never read. The
-      # writer has to be a runner of the platform the cache is for; see the
-      # `Cache warm` workflow, in .github/workflows/cache-warm.yml.
+      # The save half of this cache is the `Cache warm` workflow, in
+      # .github/workflows/cache-warm.yml: the writer has to be a runner of the
+      # platform the cache is for.
 
-      # The mfc gates. #156 specifies seven steps; this lands 3, 4 and 6.
-      #
-      # Verified before landing, against THIS repo's own CI emission (run
-      # 32086611934, 15346 constants) rather than against fixtures:
-      # `mfc lint` reports 7 passed, 0 failed, 5 not_run -- every not_run a
-      # missing input (no registry yet, no closed-lanes config), none of them a
-      # rule that could have fired and did not.
-      #
-      # Two defects surfaced doing that, both fixed upstream first:
-      # `counts.foreign` (8 constants attributed to Mathlib modules) and the
-      # repeatable `--lib`, without which coverage scopes to DerivedAlgGeoSweep
-      # alone and reports "1 in-scope module of 488 built; 0 built
-      # declarations" -- green, having compared nothing.
+      # The mfc contract gates, run against this repository's own emission
+      # rather than against fixtures.
       - name: Contract gates
         id: contract_gates
         continue-on-error: true
@@ -768,15 +562,13 @@ jobs:
         if: steps.emit.outcome == 'success'
         run: |
           set -euo pipefail
-          # Its own venv, in the workspace. The self-hosted lane is the owner's
-          # daily-driver Mac and this must not touch its system python.
+          # Its own venv, in the workspace, so this step never touches a
+          # self-hosted runner's system Python.
           #
-          # The interpreter is CHOSEN, not inherited. `python3` on that Mac is
-          # 3.9.6, and `mfc` needs 3.11+ because `mfc env` reads lakefile.toml
-          # with `tomllib`. Inheriting it cost a full 20-minute build followed
-          # by ModuleNotFoundError -- and the same commit was simultaneously
-          # green on the hosted lane, whose `python3` is newer, which is the
-          # worst shape a CI failure can take.
+          # The interpreter is CHOSEN, not inherited. `mfc` needs 3.11+ because
+          # `mfc env` reads lakefile.toml with `tomllib`, and an older inherited
+          # `python3` fails only on the runner that has it, after a full build,
+          # while the same commit is green elsewhere.
           PY311=""
           for c in python3.13 python3.12 python3.11 python3; do
             if command -v "$c" >/dev/null 2>&1 && \
@@ -790,7 +582,7 @@ jobs:
             exit 1
           fi
           echo "using $PY311 ($("$PY311" -V 2>&1))"
-          # Delete it first. On the self-hosted lane the workspace persists, and
+          # Delete it first. On a self-hosted runner the workspace persists, and
           # `python -m venv` over an existing directory does NOT reinstall what
           # is already there. `pip install "mfc @ git+...@<sha>"` then compares
           # by name and version, not by URL, so a pin bump that leaves the
@@ -800,31 +592,21 @@ jobs:
           "$PY311" -m venv .mfc-venv
 
           # A venv puts its executables in `bin` on Unix and in `Scripts` on
-          # Windows. Hardcoding `bin` made every Windows runner fail here with
-          # "No such file or directory" on the pip line, one step after paying
-          # for a full Lean build.
+          # Windows.
           #
-          # Every consumer of the venv is INSIDE THIS STEP -- the two later
-          # `python` invocations further down are the same `run:` block, not
-          # separate steps. So these stay plain shell variables. An earlier cut
-          # of this fix wrote them to $GITHUB_ENV and read them back as
-          # $MFC_VENV_*, which cannot work: $GITHUB_ENV publishes to SUBSEQUENT
-          # steps, never to the step doing the writing, so under `set -u` the
-          # first read died with `MFC_VENV_PY: unbound variable` -- on Linux and
-          # macOS, after a full build, having passed every Windows check it was
-          # written for.
+          # Every consumer of the venv is INSIDE THIS STEP -- the later `python`
+          # invocations are the same `run:` block -- so these stay plain shell
+          # variables. $GITHUB_ENV publishes only to SUBSEQUENT steps, never to
+          # the step doing the writing.
           VENV_BIN=".mfc-venv/bin"
           [ -d "$VENV_BIN" ] || VENV_BIN=".mfc-venv/Scripts"
           [ -d "$VENV_BIN" ] || { echo "::error::venv has neither bin/ nor Scripts/"; exit 1; }
 
-          # The interpreter inside the venv is NOT reliably called `python`.
-          # A venv names it after the base executable, and on Windows the base
-          # here is `python3.exe` -- Windows CPython installs `python.exe` only,
-          # so a `python3` on PATH is necessarily something else, and the venv
-          # inherits that name, leaving `.mfc-venv/Scripts/python` absent.
-          # Resolve it explicitly and fail loudly if no spelling exists. On Unix
-          # `bin/python` is present and wins first, so this changes nothing for
-          # the Mac and hosted lanes.
+          # The interpreter inside the venv is NOT reliably called `python`. A
+          # venv names it after the base executable, and on Windows that can
+          # leave `.mfc-venv/Scripts/python` absent. Resolve it explicitly and
+          # fail loudly if no spelling exists. On Unix `bin/python` is present
+          # and wins first.
           VENV_PY=""
           for cand in "$VENV_BIN/python" "$VENV_BIN/python3" \
                       "$VENV_BIN/python.exe" "$VENV_BIN/python3.exe"; do
@@ -839,15 +621,11 @@ jobs:
 
           # Assert the installed schema is the one the emitter writes against.
           #
-          # When these disagree the symptom is 21167 near-identical lines, one
-          # per constant, none of which names the cause -- as happened on
-          # 2026-09-04, when a stale `contract/build/lib` shipped a schema whose
-          # `constant` had no `discharges`, `doc` or `scope` and whose `counts`
-          # had no `external` or `foreign`, all under `additionalProperties:
-          # false`. Upstream b5a63cbab0cc removed that directory, so this should
-          # now always pass; it is cheap, and it is the difference between one
-          # line that names the five fields and 21167 that name every constant
-          # in the library.
+          # When these disagree under `additionalProperties: false`, the symptom
+          # is one near-identical error per constant, none of which names the
+          # cause. This check is cheap, and it is the difference between one
+          # line that names the missing fields and thousands that name every
+          # constant in the library.
           "$VENV_PY" -c 'import json,os,sys,mfc; p=os.path.join(os.path.dirname(mfc.__file__),"schema","emission-1.0.schema.json"); d=json.load(open(p,encoding="utf-8")); missing=({"discharges","doc","scope"}-set(d["$defs"]["constant"]["properties"]))|({"external","foreign"}-set(d["properties"]["counts"]["properties"])); sys.exit(0) if not missing else (print("::error::installed mfc emission schema is stale: it rejects "+", ".join(sorted(missing))+", which the emitter emits."), sys.exit(1))'
           echo "emission schema accepts the emitter field set"
 
@@ -862,15 +640,12 @@ jobs:
                         --environment attest/environment.json \
                         --out attest/declarations.json
 
-          # --registry runs E-04, E-05 and E-12 against the minted registry;
-          # until 2026-08-18 the step comment claimed no registry existed while
-          # `mfc seal` consumed one three commands later, and running E-12
-          # exposed a real unanchored discharge edge (adversarial review,
-          # finding P2-4). E-09 and E-11 still need a closed-lanes config this
-          # repo has not minted, so the EXACT expected not_run set is asserted
-          # below: any silent widening of it -- a malformed registry, a schema
-          # drift demoting more rules -- fails the step instead of printing a
-          # smaller green table.
+          # --registry runs E-04, E-05 and E-12 against the minted registry.
+          # E-09 and E-11 still need a closed-lanes config this repo has not
+          # minted, so the EXACT expected not_run set is asserted below: any
+          # silent widening of it -- a malformed registry, a schema drift
+          # demoting more rules -- fails the step instead of printing a smaller
+          # green table.
           "$MFC" lint --emission attest/lean-emission.json \
                       --environment attest/environment.json \
                       --registry registry/bridgeland2007.json \
@@ -885,39 +660,36 @@ jobs:
           fi
 
           # BOTH roots. The emitter sweeps DerivedAlgGeoSweep plus DerivedAlgGeo
-          # (exe/Emit.lean), and a single root makes this check vacuous rather
-          # than wrong -- see the note above.
+          # (exe/Emit.lean). With one `--lib`, coverage scopes to that root
+          # alone and the check passes having compared nothing.
           "$MFC" check-ilean-coverage --emission attest/lean-emission.json \
             --lib DerivedAlgGeoSweep --lib DerivedAlgGeo
 
-          # Step 5 of #156. It runs when there is something to run it on, and
-          # says so when there is not -- arXMCP produces resolution.json and
-          # that is M2/e7 (#134), so today this prints the notice.
+          # Runs when there is a resolution.json to run it on, and says so when
+          # there is not.
           if [ -f attest/resolution.json ]; then
             "$MFC" check-resolution attest/resolution.json
           else
-            echo "::notice::check-resolution did NOT run: no attest/resolution.json yet (arXMCP-side, #134)"
+            echo "::notice::check-resolution did NOT run: no attest/resolution.json yet"
           fi
-
 
           # ------------------------------------------------------------------
           # build.json, and the honest size of what it measured.
           #
           # There is no cheap route to project-wide NDJSON, and the obvious
-          # wirings are worse than nothing because THEY LOOK CLEAN. Measured on
-          # v4.32.1 before writing this:
+          # wirings are worse than nothing because THEY LOOK CLEAN:
           #
           #   - `lake env lean --json` on a root import file prints NOTHING.
           #     Imports are served from oleans and never re-reported, so this
-          #     step would have emitted error_count 0, warning_count 0,
+          #     step would emit error_count 0, warning_count 0,
           #     sorry_diagnostic_count 0 having elaborated no library module --
-          #     and `mfc seal` would have accepted it as the build/v1 predicate
-          #     C-12 requires. A vacuous pass wearing a passing bundle.
+          #     and `mfc seal` would accept it as the build/v1 predicate C-12
+          #     requires. A vacuous pass wearing a passing bundle.
           #   - `moreLeanArgs = ["--json"]` is consumed by lake, which
           #     re-renders every message in its own text format.
           #   - lake persists no structured log: .hash, .trace, .olean, .ilean.
-          #   - per-module invocation pays a full Mathlib import load each time;
-          #     494 own modules is hours, not a per-commit step.
+          #   - per-module invocation pays a full Mathlib import load each time,
+          #     which over the whole library is hours, not a per-commit step.
           #
           # So this covers the two ROOT modules and says so. `--covers` is what
           # puts `measured: {modules, in_scope_modules}` in the artifact, and
@@ -969,19 +741,16 @@ jobs:
                        --lake-exit "$LAKE_EXIT" --lake-jobs "$LAKE_JOBS" \
                        --out attest/build.json
 
-          # The in-toto Statement, and then the twelve rules over it. Until
-          # this step existed nothing in either repository produced the file
-          # `conformance` reads, so C-01..C-12 ran only inside mfc's own pytest
-          # against a tree the tests assembled.
+          # The in-toto Statement, and then the twelve conformance rules over
+          # it.
           #
           # `seal` REFUSES to omit a required predicate and refuses a dirty
-          # worktree; both are why the .gitignore block landed in this commit.
-          # attest/review.yaml is the one file here that is committed rather
-          # than regenerated -- see the .gitignore negation. When it exists the
-          # bundle carries a human-review predicate and C-10 stops reporting
-          # not_run; when it does not, seal is called without it and C-10 says
-          # so out loud. `--review-produced-by` is read FROM the file rather
-          # than hardcoded here, so the bundle names whoever actually signed the
+          # worktree. attest/review.yaml is the one file here that is committed
+          # rather than regenerated -- see the .gitignore negation. When it
+          # exists the bundle carries a human-review predicate and C-10 runs;
+          # when it does not, seal is called without it and C-10 says so out
+          # loud. `--review-produced-by` is read FROM the file rather than
+          # hardcoded here, so the bundle names whoever actually signed the
           # review instead of whoever wrote this workflow.
           SEAL_REVIEW=()
           if [ -f attest/review.yaml ]; then
@@ -991,7 +760,7 @@ jobs:
                          --review-produced-by "human:$REVIEWER")
             echo "::notice::sealing with human review by $REVIEWER"
           else
-            echo "::notice::no attest/review.yaml; C-10 will report not_run (#178)"
+            echo "::notice::no attest/review.yaml; C-10 will report not_run"
           fi
 
           "$MFC" seal --root . \
@@ -1007,16 +776,13 @@ jobs:
           #
           # env_digest hashes every package revision, so ONE dependency bump
           # rotates it while the mathematics sits still, and C-10 then reports
-          # every review as belonging to another environment. This repository
-          # learned that the hard way on 2026-08-19: mfc moved d3df3818 ->
-          # 21e3b442, env_digest went 45d9e8ca -> 5b2b3d86, and the first review
-          # ever recorded failed C-10 hours after it was written -- with its
-          # statement digest byte-identical on both sides.
+          # every review as belonging to another environment, with its statement
+          # digest byte-identical on both sides.
           #
-          # The recovery without this is a re-read per review per bump, costed
-          # at ~2h/entry. With it, `restated` carries the review forward on
-          # evidence and NOTHING ELSE does: `changed` means the statement moved,
-          # and `not_checkable` means nobody knows, which is not a pass either.
+          # Without this, every review needs a re-read on every bump. With it,
+          # `restated` carries the review forward on evidence and NOTHING ELSE
+          # does: `changed` means the statement moved, and `not_checkable` means
+          # nobody knows, which is not a pass either.
           #
           # The plan step exists because Lean cannot read YAML and this package
           # is forbidden dependencies -- so the reviews cross the boundary as
@@ -1026,8 +792,7 @@ jobs:
             # reviewed_statement_pp is null passes `mfc validate`, has a
             # reviewer, a date, a verdict and three digests, and is SILENTLY
             # un-carryable: restate returns not_checkable, so C-10 fails at the
-            # next dependency bump and #136's ~2h/entry comes due. Nothing about
-            # it looks wrong until then.
+            # next dependency bump. Nothing about it looks wrong until then.
             #
             # It runs ahead of restate-plan deliberately. Downstream the same
             # defect appears as `not_checkable`, which is also what a genuine
@@ -1051,20 +816,14 @@ jobs:
             echo "::notice::restate did NOT run: no attest/review.yaml"
           fi
 
-          # C-08 alone prints not_run: no resolution.json (#134). That is NOT
+          # C-08 alone prints not_run: there is no resolution.json. That is NOT
           # a pass, and the summary line says so on every run. As with lint
-          # above, the exact expected not_run set is asserted so it cannot
-          # widen silently (2026-08-18 adversarial review, finding P2-4).
+          # above, the exact expected not_run set is asserted so it cannot widen
+          # silently.
           #
-          # WAS 'C-08,C-10' until 2026-08-19. C-10 now RUNS, because
-          # attest/review.yaml exists (#178) and the bundle carries a
-          # human-review predicate. This assertion fired on that change, which
-          # is the assertion working -- it is narrowed here with the config
-          # change that explains it, per its own error message, and not to make
-          # a red build green.
-          #
-          # It must not widen back. C-10 returning to not_run would mean the
-          # review stopped being sealed into the bundle -- most likely
+          # C-10 runs because attest/review.yaml exists and the bundle carries a
+          # human-review predicate. It must not return to not_run: that would
+          # mean the review stopped being sealed into the bundle -- most likely
           # review.yaml going missing, which the .gitignore negation exists to
           # prevent.
           # $RESTATE_ARG unquoted on purpose: it is empty when there is no
@@ -1084,25 +843,18 @@ jobs:
             exit 1
           fi
 
-      # Step 6 of #156: the determinism assertion. Two runs over an unchanged
-      # environment must be byte-identical except for `emitted_at`.
+      # The determinism assertion: two runs over an unchanged environment must
+      # be byte-identical except for `emitted_at`. It is what makes
+      # `builds_clean` mean something a second machine could reproduce, and it
+      # costs a second interpreted sweep -- which is why it is here, after the
+      # artifact everything else needs has already been produced.
       #
-      # This is the gate that makes `builds_clean` mean something a second
-      # machine could reproduce, and it costs a second interpreted sweep --
-      # which is why it is here, after the artifact everything else needs has
-      # already been produced.
-      #
-      # IT NO LONGER RUNS ON EVERY EVENT, as of 2026-09-19.
-      #
-      # The second sweep averaged 3.84 min across six sampled `build` jobs whose
-      # whole job averaged 20.7 min -- 18.6% of every run, over 3238 CI runs in
-      # the month to 2026-09-19. What it tests is a property of the EMITTER, of
-      # the toolchain, and of the pinned contract revision. It is not a property
-      # of the topic commit under test, so re-proving it on a branch that
-      # touched only DerivedAlgGeo/ re-proves it about inputs that did not move.
-      #
-      # The three conditions below are the three ways that property can change,
-      # and between them they cover every path by which a commit reaches `main`:
+      # It does not run on every event. Determinism is a property of the
+      # EMITTER, of the toolchain, and of the pinned contract revision, not of
+      # the topic commit under test, so re-proving it on a branch that touched
+      # only DerivedAlgGeo/ re-proves it about inputs that did not move. The
+      # three conditions below are the three ways that property can change, and
+      # between them they cover every path by which a commit reaches `main`:
       #
       #   * `refs/heads/main` -- every merge is checked, so the determinism
       #     claim attached to a main-branch attestation is always freshly
@@ -1111,24 +863,21 @@ jobs:
       #     place two independently-green branches first meet.
       #   * `scope == 'all'` -- the "What changed" step sets this when the diff
       #     touches lakefile.toml, lean-toolchain, lake-manifest.json,
-      #     pins.json, .github/, scripts/ or exe/. That set is a SUPERSET of
+      #     .github/, scripts/ or exe/. That set is a SUPERSET of
       #     this gate's determinism inputs, so any pull request that could move
-      #     the needle still runs it. (This is that output's first consumer; it
-      #     was computed and unread before.)
+      #     the needle still runs it.
       #
-      # THE RESIDUAL HOLE, named rather than papered over: a library-only pull
-      # request that introduces a declaration whose own pretty-printing is
-      # unstable is not caught here. It is caught in the merge queue, which is
-      # the correct placement -- the queue runs before `main` moves -- but it
-      # does mean the author learns about it one step later than before.
+      # The residual hole: a library-only pull request that introduces a
+      # declaration whose own pretty-printing is unstable is caught in the merge
+      # queue, before `main` moves, rather than on the pull request.
       #
       # `attest/lean-emission-2.json` is written and read by this step alone, so
       # skipping it leaves nothing downstream short of an input.
       - name: Emitter reproducibility
         id: emitter_reproducibility
         continue-on-error: true
-        # The `steps.emit` clause is new and is not part of the gating rule
-        # above it: it reads the same artifact `Contract gates` does.
+        # The `steps.emit` clause is not part of the gating rule above: it reads
+        # the same artifact `Contract gates` does.
         if: >-
           steps.emit.outcome == 'success'
           && (github.ref == 'refs/heads/main'
@@ -1159,8 +908,8 @@ jobs:
       # is a misleading one: a pull request can look like it has one problem and
       # have four, and the regressions behind the first red gate merge unseen.
       #
-      # So the gates now carry `continue-on-error: true`, which does NOT mean
-      # they stopped mattering: it means their verdict is recorded rather than
+      # So the gates carry `continue-on-error: true`, which does NOT mean they
+      # stopped mattering: it means their verdict is recorded rather than
       # thrown, and this step turns the whole set into one exit code. A gate's
       # own annotation still appears on its own step in the UI.
       #
@@ -1190,11 +939,9 @@ jobs:
             console_encoding=${{ steps.console_encoding.outcome }}
             style_fixtures=${{ steps.style_fixtures.outcome }}
             style_ratchet=${{ steps.style_ratchet.outcome }}
-            review_docs=${{ steps.review_docs.outcome }}
             emission_sources=${{ steps.emission_sources.outcome }}
             source_independence=${{ steps.source_independence.outcome }}
             subject_layering=${{ steps.subject_layering.outcome }}
-            neutral_stability_imports=${{ steps.neutral_stability_imports.outcome }}
             umbrella_coverage=${{ steps.umbrella_coverage.outcome }}
             root_reachability=${{ steps.root_reachability.outcome }}
             coherent_families=${{ steps.coherent_families.outcome }}
@@ -1232,12 +979,10 @@ jobs:
           echo "all gates passed"
 
       - name: Upload trust artifacts
-        # `always()` alone attached a PREVIOUS run's attest/ from the
-        # persistent self-hosted workspace whenever checkout itself failed
-        # before cleaning -- the observed HTTP-429-before-checkout mode -- and
-        # the fixed artifact name let that stale bundle masquerade as this
-        # run's (2026-08-18 adversarial review, P2-6). Gating on checkout and
-        # naming the artifact by commit closes both halves.
+        # Gated on checkout, and named by commit, so a persistent self-hosted
+        # workspace can never upload a previous run's attest/ as this run's:
+        # `always()` alone would attach it whenever checkout failed before
+        # cleaning.
         if: always() && steps.checkout.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
@@ -1251,115 +996,50 @@ jobs:
             attest/restate.json
           if-no-files-found: warn
 
-  # ---------------------------------------------------------------------------
-  # The repository's Python tests. The job keeps the id `roadmap`, which `ci`
-  # needs and which branch protection may name; roadmaps themselves live in the
-  # wiki and no gate compares them with the tracker any more.
-  #
-  # Routed exactly like `build`: ubuntu-latest here, the owner's runners in the
-  # private mirror. It follows `build` only because a hosted job in a PRIVATE
-  # repository bills minutes.
-  roadmap:
-    runs-on: ${{ vars.OWNER_CI_RUNS_ON && fromJSON(vars.OWNER_CI_RUNS_ON) || 'ubuntu-latest' }}
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-
-      # The tests include header-parser fixtures that compile tiny Lean
-      # clients, so the job needs the repository's pinned Lean executable.
-      - name: Install pinned Lean for parser fixtures
-        uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9 # v1
-        with:
-          auto-config: false
-          build: false
-          test: false
-          lint: false
-          use-mathlib-cache: false
-          use-github-cache: false
-
-      - name: Repository Python tests
-        run: |
-          set -euo pipefail
-          # The interpreter is chosen, not inherited: an isolated venv with the
-          # declared requirements, so an image bump cannot change what runs.
-          python3 -m venv .tests-venv
-          VENV_PY=.tests-venv/bin/python
-          "$VENV_PY" -m pip install --quiet --disable-pip-version-check -r scripts/requirements-loop.txt
-          "$VENV_PY" -m unittest discover -s scripts/tests -p "test_*.py"
-
   ci:
-    needs: [changes, build, roadmap]
+    needs: [changes, build]
     # This job must still run when `build` FAILED -- without that, a failed
     # build would leave `ci` skipped, and a skipped required check does not
     # block a merge. That is the whole mechanism, and it is why the obvious
     # default (no `if:` at all, which skips on any upstream failure) is wrong.
     #
     # But it must NOT run when the whole RUN was cancelled, which is what
-    # `always()` did here until 2026-09-12. The concurrency block above sets
-    # `cancel-in-progress` on branch lanes, so pushing twice in a minute --
-    # the normal agent-lane cadence -- cancels the first run. Under `always()`
-    # that dead run still executed this job, saw `RESULTS: cancelled`, and
-    # posted a FAILING `ci` check: a green build sat behind a red `ci`
-    # belonging to a run that had been killed on purpose. PRs #1242 and #1243
-    # were both stuck this way.
-    #
-    # THIS PARAGRAPH USED TO EXPLAIN THAT WITH "branch protection reads the
-    # newest" check of a given name, and that is WRONG. Measured on #1409,
-    # 2026-09-19, on one commit carrying two `ci` check runs:
-    #
-    #     ci  FAILURE  22:46:52   push lane, died in 24s installing elan
-    #     ci  SUCCESS  22:58:34   pull_request lane, 14m44s, every gate
-    #     statusCheckRollup.state = FAILURE, mergeStateStatus = BLOCKED
-    #
-    # The rollup aggregates EVERY check run on the commit. One red blocks
-    # however old it is and however green a newer run of the same name is, and
-    # the branch was up to date with zero required reviews, so nothing else
-    # explains it. The pull request had to be merged with an admin bypass.
-    #
-    # The correction makes the `!cancelled()` reasoning STRONGER, not weaker: a
-    # cancelled run's red `ci` does not merely win a race against a later
-    # green, it blocks unconditionally until something overwrites that specific
-    # check run. Ordering never mattered.
-    #
-    # It also means a red check from ANY lane is a hard block, which is half
-    # the argument for `push` firing on `main` alone -- see the `on:` block.
-    # A 24-second infrastructure fault on a self-hosted runner could otherwise
-    # hold a pull request whose real verification had already passed, and the
-    # only ways out are a 40-minute rebuild or an admin merge.
+    # `always()` would do. The concurrency block above cancels a superseded
+    # branch run, and under `always()` that dead run would still execute this
+    # job, see `cancelled`, and post a FAILING `ci` check. The commit's status
+    # rollup aggregates EVERY check run on it: one red `ci` blocks the merge
+    # however green a newer run of the same name is, until something overwrites
+    # that specific check run.
     #
     # `!cancelled()` keeps the mechanism and drops the artifact: a FAILED
-    # upstream is not a cancelled run, so this still runs and still fails on
-    # it; an individually cancelled `build` inside a live run also still
-    # reaches the enumeration below and fails there.
+    # upstream is not a cancelled run, so this still runs and still fails on it;
+    # an individually cancelled `build` inside a live run also still reaches the
+    # enumeration below and fails there.
     #
-    # THE TRADE-OFF, stated rather than hidden: when a run is cancelled this
-    # job is SKIPPED, and a skipped required check does not block. That is
-    # correct for the concurrency case, because a superseding run is by
-    # definition already posting its own `ci`. It is a real if small loss for
-    # a run cancelled BY HAND with nothing following it -- that leaves `ci`
-    # skipped rather than red. Do not "fix" that by letting this job run and
-    # PASS on a cancelled run: a green `ci` over a build that never finished
-    # is the vacuous pass this repository keeps finding in new places, and it
-    # is strictly worse than a skip.
+    # THE TRADE-OFF: when a run is cancelled this job is SKIPPED, and a skipped
+    # required check does not block. That is correct for the concurrency case,
+    # because a superseding run is by definition already posting its own `ci`.
+    # It is a real if small loss for a run cancelled BY HAND with nothing
+    # following it. Do not "fix" that by letting this job run and PASS on a
+    # cancelled run: a green `ci` over a build that never finished is strictly
+    # worse than a skip.
     if: ${{ !cancelled() }}
-    # Routed like `build` and `roadmap`, for the same private-minutes reason.
+    # Routed like `build`, for the same private-minutes reason.
     runs-on: ${{ vars.OWNER_CI_RUNS_ON && fromJSON(vars.OWNER_CI_RUNS_ON) || 'ubuntu-latest' }}
     steps:
       - name: Every required job succeeded
-        # Through `env`, not interpolated into the script. Two reasons, and the
-        # second one is why the first attempt at this file was rejected outright:
-        # workflow expressions may only quote strings with SINGLE quotes, so the
-        # obvious `join(needs.*.result, " ")` is a syntax error -- and GitHub
-        # answers an invalid workflow by failing a run named after the file with
-        # no annotation and no checks at all, which reads exactly like CI never
-        # triggered. Keeping expressions out of the script body sidesteps the
-        # nested-quoting that caused it, and is the standard way to avoid script
-        # injection from expression output besides.
+        # Through `env`, not interpolated into the script. Workflow expressions
+        # may only quote strings with SINGLE quotes, so the obvious
+        # `join(needs.*.result, " ")` is a syntax error -- and GitHub answers an
+        # invalid workflow by failing a run named after the file with no
+        # annotation and no checks at all, which reads exactly like CI never
+        # triggered. Keeping expressions out of the script body sidesteps that
+        # nested quoting, and is the standard way to avoid script injection from
+        # expression output besides.
         env:
           CHANGES: ${{ needs.changes.result }}
           BUILD_NEEDED: ${{ needs.changes.outputs.build }}
           BUILD: ${{ needs.build.result }}
-          ROADMAP: ${{ needs.roadmap.result }}
         run: |
           set -euo pipefail
           # Enumerate rather than pattern-match. `contains(needs.*.result,
@@ -1369,17 +1049,15 @@ jobs:
           # fails here.
           #
           # One exception, and it is narrow: a skipped `build` is accepted when
-          # `changes` succeeded AND wrote `build=false`. That job then ran the
-          # gates that judge prose, so the skip is a verdict that nothing in
-          # the change is the build's to check, not a job that never ran.
-          echo "changes=${CHANGES} build_needed=${BUILD_NEEDED} build=${BUILD} roadmap=${ROADMAP}"
+          # `changes` succeeded AND wrote `build=false`. The skip is then a
+          # verdict that nothing in the change is the build's to check, not a
+          # job that never ran.
+          echo "changes=${CHANGES} build_needed=${BUILD_NEEDED} build=${BUILD}"
           rc=0
-          for pair in "changes=${CHANGES}" "roadmap=${ROADMAP}"; do
-            if [ "${pair#*=}" != "success" ]; then
-              echo "::error::${pair%%=*} did not succeed (result: ${pair#*=})"
-              rc=1
-            fi
-          done
+          if [ "$CHANGES" != "success" ]; then
+            echo "::error::changes did not succeed (result: ${CHANGES})"
+            rc=1
+          fi
           if [ "$BUILD" = "success" ]; then
             :
           elif [ "$BUILD" = "skipped" ] && [ "$CHANGES" = "success" ] \

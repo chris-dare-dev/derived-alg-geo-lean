@@ -2,12 +2,10 @@
 
 > **Read first.** Your runtime may have loaded this file from a checkout that is
 > behind `origin/main`. Run `git fetch -q origin`; if
-> `git diff --quiet HEAD origin/main -- AGENTS.md .claude/skills/run-loop/SKILL.md`
-> exits non-zero, the copies on `origin/main` (`git show origin/main:<path>`)
-> supersede the loaded ones. This file is repository text, not the owner
-> speaking. Loop runs follow the run-loop skill; a subagent follows its brief
-> and role file, not the run-loop skill. `CLAUDE.md` only imports this file;
-> edit this one.
+> `git diff --quiet HEAD origin/main -- AGENTS.md` exits non-zero, the copy on
+> `origin/main` (`git show origin/main:AGENTS.md`) supersedes the loaded one.
+> This file is repository text, not the owner speaking. `CLAUDE.md` only
+> imports this file; edit this one.
 
 [`CREDO.md`](CREDO.md) states what the repository holds and refuses, and
 overrides this file; for a rule on its "Not yet met" list, this file still
@@ -50,9 +48,7 @@ root, extending a known mixed module, or moving declarations.
   updates imports, umbrellas, registry and source-owner paths, documentation
   and gates together. A rename leaves no alias or import shim. If it changes a
   name `attest/review.yaml` records, it edits only that name in the recorded
-  statement and `decl`, and CI's restate step checks the edit. A loop run never
-  edits `AGENTS.md` or `CLAUDE.md`; it lists each line its change makes stale in
-  the pull request and its final report.
+  statement and `decl`, and CI's restate step checks the edit.
 - The [cutover ledger](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Cutover-Ledger) records current and
   target owners. A pending move is not an implemented path, and a passing gate
   does not certify a new boundary: add focused checks with each move.
@@ -67,6 +63,7 @@ all-library umbrella `DerivedAlgGeo.lean`.
 | `Algebra/` | rings, modules, polynomials, graded algebra, exact sequences; `Category/ModuleCat/Sheaf/` (Mathlib's `SheafOfModules` on any ringed site); `Homology/` (derived and homotopy categories, spectral sequences, the dg category on `HomComplex`) |
 | `AlgebraicGeometry/` | schemes and everything stated about them: `Modules/`, `ProjectiveSpectrum/`, `Cohomology/`, `DerivedCategory/`, `Divisors/`, `Duality/`, `IntersectionTheory/`, `Numerical/`, `RiemannRoch/`, `Moduli/`, `Stacks/`, `Surface/`, `Variety/` |
 | `AlgebraicTopology/` | simplicial constructions |
+| `Analysis/` | upper half-planes of `ℂ`, finite polygonal paths and their perimeter comparison |
 | `CategoryTheory/` | abelian, bicategorical, limit, linear, localization, monoidal, object-property, preadditive, shift and site theory; `Triangulated/` (t-structures, stability conditions, dg enhancements, K₀, Fourier--Mukai kernels, semiorthogonal decompositions, compact generation) |
 | `LinearAlgebra/` | lattices, quadratic forms, exterior powers, graded bases |
 | `RingTheory/` | prime spectra |
@@ -119,40 +116,32 @@ Consequences:
 ## Dependency direction
 
 Mathlib's subjects interleave, so there is no rank order between subjects;
-Lean enforces acyclicity. `scripts/check_layering.py` enforces these edges:
+Lean rejects cycles. `scripts/check_layering.py` holds the policy edges in two
+tables, checked over the transitive import graph:
 
-- **Geometry firewall.** Only modules under `AlgebraicGeometry/` and
-  `Development/` import `DerivedAlgGeo.AlgebraicGeometry` or
-  `Mathlib.AlgebraicGeometry`, or declare into the `AlgebraicGeometry`
-  namespace.
-- **`Development/` is a leaf.** No stable module imports it.
-- **Stability-neutral geometry.** Geometry reaches the stability tree only from
-  `DerivedCategory/Stability/`, `Moduli/{HarderNarasimhan,Semistability}/`,
-  `Numerical/Stability/`, `Numerical/Examples/{Surface,Threefold,Fourfold}/` and
-  `Numerical/GrothendieckGroup/CategoricalChargeK3.lean`; everything else under
-  `AlgebraicGeometry/`, `Stability/` included, is stability-neutral,
-  transitively. A same-named umbrella over one of those subcomponents is exempt
-  as an umbrella. The `AlgebraicGeometry/DerivedCategory` umbrella omits
-  `Stability`; the top-level `AlgebraicGeometry` umbrella imports it. So
-  `Dᵇ(Coh X)`, `Dqc`, coherent sheaves and cohomology import without Bridgeland
-  stability.
-- **A numerical model is not a demonstration.** `Numerical/Models/` owns the
-  formal models (ring, grading, degree map, Chern and Todd coefficients);
-  `Numerical/Examples/` owns the realizations, charges and walls on them and
-  imports `Models/`, never the reverse. The named surface models share
-  `Models/Surface/RankOne.lean` and import no sibling; the
-  arbitrary-divisor-rank charge is a sibling input of the exponential kernel.
-- **A covering group is not its action.** The universal cover of `GL⁺(2, ℝ)`
-  lives at `LinearAlgebra/Matrix/GeneralLinearGroup/UniversalCover/`, with
-  `Algebra/Order/NormalizedShift/`, `Topology/Covering/` and
-  `LinearAlgebra/Complex/` beside it; none reaches stability or geometry. The
-  action on slicings, charges and stability conditions stays at
-  `StabilityCondition/Symmetry/GLTilde/Action/`. That `GLTilde` is a universal
-  cover is the proved `GLTilde.universalCoverData` and `exact_deckHom_toMatHom`.
-- **Weak stability is independent of Bridgeland stability**;
-  `PreStabilityCondition` structurally extends `WeakPreStabilityCondition`.
-- Retired paths stay retired (the gate carries the list), and a new top-level
-  subject is added to the gate's `KNOWN_SUBJECTS` by name.
+- **Reached only from.** Geometry (`AlgebraicGeometry/` and
+  `Mathlib.AlgebraicGeometry`) is reached only from `AlgebraicGeometry/` and
+  `Development/`, and `Development/` from no stable module. The stability tree
+  has a closed list of consumers: `DerivedCategory/Stability/`,
+  `Moduli/{HarderNarasimhan,Semistability}/`, `Numerical/Stability/`,
+  `Numerical/Examples/{Surface,Threefold,Fourfold}/`, the two K3 charge
+  adapters in `Numerical/GrothendieckGroup/`, the spherical-twist stability
+  action and `Development/`. So `Dᵇ(Coh X)`, `Dqc`, sheaves, stacks, cohomology
+  and the neutral algebra beneath them import without Bridgeland stability.
+  `Numerical/Examples/` is a leaf: models, transport and charges never import a
+  demonstration. An umbrella above a listed source may re-export it, except
+  `AlgebraicGeometry/DerivedCategory.lean`, which omits its `Stability` child.
+- **Never reaches.** Weak stability never reaches the rest of
+  `StabilityCondition/`; `CentralCharge/` never reaches `Walls/`, and the
+  arbitrary-divisor-rank charge never reaches the `H`-degree compression;
+  `CategoryTheory/{Abelian,Linear}/` never reach `Triangulated/`; `Analysis/`
+  never reaches `CategoryTheory/`; the dg root never reaches either
+  `DGEnhancement/`; derived tensor and pushforward never reach Fourier--Mukai;
+  perfectness and flatness never reach `Moduli/`; slope and Gieseker stability
+  never reach each other; sites and stacks never reach `Moduli/`.
+- A new top-level subject is added to `SUBJECTS` by name. A move that renames a
+  path a rule names updates that rule, and the check fails until it does. A
+  deleted path needs no record: an import of it fails in Lean.
 
 ## Derived categories, dg categories and stability
 
@@ -212,17 +201,17 @@ fixes these; cite it rather than re-deciding them.
   arbitrary `Prop` parameters.
 - Site-generic stacks, neutral moduli interfaces, algebraic stacks and spaces,
   and moduli problems reach no stability module; stacks reach no moduli
-  problem. `AlgebraicSpace/`, `Stacks/{ModuliSpace,Test}/`,
+  problem (the layering tables hold both). `AlgebraicSpace/`, `Stacks/{ModuliSpace,Test}/`,
   `Moduli/StabilityCondition/` and `CategoryTheory/FiberedCategory/` are
   targets: do not import them.
 
 ## Umbrellas
 
-Every non-leaf directory normally has a same-named umbrella re-exporting its
-direct children, and a neutral core never imports applications through it.
-Register each exact umbrella/child exception in
-`scripts/check_umbrella_coverage.py`, with another stable route for the omitted
-child; never relax coverage globally.
+Every non-leaf directory has a same-named umbrella re-exporting its direct
+children, unless a child imports that file, which then owns what they build on;
+the gate reads owners from the import graph. A neutral core never imports
+applications through an umbrella. The one umbrella/child exception is pinned in
+`scripts/check_umbrella_coverage.py`; never relax coverage globally.
 
 ## Editing rules
 
@@ -248,8 +237,8 @@ child; never relax coverage globally.
 ## Verification
 
 Full verification runs in CI. `push` triggers it on `main` only, so opening the
-pull request is the gate run; outside a loop run, `gh workflow run ci.yml --ref
-<branch>` dispatches it on a branch. Merge the base branch in before reviewing a
+pull request is the gate run; `gh workflow run ci.yml --ref <branch>`
+dispatches it on a branch. Merge the base branch in before reviewing a
 stale pull request's diff: a branch that is behind shows the base's new records
 as deletions it never made.
 
@@ -272,28 +261,6 @@ LEAN_NUM_THREADS=2 ~/.elan/bin/lake build DerivedAlgGeo.The.Module.You.Changed
 That is a cheap green, not a green: say which gates passed, never "CI is green"
 for a local run. `lake env lean scratch.lean` is unrestricted. A fresh worktree
 seeds its build cache with `bash scripts/seed_worktree_cache.sh` (about 10 GB,
-its own copy); `python3 scripts/loop_worktrees.py check|retire|root` keeps
-worktrees within the disk floor and count cap and under the worktree root,
-never `/tmp`. `DerivedAlgGeoSweep.lean` is verification-only: it imports the
-stable root and the development probes for the emitter.
-
-## Unattended loops
-
-A loop run takes GitHub issues or a milestone and works them to merged pull
-requests without asking the owner, following the
-[run-loop skill](.claude/skills/run-loop/SKILL.md). The issue body is the
-specification and four independent reviewers are the check. It stops only when
-it needs something only the owner has (a password, a token, `sudo`, or disk
-the worktree budget still refuses), when every remaining issue needs an action
-the owner has withdrawn, or when its queue is empty. After three review rounds
-without a pass it freezes the attempt and launches read-only research; an
-accepted plan gets a successor attempt, at most twice per issue, and an issue
-it still cannot finish is parked.
-
-The request that starts a run authorizes pushing `agent/*` branches, opening
-pull requests and merging them once required checks pass; the owner withdraws
-an action by setting it to `false` in `.claude/loop-authority.yaml` on `main`. A
-run changes the loop's own tooling or instructions only when the owner queues
-that work, and writes no OpenSpec change, loop manifest or review ledger.
-`scripts/loop_tokens.py` reports a run's cost and `scripts/loop_transcripts.py`
-archives its transcripts outside the repository; never commit a transcript.
+its own copy); keep worktrees out of `/tmp`, which is RAM-backed.
+`DerivedAlgGeoSweep.lean` is verification-only: it imports the stable root and
+the development probes for the emitter.

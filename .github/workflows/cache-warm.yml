@@ -2,23 +2,16 @@ name: Cache warm
 
 # The writer for the `.lake/build` cache that CI's hosted lane restores.
 #
-# WHY THIS IS ITS OWN WORKFLOW AND NOT A JOB IN `ci.yml`. It started as a job
-# there and was cancelled on its first real run, 11 minutes into a 25-minute
-# cold build. `ci.yml` sets a workflow-level `cancel-in-progress: true` keyed on
-# `github.ref`, and every push to `main` shares the ref `refs/heads/main` -- so
-# each merge cancelled the warm job started by the merge before it. At the
-# current cadence (158 merges in the two days to 2026-08-15) that job would
-# essentially never have finished, and the cache it exists to write would never
-# have appeared.
-#
-# Job-level `concurrency` cannot fix that: cancelling a RUN cancels its jobs
-# whatever their own groups say. The two workloads simply want opposite
-# policies. `build` should be superseded -- an older commit's result is of no
-# interest once a newer one is in flight. `cache-warm` must not be, because its
-# whole value is finishing. Opposite policies need separate workflows.
-#
-# Splitting it out has a second benefit: it stops `cache-warm: skipping` from
-# appearing on every pull request's check list, where it meant nothing.
+# WHY THIS IS ITS OWN WORKFLOW AND NOT A JOB IN `ci.yml`. `ci.yml` cancels a
+# superseded run, and a cache-warm job inside it would be cancelled by every
+# merge that arrived during its cold build, so the cache it exists to write
+# would rarely appear. Job-level `concurrency` cannot fix that: cancelling a RUN
+# cancels its jobs whatever their own groups say. The two workloads want
+# opposite policies. `build` should be superseded -- an older commit's result is
+# of no interest once a newer one is in flight. `cache-warm` must not be,
+# because its whole value is finishing. Opposite policies need separate
+# workflows, and a separate workflow also keeps a meaningless `cache-warm:
+# skipping` off every pull request's check list.
 
 on:
   push:
@@ -44,20 +37,17 @@ concurrency:
 jobs:
   warm:
     # The cache is a linux-x86_64 artifact, so a linux-x86_64 runner has to
-    # produce it. CI's `build` job on a `push` runs on the self-hosted Mac, which
-    # is the fast lane precisely because it never needs this cache -- it keeps
-    # its own 8.3 GB `.lake` between runs. Asking that job to also emit a Linux
-    # cache is asking it to emit an artifact for a machine it is not. So: `main`
-    # moves, a hosted runner rebuilds from the previous hosted state and
-    # publishes the result, and every PR branched from `main` restores it through
-    # GitHub's default-branch fallback. Free on a public repository.
+    # produce it: `main` moves, a hosted runner rebuilds from the previous
+    # hosted state and publishes the result, and every PR branched from `main`
+    # restores it through GitHub's default-branch fallback. Free on a public
+    # repository.
     #
     # This gates nothing and is not a required check: CI's `build` on the same
-    # commit has already made the correctness claim, and this repeats none of it.
-    # It is deliberately NOT `continue-on-error` either -- a warm cache that
-    # quietly stopped being produced is exactly the "gate that silently does not
-    # run" failure this repository keeps writing comments about, and a visible
-    # red mark on a workflow nothing depends on is the cheapest way to notice.
+    # commit has already made the correctness claim, and this repeats none of
+    # it. It is deliberately NOT `continue-on-error` either -- a warm cache that
+    # quietly stopped being produced is a gate that silently does not run, and a
+    # visible red mark on a workflow nothing depends on is the cheapest way to
+    # notice.
     #
     # Public repository only. The private owner mirror sets OWNER_CI_RUNS_ON
     # (see `build` in ci.yml); nothing there restores this cache, because the
@@ -73,9 +63,8 @@ jobs:
 
       # Prefix-only restore: the exact key carries this commit's sha and by
       # definition does not exist yet. This is what makes the warm run itself
-      # incremental -- it rebuilds the merge's downstream cone, not all 377
-      # modules. Measured over 218 historical commits, that cone is a median of
-      # 115 modules and 989 of 4969 CPU-seconds.
+      # incremental -- it rebuilds the merge's downstream cone, not the whole
+      # library.
       - name: Restore previous build output
         uses: actions/cache/restore@v4
         with:
@@ -84,10 +73,9 @@ jobs:
           restore-keys: |
             lake-build-linux-${{ hashFiles('lean-toolchain', 'lake-manifest.json') }}-
 
-      # Pinned to the same commit as ci.yml: `v1` is a moving tag, and this
-      # job writes the build cache the required CI lane restores, so a floating
-      # tag here is a supply-chain channel into a required check (2026-08-18
-      # adversarial review, P2-5).
+      # Pinned to the same commit as ci.yml: `v1` is a moving tag, and this job
+      # writes the build cache the required CI lane restores, so a floating tag
+      # here is a supply-chain channel into a required check.
       - uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9 # v1
         with:
           build: true
@@ -104,13 +92,12 @@ jobs:
       # alone. The gates in `ci.yml` need more than that, and a cache that omits
       # them leaves the hosted lane paying for them from cold every time.
       #
-      # `emit` is in this list although `ci.yml` no longer builds it. Linking the
-      # executable compiles every transitively imported module to a native object
-      # -- 4173 Mathlib `:c.o` targets -- which is why the per-pull-request path
-      # now runs the emitter interpreted instead. Keeping it HERE, off the
-      # critical path where nothing waits on it, is what still proves once per
-      # merge that the executable links on Linux at all. exe/Emit.lean records
-      # that it cannot be linked on Windows, so this is the only check there is.
+      # `emit` is in this list although `ci.yml` does not build it. Linking the
+      # executable compiles every transitively imported module to a native
+      # object, which is why the per-pull-request path runs the emitter
+      # interpreted. Keeping it HERE, off the critical path where nothing waits
+      # on it, is what still proves once per merge that the executable links on
+      # Linux at all.
       - name: Build the targets the gates add
         run: |
           set -euo pipefail
