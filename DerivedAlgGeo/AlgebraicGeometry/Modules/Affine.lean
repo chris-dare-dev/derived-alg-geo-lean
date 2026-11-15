@@ -12,9 +12,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Gluing
 Mathlib provides the affine-scheme, quasi-coherent module-sheaf, and general localization-criterion
 foundations; this directory retains a local formulation using
 `AlgebraicGeometry.Scheme.Modules.basicOpenRestriction` and adds
-basic-open presentation covers and bridges. See the
-[affine and projective spectrum placement map](../../../docs/architecture/placement.md) for the
-source owners and the existing Proj chart dependency.
+basic-open presentation covers and bridges.
 
 ## Main definitions
 
@@ -44,8 +42,6 @@ Projective module charts consume `Extension` through
 
 * [Stacks, Tag 01IA](https://stacks.math.columbia.edu/tag/01IA), for the affine
   quasi-coherent comparison.
-* See the [affine and projective spectrum placement map](../../../docs/architecture/placement.md)
-  for pinned Mathlib source links.
 
 ## Tags
 
