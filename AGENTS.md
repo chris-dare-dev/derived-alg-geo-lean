@@ -48,10 +48,9 @@ root, extending a known mixed module, or moving declarations.
   ordinary `H⁰` presentations and exact enhancements.
 - Record the decision in the issue or pull request. A structural change
   updates imports, umbrellas and source-owner paths, documentation and gates
-  together. A retired name is not kept, neither as an alias nor through an
-  import shim at a retired path. A loop run never edits `AGENTS.md` or
-  `CLAUDE.md`; it lists each line its change makes stale in the pull request
-  and its final report.
+  together. A rename leaves no alias or import shim. A loop run never edits
+  `AGENTS.md` or `CLAUDE.md`; it lists each line its change makes stale in
+  the pull request and its final report.
 - The [cutover ledger](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Cutover-Ledger) records current and
   target owners. A pending move is not an implemented path, and a passing gate
   does not certify a new boundary: add focused checks with each move.
