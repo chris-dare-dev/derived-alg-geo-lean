@@ -243,7 +243,7 @@ The hypotheses on `S` and `p` other than local Noetherianity are load-bearing:
 * `LocallyOfFiniteType p`: take `X = Spec ∏_ℓ 𝔽_ℓ` over `S = Spec ℤ`, with `F = 𝒪_X`. After
   inverting any `n ≠ 0`, the idempotent of `𝔽_ℓ` for a prime `ℓ ∤ n` is nonzero and killed by
   `ℓ`, so the ring is not flat over `ℤ[1/n]`. -/
-@[stacks 052B]
+@[stacks 052B "flatness of `F`, over a locally Noetherian base"]
 theorem exists_dense_isFlatOver [IsReduced S] [IsLocallyNoetherian S] [LocallyOfFiniteType p]
     [QuasiCompact p] (F : X.Modules) (hF : IsCoherent X F) :
     ∃ U : S.Opens, Dense (U : Set S) ∧ IsFlatOver (p ∣_ U) (F.restrict (p ⁻¹ᵁ U).ι) := by
@@ -304,7 +304,8 @@ private theorem exists_flatStratification_closeds [IsNoetherian S] [LocallyOfFin
       (∀ j, IsImmersion (ι j)) ∧ (∀ j, IsReduced (W j)) ∧
       (⋃ j, Set.range (ι j)) = Z ∧
       Pairwise (fun j k ↦ Disjoint (Set.range (ι j)) (Set.range (ι k))) ∧
-      ∀ j, IsFlatOver (pullback.snd p (ι j)) ((Scheme.Modules.pullback (pullback.fst p (ι j))).obj F) := by
+      ∀ j, IsFlatOver (pullback.snd p (ι j))
+        ((Scheme.Modules.pullback (pullback.fst p (ι j))).obj F) := by
   induction Z using WellFoundedLT.induction with
   | _ Z ih =>
   rcases (Z : Set S).eq_empty_or_nonempty with hZ | hZ

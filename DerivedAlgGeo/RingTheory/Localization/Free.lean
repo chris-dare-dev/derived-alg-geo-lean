@@ -64,6 +64,8 @@ Project uses.
   Noetherian domain, proved there by induction on `dim (K ⊗_R S)`.
 * [Stacks, Tag 051Z](https://stacks.math.columbia.edu/tag/051Z): the reduced variant, over a dense
   open of `Spec R`.
+* A. Grothendieck, *EGA IV₂*, Lemme 6.9.2: generic freeness over a Noetherian domain, proved
+  there by induction on the dimension of the support of `K ⊗_R M`.
 * N. Nitsure, *Construction of Hilbert and Quot schemes*, arXiv:math/0504590, Lemma 4.1.
 
 ## Tags
@@ -79,7 +81,7 @@ namespace Module
 
 section Filtration
 
-variable {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M]
+variable {R M : Type*} [Ring R] [AddCommGroup M] [Module R M]
 
 /-- A module with an increasing exhaustive filtration, starting at `⊥`, whose successive quotients
 are free is free: lifts of bases of the quotients form a basis. -/
@@ -154,10 +156,11 @@ end Filtration
 
 section Away
 
-variable {R M N : Type*} [CommRing R] [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
+variable {R M N : Type*} [CommSemiring R] [AddCommMonoid M] [Module R M] [AddCommMonoid N]
+  [Module R N]
 
 /-- Freeness of `M_f` passes to any localization of `M` at the powers of `f`. -/
-private theorem free_of_isLocalizedModule_away (f : R) {M' : Type*} [AddCommGroup M']
+private theorem free_of_isLocalizedModule_away (f : R) {M' : Type*} [AddCommMonoid M']
     [Module R M'] [Module (Localization.Away f) M'] [IsScalarTower R (Localization.Away f) M']
     (g : M →ₗ[R] M') [IsLocalizedModule (Submonoid.powers f) g]
     [Module.Free (Localization.Away f) (LocalizedModule (Submonoid.powers f) M)] :
@@ -207,6 +210,12 @@ private theorem free_away_mul (f g : R)
   exact (IsBaseChange.of_comp (IsLocalizedModule.isBaseChange (Submonoid.powers f) A₁ mk₁)
     hb).free
 
+end Away
+
+section AwayFiltration
+
+variable {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M]
+
 /-- If the successive quotients of a filtration as in `free_of_filtration` become free after
 inverting `f`, then so does `M`: localization preserves the filtration and its quotients. -/
 private theorem free_away_of_filtration (f : R) (F : ℕ → Submodule R M) (hmono : Monotone F)
@@ -248,7 +257,7 @@ private theorem free_away_of_filtration (f : R) (F : ℕ → Submodule R M) (hmo
     free_of_isLocalizedModule_away f (P.toLocalizedQuotient' A T ν)
   exact Module.Free.of_equiv (Submodule.quotEquivOfEq _ _ heq)
 
-end Away
+end AwayFiltration
 
 section Generic
 
@@ -281,7 +290,7 @@ private theorem exists_free_away_of_finite [IsNoetherianRing R] (p : Ideal R) [p
 `x`, and suppose that every finite `S'`-module becomes free over `R` after inverting some
 `f ∉ p`. Then so does every finite `S`-module. -/
 private theorem exists_free_away_of_adjoin_singleton {S' S : Type*} {M : Type w} [CommRing S']
-    [CommRing S] [Algebra R S'] [Algebra S' S] [IsNoetherianRing S'] (p : Ideal R) [p.IsPrime]
+    [CommSemiring S] [Algebra R S'] [Algebra S' S] [IsNoetherianRing S'] (p : Ideal R) [p.IsPrime]
     (x : S) (hx : Algebra.adjoin S' {x} = ⊤) [AddCommGroup M] [Module S M] [Module S' M]
     [Module R M] [IsScalarTower S' S M] [IsScalarTower R S' M] [Module.Finite S M]
     (IH : ∀ (N : Type w) [AddCommGroup N] [Module S' N] [Module R N] [IsScalarTower R S' N]
@@ -401,7 +410,8 @@ private theorem exists_free_away_of_adjoin_singleton {S' S : Type*} {M : Type w}
     | succ j ih =>
       exact free_away_of_linearEquiv f
         ((LinearEquiv.ofBijective (φ (K + j)) ⟨hinj _ (by omega), hφ _⟩).restrictScalars R)
-  have hQ : ∀ k, Module.Free (Localization.Away f) (LocalizedModule (Submonoid.powers f) (Q k)) := by
+  have hQ : ∀ k, Module.Free (Localization.Away f)
+      (LocalizedModule (Submonoid.powers f) (Q k)) := by
     intro k
     rcases le_or_gt k K with hk | hk
     · exact hQle k hk
@@ -448,7 +458,8 @@ private theorem exists_free_away_of_adjoin_eq_top [IsNoetherianRing R] (p : Idea
     have hx : Algebra.adjoin S' {g 0} = ⊤ := by
       rw [← Fin.cons_self_tail g, Fin.range_cons, Set.insert_eq, Set.union_comm,
         Algebra.adjoin_union_eq_adjoin_adjoin] at hg
-      exact Subalgebra.restrictScalars_injective R (hg.trans (Subalgebra.restrictScalars_top R).symm)
+      exact Subalgebra.restrictScalars_injective R
+        (hg.trans (Subalgebra.restrictScalars_top R).symm)
     exact exists_free_away_of_adjoin_singleton p (g 0) hx fun N _ _ _ _ _ ↦ ih g' hg' N
 
 end Generic
@@ -486,7 +497,7 @@ of `R`, `M_f` is free over `R_f` for some `f ∉ p`.
 
 This is the pointwise content of Stacks Lemma 051Z for Noetherian `R`: the `D(f)` so obtained,
 one for each of the finitely many minimal primes, cover a dense open of `Spec R`. -/
-@[stacks 051Z]
+@[stacks 051Z "pointwise, for Noetherian `R`"]
 theorem exists_notMem_free_localizedModule_away_of_mem_minimalPrimes [IsReduced R] (p : Ideal R)
     (hp : p ∈ minimalPrimes R) :
     ∃ f ∉ p, Module.Free (Localization.Away f) (LocalizedModule (Submonoid.powers f) M) := by
