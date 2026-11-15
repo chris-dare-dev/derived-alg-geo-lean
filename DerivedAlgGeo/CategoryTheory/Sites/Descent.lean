@@ -7,6 +7,7 @@ import DerivedAlgGeo.CategoryTheory.Sites.Descent.DescentDataAsCoalgebra
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.DescentDataPrime
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.FiberProduct
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.IsStack
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.Local
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.ObjectProperty
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Discrete
@@ -51,6 +52,9 @@ its directory, so this umbrella imports the children directly.
   reindexing along a functor that preserves the pullbacks involved.
 * `FiberProduct.lean`: the 2-fibre product of two stacks over a prestack is a
   stack, and the terminal pseudofunctor is a stack.
+* `Local.lean`: effective descent along a covering sieve can be checked on the
+  members of a covering family of a second topology for which the pseudofunctor is a
+  stack.
 * `ObjectProperty.lean`: the core of a stack is a stack, and a local object
   property closed under isomorphisms cuts out a substack.
 * `ULift.lean`: a pseudofunctor is a prestack (a stack) exactly when its universe lift is.
