@@ -6,6 +6,7 @@ import DerivedAlgGeo.CategoryTheory.Sites.Descent.DescentData
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.DescentDataAsCoalgebra
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.DescentDataPrime
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.IsStack
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.Local
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Discrete
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Morphism
@@ -36,6 +37,9 @@ its directory, so this umbrella imports the children directly.
   comonadicity of its pullback functor, under the base change hypotheses.
 * `DescentDataPrime.lean`: effective descent along one morphism is unchanged by
   reindexing along a functor that preserves the pullbacks involved.
+* `Local.lean`: effective descent along a covering sieve can be checked on the
+  members of a covering family of a second topology for which the pseudofunctor is a
+  stack.
 
 ## Implementation notes
 

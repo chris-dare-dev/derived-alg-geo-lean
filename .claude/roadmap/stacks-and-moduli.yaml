@@ -474,7 +474,7 @@ items:
     kind: task
     parent: stacks-and-moduli-stk2
     title: "STK2.7: Sheaves on a slice are sheaves over the representable, and effective descent is local on the base"
-    status: planned
+    status: done
     priority: must
     size: M
     summary: "Two site-generic tools that the stack criterion of #1642 and the base comparison of #1645 both need. Neither mentions schemes."
