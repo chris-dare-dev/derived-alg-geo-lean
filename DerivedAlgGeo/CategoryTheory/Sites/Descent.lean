@@ -59,8 +59,8 @@ its directory, so this umbrella imports the children directly.
   stack.
 * `ObjectProperty.lean`: the core of a stack is a stack, and a local object
   property closed under isomorphisms cuts out a substack.
-* `Over.lean`: the pullback of a stack along a continuous functor is a stack, and a stack on
-  `C` restricts to `Over S` along `Over.forget S` and along `X ×_S -`.
+* `Over.lean`: the pullback of a stack along a continuous functor is a stack, so a stack on
+  `C` pulls back to a stack on `Over S` along `Over.forget S` and along `X ×_S -`.
 * `ULift.lean`: a pseudofunctor is a prestack (a stack) exactly when its universe lift is.
 * `StackInGroupoids/Fibered.lean`: the Grothendieck construction of a stack in
   groupoids is a category fibred in groupoids (`StackInGroupoids.isStronglyCartesian`).
