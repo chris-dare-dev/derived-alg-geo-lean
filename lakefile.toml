@@ -38,6 +38,28 @@ rev = "5ddf2536e5e57097e568b63b9de06ec00fc8930d"
 [[lean_lib]]
 name = "DerivedAlgGeo"
 
+# Mathlib's standard linter set, as Mathlib enables it for itself. It is switched on in this
+# library's own table, not in `weakLeanArgs`, because Lake traces this table: changing a value
+# here rebuilds the library, so a linter switched on reports on every module instead of
+# hiding behind replayed build logs. `lake exe lint-style` reads this table too; `mfc env`
+# and `exe/Emit.lean` read only the top-level `[leanOptions]`. The set cannot switch on
+# `longFile`, which is a number, so it carries Mathlib's own limit.
+# Each linter set to `false` still has warnings in the library. The change that clears one
+# deletes its line; nothing adds a line.
+[lean_lib.leanOptions]
+weak.linter.mathlibStandardSet = true
+weak.linter.style.longFile = 1500
+weak.linter.flexible = false
+weak.linter.unusedDecidableInType = false
+weak.linter.unusedFintypeInType = false
+weak.linter.style.emptyLine = false
+weak.linter.style.header = false
+weak.linter.style.longLine = false
+weak.linter.style.maxHeartbeats = false
+weak.linter.style.multiGoal = false
+weak.linter.style.show = false
+weak.linter.style.whitespace = false
+
 # Sweep umbrella for `lake exe emit`. Separate from the stable umbrella because
 # the sorry gate must cover development probes that the public umbrella
 # intentionally excludes. See DerivedAlgGeoSweep.lean.

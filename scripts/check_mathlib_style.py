@@ -3,14 +3,13 @@
 
 This runs on every agent edit, so it must stay under ~50ms and must never need
 Lake, Lean, or the network. It deliberately does *not* re-check anything
-`lake exe lint-style` or `lake exe runLinter` already catch in CI; it covers the
-gap between an edit landing and CI running for the `DerivedAlgGeo` library.
+`lake exe lint-style`, `lake exe runLinter` or the Mathlib linters that
+`lakefile.toml` switches on already catch in CI; it covers the gap between an
+edit landing and CI running for the `DerivedAlgGeo` library.
 
-Two severities:
-
-  ERROR   objectively wrong, no judgement involved. Exits 2 so the PostToolUse
-          hook blocks and the agent fixes it before moving on.
-  WARN    a heuristic worth a human's attention. Printed, never blocks.
+Every finding is an ERROR: objectively wrong, no judgement involved. Under
+`--hook` it exits 2, so the PostToolUse hook blocks and the agent fixes it
+before moving on.
 
 Usage:
     python3 scripts/check_mathlib_style.py FILE [FILE ...]
@@ -43,8 +42,6 @@ under every unrelated edit above it -- the reason `check_warnings.py` gives for
 keying on the message instead. Unlike that gate it records the text and not only
 a count, because a per-edit hook has to name the line to fix, and a count can
 only say the file has one too many.
-
-Conventions enforced here are documented in `.claude/references/mathlib-style.md`.
 """
 
 from __future__ import annotations
@@ -78,22 +75,8 @@ DECL_RE = re.compile(
     r"(?P<kw>theorem|lemma|def|abbrev|structure|class|inductive|instance)\b"
     r"(?P<rest>.*)$"
 )
-# Declaration kinds Mathlib requires a docstring on, no exceptions.
-DOC_REQUIRED = {"def", "abbrev", "structure", "class", "inductive"}
 NAME_RE = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_.'₁-₉]*)")
 STRING_RE = re.compile(r'"(?:[^"\\]|\\.)*"')
-
-# Primed names Mathlib itself fixes: the field obligations a bundled subobject
-# or bundled hom has to discharge, where the prime is part of the required name
-# and the unprimed form is the `simp` lemma Mathlib derives from it. The author
-# does not choose these, so "say what differs from the unprimed form" is not a
-# docstring anyone can write.
-MATHLIB_PRIMED = {
-    "zero_mem'", "one_mem'", "add_mem'", "mul_mem'", "neg_mem'", "inv_mem'",
-    "sub_mem'", "div_mem'", "smul_mem'", "algebraMap_mem'", "mem_carrier'",
-    "map_zero'", "map_one'", "map_add'", "map_mul'", "map_smul'", "map_rel'",
-    "commutes'", "ext'", "coe_injective'", "toFun_eq_coe'", "nonempty'",
-}
 
 # Git writes `<<<<<<< `, `=======`, `>>>>>>> `, and -- under
 # `merge.conflictStyle = diff3` -- `||||||| `, each at the very start of a line.
@@ -254,13 +237,10 @@ def comments_only(lines: list[str]) -> list[str]:
 def conflict_markers(raw: str, lines: list[str]) -> list[Finding]:
     """Findings for git merge-conflict markers committed into the file.
 
-    Nothing else in `scripts/` catches these. Every structural gate --
-    `check_layering.py`, `check_umbrella_coverage.py`,
-    `check_source_independence.py`, `check_root_reachability.py` -- reads
-    `import` lines and ignores the rest, so a file full of `<<<<<<< HEAD`
-    passes all four. On 2026-09-16 a rebase left markers in two files, `git
-    add -A` staged them, and the defect surfaced ~13 minutes into CI as
-    `unexpected token '<<<'; expected command` (#1359, issue #1315).
+    Nothing else in `scripts/` catches these: the structural gates read
+    imports and declaration names, not the rest of a file, so a file full of
+    `<<<<<<< HEAD` passes them. Lean rejects it only once CI reaches the module,
+    as `unexpected token '<<<'; expected command`.
 
     Raw lines, not `code_only`: a conflict inside a docstring is still a
     conflict, and a conflicted file's block-comment nesting is unbalanced
@@ -367,10 +347,7 @@ def check_text(raw: str, path: Path) -> list[Finding]:
     # --- per-line -------------------------------------------------------------
     for idx, (line, c) in enumerate(zip(lines, code), start=1):
         if line.endswith("\r"):
-            out.append(Finding("ERROR", idx, "WIN", "Windows line ending."))
             line = line[:-1]
-        if line != line.rstrip():
-            out.append(Finding("ERROR", idx, "TWS", "Trailing whitespace."))
         # Lean import commands cannot be continued onto another line. Mathlib's
         # own long-line linter therefore permits long imports; a deep subject
         # hierarchy such as `CategoryTheory.Triangulated.StabilityCondition`
@@ -402,18 +379,8 @@ def check_text(raw: str, path: Path) -> list[Finding]:
         if len(line) > MAX_LINE and not is_import and not in_string and not is_table_row:
             out.append(Finding("ERROR", idx, "LONG", f"Line is {len(line)} chars; Mathlib's limit is {MAX_LINE}."))
 
-        if " ;" in c:
-            out.append(Finding("ERROR", idx, "SEM", "Space before `;`."))
-        if re.search(r"(?<![A-Za-z0-9_])λ(?![A-Za-z0-9_])", c):
-            out.append(Finding("ERROR", idx, "LAM", "Use `fun`, not `λ`."))
-        if re.search(r"\s\$\s", c):
-            out.append(Finding("ERROR", idx, "DOLLAR", "Use `<|`, not `$`."))
         if re.search(r"\bsorry\b", c):
             out.append(Finding("ERROR", idx, "SORRY", "`sorry` is forbidden in this repository (CLAUDE.md)."))
-        if "maxHeartbeats" in c and re.match(r"^\s*set_option", c) and " in" not in c:
-            out.append(
-                Finding("ERROR", idx, "HEART", "`set_option ... maxHeartbeats` must be scoped with `... in`.")
-            )
 
     for idx, comment in enumerate(comments_only(lines), start=1):
         for what, rx in PROVENANCE_RES:
@@ -444,62 +411,11 @@ def check_text(raw: str, path: Path) -> list[Finding]:
             )
 
     # --- declarations ---------------------------------------------------------
-    for idx, line in enumerate(lines, start=1):
-        m = DECL_RE.match(code[idx - 1])
-        if not m:
+    for idx, c in enumerate(code, start=1):
+        if not (m := DECL_RE.match(c)):
             continue
-        kw = m.group("kw")
         nm = NAME_RE.match(m.group("rest"))
         name = nm.group(1) if nm else "<anonymous>"
-
-        doc = preceding_docstring(lines, idx - 1)
-        # `zero_mem'`, `ext'` and friends: Mathlib fixes the name, so neither
-        # the ERROR nor the WARN below has anything the author could write.
-        explainable_prime = name.endswith("'") and name.split(".")[-1] not in MATHLIB_PRIMED
-
-        if doc is None:
-            if kw in DOC_REQUIRED:
-                out.append(
-                    Finding("ERROR", idx, "DOC", f"`{kw} {name}` has no `/-- ... -/` docstring; Mathlib requires one.")
-                )
-            elif kw in {"theorem", "lemma"}:
-                out.append(
-                    Finding("WARN", idx, "DOC", f"`{kw} {name}` has no docstring. Add one if it has mathematical content.")
-                )
-            if explainable_prime:
-                out.append(
-                    Finding(
-                        "ERROR",
-                        idx,
-                        "PRIME",
-                        f"`{name}` ends in `'` and has no docstring explaining what differs from the unprimed form.",
-                    )
-                )
-        else:
-            if explainable_prime and "'" not in doc and "prime" not in doc.lower():
-                out.append(
-                    Finding(
-                        "WARN",
-                        idx,
-                        "PRIME",
-                        f"`{name}` ends in `'`; the docstring should say what differs from the unprimed form.",
-                    )
-                )
-            if restates_the_name(doc, name):
-                out.append(
-                    Finding(
-                        "WARN",
-                        idx,
-                        "DOCECHO",
-                        f"The docstring on `{name}` reads as a translation of its name. Say why the hypothesis "
-                        "is needed, what the proof idea is, or where the result sits in the literature.",
-                    )
-                )
-
-        if kw == "def" and "_" in name.split(".")[-1]:
-            out.append(
-                Finding("WARN", idx, "DEFNAME", f"`def {name}` should be `lowerCamelCase`, not snake_case.")
-            )
         if PAPER_NUMBERING_RE.search(name.split(".")[-1]):
             out.append(
                 Finding(
@@ -512,71 +428,6 @@ def check_text(raw: str, path: Path) -> list[Finding]:
             )
 
     return out
-
-
-def preceding_docstring(lines: list[str], decl_index: int) -> str | None:
-    """Return the `/-- ... -/` docstring immediately above `lines[decl_index]`, if any.
-
-    Attributes may sit between the docstring and the declaration; a blank line
-    detaches the docstring, so it is not skipped.
-
-    An attribute can span several lines. This repository's `@[cites ...]`
-    carries its `(note := "...")` record on a line of its own, and skipping only
-    lines that *start* with `@[` stopped at that continuation, so a documented
-    declaration was reported as undocumented -- `def stabilityDist` in
-    `.../Metric/Distance/Basic.lean` was the whole of the `DOC` ERROR count.
-    A continuation is recognised by its closing `]` and walked back to its
-    opener, never across a blank line, so an ordinary `variable [Foo]` above a
-    declaration cannot be mistaken for one.
-    """
-    i = decl_index - 1
-    while i >= 0:
-        s = lines[i].strip()
-        if s.startswith("@["):
-            i -= 1
-            continue
-        if s.endswith("]") and not s.endswith("-/"):
-            j = i
-            while j >= 0 and lines[j].strip() and not lines[j].strip().startswith("@["):
-                j -= 1
-            if j < 0 or not lines[j].strip().startswith("@["):
-                break
-            i = j - 1
-            continue
-        break
-    if i < 0 or not lines[i].strip().endswith("-/"):
-        return None
-    end = i
-    while i >= 0 and "/--" not in lines[i]:
-        i -= 1
-    if i < 0:
-        return None
-    return "\n".join(lines[i : end + 1])
-
-
-_WORDS = {
-    "eq": "equal", "ne": "not", "le": "less", "lt": "less", "add": "add", "mul": "multipl",
-    "mem": "member", "iff": "if and only if", "comm": "commut", "assoc": "associat",
-    "mono": "mono", "inj": "inject", "surj": "surject", "of": "of", "self": "self",
-}
-
-
-def restates_the_name(doc: str, name: str) -> bool:
-    """Heuristic: the docstring is a word-for-word English reading of the identifier."""
-    body = re.sub(r"/--|-/", " ", doc).strip().lower()
-    body = re.sub(r"`[^`]*`", " ", body)
-    words = [w for w in re.findall(r"[a-z]+", body) if len(w) > 2]
-    if not words or len(words) > 14:
-        return False
-    parts = [p for p in re.split(r"[._]", name.lower()) if len(p) > 1]
-    if len(parts) < 2:
-        return False
-    hits = 0
-    for p in parts:
-        stem = _WORDS.get(p, p)
-        if any(w.startswith(stem[:4]) or stem.startswith(w[:4]) for w in words):
-            hits += 1
-    return hits >= max(2, len(parts) - 1)
 
 
 @functools.lru_cache(maxsize=None)
@@ -676,11 +527,7 @@ def write_style_baseline(counts: dict[tuple[str, str, str], int]) -> None:
 def split_baselined(
     path: Path, lines: list[str], findings: list[Finding]
 ) -> tuple[list[Finding], int]:
-    """Partition `findings` into what still blocks and how many the baseline covers.
-
-    Only ERRORs are ever suppressed. A WARN does not block anything, so hiding
-    one would cost information and buy nothing.
-    """
+    """Partition `findings` into what still blocks and how many the baseline covers."""
     baseline = load_style_baseline()
     if not baseline:
         return findings, 0
@@ -692,7 +539,7 @@ def split_baselined(
     covered = 0
     for f in findings:
         entry = (key, f.code, fingerprint(lines, f))
-        if f.severity == "ERROR" and budget.get(entry, 0) > 0:
+        if budget.get(entry, 0) > 0:
             budget[entry] -= 1
             covered += 1
             continue
@@ -714,8 +561,6 @@ def survey_library() -> dict[tuple[str, str, str], int]:
         text = p.read_text(encoding="utf-8")
         lines = text.split("\n")
         for f in check_text(text, p):
-            if f.severity != "ERROR":
-                continue
             entry = (rel_key(p), f.code, fingerprint(lines, f))
             counts[entry] = counts.get(entry, 0) + 1
     return counts
@@ -792,8 +637,7 @@ def self_test() -> int:
 
     A fixture is Lean source text but deliberately not a `.lean` file: it must
     reach neither `lake`, `lake exe lint-style`, the declaration sweep, nor
-    this checker's own `in_scope`. `scripts/fixtures/layering` keeps its
-    hypothetical modules out of the build the same way.
+    this checker's own `in_scope`.
     """
     failures: list[str] = []
     groups = sorted(p for p in FIXTURES.iterdir() if p.is_dir()) if FIXTURES.is_dir() else []
@@ -831,11 +675,9 @@ def self_test() -> int:
 
 
 def report(path: Path, findings: list[Finding]) -> int:
-    errors = [f for f in findings if f.severity == "ERROR"]
-    warns = [f for f in findings if f.severity == "WARN"]
-    for f in sorted(findings, key=lambda f: (f.line, f.severity)):
+    for f in sorted(findings, key=lambda f: f.line):
         print(f"{path}:{f.line}: {f.severity} [{f.code}] {f.message}", file=sys.stderr)
-    return 1 if errors else 0
+    return 1 if findings else 0
 
 
 def main(argv: list[str]) -> int:
@@ -871,7 +713,6 @@ def main(argv: list[str]) -> int:
         return 1
 
     bad = 0
-    total_warns = 0
     total_covered = 0
     checked = 0
     for p in paths:
@@ -893,12 +734,6 @@ def main(argv: list[str]) -> int:
             touched = changed_lines(diff_ref, p)
             if touched is not None:
                 findings = [f for f in findings if f.line in touched]
-        if hook_mode:
-            # An undocumented theorem is backlog, not a defect in this edit.
-            # The per-PR review agent reports it; the per-edit hook would only
-            # bury the findings that are about the code just written.
-            findings = [f for f in findings if not (f.severity == "WARN" and f.code == "DOC")]
-        total_warns += sum(1 for f in findings if f.severity == "WARN")
         bad |= report(p, findings)
 
     if not checked and not hook_mode:
@@ -907,8 +742,7 @@ def main(argv: list[str]) -> int:
     print(f"mathlib-style: {checked} in-scope file(s) checked")
     if bad:
         print(
-            "\nMathlib-convention ERRORs above must be fixed before continuing. "
-            "See .claude/references/mathlib-style.md.",
+            "\nMathlib-convention ERRORs above must be fixed before continuing.",
             file=sys.stderr,
         )
         if total_covered:
@@ -920,9 +754,6 @@ def main(argv: list[str]) -> int:
             )
         # Exit 2 is the PostToolUse blocking code: stderr is fed back to the agent.
         return 2 if hook_mode else 1
-    if total_warns and hook_mode:
-        # Warnings are advisory: surface them without blocking.
-        return 0
     return 0
 
 
