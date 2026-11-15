@@ -17,13 +17,8 @@
 # what is checked, and reading it is allowed -- `cat`, `grep` and `git ls-tree`
 # pass the hook. `scripts/precheck.sh` is what you actually run locally.
 #
-# NEITHER LIST CONTAINS THE OTHER, and saying so precisely is the point of this
-# paragraph, because the imprecise version caused a real regression.
-#
-# What CI has and this file does not: the `Contract gates` step runs the `mfc`
-# contract tooling -- validate / env / bundle / lint / check-ilean-coverage
-# against the pinned registry -- from a venv it builds per run, and none of it is
-# reproduced below. A green `scripts/gates.sh` does not imply a green CI.
+# This file runs every gate CI runs. Saying precisely what it adds is the point
+# of this paragraph, because the imprecise version caused a real regression.
 #
 # What this file has and `.github/workflows/` does not, verified against ci.yml,
 # cache-warm.yml and docs.yml on 2026-09-16, and re-verified when the trust
@@ -38,15 +33,12 @@
 #                    machine.
 #   mathlib-style    is the PostToolUse edit hook's checker, run over the branch
 #                    diff. It is a pre-push linter by design.
-#   emit-build       runs in cache-warm.yml rather than ci.yml -- linking is
-#                    expensive on a cold tree, and exe/Emit.lean cannot link on
-#                    Windows at all. Deliberate; see the gate's own comment.
 #   single-instantiation  was NOT deliberate. Until PR #1355 it appeared in no
 #                    workflow at all, so for anyone who could not run this script
 #                    -- which, since the hook, is every agent -- it ran nowhere.
 #                    It drifted in silence: `bb8a1278` records 24 generic
 #                    abstractions that reached at most one inhabitant with
-#                    nothing going red. The first four entries above are local by
+#                    nothing going red. The first three entries above are local by
 #                    construction; this one was local by omission, and the header
 #                    that claimed "ONE deliberate exception" is what hid it.
 #
@@ -121,32 +113,19 @@ single_instantiation() {
   python3 scripts/check_single_instantiation.py "$GATE_TMP"/enum-inhabitants.txt
 }
 
-exe_sorry() {
-  # The one file the emitter cannot cover: an `lean_exe` root is not part of the
-  # environment built from its own imports. CI runs the same loop; see the
-  # "No declaration uses sorry" step in .github/workflows/ci.yml.
-  # RestateHistoricalNames is deliberately outside both library umbrellas, so
-  # a clean tree must build that executable-only dependency explicitly before
-  # elaborating exe/Restate.lean.
-  lake build DerivedAlgGeoSweep RestateHistoricalNames || return 1
-  local log="$GATE_TMP"/exe-sorry-check.txt
-  : > "$log"
-  for f in exe/*.lean; do
-    lake env lean "$f" >> "$log" 2>&1 || { tail -20 "$log"; return 1; }
-  done
-  if grep -q "declaration uses 'sorry'" "$log"; then
-    echo "a declaration uses sorry"
-    return 1
-  fi
-  return 0
+axiom_audit() {
+  # `lake env lean` does not build, and the sweep umbrella is not a default
+  # target.
+  lake build DerivedAlgGeoSweep || return 1
+  lake env lean scripts/AxiomAudit.lean
 }
 
 changed_lean_files() {
   # `origin/main`, not `main`: the local `main` in this clone is hundreds of
   # commits stale, and diffing against it would hand every gate the whole
   # library instead of the branch's own changes.
-  git diff --name-only origin/main...HEAD -- '*.lean'
-  git diff --name-only -- '*.lean'
+  git diff --name-only --diff-filter=d origin/main...HEAD -- '*.lean'
+  git diff --name-only --diff-filter=d -- '*.lean'
 }
 
 mathlib_style() {
@@ -192,7 +171,6 @@ gate script-tests python3 -m unittest discover -s scripts/tests -p "test_*.py"
 gate local-build scripts/test_local_build.sh
 gate mathlib-style mathlib_style
 gate review-docs python3 scripts/check_review_evidence.py docs --base origin/main
-gate emission-sources python3 scripts/check_emission_coverage.py --source-only
 gate explicit-numerical-data python3 scripts/check_explicit_numerical_data.py
 gate foundation-import-boundary python3 scripts/check_foundation_import_boundary.py
 gate build lake build
@@ -202,6 +180,9 @@ if [ "$MODE" != "fast" ]; then
   gate nolints-ratchet python3 scripts/check_nolints.py
   gate lint-style lake exe lint-style
   gate warning-ratchet warning_ratchet
+  # No `--require-api`: see the header. Offline this reports NOT_RUN and passes,
+  # which is the script's documented local contract; CI runs it with the flag so
+  # the one environment guaranteed to have the API cannot silently skip.
   gate pin python3 scripts/check_pin.py
   gate source-independence python3 scripts/check_source_independence.py
   gate subject-layering python3 scripts/check_layering.py
@@ -209,30 +190,8 @@ if [ "$MODE" != "fast" ]; then
   gate umbrella-coverage python3 scripts/check_umbrella_coverage.py
   gate root-reachability python3 scripts/check_root_reachability.py
   gate coherent-families python3 scripts/check_coherent_families.py
-  gate coverage-map python3 scripts/check_coverage_map.py
   gate single-instantiation single_instantiation
-  # No `--require-api`: see the header. Offline this reports NOT_RUN and passes,
-  # which is the script's documented local contract; CI runs it with the flag so
-  # the one environment guaranteed to have the API cannot silently skip.
-  # emit-build keeps proving the executable still LINKS -- linking is the only
-  # thing that exercises the native-object path at all, and exe/Emit.lean notes
-  # it cannot be linked on Windows. It is the expensive gate on a cold tree
-  # (4173 Mathlib `:c.o` targets) and cheap on a warm one, which is why CI runs
-  # it only in the cache-warm workflow and not per pull request.
-  gate emit-build lake build emit
-  # ...but the emission itself runs INTERPRETED, matching CI. It needs no native
-  # objects, and on a warm tree it is faster than the compiled path (134s vs
-  # 158s) because it never loads the 278 MB binary. Verified equivalent: same
-  # 11945 constants, same names, same counts; `emitted_at` is the only byte that
-  # differs. Exit codes propagate through `--run`, which matters because this
-  # non-zero exit IS the repository-wide sorry gate.
-  gate emit lake env lean --run exe/Emit.lean --out "$GATE_TMP"/derived-alg-geo-emission.json
-  # The emit gate above is the repository-wide sorry gate. This one checks that
-  # it swept everything -- without it, a library root nobody imported into
-  # DerivedAlgGeoSweep.lean drops out of coverage with every gate still green.
-  gate emission-coverage python3 scripts/check_emission_coverage.py \
-    "$GATE_TMP"/derived-alg-geo-emission.json
-  gate exe-sorry exe_sorry
+  gate axiom-audit axiom_audit
 fi
 
 echo

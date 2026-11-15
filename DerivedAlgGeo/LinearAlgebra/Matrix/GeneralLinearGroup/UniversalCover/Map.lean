@@ -4,7 +4,6 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.LinearAlgebra.Matrix.GeneralLinearGroup.UniversalCover.SourceTopology
 import DerivedAlgGeo.Topology.Covering.Basic
-import MathFormalContract
 import Mathlib.Analysis.SpecialFunctions.Complex.Circle
 
 set_option backward.defeqAttrib.useBackward true
@@ -468,7 +467,6 @@ theorem GLTilde.isCoveringMap_toMat : IsCoveringMap GLTilde.mat := by
 
 /-- The data comprising the universal-cover statement: the matrix projection
 is a surjective covering map and its source is simply connected. -/
-@[discharges "gltilde-universal-cover"]
 theorem GLTilde.universalCoverData :
     IsCoveringMap GLTilde.mat ∧
       Function.Surjective GLTilde.mat ∧ SimplyConnectedSpace GLTilde :=

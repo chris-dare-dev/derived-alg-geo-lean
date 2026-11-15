@@ -29,15 +29,11 @@ AREAS = {
     "product": (
         r"DerivedAlgGeo/.+\.lean",
         r"DerivedAlgGeo\.lean",
-        r"exe/[^/]+\.lean",
         r"lakefile\.toml",
         r"lean-toolchain",
         r"lake-manifest\.json",
     ),
     "authored record": (
-        r"registry/[^/]+\.json",
-        r"formalization\.yaml",
-        r"attest/review\.yaml",
         r"pins\.json",
     ),
     "prose": (
@@ -75,7 +71,6 @@ AREAS = {
 LEGACY = (
     ".claude/README.md",
     ".claude/references/",
-    "registry/README.md",
     "scripts/fixtures/",
     "scripts/private-reader.git/",
     "scripts/test_local_build.sh",

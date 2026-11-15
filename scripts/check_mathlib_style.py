@@ -520,11 +520,9 @@ def preceding_docstring(lines: list[str], decl_index: int) -> str | None:
     Attributes may sit between the docstring and the declaration; a blank line
     detaches the docstring, so it is not skipped.
 
-    An attribute can span several lines. This repository's `@[cites ...]`
-    carries its `(note := "...")` record on a line of its own, and skipping only
-    lines that *start* with `@[` stopped at that continuation, so a documented
-    declaration was reported as undocumented -- `def stabilityDist` in
-    `.../Metric/Distance/Basic.lean` was the whole of the `DOC` ERROR count.
+    An attribute can span several lines, with an argument on a line of its own.
+    Skipping only lines that *start* with `@[` stopped at that continuation, so a
+    documented declaration was reported as undocumented.
     A continuation is recognised by its closing `]` and walked back to its
     opener, never across a blank line, so an ordinary `variable [Foo]` above a
     declaration cannot be mistaken for one.

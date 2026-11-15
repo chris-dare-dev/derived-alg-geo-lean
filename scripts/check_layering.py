@@ -328,8 +328,7 @@ RETIRED_BY_CUTOVER: dict[str, tuple[str, ...]] = {
     "MO1.03": (
         # 2026-09-14 MO1.03: neutral frames and planes, orthogonality
         # arrangements, determinant alignment, and charge-zero loci received
-        # separate owners. Historical declaration spellings live only in the
-        # executable restatement bridge.
+        # separate owners.
         "LinearAlgebra/QuadraticForm/PeriodDomain.lean",
         "LinearAlgebra/QuadraticForm/Orientation.lean",
         "LinearAlgebra/QuadraticForm/PositivePairOpen.lean",

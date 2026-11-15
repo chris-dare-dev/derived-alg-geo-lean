@@ -202,8 +202,8 @@ below.
      `PATH="$V/bin:$PATH" scripts/precheck.sh`, after the variable line from
      Start. `git add` new files first: several gates read only tracked files.
    - Before each review round, commit the tracked change and run precheck and
-     module-scoped `runLinter`. Run the source-only emission check; durable Lean
-     probes belong in Development with sweep coverage, never tracked scratch.
+     module-scoped `runLinter`. Durable Lean probes belong in Development with
+     sweep coverage, never tracked scratch.
      Run `python3 scripts/check_review_evidence.py inventory --base <base SHA>
      --draft scratch/pr-<n>.md` over all docstrings in changed Lean modules, documentation and the
      draft. Resolve every occurrence; classify non-declarations with a reason
@@ -218,7 +218,7 @@ below.
      `scratch/review-checks.txt`, together with precheck, linters and
      `#print axioms` for new public declarations. The generator stamps its source
      commit and corpus digest. Exit zero without named coverage is not a check.
-     CI's full emitted-artifact, audit and contract checks remain the merge gate.
+     CI's full build and axiom audit remain the merge gate.
    - Push the branch after each commit. After the first push, bring in
      `origin/main` by merging, never by rebasing. A push starts no CI until the
      PR exists.

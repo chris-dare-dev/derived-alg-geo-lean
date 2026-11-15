@@ -3,7 +3,7 @@
 
 The inventory is occurrence-complete, not a semantic proof. Non-declaration
 classifications belong in the PR draft, with reasons. Probes stay untracked;
-durable Lean evidence belongs in Development with sweep/emitter coverage.
+durable Lean evidence belongs in Development with sweep coverage.
 """
 
 from __future__ import annotations

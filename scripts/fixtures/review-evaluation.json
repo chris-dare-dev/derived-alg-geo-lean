@@ -77,22 +77,6 @@
       }
     },
     {
-      "id": "tracked-scratch",
-      "role": "repository-boundary-adversary",
-      "claim": "A new tracked scratch/Checks.lean imports the affine modules and compiles. Adding an import of scratch.Checks to DerivedAlgGeoSweep makes it eligible for the emitter.",
-      "sources": [
-        "exe/Emit.lean",
-        "scripts/check_emission_coverage.py"
-      ],
-      "expected": {
-        "emitter-filter": "blocker"
-      },
-      "source_sha256": {
-        "exe/Emit.lean": "948af3251aa23a879faa02724a94cdb995a9a858cad5d05cbc5f0f15e590fc23",
-        "scripts/check_emission_coverage.py": "de0f0fdf34365313713d2959ad958cc0420fc5a9d2d3cb646329a29f39862530"
-      }
-    },
-    {
       "id": "module-doc-sections",
       "role": "mathlib-reviewer",
       "claim": "A newly added verification module has a title and a useful opening summary, but omits Main definitions, Main results, Implementation notes, References and Tags. Its author says a passing text style check establishes documentation completeness.",

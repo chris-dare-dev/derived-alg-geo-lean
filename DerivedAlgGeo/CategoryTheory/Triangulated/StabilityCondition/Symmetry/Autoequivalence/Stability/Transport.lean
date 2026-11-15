@@ -4,7 +4,6 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.GrothendieckGroup.Functorial
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.Autoequivalence.Foundations.FiniteLength
-import MathFormalContract
 
 set_option backward.defeqAttrib.useBackward true
 set_option backward.isDefEq.respectTransparency false
@@ -193,9 +192,9 @@ theorem autFunctor_isAdmissibleSubobject (s : Slicing C) (a b : ℝ)
 
 Dual to `relabel_isLocallyFinite` and strictly easier: the windows do not move,
 so `exists_radius` is not needed. The content is instead the strict-finite-length
-transfer along `Φ⁻¹`. -/
-@[cites "stmt:a520a8d4f877:bridgeland2007.def-5.7" (relation := no_claim)
-        (note := "Bound to the locally-finite DEFINITION because this theorem is what preserves it, not what states it. no_claim is the honest relation: a transport result neither states the definition nor is implied by it.")]
+transfer along `Φ⁻¹`.
+
+Compare Definition 5.7 of arXiv:math/0212237, the local finiteness this preserves. -/
 theorem mapEquiv_isLocallyFinite (s : Slicing C) (hs : s.IsLocallyFinite C) :
     (s.mapEquiv Φ).IsLocallyFinite C := by
   obtain ⟨η, hη, hη2, hlf⟩ := hs.intervalFinite
@@ -252,9 +251,10 @@ variable {Λ : Type u'} [AddCommGroup Λ] (v : K₀ C →+ Λ)
 
 `Φ` moves the objects; `lam` carries it on the class lattice. The witness `m`
 in `compat'` is *unchanged* — an autoequivalence moves an object without
-moving its phase. -/
-@[cites "stmt:a520a8d4f877:bridgeland2007.lem-8.2" (relation := one_way)
-        (note := "The Aut half of Lemma 8.2, but this declaration is a map for a pair (Phi, lam), not the MulAction of bare Aut(D). Downstream HNMassUniqueness identifies the mass coordinate with Bridgeland's finite HN mass and AutFullIsometry proves exact preservation by AutPairQuot v; that quotient still carries extra compatible lattice data.")]
+moving its phase.
+
+Lemma 8.2 of arXiv:math/0212237 implies this, not conversely: this is its `Aut` half, for a
+pair `(Φ, lam)` rather than an action of `Aut(D)`. -/
 noncomputable def actStabAut (lam : Λ →+ Λ)
     (hlam : ∀ x : K₀ C, v (K₀.map Φ.inverse x) = lam (v x))
     (σ : StabilityCondition.WithClassMap C v) : StabilityCondition.WithClassMap C v where

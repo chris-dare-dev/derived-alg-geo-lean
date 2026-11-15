@@ -2,10 +2,9 @@
 """Every tracked library module must be reachable by import from the public root.
 
 A module that no umbrella re-exports is still compiled when something imports
-it directly, but it is absent from the public API, from the audits that reach
-declarations through umbrellas, and from the emission sweep. In CI the
-emission-coverage gate reports that after a full build; this check reports it
-in seconds, before a push.
+it directly, but it is absent from the public API and from the audits that
+reach declarations through umbrellas, the axiom audit included. This check
+reports it in seconds, before a push.
 
 The usual cause is a module that shares a name with a directory of its
 consequences: `Sites/Descent/StackInGroupoids.lean` declares `StackInGroupoids`

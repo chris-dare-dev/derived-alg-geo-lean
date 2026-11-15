@@ -278,10 +278,5 @@
   "DerivedAlgGeo/Topology/Sheaves/CohomologyPushforward.lean",
   "Variable name `hRc` is not explicitly referenced.",
   1
- ],
- [
-  "MathFormalContract/Emit.lean",
-  "`String.trim` has been deprecated: Use `String.trimAscii` instead",
-  1
  ]
 ]

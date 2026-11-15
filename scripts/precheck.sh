@@ -11,7 +11,7 @@
 # that decides whether the work is finished, and got no verdict at all.
 #
 # This is the half of the gate list that a laptop can honestly run: no
-# `lake build` of the library, no audits, no emitter. It takes seconds, it
+# `lake build` of the library, no audits. It takes seconds, it
 # catches the failures that actually recur on this queue -- a retired source
 # root, a missing umbrella export, a style violation, an invalid workflow --
 # and it is allowed by the hook by construction, because it never asks Lake for
@@ -19,13 +19,10 @@
 #
 # THIS IS NOT A CI VERDICT, and the difference is the point of the file.
 #
-#   * It does not run the library build, the three axiom audits, the
-#     audit-completeness ratchet, the linters, the warning ratchet, the emitter,
-#     or the emission-coverage check. Those need the library elaborated.
+#   * It does not run the library build, the axiom audit, the linters or the
+#     warning ratchet. Those need the library elaborated.
 #   * It does not run `single-instantiation` either, for the same reason --
 #     `scripts/EnumInhabitants.lean` needs the same elaborated environment.
-#   * It does not run the `mfc` contract tooling, which is CI-only and which
-#     `scripts/gates.sh` does not reproduce either.
 #
 # Get the verdict from CI. Since 2026-09-19 a push to an agent branch does NOT
 # start a run -- `ci.yml` triggers `push` on `main` alone. Open the pull
@@ -117,8 +114,8 @@ changed_lean_files() {
   # `origin/main`, not `main`: the local `main` in this clone is hundreds of
   # commits stale, and diffing against it would hand every check the whole
   # library instead of the branch's own changes.
-  git diff --name-only origin/main...HEAD -- '*.lean'
-  git diff --name-only -- '*.lean'
+  git diff --name-only --diff-filter=d origin/main...HEAD -- '*.lean'
+  git diff --name-only --diff-filter=d -- '*.lean'
 }
 
 mathlib_style() {
@@ -138,7 +135,7 @@ mathlib_style() {
 
 changed_targets() {
   # `DerivedAlgGeo/Foo/Bar.lean` -> `DerivedAlgGeo.Foo.Bar`. Only library
-  # modules: `scripts/`, `exe/` and `Development` roots are not Lake module
+  # modules: `scripts/` and `Development` roots are not Lake module
   # targets under the same mapping, and `DerivedAlgGeo.lean` at the root is the
   # all-library umbrella the hook refuses by name -- correctly, since naming it
   # is the whole-library build.
@@ -217,7 +214,6 @@ gate script-tests python3 -m unittest discover -s scripts/tests -p "test_*.py"
 gate local-build scripts/test_local_build.sh
 gate mathlib-style mathlib_style
 gate review-docs python3 scripts/check_review_evidence.py docs --base origin/main
-gate emission-sources python3 scripts/check_emission_coverage.py --source-only
 gate explicit-numerical-data python3 scripts/check_explicit_numerical_data.py
 gate foundation-import-boundary python3 scripts/check_foundation_import_boundary.py
 gate nolints-ratchet python3 scripts/check_nolints.py
@@ -228,7 +224,6 @@ gate neutral-stability-imports python3 scripts/check_neutral_stability_imports.p
 gate umbrella-coverage python3 scripts/check_umbrella_coverage.py
 gate root-reachability python3 scripts/check_root_reachability.py
 gate coherent-families python3 scripts/check_coherent_families.py
-gate coverage-map python3 scripts/check_coverage_map.py
 # No `--require-api`, matching gates.sh: offline this reports NOT_RUN and
 # passes, which is the script's documented local contract. CI passes the flag.
 

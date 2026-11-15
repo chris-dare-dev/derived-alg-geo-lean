@@ -13,7 +13,6 @@ from pathlib import Path
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-import check_emission_coverage as emission
 import check_mathlib_style as style
 import check_review_evidence as evidence
 import review_dispatch as dispatch
@@ -176,23 +175,6 @@ class GitCorpusTests(unittest.TestCase):
                                                    "--output", str(output)]), 1)
             finally:
                 os.chdir(old_cwd)
-
-
-class EmissionSourceTests(unittest.TestCase):
-    def test_scratch_remains_ineligible_even_when_imported(self):
-        tracked = {"DerivedAlgGeoSweep": "DerivedAlgGeoSweep.lean", "scratch.Checks": "scratch/Checks.lean"}
-        graph = {"DerivedAlgGeoSweep": {"scratch.Checks"}}
-        failures = emission.source_errors(tracked, graph, "DerivedAlgGeoSweep", ["DerivedAlgGeoSweep", "DerivedAlgGeo"])
-        self.assertEqual(len(failures), 1)
-        self.assertIn("outside emitter roots", failures[0])
-
-    def test_orphan_and_development_are_distinguished(self):
-        tracked = {"DerivedAlgGeo.Development.Probe": "DerivedAlgGeo/Development/Probe.lean"}
-        filters = ["DerivedAlgGeoSweep", "DerivedAlgGeo"]
-        self.assertIn("not imported", emission.source_errors(tracked, {}, "DerivedAlgGeoSweep", filters)[0])
-        graph = {"DerivedAlgGeoSweep": {"DerivedAlgGeo.Development.Probe"}}
-        self.assertEqual(emission.source_errors(tracked, graph, "DerivedAlgGeoSweep", filters), [])
-        self.assertTrue(emission.source_errors({"DerivedAlgGeoOther": "Other.lean"}, {}, "DerivedAlgGeoOther", ["DerivedAlgGeo"]))
 
 
 class DispatchTests(unittest.TestCase):

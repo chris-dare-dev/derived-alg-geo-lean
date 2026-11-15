@@ -163,8 +163,7 @@ in the verdict comment if you do.
 
 **What `precheck.sh` cannot tell you**, and what therefore has to come from the
 runners in step 5: the library build, `runLinter`/`lint-style`, the warning
-ratchet, the emitter with its coverage and axiom-allowlist check, the `exe`
-sorry sweep, and the `mfc` contract tooling. A clean precheck is a *cheap* green, not a green.
+ratchet and the axiom audit. A clean precheck is a *cheap* green, not a green.
 
 A failing check is the iteration's work, not a reason to weaken it. Historical
 examples include:
@@ -257,7 +256,7 @@ why; and the reviewer's verdict with finding counts by severity. If you used
 `DAG_ALLOW_LOCAL_BUILD=1` for anything, say so here.
 
 Never write "gates pass" on the strength of a local run. Precheck does not run
-the full library build or the expensive audit and emitter checks.
+the full library build or the axiom audit.
 
 If the PR is a draft, **the CI run concluded green**, and the reviewer said
 `MERGE`:

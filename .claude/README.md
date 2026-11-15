@@ -63,10 +63,6 @@ at root scope. Put justified non-declaration classifications in the draft's
 classified automatically; reviewers still inspect their meaning. Generated
 probes stay untracked; durable probes use Development and its sweep route.
 
-`scripts/check_emission_coverage.py --source-only` uses the pinned Lean header
-parser to check every tracked obligation against both sweep reachability and
-emitter root filters, without certifying axioms or replacing CI emission.
-
 `scripts/review_dispatch.py prepare` emits Codex tool arguments for a fresh,
 explicitly selected frontier reviewer on an immutable diff. `verdict` validates
 the trailer, commit, and mathematics evidence shape; it does not certify the
@@ -109,7 +105,7 @@ distinguishes existing source from proposed destinations.
 ## Dates in this directory are UTC
 
 Everything under `.claude/` is dated **UTC**. The rest of the repo —
-`formalization.yaml` and git commits — is dated
+git commits — is dated
 **local (America/New_York)**. So an ADR reading `2026-08-04` and a trust-record
 field reading `2026-08-03` can describe the same evening. Do not "fix" one to
 match the other.

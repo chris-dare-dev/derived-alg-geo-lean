@@ -98,7 +98,6 @@ cli_case refuse 'umbrella as a module target'     lake build +DerivedAlgGeo
 cli_case allow  'lake build DerivedAlgGeo.Development' lake build DerivedAlgGeo.Development
 cli_case allow  'lake build a leaf module'        lake build DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum
 cli_case allow  'lake build two leaf modules'     lake build DerivedAlgGeo.Foo DerivedAlgGeo.Bar
-cli_case allow  'lake build emit'                 lake build emit
 cli_case allow  'lake env lean <file>'            lake env lean scripts/EnumInhabitants.lean
 cli_case allow  'lake exe lint-style'             lake exe lint-style
 # `DerivedAlgGeo` appears verbatim here and is NOT a build target. A check that

@@ -127,9 +127,9 @@ mathematical hypotheses and structure fields are acceptable; proof holes are
 not. Keep conditional geometry honest by recording the exact hypothesis that a
 later realization must supply.
 
-The axiom audit needs nothing from you. CI emits the compiled environment
-(`exe/Emit.lean`) and `scripts/check_emission_coverage.py` fails when any
-constant, private ones included, depends on an axiom other than `propext`,
+The axiom audit needs nothing from you. In CI, `scripts/AxiomAudit.lean` reads
+the compiled environment and fails when any constant, private ones included,
+depends on an axiom other than `propext`,
 `Classical.choice` and `Quot.sound`. No file lists declarations by hand.
 
 Every gate script under `scripts/` prints through `scripts/_output.py`: a new
@@ -181,11 +181,11 @@ parser dependency.
 It runs every gate in `scripts/gates.sh` that needs no Lean build — workflows,
 `--diff-only` style on your own lines, source-independence, layering, the
 neutral derived-category Stability import closure, umbrella coverage, root
-reachability, coherent families, coverage map, pin, nolints,
+reachability, coherent families, pin, nolints,
 roadmap, tree areas, and the two hook tests — then a targeted `lake build` of the modules
 you changed. About a minute plus that build, against twenty minutes or more for
 CI. It is a cheap green, not a green: the
-library build, the ratchets, the linters and the emitter's axiom audit all need
+library build, the ratchets, the linters and the axiom audit all need
 the library elaborated and run on the runners.
 
 ### Unattended issue loops
@@ -300,7 +300,7 @@ seconds-long probe interactive proof work depends on, and a push per attempt
 would make writing a lemma impractical.
 
 `scripts/gates.sh` remains the readable list of what is checked — read it, with
-the caveat in the next section that it is neither a subset nor a superset of CI
+the caveat in the next section that it is not the same list as CI
 — but let the runners run it. Reading it is allowed: the hook refuses running
 the file, not `cat`, `grep`, `diff` or `git ls-tree` over it.
 
@@ -308,19 +308,14 @@ The full gate includes:
 
 - Mathlib-style and environment linting for `DerivedAlgGeo`, including the
   `scripts/style-baseline.json` ratchet;
-- source-independence, pin, paper-coverage, and no-lint checks;
+- source-independence, pin and no-lint checks;
 - roadmap/tracker agreement, when `gh` is available;
-- the repository-wide emission, its module coverage and its axiom allowlist.
+- the axiom audit over every library module.
 
-**Neither list contains the other.** This file used to say the containment ran
-one way — "every gate in the script also runs in CI" — and that was false in
-both directions.
-
-CI has what the script does not: the `Contract gates` step runs the `mfc`
-contract tooling — `validate`, `env`, `bundle`, `lint`, and
-`check-ilean-coverage` against the pinned registry — from a virtualenv it builds
-per run, and the script reproduces none of it. Expect to learn about those
-failures from CI. A green `scripts/gates.sh` is not a green CI.
+**The script runs every gate CI runs, and more.** This file used to say the
+containment ran the other way — "every gate in the script also runs in CI" —
+and that was false. A green `scripts/gates.sh` is still not a green CI: CI
+builds from a clean checkout on its own runners.
 
 The script has what no workflow does. Verified against `ci.yml`,
 `cache-warm.yml` and `docs.yml`:
@@ -330,10 +325,9 @@ The script has what no workflow does. Verified against `ci.yml`,
 | `workflows` | a workflow too invalid to parse is too invalid to run the job that would check it |
 | `local-build` | tests a `PreToolUse` hook, which exists only on a developer's machine |
 | `mathlib-style` | **only partly.** Its `--self-test` fixtures and, since #1371, its `--check-baseline` ratchet both run in `ci.yml`; what stays local is the `--diff-only` pass over the branch diff, which is a pre-push linter by design |
-| `emit-build` | runs in `cache-warm.yml` instead; linking is expensive cold and cannot happen on Windows at all |
 | `single-instantiation` | **omission, not design.** Fixed by PR #1355 |
 
-The first four are local by construction and `scripts/precheck.sh` runs three
+The first three are local by construction and `scripts/precheck.sh` runs all
 of them. `single-instantiation` was local by accident, and the cost of the wrong
 sentence above is on the record: once the hook made `scripts/gates.sh`
 unrunnable, that gate ran nowhere for anyone, and `bb8a1278` records 24 generic
@@ -348,10 +342,7 @@ coverage the files did not have. Verify the list before citing it.
 ## Review evidence
 
 Local precheck and CI run `review-docs` (primary docstrings on new modules with
-commands and required sections in added or revised module docstrings) and
-`emission-sources` (tracked obligations, sweep imports,
-and emitter eligibility using pinned Lean's header parser). The latter is a
-source check; the emitted artifact and axiom verdict still require CI.
+commands and required sections in added or revised module docstrings).
 
 Loop PR drafts carry a Claim evidence table distinguishing definition owners,
 re-exports, hypotheses, versioned source statements, and executable witnesses.
@@ -384,8 +375,8 @@ lake build DerivedAlgGeo:docs
 
 ## Changes that move declarations
 
-Structural changes must update imports, umbrellas, audit names, registry
-bindings, source-independence checks, documentation, and CI paths in the same
+Structural changes must update imports, umbrellas, audit names,
+source-independence checks, documentation, and CI paths in the same
 change. A move is complete only when CI passes on the pushed branch from a clean
 checkout — not when a local `scripts/gates.sh` goes green, which is neither
 permitted here nor sufficient.

@@ -47,11 +47,11 @@ root, extending a known mixed module, or moving declarations.
   destabilization loci; frames and planes; kernel negativity and full support;
   ordinary `H⁰` presentations and exact enhancements.
 - Record the decision in the issue or pull request. A structural change
-  updates imports, umbrellas, registry and source-owner paths, documentation
-  and gates together. Historical names survive only through the
-  executable-only `exe/RestateHistoricalNames.lean`, never through import shims
-  at retired paths. A loop run never edits `AGENTS.md` or `CLAUDE.md`; it lists
-  each line its change makes stale in the pull request and its final report.
+  updates imports, umbrellas and source-owner paths, documentation and gates
+  together. A retired name is not kept, neither as an alias nor through an
+  import shim at a retired path. A loop run never edits `AGENTS.md` or
+  `CLAUDE.md`; it lists each line its change makes stale in the pull request
+  and its final report.
 - The [cutover ledger](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Cutover-Ledger) records current and
   target owners. A pending move is not an implemented path, and a passing gate
   does not certify a new boundary: add focused checks with each move.
@@ -234,10 +234,10 @@ child; never relax coverage globally.
 - Split a file that mixes a foundation, its application and their comparison
   at those boundaries, the comparison downstream of both. A deferred split is
   recorded in the cutover ledger; do not extend the misplaced block.
-- No `sorry`, `admit` or hidden axiom across an unfinished seam. The axiom
-  audit is the emission: CI emits the compiled environment and
-  `scripts/check_emission_coverage.py` refuses any axiom outside `propext`,
-  `Classical.choice` and `Quot.sound`. Nothing is listed by hand.
+- No `sorry`, `admit` or hidden axiom across an unfinished seam.
+  `scripts/AxiomAudit.lean` reads the compiled environment and refuses any
+  axiom outside `propext`, `Classical.choice` and `Quot.sound`. Nothing is
+  listed by hand.
 - Do not edit generated build artifacts or alter unrelated work in a dirty tree.
 - Add no review, handoff, note, loop specification or change proposal as a
   file, and keep provenance (issue, pull request, milestone or decision
@@ -274,7 +274,7 @@ seeds its build cache with `bash scripts/seed_worktree_cache.sh` (about 10 GB,
 its own copy); `python3 scripts/loop_worktrees.py check|retire|root` keeps
 worktrees within the disk floor and count cap and under the worktree root,
 never `/tmp`. `DerivedAlgGeoSweep.lean` is verification-only: it imports the
-stable root and the development probes for the emitter.
+stable root and the development probes for the axiom audit.
 
 ## Unattended loops
 

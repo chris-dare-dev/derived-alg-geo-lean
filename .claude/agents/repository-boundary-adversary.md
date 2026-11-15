@@ -44,9 +44,8 @@ infer the resolved runtime from the requested model or inherit another verdict.
    the reviewed commit, never from another checkout.
 1. Read AGENTS.md, the relevant architecture/ownership documents, the
    issue and its PR description draft, and the full changed-file list.
-2. Run `python3 scripts/check_emission_coverage.py --source-only`. Check each
-   newly tracked Lean file's Git obligation, sweep import reachability, and emitter
-   root eligibility independently. A standalone compilation establishes none of
+2. Run `python3 scripts/check_root_reachability.py`. Check each newly tracked
+   Lean file's Git obligation and sweep import reachability independently. A standalone compilation establishes none of
    the latter two. Temporary probes stay untracked; durable probes belong under
    Development, covered by its verification umbrella and excluded from the stable
    root. Do not waive the later emitted-artifact/axiom checks.

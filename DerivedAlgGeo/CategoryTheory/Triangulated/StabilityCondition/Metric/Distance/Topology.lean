@@ -6,7 +6,6 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Metric.Dista
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Foundation.Deformation.ConnectedComponent
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds
 import Mathlib.Topology.EMetricSpace.Defs
-import MathFormalContract
 
 /-!
 # Topology induced by the full stability distance
@@ -1090,9 +1089,10 @@ def StabilityDistanceTopologyCompatible : Prop :=
 /-- Once mass subadditivity across distinguished triangles is supplied, the
 full-distance balls form a basis for the existing Section 6 topology.  This
 packages both cofinality directions and is the exact hypothesis consumed by
-`PseudoEMetricSpace.ofEDistOfTopology`. -/
-@[cites "stmt:a520a8d4f877:bridgeland2007.prop-8.1" (relation := no_claim)
-        (note := "Conditional topology-comparison substrate. All analytic estimates and both neighborhood cofinality directions are formalized here; Mass/Subadditivity/Triangle.lean supplies the proved mass premise and exposes the unconditional corollary. The citation remains no_claim pending exact-head source-faithfulness review and owner acceptance.")]
+`PseudoEMetricSpace.ofEDistOfTopology`.
+
+Compare Proposition 8.1 of arXiv:math/0212237: this is its topology comparison, conditional on
+the mass triangle inequality, which `stabilityDistanceTopologyCompatible` discharges. -/
 theorem stabilityDistanceTopologyCompatible_of_mass_triangle
     (htriangle : StabilityMassTriangleInequality (C := C) (v := v)) :
     StabilityDistanceTopologyCompatible (C := C) (v := v) := by
