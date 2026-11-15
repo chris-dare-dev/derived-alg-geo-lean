@@ -5,7 +5,6 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.Linear.ModuleObject.Basic
 import Mathlib.Algebra.Category.CommAlgCat.Basic
 import Mathlib.Algebra.Category.ModuleCat.ChangeOfRings
-import Mathlib.Algebra.Module.RingHom
 import Mathlib.CategoryTheory.Adjunction.CompositionIso
 import Mathlib.CategoryTheory.Adjunction.Limits
 import Mathlib.CategoryTheory.Adjunction.Parametrized
@@ -71,12 +70,14 @@ open Limits
 
 namespace ModuleObject
 
-variable {k : Type u} [CommRing k] {A : Type v} [Category.{w} A] [Preadditive A] [Linear k A]
-  {R : Type u₁} [CommRing R] [Algebra k R]
+variable {k : Type u} [CommSemiring k] {A : Type v} [Category.{w} A] [Preadditive A] [Linear k A]
+  {R : Type u₁}
 
 section HomModule
 
-variable (E : ModuleObject k A R)
+section
+
+variable [Semiring R] [Algebra k R] (E : ModuleObject k A R)
 
 /-- `Hom_A(E, F)`, on which `R` acts by precomposition with its action on `E`. -/
 @[ext]
@@ -112,6 +113,28 @@ instance : SMul R (E.HomModule F) :=
 
 @[simp] lemma hom_smul (r : R) (f : E.HomModule F) : (r • f).hom = (E.act r).asHom ≫ f.hom := rfl
 
+/-- Postcomposition with a morphism `F ⟶ G`. -/
+def comp {G : A} (f : E.HomModule F) (g : F ⟶ G) : E.HomModule G :=
+  .of (f.hom ≫ g)
+
+@[simp] lemma hom_comp {G : A} (f : E.HomModule F) (g : F ⟶ G) : (f.comp g).hom = f.hom ≫ g := rfl
+
+/-- Precomposition with a morphism of module objects `E' ⟶ E`. -/
+def precomp {E' : ModuleObject k A R} (f : E' ⟶ E) (g : E.HomModule F) : E'.HomModule F :=
+  .of (f.hom ≫ g.hom)
+
+@[simp] lemma hom_precomp {E' : ModuleObject k A R} (f : E' ⟶ E) (g : E.HomModule F) :
+    (precomp f g).hom = f.hom ≫ g.hom :=
+  rfl
+
+end HomModule
+
+end
+
+namespace HomModule
+
+variable [CommSemiring R] [Algebra k R] {E : ModuleObject k A R} {F : A}
+
 instance : Module R (E.HomModule F) where
   one_smul _ := by ext; simp
   mul_smul r s _ := by ext; simp [act_comm E s r]
@@ -122,11 +145,13 @@ instance : Module R (E.HomModule F) where
 
 end HomModule
 
+variable [CommRing R] [Algebra k R] (E : ModuleObject k A R)
+
 /-- `Hom_A(E, -)` as a functor to `R`-modules. -/
 abbrev homFunctor : A ⥤ ModuleCat.{w} R where
   obj F := ModuleCat.of R (E.HomModule F)
   map {F G} g := ModuleCat.ofHom
-    { toFun f := .of (f.hom ≫ g)
+    { toFun f := f.comp g
       map_add' _ _ := by ext; simp
       map_smul' _ _ := by ext; simp }
   map_id _ := by ext; simp
@@ -147,7 +172,7 @@ end HomModule
 
 section Tensor
 
-variable (E : ModuleObject k A R) (M : ModuleCat.{w} R)
+variable [CommRing R] [Algebra k R] (E : ModuleObject k A R) (M : ModuleCat.{w} R)
 
 /-- The relations presenting `M ⊗_R E`: one for each pair `(m, m')`, imposing additivity, and one
 for each value `(E.act r, m, r • m)`, imposing `R`-linearity. The second family is indexed by
@@ -502,7 +527,7 @@ namespace ModuleObject
 
 section Extend
 
-variable {k : Type u} [CommRing k] {A : Type v} [Category.{w} A] [Preadditive A] [Linear k A]
+variable {k : Type u} [CommSemiring k] {A : Type v} [Category.{w} A] [Preadditive A] [Linear k A]
   [HasCoproducts.{w} A] [HasCoequalizers A]
   {R₁ : Type u₁} {R₂ : Type w} [CommRing R₁] [CommRing R₂] [Algebra k R₁] [Algebra k R₂]
   (φ : R₁ →ₐ[k] R₂)
@@ -810,8 +835,9 @@ attribute [local simp] Bicategory.toNatTrans_conjugateEquiv conjugateEquiv_exten
   Adjunction.ofCat_comp conjugateEquiv_extendComp_inv in
 /-- The pseudofunctor `R ↦ A_R` on commutative `k`-algebras, valued in the bicategory of
 adjunctions: a morphism `φ : R₁ ⟶ R₂` goes to the adjunction `φ^* ⊣ φ_*` between base change and
-restriction [AHLH, §7.1]. Its left adjoints form the covariant functoriality, a contravariant
-pseudofunctor on affine `k`-schemes; its right adjoints compose strictly. -/
+restriction of [AHLH, §7.1]. The left adjoints give the covariant functoriality in `R`, that is
+a contravariant pseudofunctor on affine `k`-schemes; the right adjoints compose up to identity
+isomorphisms. -/
 noncomputable def pseudofunctor :
     Pseudofunctor (LocallyDiscrete (CommAlgCat.{w} k)) (Adj Cat.{w, max v w}) :=
   LocallyDiscrete.mkPseudofunctor

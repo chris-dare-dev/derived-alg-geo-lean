@@ -12,7 +12,7 @@ import Mathlib.CategoryTheory.Linear.LinearFunctor
 An `R`-module object of `ModuleCat k` is a `k`-module with a `k`-algebra map from `R` to its
 endomorphisms, that is, an `R`-module. This file makes the identification an equivalence
 `ModuleObject.moduleCatEquiv : ModuleObject k (ModuleCat k) R ≌ ModuleCat R`, which is
-`R`-linear and compatible with restriction of scalars.
+`R`-linear and compatible with restriction and extension of scalars.
 
 ## Main definitions
 
@@ -21,6 +21,8 @@ endomorphisms, that is, an `R`-module. This file makes the identification an equ
 * `ModuleObject.moduleCatEquiv`: the equivalence `ModuleObject k (ModuleCat k) R ≌ ModuleCat R`.
 * `ModuleObject.restrictModuleCatIso`: restriction of module objects along `φ` corresponds to
   `ModuleCat.restrictScalars φ`.
+* `ModuleObject.extendModuleCatIso`: base change of module objects along `φ` corresponds to
+  `ModuleCat.extendScalars φ`.
 
 ## References
 
@@ -127,7 +129,7 @@ noncomputable def objIsoRestrictToModule (E : ModuleObject k (ModuleCat.{w} k) R
       map_add' _ _ := rfl
       map_smul' c x := act_algebraMap_hom_apply k R E c x }
 
-/-- `R`-module objects of `ModuleCat k` are `R`-modules [AHLH, §7.1]. -/
+/-- `R`-module objects of `ModuleCat k` are `R`-modules. -/
 noncomputable def moduleCatEquiv : ModuleObject k (ModuleCat.{w} k) R ≌ ModuleCat.{w} R where
   functor := toModuleFunctor k R
   inverse := ofModuleFunctor k R
@@ -199,8 +201,8 @@ noncomputable def restrictScalarsCompInverseIso :
     (moduleCatEquiv k R₂).invFunIdAssoc
       (ModuleCat.restrictScalars.{w} (φ : R₁ →+* R₂) ⋙ (moduleCatEquiv k R₁).inverse)).symm
 
-/-- Base change of module objects of `ModuleCat k` along `φ` is `ModuleCat.extendScalars φ`:
-the left adjoints of `restrictModuleCatIso` [AHLH, §7.1]. -/
+/-- Base change of module objects of `ModuleCat k` along `φ` is `ModuleCat.extendScalars φ`: the
+isomorphism of left adjoints conjugate to `restrictModuleCatIso`. -/
 noncomputable def extendModuleCatIso :
     extend (ModuleCat.{w} k) φ ⋙ (moduleCatEquiv k R₂).functor ≅
       (moduleCatEquiv k R₁).functor ⋙ ModuleCat.extendScalars (φ : R₁ →+* R₂) :=

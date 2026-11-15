@@ -46,7 +46,7 @@ The numbering of [AZ] is quoted from [AHLH, §7.1] and has not been checked agai
   305–394.
 -/
 
-universe u v w u₁ u₂ u₃
+universe u v w u₁ u₂ u₃ u₄ u₅
 
 namespace CategoryTheory
 
@@ -142,7 +142,6 @@ abbrev ofObj (X : A) : ModuleObject k A k where
   obj := X
   act := Algebra.ofId k (End X)
 
-@[simp]
 lemma ofObj_act_asHom (X : A) (c : k) : ((ofObj X).act c).asHom = c • 𝟙 X :=
   rfl
 
@@ -397,7 +396,7 @@ lemma full_restrict (hφ : Function.Surjective φ) : (restrict (A := A) φ).Full
     obtain ⟨s, rfl⟩ := hφ r
     exact f.comm s⟩, rfl⟩
 
-variable {J : Type u₃} [Category.{w} J]
+variable {J : Type u₄} [Category.{u₅} J]
 
 /-- Restriction preserves every colimit that exists in `A`; in particular it is right exact and
 commutes with filtered colimits [AHLH, §7.1, citing AZ, Prop. B2.3]. -/
