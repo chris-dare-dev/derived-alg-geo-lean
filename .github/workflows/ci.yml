@@ -453,14 +453,16 @@ jobs:
         run: |
           set -euo pipefail
           # The disease detector: a generic abstraction written for N cases,
-          # instantiated once, and never adopted. It reuses the build the step
-          # above already did.
+          # instantiated once, and never adopted. `EnumInhabitants.lean` imports
+          # `DerivedAlgGeo.Development`, which the default target does not build
+          # and a cold cache does not hold, and `lake env lean` does not build.
           #
           # This ran only in scripts/gates.sh until now, which is precisely why
           # it drifted: between 2026-09-08 and 2026-09-14, 29 names arrived at
           # or below one inhabitant against 80 recorded, and nothing anywhere
           # went red. A gate whose whole purpose is to make invisible drift
           # visible cannot itself be invisible.
+          lake build DerivedAlgGeo.Development
           lake env lean scripts/EnumInhabitants.lean > enum-inhabitants.txt 2>&1 || {
             echo "::error::scripts/EnumInhabitants.lean failed to elaborate"
             cat enum-inhabitants.txt

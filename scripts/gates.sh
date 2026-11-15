@@ -104,8 +104,9 @@ warning_ratchet() {
 }
 
 single_instantiation() {
-  # The disease detector. `EnumInhabitants.lean` imports only modules the
-  # `build` gate compiles, so it runs after that gate.
+  # The disease detector. `EnumInhabitants.lean` also imports
+  # `DerivedAlgGeo.Development`, which the `build` gate's default target omits.
+  lake build DerivedAlgGeo.Development || return 1
   lake env lean scripts/EnumInhabitants.lean > "$GATE_TMP"/enum-inhabitants.txt 2>&1 || {
     tail -20 "$GATE_TMP"/enum-inhabitants.txt
     return 1
