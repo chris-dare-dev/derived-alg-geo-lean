@@ -9,6 +9,8 @@ import DerivedAlgGeo.Algebra.Category.ModuleCat.Limits
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Noetherian
 import DerivedAlgGeo.Algebra.Category.ModuleCat.ProjectiveResolution
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Localization
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Pseudofunctor
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Descent
 
 /-!
 # Categories of modules
