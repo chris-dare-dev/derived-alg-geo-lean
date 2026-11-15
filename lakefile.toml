@@ -66,13 +66,6 @@ weak.linter.style.whitespace = false
 [[lean_lib]]
 name = "DerivedAlgGeoSweep"
 
-# Executable-only aliases for names embedded in immutable review payloads.
-# This target is deliberately outside the public `DerivedAlgGeo` library and
-# is loaded only into the restatement environment.
-[[lean_lib]]
-name = "RestateHistoricalNames"
-srcDir = "exe"
-
 [[lean_exe]]
 name = "emit"
 root = "Emit"
