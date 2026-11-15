@@ -5,13 +5,17 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.DescentData
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.DescentDataAsCoalgebra
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.DescentDataPrime
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.FiberProduct
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.IsStack
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.ObjectProperty
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Discrete
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.FiberProduct
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Morphism
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.ObjectProperty
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Representable
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.ULift
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.ULift
 
 /-!
 # Descent and stacks
@@ -30,8 +34,12 @@ its directory, so this umbrella imports the children directly.
 * `ObjectProperty.lean`: local object properties and the equivalence between
   descent data of the core and the core of descent data.
 * `StackInGroupoids.lean` and its children: stacks in groupoids, discrete
-  stacks from sheaves, stack morphisms, site-object representability, and
-  the moduli of objects `StackInGroupoids.ofObjectProperty`.
+  stacks from sheaves, stack morphisms, site-object representability, the
+  moduli of objects `StackInGroupoids.ofObjectProperty`, universe lifts of
+  stacks, and 2-fibre products, diagonals and Isom sheaves of stacks in
+  groupoids.
+* `ULift.lean`: descent data of the universe lift `Pseudofunctor.ulift` are
+  equivalent to those of the original pseudofunctor.
 
 ## Main results
 
@@ -41,8 +49,11 @@ its directory, so this umbrella imports the children directly.
   comonadicity of its pullback functor, under the base change hypotheses.
 * `DescentDataPrime.lean`: effective descent along one morphism is unchanged by
   reindexing along a functor that preserves the pullbacks involved.
+* `FiberProduct.lean`: the 2-fibre product of two stacks over a prestack is a
+  stack, and the terminal pseudofunctor is a stack.
 * `ObjectProperty.lean`: the core of a stack is a stack, and a local object
   property closed under isomorphisms cuts out a substack.
+* `ULift.lean`: a pseudofunctor is a prestack (a stack) exactly when its universe lift is.
 
 ## Implementation notes
 
