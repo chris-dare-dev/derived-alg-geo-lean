@@ -113,10 +113,10 @@ cast doubt on a build that has already finished.
 ## What this gate does NOT say
 
 It does not say that CI is a superset of `gates.sh`. It is not, and the text
-here used to claim otherwise ("CI runs every gate in it, and more"). Four gates
+here used to claim otherwise ("CI runs every gate in it, and more"). Three gates
 in `scripts/gates.sh` have no counterpart in any workflow: `workflows`,
-`local-build`, `mathlib-style`, and `single-instantiation`. The
-first three are local by construction -- they test hooks, or a pre-push linter
+`mathlib-style`, and `single-instantiation`. The
+first two are local by construction -- a workflow check, or a pre-push linter
 that cannot run after the file reaches GitHub. `single-instantiation` was not,
 and the cost of the false claim is on the record: it ran nowhere for agents,
 and 24 names drifted past its baseline unseen until `bb8a1278` recorded them.
@@ -288,8 +288,7 @@ ASSIGNMENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
 
 # `env` flags that swallow the following token. Without these, `env -u FOO grep
 # ... gates.sh` reports its command word as `FOO`, which is in no allow-list, so
-# a read would be refused -- and `env -u DAG_ALLOW_LOCAL_BUILD` is exactly how
-# scripts/test_local_build.sh invokes this checker.
+# a read would be refused.
 ENV_FLAGS_WITH_ARG = {"-u", "--unset", "-C", "--chdir", "-S", "--split-string"}
 
 
@@ -708,9 +707,9 @@ def main() -> int:
         "`lake exe runLinter`, `lake exe lint-style`, the python checkers,\n"
         "and READING gates.sh.\n"
         "\n"
-        "CI is NOT a superset of gates.sh: `workflows`, `local-build`,\n"
-        "`mathlib-style` and `single-instantiation` have no ci.yml\n"
-        "counterpart. `precheck.sh` runs the first three.\n"
+        "CI is NOT a superset of gates.sh: `workflows`, `mathlib-style`\n"
+        "and `single-instantiation` have no ci.yml counterpart.\n"
+        "`precheck.sh` runs the first two.\n"
         "\n"
         "If the runner is genuinely unavailable, set DAG_ALLOW_LOCAL_BUILD=1 for\n"
         "the command -- and say so in your report.",

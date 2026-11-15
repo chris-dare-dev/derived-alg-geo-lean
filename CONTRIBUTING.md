@@ -331,12 +331,11 @@ The script has what no workflow does. Verified against `ci.yml`,
 | Gate | Why it is not in CI |
 | --- | --- |
 | `workflows` | a workflow too invalid to parse is too invalid to run the job that would check it |
-| `local-build` | tests a `PreToolUse` hook, which exists only on a developer's machine |
 | `mathlib-style` | **only partly.** Its `--self-test` fixtures and, since #1371, its `--check-baseline` ratchet both run in `ci.yml`; what stays local is the `--diff-only` pass over the branch diff, which is a pre-push linter by design |
 | `emit-build` | runs in `cache-warm.yml` instead; linking is expensive cold and cannot happen on Windows at all |
 | `single-instantiation` | **omission, not design.** Fixed by PR #1355 |
 
-The first four are local by construction and `scripts/precheck.sh` runs three
+The first three are local by construction and `scripts/precheck.sh` runs two
 of them. `single-instantiation` was local by accident, and the cost of the wrong
 sentence above is on the record: once the hook made `scripts/gates.sh`
 unrunnable, that gate ran nowhere for anyone, and `bb8a1278` records 24 generic
