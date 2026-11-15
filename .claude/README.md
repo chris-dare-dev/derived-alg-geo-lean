@@ -34,9 +34,6 @@ A loop run follows `skills/run-loop/SKILL.md`:
 - the PR description is its record. There is no manifest, ledger or controller
   on the run path.
 
-The manifest controller that preceded the run-loop skill, its manifests and
-its OpenSpec change records have been deleted; git history keeps them.
-
 `scripts/loop_tokens.py` is the cost side of the same run. It reconstructs
 token totals from the Claude Code and Codex transcripts after the fact, so
 neither runtime has to be instrumented in advance, and attributes them to the

@@ -14,9 +14,6 @@ This standalone skill performs **one** iteration against an eligible open PR
 and **halts** before the merge. Read the issue tracker and native blockers
 before selecting a PR; an open PR is not by itself admission-ready.
 
-No loop manifest, OpenSpec change or review ledger scopes this skill; the
-controller that used them has been deleted.
-
 ## What the queue actually is
 
 The historical 28-PR cumulative stack and 90-minute Windows queue have
