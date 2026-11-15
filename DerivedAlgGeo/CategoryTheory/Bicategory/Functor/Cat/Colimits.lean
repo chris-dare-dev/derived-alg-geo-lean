@@ -63,9 +63,7 @@ abbrev componentDiagram (K : J ⥤ (F ⟶ G)) (a : LocallyDiscrete B₀) : J ⥤
   map_id j := by rw [K.map_id]; rfl
   map_comp φ ψ := by rw [K.map_comp]; rfl
 
-variable [∀ a, HasColimitsOfShape J (G.obj a)]
-  [∀ ⦃a b : LocallyDiscrete B₀⦄ (f : a ⟶ b), PreservesColimitsOfShape J (G.map f).toFunctor]
-  (K : J ⥤ (F ⟶ G))
+variable (K : J ⥤ (F ⟶ G))
 
 /-- The naturality isomorphisms of the `K_j` along `f`, as an isomorphism of diagrams. -/
 @[simps!]
@@ -76,8 +74,13 @@ def componentDiagramNaturality {a b : LocallyDiscrete B₀} (f : a ⟶ b) :
     ext x
     exact congrArg (fun t ↦ t.toNatTrans.app x) ((K.map φ).as.naturality f))
 
+section Naturality
+
+variable {a b : LocallyDiscrete B₀} [HasColimitsOfShape J (G.obj a)]
+  [HasColimitsOfShape J (G.obj b)] (f : a ⟶ b) [PreservesColimitsOfShape J (G.map f).toFunctor]
+
 /-- The naturality isomorphism of the componentwise colimit along `f`. -/
-noncomputable def colimitNaturality {a b : LocallyDiscrete B₀} (f : a ⟶ b) :
+noncomputable def colimitNaturality :
     (F.map f).toFunctor ⋙ colimit (componentDiagram K b) ≅
       colimit (componentDiagram K a) ⋙ (G.map f).toFunctor :=
   (colimitCompWhiskeringLeftIsoCompColimit _ _).symm ≪≫
@@ -87,8 +90,7 @@ noncomputable def colimitNaturality {a b : LocallyDiscrete B₀} (f : a ⟶ b) :
 /-- The naturality isomorphism of the componentwise colimit, after a colimit injection: the
 naturality isomorphism of `K_j`, followed by the image of the injection. -/
 @[reassoc (attr := simp)]
-lemma ι_colimitNaturality_hom_app {a b : LocallyDiscrete B₀} (f : a ⟶ b) (j : J)
-    (x : F.obj a) :
+lemma ι_colimitNaturality_hom_app (j : J) (x : F.obj a) :
     (colimit.ι (componentDiagram K b) j).app ((F.map f).toFunctor.obj x) ≫
         (colimitNaturality K f).hom.app x =
       ((K.obj j).naturality f).hom.toNatTrans.app x ≫
@@ -105,6 +107,11 @@ lemma ι_colimitNaturality_hom_app {a b : LocallyDiscrete B₀} (f : a ⟶ b) (j
     Category.assoc]
   erw [h₂]
   rfl
+
+end Naturality
+
+variable [∀ a, HasColimitsOfShape J (G.obj a)]
+  [∀ ⦃a b : LocallyDiscrete B₀⦄ (f : a ⟶ b), PreservesColimitsOfShape J (G.map f).toFunctor]
 
 /-- The componentwise colimit of a diagram of strong transformations. -/
 noncomputable def colimitObj : F ⟶ G where
