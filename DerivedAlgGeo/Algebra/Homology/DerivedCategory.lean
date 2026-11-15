@@ -27,6 +27,7 @@ import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Homology
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.RightDerivedFunctorPlus
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KProjective
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KInjective
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.LocallySmall
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomology
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyLinear
@@ -50,7 +51,8 @@ bounded-derived Hom-finiteness from explicit heart Ext-finiteness, the
 functoriality laws for short-exact triangles, the opposite-category
 comparison, the exact derived lift of algebraic linear duality, `Ext`
 adjunction and dimension shift, K-projective and bounded-above-projective
-models, and the construction of derived tensor from a K-flat resolution.
+models, unbounded right-derived functors from K-injective resolutions, and the
+construction of derived tensor from a K-flat resolution.
 Canonical localization of modules is naturally isomorphic, as an exact derived
 functor, to scalar extension to the localization; this comparison agrees with
 the degreewise cochain comparison after `Qh` on displayed complexes.
