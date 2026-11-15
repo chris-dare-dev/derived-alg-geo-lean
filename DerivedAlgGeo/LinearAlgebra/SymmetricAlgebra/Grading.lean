@@ -44,8 +44,10 @@ commutative because `Sym(M)` is.
 
 ## References
 
-* [Stacks, Tag 00DM: the symmetric algebra and its grading](https://stacks.math.columbia.edu/tag/00DM).
-* [Stacks, Tag 01CF: the symmetric algebra of a sheaf of modules](https://stacks.math.columbia.edu/tag/01CF).
+* [Stacks, Section 10.13 (Tag 00DM)](https://stacks.math.columbia.edu/tag/00DM): the tensor,
+  symmetric and exterior algebras and their gradings.
+* [Stacks, Lemma 10.13.6 (Tag 0C6F)](https://stacks.math.columbia.edu/tag/0C6F): the symmetric
+  algebra commutes with localization.
 
 ## Tags
 
@@ -126,7 +128,7 @@ end Grading
 
 section RingHomExt
 
-variable {R M A : Type*} [CommSemiring R] [AddCommMonoid M] [Module R M] [Semiring A]
+variable {R M A : Type*} [CommSemiring R] [AddCommMonoid M] [Module R M] [NonAssocSemiring A]
 
 /-- Two ring maps out of the symmetric algebra agree once they agree on the scalars and on the
 generators `ι x`. -/
@@ -183,11 +185,11 @@ end Map
 
 section Localization
 
-variable {R R' M M' : Type*} [CommRing R] [CommRing R'] [Algebra R R'] [AddCommGroup M]
-  [Module R M] [AddCommGroup M'] [Module R M'] [Module R' M'] [IsScalarTower R R' M']
+variable {R R' M M' : Type*} [CommSemiring R] [CommSemiring R'] [Algebra R R'] [AddCommMonoid M]
+  [Module R M] [AddCommMonoid M'] [Module R M'] [Module R' M'] [IsScalarTower R R' M']
   (S : Submonoid R) (g : M →ₗ[R] M')
 
-/-- **The symmetric algebra commutes with localization** (Stacks 00DM, 01CF). If `R'` is the
+/-- **The symmetric algebra commutes with localization** (Stacks 0C6F). If `R'` is the
 localization of `R` at `S` and `g : M →ₗ[R] M'` is the localization of `M` at `S`, then
 `Sym_{R'}(M')` is the localization of `Sym_R(M)` at the image of `S`, through
 `SymmetricAlgebra.map R' g`. -/
