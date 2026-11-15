@@ -94,6 +94,8 @@ results use `CategoryTheory.Limits.Sigma.π` and
 bicomplex, total complex, coproduct, colimit, exactness, epi refinement
 -/
 
+set_option linter.style.longFile 1700
+
 open CategoryTheory CategoryTheory.Limits
 
 universe u v w
