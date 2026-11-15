@@ -188,16 +188,14 @@ CI. It is a cheap green, not a green: the
 library build, the ratchets, the linters and the emitter's axiom audit all need
 the library elaborated and run on the runners.
 
-### Unattended issue loops
+### Writing issues
 
-An unattended run takes GitHub issues or a milestone and follows
-[the run-loop skill](.claude/skills/run-loop/SKILL.md) to merged PRs without
-owner input. The issue body is its specification, so write issues so that
-works. Use the [formalization issue template](.github/ISSUE_TEMPLATE/formalization.md);
+The issue body is the specification of the work, so write it to be worked from
+without asking. Use the [formalization issue template](.github/ISSUE_TEMPLATE/formalization.md);
 an agent fills in a copy, deletes its front matter, and files it with
 `gh issue create --title <title> --body-file <file>`, because
-`gh issue create --body` ignores templates. Each field prevents a failure seen
-in loop runs:
+`gh issue create --body` ignores templates. Each field prevents a known
+failure:
 
 | Field | What it prevents |
 | --- | --- |
@@ -212,7 +210,7 @@ in loop runs:
 | Known traps | repeating a failed route |
 | No process text | runs reverting to retired process |
 
-Before filing, check what the run's readiness step will check: dependencies
+Before filing, check that dependencies
 resolve to issue numbers, every path and name the issue cites exists at the pin
 (or is marked absent), and the placement agrees with
 https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Placement. The filing agent does this, not the owner.
@@ -220,7 +218,7 @@ https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Placeme
 Roadmaps live in the [wiki](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki); GitHub blocked-by links are the
 authoritative dependency record, and a roadmap page follows them.
 
-Labels never gate a loop run. `blocked` follows the blocked-by links;
+Labels gate nothing. `blocked` follows the blocked-by links;
 `research` means the first deliverable is a written verdict in the issue
 thread; `in-progress` expires when no PR is open.
 
@@ -251,32 +249,11 @@ that look droppable but are not.>
 
 **Done when.** <All issues closed, plus any milestone-level statement.>
 
-**State.** Not kept here. Each issue's loop-state comment, and the latest run
-report on the tracking issue (#<n>, if any), hold it. Put no dated baselines,
-SHAs or "run X before Y" instructions in this description.
+**State.** Not kept here; the issues and their pull requests hold it. Put no
+dated baselines, SHAs or "run X before Y" instructions in this description.
 ```
 
-Start a run with one line: "Run the run-loop skill from origin/main on
-<milestone URL, or issues #a #b>." The runtime re-sends the kickoff message
-after every compaction, so keep rules and state out of it.
-
-The run researches each issue and writes its plan into the PR description.
-Four independent reviewers must pass it on the same commit, with at most three
-rounds per attempt. After an attempt exhausts them, the run freezes it as a
-draft PR, starts a separate read-only research examination and has the changed
-plan reviewed independently; an accepted plan gets a successor attempt on the
-same issue that inherits every finding, at most twice per issue. A renamed PR
-or branch cannot reset that history. The issue's loop-state comment carries it
-between contexts. The run merges once the required `ci` check passes on the
-PR's head, then takes the next issue; an issue it still cannot finish is
-parked as a draft PR with its open findings, and dependent issues wait.
-
-The request that starts a run authorizes its pushes, PRs and merges. The owner
-withdraws any of these with an explicit `false` in `.claude/loop-authority.yaml`
-on the default branch. A run changes the loop's own tooling or instructions
-only when the owner puts that work in its queue, and it uses no OpenSpec
-change, loop manifest or review ledger. Issue closure for code work requires a
-merged PR.
+Issue closure for code work requires a merged PR.
 
 This section previously read "Build the stable root while developing:
 `lake build`", and told you to run the fast gate before review and the full gate
@@ -344,22 +321,12 @@ while `scripts/gates.sh` stayed green on all of them; the `roadmap` gate closed
 that hole. Both times the gap was invisible because a summary sentence claimed
 coverage the files did not have. Verify the list before citing it.
 
-## Review evidence
+## Emitter sources
 
-Local precheck and CI run `review-docs` (primary docstrings on new modules with
-commands and required sections in added or revised module docstrings) and
-`emission-sources` (tracked obligations, sweep imports,
-and emitter eligibility using pinned Lean's header parser). The latter is a
-source check; the emitted artifact and axiom verdict still require CI.
-
-Loop PR drafts carry a Claim evidence table distinguishing definition owners,
-re-exports, hypotheses, versioned source statements, and executable witnesses.
-Run `scripts/check_review_evidence.py inventory` over the changed documentation
-and draft before review, classify non-declaration spans with reasons, and
-compile the generated `probe` in ignored scratch. Keep permanent probes in
-Development with its verification export route. A reference check establishes
-existence and type, not novelty, an equivalence, or a literature attribution.
-The run-loop skill and `.claude/README.md` document the complete commands.
+Local precheck and CI run `emission-sources` (tracked obligations, sweep
+imports, and emitter eligibility using pinned Lean's header parser). It is a
+source check; the emitted artifact and axiom verdict still require CI. Keep
+permanent probes in Development with its verification export route.
 
 ## Documentation
 
@@ -369,8 +336,8 @@ such as “the old CohLean version”; Git already records that history. The
 same holds for names and comments: no issue or pull-request numbers and no
 dates.
 
-Prose in the tree is limited to the files `CREDO.md` lists. Reviews, handoffs,
-loop specifications and change proposals go in the issue or the pull request,
+Prose in the tree is limited to the files `CREDO.md` lists. Reviews, handoffs
+and change proposals go in the issue or the pull request,
 not in a file. Architecture notes, CI notes, decision records and roadmaps live
 in the [wiki](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki); a decision with no code yet stays in its issue.
 

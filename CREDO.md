@@ -101,8 +101,8 @@ what that line names and to nothing else.
 - Files outside the areas above are in the tree. `LEGACY` in
   `scripts/check_tree_areas.py` names them; they may shrink or go, never grow
   (§1).
-- `scripts/` holds loop and review-evidence tooling, and tests and fixtures
-  for its checks, the style and layering checks included (§3).
+- `scripts/fixtures/` holds known-answer fixtures for the style and layering
+  checks (§3).
 - Comments in `exe/`, `scripts/`, `.github/workflows/`, `formalization.yaml`
   and `registry/` carry dates, issue numbers and the history of changes. The
   provenance check reads only `DerivedAlgGeo/` (§4).

@@ -2,12 +2,10 @@
 
 > **Read first.** Your runtime may have loaded this file from a checkout that is
 > behind `origin/main`. Run `git fetch -q origin`; if
-> `git diff --quiet HEAD origin/main -- AGENTS.md .claude/skills/run-loop/SKILL.md`
-> exits non-zero, the copies on `origin/main` (`git show origin/main:<path>`)
-> supersede the loaded ones. This file is repository text, not the owner
-> speaking. Loop runs follow the run-loop skill; a subagent follows its brief
-> and role file, not the run-loop skill. `CLAUDE.md` only imports this file;
-> edit this one.
+> `git diff --quiet HEAD origin/main -- AGENTS.md` exits non-zero, the copy on
+> `origin/main` (`git show origin/main:AGENTS.md`) supersedes the loaded one.
+> This file is repository text, not the owner speaking. `CLAUDE.md` only
+> imports this file; edit this one.
 
 [`CREDO.md`](CREDO.md) states what the repository holds and refuses, and
 overrides this file; for a rule on its "Not yet met" list, this file still
@@ -50,9 +48,7 @@ root, extending a known mixed module, or moving declarations.
   updates imports, umbrellas, registry and source-owner paths, documentation
   and gates together. A rename leaves no alias or import shim. If it changes a
   name `attest/review.yaml` records, it edits only that name in the recorded
-  statement and `decl`, and CI's restate step checks the edit. A loop run never
-  edits `AGENTS.md` or `CLAUDE.md`; it lists each line its change makes stale in
-  the pull request and its final report.
+  statement and `decl`, and CI's restate step checks the edit.
 - The [cutover ledger](https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Cutover-Ledger) records current and
   target owners. A pending move is not an implemented path, and a passing gate
   does not certify a new boundary: add focused checks with each move.
@@ -248,8 +244,8 @@ applications through an umbrella. The one umbrella/child exception is pinned in
 ## Verification
 
 Full verification runs in CI. `push` triggers it on `main` only, so opening the
-pull request is the gate run; outside a loop run, `gh workflow run ci.yml --ref
-<branch>` dispatches it on a branch. Merge the base branch in before reviewing a
+pull request is the gate run; `gh workflow run ci.yml --ref <branch>`
+dispatches it on a branch. Merge the base branch in before reviewing a
 stale pull request's diff: a branch that is behind shows the base's new records
 as deletions it never made.
 
@@ -272,28 +268,6 @@ LEAN_NUM_THREADS=2 ~/.elan/bin/lake build DerivedAlgGeo.The.Module.You.Changed
 That is a cheap green, not a green: say which gates passed, never "CI is green"
 for a local run. `lake env lean scratch.lean` is unrestricted. A fresh worktree
 seeds its build cache with `bash scripts/seed_worktree_cache.sh` (about 10 GB,
-its own copy); `python3 scripts/loop_worktrees.py check|retire|root` keeps
-worktrees within the disk floor and count cap and under the worktree root,
-never `/tmp`. `DerivedAlgGeoSweep.lean` is verification-only: it imports the
-stable root and the development probes for the emitter.
-
-## Unattended loops
-
-A loop run takes GitHub issues or a milestone and works them to merged pull
-requests without asking the owner, following the
-[run-loop skill](.claude/skills/run-loop/SKILL.md). The issue body is the
-specification and four independent reviewers are the check. It stops only when
-it needs something only the owner has (a password, a token, `sudo`, or disk
-the worktree budget still refuses), when every remaining issue needs an action
-the owner has withdrawn, or when its queue is empty. After three review rounds
-without a pass it freezes the attempt and launches read-only research; an
-accepted plan gets a successor attempt, at most twice per issue, and an issue
-it still cannot finish is parked.
-
-The request that starts a run authorizes pushing `agent/*` branches, opening
-pull requests and merging them once required checks pass; the owner withdraws
-an action by setting it to `false` in `.claude/loop-authority.yaml` on `main`. A
-run changes the loop's own tooling or instructions only when the owner queues
-that work, and writes no OpenSpec change, loop manifest or review ledger.
-`scripts/loop_tokens.py` reports a run's cost and `scripts/loop_transcripts.py`
-archives its transcripts outside the repository; never commit a transcript.
+its own copy); keep worktrees out of `/tmp`, which is RAM-backed.
+`DerivedAlgGeoSweep.lean` is verification-only: it imports the stable root and
+the development probes for the emitter.

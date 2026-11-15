@@ -109,8 +109,8 @@ jobs:
   # No usable diff base, an empty diff, a merge-queue entry, a manual dispatch
   # or one path outside the list all leave `build=true`.
   #
-  # The prose list is the set of paths that no step in `build` reads, apart
-  # from the two gates repeated at the end of this job. `scripts/`, `.github/`,
+  # The prose list is the set of paths that no step in `build` reads.
+  # `scripts/`, `.github/`,
   # `registry/`, `attest/` and every Lean file stay out of it on purpose.
   # cache-warm.yml ignores the same paths; change the two together.
   changes:
@@ -164,17 +164,6 @@ jobs:
         env:
           AREAS_BASE: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha || github.event.before }}
         run: python3 scripts/check_tree_areas.py "$AREAS_BASE"
-
-      # The two gates in `build` that read prose. Neither needs Lean.
-      - name: Codex loop entrypoint
-        if: steps.classify.outputs.build == 'false'
-        run: python3 scripts/check_codex_entrypoint.py
-
-      - name: Changed documentation
-        if: steps.classify.outputs.build == 'false'
-        env:
-          REVIEW_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
-        run: python3 scripts/check_review_evidence.py docs --base "$REVIEW_BASE"
 
   build:
     needs: changes
@@ -291,9 +280,6 @@ jobs:
           git reset --hard
           git clean -ffdx -e .lake
           echo "kept: $(du -sh .lake 2>/dev/null | cut -f1 || echo 'no .lake yet')"
-
-      - name: Codex loop entrypoint
-        run: python3 scripts/check_codex_entrypoint.py
 
       # Path scoping (2026-08-14). #362 removed the per-file sorry sweep, which
       # was 72.9% of a 54-minute run; what is left is dominated by the linter
@@ -593,13 +579,6 @@ jobs:
         # says the checker still rejects what it is meant to reject, and a check
         # that quietly stops firing is how #1359 reached the Lean parser.
         run: python3 scripts/check_mathlib_style.py --self-test
-
-      - name: Changed module documentation
-        id: review_docs
-        continue-on-error: true
-        env:
-          REVIEW_BASE: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha || github.event.before || 'HEAD^' }}
-        run: python3 scripts/check_review_evidence.py docs --base "$REVIEW_BASE"
 
       - name: Emitter source reachability and eligibility
         id: emission_sources
@@ -1190,7 +1169,6 @@ jobs:
             console_encoding=${{ steps.console_encoding.outcome }}
             style_fixtures=${{ steps.style_fixtures.outcome }}
             style_ratchet=${{ steps.style_ratchet.outcome }}
-            review_docs=${{ steps.review_docs.outcome }}
             emission_sources=${{ steps.emission_sources.outcome }}
             source_independence=${{ steps.source_independence.outcome }}
             subject_layering=${{ steps.subject_layering.outcome }}
@@ -1332,9 +1310,9 @@ jobs:
           # fails here.
           #
           # One exception, and it is narrow: a skipped `build` is accepted when
-          # `changes` succeeded AND wrote `build=false`. That job then ran the
-          # gates that judge prose, so the skip is a verdict that nothing in
-          # the change is the build's to check, not a job that never ran.
+          # `changes` succeeded AND wrote `build=false`. The skip is then a
+          # verdict that nothing in the change is the build's to check, not a
+          # job that never ran.
           echo "changes=${CHANGES} build_needed=${BUILD_NEEDED} build=${BUILD}"
           rc=0
           if [ "$CHANGES" != "success" ]; then

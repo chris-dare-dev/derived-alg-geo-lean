@@ -5,10 +5,8 @@
 # WHY THIS EXISTS. `scripts/check_local_build.py` refuses `scripts/gates.sh` in
 # any mode, because its `build` gate is the whole-library build that cost a
 # developer three hours on 2026-08-27. That refusal was correct and it was also
-# the whole story: nothing replaced it. Both agent skills under `.claude/skills/`
-# called `scripts/gates.sh fast` and then `scripts/gates.sh` as their definition
-# of done, so every unattended iteration hit a blocked hook at exactly the step
-# that decides whether the work is finished, and got no verdict at all.
+# the whole story: nothing replaced it, so a session told to run the gates got
+# a refusal at exactly the step that decides whether the work is finished.
 #
 # This is the half of the gate list that a laptop can honestly run: no
 # `lake build` of the library, no audits, no emitter. It takes seconds, it
@@ -33,9 +31,6 @@
 # the self-hosted Ubuntu lane on a branch instead:
 #
 #   gh workflow run ci.yml --ref <branch>
-#
-# Not in loop runs: there the pull request's CI is the gate, and a reviewer
-# never dispatches or waits for a workflow (see the run-loop skill).
 #
 # Usage:
 #   scripts/precheck.sh          the checks above, plus the targeted build
@@ -201,7 +196,7 @@ targeted_build() {
 }
 
 echo "== precheck =="
-echo "(not a CI verdict -- see the header, and gh workflow run ci.yml --ref <branch>; loop runs never dispatch: the PR's CI is the gate)"
+echo "(not a CI verdict -- see the header, and gh workflow run ci.yml --ref <branch>)"
 echo
 
 # First and cheapest, and the one whose failure is otherwise invisible: an
@@ -209,10 +204,8 @@ echo
 # cannot be a CI gate at all; see scripts/check_workflows.sh.
 gate workflows scripts/check_workflows.sh
 gate output-encoding python3 scripts/_output.py
-gate codex-entrypoint python3 scripts/check_codex_entrypoint.py
 gate tree-areas python3 scripts/check_tree_areas.py origin/main
 gate mathlib-style mathlib_style
-gate review-docs python3 scripts/check_review_evidence.py docs --base origin/main
 gate emission-sources python3 scripts/check_emission_coverage.py --source-only
 gate explicit-numerical-data python3 scripts/check_explicit_numerical_data.py
 gate foundation-import-boundary python3 scripts/check_foundation_import_boundary.py
@@ -240,7 +233,7 @@ fi
 echo
 if [ ${#FAILED[@]} -eq 0 ]; then
   echo "precheck clean -- this is NOT a CI verdict."
-  echo "Open the pull request for the verdict, or dispatch CI on the pushed branch (never in a loop run):"
+  echo "Open the pull request for the verdict, or dispatch CI on the pushed branch:"
   echo "  gh workflow run ci.yml --ref \$(git branch --show-current)"
   exit 0
 fi
