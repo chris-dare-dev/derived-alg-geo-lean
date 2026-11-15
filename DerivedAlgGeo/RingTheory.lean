@@ -6,6 +6,7 @@ import DerivedAlgGeo.RingTheory.Finiteness
 import DerivedAlgGeo.RingTheory.Flat
 import DerivedAlgGeo.RingTheory.GradedAlgebra
 import DerivedAlgGeo.RingTheory.LocalRing
+import DerivedAlgGeo.RingTheory.Localization
 import DerivedAlgGeo.RingTheory.Nagata
 import DerivedAlgGeo.RingTheory.Spectrum
 
