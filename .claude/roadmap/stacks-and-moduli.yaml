@@ -551,7 +551,7 @@ items:
     kind: task
     parent: stacks-and-moduli-stk2
     title: "STK2.10: Finite presentation and flatness over a third ring descend along faithfully flat ring maps"
-    status: planned
+    status: done
     priority: must
     size: S
     summary: "Two statements of commutative algebra that the fpqc-locality of #1650 reduces to. Both are absent at the pin, and both are natural additions beside Mathlib's Module.Finite.of_finite_tensorProduct_of_faithfullyFlat."
