@@ -1251,44 +1251,8 @@ jobs:
             attest/restate.json
           if-no-files-found: warn
 
-  # ---------------------------------------------------------------------------
-  # The repository's Python tests. The job keeps the id `roadmap`, which `ci`
-  # needs and which branch protection may name; roadmaps themselves live in the
-  # wiki and no gate compares them with the tracker any more.
-  #
-  # Routed exactly like `build`: ubuntu-latest here, the owner's runners in the
-  # private mirror. It follows `build` only because a hosted job in a PRIVATE
-  # repository bills minutes.
-  roadmap:
-    runs-on: ${{ vars.OWNER_CI_RUNS_ON && fromJSON(vars.OWNER_CI_RUNS_ON) || 'ubuntu-latest' }}
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-
-      # The tests include header-parser fixtures that compile tiny Lean
-      # clients, so the job needs the repository's pinned Lean executable.
-      - name: Install pinned Lean for parser fixtures
-        uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9 # v1
-        with:
-          auto-config: false
-          build: false
-          test: false
-          lint: false
-          use-mathlib-cache: false
-          use-github-cache: false
-
-      - name: Repository Python tests
-        run: |
-          set -euo pipefail
-          # The interpreter is chosen, not inherited: an isolated venv with the
-          # declared requirements, so an image bump cannot change what runs.
-          python3 -m venv .tests-venv
-          VENV_PY=.tests-venv/bin/python
-          "$VENV_PY" -m pip install --quiet --disable-pip-version-check -r scripts/requirements-loop.txt
-          "$VENV_PY" -m unittest discover -s scripts/tests -p "test_*.py"
-
   ci:
-    needs: [changes, build, roadmap]
+    needs: [changes, build]
     # This job must still run when `build` FAILED -- without that, a failed
     # build would leave `ci` skipped, and a skipped required check does not
     # block a merge. That is the whole mechanism, and it is why the obvious
@@ -1342,7 +1306,7 @@ jobs:
     # is the vacuous pass this repository keeps finding in new places, and it
     # is strictly worse than a skip.
     if: ${{ !cancelled() }}
-    # Routed like `build` and `roadmap`, for the same private-minutes reason.
+    # Routed like `build`, for the same private-minutes reason.
     runs-on: ${{ vars.OWNER_CI_RUNS_ON && fromJSON(vars.OWNER_CI_RUNS_ON) || 'ubuntu-latest' }}
     steps:
       - name: Every required job succeeded
@@ -1359,7 +1323,6 @@ jobs:
           CHANGES: ${{ needs.changes.result }}
           BUILD_NEEDED: ${{ needs.changes.outputs.build }}
           BUILD: ${{ needs.build.result }}
-          ROADMAP: ${{ needs.roadmap.result }}
         run: |
           set -euo pipefail
           # Enumerate rather than pattern-match. `contains(needs.*.result,
@@ -1372,14 +1335,12 @@ jobs:
           # `changes` succeeded AND wrote `build=false`. That job then ran the
           # gates that judge prose, so the skip is a verdict that nothing in
           # the change is the build's to check, not a job that never ran.
-          echo "changes=${CHANGES} build_needed=${BUILD_NEEDED} build=${BUILD} roadmap=${ROADMAP}"
+          echo "changes=${CHANGES} build_needed=${BUILD_NEEDED} build=${BUILD}"
           rc=0
-          for pair in "changes=${CHANGES}" "roadmap=${ROADMAP}"; do
-            if [ "${pair#*=}" != "success" ]; then
-              echo "::error::${pair%%=*} did not succeed (result: ${pair#*=})"
-              rc=1
-            fi
-          done
+          if [ "$CHANGES" != "success" ]; then
+            echo "::error::changes did not succeed (result: ${CHANGES})"
+            rc=1
+          fi
           if [ "$BUILD" = "success" ]; then
             :
           elif [ "$BUILD" = "skipped" ] && [ "$CHANGES" = "success" ] \

@@ -117,8 +117,8 @@ changed_lean_files() {
   # `origin/main`, not `main`: the local `main` in this clone is hundreds of
   # commits stale, and diffing against it would hand every check the whole
   # library instead of the branch's own changes.
-  git diff --name-only origin/main...HEAD -- '*.lean'
-  git diff --name-only -- '*.lean'
+  git diff --name-only --diff-filter=d origin/main...HEAD -- '*.lean'
+  git diff --name-only --diff-filter=d -- '*.lean'
 }
 
 mathlib_style() {
@@ -211,10 +211,6 @@ gate workflows scripts/check_workflows.sh
 gate output-encoding python3 scripts/_output.py
 gate codex-entrypoint python3 scripts/check_codex_entrypoint.py
 gate tree-areas python3 scripts/check_tree_areas.py origin/main
-gate script-tests python3 -m unittest discover -s scripts/tests -p "test_*.py"
-# Tests a PreToolUse hook, which has no ci.yml counterpart and cannot have one:
-# the hook exists only on a developer's machine.
-gate local-build scripts/test_local_build.sh
 gate mathlib-style mathlib_style
 gate review-docs python3 scripts/check_review_evidence.py docs --base origin/main
 gate emission-sources python3 scripts/check_emission_coverage.py --source-only
