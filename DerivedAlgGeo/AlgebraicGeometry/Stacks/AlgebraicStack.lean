@@ -105,7 +105,8 @@ theorem representableFppfStackMap_hasRepresentableProperty
              (RepresentableZariskiStackMap.fiberRepresentation f y).representing
            fiberEquivalence :=
              (RepresentableZariskiStackMap.fiberRepresentation f y).fiberEquivalence
-           property := P.pullback_snd f y.as hf }⟩
+           property :=
+             P.pullback_snd f ((StackInGroupoids.representableObjEquiv _).symm y) hf }⟩
 
 set_option backward.isDefEq.respectTransparency false in
 set_option backward.defeqAttrib.useBackward true in

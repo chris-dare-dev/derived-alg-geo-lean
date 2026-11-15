@@ -130,32 +130,39 @@ theorem representableZariskiStackMap_tripleComp_obj
       representableZariskiObject (((x ≫ f) ≫ g) ≫ h) :=
   rfl
 
+/-- The scheme morphism `S ⟶ X` underlying an object of the stack represented by `X`. -/
+private abbrev representableZariskiHom {X S : Scheme.{u}}
+    (x : (representableZariskiStack X).presheaf.obj (.mk (op S))) : S ⟶ X :=
+  (StackInGroupoids.representableObjEquiv _).symm x
+
 namespace RepresentableZariskiStackMap
 
 variable {X Y S : Scheme.{u}} (f : X ⟶ Y)
-  (y : Discrete (S ⟶ Y))
+  (y : (representableZariskiStack Y).presheaf.obj (.mk (op S)))
 
 /-- The ordinary scheme fiber product representing the fiber of a
-representable-stack morphism over `y : S ⟶ Y`. -/
+representable-stack morphism over an object `y` of the stack represented by `Y`, that is, over
+a morphism `S ⟶ Y`. -/
 def fiberProduct : Over S :=
-  Over.mk (pullback.snd f y.as)
+  Over.mk (pullback.snd f (representableZariskiHom y))
 
 private def fiberObject (T : Over S)
     (a : T ⟶ fiberProduct f y) :
     StructuredArrow
       (((representableZariskiStack Y).presheaf.map T.hom.op.toLoc).toFunctor.obj y)
       ((representableZariskiStackMap f).app T.left) :=
-  StructuredArrow.mk (Discrete.eqToHom (by
-    change T.hom ≫ y.as = (a.left ≫ pullback.fst f y.as) ≫ f
-    have ha : a.left ≫ pullback.snd f y.as = T.hom := a.w
-    calc
-      T.hom ≫ y.as = (a.left ≫ pullback.snd f y.as) ≫ y.as :=
-        congrArg (fun k ↦ k ≫ y.as) ha.symm
-      _ = a.left ≫ (pullback.snd f y.as ≫ y.as) := Category.assoc ..
-      _ = a.left ≫ (pullback.fst f y.as ≫ f) :=
-        congrArg (fun k ↦ a.left ≫ k)
-          (pullback.condition (f := f) (g := y.as)).symm
-      _ = (a.left ≫ pullback.fst f y.as) ≫ f := (Category.assoc ..).symm))
+  let y' := representableZariskiHom y
+  StructuredArrow.mk (Y := representableZariskiObject (a.left ≫ pullback.fst f y'))
+    (eqToHom (congrArg (representableZariskiObject (T := T.left)) (by
+      have ha : a.left ≫ pullback.snd f y' = T.hom := a.w
+      calc
+        T.hom ≫ y' = (a.left ≫ pullback.snd f y') ≫ y' :=
+          congrArg (fun k ↦ k ≫ y') ha.symm
+        _ = a.left ≫ (pullback.snd f y' ≫ y') := Category.assoc ..
+        _ = a.left ≫ (pullback.fst f y' ≫ f) :=
+          congrArg (fun k ↦ a.left ≫ k)
+            (pullback.condition (f := f) (g := y')).symm
+        _ = (a.left ≫ pullback.fst f y') ≫ f := (Category.assoc ..).symm)))
 
 /-- Yoneda's fiber-product comparison as a functor into the actual groupoid
 fiber of the induced stack morphism. -/
@@ -171,11 +178,11 @@ instance fiberFunctor_faithful (T : Over S) :
 instance fiberFunctor_full (T : Over S) :
     (fiberFunctor f y T).Full where
   map_surjective {a b} h := by
-    have hfst : a.as.left ≫ pullback.fst f y.as =
-        b.as.left ≫ pullback.fst f y.as :=
-      Discrete.eq_of_hom h.iso.hom.right
-    have hsnd : a.as.left ≫ pullback.snd f y.as =
-        b.as.left ≫ pullback.snd f y.as :=
+    have hfst : a.as.left ≫ pullback.fst f (representableZariskiHom y) =
+        b.as.left ≫ pullback.fst f (representableZariskiHom y) :=
+      representableZariskiObject_injective (IsDiscrete.eq_of_hom h.iso.hom.right)
+    have hsnd : a.as.left ≫ pullback.snd f (representableZariskiHom y) =
+        b.as.left ≫ pullback.snd f (representableZariskiHom y) :=
       a.as.w.trans b.as.w.symm
     have hab : a.as = b.as := by
       apply CostructuredArrow.hom_ext
@@ -183,9 +190,6 @@ instance fiberFunctor_full (T : Over S) :
       · exact hfst
       · exact hsnd
     refine ⟨eqToHom (Discrete.ext hab), ?_⟩
-    letI : IsDiscrete
-        ((representableZariskiStack X).presheaf.obj (.mk (op T.left))) := by
-      exact discretePseudofunctor_obj_isDiscrete (yoneda.obj X) _
     apply Core.hom_ext
     apply StructuredArrow.hom_ext
     apply Subsingleton.elim
@@ -194,21 +198,17 @@ instance fiberFunctor_essSurj (T : Over S) :
     (fiberFunctor f y T).EssSurj := by
   constructor
   intro z
-  let x : T.left ⟶ X := z.of.right.as
-  have hxy : T.hom ≫ y.as = x ≫ f :=
-    Discrete.eq_of_hom z.of.hom
+  let x : T.left ⟶ X := representableZariskiHom z.of.right
+  have hxy : T.hom ≫ representableZariskiHom y = x ≫ f :=
+    congrArg (StackInGroupoids.representableObjEquiv _).symm (IsDiscrete.eq_of_hom z.of.hom)
   let a : T ⟶ fiberProduct f y :=
     Over.homMk (pullback.lift x T.hom hxy.symm)
       (pullback.lift_snd x T.hom hxy.symm)
   refine ⟨Discrete.mk a, ?_⟩
   apply Nonempty.intro
   apply Core.isoMk
-  refine StructuredArrow.isoMk (Discrete.eqToIso (by
-    change (pullback.lift x T.hom hxy.symm ≫ pullback.fst f y.as) = x
-    exact pullback.lift_fst x T.hom hxy.symm)) ?_
-  letI : IsDiscrete
-      ((representableZariskiStack Y).presheaf.obj (.mk (op T.left))) := by
-    exact discretePseudofunctor_obj_isDiscrete (yoneda.obj Y) _
+  refine StructuredArrow.isoMk (eqToIso (congrArg (representableZariskiObject (T := T.left))
+    (pullback.lift_fst x T.hom hxy.symm))) ?_
   apply Subsingleton.elim
 
 /-- The fiber of a morphism between representable stacks is represented by
@@ -292,7 +292,7 @@ theorem representableZariskiStackMap_hasRepresentableProperty
   intro S y
   exact ⟨{
     RepresentableZariskiStackMap.fiberRepresentation f y with
-    property := P.pullback_snd f y.as hf }⟩
+    property := P.pullback_snd f (representableZariskiHom y) hf }⟩
 
 /-- Local finite presentation for stack morphisms is measured on the actual
 representing scheme morphisms of all fibers. -/
@@ -379,33 +379,36 @@ set_option backward.defeqAttrib.useBackward true in
 /-- For a representable stack, the diagonal fiber over two maps `x,y : S ⟶ X`
 is the scheme-theoretic equalizer of those maps. -/
 def representableZariskiDiagonalFiberRepresentation
-    {X S : Scheme.{u}} (x y : Discrete (S ⟶ X)) :
+    {X S : Scheme.{u}} (x y : (representableZariskiStack X).presheaf.obj (.mk (op S))) :
     AlgebraicGeometry.StackInGroupoids.DiagonalFiberRepresentation
-      (representableZariskiStack X) x y where
-  representing := Over.mk (equalizer.ι x.as y.as)
-  isomorphismEquiv T :=
-    { toFun := fun a ↦ Discrete.eqToIso (by
-        have ha : a.left ≫ equalizer.ι x.as y.as = T.hom := a.w
-        calc
-          T.hom ≫ x.as = (a.left ≫ equalizer.ι x.as y.as) ≫ x.as :=
-            congrArg (fun k ↦ k ≫ x.as) ha.symm
-          _ = a.left ≫ (equalizer.ι x.as y.as ≫ x.as) := Category.assoc ..
-          _ = a.left ≫ (equalizer.ι x.as y.as ≫ y.as) :=
-            congrArg (fun k ↦ a.left ≫ k) (equalizer.condition x.as y.as)
-          _ = (a.left ≫ equalizer.ι x.as y.as) ≫ y.as := (Category.assoc ..).symm
-          _ = T.hom ≫ y.as := congrArg (fun k ↦ k ≫ y.as) ha)
-      invFun := fun e ↦ Over.homMk
-        (equalizer.lift T.hom (Discrete.eq_of_hom e.hom))
-        (equalizer.lift_ι T.hom (Discrete.eq_of_hom e.hom))
-      left_inv := fun a ↦ by
-        apply CostructuredArrow.hom_ext
-        change equalizer.lift T.hom _ = a.left
-        apply equalizer.hom_ext
-        rw [equalizer.lift_ι]
-        exact a.w.symm
-      right_inv := fun e ↦ by
-        apply Iso.ext
-        apply Subsingleton.elim }
+      (representableZariskiStack X) x y :=
+  let x' := representableZariskiHom x
+  let y' := representableZariskiHom y
+  { representing := Over.mk (equalizer.ι x' y')
+    isomorphismEquiv T :=
+      { toFun := fun a ↦ eqToIso (congrArg (representableZariskiObject (T := T.left)) (by
+          have ha : a.left ≫ equalizer.ι x' y' = T.hom := a.w
+          calc
+            T.hom ≫ x' = (a.left ≫ equalizer.ι x' y') ≫ x' :=
+              congrArg (fun k ↦ k ≫ x') ha.symm
+            _ = a.left ≫ (equalizer.ι x' y' ≫ x') := Category.assoc ..
+            _ = a.left ≫ (equalizer.ι x' y' ≫ y') :=
+              congrArg (fun k ↦ a.left ≫ k) (equalizer.condition x' y')
+            _ = (a.left ≫ equalizer.ι x' y') ≫ y' := (Category.assoc ..).symm
+            _ = T.hom ≫ y' := congrArg (fun k ↦ k ≫ y') ha))
+        invFun := fun e ↦
+          have he : T.hom ≫ x' = T.hom ≫ y' :=
+            congrArg (StackInGroupoids.representableObjEquiv _).symm (IsDiscrete.eq_of_hom e.hom)
+          Over.homMk (equalizer.lift T.hom he) (equalizer.lift_ι T.hom he)
+        left_inv := fun a ↦ by
+          apply CostructuredArrow.hom_ext
+          change equalizer.lift T.hom _ = a.left
+          apply equalizer.hom_ext
+          rw [equalizer.lift_ι]
+          exact a.w.symm
+        right_inv := fun e ↦ by
+          apply Iso.ext
+          apply Subsingleton.elim } }
 
 instance representableZariskiStack_hasRepresentableDiagonal
     (X : Scheme.{u}) :
