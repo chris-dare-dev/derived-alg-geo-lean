@@ -62,7 +62,7 @@ run: the worktree is frozen until their verdicts are in.
   not output.
 - Never propose a weakening that would make the ancestor module import one of
   its own consumers, or pull a heavier dependency into a foundational file. The
-  dependency direction in `docs/architecture/layers.md` outranks generality.
+  dependency direction in https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Layers outranks generality.
 - Do not propose introducing a new carrier. That is the review panel's call
   under the proof-witness test, and a carrier with no theorem over it is a
   blocker there.
@@ -70,11 +70,11 @@ run: the worktree is frozen until their verdicts are in.
 ## Output
 
 Append one row per verified weakening to
-`docs/architecture/generalization-backlog.md`, marked
+https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Generalization-Backlog, marked
 `L (proof-witness verified)` with the hypothesis set that compiled.
 
 A weakening that **failed** gets a row too, marked `FALSIFIED` with the error or
-counterexample. `docs/architecture/abstraction-tree.md` is explicit that a
+counterexample. https://github.com/chris-dare-dev/derived-alg-geo-lean/wiki/Architecture-Abstraction-Tree is explicit that a
 falsified unification is a successful architecture result, and recording it is
 what stops the next milestone rediscovering it. You are never penalized for
 attempting a weakening that did not hold.
