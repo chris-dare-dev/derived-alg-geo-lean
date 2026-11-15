@@ -9,6 +9,7 @@ import DerivedAlgGeo.CategoryTheory.Sites.Descent.FiberProduct
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.IsStack
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.Local
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.ObjectProperty
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.Over
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Discrete
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Fibered
@@ -49,7 +50,7 @@ its directory, so this umbrella imports the children directly.
   transformations whose components are equivalences of categories.
 * `DescentDataAsCoalgebra.lean`: effective descent along one morphism is
   comonadicity of its pullback functor, under the base change hypotheses.
-* `DescentDataPrime.lean`: effective descent along one morphism is unchanged by
+* `DescentDataPrime.lean`: effective descent along a family of morphisms is unchanged by
   reindexing along a functor that preserves the pullbacks involved.
 * `FiberProduct.lean`: the 2-fibre product of two stacks over a prestack is a
   stack, and the terminal pseudofunctor is a stack.
@@ -58,6 +59,8 @@ its directory, so this umbrella imports the children directly.
   stack.
 * `ObjectProperty.lean`: the core of a stack is a stack, and a local object
   property closed under isomorphisms cuts out a substack.
+* `Over.lean`: the pullback of a stack along a continuous functor is a stack, and a stack on
+  `C` restricts to `Over S` along `Over.forget S` and along `X ×_S -`.
 * `ULift.lean`: a pseudofunctor is a prestack (a stack) exactly when its universe lift is.
 * `StackInGroupoids/Fibered.lean`: the Grothendieck construction of a stack in
   groupoids is a category fibred in groupoids (`StackInGroupoids.isStronglyCartesian`).
