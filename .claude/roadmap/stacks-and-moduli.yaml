@@ -507,7 +507,7 @@ items:
     kind: task
     parent: stacks-and-moduli-stk2
     title: "STK2.3: Modules have effective descent along faithfully flat ring maps"
-    status: planned
+    status: done
     priority: must
     size: M
     summary: "Modules have effective descent along faithfully flat ring maps. If φ : A ⟶ B is a faithfully flat map of commutative rings, the module pseudofunctor (extension of scalars) on CommRingCatᵒᵖ is a stack for the singleton {φ.op}. Equivalently, ModuleCat A is equivalent to the category of B-modules with descent data along A → B."
