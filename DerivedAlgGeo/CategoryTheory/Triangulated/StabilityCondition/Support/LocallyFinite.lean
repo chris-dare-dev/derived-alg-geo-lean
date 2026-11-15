@@ -273,7 +273,11 @@ property for a genuine quadratic form is locally finite.
 
 `Zlin` realizes the central charge on `Λ` through `ι`, and the selected locus
 is `ι` applied to the classes of nonzero semistable objects. The source states
-finite length of each slice `P(φ)`; this is the stronger local finiteness. -/
+finite length of each slice `P(φ)`; this is the stronger local finiteness.
+
+The hypotheses on `ι` and `Zlin` are stated on all of `Λ`, as in the source;
+`isLocallyFinite_of_hasSupportProperty` with `w = ι.comp v` needs them only on
+the classes of objects. -/
 theorem isLocallyFinite_of_quadraticSupport (σ : WithClassMap C v)
     (ι : Λ →+ V) (hι : DiscreteTopology (Set.range ι)) (Zlin : V →ₗ[ℝ] ℂ)
     (hZ : ∀ x, Zlin (ι x) = σ.Z x)

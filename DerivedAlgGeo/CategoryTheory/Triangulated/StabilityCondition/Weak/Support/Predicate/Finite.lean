@@ -47,7 +47,7 @@ support property, quadratic form, lattice, finiteness
 
 namespace CategoryTheory.Triangulated.WeakStabilityCondition.Support
 
-variable {Λ V W : Type*} [AddCommGroup Λ]
+variable {Λ V W : Type*} [AddGroup Λ]
   [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
   [NormedAddCommGroup W] [NormedSpace ℝ W]
 
