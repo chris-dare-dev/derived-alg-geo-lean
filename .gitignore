@@ -9,10 +9,22 @@
 # Throwaway probes and one-off examples.
 /scratch/
 
-# Planning and session handoffs live in the issue tracker or external notes.
+# Plans, handoffs, notes and run records go in the issue, the pull request or
+# the wiki (CREDO.md §1). These are the names agents write them under.
 HANDOFF.md
 ROADMAP.md
+PLAN.md
+NOTES.md
+TODO.md
 /ARCHITECTURE.md
+/notes/
+/plans/
+/openspec/
+/.claude/loop-specs/
+/.milestone-pipeline/
+.claude/settings.local.json
+*.orig
+*.rej
 
 # Environment-emission artifacts are attached to releases or CI runs, not
 # committed as potentially stale trust records.
@@ -39,20 +51,13 @@ ROADMAP.md
 # The `roadmap` job's venv (PyYAML for scripts/check_roadmap.py), and the same
 # venv when the gate is run by hand.
 /.roadmap-venv/
-/algebraic-geometry-audit.txt
-/bridgeland-audit.txt
-/coh-audit.txt
-/dg-audit.txt
-/enum-decls.txt
 /enum-inhabitants.txt
 /lean-source-check.txt
 /lean-warnings.log
-/stability-condition-audit.txt
 
 # Python bytecode from the gate scripts (scripts/_output.py is imported, so it compiles).
 __pycache__/
 *.pyc
 
-# Local review ledgers are run-specific and digest-bound; the manifest and
-# OpenSpec artifacts remain tracked.
+# Local loop ledgers, which scripts/loop_tokens.py reads.
 /.loop-runs/

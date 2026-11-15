@@ -48,6 +48,7 @@ and future upstream work; matching directories is not required to import Mathlib
 | `PrimeSpectrum` and its topology | `RingTheory/Spectrum/Prime/` | `RingTheory/Spectrum/Prime/` |
 | `HomogeneousLocalization` and graded algebras | `RingTheory/GradedAlgebra/` | `RingTheory/GradedAlgebra/` |
 | `LocalSubring` and its domination order | `RingTheory/LocalRing/` | `RingTheory/LocalRing/` |
+| Descent of finite presentation and of flatness along faithfully flat ring maps | `RingTheory/Finiteness/Descent.lean`, `RingTheory/Flat/FaithfullyFlat/` | `RingTheory/Finiteness/Descent.lean`, `RingTheory/Flat/FaithfullyFlat/Descent.lean` |
 | Modules, localization, graded modules, polynomials | `Algebra/Module/`, `Algebra/MvPolynomial/` | the same |
 | Lattices, bilinear forms, exterior powers, finite-dimensional lemmas | `LinearAlgebra/` | `LinearAlgebra/` |
 | Upper half-planes of `ℂ`, argument bounds, polygonal-path length and perimeter | `Analysis/Complex/`, `Analysis/Convex/` (no Mathlib owner: the pinned revision has no chain length and no perimeter) | `Analysis/Complex/`, `Analysis/Convex/ComplexPolygonalPath/` |

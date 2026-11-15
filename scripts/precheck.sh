@@ -210,7 +210,8 @@ echo
 gate workflows scripts/check_workflows.sh
 gate output-encoding python3 scripts/_output.py
 gate codex-entrypoint python3 scripts/check_codex_entrypoint.py
-gate loop-engine-tests python3 -m unittest discover -s scripts/tests -p "test_*.py"
+gate tree-areas python3 scripts/check_tree_areas.py origin/main
+gate script-tests python3 -m unittest discover -s scripts/tests -p "test_*.py"
 # Tests a PreToolUse hook, which has no ci.yml counterpart and cannot have one:
 # the hook exists only on a developer's machine.
 gate local-build scripts/test_local_build.sh
