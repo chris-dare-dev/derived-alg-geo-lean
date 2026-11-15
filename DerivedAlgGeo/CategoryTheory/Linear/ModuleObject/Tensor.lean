@@ -5,8 +5,13 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.Linear.ModuleObject.Basic
 import Mathlib.Algebra.Category.ModuleCat.ChangeOfRings
 import Mathlib.Algebra.Module.RingHom
+import Mathlib.Algebra.Category.CommAlgCat.Basic
+import Mathlib.CategoryTheory.Adjunction.CompositionIso
 import Mathlib.CategoryTheory.Adjunction.Limits
 import Mathlib.CategoryTheory.Adjunction.Parametrized
+import Mathlib.CategoryTheory.Bicategory.Adjunction.Adj
+import Mathlib.CategoryTheory.Bicategory.Adjunction.Cat
+import Mathlib.CategoryTheory.Bicategory.Functor.LocallyDiscrete
 import Mathlib.CategoryTheory.Linear.Yoneda
 import Mathlib.CategoryTheory.Limits.Preserves.Filtered
 import Mathlib.CategoryTheory.Limits.Shapes.Equalizers
@@ -681,6 +686,123 @@ lemma extendRestrictAdj_homEquiv (E : ModuleObject k A R₁) (F : ModuleObject k
   erw [Adjunction.mkOfHomEquiv_homEquiv]
 
 end Extend
+
+section Pseudofunctor
+
+variable {k : Type u} [CommRing k] {A : Type v} [Category.{w} A] [Preadditive A] [Linear k A]
+  [HasCoproducts.{w} A] [HasCoequalizers A]
+  {R₁ R₂ R₃ R₄ : Type w} [CommRing R₁] [CommRing R₂] [CommRing R₃] [CommRing R₄]
+  [Algebra k R₁] [Algebra k R₂] [Algebra k R₃] [Algebra k R₄]
+
+variable (A R₁) in
+/-- Base change along the identity is the identity. -/
+noncomputable def extendId : extend A (AlgHom.id k R₁) ≅ 𝟭 _ :=
+  (extendRestrictAdj (AlgHom.id k R₁)).leftAdjointIdIso (restrictId k A R₁)
+
+variable (A R₁) in
+lemma conjugateEquiv_extendId_hom :
+    conjugateEquiv .id (extendRestrictAdj (A := A) (AlgHom.id k R₁)) (extendId A R₁).hom =
+      (restrictId k A R₁).inv :=
+  Adjunction.conjugateEquiv_leftAdjointIdIso_hom _ _
+
+/-- Base change along a composite is the composite of the base changes. -/
+noncomputable def extendComp (φ : R₁ →ₐ[k] R₂) (ψ : R₂ →ₐ[k] R₃) :
+    extend A φ ⋙ extend A ψ ≅ extend A (ψ.comp φ) :=
+  Adjunction.leftAdjointCompIso (extendRestrictAdj φ) (extendRestrictAdj ψ)
+    (extendRestrictAdj (ψ.comp φ)) (restrictComp φ ψ)
+
+lemma conjugateEquiv_extendComp_inv (φ : R₁ →ₐ[k] R₂) (ψ : R₂ →ₐ[k] R₃) :
+    conjugateEquiv ((extendRestrictAdj (A := A) φ).comp (extendRestrictAdj ψ))
+      (extendRestrictAdj (ψ.comp φ)) (extendComp φ ψ).inv = (restrictComp φ ψ).hom :=
+  Adjunction.conjugateEquiv_leftAdjointCompIso_inv _ _ _ _
+
+lemma extend_assoc (φ : R₁ →ₐ[k] R₂) (ψ : R₂ →ₐ[k] R₃) (χ : R₃ →ₐ[k] R₄) :
+    Functor.isoWhiskerLeft _ (extendComp (A := A) ψ χ) ≪≫ extendComp φ (χ.comp ψ) =
+      (Functor.associator _ _ _).symm ≪≫ Functor.isoWhiskerRight (extendComp φ ψ) _ ≪≫
+        extendComp (ψ.comp φ) χ :=
+  Adjunction.leftAdjointCompIso_assoc _ _ _ _ _ _ _ _ _ _ (by ext; (try simp); rfl)
+
+lemma extend_id_comp (φ : R₁ →ₐ[k] R₂) :
+    extendComp (A := A) (AlgHom.id k R₁) φ =
+      Functor.isoWhiskerRight (extendId A R₁) (extend A φ) ≪≫ Functor.leftUnitor _ :=
+  Adjunction.leftAdjointCompIso_id_comp _ _ _ _ (by ext; (try simp); rfl)
+
+lemma extend_comp_id (φ : R₁ →ₐ[k] R₂) :
+    extendComp (A := A) φ (AlgHom.id k R₂) =
+      Functor.isoWhiskerLeft (extend A φ) (extendId A R₂) ≪≫ Functor.rightUnitor _ :=
+  Adjunction.leftAdjointCompIso_comp_id _ _ _ _ (by ext; (try simp); rfl)
+
+section
+
+open Bicategory
+
+variable {R₁ R₂ R₃ R₄ : CommAlgCat.{w} k} (f : R₁ ⟶ R₂) (g : R₂ ⟶ R₃) (h : R₃ ⟶ R₄)
+
+set_option backward.isDefEq.respectTransparency false in
+@[reassoc]
+lemma pseudofunctor_associativity :
+    (extendComp (A := A) (f ≫ g).hom h.hom).inv ≫
+      Functor.whiskerRight (extendComp f.hom g.hom).inv _ ≫ (Functor.associator _ _ _).hom ≫
+        Functor.whiskerLeft _ (extendComp g.hom h.hom).hom ≫ (extendComp f.hom (g ≫ h).hom).hom =
+    eqToHom (by simp [AlgHom.comp_assoc]) := by
+  let e₁ := extendComp (A := A) (f ≫ g).hom h.hom
+  let e₂ := Functor.isoWhiskerRight (extendComp (A := A) f.hom g.hom) (extend A h.hom)
+  let e₃ := Functor.isoWhiskerLeft (extend A f.hom) (extendComp (A := A) g.hom h.hom)
+  let e₄ := extendComp (A := A) f.hom (g ≫ h).hom
+  change e₁.inv ≫ e₂.inv ≫ (Functor.associator _ _ _).hom ≫ e₃.hom ≫ e₄.hom = _
+  have : e₃.hom ≫ e₄.hom = (Functor.associator _ _ _).inv ≫ e₂.hom ≫ e₁.hom :=
+    congr($(extend_assoc (A := A) f.hom g.hom h.hom).hom)
+  simp [this]
+
+set_option backward.isDefEq.respectTransparency false in
+@[reassoc]
+lemma pseudofunctor_left_unitality :
+    (extendComp (A := A) (CommAlgCat.Hom.hom (𝟙 R₁)) f.hom).inv ≫
+      Functor.whiskerRight (extendId A R₁).hom (extend A f.hom) ≫ (Functor.leftUnitor _).hom =
+        eqToHom (by simp) := by
+  let e₁ := extendComp (A := A) (CommAlgCat.Hom.hom (𝟙 R₁)) f.hom
+  let e₂ := Functor.isoWhiskerRight (extendId A R₁) (extend A f.hom)
+  let e₃ := (extend A f.hom).leftUnitor
+  change e₁.inv ≫ e₂.hom ≫ e₃.hom = _
+  have : e₁.hom = e₂.hom ≫ e₃.hom := congr($(extend_id_comp (A := A) f.hom).hom)
+  simp [← this]
+
+set_option backward.isDefEq.respectTransparency false in
+@[reassoc]
+lemma pseudofunctor_right_unitality :
+    (extendComp (A := A) f.hom (CommAlgCat.Hom.hom (𝟙 R₂))).inv ≫
+      Functor.whiskerLeft (extend A f.hom) (extendId A R₂).hom ≫ (Functor.rightUnitor _).hom =
+        eqToHom (by simp) := by
+  let e₁ := extendComp (A := A) f.hom (CommAlgCat.Hom.hom (𝟙 R₂))
+  let e₂ := Functor.isoWhiskerLeft (extend A f.hom) (extendId A R₂)
+  let e₃ := (extend A f.hom).rightUnitor
+  change e₁.inv ≫ e₂.hom ≫ e₃.hom = _
+  have : e₁.hom = e₂.hom ≫ e₃.hom := congr($(extend_comp_id (A := A) f.hom).hom)
+  simp [← this]
+
+end
+
+open Bicategory in
+variable (k A) in
+attribute [local simp] Bicategory.toNatTrans_conjugateEquiv conjugateEquiv_extendId_hom
+  Adjunction.ofCat_comp conjugateEquiv_extendComp_inv in
+/-- The pseudofunctor `R ↦ A_R` on commutative `k`-algebras, valued in the bicategory of
+adjunctions: a morphism `φ : R₁ ⟶ R₂` goes to the adjunction `φ^* ⊣ φ_*` between base change and
+restriction [AHLH, §7.1]. Its left adjoints form the covariant functoriality, a contravariant
+pseudofunctor on affine `k`-schemes; its right adjoints compose strictly. -/
+noncomputable def pseudofunctor :
+    Pseudofunctor (LocallyDiscrete (CommAlgCat.{w} k)) (Adj Cat.{w, max v w}) :=
+  LocallyDiscrete.mkPseudofunctor
+    (fun R ↦ Adj.mk (Cat.of (ModuleObject k A R)))
+    (fun f ↦ .mk (extendRestrictAdj (A := A) f.hom).toCat)
+    (fun R ↦ Adj.iso₂Mk (Cat.Hom.isoMk (extendId A R)) (Cat.Hom.isoMk (restrictId k A R).symm))
+    (fun f g ↦ Adj.iso₂Mk (Cat.Hom.isoMk (extendComp f.hom g.hom).symm)
+      (Cat.Hom.isoMk (restrictComp f.hom g.hom)))
+    (fun f g h => by ext1; ext1; exact pseudofunctor_associativity f g h)
+    (fun f => by ext1; ext1; exact pseudofunctor_left_unitality f)
+    (fun f => by ext1; ext1; exact pseudofunctor_right_unitality f)
+
+end Pseudofunctor
 
 end ModuleObject
 

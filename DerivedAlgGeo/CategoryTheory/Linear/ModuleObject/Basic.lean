@@ -417,14 +417,16 @@ variable (k A R₁) in
 /-- Restriction along the identity is the identity. -/
 @[simps!]
 def restrictId : restrict (A := A) (AlgHom.id k R₁) ≅ 𝟭 _ :=
-  NatIso.ofComponents (fun _ => Iso.refl _)
+  NatIso.ofComponents
+    (fun X => isoMk (Iso.refl X.obj) fun _ => (Category.comp_id _).trans (Category.id_comp _).symm)
     (fun _ => by ext; exact (Category.comp_id _).trans (Category.id_comp _).symm)
 
 /-- Restriction along a composite is the composite of the restrictions. -/
 @[simps!]
 def restrictComp (ψ : R₂ →ₐ[k] R₃) :
     restrict (A := A) ψ ⋙ restrict φ ≅ restrict (ψ.comp φ) :=
-  NatIso.ofComponents (fun _ => Iso.refl _)
+  NatIso.ofComponents
+    (fun X => isoMk (Iso.refl X.obj) fun _ => (Category.comp_id _).trans (Category.id_comp _).symm)
     (fun _ => by ext; exact (Category.comp_id _).trans (Category.id_comp _).symm)
 
 end Restrict
