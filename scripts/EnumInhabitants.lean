@@ -10,9 +10,9 @@ Run: `lake env lean scripts/EnumInhabitants.lean`
 ## Why the environment, and not a grep
 
 The question "how many things instantiate `S`" cannot be answered from source
-text. A first attempt counted every signature mentioning `S` after a colon,
-which reports `def IsPositive (D : ClassDatum O G) : Prop` as an instantiation
-of `ClassDatum`. That is a *consumer*: it takes one as a parameter. Producers
+text. Counting every signature mentioning `S` after a colon would report
+`def IsPositive (D : ClassDatum O G) : Prop` as an instantiation of
+`ClassDatum`. That is a *consumer*: it takes one as a parameter. Producers
 and consumers are indistinguishable by position in the text and trivially
 distinguishable in the elaborated environment.
 

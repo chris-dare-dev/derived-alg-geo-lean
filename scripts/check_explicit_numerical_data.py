@@ -3,8 +3,8 @@
 
 Numerical intersection rings and numerical varieties are choices of data: two
 presentations may legitimately use the same carrier types.  Selecting either
-one through typeclass inference makes that choice global and reintroduces the
-instance ambiguity removed by issue #602.  This source gate protects the
+one through typeclass inference makes that choice global and creates an
+instance ambiguity between them.  This source gate protects the
 boundary independently of whether today's examples happen to trigger an
 ambiguity during elaboration.
 

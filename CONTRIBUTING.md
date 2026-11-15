@@ -299,27 +299,17 @@ contract tooling — `validate`, `env`, `bundle`, `lint`, and
 per run, and the script reproduces none of it. Expect to learn about those
 failures from CI. A green `scripts/gates.sh` is not a green CI.
 
-The script has what no workflow does. Verified against `ci.yml`,
-`cache-warm.yml` and `docs.yml`:
+The script has gates `ci.yml` does not:
 
-| Gate | Why it is not in CI |
+| Gate | Why it is not in `ci.yml` |
 | --- | --- |
 | `workflows` | a workflow too invalid to parse is too invalid to run the job that would check it |
-| `mathlib-style` | **only partly.** Its `--self-test` fixtures and, since #1371, its `--check-baseline` ratchet both run in `ci.yml`; what stays local is the `--diff-only` pass over the branch diff, which is a pre-push linter by design |
-| `emit-build` | runs in `cache-warm.yml` instead; linking is expensive cold and cannot happen on Windows at all |
-| `single-instantiation` | **omission, not design.** Fixed by PR #1355 |
+| `mathlib-style` | **only partly.** Its `--self-test` fixtures and its `--check-baseline` ratchet both run in `ci.yml`; what stays local is the `--diff-only` pass over the branch diff, which is a pre-push linter by design |
+| `emit-build` | runs in `cache-warm.yml` instead; linking is expensive on a cold tree |
 
-The first three are local by construction and `scripts/precheck.sh` runs two
-of them. `single-instantiation` was local by accident, and the cost of the wrong
-sentence above is on the record: once the hook made `scripts/gates.sh`
-unrunnable, that gate ran nowhere for anyone, and `bb8a1278` records 24 generic
-abstractions that drifted to at most one inhabitant with nothing going red.
-
-The same failure shape has now happened twice. A roadmap entry left at `planned`
-after its issue closed reddened CI on `main` and on every open pull request
-while `scripts/gates.sh` stayed green on all of them; the `roadmap` gate closed
-that hole. Both times the gap was invisible because a summary sentence claimed
-coverage the files did not have. Verify the list before citing it.
+`scripts/precheck.sh` runs the first two. A summary sentence that claims
+coverage the files do not have hides a gate that runs nowhere, so verify the
+list before citing it.
 
 ## Emitter sources
 
