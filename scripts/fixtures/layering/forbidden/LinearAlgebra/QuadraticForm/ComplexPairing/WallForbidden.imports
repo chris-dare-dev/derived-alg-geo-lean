@@ -1,2 +1,0 @@
-# The paired-functional core may not import its wall-arrangement consumers.
-import DerivedAlgGeo.LinearAlgebra.QuadraticForm.OrthogonalityFiniteness

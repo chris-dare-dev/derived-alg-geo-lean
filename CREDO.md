@@ -101,11 +101,9 @@ what that line names and to nothing else.
 - Files outside the areas above are in the tree. `LEGACY` in
   `scripts/check_tree_areas.py` names them; they may shrink or go, never grow
   (§1).
-- `scripts/fixtures/` holds known-answer fixtures for the style and layering
-  checks (§3).
-- Comments in `exe/`, `formalization.yaml`, `registry/` and the scripts
-  `check_layering.py` and `check_mathlib_style.py` carry dates, issue numbers
-  and the history of changes. The provenance check reads only `DerivedAlgGeo/`
-  (§4).
+- `scripts/fixtures/` holds known-answer fixtures for the style check (§3).
+- Comments in `exe/`, `formalization.yaml`, `registry/` and
+  `scripts/check_mathlib_style.py` carry dates, issue numbers and the history of
+  changes. The provenance check reads only `DerivedAlgGeo/` (§4).
 - Some names pass 60 characters (§4).
 - Structures that package unproved inputs are named `Data` (Lean rules).
