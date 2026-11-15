@@ -78,7 +78,6 @@ LEGACY = (
     ".claude/references/",
     ".claude/roadmap/",
     "docs/",
-    "registry/README.md",
     "scripts/fixtures/",
     "scripts/private-reader.git/",
     "scripts/test_local_build.sh",

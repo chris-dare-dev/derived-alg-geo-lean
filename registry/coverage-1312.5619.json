@@ -1,24 +1,5 @@
 {
-  "_readme": [
-    "Coverage map for arXiv:1312.5619v3 -- 'Internal Homs via extensions of dg functors', Canonaco, Stellari. Created for the dg-enhancements track (.claude/roadmap/dg-enhancements.yaml, item dg-enhancements-e0, GitHub #328).",
-    "",
-    "THIS IS NOT A TRUST RECORD AND NOT A MINT SURFACE. It is a zero-claim map of the paper's structure onto statuses. formalization.yaml's `source` remains the Bridgeland 2007 record, and registry/bridgeland2007.json remains the only mint surface; nothing in this file changes either, and nothing in this file may be cited as theorem coverage. The only status that ever counts as coverage is 'formalized'.",
-    "",
-    "Validation: python scripts/check_coverage_map.py registry/coverage-1312.5619.json",
-    "Run it before and after every edit. It fails on any status outside the vocabulary, any non-target status without complete evidence, and any corpus-derived identifier key.",
-    "",
-    "Update ownership: the owner (Chris Dare) promotes statuses; agents may propose a promotion only by a landing PR carrying the evidence fields the validator demands, and 'formalized' additionally requires explicit owner acceptance recorded in the entry. Adding sections, fixing titles against the pinned PDF, and adding tracking links are ordinary edits; status promotion is not.",
-    "",
-    "Provenance of this file: identity fields from http://export.arxiv.org/api/query, section and subsection titles read from the pinned PDF with `pdftotext -layout`, both on 2026-08-13. No title here was taken from an HTML rendering or from a corpus extraction.",
-    "",
-    "This paper is the furthest from reach of the five. It is pinned so that dg-enhancements-e17's un-park trigger has something concrete to point at.",
-    "",
-    "Quotes: none are minted here. When a quote is later needed it must be checked directly against the artifact identified in `source`, never against an unversioned corpus extraction."
-  ],
   "schema": "coverage-map/1",
-  "created": "2026-08-13",
-  "issue": "https://github.com/chris-dare-dev/derived-alg-geo-lean/issues/328",
-  "roadmap": ".claude/roadmap/dg-enhancements.yaml",
   "source": {
     "title": "Internal Homs via extensions of dg functors",
     "authors": [

@@ -3,7 +3,7 @@
 # Schema FOLLOWS mattrobball/BridgelandStability's formalization.yaml: same
 # top-level blocks, same key names, same intent. It is NOT a key-for-key
 # mirror, and a single parser does NOT read both without a shim. The known
-# divergences, as of 2026-08-04:
+# divergences:
 #
 #   - the foundational library's first key, `schema_version`, is absent here;
 #   - `dependencies` is a list of mappings here, a list of strings there;
@@ -12,8 +12,7 @@
 #   - `funding`, `sorry_in_definitions`, and `upstream_prs`/`reviews` differ
 #     in type or presence.
 #
-# Do not rename keys to taste. Closing these divergences is tracked as
-# .claude/roadmap/contract-v1.yaml -> contract-v1-e1 (GitHub #140).
+# Do not rename keys to taste: close a divergence on both sides or not at all.
 #
 # Every field is a claim. If a field cannot be filled honestly, it says
 # "none" or "pending" -- never a flattering guess.
@@ -59,23 +58,16 @@ source:
     - Tom Bridgeland
   # Versioned deliberately. An unversioned arXiv id resolves to whatever is
   # latest at fetch time, which makes every downstream quote hash a claim about
-  # an unidentified document. Confirmed by the owner on 2026-08-03, not
-  # inferred: the arXMCP corpus records `arxiv_version = ''` for every row in
-  # every notebook, so nothing on this machine knows which version it holds.
+  # an unidentified document.
   #
   # arxiv.org/abs/math/0212237 has three versions -- v1 (2002-12-17),
-  # v2 (2003-05-02), v3 (2006-02-08). v3 is both the latest and the one the
-  # corpus almost certainly holds, since notebook_fetch pulls ar5iv for the
-  # bare id. It is also the version closest to the published Annals paper
-  # (2007), which is where section 8's identity as the group-action section
-  # comes from.
+  # v2 (2003-05-02), v3 (2006-02-08). v3 is the latest and the version closest
+  # to the published Annals paper (2007), which is where section 8's identity
+  # as the group-action section comes from.
   #
-  # STILL UNVERIFIED, and it is the corpus's fault, not this record's: nothing
-  # on this machine can confirm which version the ingested chunks came from,
-  # because the column that would say is empty for every row. Until GitHub #44
-  # backfills arxiv_version, a quote match against the corpus is a match
-  # against a probable-but-unconfirmed v3. Do not upgrade that to "confirmed"
-  # on the strength of a hash match alone. The backfill is GitHub #171.
+  # The paper corpus records an empty arxiv_version for every row, so a quote
+  # matched against it is matched against a probable but unconfirmed v3. Do
+  # not upgrade that to "confirmed" on the strength of a hash match alone.
   id: math/0212237v3
   type: arXiv
   license: arXiv perpetual non-exclusive

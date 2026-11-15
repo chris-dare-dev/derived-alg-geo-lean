@@ -1,20 +1,5 @@
 {
-  "_readme": [
-    "Coverage map for arXiv:2501.00710v2 -- 'The Space of augmented stability conditions', Daniel Halpern-Leistner and Antonios-Alexandros Robotis. Created for GitHub #1178.",
-    "",
-    "THIS IS NOT A TRUST RECORD AND NOT A MINT SURFACE. It is a zero-claim map restricted to the two source sections used by the mass--Hom and moduli lanes: section 2.2 and section 2.5. formalization.yaml's source remains the Bridgeland 2007 record, and registry/bridgeland2007.json remains the only mint surface. Every status in this file is target.",
-    "",
-    "Validation: python scripts/check_coverage_map.py registry/coverage-2501.00710.json",
-    "",
-    "Update ownership: the owner (Chris Dare) promotes statuses. Agents may add or correct coordinates, but a promotion requires the evidence fields enforced by the validator and formalized additionally requires explicit owner acceptance.",
-    "",
-    "Provenance: metadata and submission history were checked against the arXiv abstract page on 2026-09-12. Section titles and statement numbering were read with pdftotext -layout from the pinned v2 PDF. No corpus extraction was used.",
-    "",
-    "Numbering caution: v1 and v2 differ. In particular, v1 Theorem 2.31 is v2 Theorem 2.35. Coordinates in this file always mean v2."
-  ],
   "schema": "coverage-map/1",
-  "created": "2026-09-12",
-  "issue": "https://github.com/chris-dare-dev/derived-alg-geo-lean/issues/1178",
   "source": {
     "title": "The Space of augmented stability conditions",
     "authors": [

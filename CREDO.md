@@ -107,9 +107,9 @@ what that line names and to nothing else.
   (§1).
 - `scripts/` holds loop and review-evidence tooling, and tests and fixtures
   for its checks, the style and layering checks included (§3).
-- Comments in `exe/`, `scripts/`, `.github/workflows/`, `formalization.yaml`
-  and `registry/` carry dates, issue numbers and the history of changes. The
-  provenance check reads only `DerivedAlgGeo/` (§4).
+- Comments in `exe/`, `scripts/` and `.github/workflows/` carry dates, issue
+  numbers and the history of changes. The provenance check reads only
+  `DerivedAlgGeo/` (§4).
 - `pins.json` restates `lean-toolchain`, `lakefile.toml` and
   `lake-manifest.json`, and records where and when it was written (§1, §4).
 - Some names pass 60 characters (§4).
