@@ -142,6 +142,21 @@ def baseChange : (F.map f₂.op.toLoc).r ≫ (F.map f₁.op.toLoc).l ⟶
     { app M := baseChangeApp F h M
       naturality _ _ g := baseChangeApp_naturality F h g }
 
+/-- The components of `baseChange`, in terms of the adjunctions and compositors of `F`: the
+unit of `p₁^* ⊣ (p₁)_*`, followed by `(p₁)_*` of the compositor comparison
+`p₁^* f₁^* ≅ p^* ≅ p₂^* f₂^*` and of `p₂^*` applied to the counit of `f₂^* ⊣ (f₂)_*`. -/
+lemma baseChange_toNatTrans_app (M : (F.obj (.mk (op X₂))).obj) :
+    (F.baseChange h).toNatTrans.app M =
+      (Adjunction.ofCat (F.map h.p₁.op.toLoc).adj).unit.app _ ≫
+        (F.map h.p₁.op.toLoc).r.toFunctor.map
+          ((((F.comp Adj.forget₁).mapComp' f₁.op.toLoc h.p₁.op.toLoc h.p.op.toLoc
+              (by rw [← Quiver.Hom.comp_toLoc, ← op_comp, h.hp₁])).inv.toNatTrans.app _ ≫
+            ((F.comp Adj.forget₁).mapComp' f₂.op.toLoc h.p₂.op.toLoc h.p.op.toLoc
+              (by rw [← Quiver.Hom.comp_toLoc, ← op_comp, h.hp₂])).hom.toNatTrans.app _) ≫
+            ((F.comp Adj.forget₁).map h.p₂.op.toLoc).toFunctor.map
+              ((Adjunction.ofCat (F.map f₂.op.toLoc).adj).counit.app M)) :=
+  rfl
+
 private lemma baseChange_app (M : (F.comp Adj.forget₁).obj (.mk (op X₂))) :
     (F.baseChange h).toNatTrans.app M = baseChangeApp F h M := rfl
 

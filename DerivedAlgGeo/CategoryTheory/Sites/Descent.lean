@@ -12,6 +12,8 @@ import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Discrete
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Morphism
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.ObjectProperty
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Representable
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.ULift
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.ULift
 
 /-!
 # Descent and stacks
@@ -30,8 +32,11 @@ its directory, so this umbrella imports the children directly.
 * `ObjectProperty.lean`: local object properties and the equivalence between
   descent data of the core and the core of descent data.
 * `StackInGroupoids.lean` and its children: stacks in groupoids, discrete
-  stacks from sheaves, stack morphisms, site-object representability, and
-  the moduli of objects `StackInGroupoids.ofObjectProperty`.
+  stacks from sheaves, stack morphisms, site-object representability, the
+  moduli of objects `StackInGroupoids.ofObjectProperty`, and universe lifts of
+  stacks.
+* `ULift.lean`: descent data of the universe lift `Pseudofunctor.ulift` are
+  equivalent to those of the original pseudofunctor.
 
 ## Main results
 
@@ -43,6 +48,7 @@ its directory, so this umbrella imports the children directly.
   reindexing along a functor that preserves the pullbacks involved.
 * `ObjectProperty.lean`: the core of a stack is a stack, and a local object
   property closed under isomorphisms cuts out a substack.
+* `ULift.lean`: a pseudofunctor is a prestack (a stack) exactly when its universe lift is.
 
 ## Implementation notes
 

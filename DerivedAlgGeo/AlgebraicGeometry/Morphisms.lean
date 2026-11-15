@@ -8,6 +8,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Morphisms.FiltrationProperty
 import DerivedAlgGeo.AlgebraicGeometry.Morphisms.FinitePresentation
 import DerivedAlgGeo.AlgebraicGeometry.Morphisms.Projective
 import DerivedAlgGeo.AlgebraicGeometry.Morphisms.RelativelyAmple
+import DerivedAlgGeo.AlgebraicGeometry.Morphisms.UniversallyClosed
 
 /-! # Scheme-morphism properties
 
