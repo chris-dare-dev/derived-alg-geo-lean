@@ -8,20 +8,17 @@
 # verdict at exactly the step that decides whether the work is finished.
 #
 # This is the half of the gate list that a laptop can honestly run: no
-# `lake build` of the library, no audits, no emitter. It takes seconds, it
+# `lake build` of the library, no audits. It takes seconds, it
 # catches the failures that actually recur -- a retired source root, a missing
 # umbrella export, a style violation, an invalid workflow -- and it is allowed
 # by the hook by construction, because it never asks Lake for an umbrella.
 #
 # THIS IS NOT A CI VERDICT, and the difference is the point of the file.
 #
-#   * It does not run the library build, the three axiom audits, the
-#     audit-completeness ratchet, the linters, the warning ratchet, the emitter,
-#     or the emission-coverage check. Those need the library elaborated.
+#   * It does not run the library build, the axiom audit, the linters or the
+#     warning ratchet. Those need the library elaborated.
 #   * It does not run `single-instantiation` either, for the same reason --
 #     `scripts/EnumInhabitants.lean` needs the same elaborated environment.
-#   * It does not run the `mfc` contract tooling, which is CI-only and which
-#     `scripts/gates.sh` does not reproduce either.
 #
 # Get the verdict from CI: `ci.yml` triggers `push` on `main` alone, so open the
 # pull request, or dispatch it on a branch:
@@ -120,7 +117,7 @@ mathlib_style() {
   # would otherwise reach CI to find out. ~5s over the whole library.
   python3 scripts/check_mathlib_style.py --check-baseline || return 1
   # Library sources only: the checker refuses a run in which no file it judges
-  # was given, and `scripts/` and `exe/` Lean files are outside its scope.
+  # was given, and `scripts/` Lean files are outside its scope.
   files="$(changed_lean_files | grep -E '^DerivedAlgGeo(/|\.lean$)' | sort -u)"
   [ -z "$files" ] && return 0
   # --diff-only, matching gates.sh: judge the lines this branch wrote, not the
@@ -131,7 +128,7 @@ mathlib_style() {
 
 changed_targets() {
   # `DerivedAlgGeo/Foo/Bar.lean` -> `DerivedAlgGeo.Foo.Bar`. Only library
-  # modules: `scripts/`, `exe/` and `Development` roots are not Lake module
+  # modules: `scripts/` and `Development` roots are not Lake module
   # targets under the same mapping, and `DerivedAlgGeo.lean` at the root is the
   # all-library umbrella the hook refuses by name -- correctly, since naming it
   # is the whole-library build.
@@ -188,7 +185,6 @@ gate workflows scripts/check_workflows.sh
 gate output-encoding python3 scripts/_output.py
 gate tree-areas python3 scripts/check_tree_areas.py origin/main
 gate mathlib-style mathlib_style
-gate emission-sources python3 scripts/check_emission_coverage.py --source-only
 gate explicit-numerical-data python3 scripts/check_explicit_numerical_data.py
 gate foundation-import-boundary python3 scripts/check_foundation_import_boundary.py
 gate nolints-ratchet python3 scripts/check_nolints.py
@@ -198,7 +194,6 @@ gate subject-layering python3 scripts/check_layering.py
 gate umbrella-coverage python3 scripts/check_umbrella_coverage.py
 gate root-reachability python3 scripts/check_root_reachability.py
 gate coherent-families python3 scripts/check_coherent_families.py
-gate coverage-map python3 scripts/check_coverage_map.py
 # No `--require-api`, matching gates.sh: offline this reports NOT_RUN and
 # passes, which is the script's documented local contract. CI passes the flag.
 

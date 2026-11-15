@@ -46,9 +46,8 @@ are index types, never cardinals, and need no cardinal arithmetic.
   `G`, so its morphisms from `G` embed into `G ⟶ cokernel R.arrow`.
 * Along an exact sequence `P ⟶ Q ⟶ R`, an `S`-generated subobject of `Q` killed by
   `Q ⟶ R` is the image of an `S × (G ⟶ G)`-generated subobject of `P`. This is the
-  form of Tag 079J used here; it is a private step, since a public lemma about objects
-  of a Grothendieck abelian category belongs with Mathlib's
-  `CategoryTheory.IsGrothendieckAbelian`. Each generator
+  relative form of Tag 079J used here, a private step; the lemma as Stacks states it
+  is `CategoryTheory.IsSeparator.exists_subobject_epi_of_epi`. Each generator
   lifts only up to a refinement `A ⟶ G`, and keeping one morphism `G ⟶ A` for each
   endomorphism of `G` it induces bounds the number of lifts.
 

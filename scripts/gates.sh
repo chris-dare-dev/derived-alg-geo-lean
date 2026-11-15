@@ -16,14 +16,7 @@
 # readable list of what is checked, and reading it is allowed -- `cat`, `grep`
 # and `git ls-tree` pass the hook. `scripts/precheck.sh` is what you run locally.
 #
-# NEITHER LIST CONTAINS THE OTHER.
-#
-# What CI has and this file does not: the `Contract gates` step runs the `mfc`
-# contract tooling -- validate / env / bundle / lint / check-ilean-coverage
-# against the pinned registry -- from a venv it builds per run, and none of it is
-# reproduced below. A green `scripts/gates.sh` does not imply a green CI.
-#
-# What this file has and `ci.yml` does not:
+# This file runs every gate CI runs. What it has and `ci.yml` does not:
 #
 #   workflows        cannot be a CI gate. A workflow file too invalid to parse is
 #                    also too invalid to run the job that would have checked it;
@@ -33,9 +26,6 @@
 #   mathlib-style    its `--diff-only` pass is the edit hook's checker over the
 #                    branch diff, a pre-push linter by design. Its fixtures and
 #                    baseline ratchet also run in CI.
-#   emit-build       runs in cache-warm.yml rather than ci.yml: linking is
-#                    expensive on a cold tree, so it stays off the per-pull-
-#                    request path. See the gate's own comment.
 #
 # Each gate prints `GATE <name>: pass|FAIL`. The script does not stop at the
 # first failure -- an unattended run wants the whole picture in one pass -- and
@@ -98,8 +88,9 @@ warning_ratchet() {
 }
 
 single_instantiation() {
-  # The disease detector. `EnumInhabitants.lean` imports only modules the
-  # `build` gate compiles, so it runs after that gate.
+  # The disease detector. `EnumInhabitants.lean` also imports
+  # `DerivedAlgGeo.Development`, which the `build` gate's default target omits.
+  lake build DerivedAlgGeo.Development || return 1
   lake env lean scripts/EnumInhabitants.lean > "$GATE_TMP"/enum-inhabitants.txt 2>&1 || {
     tail -20 "$GATE_TMP"/enum-inhabitants.txt
     return 1
@@ -107,21 +98,11 @@ single_instantiation() {
   python3 scripts/check_single_instantiation.py "$GATE_TMP"/enum-inhabitants.txt
 }
 
-exe_sorry() {
-  # The one file the emitter cannot cover: an `lean_exe` root is not part of the
-  # environment built from its own imports. CI runs the same loop; see the
-  # "No declaration uses sorry" step in .github/workflows/ci.yml.
+axiom_audit() {
+  # `lake env lean` does not build, and the sweep umbrella is not a default
+  # target.
   lake build DerivedAlgGeoSweep || return 1
-  local log="$GATE_TMP"/exe-sorry-check.txt
-  : > "$log"
-  for f in exe/*.lean; do
-    lake env lean "$f" >> "$log" 2>&1 || { tail -20 "$log"; return 1; }
-  done
-  if grep -q "declaration uses 'sorry'" "$log"; then
-    echo "a declaration uses sorry"
-    return 1
-  fi
-  return 0
+  lake env lean scripts/AxiomAudit.lean
 }
 
 changed_lean_files() {
@@ -143,7 +124,7 @@ mathlib_style() {
   # a file no agent edited would otherwise reach CI to find out.
   python3 scripts/check_mathlib_style.py --check-baseline || return 1
   # Library sources only: the checker refuses a run in which no file it judges
-  # was given, and `scripts/` and `exe/` Lean files are outside its scope.
+  # was given, and `scripts/` Lean files are outside its scope.
   files="$(changed_lean_files | grep -E '^DerivedAlgGeo(/|\.lean$)' | sort -u)"
   [ -z "$files" ] && return 0
   # --diff-only: judge the lines this branch wrote, not the pre-existing debt in
@@ -168,7 +149,6 @@ gate workflows scripts/check_workflows.sh
 gate output-encoding python3 scripts/_output.py
 gate tree-areas python3 scripts/check_tree_areas.py origin/main
 gate mathlib-style mathlib_style
-gate emission-sources python3 scripts/check_emission_coverage.py --source-only
 gate explicit-numerical-data python3 scripts/check_explicit_numerical_data.py
 gate foundation-import-boundary python3 scripts/check_foundation_import_boundary.py
 gate build lake build
@@ -178,33 +158,17 @@ if [ "$MODE" != "fast" ]; then
   gate nolints-ratchet python3 scripts/check_nolints.py
   gate lint-style lake exe lint-style
   gate warning-ratchet warning_ratchet
+  # No `--require-api`: see the header. Offline this reports NOT_RUN and passes,
+  # which is the script's documented local contract; CI runs it with the flag so
+  # the one environment guaranteed to have the API cannot silently skip.
   gate pin python3 scripts/check_pin.py
   gate source-independence python3 scripts/check_source_independence.py
   gate subject-layering python3 scripts/check_layering.py
   gate umbrella-coverage python3 scripts/check_umbrella_coverage.py
   gate root-reachability python3 scripts/check_root_reachability.py
   gate coherent-families python3 scripts/check_coherent_families.py
-  gate coverage-map python3 scripts/check_coverage_map.py
   gate single-instantiation single_instantiation
-  # No `--require-api`: see the header. Offline this reports NOT_RUN and passes,
-  # which is the script's documented local contract; CI runs it with the flag so
-  # the one environment guaranteed to have the API cannot silently skip.
-  # emit-build keeps proving the executable still LINKS -- linking is the only
-  # thing that exercises the native-object path at all. It is the expensive gate
-  # on a cold tree (thousands of Mathlib `:c.o` targets) and cheap on a warm
-  # one, which is why CI runs it only in the cache-warm workflow.
-  gate emit-build lake build emit
-  # ...but the emission itself runs INTERPRETED, matching CI. It needs no native
-  # objects and never loads the linked binary, and it emits the same artifact
-  # apart from `emitted_at`. Exit codes propagate through `--run`, which matters
-  # because this non-zero exit IS the repository-wide sorry gate.
-  gate emit lake env lean --run exe/Emit.lean --out "$GATE_TMP"/derived-alg-geo-emission.json
-  # The emit gate above is the repository-wide sorry gate. This one checks that
-  # it swept everything -- without it, a library root nobody imported into
-  # DerivedAlgGeoSweep.lean drops out of coverage with every gate still green.
-  gate emission-coverage python3 scripts/check_emission_coverage.py \
-    "$GATE_TMP"/derived-alg-geo-emission.json
-  gate exe-sorry exe_sorry
+  gate axiom-audit axiom_audit
 fi
 
 echo

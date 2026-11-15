@@ -4,7 +4,6 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Metric.Distance.Basic
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Metric.Isometry.Phase
-import MathFormalContract
 
 /-!
 # Autoequivalences preserve the full stability distance
@@ -122,9 +121,10 @@ theorem act_stabilityDistTerm_functor_obj
   rw [← hmassσ, ← hmassτ]
 
 /-- A compatible autoequivalence pair preserves the complete three-coordinate
-stability distance. -/
-@[cites "stmt:a520a8d4f877:bridgeland2007.lem-8.2" (relation := no_claim)
-        (note := "Full three-coordinate isometry using the ordinary finite HN mass. It is not identified with Lemma 8.2 because the acting group is AutPairQuot v, carrying compatible lattice data, rather than bare Aut(D).")]
+stability distance.
+
+Compare Lemma 8.2 of arXiv:math/0212237, which is stated for `Aut(D)`: an `AutPair` also
+carries a compatible automorphism of the class lattice. -/
 theorem act_stabilityDist (σ τ : StabilityCondition.WithClassMap C v) :
     stabilityDist (a.act σ) (a.act τ) = stabilityDist σ τ := by
   apply le_antisymm
@@ -159,9 +159,10 @@ variable {C : Type u} [Category.{w} C] [HasZeroObject C] [HasShift C ℤ]
   [IsTriangulated C]
 variable {Λ : Type u'} [AddCommGroup Λ] (v : K₀ C →+ Λ)
 
-/-- **The compatible autoequivalence group acts by full-distance isometries.** -/
-@[cites "stmt:a520a8d4f877:bridgeland2007.lem-8.2" (relation := no_claim)
-        (note := "Quotient-group form of AutPair.act_stabilityDist for the ordinary finite HN mass. The remaining boundary is group-theoretic: AutPairQuot v has extra compatible lattice data and is not proved equivalent to Aut(D).")]
+/-- **The compatible autoequivalence group acts by full-distance isometries.**
+
+Compare Lemma 8.2 of arXiv:math/0212237: `AutPairQuot v` carries compatible lattice data and
+is not proved equivalent to `Aut(D)`. -/
 theorem AutPairQuot_smul_stabilityDist
     (g : CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.GroupAction.AutPairQuot v)
     (σ τ : StabilityCondition.WithClassMap C v) :

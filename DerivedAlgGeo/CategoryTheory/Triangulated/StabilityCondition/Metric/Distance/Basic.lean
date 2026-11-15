@@ -3,7 +3,6 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Mass.Uniqueness
-import MathFormalContract
 
 /-!
 # The three-coordinate stability distance
@@ -117,9 +116,10 @@ def stabilityDistTerm (σ τ : StabilityCondition.WithClassMap C v) (E : C)
     (hE : ¬IsZero E) : ℝ≥0∞ :=
   max (phiPlusDist σ τ E hE) (max (phiMinusDist σ τ E hE) (massDist σ τ E))
 
-/-- The three-coordinate, `ℝ≥0∞`-valued stability distance. -/
-@[cites "stmt:a520a8d4f877:bridgeland2007.prop-8.1" (relation := no_claim)
-        (note := "The same three-coordinate formula, with stabilityMass proved equal to the finite mass sum of every HN filtration. WeakStabilityCondition/StabilityCondition/Metric/Distance/Separation.lean proves separation for ordinary stability conditions and for surjective class maps. The comparison with the Section 6 topology is proved unconditionally as stabilityDistanceTopologyCompatible in WeakStabilityCondition/StabilityCondition/Metric/Mass/Subadditivity/Triangle/Consequences.lean: full-distance balls are a neighbourhood basis for the basisNhd topology. The citation stays no_claim pending exact-head source-faithfulness review; no topology or metric instance is installed.")]
+/-- The three-coordinate, `ℝ≥0∞`-valued stability distance.
+
+Compare Proposition 8.1 of arXiv:math/0212237: the formula is the same, and `stabilityMass` is
+proved equal to the finite mass sum of every HN filtration. -/
 def stabilityDist (σ τ : StabilityCondition.WithClassMap C v) : ℝ≥0∞ :=
   ⨆ (E : C) (hE : ¬IsZero E), stabilityDistTerm σ τ E hE
 

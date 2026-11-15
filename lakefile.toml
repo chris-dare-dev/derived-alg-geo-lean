@@ -14,8 +14,7 @@ allowNonModules = true
 # Mathlib v4.35's `haveI`/`letI` style linter is new with the toolchain bump. Adopting it
 # rewrites several hundred proofs, which is left to a follow-up so the bump stays reviewable.
 # It is switched off here rather than in `[leanOptions]`: a style linter does not change what
-# elaborates, so it stays out of the build trace, and `[leanOptions]` is the elaboration
-# environment that `mfc env` records and `exe/Emit.lean` mirrors, scalar values only.
+# elaborates, so it stays out of the build trace.
 weakLeanArgs = ["-Dweak.linter.style.haveILetI=false"]
 
 [leanOptions]
@@ -28,22 +27,14 @@ name = "mathlib"
 scope = "leanprover-community"
 rev = "v4.35.0"
 
-# Shared provenance/emission leaf. It has no Lake dependencies, so it cannot
-# introduce a competing Mathlib revision.
-[[require]]
-name = "MathFormalContract"
-git = "https://github.com/chris-dare-dev/math-formal-contract-lean"
-rev = "5ddf2536e5e57097e568b63b9de06ec00fc8930d"
-
 [[lean_lib]]
 name = "DerivedAlgGeo"
 
 # Mathlib's standard linter set, as Mathlib enables it for itself. It is switched on in this
 # library's own table, not in `weakLeanArgs`, because Lake traces this table: changing a value
 # here rebuilds the library, so a linter switched on reports on every module instead of
-# hiding behind replayed build logs. `lake exe lint-style` reads this table too; `mfc env`
-# and `exe/Emit.lean` read only the top-level `[leanOptions]`. The set cannot switch on
-# `longFile`, which is a number, so it carries Mathlib's own limit.
+# hiding behind replayed build logs. `lake exe lint-style` reads this table too. The set
+# cannot switch on `longFile`, which is a number, so it carries Mathlib's own limit.
 # Each linter set to `false` still has warnings in the library. The change that clears one
 # deletes its line; nothing adds a line.
 [lean_lib.leanOptions]
@@ -60,24 +51,9 @@ weak.linter.style.multiGoal = false
 weak.linter.style.show = false
 weak.linter.style.whitespace = false
 
-# Sweep umbrella for `lake exe emit`. Separate from the stable umbrella because
-# the sorry gate must cover development probes that the public umbrella
+# Sweep umbrella for the axiom audit. Separate from the stable umbrella because
+# the audit must cover development probes that the public umbrella
 # intentionally excludes. See DerivedAlgGeoSweep.lean.
 [[lean_lib]]
 name = "DerivedAlgGeoSweep"
 
-[[lean_exe]]
-name = "emit"
-root = "Emit"
-srcDir = "exe"
-supportInterpreter = true
-
-# The restate producer. `supportInterpreter` for the same reason `emit` needs
-# it: `importModules` reaches Init/Std/Lean declarations with no native
-# implementation, and omitting the flag FAILS ONLY ON LINUX -- macOS resolves
-# the symbol dynamically, so it passes locally and dies in CI.
-[[lean_exe]]
-name = "restate"
-root = "Restate"
-srcDir = "exe"
-supportInterpreter = true

@@ -5,7 +5,6 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.GLTilde.Action.PreStability
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Symmetry.Autoequivalence.Foundations.FiniteLength
 import DerivedAlgGeo.Algebra.Order.NormalizedShift.UniformContinuity
-import MathFormalContract
 
 /-!
 # The lifted linear action on stability conditions
@@ -95,10 +94,12 @@ theorem actStab_slicing (x : GLTilde) (σ : StabilityCondition.WithClassMap C v)
 theorem actStab_Z (x : GLTilde) (σ : StabilityCondition.WithClassMap C v) (a : Λ) :
     (actStab C v x σ).Z a = actC x.mat (σ.Z a) := rfl
 
-/-- **The §8 action.** `G̃L⁺(2, ℝ)` acts on stability conditions. -/
-@[cites "stmt:a520a8d4f877:bridgeland2007.lem-8.2" (relation := one_way)
-        (frontier := ["gltilde-universal-cover"])
-        (note := "Lemma 8.2 names GLTilde as the universal covering space of GL+(2,R). Here it is CONSTRUCTED as a group of compatible pairs (T, f); the covering-space facts are proved separately -- GLTilde.universalCoverData (IsCoveringMap, surjectivity, SimplyConnectedSpace) and exact_deckHom_toMatHom (the Z deck group). The open residual is only that Mathlib has no bundled universal-cover predicate at this pin to instantiate, so cite those declarations rather than implying a larger bundled API. PRESENTATION DIVERGENCE: the paper's is a RIGHT action; this is the corresponding LEFT action of the inverse pair, which is faithful but is not literally the paper's form. The paper's statement implies this one; not conversely.")]
+/-- **The §8 action.** `G̃L⁺(2, ℝ)` acts on stability conditions.
+
+Lemma 8.2 of arXiv:math/0212237 implies this, not conversely. There `G̃L⁺(2, ℝ)` is the
+universal cover of `GL⁺(2, ℝ)`; here it is a group of compatible pairs, shown to be that
+cover by `GLTilde.universalCoverData` and `exact_deckHom_toMatHom`. The paper's action is
+on the right; this is the corresponding left action of the inverse pair. -/
 instance stabMulAction : MulAction GLTilde (StabilityCondition.WithClassMap C v) where
   smul := actStab C v
   one_smul σ := by

@@ -2,7 +2,7 @@
 """Invariant: every tracked file lies in an area that CREDO.md lists.
 
 AREAS is the "In this repository" table of CREDO.md written as path patterns:
-product, authored records, prose and tooling. A file in none of them is a
+product, prose, tooling and exceptions lists. A file in none of them is a
 plan, a review, a run log, a generated listing or some other thing the tree
 refuses. LEGACY names the files outside every area that the tree still holds.
 They may be deleted or shortened, never added to, and LEGACY only shrinks.
@@ -29,16 +29,9 @@ AREAS = {
     "product": (
         r"DerivedAlgGeo/.+\.lean",
         r"DerivedAlgGeo\.lean",
-        r"exe/[^/]+\.lean",
         r"lakefile\.toml",
         r"lean-toolchain",
         r"lake-manifest\.json",
-    ),
-    "authored record": (
-        r"registry/[^/]+\.json",
-        r"formalization\.yaml",
-        r"attest/review\.yaml",
-        r"pins\.json",
     ),
     "prose": (
         r"(README|CONTRIBUTING|CREDO|AGENTS|CLAUDE|LICENSE)\.md",
@@ -73,7 +66,6 @@ AREAS = {
 
 # An entry ending in / names a directory; any other names one file.
 LEGACY = (
-    "registry/README.md",
     "scripts/fixtures/",
     "scripts/private-reader.git/",
 )

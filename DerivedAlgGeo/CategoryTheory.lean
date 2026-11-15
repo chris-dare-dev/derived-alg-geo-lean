@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.Abelian
 import DerivedAlgGeo.CategoryTheory.Bicategory
 import DerivedAlgGeo.CategoryTheory.FiniteFiltration
+import DerivedAlgGeo.CategoryTheory.Generator
 import DerivedAlgGeo.CategoryTheory.GrothendieckGroup
 import DerivedAlgGeo.CategoryTheory.Limits
 import DerivedAlgGeo.CategoryTheory.Monoidal

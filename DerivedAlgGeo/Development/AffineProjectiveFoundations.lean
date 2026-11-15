@@ -13,7 +13,7 @@ This compile-only probe checks the pinned Mathlib APIs for prime and scheme
 spectra, affine module sheaves, and projective affine charts, together with the
 repository's concrete comparison maps. It adds no mathematical declarations.
 `DerivedAlgGeo.Development` imports this module so the verification sweep and
-emitter cover the probe; the stable `DerivedAlgGeo` root does not import it.
+axiom audit cover the probe; the stable `DerivedAlgGeo` root does not import it.
 
 The general localization criterion for the affine counit is Mathlib's
 `AlgebraicGeometry.IsLocalizing` and
@@ -37,7 +37,7 @@ The declaration checks verify the names and types cited by the affine and
 projective spectrum placement map. The anonymous example uses `Iff.rfl` so a
 change that breaks the definitional agreement fails compilation.
 `DerivedAlgGeo.Development` imports this module so the verification sweep and
-emitter cover it; the stable `DerivedAlgGeo` root does not import it.
+axiom audit cover it; the stable `DerivedAlgGeo` root does not import it.
 
 ## References
 

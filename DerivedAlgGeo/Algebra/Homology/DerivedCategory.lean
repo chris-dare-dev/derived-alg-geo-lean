@@ -27,6 +27,7 @@ import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Homology
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.RightDerivedFunctorPlus
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Ext
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KProjective
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.LocallySmall
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomology
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyLinear
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyLocalization
