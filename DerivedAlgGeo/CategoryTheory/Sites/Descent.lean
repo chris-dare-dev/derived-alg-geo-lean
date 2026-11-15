@@ -7,10 +7,12 @@ import DerivedAlgGeo.CategoryTheory.Sites.Descent.DescentDataAsCoalgebra
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.DescentDataPrime
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.FiberProduct
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.IsStack
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.ObjectProperty
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Discrete
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.FiberProduct
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Morphism
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.ObjectProperty
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Representable
 
 /-!
@@ -27,9 +29,12 @@ its directory, so this umbrella imports the children directly.
 * `DescentDataAsCoalgebra.lean`: the base change morphism of a chosen pullback,
   and descent data along one morphism as coalgebras for the comonad of
   `f^* ⊣ f_*` when two base change morphisms are isomorphisms.
+* `ObjectProperty.lean`: local object properties and the equivalence between
+  descent data of the core and the core of descent data.
 * `StackInGroupoids.lean` and its children: stacks in groupoids, discrete
-  stacks from sheaves, stack morphisms, site-object representability, and
-  2-fibre products, diagonals and Isom sheaves of stacks in groupoids.
+  stacks from sheaves, stack morphisms, site-object representability, the
+  moduli of objects `StackInGroupoids.ofObjectProperty`, and 2-fibre products,
+  diagonals and Isom sheaves of stacks in groupoids.
 
 ## Main results
 
@@ -41,6 +46,8 @@ its directory, so this umbrella imports the children directly.
   reindexing along a functor that preserves the pullbacks involved.
 * `FiberProduct.lean`: the 2-fibre product of two stacks over a prestack is a
   stack, and the terminal pseudofunctor is a stack.
+* `ObjectProperty.lean`: the core of a stack is a stack, and a local object
+  property closed under isomorphisms cuts out a substack.
 
 ## Implementation notes
 

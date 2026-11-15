@@ -101,7 +101,8 @@ concurrency:
 
 jobs:
   # Decides whether a change needs the Lean build, and judges it here when it
-  # does not.
+  # does not. Also judges, on every change, that each file lies in an area
+  # CREDO.md lists.
   #
   # FAIL-OPEN, like "What changed" in `build`: `build=false` is written only
   # once this job has positively established that every changed path is prose.
@@ -135,7 +136,7 @@ jobs:
           PUSH_BEFORE: ${{ github.event.before }}
         run: |
           set -euo pipefail
-          prose='^((docs|notes|openspec|\.claude/roadmap)/.*|([^/]+|\.claude/.*)\.md)$'
+          prose='^((docs|\.claude/roadmap)/.*|([^/]+|\.claude/.*)\.md)$'
           base=""
           case "$EVENT_NAME" in
             pull_request) base="$PR_BASE" ;;
@@ -160,6 +161,11 @@ jobs:
           fi
           echo "build=$build" >> "$GITHUB_OUTPUT"
           echo "build=$build"
+
+      - name: Every file lies in a CREDO area
+        env:
+          AREAS_BASE: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha || github.event.before }}
+        run: python3 scripts/check_tree_areas.py "$AREAS_BASE"
 
       # The two gates in `build` that read prose. Neither needs Lean.
       - name: Codex loop entrypoint
