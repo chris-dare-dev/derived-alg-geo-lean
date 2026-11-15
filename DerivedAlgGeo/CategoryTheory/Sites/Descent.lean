@@ -16,6 +16,7 @@ import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.FiberProduct
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Morphism
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.ObjectProperty
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Representable
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Representability
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.ULift
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.ULift
 
@@ -39,7 +40,9 @@ its directory, so this umbrella imports the children directly.
   stacks from sheaves, stack morphisms, site-object representability, the
   moduli of objects `StackInGroupoids.ofObjectProperty`, universe lifts of
   stacks, 2-fibre products, diagonals and Isom sheaves of stacks in
-  groupoids, and the 2-Yoneda equivalence `StackInGroupoids.yonedaEquivalence`.
+  groupoids, the 2-Yoneda equivalence `StackInGroupoids.yonedaEquivalence`,
+  and representable morphisms of stacks, natural in the test object
+  (`StackMorphism.IsRepresentable`).
 * `ULift.lean`: descent data of the universe lift `Pseudofunctor.ulift` are
   equivalent to those of the original pseudofunctor.
 
