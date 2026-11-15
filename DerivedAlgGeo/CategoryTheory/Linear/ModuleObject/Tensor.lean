@@ -3,7 +3,8 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.CategoryTheory.Linear.ModuleObject.Basic
-import Mathlib.Algebra.Category.ModuleCat.Basic
+import Mathlib.Algebra.Category.ModuleCat.ChangeOfRings
+import Mathlib.Algebra.Module.RingHom
 import Mathlib.CategoryTheory.Adjunction.Limits
 import Mathlib.CategoryTheory.Adjunction.Parametrized
 import Mathlib.CategoryTheory.Linear.Yoneda
@@ -246,6 +247,23 @@ lemma ιTensorObj_tensorObjMap {M M' : ModuleCat.{w} R} (g : M ⟶ M') (m : M) :
     E.ιTensorObj M m ≫ E.tensorObjMap g = E.ιTensorObj M' (g.hom m) :=
   E.ιTensorObj_tensorHomEquiv_symm M _ m
 
+@[simp]
+lemma tensorObjMap_id : E.tensorObjMap (𝟙 M) = 𝟙 _ :=
+  E.tensorObj_hom_ext M fun m => by simp
+
+@[reassoc]
+lemma tensorObjMap_comp {M M' M'' : ModuleCat.{w} R} (g : M ⟶ M') (g' : M' ⟶ M'') :
+    E.tensorObjMap (g ≫ g') = E.tensorObjMap g ≫ E.tensorObjMap g' :=
+  E.tensorObj_hom_ext M fun m => by simp
+
+lemma tensorObjMap_add {M M' : ModuleCat.{w} R} (g g' : M ⟶ M') :
+    E.tensorObjMap (g + g') = E.tensorObjMap g + E.tensorObjMap g' :=
+  E.tensorObj_hom_ext M fun m => by simp [ιTensorObj_add]
+
+@[simp]
+lemma tensorObjMap_zero {M M' : ModuleCat.{w} R} : E.tensorObjMap (0 : M ⟶ M') = 0 :=
+  E.tensorObj_hom_ext M fun m => by simp
+
 /-- The functor `(-) ⊗_R E` from `R`-modules to `A`. -/
 noncomputable abbrev tensorFunctor : ModuleCat.{w} R ⥤ A where
   obj M := E.tensorObj M
@@ -452,5 +470,218 @@ def IsFlatObject (E : A) : Prop :=
   PreservesFiniteLimits ((moduleTensor k A).flip.obj E)
 
 end ModuleTensor
+
+namespace ModuleObject
+
+section Extend
+
+variable {k : Type u} [CommRing k] {A : Type v} [Category.{w} A] [Preadditive A] [Linear k A]
+  [HasCoproducts.{w} A] [HasCoequalizers A]
+  {R₁ : Type u₁} {R₂ : Type w} [CommRing R₁] [CommRing R₂] [Algebra k R₁] [Algebra k R₂]
+  (φ : R₁ →ₐ[k] R₂)
+
+/-- `R₂` as an `R₁`-module through `φ`. -/
+noncomputable abbrev extendModule : ModuleCat.{w} R₁ :=
+  (ModuleCat.restrictScalars (φ : R₁ →+* R₂)).obj (ModuleCat.of R₂ R₂)
+
+/-- An element of `R₂`, as an element of the `R₁`-module `R₂`. -/
+def extendModuleOf (s : R₂) : extendModule φ :=
+  s
+
+/-- An element of the `R₁`-module `R₂`, as an element of `R₂`. -/
+def extendModuleTo (x : extendModule φ) : R₂ :=
+  x
+
+@[simp]
+lemma extendModuleTo_extendModuleOf (s : R₂) : extendModuleTo φ (extendModuleOf φ s) = s :=
+  rfl
+
+lemma extendModuleOf_surjective : Function.Surjective (extendModuleOf φ) :=
+  fun x => ⟨x, rfl⟩
+
+/-- Multiplication by `s` on `R₂`, as an endomorphism of the `R₁`-module `R₂`. -/
+noncomputable def extendModuleMul (s : R₂) : extendModule φ ⟶ extendModule φ :=
+  (ModuleCat.restrictScalars (φ : R₁ →+* R₂)).map (s • 𝟙 (ModuleCat.of R₂ R₂))
+
+@[simp]
+lemma extendModuleMul_hom_extendModuleOf (s t : R₂) :
+    (extendModuleMul φ s).hom (extendModuleOf φ t) = extendModuleOf φ (s * t) :=
+  rfl
+
+lemma smul_extendModuleOf (r : R₁) (t : R₂) :
+    r • extendModuleOf φ t = extendModuleOf φ (φ r * t) :=
+  rfl
+
+lemma extendModuleOf_add (s t : R₂) :
+    extendModuleOf φ (s + t) = extendModuleOf φ s + extendModuleOf φ t :=
+  rfl
+
+lemma extendModuleMul_one : extendModuleMul φ 1 = 𝟙 _ := by
+  ext x
+  obtain ⟨x, rfl⟩ := extendModuleOf_surjective φ x
+  simp
+
+lemma extendModuleMul_mul (s t : R₂) :
+    extendModuleMul φ (s * t) = extendModuleMul φ t ≫ extendModuleMul φ s := by
+  ext x
+  obtain ⟨x, rfl⟩ := extendModuleOf_surjective φ x
+  simp [mul_assoc]
+
+lemma extendModuleMul_zero : extendModuleMul φ 0 = 0 := by
+  ext x
+  obtain ⟨x, rfl⟩ := extendModuleOf_surjective φ x
+  simp only [extendModuleMul_hom_extendModuleOf, zero_mul]
+  rfl
+
+lemma extendModuleMul_add (s t : R₂) :
+    extendModuleMul φ (s + t) = extendModuleMul φ s + extendModuleMul φ t := by
+  ext x
+  obtain ⟨x, rfl⟩ := extendModuleOf_surjective φ x
+  simp only [extendModuleMul_hom_extendModuleOf, add_mul, extendModuleOf_add]
+  rfl
+
+lemma extendModuleMul_algebraMap (c : k) :
+    extendModuleMul φ (algebraMap k R₂ c) = algebraMap k R₁ c • 𝟙 _ := by
+  ext x
+  obtain ⟨x, rfl⟩ := extendModuleOf_surjective φ x
+  change extendModuleOf φ (algebraMap k R₂ c * x) = extendModuleOf φ (φ (algebraMap k R₁ c) * x)
+  rw [φ.commutes]
+
+/-- The base change `R₂ ⊗_{R₁} E` of an `R₁`-module object along `φ`, on which `R₂` acts through
+its action on the factor `R₂` [AHLH, §7.1]. -/
+noncomputable def extendObj (E : ModuleObject k A R₁) : ModuleObject k A R₂ where
+  obj := E.tensorObj (extendModule φ)
+  act :=
+    { toFun s := .of (E.tensorObjMap (extendModuleMul φ s))
+      map_one' := by ext; simp [extendModuleMul_one]
+      map_mul' s t := by ext; simp [extendModuleMul_mul, tensorObjMap_comp]
+      map_zero' := by ext; simp [extendModuleMul_zero]
+      map_add' s t := by ext; simp [extendModuleMul_add, tensorObjMap_add]
+      commutes' c := End.ext <| E.tensorObj_hom_ext _ fun x => by
+        dsimp only
+        rw [extendModuleMul_algebraMap, ιTensorObj_tensorObjMap]
+        change E.ιTensorObj _ (algebraMap k R₁ c • x) = _
+        rw [ιTensorObj_smul, AlgHom.commutes]
+        simp [Algebra.algebraMap_eq_smul_one] }
+
+variable {φ} in
+/-- The map `E ⟶ R₂ ⊗_{R₁} E` at an element `x` of `R₂`, that is `e ↦ x ⊗ e`. -/
+noncomputable def extendι (E : ModuleObject k A R₁) (x : extendModule φ) :
+    E.obj ⟶ (extendObj φ E).obj :=
+  E.ιTensorObj (extendModule φ) x
+
+variable {φ} in
+lemma extendObj_hom_ext {E : ModuleObject k A R₁} {G : A} {f g : (extendObj φ E).obj ⟶ G}
+    (h : ∀ x, extendι E x ≫ f = extendι E x ≫ g) : f = g :=
+  E.tensorObj_hom_ext _ h
+
+variable {φ} in
+lemma extendι_smul (E : ModuleObject k A R₁) (r : R₁) (x : extendModule φ) :
+    extendι E (r • x) = (E.act r).asHom ≫ extendι E x :=
+  E.ιTensorObj_smul _ r x
+
+variable {φ} in
+@[reassoc (attr := simp)]
+lemma extendι_act (E : ModuleObject k A R₁) (s : R₂) (x : extendModule φ) :
+    extendι E x ≫ ((extendObj φ E).act s).asHom = extendι E ((extendModuleMul φ s).hom x) :=
+  E.ιTensorObj_tensorObjMap _ x
+
+variable {φ} in
+/-- A morphism out of `R₂ ⊗_{R₁} E` from an `R₁`-linear map `R₂ → Hom_A(E, G)`. -/
+noncomputable def extendObjDesc {E : ModuleObject k A R₁} {G : A}
+    (L : extendModule φ ⟶ ModuleCat.of R₁ (E.HomModule G)) : (extendObj φ E).obj ⟶ G :=
+  (E.tensorHomEquiv _ G).symm L
+
+variable {φ} in
+@[reassoc (attr := simp)]
+lemma extendι_extendObjDesc {E : ModuleObject k A R₁} {G : A}
+    (L : extendModule φ ⟶ ModuleCat.of R₁ (E.HomModule G)) (x : extendModule φ) :
+    extendι E x ≫ extendObjDesc L = (L.hom x).hom :=
+  E.ιTensorObj_tensorHomEquiv_symm _ L x
+
+/-- The unit of base change: `E ⟶ φ_* (R₂ ⊗_{R₁} E)`, the map `e ↦ 1 ⊗ e`. -/
+noncomputable def extendUnit (E : ModuleObject k A R₁) : E ⟶ (restrict φ).obj (extendObj φ E) where
+  hom := extendι E (extendModuleOf φ 1)
+  comm r := by
+    have h₁ := (extendι_smul E r (extendModuleOf φ 1)).symm
+    have h₂ := extendι_act E (φ r) (extendModuleOf φ 1)
+    rw [smul_extendModuleOf, mul_one] at h₁
+    rw [extendModuleMul_hom_extendModuleOf, mul_one] at h₂
+    exact h₁.trans h₂.symm
+
+/-- The `R₁`-linear map `R₂ → Hom_A(E, F)`, `x ↦ h ≫ F.act x`, adjoint to `h : E ⟶ φ_* F`. -/
+noncomputable def extendLinearMap {E : ModuleObject k A R₁} {F : ModuleObject k A R₂}
+    (h : E ⟶ (restrict φ).obj F) : extendModule φ ⟶ ModuleCat.of R₁ (E.HomModule F.obj) :=
+  ConcreteCategory.ofHom (C := ModuleCat.{w} R₁)
+    { toFun x := .of (h.hom ≫ (F.act (extendModuleTo φ x)).asHom)
+      map_add' x y := by
+        obtain ⟨x, rfl⟩ := extendModuleOf_surjective φ x
+        obtain ⟨y, rfl⟩ := extendModuleOf_surjective φ y
+        ext
+        change h.hom ≫ (F.act (x + y)).asHom = h.hom ≫ (F.act x).asHom + h.hom ≫ (F.act y).asHom
+        rw [map_add, End.add_asHom]
+        exact Preadditive.comp_add _ _ _ _ _ _
+      map_smul' r x := by
+        obtain ⟨x, rfl⟩ := extendModuleOf_surjective φ x
+        ext
+        change h.hom ≫ (F.act (φ r * x)).asHom = (E.act r).asHom ≫ h.hom ≫ (F.act x).asHom
+        rw [mul_comm, map_mul, End.mul_asHom]
+        exact (h.comm_assoc r _).symm }
+
+omit [HasCoproducts.{w} A] [HasCoequalizers A] in
+@[simp]
+lemma extendLinearMap_hom_apply_hom {E : ModuleObject k A R₁} {F : ModuleObject k A R₂}
+    (h : E ⟶ (restrict φ).obj F) (x : R₂) :
+    ((extendLinearMap φ h).hom (extendModuleOf φ x)).hom = h.hom ≫ (F.act x).asHom :=
+  rfl
+
+/-- The bijection `Hom(R₂ ⊗_{R₁} E, F) ≃ Hom(E, φ_* F)`. -/
+noncomputable def extendHomEquiv (E : ModuleObject k A R₁) (F : ModuleObject k A R₂) :
+    (extendObj φ E ⟶ F) ≃ (E ⟶ (restrict φ).obj F) where
+  toFun g := extendUnit φ E ≫ (restrict φ).map g
+  invFun h := ⟨extendObjDesc (extendLinearMap φ h), fun s => extendObj_hom_ext fun x => by
+    obtain ⟨x, rfl⟩ := extendModuleOf_surjective φ x
+    have key : h.hom ≫ (F.act (s * x)).asHom = (h.hom ≫ (F.act x).asHom) ≫ (F.act s).asHom := by
+      rw [map_mul, End.mul_asHom]
+      exact (Category.assoc _ _ _).symm
+    simp only [extendι_act_assoc, extendι_extendObjDesc, extendι_extendObjDesc_assoc,
+      extendModuleMul_hom_extendModuleOf]
+    exact key⟩
+  left_inv g := by
+    ext
+    refine extendObj_hom_ext fun x => ?_
+    obtain ⟨x, rfl⟩ := extendModuleOf_surjective φ x
+    simp only [extendι_extendObjDesc]
+    change (extendι E (extendModuleOf φ 1) ≫ g.hom) ≫ (F.act x).asHom = _
+    rw [Category.assoc, ← Hom.comm, extendι_act_assoc, extendModuleMul_hom_extendModuleOf, mul_one]
+  right_inv h := by
+    ext
+    change extendι E (extendModuleOf φ 1) ≫ extendObjDesc (extendLinearMap φ h) = h.hom
+    rw [extendι_extendObjDesc, extendLinearMap_hom_apply_hom, map_one, End.one_asHom]
+    exact Category.comp_id _
+
+variable (A) in
+/-- Base change `φ^* = R₂ ⊗_{R₁} (-)` along `φ : R₁ →ₐ[k] R₂` [AHLH, §7.1, citing AZ,
+Prop. B3.16]. -/
+noncomputable def extend : ModuleObject k A R₁ ⥤ ModuleObject k A R₂ :=
+  Adjunction.leftAdjointOfEquiv (G := restrict φ) (extendHomEquiv φ)
+    fun _ _ _ _ _ => by simp [extendHomEquiv]
+
+@[simp]
+lemma extend_obj (E : ModuleObject k A R₁) : (extend A φ).obj E = extendObj φ E :=
+  rfl
+
+/-- Base change is left adjoint to restriction [AHLH, §7.1, citing AZ, Prop. B3.16]. -/
+noncomputable def extendRestrictAdj : extend A φ ⊣ restrict φ :=
+  Adjunction.adjunctionOfEquivLeft _ _
+
+lemma extendRestrictAdj_homEquiv (E : ModuleObject k A R₁) (F : ModuleObject k A R₂) :
+    (extendRestrictAdj (A := A) φ).homEquiv E F = extendHomEquiv φ E F := by
+  unfold extendRestrictAdj Adjunction.adjunctionOfEquivLeft
+  erw [Adjunction.mkOfHomEquiv_homEquiv]
+
+end Extend
+
+end ModuleObject
 
 end CategoryTheory
