@@ -182,7 +182,7 @@ It runs every gate in `scripts/gates.sh` that needs no Lean build — workflows,
 `--diff-only` style on your own lines, source-independence, layering, the
 neutral derived-category Stability import closure, umbrella coverage, root
 reachability, coherent families, coverage map, pin, nolints,
-roadmap, tree areas, and the two hook tests — then a targeted `lake build` of the modules
+roadmap and tree areas — then a targeted `lake build` of the modules
 you changed. About a minute plus that build, against twenty minutes or more for
 CI. It is a cheap green, not a green: the
 library build, the ratchets, the linters and the emitter's axiom audit all need
