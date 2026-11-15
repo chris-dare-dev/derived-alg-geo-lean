@@ -109,8 +109,8 @@ jobs:
   # No usable diff base, an empty diff, a merge-queue entry, a manual dispatch
   # or one path outside the list all leave `build=true`.
   #
-  # The prose list is the set of paths that no step in `build` reads, apart
-  # from the two gates repeated at the end of this job. `scripts/`, `.github/`,
+  # The prose list is the set of paths that no step in `build` reads.
+  # `scripts/`, `.github/`,
   # `registry/`, `attest/` and every Lean file stay out of it on purpose.
   # `.claude/roadmap/` is in it because its only judge is the `roadmap` job,
   # which always runs. cache-warm.yml ignores the same paths; change the two
@@ -1494,9 +1494,9 @@ jobs:
           # fails here.
           #
           # One exception, and it is narrow: a skipped `build` is accepted when
-          # `changes` succeeded AND wrote `build=false`. That job then ran the
-          # gates that judge prose, so the skip is a verdict that nothing in
-          # the change is the build's to check, not a job that never ran.
+          # `changes` succeeded AND wrote `build=false`. The skip is then a
+          # verdict that nothing in the change is the build's to check, not a
+          # job that never ran.
           echo "changes=${CHANGES} build_needed=${BUILD_NEEDED} build=${BUILD} roadmap=${ROADMAP}"
           rc=0
           for pair in "changes=${CHANGES}" "roadmap=${ROADMAP}"; do
