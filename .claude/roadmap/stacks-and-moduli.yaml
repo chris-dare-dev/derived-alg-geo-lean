@@ -1436,7 +1436,7 @@ items:
     kind: task
     parent: stacks-and-moduli-mod1
     title: "MOD1.4a: The solution scheme of a finite linear system over a base is affine and of finite presentation"
-    status: planned
+    status: done
     priority: must
     size: S
     summary: "The solutions of a finite linear system over a base scheme form a scheme that is affine and of finite presentation over the base. For A : Matrix n m Γ(S, ⊤) with m, n finite, there is a closed subscheme linearKernel A of 𝔸(m; S). Its S-morphisms from any X over S are exactly the vectors v : m → Γ(X, ⊤) with A · v = 0, where A is pulled back along X ↘ S. The structure morphism linearKernel A ↘ S is affine and locally of finite presentation."

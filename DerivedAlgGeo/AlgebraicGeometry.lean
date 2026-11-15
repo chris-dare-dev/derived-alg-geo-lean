@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.AlgebraicGeometry.AffineSpace
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology
 import DerivedAlgGeo.AlgebraicGeometry.CohomologyPushforward
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory
