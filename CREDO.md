@@ -104,10 +104,8 @@ what that line names and to nothing else.
 - `scripts/fixtures/` holds known-answer fixtures for the style and layering
   checks (§3).
 - Comments in `exe/`, `formalization.yaml`, `registry/` and the scripts
-  `check_layering.py`, `check_mathlib_style.py` and `check_pin.py` carry dates,
-  issue numbers and the history of changes. The provenance check reads only
-  `DerivedAlgGeo/` (§4).
-- `pins.json` restates `lean-toolchain`, `lakefile.toml` and
-  `lake-manifest.json`, and records where and when it was written (§1, §4).
+  `check_layering.py` and `check_mathlib_style.py` carry dates, issue numbers
+  and the history of changes. The provenance check reads only `DerivedAlgGeo/`
+  (§4).
 - Some names pass 60 characters (§4).
 - Structures that package unproved inputs are named `Data` (Lean rules).
