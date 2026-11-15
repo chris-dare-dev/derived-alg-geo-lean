@@ -13,15 +13,13 @@ question and does not have to be a Mathlib-clean file in every other respect.
 A fixture is Lean source text but deliberately **not** a `.lean` file. It must
 reach neither `lake`, `lake exe lint-style`, the declaration sweep, nor the
 checker's own `in_scope`, which excludes `scripts/` anyway.
-`scripts/fixtures/layering` keeps its hypothetical modules out of the build the
-same way, with `*.imports`.
 
 ## `conflict` — unresolved merge-conflict markers
 
 Added after #1359 (issue #1315): a rebase left markers in two files, `git add
--A` staged them, and nothing local caught it. Every structural gate in
-`scripts/` parses `import` lines and ignores the rest, so a conflicted file
-passes all of them; the defect surfaced ~13 minutes into CI as
+-A` staged them, and nothing local caught it. The structural gates in
+`scripts/` read imports and declaration names, not the rest of a file, so a
+conflicted file passes them; the defect surfaced ~13 minutes into CI as
 `unexpected token '<<<'; expected command`.
 
 | Fixture | What it pins |
@@ -58,18 +56,3 @@ module docstring.
 | --- | --- |
 | `allowed/NoteStringLiteral` | the limit landing inside a string literal; the code on the line is short and reflowing means a string gap that edits the payload |
 | `forbidden/BreakableTerm` | an ordinary overlong term, which is what the rule is for |
-
-## `prime` — a trailing `'` wants an explanation
-
-| Fixture | What it pins |
-| --- | --- |
-| `allowed/MathlibFieldObligations` | `zero_mem'` and `ext'`: Mathlib fixes the name, so there is no "differs from the unprimed form" to write |
-| `forbidden/UndocumentedPrime` | a primed name the author chose, with no docstring |
-
-## `doc` — a definition needs a docstring
-
-| Fixture | What it pins |
-| --- | --- |
-| `allowed/MultiLineAttribute` | a docstring separated from its `def` by an `@[cites ...]` that spans two lines; skipping only lines starting with `@[` stopped at the continuation and called the declaration undocumented |
-| `forbidden/UndocumentedDef` | a `def` with no docstring, which is what the check is for |
-| `forbidden/VariableBracketAbove` | a `variable [...]` line directly above a `def`: the walk back from a closing `]` stops at a blank line, so it cannot borrow the docstring of an earlier `@[simp]` declaration |
