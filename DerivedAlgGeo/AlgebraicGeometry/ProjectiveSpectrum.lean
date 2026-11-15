@@ -5,6 +5,7 @@ import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Integral
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Modules
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.ProjectiveSpaceProperties
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.ProjectiveSpaceVariety
+import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Relative
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.StructureSections
 
 /-!
@@ -32,12 +33,14 @@ develops further geometric and module-sheaf results on those charts.
   of the graded ring.
 * `AlgebraicGeometry.Proj.isClosedImmersion_map` shows that `Proj` of a surjective graded ring
   map is a closed immersion.
+* `AlgebraicGeometry.Scheme.QuasicoherentGradedAlgebraData.relativeProj` is the relative `Proj`
+  of a quasi-coherent graded algebra over a base scheme.
 
 ## Implementation notes
 
 This umbrella re-exports `BaseChange`, `BasicOpenLemmas`, `Functor`, `Integral`, `Modules`,
-`ProjectiveSpaceProperties`, `ProjectiveSpaceVariety`, and `StructureSections`. The local
-module-chart path is
+`ProjectiveSpaceProperties`, `ProjectiveSpaceVariety`, `Relative`, and `StructureSections`. The
+local module-chart path is
 `ProjectiveSpectrum/Modules/ChartExtension.lean` →
 `AlgebraicGeometry/Modules/Affine/Extension.lean` → Mathlib's
 `AlgebraicGeometry/Modules/Tilde.lean`. Its chart ring is
