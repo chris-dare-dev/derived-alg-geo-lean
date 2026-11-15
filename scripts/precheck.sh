@@ -117,8 +117,8 @@ changed_lean_files() {
   # `origin/main`, not `main`: the local `main` in this clone is hundreds of
   # commits stale, and diffing against it would hand every check the whole
   # library instead of the branch's own changes.
-  git diff --name-only origin/main...HEAD -- '*.lean'
-  git diff --name-only -- '*.lean'
+  git diff --name-only --diff-filter=d origin/main...HEAD -- '*.lean'
+  git diff --name-only --diff-filter=d -- '*.lean'
 }
 
 mathlib_style() {
