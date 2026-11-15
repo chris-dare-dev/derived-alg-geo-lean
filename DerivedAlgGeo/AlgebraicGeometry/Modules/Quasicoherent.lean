@@ -7,6 +7,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.Descent
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.Extensions
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.Kernels
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.Pullback
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.Stalk
 
 /-! # Quasi-coherent module sheaves
 
