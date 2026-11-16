@@ -13,10 +13,11 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.Stalk
 
 A point `x` of a scheme `X` is associated to a module sheaf `F` when the maximal ideal of the
 local ring `𝒪_{X,x}` is an associated prime of the stalk `F_x` (Stacks 02OJ). On an affine open
-`U` of `X`, for quasi-coherent `F`, the associated points are the associated primes of the
-`Γ(X, U)`-module `Γ(U, F)` (Stacks 02OK); a coherent sheaf on a Noetherian scheme has finitely
-many of them (Stacks 05AF); and a function on `U` that is a unit at every associated point in `U`
-acts injectively on every stalk of `F` over `U`.
+`U` of `X`, for quasi-coherent `F`, an associated prime of the `Γ(X, U)`-module `Γ(U, F)` is an
+associated point, and conversely for a finitely generated prime (Stacks 02OK). A coherent sheaf
+on a locally Noetherian scheme has finitely many associated points in every quasi-compact subset
+(Stacks 05AF). When `Γ(X, U)` is Noetherian, a function on `U` that is a unit at every associated
+point in `U` acts injectively on every stalk of `F` over `U`.
 
 ## Main definitions
 
@@ -30,8 +31,9 @@ acts injectively on every stalk of `F` over `U`.
   converse, for a finitely generated prime.
 * `AlgebraicGeometry.Scheme.Modules.fromSpec_mem_associatedPoints_iff`: the two together, when
   `Γ(X, U)` is Noetherian.
-* `AlgebraicGeometry.Scheme.Modules.associatedPoints_finite`: a coherent sheaf on a Noetherian
-  scheme has finitely many associated points.
+* `AlgebraicGeometry.Scheme.Modules.associatedPoints_inter_finite`: a coherent sheaf on a locally
+  Noetherian scheme has finitely many associated points in every quasi-compact subset, and
+  `AlgebraicGeometry.Scheme.Modules.associatedPoints_finite` on a Noetherian scheme.
 * `AlgebraicGeometry.Scheme.Modules.isSMulRegular_germ`: a function on an affine open with a
   Noetherian coordinate ring that is a unit at every associated point there is a nonzerodivisor on
   every stalk there.
@@ -45,8 +47,7 @@ element, not the annihilator itself. At the maximal ideal of a local ring this s
 minimal over the annihilator of an element, which is Stacks' *weakly* associated prime (Stacks
 0547). So `associatedPoints F` is the set of weakly associated points of Stacks 056L. When `𝔪_x`
 is finitely generated, in particular on a locally Noetherian scheme, the two notions agree
-(Stacks 05AR), and that is the setting of every theorem here except the definition and the
-direction `fromSpec_mem_associatedPoints_of_mem_associatedPrimes`.
+(Stacks 05AR). The finiteness and nonzerodivisor theorems here are stated in that setting.
 
 ### The affine comparison is a localization statement
 
@@ -261,17 +262,15 @@ private theorem moduleFinite_sections (F : X.Modules) (hF : IsCoherent X F) {U :
   rw [CategoryTheory.Functor.map_id]
   rfl
 
-/-- **A coherent sheaf on a Noetherian scheme has finitely many associated points** (Stacks
-05AF).
+/-- **A coherent sheaf on a locally Noetherian scheme has finitely many associated points in every
+quasi-compact subset** (Stacks 05AF).
 
-Cover `X` by finitely many affine opens. On each, the associated points are the associated
+Cover the subset by finitely many affine opens. On each, the associated points are the associated
 primes of the sections (`fromSpec_mem_associatedPoints_iff`), and a finite module over a
-Noetherian ring has finitely many (`associatedPrimes.finite`).
-
-`IsNoetherian X` is load-bearing: on `Spec A` for `A = k[x₁, x₂, …]/(xᵢ xⱼ)_{i ≠ j}`, the
-structure sheaf has the infinitely many associated points `(xⱼ)_{j ≠ i}`, one for each `i`. -/
-theorem associatedPoints_finite [IsNoetherian X] (F : X.Modules) (hF : IsCoherent X F) :
-    (associatedPoints F).Finite := by
+Noetherian ring has finitely many (`associatedPrimes.finite`). -/
+theorem associatedPoints_inter_finite [IsLocallyNoetherian X] (F : X.Modules)
+    (hF : IsCoherent X F) {S : Set X} (hS : IsCompact S) :
+    (associatedPoints F ∩ S).Finite := by
   haveI : SheafOfModules.IsQuasicoherent.{u, u, u}
       (show SheafOfModules X.ringCatSheaf from F) := by
     haveI : SheafOfModules.IsFinitePresentation.{u, u, u}
@@ -288,13 +287,22 @@ theorem associatedPoints_finite [IsNoetherian X] (F : X.Modules) (hF : IsCoheren
       rw [← fromSpec_mem_associatedPoints_iff F hU, hU.fromSpec_primeIdealOf ⟨x, hxU⟩]
       exact hx
     · exact hU.fromSpec_primeIdealOf ⟨x, hxU⟩
-  obtain ⟨t, ht⟩ := isCompact_univ.elim_finite_subcover (fun U : X.affineOpens ↦ (U : Set X))
+  obtain ⟨t, ht⟩ := hS.elim_finite_subcover (fun U : X.affineOpens ↦ (U : Set X))
     (fun U ↦ U.1.isOpen) fun x _ ↦ by
       obtain ⟨_, ⟨U, hU, rfl⟩, hxU, -⟩ :=
         X.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ x) isOpen_univ
       exact Set.mem_iUnion.mpr ⟨⟨U, hU⟩, hxU⟩
-  refine (t.finite_toSet.biUnion fun U _ ↦ hchart U).subset fun x hx ↦ ?_
-  obtain ⟨U, hU, hxU⟩ := Set.mem_iUnion₂.mp (ht (Set.mem_univ x))
+  refine (t.finite_toSet.biUnion fun U _ ↦ hchart U).subset fun x ⟨hx, hxS⟩ ↦ ?_
+  obtain ⟨U, hU, hxU⟩ := Set.mem_iUnion₂.mp (ht hxS)
   exact Set.mem_iUnion₂.mpr ⟨U, hU, hx, hxU⟩
+
+/-- **A coherent sheaf on a Noetherian scheme has finitely many associated points** (Stacks
+05AF, for the quasi-compact open `X`).
+
+`IsNoetherian X` is load-bearing: on `Spec A` for `A = k[x₁, x₂, …]/(xᵢ xⱼ)_{i ≠ j}`, the
+structure sheaf has the infinitely many associated points `(xⱼ)_{j ≠ i}`, one for each `i`. -/
+theorem associatedPoints_finite [IsNoetherian X] (F : X.Modules) (hF : IsCoherent X F) :
+    (associatedPoints F).Finite := by
+  simpa using associatedPoints_inter_finite F hF isCompact_univ
 
 end AlgebraicGeometry.Scheme.Modules

@@ -22,9 +22,9 @@ no associated point of `F`,
 `0 ⟶ F(-1) ⟶(·h) F ⟶ i_* i^* F ⟶ 0`
 
 is short exact. Over an infinite field a coherent `F` has such an `h`: its associated points are
-finite (`Scheme.Modules.associatedPoints_finite`) and `exists_linearForm_not_mem` avoids them.
-Together these are Stacks 08A0, the restriction-to-a-hyperplane step of the inductions on the
-dimension of `ℙ(ι)`.
+finite (`Scheme.Modules.associatedPoints_inter_finite`) and `exists_linearForm_not_mem` avoids
+them. Together these are Stacks 08A0 (`exists_hyperplaneSequence_shortExact`), the
+restriction-to-a-hyperplane step of the inductions on the dimension of `ℙ(ι)`.
 
 ## Main definitions
 
@@ -42,6 +42,8 @@ dimension of `ℙ(ι)`.
   linear form avoids finitely many points.
 * `AlgebraicGeometry.Proj.hyperplaneSection_shortExact`: the hyperplane sequence is short exact
   when `h` avoids the associated points of `F`.
+* `AlgebraicGeometry.Proj.exists_hyperplaneSequence_shortExact`: over an infinite field, a
+  coherent `F` has such an `h` (Stacks 08A0).
 
 ## Implementation notes
 
@@ -109,9 +111,11 @@ variable {Z Y : Scheme.{u}} (i : Z ⟶ Y) [IsClosedImmersion i]
 
 set_option backward.isDefEq.respectTransparency false in
 set_option backward.defeqAttrib.useBackward true in
+omit [IsClosedImmersion i] in
 /-- At a point `i q`, the stalk of the unit `G ⟶ i_* i^* G` is `m ↦ 1 ⊗ m` into
-`𝒪_{Z,q} ⊗ G_{i q}`, read through an injective map. -/
-private theorem exists_injective_unit_stalk (G : Y.Modules) (q : Z) :
+`𝒪_{Z,q} ⊗ G_{i q}`, read through an injective map, when `i` is inducing. -/
+private theorem exists_injective_unit_stalk (hi : Topology.IsInducing i.base) (G : Y.Modules)
+    (q : Z) :
     ∃ E : (Scheme.Modules.moduleStalkFunctor Y (i.base q)).obj
         ((Scheme.Modules.pushforward i).obj ((Scheme.Modules.pullback i).obj G)) →
         (ModuleCat.extendScalars (i.stalkMap q).hom).obj
@@ -123,7 +127,7 @@ private theorem exists_injective_unit_stalk (G : Y.Modules) (q : Z) :
   let F := (Scheme.Modules.pullback i).obj G
   let T := TopCat.Presheaf.stalkPushforward AddCommGrpCat i.base F.presheaf q
   have hT : IsIso T := TopCat.Presheaf.stalkPushforward.stalkPushforward_iso_of_isInducing
-    AddCommGrpCat i.isClosedEmbedding.isInducing F.presheaf q
+    AddCommGrpCat hi F.presheaf q
   let P := (Scheme.Modules.pullbackStalkIso i q).hom.app G
   refine ⟨fun y ↦ P (T y), (ConcreteCategory.bijective_of_isIso P).1.comp
     (ConcreteCategory.bijective_of_isIso T).1, fun g ↦ ?_⟩
@@ -174,7 +178,7 @@ private theorem epi_unit_of_isClosedImmersion (G : Y.Modules) :
   intro p
   by_cases hp : p ∈ Set.range i.base
   · obtain ⟨q, rfl⟩ := hp
-    obtain ⟨E, hE, hEη⟩ := exists_injective_unit_stalk i G q
+    obtain ⟨E, hE, hEη⟩ := exists_injective_unit_stalk i i.isClosedEmbedding.isInducing G q
     intro y
     obtain ⟨g, hg⟩ := extendRestrictScalarsAdj_unit_surjective _ (i.stalkMap_surjective q) _
       (E y)
@@ -345,7 +349,7 @@ private theorem twistBy_comp_unit_eq_zero {x : A} (hx : x ∈ 𝒜 1) (hψx : ψ
   by_cases hp : p ∈ Set.range i.base
   · obtain ⟨q, rfl⟩ := hp
     obtain ⟨s, hs, hps⟩ := hcov (i.base q)
-    obtain ⟨E, hE, hEη⟩ := exists_injective_unit_stalk i
+    obtain ⟨E, hE, hEη⟩ := exists_injective_unit_stalk i i.isClosedEmbedding.isInducing
       (Scheme.Modules.tensorObj G (twistingSheaf 𝒜 ((1 : ℕ) : ℤ))) q
     have key : E ((Scheme.Modules.moduleStalkFunctor (Proj 𝒜) (i.base q)).map
         ((Scheme.Modules.pullbackPushforwardAdjunction i).unit.app
@@ -465,6 +469,10 @@ private theorem eq_sum_coeff_smul_X [Fintype ι] {h : MvPolynomial ι k}
   refine Finset.sum_congr rfl fun i _ ↦ congrArg (· • X i) ?_
   simp [coeff_X, Finsupp.single_left_inj]
 
+section Drop
+
+variable {k : Type u} [CommSemiring k]
+
 open Classical in
 /-- `X i ↦ X i` for `i ≠ j` and `X j ↦ 0`, into the polynomial ring on the other variables. -/
 def dropVariable (j : ι) (i : ι) : MvPolynomial {i // i ≠ j} k :=
@@ -476,6 +484,8 @@ theorem dropVariable_of_ne {j i : ι} (hi : i ≠ j) :
 
 theorem dropVariable_self (j : ι) : dropVariable (k := k) j j = 0 := by
   simp [dropVariable]
+
+end Drop
 
 open Classical in
 /-- The substitution solving a linear form `h` for the variable `X j`: `X i ↦ X i` for `i ≠ j`,
@@ -766,8 +776,8 @@ def hyperplaneSequence [Finite ι] (F : (projectiveSpace ι k).Modules) {h : MvP
         (linearHyperplaneHom_surjective hh j) hh (linearHyperplaneHom_self hh hj)
         exists_mem_basicOpen_one _)).trans zero_comp)
 
-/-- **Restriction to a hyperplane avoiding the associated points is short exact** (Stacks 08A0):
-for a quasi-coherent `F` on `ℙ(ι)` and a linear form `h` lying in the prime of no associated point
+/-- **Restriction to a hyperplane avoiding the associated points is short exact** (the exactness
+in Stacks 08A0): for a quasi-coherent `F` on `ℙ(ι)` and a linear form `h` lying in the prime of no associated point
 of `F`,
 
 `0 ⟶ F(-1) ⟶(·h) F ⟶ i_* i^* F ⟶ 0`
@@ -784,9 +794,9 @@ point is a nonzerodivisor on every stalk (`Scheme.Modules.isSMulRegular_germ`).
 `hass` is load-bearing: for `F = i_* 𝒪_H` itself, with at least two variables, the hyperplane
 contains every point of the support, multiplication by `h` is zero on the nonzero `F(-1)`, and
 the sequence is not left exact. Coherence
-is not needed here; it is what makes the associated points finite
-(`Scheme.Modules.associatedPoints_finite`), so that `exists_linearForm_not_mem` supplies such an
-`h` over an infinite field. -/
+is not needed here; it is what makes the associated points finite, so that
+`exists_linearForm_not_mem` supplies such an `h` over an infinite field
+(`exists_hyperplaneSequence_shortExact`). -/
 theorem hyperplaneSection_shortExact [Finite ι] (F : (projectiveSpace ι k).Modules)
     [F.IsQuasicoherent] {h : MvPolynomial ι k} (hh : h ∈ homogeneousSubmodule ι k 1) (j : ι)
     (hj : h.coeff (Finsupp.single j 1) ≠ 0)
@@ -803,6 +813,46 @@ theorem hyperplaneSection_shortExact [Finite ι] (F : (projectiveSpace ι k).Mod
     (by simp [hyperplaneSequence]) ?_
   exact ((Scheme.Modules.pullbackPushforwardAdjunction (linearHyperplane hh j)).unit_naturality
     (tensorTwistNegOneTwistIso F).hom).symm
+
+/-- Projective space on finitely many variables is quasi-compact: the charts `D₊(X i)` cover it
+and are affine. -/
+private theorem isCompact_univ_projectiveSpace [Finite ι] :
+    IsCompact (Set.univ : Set (projectiveSpace ι k)) := by
+  have h : (Set.univ : Set (projectiveSpace ι k)) =
+      ⋃ i, (Proj.basicOpen (homogeneousSubmodule ι k) (X i) : Set (projectiveSpace ι k)) := by
+    ext p
+    simp only [Set.mem_univ, Set.mem_iUnion, true_iff]
+    exact exists_mem_basicOpen_X p
+  rw [h]
+  exact isCompact_iUnion fun i ↦
+    (Proj.isAffineOpen_basicOpen (homogeneousSubmodule ι k) (X i) (isHomogeneous_X k i)
+      one_pos).isCompact
+
+/-- **A coherent sheaf on projective space over an infinite field has a short exact hyperplane
+sequence** (Stacks 08A0): some linear form `h`, with some nonzero coefficient, gives a short
+exact `0 ⟶ F(-1) ⟶(·h) F ⟶ i_* i^* F ⟶ 0`.
+
+The associated points of `F` are finite (`Scheme.Modules.associatedPoints_inter_finite`), a
+nonzero linear form avoids them (`exists_linearForm_not_mem`), and the sequence is then short
+exact (`hyperplaneSection_shortExact`). -/
+theorem exists_hyperplaneSequence_shortExact [Infinite k] [Finite ι] [Nonempty ι]
+    (F : (projectiveSpace ι k).Modules) (hF : Scheme.Modules.IsCoherent _ F) :
+    ∃ (h : MvPolynomial ι k) (hh : h ∈ homogeneousSubmodule ι k 1) (j : ι)
+      (hj : h.coeff (Finsupp.single j 1) ≠ 0), (hyperplaneSequence F hh j hj).ShortExact := by
+  haveI : SheafOfModules.IsQuasicoherent.{u, u, u}
+      (show SheafOfModules (projectiveSpace ι k).ringCatSheaf from F) := by
+    haveI : SheafOfModules.IsFinitePresentation.{u, u, u}
+      (show SheafOfModules (projectiveSpace ι k).ringCatSheaf from F) := hF
+    infer_instance
+  have hfin := Scheme.Modules.associatedPoints_inter_finite F hF isCompact_univ_projectiveSpace
+  rw [Set.inter_univ] at hfin
+  obtain ⟨h, hh, h0, hZ⟩ := exists_linearForm_not_mem hfin.toFinset
+  obtain ⟨j, hj⟩ : ∃ j, h.coeff (Finsupp.single j 1) ≠ 0 := by
+    by_contra! H
+    cases nonempty_fintype ι
+    exact h0 ((eq_sum_coeff_smul_X hh).trans (by simp [H]))
+  exact ⟨h, hh, j, hj, hyperplaneSection_shortExact F hh j hj fun z hz ↦
+    hZ z (hfin.mem_toFinset.mpr hz)⟩
 
 end ProjectiveSpace
 
