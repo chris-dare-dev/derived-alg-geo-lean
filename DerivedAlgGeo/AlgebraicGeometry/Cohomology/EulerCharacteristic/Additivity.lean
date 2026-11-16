@@ -29,8 +29,7 @@ namespace AlgebraicGeometry
 
 namespace Cohomology
 
-variable {k : Type u} [Field k]
-variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
+variable {X : Scheme.{u}}
 
 /-- The short exact sequence of abelian sheaves underlying a short exact sequence of coherent
 sheaves. -/
@@ -45,7 +44,7 @@ theorem coherentSheafShortComplex_shortExact [IsLocallyNoetherian X] {S : ShortC
 
 /-- The additive connecting homomorphism in the `Ext` long exact sequence underlying coherent
 sheaf cohomology. -/
-noncomputable def coherentConnectingMap (S : ShortComplex (Coh X))
+noncomputable def coherentConnectingMap [IsLocallyNoetherian X] (S : ShortComplex (Coh X))
     (hS : S.ShortExact) (i : ℕ) :
     (coherentH X i).obj S.X₃ ⟶ (coherentH X (i + 1)).obj S.X₁ := by
   letI : HasExt.{u + 1}
@@ -55,6 +54,8 @@ noncomputable def coherentConnectingMap (S : ShortComplex (Coh X))
   exact AddCommGrpCat.ofHom (hT.extClass.postcomp
     ((constantSheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}).obj
       (AddCommGrpCat.of (ULift ℤ))) rfl)
+
+variable {k : Type u} [Field k] [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
 
 namespace FiniteCohomology
 

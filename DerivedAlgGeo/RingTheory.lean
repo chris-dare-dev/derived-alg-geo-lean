@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.RingTheory.Finiteness
 import DerivedAlgGeo.RingTheory.Flat
 import DerivedAlgGeo.RingTheory.GradedAlgebra
+import DerivedAlgGeo.RingTheory.Grassmannian
 import DerivedAlgGeo.RingTheory.LocalRing
 import DerivedAlgGeo.RingTheory.Nagata
 import DerivedAlgGeo.RingTheory.Spectrum
