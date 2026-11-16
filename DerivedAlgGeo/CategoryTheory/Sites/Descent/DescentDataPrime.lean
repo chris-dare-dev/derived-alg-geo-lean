@@ -10,9 +10,9 @@ import Mathlib.CategoryTheory.Sites.Descent.DescentDataPrime
 # Descent along a pullback-preserving reindexing
 
 Let `Φ : D ⥤ C` be a functor and `G : LocallyDiscrete Cᵒᵖ ⥤ᵖ Cat` a pseudofunctor. For a
-morphism `f : X ⟶ S` of `D` whose pullback along itself and triple pullback exist in `D` and are
-preserved by `Φ`, the reindexed pseudofunctor `Φ.op.toPseudofunctor.comp G` has effective
-descent along `f` exactly when `G` has effective descent along `Φ.map f`.
+family of morphisms `f i : X i ⟶ S` of `D` whose pairwise and triple pullbacks exist in `D` and
+are preserved by `Φ`, the reindexed pseudofunctor `Φ.op.toPseudofunctor.comp G` has effective
+descent along `f` exactly when `G` has effective descent along the image family `Φ.map (f i)`.
 
 ## Main definitions
 
@@ -21,24 +21,25 @@ None. The images of chosen pullbacks under `Φ`, and the equivalence between the
 
 ## Main results
 
-* `Pseudofunctor.isStackFor_singleton_comp_toPseudofunctor_iff`: under these hypotheses,
-  `Φ.op.toPseudofunctor.comp G` is a stack for `Presieve.singleton f` if and only if `G` is a
-  stack for `Presieve.singleton (Φ.map f)`.
+* `Pseudofunctor.isStackFor_ofArrows_comp_toPseudofunctor_iff`: under these hypotheses,
+  `Φ.op.toPseudofunctor.comp G` is a stack for `Presieve.ofArrows X f` if and only if `G` is a
+  stack for `Presieve.ofArrows (fun i ↦ Φ.obj (X i)) (fun i ↦ Φ.map (f i))`.
+* `Pseudofunctor.isStackFor_singleton_comp_toPseudofunctor_iff`: the case of one morphism.
 
 ## Implementation notes
 
 `DescentData` quantifies over every test object of the site, and `D` and `C` have different
 test objects, so the categories of descent data are not compared directly. Both sides are
 replaced by `DescentData'` through `DescentData'.descentDataEquivalence`. `DescentData'` only
-involves the chosen pullback of `f` along itself, the chosen triple pullback and the pullback
-functors between their fibres. The images under `Φ` of chosen pullbacks in `D` are chosen
-pullbacks in `C`, the fibres of `Φ.op.toPseudofunctor.comp G` are those of `G`, and its
-compositors are those of `G` at the images, so the two categories `DescentData'` have the same
-objects and morphisms.
+involves the chosen pairwise and triple pullbacks of the family and the pullback functors
+between their fibres. The images under `Φ` of chosen pullbacks in `D` are chosen pullbacks in
+`C`, the fibres of `Φ.op.toPseudofunctor.comp G` are those of `G`, and its compositors are those
+of `G` at the images, so the two categories `DescentData'` have the same objects and
+morphisms.
 
-The triple pullback is the pullback of `pullback.snd f f` and `pullback.fst f f`, the shape
-`ChosenPullback₃` uses. Its existence in `D` is a hypothesis: preservation of pullbacks by `Φ`
-does not provide it.
+The triple pullback of `f i`, `f j` and `f k` is the pullback of `pullback.snd (f i) (f j)` and
+`pullback.fst (f j) (f k)`, the shape `ChosenPullback₃` uses. Its existence in `D` is a
+hypothesis: preservation of pullbacks by `Φ` does not provide it.
 
 ## References
 
@@ -51,7 +52,7 @@ No literature source is followed. Both sides are compared through Mathlib's
 descent, stack, reindexing, pullback
 -/
 
-universe v₂ v' v u₂ u' u
+universe t v₂ v' v u₂ u' u
 
 namespace CategoryTheory.Pseudofunctor
 
@@ -137,117 +138,124 @@ private noncomputable def chosenPullback₃Map {X₁ X₂ X₃ S : D} {f₁ : X�
 
 section
 
-variable {X S : D} (f : X ⟶ S) [HasPullback f f]
+variable {ι : Type t} {S : D} {X : ι → D} (f : ∀ i, X i ⟶ S) [∀ i j, HasPullback (f i) (f j)]
 
-/-- The pullback of `f` along itself, as a chosen pullback. -/
-private noncomputable def chosenPullbackSelf : ChosenPullback f f where
-  pullback := pullback f f
-  p₁ := pullback.fst f f
-  p₂ := pullback.snd f f
+/-- The pullbacks of the members of a family, as chosen pullbacks. -/
+private noncomputable def chosenPullbackFamily (i j : ι) : ChosenPullback (f i) (f j) where
+  pullback := pullback (f i) (f j)
+  p₁ := pullback.fst (f i) (f j)
+  p₂ := pullback.snd (f i) (f j)
   condition := pullback.condition
-  isLimit := pullbackIsPullback f f
+  isLimit := pullbackIsPullback (f i) (f j)
 
-/-- The triple pullback of `f` along itself, as a chosen triple pullback. -/
-private noncomputable def chosenPullback₃Self
-    [HasPullback (pullback.snd f f) (pullback.fst f f)] :
-    ChosenPullback₃ (chosenPullbackSelf f) (chosenPullbackSelf f) (chosenPullbackSelf f) where
+/-- The triple pullbacks of the members of a family, as chosen triple pullbacks. -/
+private noncomputable def chosenPullback₃Family
+    [∀ i j k, HasPullback (pullback.snd (f i) (f j)) (pullback.fst (f j) (f k))] (i j k : ι) :
+    ChosenPullback₃ (chosenPullbackFamily f i j) (chosenPullbackFamily f j k)
+      (chosenPullbackFamily f i k) where
   chosenPullback :=
-    { pullback := pullback (pullback.snd f f) (pullback.fst f f)
-      p₁ := pullback.fst (pullback.snd f f) (pullback.fst f f)
-      p₂ := pullback.snd (pullback.snd f f) (pullback.fst f f)
-      condition := pullback.condition (f := pullback.snd f f) (g := pullback.fst f f)
-      isLimit := pullbackIsPullback (pullback.snd f f) (pullback.fst f f) }
+    { pullback := pullback (pullback.snd (f i) (f j)) (pullback.fst (f j) (f k))
+      p₁ := pullback.fst (pullback.snd (f i) (f j)) (pullback.fst (f j) (f k))
+      p₂ := pullback.snd (pullback.snd (f i) (f j)) (pullback.fst (f j) (f k))
+      condition :=
+        pullback.condition (f := pullback.snd (f i) (f j)) (g := pullback.fst (f j) (f k))
+      isLimit := pullbackIsPullback (pullback.snd (f i) (f j)) (pullback.fst (f j) (f k)) }
   l :=
-    { f := pullback.lift (pullback.fst (pullback.snd f f) (pullback.fst f f) ≫ pullback.fst f f)
-        (pullback.snd (pullback.snd f f) (pullback.fst f f) ≫ pullback.snd f f) (by
+    { f := pullback.lift
+        (pullback.fst (pullback.snd (f i) (f j)) (pullback.fst (f j) (f k)) ≫
+          pullback.fst (f i) (f j))
+        (pullback.snd (pullback.snd (f i) (f j)) (pullback.fst (f j) (f k)) ≫
+          pullback.snd (f j) (f k)) (by
           simp only [Category.assoc, pullback.condition, pullback.condition_assoc])
-      f_p₁ := by simp [chosenPullbackSelf]
-      f_p₂ := by simp [chosenPullbackSelf]
-      f_p := by simp [chosenPullbackSelf] }
+      f_p₁ := by simp [chosenPullbackFamily]
+      f_p₂ := by simp [chosenPullbackFamily]
+      f_p := by simp [chosenPullbackFamily] }
 
 end
 
 section
 
-variable {X S : D} {f : X ⟶ S} (sq : ChosenPullback f f) [PreservesLimit (cospan f f) Φ]
+variable {ι : Type t} {S : D} {X : ι → D} {f : ∀ i, X i ⟶ S}
+  (sq : ∀ i j, ChosenPullback (f i) (f j)) [∀ i j, PreservesLimit (cospan (f i) (f j)) Φ]
 
-/-- `pullHom'` for `Φ.op.toPseudofunctor.comp G` over `sq` is `pullHom'` for `G` over the image
+/-- `pullHom'` for `Φ.op.toPseudofunctor.comp G` over `sq` is `pullHom'` for `G` over the images
 of `sq`, at the images of the morphisms. -/
 private lemma pullHom'_comp_toPseudofunctor
-    {obj obj' : PUnit.{1} → (Φ.op.toPseudofunctor.comp G).obj (.mk (op X))}
-    (hom : ∀ (i j : PUnit.{1}),
-      ((Φ.op.toPseudofunctor.comp G).map sq.p₁.op.toLoc).toFunctor.obj (obj i) ⟶
-        ((Φ.op.toPseudofunctor.comp G).map sq.p₂.op.toLoc).toFunctor.obj (obj' j))
-    ⦃Y : D⦄ (q : Y ⟶ S) (i₁ i₂ : PUnit.{1}) (g₁ g₂ : Y ⟶ X) (hg₁ : g₁ ≫ f = q)
-    (hg₂ : g₂ ≫ f = q) :
-    DescentData'.pullHom' (sq := fun (_ _ : PUnit.{1}) ↦ sq) hom q (i₁ := i₁) (i₂ := i₂)
-        g₁ g₂ hg₁ hg₂ =
-      DescentData'.pullHom' (F := G) (sq := fun (_ _ : PUnit.{1}) ↦ chosenPullbackMap Φ sq)
+    {obj obj' : ∀ i, (Φ.op.toPseudofunctor.comp G).obj (.mk (op (X i)))}
+    (hom : ∀ (i j : ι),
+      ((Φ.op.toPseudofunctor.comp G).map (sq i j).p₁.op.toLoc).toFunctor.obj (obj i) ⟶
+        ((Φ.op.toPseudofunctor.comp G).map (sq i j).p₂.op.toLoc).toFunctor.obj (obj' j))
+    ⦃Y : D⦄ (q : Y ⟶ S) ⦃i₁ i₂ : ι⦄ (g₁ : Y ⟶ X i₁) (g₂ : Y ⟶ X i₂) (hg₁ : g₁ ≫ f i₁ = q)
+    (hg₂ : g₂ ≫ f i₂ = q) :
+    DescentData'.pullHom' (sq := sq) hom q g₁ g₂ hg₁ hg₂ =
+      DescentData'.pullHom' (F := G) (sq := fun i j ↦ chosenPullbackMap Φ (sq i j))
         hom (Φ.map q) (i₁ := i₁) (i₂ := i₂) (Φ.map g₁) (Φ.map g₂)
         (by rw [← Φ.map_comp, hg₁]) (by rw [← Φ.map_comp, hg₂]) := by
   dsimp only [DescentData'.pullHom']
   rw [pullHom_comp_toPseudofunctor]
-  exact pullHom_congr_left _ _ _ ((chosenPullbackMap Φ sq).hom_ext
+  exact pullHom_congr_left _ _ _ ((chosenPullbackMap Φ (sq i₁ i₂)).hom_ext
     (by simp [chosenPullbackMap, ← Φ.map_comp]) (by simp [chosenPullbackMap, ← Φ.map_comp]))
     _ _ _ _ _ _
 
-private lemma pullHom'_congr_id {obj : PUnit.{1} → G.obj (.mk (op (Φ.obj X)))}
-    (hom : ∀ (i j : PUnit.{1}),
-      (G.map (chosenPullbackMap Φ sq).p₁.op.toLoc).toFunctor.obj (obj i) ⟶
-        (G.map (chosenPullbackMap Φ sq).p₂.op.toLoc).toFunctor.obj (obj j))
-    (i : PUnit.{1}) (u : Φ.obj X ⟶ Φ.obj X) (hu : u = 𝟙 _) (h : u ≫ Φ.map f = Φ.map f) :
-    DescentData'.pullHom' (sq := fun (_ _ : PUnit.{1}) ↦ chosenPullbackMap Φ sq) hom
-        (Φ.map f) (i₁ := i) (i₂ := i) u u h h = 𝟙 _ ↔
-      DescentData'.pullHom' (sq := fun (_ _ : PUnit.{1}) ↦ chosenPullbackMap Φ sq) hom
-        (Φ.map f) (i₁ := i) (i₂ := i) (𝟙 _) (𝟙 _) (by simp) (by simp) = 𝟙 _ := by
+private lemma pullHom'_congr_id {obj : ∀ i, G.obj (.mk (op (Φ.obj (X i))))}
+    (hom : ∀ (i j : ι),
+      (G.map (chosenPullbackMap Φ (sq i j)).p₁.op.toLoc).toFunctor.obj (obj i) ⟶
+        (G.map (chosenPullbackMap Φ (sq i j)).p₂.op.toLoc).toFunctor.obj (obj j))
+    (i : ι) (u : Φ.obj (X i) ⟶ Φ.obj (X i)) (hu : u = 𝟙 _)
+    (h : u ≫ Φ.map (f i) = Φ.map (f i)) :
+    DescentData'.pullHom' (sq := fun i j ↦ chosenPullbackMap Φ (sq i j)) hom
+        (Φ.map (f i)) (i₁ := i) (i₂ := i) u u h h = 𝟙 _ ↔
+      DescentData'.pullHom' (sq := fun i j ↦ chosenPullbackMap Φ (sq i j)) hom
+        (Φ.map (f i)) (i₁ := i) (i₂ := i) (𝟙 _) (𝟙 _) (by simp) (by simp) = 𝟙 _ := by
   subst hu
   rfl
 
-private lemma pullHom'_self_iff {obj : PUnit.{1} → (Φ.op.toPseudofunctor.comp G).obj (.mk (op X))}
-    (hom : ∀ (i j : PUnit.{1}),
-      ((Φ.op.toPseudofunctor.comp G).map sq.p₁.op.toLoc).toFunctor.obj (obj i) ⟶
-        ((Φ.op.toPseudofunctor.comp G).map sq.p₂.op.toLoc).toFunctor.obj (obj j))
-    (i : PUnit.{1}) :
-    DescentData'.pullHom' (sq := fun (_ _ : PUnit.{1}) ↦ sq) hom f (i₁ := i) (i₂ := i)
-        (𝟙 X) (𝟙 X) (by simp) (by simp) = 𝟙 _ ↔
-      DescentData'.pullHom' (F := G) (sq := fun (_ _ : PUnit.{1}) ↦ chosenPullbackMap Φ sq) hom
-        (Φ.map f) (i₁ := i) (i₂ := i) (𝟙 _) (𝟙 _) (by simp) (by simp) = 𝟙 _ := by
+private lemma pullHom'_self_iff {obj : ∀ i, (Φ.op.toPseudofunctor.comp G).obj (.mk (op (X i)))}
+    (hom : ∀ (i j : ι),
+      ((Φ.op.toPseudofunctor.comp G).map (sq i j).p₁.op.toLoc).toFunctor.obj (obj i) ⟶
+        ((Φ.op.toPseudofunctor.comp G).map (sq i j).p₂.op.toLoc).toFunctor.obj (obj j))
+    (i : ι) :
+    DescentData'.pullHom' (sq := sq) hom (f i) (i₁ := i) (i₂ := i)
+        (𝟙 (X i)) (𝟙 (X i)) (by simp) (by simp) = 𝟙 _ ↔
+      DescentData'.pullHom' (F := G) (sq := fun i j ↦ chosenPullbackMap Φ (sq i j)) hom
+        (Φ.map (f i)) (i₁ := i) (i₂ := i) (𝟙 _) (𝟙 _) (by simp) (by simp) = 𝟙 _ := by
   rw [pullHom'_comp_toPseudofunctor]
-  exact pullHom'_congr_id Φ G sq hom i _ (Φ.map_id X) _
+  exact pullHom'_congr_id Φ G sq hom i _ (Φ.map_id (X i)) _
 
-variable (sq₃ : ChosenPullback₃ sq sq sq) [PreservesLimit (cospan sq.p₂ sq.p₁) Φ]
+variable (sq₃ : ∀ i₁ i₂ i₃, ChosenPullback₃ (sq i₁ i₂) (sq i₂ i₃) (sq i₁ i₃))
+  [∀ i₁ i₂ i₃, PreservesLimit (cospan (sq i₁ i₂).p₂ (sq i₂ i₃).p₁) Φ]
 
-private lemma pullHom'_comp_iff {obj : PUnit.{1} → (Φ.op.toPseudofunctor.comp G).obj (.mk (op X))}
-    (hom : ∀ (i j : PUnit.{1}),
-      ((Φ.op.toPseudofunctor.comp G).map sq.p₁.op.toLoc).toFunctor.obj (obj i) ⟶
-        ((Φ.op.toPseudofunctor.comp G).map sq.p₂.op.toLoc).toFunctor.obj (obj j))
-    (i₁ i₂ i₃ : PUnit.{1}) :
-    DescentData'.pullHom' (sq := fun (_ _ : PUnit.{1}) ↦ sq) hom sq₃.p (i₁ := i₁) (i₂ := i₂)
-        sq₃.p₁ sq₃.p₂ (by simp) (by simp) ≫
-      DescentData'.pullHom' (sq := fun (_ _ : PUnit.{1}) ↦ sq) hom sq₃.p (i₁ := i₂) (i₂ := i₃)
-        sq₃.p₂ sq₃.p₃ (by simp) (by simp) =
-      DescentData'.pullHom' (sq := fun (_ _ : PUnit.{1}) ↦ sq) hom sq₃.p (i₁ := i₁) (i₂ := i₃)
-        sq₃.p₁ sq₃.p₃ (by simp) (by simp) ↔
-    DescentData'.pullHom' (F := G) (sq := fun (_ _ : PUnit.{1}) ↦ chosenPullbackMap Φ sq) hom
-        (chosenPullback₃Map Φ sq₃).p (i₁ := i₁) (i₂ := i₂)
-        (chosenPullback₃Map Φ sq₃).p₁ (chosenPullback₃Map Φ sq₃).p₂ (by simp) (by simp) ≫
-      DescentData'.pullHom' (F := G) (sq := fun (_ _ : PUnit.{1}) ↦ chosenPullbackMap Φ sq) hom
-        (chosenPullback₃Map Φ sq₃).p (i₁ := i₂) (i₂ := i₃)
-        (chosenPullback₃Map Φ sq₃).p₂ (chosenPullback₃Map Φ sq₃).p₃ (by simp) (by simp) =
-      DescentData'.pullHom' (F := G) (sq := fun (_ _ : PUnit.{1}) ↦ chosenPullbackMap Φ sq) hom
-        (chosenPullback₃Map Φ sq₃).p (i₁ := i₁) (i₂ := i₃)
-        (chosenPullback₃Map Φ sq₃).p₁ (chosenPullback₃Map Φ sq₃).p₃ (by simp) (by simp) := by
+private lemma pullHom'_comp_iff
+    {obj : ∀ i, (Φ.op.toPseudofunctor.comp G).obj (.mk (op (X i)))}
+    (hom : ∀ (i j : ι),
+      ((Φ.op.toPseudofunctor.comp G).map (sq i j).p₁.op.toLoc).toFunctor.obj (obj i) ⟶
+        ((Φ.op.toPseudofunctor.comp G).map (sq i j).p₂.op.toLoc).toFunctor.obj (obj j))
+    (i₁ i₂ i₃ : ι) :
+    DescentData'.pullHom' (sq := sq) hom (sq₃ i₁ i₂ i₃).p (sq₃ i₁ i₂ i₃).p₁
+        (sq₃ i₁ i₂ i₃).p₂ (by simp) (by simp) ≫
+      DescentData'.pullHom' (sq := sq) hom (sq₃ i₁ i₂ i₃).p (sq₃ i₁ i₂ i₃).p₂
+        (sq₃ i₁ i₂ i₃).p₃ (by simp) (by simp) =
+      DescentData'.pullHom' (sq := sq) hom (sq₃ i₁ i₂ i₃).p (sq₃ i₁ i₂ i₃).p₁
+        (sq₃ i₁ i₂ i₃).p₃ (by simp) (by simp) ↔
+    DescentData'.pullHom' (F := G) (sq := fun i j ↦ chosenPullbackMap Φ (sq i j)) hom
+        (chosenPullback₃Map Φ (sq₃ i₁ i₂ i₃)).p (chosenPullback₃Map Φ (sq₃ i₁ i₂ i₃)).p₁
+        (chosenPullback₃Map Φ (sq₃ i₁ i₂ i₃)).p₂ (by simp) (by simp) ≫
+      DescentData'.pullHom' (F := G) (sq := fun i j ↦ chosenPullbackMap Φ (sq i j)) hom
+        (chosenPullback₃Map Φ (sq₃ i₁ i₂ i₃)).p (chosenPullback₃Map Φ (sq₃ i₁ i₂ i₃)).p₂
+        (chosenPullback₃Map Φ (sq₃ i₁ i₂ i₃)).p₃ (by simp) (by simp) =
+      DescentData'.pullHom' (F := G) (sq := fun i j ↦ chosenPullbackMap Φ (sq i j)) hom
+        (chosenPullback₃Map Φ (sq₃ i₁ i₂ i₃)).p (chosenPullback₃Map Φ (sq₃ i₁ i₂ i₃)).p₁
+        (chosenPullback₃Map Φ (sq₃ i₁ i₂ i₃)).p₃ (by simp) (by simp) := by
   rw [pullHom'_comp_toPseudofunctor, pullHom'_comp_toPseudofunctor,
     pullHom'_comp_toPseudofunctor]
   rfl
 
-/-- `DescentData'` along `f` for `Φ.op.toPseudofunctor.comp G` is `DescentData'` along
-`Φ.map f` for `G`, over the images of the chosen pullbacks. -/
+/-- `DescentData'` along `f` for `Φ.op.toPseudofunctor.comp G` is `DescentData'` along the
+images `Φ.map (f i)` for `G`, over the images of the chosen pullbacks. -/
 private noncomputable def descentDataPrimeEquivalence :
-    (Φ.op.toPseudofunctor.comp G).DescentData' (fun (_ _ : PUnit.{1}) ↦ sq)
-        (fun _ _ _ ↦ sq₃) ≌
-      G.DescentData' (fun (_ _ : PUnit.{1}) ↦ chosenPullbackMap Φ sq)
-        (fun _ _ _ ↦ chosenPullback₃Map Φ sq₃) :=
+    (Φ.op.toPseudofunctor.comp G).DescentData' sq sq₃ ≌
+      G.DescentData' (fun i j ↦ chosenPullbackMap Φ (sq i j))
+        (fun i₁ i₂ i₃ ↦ chosenPullback₃Map Φ (sq₃ i₁ i₂ i₃)) :=
   Equivalence.mk
     { obj D :=
         { obj := D.obj
@@ -280,13 +288,13 @@ private noncomputable def descentDataPrimeEquivalence :
       (fun _ ↦ DescentData'.hom_ext (fun _ ↦ (Category.comp_id _).trans
         (Category.id_comp _).symm)))
 
-omit [PreservesLimit (cospan f f) Φ] in
+omit [∀ i j, PreservesLimit (cospan (f i) (f j)) Φ] in
 private lemma ofObj_hom_comp_toPseudofunctor (M : (Φ.op.toPseudofunctor.comp G).obj (.mk (op S)))
-    ⦃Y : D⦄ (q : Y ⟶ S) (i₁ i₂ : PUnit.{1}) (g₁ g₂ : Y ⟶ X) (hg₁ : g₁ ≫ f = q)
-    (hg₂ : g₂ ≫ f = q) :
-    (DescentData.ofObj (F := Φ.op.toPseudofunctor.comp G) (f := fun (_ : PUnit.{1}) ↦ f) M).hom
+    ⦃Y : D⦄ (q : Y ⟶ S) (i₁ i₂ : ι) (g₁ : Y ⟶ X i₁) (g₂ : Y ⟶ X i₂) (hg₁ : g₁ ≫ f i₁ = q)
+    (hg₂ : g₂ ≫ f i₂ = q) :
+    (DescentData.ofObj (F := Φ.op.toPseudofunctor.comp G) (f := f) M).hom
         q (i₁ := i₁) (i₂ := i₂) g₁ g₂ hg₁ hg₂ =
-      (DescentData.ofObj (F := G) (f := fun (_ : PUnit.{1}) ↦ Φ.map f) M).hom (Φ.map q)
+      (DescentData.ofObj (F := G) (f := fun i ↦ Φ.map (f i)) M).hom (Φ.map q)
         (i₁ := i₁) (i₂ := i₂) (Φ.map g₁) (Φ.map g₂) (by rw [← Φ.map_comp, hg₁])
         (by rw [← Φ.map_comp, hg₂]) := by
   simp only [DescentData.ofObj_hom]
@@ -295,23 +303,51 @@ private lemma ofObj_hom_comp_toPseudofunctor (M : (Φ.op.toPseudofunctor.comp G)
 
 /-- Restriction to descent data commutes with `descentDataPrimeEquivalence`. -/
 private noncomputable def toDescentDataCompDescentDataPrimeEquivalenceIso :
-    (Φ.op.toPseudofunctor.comp G).toDescentData (fun (_ : PUnit.{1}) ↦ f) ⋙
-        (DescentData'.descentDataEquivalence _ (fun (_ _ : PUnit.{1}) ↦ sq)
-          (fun _ _ _ ↦ sq₃)).inverse ⋙
+    (Φ.op.toPseudofunctor.comp G).toDescentData f ⋙
+        (DescentData'.descentDataEquivalence _ sq sq₃).inverse ⋙
         (descentDataPrimeEquivalence Φ G sq sq₃).functor ≅
-      G.toDescentData (fun (_ : PUnit.{1}) ↦ Φ.map f) ⋙
-        (DescentData'.descentDataEquivalence _ (fun (_ _ : PUnit.{1}) ↦ chosenPullbackMap Φ sq)
-          (fun _ _ _ ↦ chosenPullback₃Map Φ sq₃)).inverse :=
+      G.toDescentData (fun i ↦ Φ.map (f i)) ⋙
+        (DescentData'.descentDataEquivalence _ (fun i j ↦ chosenPullbackMap Φ (sq i j))
+          (fun i₁ i₂ i₃ ↦ chosenPullback₃Map Φ (sq₃ i₁ i₂ i₃))).inverse :=
   NatIso.ofComponents (fun M ↦ DescentData'.isoMk (fun _ ↦ Iso.refl _) (fun i₁ i₂ ↦ by
       rw [Iso.refl_hom]
       erw [Functor.map_id, Functor.map_id]
-      exact (Category.id_comp _).trans ((ofObj_hom_comp_toPseudofunctor Φ G M sq.p i₁ i₂ sq.p₁
-        sq.p₂ sq.hp₁ sq.hp₂).symm.trans (Category.comp_id _).symm)))
+      exact (Category.id_comp _).trans ((ofObj_hom_comp_toPseudofunctor Φ G M (sq i₁ i₂).p i₁ i₂
+        (sq i₁ i₂).p₁ (sq i₁ i₂).p₂ (sq i₁ i₂).hp₁ (sq i₁ i₂).hp₂).symm.trans
+        (Category.comp_id _).symm)))
     (fun _ ↦ DescentData'.hom_ext (fun _ ↦ (Category.comp_id _).trans
       (Category.id_comp _).symm))
 
 end
 
+/-- Let `f i : X i ⟶ S` be a family of morphisms of `D` whose pairwise pullbacks and triple
+pullbacks (the pullbacks of `pullback.snd (f i) (f j)` and `pullback.fst (f j) (f k)`) exist in
+`D`, and let `Φ : D ⥤ C` preserve them. Then `Φ.op.toPseudofunctor.comp G` has effective
+descent along the family `f` if and only if `G` has effective descent along the image family
+`Φ.map (f i)`. -/
+theorem isStackFor_ofArrows_comp_toPseudofunctor_iff {ι : Type t} {S : D} {X : ι → D}
+    (f : ∀ i, X i ⟶ S) [∀ i j, HasPullback (f i) (f j)]
+    [∀ i j k, HasPullback (pullback.snd (f i) (f j)) (pullback.fst (f j) (f k))]
+    [∀ i j, PreservesLimit (cospan (f i) (f j)) Φ]
+    [∀ i j k, PreservesLimit (cospan (pullback.snd (f i) (f j)) (pullback.fst (f j) (f k))) Φ] :
+    (Φ.op.toPseudofunctor.comp G).IsStackFor (Presieve.ofArrows X f) ↔
+      G.IsStackFor (Presieve.ofArrows (fun i ↦ Φ.obj (X i)) (fun i ↦ Φ.map (f i))) := by
+  have : ∀ i j k, PreservesLimit
+      (cospan (chosenPullbackFamily f i j).p₂ (chosenPullbackFamily f j k).p₁) Φ :=
+    fun i j k ↦ (inferInstance :
+      PreservesLimit (cospan (pullback.snd (f i) (f j)) (pullback.fst (f j) (f k))) Φ)
+  rw [isStackFor_ofArrows_iff, isStackFor_ofArrows_iff]
+  have e := toDescentDataCompDescentDataPrimeEquivalenceIso Φ G (chosenPullbackFamily f)
+    (chosenPullback₃Family f)
+  constructor
+  · intro h
+    have := (Functor.isEquivalence_iff_of_iso e).1
+      (@Functor.isEquivalence_trans _ _ _ _ _ _ _ _ h inferInstance)
+    exact @Functor.isEquivalence_of_comp_right _ _ _ _ _ _ _ _ inferInstance this
+  · intro h
+    have := (Functor.isEquivalence_iff_of_iso e).2
+      (@Functor.isEquivalence_trans _ _ _ _ _ _ _ _ h inferInstance)
+    exact @Functor.isEquivalence_of_comp_right _ _ _ _ _ _ _ _ inferInstance this
 
 /-- Let `Φ : D ⥤ C` preserve the pullback of `f : X ⟶ S` along itself and the triple pullback
 (the pullback of `pullback.snd f f` and `pullback.fst f f`), both of which exist in `D`. Then
@@ -322,20 +358,7 @@ theorem isStackFor_singleton_comp_toPseudofunctor_iff {X S : D} (f : X ⟶ S) [H
     [PreservesLimit (cospan (pullback.snd f f) (pullback.fst f f)) Φ] :
     (Φ.op.toPseudofunctor.comp G).IsStackFor (Presieve.singleton f) ↔
       G.IsStackFor (Presieve.singleton (Φ.map f)) := by
-  have : PreservesLimit (cospan (chosenPullbackSelf f).p₂ (chosenPullbackSelf f).p₁) Φ :=
-    (inferInstance : PreservesLimit (cospan (pullback.snd f f) (pullback.fst f f)) Φ)
-  rw [← Presieve.ofArrows_pUnit.{0}, ← Presieve.ofArrows_pUnit.{0}, isStackFor_ofArrows_iff,
-    isStackFor_ofArrows_iff]
-  have e := toDescentDataCompDescentDataPrimeEquivalenceIso Φ G (chosenPullbackSelf f)
-    (chosenPullback₃Self f)
-  constructor
-  · intro h
-    have := (Functor.isEquivalence_iff_of_iso e).1
-      (@Functor.isEquivalence_trans _ _ _ _ _ _ _ _ h inferInstance)
-    exact @Functor.isEquivalence_of_comp_right _ _ _ _ _ _ _ _ inferInstance this
-  · intro h
-    have := (Functor.isEquivalence_iff_of_iso e).2
-      (@Functor.isEquivalence_trans _ _ _ _ _ _ _ _ h inferInstance)
-    exact @Functor.isEquivalence_of_comp_right _ _ _ _ _ _ _ _ inferInstance this
+  rw [← Presieve.ofArrows_pUnit.{0}, ← Presieve.ofArrows_pUnit.{0}]
+  exact isStackFor_ofArrows_comp_toPseudofunctor_iff Φ G (fun _ : PUnit.{1} ↦ f)
 
 end CategoryTheory.Pseudofunctor
