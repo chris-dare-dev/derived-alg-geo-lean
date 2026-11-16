@@ -258,7 +258,9 @@ LEAN_NUM_THREADS=2 ~/.elan/bin/lake build DerivedAlgGeo.The.Module.You.Changed
 
 That is a cheap green, not a green: say which gates passed, never "CI is green"
 for a local run. `lake env lean scratch.lean` is unrestricted. A fresh worktree
-seeds its build cache with `bash scripts/seed_worktree_cache.sh` (about 10 GB,
-its own copy); keep worktrees out of `/tmp`, which is RAM-backed.
+needs Mathlib's build outputs: where the machine has `lake-seed`, run it to link
+them from Lake's shared artifact store (about 0.5 GB per worktree); elsewhere
+`lake exe cache get` unpacks a private copy (about 7.5 GB). Keep worktrees out
+of `/tmp`, which is RAM-backed.
 `DerivedAlgGeoSweep.lean` is verification-only: it imports the stable root and
 the development probes for the axiom audit.
