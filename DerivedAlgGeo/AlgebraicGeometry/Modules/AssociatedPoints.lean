@@ -130,8 +130,9 @@ private theorem mem_associatedPrimes_stalk (y : PrimeSpectrum Γ(X, U))
       ((ModuleCat.restrictScalars (X.presheaf.germ U _ (fromSpec_mem hU y)).hom).obj
         ((moduleStalkFunctor X (hU.fromSpec y)).obj F)) :=
     IsScalarTower.of_algebraMap_smul fun _ _ ↦ rfl
-  exact Module.associatedPrimes.mem_associatedPrimes_of_comap_mem_associatedPrimes_of_isLocalizedModule
-    y.asIdeal.primeCompl (germLinearMap F U _ (fromSpec_mem hU y)) 𝔮 h
+  exact
+    Module.associatedPrimes.mem_associatedPrimes_of_comap_mem_associatedPrimes_of_isLocalizedModule
+      y.asIdeal.primeCompl (germLinearMap F U _ (fromSpec_mem hU y)) 𝔮 h
 
 /-- The converse comparison (Stacks 0310, part 2): the contraction of an associated prime of
 `F_x` is associated to `Γ(U, F)` when it is finitely generated. -/
@@ -155,9 +156,9 @@ private theorem comap_mem_associatedPrimes (y : PrimeSpectrum Γ(X, U))
       ((ModuleCat.restrictScalars (X.presheaf.germ U _ (fromSpec_mem hU y)).hom).obj
         ((moduleStalkFunctor X (hU.fromSpec y)).obj F)) :=
     IsScalarTower.of_algebraMap_smul fun _ _ ↦ rfl
-  exact
-    Module.associatedPrimes.comap_mem_associatedPrimes_of_mem_associatedPrimes_of_isLocalizedModule_of_fg
-      y.asIdeal.primeCompl (germLinearMap F U _ (fromSpec_mem hU y)) 𝔮 h hfg
+  open Module.associatedPrimes in
+  exact comap_mem_associatedPrimes_of_mem_associatedPrimes_of_isLocalizedModule_of_fg
+    y.asIdeal.primeCompl (germLinearMap F U _ (fromSpec_mem hU y)) 𝔮 h hfg
 
 /-- The maximal ideal of `𝒪_{X,x}` contracts to the prime of `x` in `Γ(X, U)`. -/
 private theorem comap_maximalIdeal (y : PrimeSpectrum Γ(X, U)) :
@@ -205,7 +206,8 @@ is an associated point of `F` in `U`, and `a` lies in its prime: `a` is not a un
 theorem isSMulRegular_germ [IsNoetherianRing Γ(X, U)] (a : Γ(X, U))
     (ha : ∀ z ∈ associatedPoints F, z ∈ U → z ∈ X.basicOpen a) {x : X} (hx : x ∈ U) :
     IsSMulRegular ((moduleStalkFunctor X x).obj F) (X.presheaf.germ U x hx a) := by
-  obtain ⟨y, rfl⟩ : ∃ y : PrimeSpectrum Γ(X, U), hU.fromSpec y = x := ⟨_, hU.fromSpec_primeIdealOf ⟨x, hx⟩⟩
+  obtain ⟨y, rfl⟩ : ∃ y : PrimeSpectrum Γ(X, U), hU.fromSpec y = x :=
+    ⟨_, hU.fromSpec_primeIdealOf ⟨x, hx⟩⟩
   letI : Algebra Γ(X, U) (X.presheaf.stalk (hU.fromSpec y)) :=
     TopCat.Presheaf.algebra_section_stalk X.presheaf ⟨_, hx⟩
   haveI : IsLocalization.AtPrime (X.presheaf.stalk (hU.fromSpec y)) y.asIdeal :=

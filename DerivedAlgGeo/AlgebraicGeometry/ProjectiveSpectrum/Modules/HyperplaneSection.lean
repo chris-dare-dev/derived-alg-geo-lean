@@ -413,7 +413,8 @@ private theorem shortExact_twistBy_unit {x : A} (hx : x ∈ 𝒜 1)
       (map ψ (irrelevant_le_map_of_surjective ψ hψ))).unit.app
         (Scheme.Modules.tensorObj G (twistingSheaf 𝒜 ((1 : ℕ) : ℤ))))
       (twistBy_comp_unit_eq_zero ψ hψ hx (RingHom.mem_ker.mp
-        (hker ▸ Ideal.mem_span_singleton_self x : x ∈ RingHom.ker (ψ : A →+* B))) hcov G)).ShortExact := by
+        (hker ▸ Ideal.mem_span_singleton_self x : x ∈ RingHom.ker (ψ : A →+* B))) hcov
+        G)).ShortExact := by
   have := isClosedImmersion_map ψ hψ
   set i := map ψ (irrelevant_le_map_of_surjective ψ hψ)
   set adj := Scheme.Modules.pullbackPushforwardAdjunction i
@@ -550,13 +551,15 @@ theorem linearHyperplaneHom_self [Finite ι] {h : MvPolynomial ι k}
   have hsum := eq_sum_coeff_smul_X hh
   have hdrop : aeval (dropVariable (k := k) j) h =
       ∑ i : {i // i ≠ j}, h.coeff (Finsupp.single i.1 1) • X i := by
-    have e : aeval (dropVariable (k := k) j) (∑ i, h.coeff (Finsupp.single i 1) • (X i : MvPolynomial ι k)) =
+    have e : aeval (dropVariable (k := k) j)
+        (∑ i, h.coeff (Finsupp.single i 1) • (X i : MvPolynomial ι k)) =
         ∑ i, h.coeff (Finsupp.single i 1) • dropVariable j i := by
       simp only [map_sum, map_smul, aeval_X]
     rw [← hsum] at e
     rw [e, Fintype.sum_eq_add_sum_subtype_ne _ j, dropVariable_self, smul_zero, zero_add]
     exact Finset.sum_congr rfl fun i _ ↦ by rw [dropVariable_of_ne i.2]
-  have e : aeval (linearHyperplaneSubst h j) (∑ i, h.coeff (Finsupp.single i 1) • (X i : MvPolynomial ι k)) =
+  have e : aeval (linearHyperplaneSubst h j)
+      (∑ i, h.coeff (Finsupp.single i 1) • (X i : MvPolynomial ι k)) =
       ∑ i, h.coeff (Finsupp.single i 1) • linearHyperplaneSubst h j i := by
     simp only [map_sum, map_smul, aeval_X]
   rw [← hsum] at e
@@ -589,7 +592,8 @@ theorem ker_linearHyperplaneHom [Finite ι] {h : MvPolynomial ι k}
             h.coeff (Finsupp.single i 1) • X i := by
           have e : rename Subtype.val (aeval (dropVariable (k := k) i)
               (∑ i, h.coeff (Finsupp.single i 1) • (X i : MvPolynomial ι k))) =
-              ∑ i', h.coeff (Finsupp.single i' 1) • rename Subtype.val (dropVariable (k := k) i i') := by
+              ∑ i', h.coeff (Finsupp.single i' 1) •
+                rename Subtype.val (dropVariable (k := k) i i') := by
             simp only [map_sum, map_smul, aeval_X]
           rw [← hsum] at e
           rw [e, eq_sub_iff_add_eq]
@@ -645,7 +649,8 @@ private theorem exists_mem_basicOpen_X (p : projectiveSpace ι k) :
 
 /-- Every point of `ℙ(ι)` lies in `D₊(s)` for some `s` of degree one. -/
 private theorem exists_mem_basicOpen_one (p : projectiveSpace ι k) :
-    ∃ s ∈ homogeneousSubmodule ι k 1, p ∈ ProjectiveSpectrum.basicOpen (homogeneousSubmodule ι k) s :=
+    ∃ s ∈ homogeneousSubmodule ι k 1,
+      p ∈ ProjectiveSpectrum.basicOpen (homogeneousSubmodule ι k) s :=
   let ⟨i, hi⟩ := exists_mem_basicOpen_X p
   ⟨X i, isHomogeneous_X k i, hi⟩
 
@@ -657,9 +662,9 @@ since some variable `X i` is not in it, and over an infinite field a finite unio
 subspaces is not the whole space (`Submodule.iUnion_ssubset_of_forall_ne_top_of_card_lt`).
 
 `[Infinite k]` is load-bearing: over `𝔽₂` on `ℙ¹`, the three rational points
-`(1 : 0)`, `(0 : 1)` and `(1 : 1)` have the primes `(X₁)`, `(X₀)` and `(X₀ + X₁)`, which between them
-contain the three nonzero linear forms `X₀`, `X₁`, `X₀ + X₁`. `[Nonempty ι]` excludes the empty
-projective space, where the only linear form is `0`. -/
+`(1 : 0)`, `(0 : 1)` and `(1 : 1)` have the primes `(X₁)`, `(X₀)` and `(X₀ + X₁)`, which
+between them contain the three nonzero linear forms `X₀`, `X₁`, `X₀ + X₁`. `[Nonempty ι]`
+excludes the empty projective space, where the only linear form is `0`. -/
 theorem exists_linearForm_not_mem [Infinite k] [Nonempty ι] (Z : Finset (projectiveSpace ι k)) :
     ∃ h ∈ homogeneousSubmodule ι k 1, h ≠ 0 ∧ ∀ z ∈ Z, h ∉ z.asHomogeneousIdeal := by
   classical
@@ -777,8 +782,8 @@ def hyperplaneSequence [Finite ι] (F : (projectiveSpace ι k).Modules) {h : MvP
         exists_mem_basicOpen_one _)).trans zero_comp)
 
 /-- **Restriction to a hyperplane avoiding the associated points is short exact** (the exactness
-in Stacks 08A0): for a quasi-coherent `F` on `ℙ(ι)` and a linear form `h` lying in the prime of no associated point
-of `F`,
+in Stacks 08A0): for a quasi-coherent `F` on `ℙ(ι)` and a linear form `h` lying in the prime of
+no associated point of `F`,
 
 `0 ⟶ F(-1) ⟶(·h) F ⟶ i_* i^* F ⟶ 0`
 
