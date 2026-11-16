@@ -18,6 +18,8 @@ due to Spaltenstein in this generality.
 
 * `CochainComplex.kInjectiveResolution`: the functor `M ↦ I`.
 * `CochainComplex.kInjectiveResolutionι`: the natural comparison `M ⟶ I`.
+* `CategoryTheory.Cdg.HasKInjectiveResolutions`: every cochain complex over an abelian
+  category has a quasi-isomorphism to a K-injective complex.
 
 ## Main results
 
@@ -26,6 +28,8 @@ due to Spaltenstein in this generality.
 * `CochainComplex.exists_isKInjective_quasiIso`: Tag 079P.
 * Instances: `kInjectiveResolutionι` is a monomorphism and a quasi-isomorphism, and its
   target is K-injective with injective terms.
+* `CategoryTheory.Cdg.hasKInjectiveResolutions_of_isGrothendieckAbelian`: the instance of
+  `HasKInjectiveResolutions` for a Grothendieck abelian category.
 
 ## Implementation notes
 
@@ -35,6 +39,10 @@ acyclic, so the comparison is a monomorphic quasi-isomorphism into a complex wit
 injective terms (Tags 079M and 079N), and every morphism from a member to the target is
 null-homotopic. The family detects acyclic complexes, so the criterion of Tag 079L makes
 the target K-injective.
+
+`HasKInjectiveResolutions` asks only for the existence of resolutions, over any abelian
+category. It keeps the `Cdg` namespace of the derived seam, which consumes it, and lives
+here so that consumers outside the dg subtree can use it without importing dg material.
 
 ## References
 
@@ -113,3 +121,27 @@ theorem exists_isKInjective_quasiIso (M : CochainComplex C ℤ) :
     inferInstance⟩
 
 end CochainComplex
+
+namespace CategoryTheory.Cdg
+
+variable (A : Type u) [Category.{v} A] [Abelian A]
+
+/-- **Every cochain complex admits a K-injective resolution**: a quasi-isomorphism to a
+K-injective complex.
+
+Mathlib proves this only for bounded-below complexes. For a Grothendieck abelian category it
+is the instance `hasKInjectiveResolutions_of_isGrothendieckAbelian` (Tag 079P). The class
+states the existence of resolutions, not a property of any functor built from them. -/
+class HasKInjectiveResolutions : Prop where
+  /-- Every cochain complex has a quasi-isomorphism to a K-injective one. -/
+  exists_kInjective_quasiIso (K : CochainComplex A ℤ) :
+    ∃ (L : CochainComplex A ℤ) (_ : L.IsKInjective) (f : K ⟶ L), QuasiIso f
+
+/-- **K-injective resolutions exist in a Grothendieck abelian category** (Stacks,
+Theorem 19.12.6, Tag 079P): `CochainComplex.kInjectiveResolution`. -/
+instance hasKInjectiveResolutions_of_isGrothendieckAbelian [IsGrothendieckAbelian.{w} A] :
+    HasKInjectiveResolutions A where
+  exists_kInjective_quasiIso K :=
+    ⟨_, inferInstance, (CochainComplex.kInjectiveResolutionι A).app K, inferInstance⟩
+
+end CategoryTheory.Cdg

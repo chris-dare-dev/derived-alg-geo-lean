@@ -29,8 +29,9 @@ morphism universe. Together they move the fibres from `Cat.{v', u'}` to
 * `CategoryTheory.Pseudofunctor.ulift.isGroupoid_obj` and
   `CategoryTheory.Pseudofunctor.ulift.isDiscrete_obj`: the lift has groupoid (discrete) fibres
   where `F` does.
-* `CategoryTheory.Pseudofunctor.ulift.mapComp'_hom_app`: the compositors of the lift are those
-  of `F`, lifted along `CategoryTheory.Pseudofunctor.ulift.objEquivalence`.
+* `CategoryTheory.Pseudofunctor.ulift.mapComp'_hom_app` and
+  `CategoryTheory.Pseudofunctor.ulift.mapId_hom_app`: the compositors and unitors of the lift
+  are those of `F`, lifted along `CategoryTheory.Pseudofunctor.ulift.objEquivalence`.
 
 ## Implementation notes
 
@@ -355,6 +356,18 @@ lemma mapComp'_inv_app {X Y Z : LocallyDiscrete B₀} (f : X ⟶ Y) (g : Y ⟶ Z
   subst h
   rw [(F.ulift.{w₁, w₂}).mapComp'_eq_mapComp f g]
   exact mapCompIso_inv_app F f.as g.as _ rfl x
+
+set_option backward.isDefEq.respectTransparency false in
+/-- The unitors of `F.ulift` are those of `F` lifted along
+`CategoryTheory.Pseudofunctor.ulift.objEquivalence`. -/
+lemma mapId_hom_app (X : LocallyDiscrete B₀) (x : (F.ulift.{w₁, w₂}).obj X) :
+    ((F.ulift.{w₁, w₂}).mapId X).hom.toNatTrans.app x =
+      (objEquivalence.{w₁, w₂} F X).functor.map
+        ((F.mapId X).hom.toNatTrans.app ((objEquivalence.{w₁, w₂} F X).inverse.obj x)) := by
+  apply (objEquivalence.{w₁, w₂} F X).inverse.map_injective
+  simp [ulift, mapIdIso, equivalenceTransportIdIso, objEquivalence, Cat.Hom.toNatIso,
+    ULiftHomULiftCategory.equiv, ULiftHom.equiv]
+  exact Category.comp_id _ |>.trans (Category.id_comp _).symm
 
 end ulift
 

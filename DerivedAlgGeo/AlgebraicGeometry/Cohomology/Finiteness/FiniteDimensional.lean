@@ -19,9 +19,10 @@ eventual cohomological vanishing. The separation matters mathematically:
 * finite-dimensionality of each `Hⁱ(X, F)` is the content of the finiteness theorem;
 * a bound above which the groups vanish is separate content, supplied by a finite affine cover.
 
-Mathlib currently exposes `Sheaf.H` only as an abelian group. This file constructs its canonical
-functorial `k`-linear lift from the central action of global functions and proves the natural
-comparison after forgetting scalars. `LinearCohomology` records that lift, while
+Mathlib currently exposes `Sheaf.H` only as an abelian group. For a scheme `Y` over `Spec k`,
+with `k` any commutative ring, this file constructs its canonical functorial `k`-linear lift from
+the central action of global functions and proves the natural comparison after forgetting
+scalars. Over a base field, `LinearCohomology` records that lift on a variety, while
 `FiniteDimensionalCohomology` adds exactly the still-geometric degreewise `Module.Finite`
 conclusion. These are structures carrying explicit proof data, not global existence axioms.
 
@@ -35,12 +36,16 @@ conclusion. These are structures carrying explicit proof data, not global existe
   are degreewise finite-dimensional.
 * `AlgebraicGeometry.Cohomology.globalSectionSmul`, `globalSectionAction`: multiplication by a
   global function as an endomorphism of a sheaf of modules.
+* `AlgebraicGeometry.Cohomology.baseFieldToGlobalSections`: the base ring `k` as global
+  functions on a scheme over `Spec k`.
 * `AlgebraicGeometry.Cohomology.varietyScalarAction`, `coherentScalarAction`: the canonical
-  base-field action on module and coherent sheaves over a variety.
-* `AlgebraicGeometry.Cohomology.coherentHModule`: the induced base-field module structure on a
+  base-ring action on module and coherent sheaves over `Spec k`.
+* `AlgebraicGeometry.Cohomology.coherentHModule`: the induced base-ring module structure on a
   cohomology group.
-* `AlgebraicGeometry.Cohomology.linearCoherentH`, `canonicalLinearCohomology`: the canonical
-  functorial linear realization.
+* `AlgebraicGeometry.Cohomology.linearCoherentH`: the canonical functorial `k`-linear
+  realization, over any commutative ring `k`.
+* `AlgebraicGeometry.Cohomology.canonicalLinearCohomology`: the same realization packaged as a
+  `LinearCohomology` on a variety over a field.
 
 ## Main results
 
@@ -48,13 +53,17 @@ conclusion. These are structures carrying explicit proof data, not global existe
   `varietyScalarAction_naturality`, `coherentScalarAction_naturality`: the actions are central
   on morphisms.
 * `AlgebraicGeometry.Cohomology.coherentH_map_smul`: every cohomology map respects the canonical
-  base-field action.
+  base-ring action.
 * `AlgebraicGeometry.Cohomology.linearCoherentHComparison`: forgetting scalars from
   `linearCoherentH` recovers Mathlib's derived cohomology functor.
 * `AlgebraicGeometry.Cohomology.FiniteDimensionalCohomology.dimension_iso`: isomorphic coherent
   sheaves have equal cohomology dimensions.
 
 ## Implementation notes
+
+The base-ring action uses only the ring map `k →+* Γ(Y, ⊤)` of the structure morphism, so it is
+built over a commutative ring. Only the interfaces that speak of dimension, `LinearCohomology` and
+`FiniteDimensionalCohomology`, fix a field and a variety.
 
 The natural comparison in `LinearCohomology` rules out an unrelated family of vector spaces with
 the desired dimensions: after forgetting scalars these are the actual `Sheaf.H` groups and maps.
@@ -68,7 +77,7 @@ The file cites no literature. It builds on Mathlib's `Sheaf.H` and `Sheaf.functo
 
 ## Tags
 
-sheaf cohomology, coherent sheaf, variety, finite-dimensional, base field action
+sheaf cohomology, coherent sheaf, variety, finite-dimensional, base ring action
 -/
 
 universe u v w x
@@ -78,7 +87,7 @@ open scoped AlgebraicGeometry
 
 namespace AlgebraicGeometry.Cohomology
 
-variable {k : Type u} [Field k]
+variable {k : Type u} [CommRing k]
 
 /-- The existing abelian-group-valued degree-`i` cohomology functor on coherent sheaves.
 
@@ -90,28 +99,6 @@ noncomputable def coherentH (X : Scheme.{u}) (i : ℕ) :
     HasExt.standard _
   exact Coh.ι X ⋙ Scheme.Modules.toSheaf X ⋙
     Sheaf.functorH (Opens.grothendieckTopology X) i
-
-variable (k) in
-/-- A functorial base-field-linear realization of Mathlib's coherent sheaf cohomology.
-
-The natural comparison rules out an unrelated family of vector spaces with the desired
-dimensions: after forgetting scalars these are the actual `Sheaf.H` groups and maps. -/
-structure LinearCohomology (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] where
-  /-- The base-field vector spaces `Hⁱ(X, F)`, functorial in the coherent sheaf `F`. -/
-  moduleH : ℕ → Coh X ⥤ ModuleCat.{u + 1} k
-  /-- Forgetting the vector-space structure recovers derived-functor sheaf cohomology. -/
-  comparison : ∀ i,
-    moduleH i ⋙ forget₂ (ModuleCat.{u + 1} k) AddCommGrpCat.{u + 1} ≅
-      coherentH X i
-
-variable (k) in
-/-- Degreewise finite-dimensional coherent cohomology, with no eventual-vanishing claim.
-
-This is the exact output interface for the projective finiteness theorem. A boundedness result
-extends it without re-proving or repackaging the linear comparison. -/
-structure FiniteDimensionalCohomology (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] extends LinearCohomology k X where
-  /-- Every coherent cohomology vector space is finite-dimensional. -/
-  finite : ∀ (i : ℕ) (F : Coh X), Module.Finite k ((moduleH i).obj F)
 
 variable {X : Scheme.{u}}
 
@@ -288,24 +275,24 @@ theorem globalSectionSmul_naturality {M N : X.Modules} (f : M ⟶ N)
     globalSectionSmul_app (U := U.unop)]
   exact (f.val.app U).hom.map_smul _ _
 
-/-- The structure morphism realizes base-field scalars as global functions on a variety. -/
+/-- The structure morphism `Y ⟶ Spec k` realizes the base ring `k` as global functions on `Y`. -/
 noncomputable def baseFieldToGlobalSections (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] :
     k →+* Γ(Y, (⊤ : Y.Opens)) :=
   ((Scheme.ΓSpecIso (CommRingCat.of k)).inv ≫
     (Y ↘ Spec (CommRingCat.of k)).appTop).hom
 
-/-- The canonical base-field action on a module sheaf over a variety. -/
+/-- The canonical base-ring action on a module sheaf over `Spec k`. -/
 noncomputable def varietyScalarAction (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))]
     (M : Y.Modules) : k →+* End M :=
   (globalSectionAction M).comp (baseFieldToGlobalSections Y)
 
-/-- The canonical base-field action is central on morphisms of module sheaves. -/
+/-- The canonical base-ring action is central on morphisms of module sheaves. -/
 theorem varietyScalarAction_naturality (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))]
     {M N : Y.Modules} (f : M ⟶ N) (r : k) :
     (varietyScalarAction Y M r).asHom ≫ f = f ≫ (varietyScalarAction Y N r).asHom :=
   globalSectionSmul_naturality f (baseFieldToGlobalSections Y r)
 
-/-- The canonical base-field action on a coherent sheaf. -/
+/-- The canonical base-ring action on a coherent sheaf. -/
 noncomputable def coherentScalarAction (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))]
     (F : Coh Y) : k →+* End F where
   toFun r := End.of (ObjectProperty.homMk
@@ -327,7 +314,7 @@ noncomputable def coherentScalarAction (Y : Scheme.{u}) [Y.Over (Spec (CommRingC
     apply ObjectProperty.hom_ext
     exact congrArg End.asHom (map_add (varietyScalarAction Y ((Coh.ι Y).obj F)) r s)
 
-/-- The canonical base-field action is central on coherent-sheaf morphisms. -/
+/-- The canonical base-ring action is central on coherent-sheaf morphisms. -/
 theorem coherentScalarAction_naturality (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))]
     {F G : Coh Y} (f : F ⟶ G) (r : k) :
     (coherentScalarAction Y F r).asHom ≫ f = f ≫ (coherentScalarAction Y G r).asHom := by
@@ -358,7 +345,7 @@ noncomputable instance coherentH_additive (Y : Scheme.{u}) (i : ℕ) :
   infer_instance
 
 variable (k) in
-/-- The base-field action induced on a derived coherent cohomology group. -/
+/-- The base-ring action induced on a derived coherent cohomology group. -/
 noncomputable def coherentHScalarAction (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] (i : ℕ)
     (F : Coh Y) : k →+* AddMonoid.End ((coherentH Y i).obj F) :=
   (addCommGrpEndRingHom ((coherentH Y i).obj F)).comp
@@ -366,13 +353,13 @@ noncomputable def coherentHScalarAction (Y : Scheme.{u}) [Y.Over (Spec (CommRing
       (coherentScalarAction Y F))
 
 variable (k) in
-/-- The canonical base-field module structure on a derived coherent cohomology group. -/
+/-- The canonical base-ring module structure on a derived coherent cohomology group. -/
 @[reducible]
 noncomputable def coherentHModule (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] (i : ℕ)
     (F : Coh Y) : Module k ((coherentH Y i).obj F) :=
   Module.compHom _ (coherentHScalarAction k Y i F)
 
-/-- Every derived coherent cohomology map respects the canonical base-field action. -/
+/-- Every derived coherent cohomology map respects the canonical base-ring action. -/
 theorem coherentH_map_smul (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] (i : ℕ)
     {F G : Coh Y} (f : F ⟶ G) (r : k)
     (x : (coherentH Y i).obj F) :
@@ -387,7 +374,7 @@ theorem coherentH_map_smul (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] (
 
 set_option maxHeartbeats 400000 in
 variable (k) in
-/-- Coherent sheaf cohomology with its canonical functorial base-field module structure. -/
+/-- Coherent sheaf cohomology with its canonical functorial base-ring module structure. -/
 noncomputable def linearCoherentH (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] (i : ℕ) :
     Coh Y ⥤ ModuleCat.{u + 1} k where
   obj F := letI := coherentHModule k Y i F
@@ -414,6 +401,32 @@ noncomputable def linearCoherentHComparison (Y : Scheme.{u}) [Y.Over (Spec (Comm
       coherentH Y i :=
   NatIso.ofComponents (fun _ ↦ Iso.refl _)
 
+section Field
+
+variable {k : Type u} [Field k]
+
+variable (k) in
+/-- A functorial base-field-linear realization of Mathlib's coherent sheaf cohomology.
+
+The natural comparison rules out an unrelated family of vector spaces with the desired
+dimensions: after forgetting scalars these are the actual `Sheaf.H` groups and maps. -/
+structure LinearCohomology (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] where
+  /-- The base-field vector spaces `Hⁱ(X, F)`, functorial in the coherent sheaf `F`. -/
+  moduleH : ℕ → Coh X ⥤ ModuleCat.{u + 1} k
+  /-- Forgetting the vector-space structure recovers derived-functor sheaf cohomology. -/
+  comparison : ∀ i,
+    moduleH i ⋙ forget₂ (ModuleCat.{u + 1} k) AddCommGrpCat.{u + 1} ≅
+      coherentH X i
+
+variable (k) in
+/-- Degreewise finite-dimensional coherent cohomology, with no eventual-vanishing claim.
+
+This is the exact output interface for the projective finiteness theorem. A boundedness result
+extends it without re-proving or repackaging the linear comparison. -/
+structure FiniteDimensionalCohomology (X : Scheme.{u}) [X.Over (Spec (CommRingCat.of k))] [IsVariety k X] extends LinearCohomology k X where
+  /-- Every coherent cohomology vector space is finite-dimensional. -/
+  finite : ∀ (i : ℕ) (F : Coh X), Module.Finite k ((moduleH i).obj F)
+
 /-- The canonical functorial linear realization of coherent sheaf cohomology on a variety. -/
 noncomputable def canonicalLinearCohomology (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] [IsVariety k Y] :
     LinearCohomology k Y where
@@ -436,5 +449,7 @@ theorem dimension_iso (D : FiniteDimensionalCohomology k X)
   ((D.moduleH i).mapIso e).toLinearEquiv.finrank_eq
 
 end FiniteDimensionalCohomology
+
+end Field
 
 end AlgebraicGeometry.Cohomology
