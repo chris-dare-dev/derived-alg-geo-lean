@@ -12,7 +12,8 @@ over categories. This construction is independent of any geometric realization o
 
 A presheaf `G` on `Over X` has a total presheaf `Y ↦ Σ (p : Y ⟶ X), G (Y, p)` on `C`, the
 presheaf `j_{X!} G` of Stacks 00Y1. When `yoneda.obj X` is a sheaf, `G` is a sheaf for the
-slice topology `J.over X` exactly when its total presheaf is a `J`-sheaf.
+slice topology `J.over X` exactly when its total presheaf is a `J`-sheaf. The passage from `G`
+to its total presheaf holds sieve by sieve.
 
 ## Main definitions
 
@@ -22,6 +23,7 @@ slice topology `J.over X` exactly when its total presheaf is a `J`-sheaf.
 ## Main results
 
 * `CategoryTheory.Over.post_isCocontinuous`
+* `CategoryTheory.Over.isSheafFor_totalPresheaf`
 * `CategoryTheory.GrothendieckTopology.isSheaf_over_iff_isSheaf_totalPresheaf`
 
 ## Implementation notes
@@ -185,6 +187,37 @@ private lemma totalPresheaf_ext {Y : C} {p : Y ⟶ X} {a : G.obj (op (Over.mk p)
   rw [totalPresheafEv_mk] at h'
   rw [h']
 
+/-- Let `S` be a sieve on `Y`. If `yoneda.obj X` is a sheaf for `S` and, for every `p : Y ⟶ X`,
+`G` is a sheaf for the sieve on `Over.mk p` corresponding to `S`, then the total presheaf of `G`
+is a sheaf for `S`. -/
+lemma isSheafFor_totalPresheaf {Y : C} {S : Sieve Y}
+    (hX : Presieve.IsSheafFor (CategoryTheory.yoneda.obj X) S.arrows) {G : (Over X)ᵒᵖ ⥤ Type w}
+    (hG : ∀ p : Y ⟶ X, Presieve.IsSheafFor G ((Sieve.overEquiv (Over.mk p)).symm S).arrows) :
+    Presieve.IsSheafFor (totalPresheaf G) S.arrows := by
+  intro x hx
+  let x₁ : Presieve.FamilyOfElements (CategoryTheory.yoneda.obj X) S.arrows :=
+    fun _ f hf ↦ (x f hf).1
+  have hx₁ : x₁.Compatible := fun _ _ _ g₁ g₂ f₁ f₂ h₁ h₂ w ↦
+    congr_arg Sigma.fst (hx g₁ g₂ h₁ h₂ w)
+  obtain ⟨p, hp, hp_uniq⟩ : ∃! p : Y ⟶ X, x₁.IsAmalgamation p := hX x₁ hx₁
+  replace hp : ∀ ⦃Z : C⦄ (f : Z ⟶ Y) (hf : S f), f ≫ p = (x f hf).1 := hp
+  let S' := (Sieve.overEquiv (Over.mk p)).symm S
+  let y : Presieve.FamilyOfElements G S'.arrows := fun W u hu ↦
+    totalPresheafEv W (x u.left hu) ((hp u.left hu).symm.trans (Over.w u))
+  have hy : y.Compatible := by
+    intro W₁ W₂ W g₁ g₂ u₁ u₂ h₁ h₂ w
+    have hw : g₁.left ≫ u₁.left = g₂.left ≫ u₂.left := congr_arg CommaMorphism.left w
+    exact (totalPresheafEv_map g₁ _ _).symm.trans
+      ((totalPresheafEv_congr (hx g₁.left g₂.left h₁ h₂ hw) _).trans
+        (totalPresheafEv_map g₂ _ _))
+  obtain ⟨g, hg, hg_uniq⟩ := hG p y hy
+  refine ⟨⟨p, g⟩, fun Z f hf ↦ ?_, fun t ht ↦ ?_⟩
+  · exact totalPresheaf_ext (hp f hf) (hg (Over.homMk f : Over.mk (f ≫ p) ⟶ Over.mk p) hf)
+  · have htp : t.1 = p := hp_uniq t.1 fun Z f hf ↦ congr_arg Sigma.fst (ht f hf)
+    refine (totalPresheaf_ext (G := G) htp.symm ?_).symm
+    refine (hg_uniq _ fun W u hu ↦ ?_).symm
+    exact (totalPresheafEv_map u t _).symm.trans (totalPresheafEv_congr (ht u.left hu) _)
+
 end Over
 
 namespace GrothendieckTopology
@@ -198,30 +231,8 @@ variable (J : GrothendieckTopology C)
 private lemma isSheaf_totalPresheaf_of_isSheaf_over
     (hX : Presieve.IsSheaf J (CategoryTheory.yoneda.obj X))
     {G : (Over X)ᵒᵖ ⥤ Type w} (hG : Presieve.IsSheaf (J.over X) G) :
-    Presieve.IsSheaf J (totalPresheaf G) := by
-  intro Y S hS x hx
-  let x₁ : Presieve.FamilyOfElements (CategoryTheory.yoneda.obj X) S.arrows :=
-    fun _ f hf ↦ (x f hf).1
-  have hx₁ : x₁.Compatible := fun _ _ _ g₁ g₂ f₁ f₂ h₁ h₂ w ↦
-    congr_arg Sigma.fst (hx g₁ g₂ h₁ h₂ w)
-  obtain ⟨p, hp, hp_uniq⟩ : ∃! p : Y ⟶ X, x₁.IsAmalgamation p := hX S hS x₁ hx₁
-  replace hp : ∀ ⦃Z : C⦄ (f : Z ⟶ Y) (hf : S f), f ≫ p = (x f hf).1 := hp
-  let S' := (Sieve.overEquiv (Over.mk p)).symm S
-  let y : Presieve.FamilyOfElements G S'.arrows := fun W u hu ↦
-    totalPresheafEv W (x u.left hu) ((hp u.left hu).symm.trans (Over.w u))
-  have hy : y.Compatible := by
-    intro W₁ W₂ W g₁ g₂ u₁ u₂ h₁ h₂ w
-    have hw : g₁.left ≫ u₁.left = g₂.left ≫ u₂.left := congr_arg CommaMorphism.left w
-    exact (totalPresheafEv_map g₁ _ _).symm.trans
-      ((totalPresheafEv_congr (hx g₁.left g₂.left h₁ h₂ hw) _).trans
-        (totalPresheafEv_map g₂ _ _))
-  obtain ⟨g, hg, hg_uniq⟩ := hG S' (J.overEquiv_symm_mem_over _ _ hS) y hy
-  refine ⟨⟨p, g⟩, fun Z f hf ↦ ?_, fun t ht ↦ ?_⟩
-  · exact totalPresheaf_ext (hp f hf) (hg (Over.homMk f : Over.mk (f ≫ p) ⟶ Over.mk p) hf)
-  · have htp : t.1 = p := hp_uniq t.1 fun Z f hf ↦ congr_arg Sigma.fst (ht f hf)
-    refine (totalPresheaf_ext (G := G) htp.symm ?_).symm
-    refine (hg_uniq _ fun W u hu ↦ ?_).symm
-    exact (totalPresheafEv_map u t _).symm.trans (totalPresheafEv_congr (ht u.left hu) _)
+    Presieve.IsSheaf J (totalPresheaf G) := fun _ _ hS ↦
+  isSheafFor_totalPresheaf (hX _ hS) fun _ ↦ hG _ (J.overEquiv_symm_mem_over _ _ hS)
 
 /-- If `yoneda.obj X` is `J`-separated and the total presheaf of `G` is a `J`-sheaf, then `G`
 is a `J.over X`-sheaf. -/
