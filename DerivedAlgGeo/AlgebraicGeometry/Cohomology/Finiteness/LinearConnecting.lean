@@ -5,20 +5,21 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.EulerCharacteristic.Additivity
 
 /-!
-# The connecting map of coherent cohomology is base-field linear
+# The connecting map of coherent cohomology is base-ring linear
 
-`coherentConnectingMap` is Mathlib's `Ext` connecting homomorphism, an additive map. The base
-field acts on `Hⁱ(X, F)` through the endomorphism of `F` that a scalar induces
-(`coherentHModule`), and the connecting map commutes with that action because the scalar
-endomorphisms of the three terms of a short exact sequence form a morphism of short exact
-sequences, and `extClass_naturality` says the extension class is natural in such morphisms.
+`coherentConnectingMap` is Mathlib's `Ext` connecting homomorphism, an additive map. For a scheme
+`X` over `Spec k`, with `k` any commutative ring, the base ring acts on `Hⁱ(X, F)` through the
+endomorphism of `F` that a scalar induces (`coherentHModule`), and the connecting map commutes
+with that action because the scalar endomorphisms of the three terms of a short exact sequence
+form a morphism of short exact sequences, and `extClass_naturality` says the extension class is
+natural in such morphisms.
 
 So the canonical linear realization `linearCoherentH` carries a *linear* connecting map, and the
-covariant `Ext` long exact sequence is exact as a sequence of `k`-vector spaces. This is the
-input the dévissage on projective space needs: `Hⁱ(G) → Hⁱ(F) → Hⁱ⁺¹(K)` exact and linear, with
-the outer terms finite-dimensional, forces `Hⁱ(F)` finite-dimensional. An additive exact sequence
-would not do: an additive injection into a finite-dimensional space bounds nothing over an
-infinite field.
+covariant `Ext` long exact sequence is exact as a sequence of `k`-modules. This is the input the
+dévissage on projective space needs: `Hⁱ(G) → Hⁱ(F) → Hⁱ⁺¹(K)` exact and linear, with the outer
+terms finite, forces `Hⁱ(F)` finite over a Noetherian `k`. An additive exact sequence would not
+do: an additive injection into a finite-dimensional space bounds nothing over an infinite
+field.
 
 `EulerCharacteristic/Additivity.lean` records the same exactness for an arbitrary
 `FiniteCohomology` realization whose connecting maps are *supplied* as `LinearConnectingMaps`.
@@ -32,8 +33,8 @@ open CategoryTheory Opposite
 
 namespace AlgebraicGeometry.Cohomology
 
-variable {k : Type u} [Field k]
-variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))] [IsVariety k X]
+variable {k : Type u} [CommRing k]
+variable {X : Scheme.{u}} [X.Over (Spec (CommRingCat.of k))]
 
 /-- **A scalar acts on a short complex of coherent sheaves by a morphism of short complexes.**
 The three components are the scalar endomorphisms, and they commute with the differentials by
@@ -45,7 +46,7 @@ noncomputable def coherentScalarShortComplexHom (S : ShortComplex (Coh X)) (r : 
   comm₁₂ := coherentScalarAction_naturality X S.f r
   comm₂₃ := coherentScalarAction_naturality X S.g r
 
-/-- **The connecting map commutes with the base-field action.**
+/-- **The connecting map commutes with the base-ring action.**
 
 Both sides are `Ext` composites: `r • x` is `x` postcomposed with the scalar endomorphism, and
 the connecting map is postcomposition with the extension class. Associativity moves the two
@@ -82,7 +83,6 @@ noncomputable def linearCoherentConnectingMap [IsLocallyNoetherian X] (S : Short
       map_add' := map_add _
       map_smul' := fun r x => coherentConnectingMap_smul S hS i r x }
 
-omit [IsVariety k X] in
 /-- Exactness at the middle cohomology group in each degree, for the canonical realization. -/
 theorem linearCoherentH_exact₂ [IsLocallyNoetherian X] (S : ShortComplex (Coh X))
     (hS : S.ShortExact) (i : ℕ) :

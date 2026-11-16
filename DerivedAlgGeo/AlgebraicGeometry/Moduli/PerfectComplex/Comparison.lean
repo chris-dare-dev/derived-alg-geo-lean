@@ -14,8 +14,8 @@ The repository uses three deliberately different notions:
 
 * `schemePerfect X` is the absolute thick envelope of finite locally free
   coherent sheaves in `D(Coh X)`;
-* `schemeRelativePerfect p` is pseudo-coherence plus local finite Tor
-  amplitude over a chosen morphism `p`, inside `Dqc(X)`;
+* `schemeRelativePerfect p` asks for local bounded models by finitely
+  presented modules flat over a chosen morphism `p`, inside `Dqc(X)`;
 * `Coh.TwoTermPerfectDeterminantData F` is explicit presentation data for a
   degree-zero coherent sheaf, restricted to a two-term finite locally free
   resolution.
@@ -24,26 +24,14 @@ Only the valid forgetful direction involving the presentation data is proved
 here: a two-term resolution gives an absolute perfect object, which then maps
 to the defining essential image of perfect objects in `Dqc(X)`. Relative
 perfection depends on the base morphism and is not identified with absolute
-perfection without an additional geometric theorem.
+perfection without an additional geometric theorem. Its comparison with the
+cohomological pseudo-coherence criterion is a statement about the predicates
+alone and lives with them, as
+`AlgebraicGeometry.schemeRelativePerfect_le_schemePseudoCoherent` in
+`DerivedCategory/Perfect/Relative.lean`.
 -/
 
 attribute [local instance] HasDerivedCategory.standard
-
-namespace AlgebraicGeometry
-
-open CategoryTheory
-open AlgebraicGeometry.DerivedCategory.Dqc
-
-universe u
-
-/-- Relative perfection always includes pseudo-coherence. It does not, by
-itself, identify the object with the absolute perfect locus in `Dqc(X)`. -/
-theorem schemeRelativePerfect_le_schemePseudoCoherent
-    {X S : Scheme.{u}} (p : X ⟶ S) :
-    schemeRelativePerfect p ≤ schemePseudoCoherent X :=
-  fun _ hE ↦ hE.1
-
-end AlgebraicGeometry
 
 namespace AlgebraicGeometry.Coh.TwoTermPerfectDeterminantData
 

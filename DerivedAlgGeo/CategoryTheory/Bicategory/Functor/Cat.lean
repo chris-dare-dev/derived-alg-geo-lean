@@ -2,9 +2,11 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.Colimits
 import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.Core
 import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.FiberProduct
 import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.ObjectProperty
+import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.Preadditive
 import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.Transport
 import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.ULift
 import DerivedAlgGeo.CategoryTheory.Bicategory.Functor.Cat.Yoneda
@@ -39,7 +41,15 @@ This umbrella introduces no definitions. It exports:
   terminal pseudofunctor;
 * `Cat/Yoneda.lean`: the representable pseudofunctor `Pseudofunctor.representable`
   of an object, in the universes of `Pseudofunctor.ulift`, and the strong
-  transformation `Pseudofunctor.ofObj` attached to an object of a fibre.
+  transformation `Pseudofunctor.ofObj` attached to an object of a fibre;
+* `Cat/Preadditive.lean`: strong transformations into a pseudofunctor with
+  preadditive fibres and additive transition functors form a preadditive
+  category, `Pseudofunctor.StrongTrans.preadditive`, with modifications added
+  componentwise;
+* `Cat/Colimits.lean`: strong transformations into a pseudofunctor on a locally
+  discrete base whose fibres have colimits of shape `J`, preserved by its
+  transition functors, have colimits of shape `J`, computed componentwise
+  (`Pseudofunctor.StrongTrans.colimitCocone`).
 
 ## Main results
 
@@ -61,5 +71,6 @@ The 2-fibre product follows the Stacks Project, Tags 02X9 and 02XI, and the
 
 ## Tags
 
-pseudofunctor, Cat, object property, core, 2-fibre product, 2-Yoneda lemma
+pseudofunctor, Cat, object property, core, 2-fibre product, 2-Yoneda lemma,
+preadditive category, colimit
 -/

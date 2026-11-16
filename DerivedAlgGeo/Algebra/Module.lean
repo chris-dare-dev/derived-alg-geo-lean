@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.Algebra.Module.FinitePresentation
 import DerivedAlgGeo.Algebra.Module.Localization
 import DerivedAlgGeo.Algebra.Module.LocalizedModule
 import DerivedAlgGeo.Algebra.Module.GradedModule
