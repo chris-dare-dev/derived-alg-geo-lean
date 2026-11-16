@@ -3,19 +3,18 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.FiniteType
-import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Stability.BoundedCoherentBaseChange
 import DerivedAlgGeo.AlgebraicGeometry.Moduli.HarderNarasimhan.DedekindProblem
 import DerivedAlgGeo.AlgebraicGeometry.Moduli.Semistability.LocusProbes
 
 /-!
 # Finite-type openness and relative HN consequences
 
-This file discharges the scheme-facing openness and relative-HN interfaces
-from the geometric bounded-coherent base-change witness.  The input is
-`GeometricPreStabilityBaseChangeHypotheses`: supplied hypotheses on the genuine
-bounded coherent pullback, including the phase-indexed output of the Appendix A
-inducing theorem.  No openness proposition or relative-HN existence proposition
-is an input.
+This file restricts the scheme-facing openness and relative-HN interfaces to
+base changes of finite type, and discharges them from the categorical
+base-change witness `FiberPreStabilityBaseChangeData`, the witness the
+unrestricted forms in `Locus.lean`, `LocusProbes.lean` and
+`HarderNarasimhan/RelativeFiltration.lean` already use.  No openness
+proposition or relative-HN existence proposition is an input.
 
 ## Main definitions
 
@@ -41,8 +40,10 @@ is an input.
   `Semistability.integratesAfterFiniteTypeRegularCurveBaseChange`: objectwise
   relative HN existence on every regular finite-type curve base change, and its
   integration after that base change.
-* `Semistability.GeometricPreStabilityBaseChangeHypotheses.finiteTypeConsequences`:
-  all three conclusions from the geometric base-change hypotheses.
+* `Semistability.finiteTypeConsequences_of_fiberPreStabilityBaseChangeData`:
+  all three conclusions from the categorical base-change witness.
+* `Semistability.finiteTypeGeometricConsequences_constant`: the constant family
+  over any scheme has all three, so the hypotheses above are satisfiable.
 
 ## Implementation notes
 
@@ -52,34 +53,34 @@ The finite-type condition is the standard scheme-theoretic one: a structure
 morphism is locally of finite type and quasi-compact.  It is recorded on the
 actual object of `Over S`, not as a caller-chosen eligibility label.
 
-### Consequences of the phase equivalence
+### What the witness gives
 
-The exported phase equivalence of `GeometricPreStabilityBaseChangeHypotheses`
-has two consequences.
-
-* Residue-fiber phase membership is independent of the point, so each actual
-  semistable locus is either the whole finite-type base change or empty and is
-  Zariski open.  Generic openness uses the same open locus.
-* The HN filtration supplied by the slicing over a regular curve base pulls
-  to every residue fiber.  This constructs `SchemeRelativeHNFiltration`
-  objectwise, including its length, phase, factor, and further base-change
-  compatibility.
+`FiberPreStabilityBaseChangeData` identifies phase membership along every
+morphism of base changes, residue maps included.  So residue-fibre phase
+membership is independent of the point, and every semistable locus is either
+empty or the whole base change (`schemeSemistableLocus_eq_univ_of_phase` and
+`schemeSemistableLocus_eq_empty_of_not_phase`); generic openness uses the same
+locus.  The HN filtration supplied by the slicing over a regular curve base
+pulls to every residue fibre, which constructs `SchemeRelativeHNFiltration`
+objectwise.
 
 ### Scope
 
-The finite-type proofs are not needed after restricting the quantifiers,
-because the geometric phase equivalence proves the stronger all-base-change
-statement. This is a consequence of the deliberately strong pseudofunctorial
-family interface; it is not a formalization of semistable reduction, a
-moduli-space construction, or Theorem 22.2 of arXiv:1902.08184v4.
+The finite-type restriction is the reduction of Lemma 20.3 of
+arXiv:1902.08184v4, which checks the universal properties on finite-type
+morphisms from an affine scheme; under this witness it adds nothing, since the
+unrestricted statements hold.  Openness in the sense of Definition 20.1(2) for
+a genuine family, whose loci are neither empty nor everything, is not proved
+here: Definition 20.5(2) makes it an axiom of a flat family of fibrewise
+stability conditions.  The geometric witness
+`GeometricPreStabilityBaseChangeHypotheses` quantifies only over morphisms with
+exact coherent pullback, which residue maps rarely have, so it does not supply
+`FiberPreStabilityBaseChangeData`.  Nor is this a formalization of semistable
+reduction, a moduli-space construction, or Theorem 22.2 of arXiv:1902.08184v4.
 
 ## References
 
-* arXiv:1902.08184v4, Theorem 22.2, which this file does not formalize.
-
-The proofs use `GeometricPreStabilityBaseChangeHypotheses.toFiberPreStabilityBaseChangeData`,
-`Semistability.schemeSemistableLocus_isOpen` and
-`HarderNarasimhan.SchemeRelativeHNFiltration.ofBaseChangeWitness`.
+* arXiv:1902.08184v4, Definition 20.1(2), Lemma 20.3 and Definition 20.5(2).
 
 ## Tags
 
@@ -87,21 +88,19 @@ semistable locus, openness, finite type, relative Harder-Narasimhan filtration,
 base change, stability condition
 -/
 
-attribute [local instance] HasDerivedCategory.standard
-
 namespace AlgebraicGeometry.Moduli.Semistability
 open AlgebraicGeometry.DerivedCategory
 open AlgebraicGeometry.DerivedCategory.Families
-open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 open AlgebraicGeometry.Moduli.HarderNarasimhan
 
 open CategoryTheory CategoryTheory.Limits CategoryTheory.Pretriangulated
 open CategoryTheory.Triangulated AlgebraicGeometry
 open CategoryTheory.Triangulated.WeakStabilityCondition.Families
+open CategoryTheory.Triangulated.WeakStabilityCondition.StabilityCondition.Families
 
 noncomputable section
 
-universe u uV
+universe u w uV
 
 /-- A semistable-locus index whose actual structure morphism is of finite
 type. -/
@@ -127,10 +126,6 @@ def finiteTypeRegularCurveEligible {S : Scheme.{u}}
   IsFiniteTypeBaseChange T.baseChange
 
 variable {S : Scheme.{u}} {F : SchemeTriangulatedFiberFamily S}
-  [∀ T : SchemeBaseChange S, IsLocallyNoetherian T.left]
-  [∀ {T U : SchemeBaseChange S} (f : T ⟶ U),
-    SchemeBaseChange.HasCoherentPullback f]
-  {R : BoundedCoherentDerivedRealization F}
   {V : Type uV} [AddCommGroup V]
   {classMap : ∀ T, K₀ (F.Fiber T) →+ V}
   {sigma : ∀ T, PreStabilityCondition.WithClassMap
@@ -139,14 +134,14 @@ variable {S : Scheme.{u}} {F : SchemeTriangulatedFiberFamily S}
 /-- Every semistable locus on an actual finite-type base change is Zariski
 open, with no openness conclusion supplied by the caller. -/
 theorem finiteTypeSchemeSemistableLocus_isOpen
-    (h : GeometricPreStabilityBaseChangeHypotheses F R classMap sigma)
+    (h : FiberPreStabilityBaseChangeData F classMap sigma)
     (j : FiniteTypeSchemeSemistableLocusIndex F) :
     _root_.IsOpen (schemeSemistableLocus F classMap sigma j.index) :=
-  schemeSemistableLocus_isOpen h.toFiberPreStabilityBaseChangeData j.index
+  schemeSemistableLocus_isOpen h j.index
 
 /-- Universal openness restricted to actual finite-type scheme base changes. -/
 theorem universalFiniteTypeSchemeSemistableOpenness
-    (h : GeometricPreStabilityBaseChangeHypotheses F R classMap sigma) :
+    (h : FiberPreStabilityBaseChangeData F classMap sigma) :
     UniversalOpenness
       (fun j : FiniteTypeSchemeSemistableLocusIndex F ↦
         schemeSemistableOpenProbe F classMap sigma j.index) :=
@@ -156,15 +151,14 @@ theorem universalFiniteTypeSchemeSemistableOpenness
 /-- Generic openness is obtained from the same Zariski-open semistable locus,
 not from a separate generic-openness premise. -/
 theorem finiteTypeSchemeGenericSemistabilityProbe_isGenericallyOpen
-    (h : GeometricPreStabilityBaseChangeHypotheses F R classMap sigma)
+    (h : FiberPreStabilityBaseChangeData F classMap sigma)
     (j : FiniteTypeSchemeGenericSemistableLocusIndex F) :
     (schemeGenericSemistabilityProbe F classMap sigma j.index).IsGenericallyOpen :=
-  schemeGenericSemistabilityProbe_isGenericallyOpen
-    h.toFiberPreStabilityBaseChangeData j.index
+  schemeGenericSemistabilityProbe_isGenericallyOpen h j.index
 
 /-- Universal generic openness on actual finite-type scheme base changes. -/
 theorem universalFiniteTypeSchemeGenericSemistabilityOpenness
-    (h : GeometricPreStabilityBaseChangeHypotheses F R classMap sigma) :
+    (h : FiberPreStabilityBaseChangeData F classMap sigma) :
     UniversalGenericOpenness
       (fun j : FiniteTypeSchemeGenericSemistableLocusIndex F ↦
         schemeGenericSemistabilityProbe F classMap sigma j.index) :=
@@ -172,21 +166,20 @@ theorem universalFiniteTypeSchemeGenericSemistabilityOpenness
 
 /-- Construct an actual relative HN filtration for one object over an eligible
 regular finite-type curve.  The ordinary HN filtration comes from the slicing;
-the geometric witness constructs all residue-fiber filtrations and their
+the base-change witness constructs all residue-fiber filtrations and their
 compatibility. -/
 noncomputable def finiteTypeSchemeRelativeHNFiltration
-    (h : GeometricPreStabilityBaseChangeHypotheses F R classMap sigma)
+    (h : FiberPreStabilityBaseChangeData F classMap sigma)
     (T : RegularCurveBaseChange S) (_ : finiteTypeRegularCurveEligible T)
     (E : F.Fiber T.baseChange) :
     SchemeRelativeHNFiltration F classMap sigma E :=
   SchemeRelativeHNFiltration.ofBaseChangeWitness
-    ((sigma T.baseChange).slicing.hn_exists E).some
-    h.toFiberPreStabilityBaseChangeData
+    ((sigma T.baseChange).slicing.hn_exists E).some h
 
-/-- The geometric bounded-coherent witness supplies objectwise relative HN
-existence on every regular finite-type curve base change. -/
+/-- The base-change witness supplies objectwise relative HN existence on every
+regular finite-type curve base change. -/
 theorem hasFiniteTypeSchemeRelativeHNFiltrations
-    (h : GeometricPreStabilityBaseChangeHypotheses F R classMap sigma) :
+    (h : FiberPreStabilityBaseChangeData F classMap sigma) :
     HasSchemeRelativeHNFiltrations F classMap sigma
       finiteTypeRegularCurveEligible := by
   intro T hT E
@@ -196,7 +189,7 @@ theorem hasFiniteTypeSchemeRelativeHNFiltrations
 existing object-level relative-HN problem, without accepting
 `HasSchemeRelativeHNFiltrations` as an input. -/
 theorem integratesAfterFiniteTypeRegularCurveBaseChange
-    (h : GeometricPreStabilityBaseChangeHypotheses F R classMap sigma) :
+    (h : FiberPreStabilityBaseChangeData F classMap sigma) :
     IntegratesAfterDedekindBaseChange
       (schemeRelativeHNProblem F classMap sigma
         finiteTypeRegularCurveEligible) :=
@@ -204,7 +197,7 @@ theorem integratesAfterFiniteTypeRegularCurveBaseChange
     (hasFiniteTypeSchemeRelativeHNFiltrations h)
 
 /-- The three finite-type geometric conclusions exported together.  This is
-an output package; none of its fields is assumed by the construction theorem
+an output package; none of its fields is assumed by the construction theorems
 below. -/
 structure FiniteTypeGeometricConsequences
     {S : Scheme.{u}} (F : SchemeTriangulatedFiberFamily S)
@@ -224,14 +217,27 @@ structure FiniteTypeGeometricConsequences
   relativeHN : HasSchemeRelativeHNFiltrations F classMap sigma
     finiteTypeRegularCurveEligible
 
-/-- Construct every finite-type geometric consequence from the bounded-coherent
-base-change input `GeometricPreStabilityBaseChangeHypotheses`. -/
-theorem GeometricPreStabilityBaseChangeHypotheses.finiteTypeConsequences
-    (h : GeometricPreStabilityBaseChangeHypotheses F R classMap sigma) :
+/-- Construct every finite-type geometric consequence from the categorical
+base-change witness. -/
+theorem finiteTypeConsequences_of_fiberPreStabilityBaseChangeData
+    (h : FiberPreStabilityBaseChangeData F classMap sigma) :
     FiniteTypeGeometricConsequences F classMap sigma where
   semistableOpenness := universalFiniteTypeSchemeSemistableOpenness h
   genericOpenness := universalFiniteTypeSchemeGenericSemistabilityOpenness h
   relativeHN := hasFiniteTypeSchemeRelativeHNFiltrations h
+
+/-- The constant family over any scheme has every finite-type geometric
+consequence, so the hypotheses of this file are satisfiable over every base. -/
+theorem finiteTypeGeometricConsequences_constant (S : Scheme.{u})
+    (C : Type w) [Category.{w} C] [Preadditive C] [HasZeroObject C]
+    [HasShift C ℤ] [∀ n : ℤ, (shiftFunctor C n).Additive]
+    [Pretriangulated C]
+    (V : Type uV) [AddCommGroup V] (v₀ : K₀ C →+ V)
+    (sigma₀ : PreStabilityCondition.WithClassMap C v₀) :
+    FiniteTypeGeometricConsequences (SchemeTriangulatedFiberFamily.constant S C)
+      (fun _ ↦ v₀) (fun _ ↦ sigma₀) :=
+  finiteTypeConsequences_of_fiberPreStabilityBaseChangeData
+    (FiberPreStabilityBaseChangeData.constant C V v₀ sigma₀)
 
 end
 
