@@ -9,6 +9,7 @@ import DerivedAlgGeo.CategoryTheory.Sites.Descent.FiberProduct
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.IsStack
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.Local
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.ObjectProperty
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.Over
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Discrete
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Fibered
@@ -16,6 +17,7 @@ import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.FiberProduct
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Morphism
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.ObjectProperty
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Representable
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Representability
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.ULift
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.ULift
 
@@ -39,7 +41,9 @@ its directory, so this umbrella imports the children directly.
   stacks from sheaves, stack morphisms, site-object representability, the
   moduli of objects `StackInGroupoids.ofObjectProperty`, universe lifts of
   stacks, 2-fibre products, diagonals and Isom sheaves of stacks in
-  groupoids, and the 2-Yoneda equivalence `StackInGroupoids.yonedaEquivalence`.
+  groupoids, the 2-Yoneda equivalence `StackInGroupoids.yonedaEquivalence`,
+  and representable morphisms of stacks, natural in the test object
+  (`StackMorphism.IsRepresentable`).
 * `ULift.lean`: descent data of the universe lift `Pseudofunctor.ulift` are
   equivalent to those of the original pseudofunctor.
 
@@ -49,7 +53,7 @@ its directory, so this umbrella imports the children directly.
   transformations whose components are equivalences of categories.
 * `DescentDataAsCoalgebra.lean`: effective descent along one morphism is
   comonadicity of its pullback functor, under the base change hypotheses.
-* `DescentDataPrime.lean`: effective descent along one morphism is unchanged by
+* `DescentDataPrime.lean`: effective descent along a family of morphisms is unchanged by
   reindexing along a functor that preserves the pullbacks involved.
 * `FiberProduct.lean`: the 2-fibre product of two stacks over a prestack is a
   stack, and the terminal pseudofunctor is a stack.
@@ -58,6 +62,8 @@ its directory, so this umbrella imports the children directly.
   stack.
 * `ObjectProperty.lean`: the core of a stack is a stack, and a local object
   property closed under isomorphisms cuts out a substack.
+* `Over.lean`: the pullback of a stack along a continuous functor is a stack, so a stack on
+  `C` pulls back to a stack on `Over S` along `Over.forget S` and along `X ×_S -`.
 * `ULift.lean`: a pseudofunctor is a prestack (a stack) exactly when its universe lift is.
 * `StackInGroupoids/Fibered.lean`: the Grothendieck construction of a stack in
   groupoids is a category fibred in groupoids (`StackInGroupoids.isStronglyCartesian`).
