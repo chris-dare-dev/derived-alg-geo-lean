@@ -6,19 +6,20 @@ import DerivedAlgGeo.CategoryTheory.Sites.SheafCohomology.Cech.ComplexNaturality
 import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.FiniteDimensional
 
 /-!
-# The base-field-linear form of the Čech comparison
+# The base-ring-linear form of the Čech comparison
 
 The Čech comparison `cechComparisonAddEquiv` is valued in `AddCommGrpCat`, and the interface a
 finiteness theorem has to discharge is not: `Module.Finite k` needs the `k`-module structure that
-`coherentScalarAction` supplies. This file makes the comparison `k`-linear.
+`coherentScalarAction` supplies. This file makes the comparison `k`-linear, for a scheme over
+`Spec k` and `k` any commutative ring.
 
 ## Main definitions
 
 * `AlgebraicGeometry.Cohomology.cechCohomologyFunctor` is Čech cohomology of an abelian sheaf
   for a fixed cover, as an additive functor.
 * `AlgebraicGeometry.Cohomology.cechScalarAction` and
-  `AlgebraicGeometry.Cohomology.cechCohomologyModule` give the base-field action on Čech
-  cohomology of a module sheaf over a variety.
+  `AlgebraicGeometry.Cohomology.cechCohomologyModule` give the base-ring action on Čech
+  cohomology of a module sheaf over `Spec k`.
 * `AlgebraicGeometry.Cohomology.cechComparisonLinearEquiv` is the Čech comparison as a
   `k`-linear equivalence onto `linearCoherentH`.
 
@@ -28,13 +29,13 @@ finiteness theorem has to discharge is not: `Module.Finite k` needs the `k`-modu
   `AlgebraicGeometry.Cohomology.cechComparisonAddEquiv_coherentSmul` show that the comparison
   commutes with the scalar actions.
 * `AlgebraicGeometry.Cohomology.module_finite_linearCoherentH_of_cech` transfers
-  finite-dimensionality from Čech cohomology to `linearCoherentH`.
+  `Module.Finite` from Čech cohomology to `linearCoherentH`.
 
 ## Implementation notes
 
 The `k`-action on a cohomology group is not extra data. For `r : k`, multiplication by `r` is an
 endomorphism of the sheaf -- `varietyScalarAction`, built from the central action of global
-functions through the variety's structure morphism -- and the action on cohomology is the map
+functions through the structure morphism to `Spec k` -- and the action on cohomology is the map
 that endomorphism induces. So both sides of the Čech comparison carry an action for the same
 reason, and `k`-linearity of the comparison is exactly the statement that it commutes with the
 maps induced by an endomorphism, which is `cechComparisonAddEquiv_naturality`.
@@ -55,7 +56,7 @@ open CategoryTheory CategoryTheory.Sheaf CategoryTheory.Limits TopologicalSpace 
 
 namespace AlgebraicGeometry.Cohomology
 
-variable {k : Type u} [Field k]
+variable {k : Type u} [CommRing k]
 
 /-- Čech cohomology of an abelian sheaf on a space, as a functor.
 
@@ -76,7 +77,7 @@ noncomputable instance cechCohomologyFunctor_additive {X : TopCat.{u}} {ind : Ty
   infer_instance
 
 variable (k) in
-/-- The base-field action on the Čech cohomology of a module sheaf over a variety.
+/-- The base-ring action on the Čech cohomology of a module sheaf over `Spec k`.
 
 It is the action of `varietyScalarAction` pushed through two additive functors: the forgetful
 functor to abelian sheaves, and Čech cohomology. -/
@@ -91,7 +92,7 @@ noncomputable def cechScalarAction (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.o
         (varietyScalarAction Y M))
 
 variable (k) in
-/-- The base-field module structure on Čech cohomology. -/
+/-- The base-ring module structure on Čech cohomology. -/
 @[reducible]
 noncomputable def cechCohomologyModule (Y : Scheme.{u}) [Y.Over (Spec (CommRingCat.of k))] (M : Y.Modules)
     {ind : Type u} (U : ind → Opens Y) (n : ℕ) :
@@ -190,7 +191,7 @@ noncomputable def cechComparisonLinearEquiv (Y : Scheme.{u}) [Y.Over (Spec (Comm
       hcover n
     map_smul' := cechComparisonAddEquiv_coherentSmul Y F U I hcover n }
 
-/-- **Finite-dimensionality transfers from the Čech complex to the interface group.**
+/-- **`Module.Finite` transfers from the Čech complex to the interface group.**
 
 `FiniteDimensionalCohomology` asks for `Module.Finite k ((moduleH i).obj F)`, and
 `linearCoherentH` is the realization that supplies `moduleH`. The Čech side is where a finite

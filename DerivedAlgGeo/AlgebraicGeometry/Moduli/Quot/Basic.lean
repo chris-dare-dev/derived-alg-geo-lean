@@ -2,30 +2,31 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Families.ExactPullback
+import Mathlib.AlgebraicGeometry.Modules.Sheaf
 
 /-!
 # Quotient presentations of module sheaves
 
 This file defines the elementary input to a Quot construction: an actual
 epimorphism from a fixed module sheaf.  Morphisms are maps of targets commuting
-with the quotient arrows.  Pullback of module sheaves preserves these
+with the quotient arrows; since quotient arrows are epimorphisms there is at most
+one between two presentations (`ModuleQuotient.instSubsingletonHom`), and an
+isomorphism of targets compatible with the arrows is an isomorphism
+(`ModuleQuotient.isoMk`).  Pullback of module sheaves preserves these
 presentations because it preserves finite colimits, so quotient presentations
 have a genuine base-change operation before any representability theorem is
-claimed.
+claimed.  A presentation can also be read through an epimorphism into its source
+(`ModuleQuotient.precomp`), and every module sheaf has the zero quotient
+(`ModuleQuotient.toZero`).
 
-No scheme named `QuotScheme` is introduced here.  Representability, when it
-is available, is a separate Yoneda universal property.
+The Quot functor built from these presentations is `quotFunctor` in
+`Moduli/Quot/Functor.lean`; representability is Mathlib's Yoneda
+`Functor.RepresentableBy`, not a structure on this carrier.
 -/
-
-attribute [local instance] HasDerivedCategory.standard
 
 namespace AlgebraicGeometry
 
 open CategoryTheory CategoryTheory.Limits
-open AlgebraicGeometry.DerivedCategory
-open AlgebraicGeometry.DerivedCategory.Families
-open AlgebraicGeometry.DerivedCategory.Families.SchemeBaseChange
 open scoped ZeroObject
 
 noncomputable section
@@ -90,6 +91,21 @@ theorem comp_right {q r s : ModuleQuotient F}
     (f ≫ g).right = f.right ≫ g.right :=
   rfl
 
+/-- Quotient arrows are epimorphisms, so there is at most one morphism between two quotient
+presentations of the same module sheaf. -/
+instance instSubsingletonHom (q r : ModuleQuotient F) : Subsingleton (q ⟶ r) :=
+  ⟨fun f g ↦ Hom.ext _ _ ((cancel_epi q.hom).1 (f.comm.trans g.comm.symm))⟩
+
+/-- An isomorphism of targets that commutes with the quotient arrows is an isomorphism of
+quotient presentations. -/
+@[simps]
+def isoMk {q r : ModuleQuotient F} (e : q.target ≅ r.target) (w : q.hom ≫ e.hom = r.hom) :
+    q ≅ r where
+  hom := ⟨e.hom, w⟩
+  inv := ⟨e.inv, by rw [← w, Category.assoc, e.hom_inv_id, Category.comp_id]⟩
+  hom_inv_id := Subsingleton.elim _ _
+  inv_hom_id := Subsingleton.elim _ _
+
 /-- The forgetful functor from quotient presentations to their targets. -/
 def targetFunctor (F : X.Modules) : ModuleQuotient F ⥤ X.Modules where
   obj q := q.target
@@ -115,6 +131,21 @@ def pullbackFunctor (f : X ⟶ Y) (G : Y.Modules) :
       congrArg (Scheme.Modules.pullback f).map g.comm⟩
   map_id q := Hom.ext _ _ (by simp [pullback])
   map_comp g h := Hom.ext _ _ (by simp [pullback])
+
+/-- Precompose a quotient presentation of `F` with an epimorphism `G ⟶ F`, giving a quotient
+presentation of `G` with the same target. -/
+@[simps]
+def precomp {G : X.Modules} (f : G ⟶ F) [Epi f] (q : ModuleQuotient F) : ModuleQuotient G where
+  target := q.target
+  hom := f ≫ q.hom
+  isEpi := epi_comp f q.hom
+
+/-- The quotient `F ⟶ 0` onto the zero module sheaf. -/
+@[simps]
+def toZero (F : X.Modules) : ModuleQuotient F where
+  target := 0
+  hom := 0
+  isEpi := (isZero_zero _).epi _
 
 /-- The identity arrow presents a module sheaf as a quotient of itself. -/
 def identity (F : X.Modules) : ModuleQuotient F where
