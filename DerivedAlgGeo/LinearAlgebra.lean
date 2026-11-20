@@ -11,12 +11,14 @@ import DerivedAlgGeo.LinearAlgebra.Matrix.GeneralLinearGroup.Positive
 import DerivedAlgGeo.LinearAlgebra.Matrix.GeneralLinearGroup.UniversalCover
 import DerivedAlgGeo.LinearAlgebra.Matrix.PolarDecomposition
 import DerivedAlgGeo.LinearAlgebra.QuadraticForm
+import DerivedAlgGeo.LinearAlgebra.SymmetricAlgebra.Grading
 import DerivedAlgGeo.LinearAlgebra.FiniteDimensional
 
 /-! # Linear algebra
 
 Exterior powers, weighted-basis decompositions, lattice theory, Mukai
-constructions, quadratic-form signature theory, and matrix infrastructure used
+constructions, quadratic-form signature theory, the grading of the symmetric
+algebra, and matrix infrastructure used
 throughout the repository, including the universal cover of `GL⁺(2, ℝ)`
 beside the general-linear-group API it covers.
 -/
