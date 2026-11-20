@@ -28,7 +28,9 @@ the one `Coherent/Pullback.lean` runs on presentations.
 
 * `Scheme.Modules.isLocallyFreeData_pullbackLocalGeneratorsData`: locally free data pulls
   back to locally free data;
-* `Scheme.Modules.isLocallyFree_pullback`: pullback preserves local freeness.
+* `Scheme.Modules.isLocallyFree_pullback`: pullback preserves local freeness;
+* `Scheme.Modules.isLocallyFreeOfRank_pullback`: pullback preserves local freeness of a fixed
+  rank.
 -/
 
 open CategoryTheory Limits TopologicalSpace
@@ -87,6 +89,17 @@ lemma isLocallyFree_pullback (f : X ⟶ Y) (M : Y.Modules)
   exact (pullbackLocalGeneratorsData f q).isLocallyFree
 
 attribute [instance] isLocallyFree_pullback
+
+/-- Pullback preserves local freeness of a fixed rank: the pulled-back frame has the same index
+types (`pullbackLocalGeneratorsData_generators_I`). -/
+theorem isLocallyFreeOfRank_pullback (f : X ⟶ Y) (M : Y.Modules) {r : ℕ}
+    (h : SheafOfModules.IsLocallyFreeOfRank.{u, u, u}
+      (show SheafOfModules Y.ringCatSheaf from M) r) :
+    SheafOfModules.IsLocallyFreeOfRank.{u, u, u}
+      (show SheafOfModules X.ringCatSheaf from (pullback f).obj M) r := by
+  obtain ⟨q, hq, hrank⟩ := h
+  letI : q.IsLocallyFreeData := hq
+  exact ⟨pullbackLocalGeneratorsData f q, inferInstance, fun i ↦ hrank i⟩
 
 end
 
