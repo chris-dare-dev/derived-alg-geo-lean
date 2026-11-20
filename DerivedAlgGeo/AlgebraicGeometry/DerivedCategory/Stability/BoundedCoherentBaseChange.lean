@@ -12,10 +12,13 @@ import Mathlib.CategoryTheory.Triangulated.Adjunction
 
 This file connects the actual bounded coherent pullback from
 `Families.BoundedGeometry`, with its identity and composition laws from
-`Families.CoherentPullbackCoherence`, to `FiberPreStabilityBaseChangeData`.
-Every `Slicing.PreimageData` witness that the categorical base-change package
-needs is constructed here from bounded coherent geometry and the phase-indexed
-output of Theorem A.17, rather than accepted from the caller.
+`Families.CoherentPullbackCoherence`, to the slicings of a pre-stability family.
+Every `Slicing.PreimageData` witness it uses is constructed here from bounded
+coherent geometry and the phase-indexed output of Theorem A.17, rather than
+accepted from the caller.  Bounded coherent fibres exist only over locally
+Noetherian base changes, and bounded coherent pullback only along morphisms
+with exact coherent pullback, so the geometric witness quantifies over exactly
+those.
 
 ## Main definitions
 
@@ -26,8 +29,9 @@ output of Theorem A.17, rather than accepted from the caller.
 * `SchemeBaseChange.BoundedCoherentPullbackInducingData`: the phase-indexed
   Theorem A.17 output, the induced source t-structures, for that pullback.
 * `Families.BoundedCoherentDerivedRealization`: triangulated equivalences from
-  the fibres of an abstract fibre family to the genuine `Dᵇ(Coh)` fibres, with
-  every abstract pullback identified with bounded coherent pullback.
+  the fibres of an abstract fibre family over locally Noetherian base changes
+  to the genuine `Dᵇ(Coh)` fibres, with the abstract pullback along a morphism
+  with exact coherent pullback identified with bounded coherent pullback.
 * `Families.BoundedCoherentDerivedRealization.inversePreimage`: a slicing on an
   abstract fibre transported to its bounded coherent realization.
 * `Families.GeometricPreStabilityBaseChangeHypotheses`: the supplied class-map
@@ -46,11 +50,10 @@ output of Theorem A.17, rather than accepted from the caller.
 * `Families.BoundedCoherentDerivedRealization.inversePreimageData` and
   `Families.BoundedCoherentDerivedRealization.preimageData`: preimage witnesses
   for the inverse fibre equivalence and for the abstract family pullback.
-* `Families.GeometricPreStabilityBaseChangeHypotheses.toFiberPreStabilityBaseChangeData`:
-  the categorical base-change witness, with its preimage field constructed.
 * `Families.GeometricPreStabilityBaseChangeHypotheses.phase_iff` and
   `Families.GeometricPreStabilityBaseChangeHypotheses.phase_iff_comp`: phase
-  membership is detected by one pullback and by a composite of two.
+  membership is detected by one pullback with exact coherent pullback, and by a
+  composite of two.
 
 ## Implementation notes
 
@@ -64,10 +67,21 @@ output of Theorem A.17, rather than accepted from the caller.
   `Slicing.InducedTStructures.preimageData` converts this output into preimage
   data.
 * `BoundedCoherentDerivedRealization` identifies an abstract strict fiber
-  family with the genuine `Dᵇ(Coh)` fibers and their pullbacks.
-  `GeometricPreStabilityBaseChangeHypotheses.toFiberPreStabilityBaseChangeData`
-  then exports the downstream witness without accepting `Slicing.PreimageData`
+  family with the genuine `Dᵇ(Coh)` fibers over locally Noetherian base
+  changes, and their pullbacks along morphisms with exact coherent pullback.
+  `GeometricPreStabilityBaseChangeHypotheses` then states slicing
+  compatibility along those morphisms without accepting `Slicing.PreimageData`
   from the caller.
+
+### Quantifiers
+
+Both structures quantify per object over locally Noetherian base changes and
+per morphism over those with `SchemeBaseChange.HasCoherentPullback`; global
+binders over every base change and every morphism would be unsatisfiable over
+every nonempty `S`, and the structure docstrings give the two witnesses.  So
+no `FiberPreStabilityBaseChangeData`, which quantifies over every morphism, is
+exported, and residue-fibre semistable loci are not shown open: the residue
+maps `SchemeBaseChange.residueTo x` rarely have exact coherent pullback.
 
 ### Scope
 
@@ -75,7 +89,7 @@ This file does not manufacture the scheme-specific A.17 realization from
 flatness; `GeometricPreStabilityBaseChangeHypotheses` takes it as a supplied
 input.  It does, however, consume its honest phase-indexed output directly:
 there is no global theorem switch and no preconstructed `Slicing.PreimageData`
-input.  Openness and relative-HN consequences are exported downstream.
+input.  No openness or relative-HN consequence is derived here.
 
 ## References
 
@@ -242,35 +256,47 @@ end BoundedCoherentPullbackInducingData
 end SchemeBaseChange
 
 /-- A pseudofunctorial triangulated fiber family realized by the genuine
-bounded coherent derived categories, with every abstract pullback identified
-with the actual bounded coherent pullback. -/
+bounded coherent derived categories over every locally Noetherian base change,
+with the abstract pullback along every morphism with exact coherent pullback
+identified with the actual bounded coherent pullback.
+
+The binders are per object and per morphism.  A global
+`[∀ T, IsLocallyNoetherian T.left]` is false over every nonempty `S`
+(`Spec κ(s)[x₁, x₂, …] → S` is a base change that is not locally Noetherian),
+and so is `[∀ f, HasCoherentPullback f]` even over locally Noetherian base
+changes (the closed immersion `Spec κ(s) → Spec κ(s)[ε]/(ε²)` has none, since
+module pullback sends the monomorphism `(ε) ↪ κ(s)[ε]/(ε²)` to zero).  Residue
+maps rarely have exact coherent pullback, so the realization says nothing
+about them and does not imply openness of residue-fibre loci. -/
 structure BoundedCoherentDerivedRealization
-    {S : Scheme.{u}} (F : SchemeTriangulatedFiberFamily S)
-    [∀ T : SchemeBaseChange S, IsLocallyNoetherian T.left]
-    [∀ {T U : SchemeBaseChange S} (f : T ⟶ U),
-      SchemeBaseChange.HasCoherentPullback f] where
+    {S : Scheme.{u}} (F : SchemeTriangulatedFiberFamily S) where
   /-- Equivalence from each abstract fiber to `Dᵇ(Coh)`. -/
-  fiberEquivalence (T : SchemeBaseChange S) :
+  fiberEquivalence (T : SchemeBaseChange S) [IsLocallyNoetherian T.left] :
     F.Fiber T ≌ T.BoundedCoherentDerivedFiber
   /-- The chosen forward functor commutes with shifts.  Mathlib derives the
   unique compatible shift structure on the inverse functor from this one. -/
-  fiberEquivalenceFunctorCommShift (T : SchemeBaseChange S) :
+  fiberEquivalenceFunctorCommShift (T : SchemeBaseChange S)
+    [IsLocallyNoetherian T.left] :
     (fiberEquivalence T).functor.CommShift ℤ
   /-- Unit and counit coherence for the derived inverse shift structure. -/
-  fiberEquivalenceCommShift (T : SchemeBaseChange S) :
+  fiberEquivalenceCommShift (T : SchemeBaseChange S)
+    [IsLocallyNoetherian T.left] :
     letI := fiberEquivalenceFunctorCommShift T
     letI := (fiberEquivalence T).commShiftInverse ℤ
     (fiberEquivalence T).CommShift ℤ
   /-- The equivalence is triangulated.  Mathlib derives exactness and
   additivity for both directions from this equivalence-level property. -/
-  fiberEquivalenceIsTriangulated (T : SchemeBaseChange S) :
+  fiberEquivalenceIsTriangulated (T : SchemeBaseChange S)
+    [IsLocallyNoetherian T.left] :
     letI := fiberEquivalenceFunctorCommShift T
     letI := (fiberEquivalence T).commShiftInverse ℤ
     letI := fiberEquivalenceCommShift T
     (fiberEquivalence T).IsTriangulated
   /-- Abstract pullback is the actual bounded coherent pullback, transported
   through the two fiber equivalences. -/
-  pullbackIso {T U : SchemeBaseChange S} (f : T ⟶ U) :
+  pullbackIso {T U : SchemeBaseChange S} (f : T ⟶ U)
+    [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
+    [SchemeBaseChange.HasCoherentPullback f] :
     F.pull f ≅
       (fiberEquivalence U).functor ⋙
         (SchemeBaseChange.boundedCoherentDerivedPullback f ⋙
@@ -279,14 +305,12 @@ structure BoundedCoherentDerivedRealization
 namespace BoundedCoherentDerivedRealization
 
 variable {S : Scheme.{u}} {F : SchemeTriangulatedFiberFamily S}
-  [∀ T : SchemeBaseChange S, IsLocallyNoetherian T.left]
-  [∀ {T U : SchemeBaseChange S} (f : T ⟶ U),
-    SchemeBaseChange.HasCoherentPullback f]
 
 /-- The standard Mathlib triangulated-equivalence structure supplies preimage
 data for the inverse fiber equivalence. -/
 theorem inversePreimageData (R : BoundedCoherentDerivedRealization F)
-    (T : SchemeBaseChange S) (s : Slicing (F.Fiber T)) :
+    (T : SchemeBaseChange S) [IsLocallyNoetherian T.left]
+    (s : Slicing (F.Fiber T)) :
     s.PreimageData (R.fiberEquivalence T).inverse := by
   letI : (R.fiberEquivalence T).functor.CommShift ℤ :=
     R.fiberEquivalenceFunctorCommShift T
@@ -302,7 +326,8 @@ theorem inversePreimageData (R : BoundedCoherentDerivedRealization F)
 realization through the inverse equivalence. -/
 noncomputable def inversePreimage
     (R : BoundedCoherentDerivedRealization F) (T : SchemeBaseChange S)
-    (s : Slicing (F.Fiber T)) : Slicing T.BoundedCoherentDerivedFiber := by
+    [IsLocallyNoetherian T.left] (s : Slicing (F.Fiber T)) :
+    Slicing T.BoundedCoherentDerivedFiber := by
   letI : (R.fiberEquivalence T).functor.CommShift ℤ :=
     R.fiberEquivalenceFunctorCommShift T
   letI : (R.fiberEquivalence T).inverse.CommShift ℤ :=
@@ -319,6 +344,8 @@ coherent realization.  The result is preimage data for the abstract family
 pullback, not a caller-supplied preimage witness. -/
 theorem preimageData (R : BoundedCoherentDerivedRealization F)
     {T U : SchemeBaseChange S} (f : T ⟶ U)
+    [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
+    [SchemeBaseChange.HasCoherentPullback f]
     (s : Slicing (F.Fiber T))
     (h : SchemeBaseChange.BoundedCoherentPullbackInducingData f
       (R.inversePreimage T s)) :
@@ -357,12 +384,19 @@ end BoundedCoherentDerivedRealization
 /-- Supplied geometric inducing hypotheses for a pre-stability family.  Unlike
 `FiberPreStabilityBaseChangeData`, this structure does not contain a
 `Slicing.PreimageData` field: every such witness is constructed from the
-actual bounded coherent pullback and its phase-indexed A.17 output. -/
+actual bounded coherent pullback and its phase-indexed A.17 output.
+
+The inducing and slicing fields quantify only over morphisms of locally
+Noetherian base changes with exact coherent pullback, the morphisms along
+which bounded coherent pullback exists.  The global binders they replace were
+unsatisfiable over every nonempty `S`: `Spec κ(s)[x₁, x₂, …] → S` is not locally
+Noetherian, and the closed immersion `Spec κ(s) → Spec κ(s)[ε]/(ε²)` has no
+exact coherent pullback.  Consequently this witness exports no
+`FiberPreStabilityBaseChangeData`, and it does not imply openness of
+residue-fibre semistable loci, because residue maps rarely have exact coherent
+pullback. -/
 structure GeometricPreStabilityBaseChangeHypotheses
     {S : Scheme.{u}} (F : SchemeTriangulatedFiberFamily S)
-    [∀ T : SchemeBaseChange S, IsLocallyNoetherian T.left]
-    [∀ {T U : SchemeBaseChange S} (f : T ⟶ U),
-      SchemeBaseChange.HasCoherentPullback f]
     (R : BoundedCoherentDerivedRealization F)
     {V : Type uV} [AddCommGroup V]
     (classMap : ∀ T, K₀ (F.Fiber T) →+ V)
@@ -374,57 +408,52 @@ structure GeometricPreStabilityBaseChangeHypotheses
   chargeCompatible : ∀ {T U} (_ : T ⟶ U), (sigma T).Z = (sigma U).Z
   /-- The geometric inducing premises on the actual bounded coherent
   pullback. -/
-  inducing : ∀ {T U} (f : T ⟶ U),
+  inducing : ∀ {T U} (f : T ⟶ U) [IsLocallyNoetherian T.left]
+    [IsLocallyNoetherian U.left] [SchemeBaseChange.HasCoherentPullback f],
     SchemeBaseChange.BoundedCoherentPullbackInducingData f
       (R.inversePreimage T (sigma T).slicing)
   /-- The supplied target slicing is the one induced geometrically.  The
   preimage witness occurring here is constructed from `inducing`; it is not a
   field of this structure. -/
-  slicingCompatible : ∀ {T U} (f : T ⟶ U),
+  slicingCompatible : ∀ {T U} (f : T ⟶ U) [IsLocallyNoetherian T.left]
+    [IsLocallyNoetherian U.left] [SchemeBaseChange.HasCoherentPullback f],
     (sigma U).slicing = (sigma T).slicing.preimage (F.pull f)
-    (R.preimageData f (sigma T).slicing (inducing f))
+      (R.preimageData f (sigma T).slicing (inducing f))
 
 namespace GeometricPreStabilityBaseChangeHypotheses
 
 variable {S : Scheme.{u}} {F : SchemeTriangulatedFiberFamily S}
-  [∀ T : SchemeBaseChange S, IsLocallyNoetherian T.left]
-  [∀ {T U : SchemeBaseChange S} (f : T ⟶ U),
-    SchemeBaseChange.HasCoherentPullback f]
   {R : BoundedCoherentDerivedRealization F}
   {V : Type uV} [AddCommGroup V]
   {classMap : ∀ T, K₀ (F.Fiber T) →+ V}
   {sigma : ∀ T, PreStabilityCondition.WithClassMap
     (F.Fiber T) (classMap T)}
 
-/-- Export the ordinary categorical base-change witness.  Its preimage field
-is built from bounded coherent geometry and the inducing theorem. -/
-theorem toFiberPreStabilityBaseChangeData
-    (h : GeometricPreStabilityBaseChangeHypotheses F R classMap sigma) :
-    FiberPreStabilityBaseChangeData F classMap sigma where
-  classMap_compatible := h.classMapCompatible
-  charge_compatible := h.chargeCompatible
-  preimageData := fun f ↦ R.preimageData f _ (h.inducing f)
-  slicing_compatible := h.slicingCompatible
-
 /-- Phase membership is detected by the geometrically realized bounded
-coherent pullback. -/
+coherent pullback along a morphism with exact coherent pullback. -/
 theorem phase_iff
     (h : GeometricPreStabilityBaseChangeHypotheses F R classMap sigma)
-    {T U : SchemeBaseChange S} (f : T ⟶ U) (phi : ℝ) (E : F.Fiber U) :
+    {T U : SchemeBaseChange S} (f : T ⟶ U)
+    [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
+    [SchemeBaseChange.HasCoherentPullback f] (phi : ℝ) (E : F.Fiber U) :
     (sigma U).slicing.P phi E ↔
-      (sigma T).slicing.P phi ((F.pull f).obj E) :=
-  h.toFiberPreStabilityBaseChangeData.phase_iff f phi E
+      (sigma T).slicing.P phi ((F.pull f).obj E) := by
+  rw [h.slicingCompatible f]
+  exact Slicing.preimage_P _ _ _ _ _
 
-/-- The geometric witness inherits pseudofunctorial composition compatibility
-after its pullbacks have been identified with bounded coherent derived
-pullback. -/
+/-- Phase membership is detected by the composite of two pullbacks, each along
+a morphism with exact coherent pullback. -/
 theorem phase_iff_comp
     (h : GeometricPreStabilityBaseChangeHypotheses F R classMap sigma)
     {T U V' : SchemeBaseChange S} (f : T ⟶ U) (g : U ⟶ V')
+    [IsLocallyNoetherian T.left] [IsLocallyNoetherian U.left]
+    [IsLocallyNoetherian V'.left]
+    [SchemeBaseChange.HasCoherentPullback f]
+    [SchemeBaseChange.HasCoherentPullback g]
     (phi : ℝ) (E : F.Fiber V') :
     (sigma V').slicing.P phi E ↔
       (sigma T).slicing.P phi ((F.pull f).obj ((F.pull g).obj E)) :=
-  h.toFiberPreStabilityBaseChangeData.phase_iff_comp f g phi E
+  (h.phase_iff g phi E).trans (h.phase_iff f phi ((F.pull g).obj E))
 
 end GeometricPreStabilityBaseChangeHypotheses
 
