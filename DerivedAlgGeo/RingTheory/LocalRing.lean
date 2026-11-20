@@ -16,6 +16,8 @@ None: this umbrella re-exports its children.
 ## Main results
 
 * `LocalSubring.exists_le_ringKrullDim_eq_one`: Stacks 00P8.
+* `LocalSubring.exists_le_ringKrullDim_eq_one_of_closure_eq_top`: Stacks 00P8 with prescribed
+  fraction field.
 
 ## Implementation notes
 

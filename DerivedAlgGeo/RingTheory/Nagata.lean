@@ -430,50 +430,6 @@ open IsLocalRing
 
 variable {L : Type u} [Field L]
 
-/-- A subring of a field that contains a subring with fraction field `L` has fraction field `L`. -/
-private theorem isFractionRing_of_subring_le {D B : Subring L} (h : D ≤ B)
-    [IsFractionRing D L] : IsFractionRing B L where
-  map_units b := IsUnit.mk0 _ fun h0 ↦ nonZeroDivisors.coe_ne_zero b (Subtype.ext h0)
-  surj z := by
-    obtain ⟨⟨x, y⟩, hxy⟩ := IsLocalization.surj D⁰ z
-    refine ⟨⟨Subring.inclusion h x,
-      ⟨Subring.inclusion h y, mem_nonZeroDivisors_of_ne_zero fun h0 ↦ ?_⟩⟩, hxy⟩
-    exact nonZeroDivisors.coe_ne_zero y (Subtype.ext (congr_arg (fun b : B ↦ (b : L)) h0))
-  exists_of_eq h := ⟨1, by simpa using Subtype.ext h⟩
-
-/-- A subring of a field that generates it as a field has the field as fraction field. -/
-private theorem isFractionRing_of_closure_eq_top (D : Subring L)
-    (hD : Subfield.closure (D : Set L) = ⊤) : IsFractionRing D L where
-  map_units b := IsUnit.mk0 _ fun h0 ↦ nonZeroDivisors.coe_ne_zero b (Subtype.ext h0)
-  surj z := by
-    obtain ⟨x, hx, y, hy, rfl⟩ :=
-      Subfield.mem_closure_iff.mp (by rw [hD]; exact Subfield.mem_top z)
-    rw [Subring.closure_eq] at hx hy
-    by_cases hy0 : y = 0
-    · exact ⟨⟨0, 1⟩, by simp [hy0]⟩
-    · refine ⟨⟨⟨x, hx⟩, ⟨⟨y, hy⟩, mem_nonZeroDivisors_of_ne_zero fun h ↦
-        hy0 (congr_arg Subtype.val h)⟩⟩, ?_⟩
-      show x / y * y = x
-      exact div_mul_cancel₀ x hy0
-  exists_of_eq h := ⟨1, by simpa using Subtype.ext h⟩
-
-/-- A subfield of a finitely generated field extension of `K` that contains `K` and the chosen
-generators is everything. -/
-private theorem eq_top_of_essFiniteType (K : Type*) [Field K] [Algebra K L]
-    [Algebra.EssFiniteType K L] (F : Subfield L) (hK : ∀ k, algebraMap K L k ∈ F)
-    (hs : (Algebra.EssFiniteType.finset K L : Set L) ⊆ F) : F = ⊤ := by
-  have hsub : Algebra.EssFiniteType.subalgebra K L ≤ (F.toIntermediateField hK).toSubalgebra :=
-    Algebra.adjoin_le hs
-  rw [eq_top_iff]
-  intro l _
-  obtain ⟨⟨x, y⟩, rfl⟩ :=
-    IsLocalization.mk'_surjective (Algebra.EssFiniteType.submonoid K L) l
-  have h1 := IsLocalization.mk'_spec L x y
-  rw [← eq_div_iff (IsLocalization.map_units L y).ne_zero] at h1
-  change IsLocalization.mk' L x y ∈ F
-  rw [h1]
-  exact div_mem (hsub x.2) (hsub (y : Algebra.EssFiniteType.subalgebra K L).2)
-
 /-- BLMNPS Lemma 11.15 for local subrings: a Noetherian, universally Japanese local subring of `L`
 that is not a field, and that together with finitely many elements generates `L` as a field, is
 dominated by a discrete valuation ring with fraction field `L`, essentially of finite type over
@@ -486,72 +442,13 @@ private theorem exists_dvr_le_of_closure_eq_top (A : LocalSubring L)
       IsFractionRing R.toSubring L ∧
         (Subring.inclusion (LocalSubring.toSubring_mono h)).EssFiniteType := by
   classical
-  obtain ⟨V, hAW⟩ := A.exists_le_valuationSubring
-  set W := V.toLocalSubring
-  -- A finitely generated `A`-subalgebra `D ⊆ V` with fraction field `L`.
-  let zs : Finset L := s.image fun z ↦ if z ∈ V then z else z⁻¹
-  let D : Subalgebra A.toSubring L := Algebra.adjoin A.toSubring (zs : Set L)
-  have hAD : A.toSubring ≤ D.toSubring := fun a ha ↦
-    D.algebraMap_mem (⟨a, ha⟩ : A.toSubring)
-  have hDW : D.toSubring ≤ W.toSubring := by
-    rw [Algebra.adjoin_eq_ring_closure, Subring.closure_le]
-    rintro _ (⟨a, rfl⟩ | hz)
-    · exact LocalSubring.toSubring_mono hAW a.2
-    · obtain ⟨z, -, rfl⟩ := Finset.mem_image.mp hz
-      split_ifs with h
-      · exact h
-      · exact (V.mem_or_inv_mem z).resolve_left h
-  have hD : Subfield.closure (D.toSubring : Set L) = ⊤ := by
-    rw [eq_top_iff, ← hs, Subfield.closure_le]
-    rintro z (hz | hz)
-    · exact Subfield.subset_closure (hAD hz)
-    · by_cases hzV : z ∈ V
-      · exact Subfield.subset_closure
-          (Algebra.subset_adjoin (Finset.mem_image.mpr ⟨z, hz, ite_eq_left hzV⟩))
-      · have : z⁻¹ ∈ Subfield.closure (D.toSubring : Set L) := Subfield.subset_closure
-          (Algebra.subset_adjoin (Finset.mem_image.mpr ⟨z, hz, ite_eq_right hzV⟩))
-        simpa using inv_mem this
-  have : IsFractionRing D.toSubring L := isFractionRing_of_closure_eq_top _ hD
-  have : Algebra.FiniteType A.toSubring D :=
-    (Subalgebra.fg_iff_finiteType D).mp (Subalgebra.fg_adjoin_finset zs)
-  have : IsNoetherianRing D := Algebra.FiniteType.isNoetherianRing A.toSubring D
-  have : IsNoetherianRing D.toSubring := ‹IsNoetherianRing D›
-  -- Its localization `Dp` at the centre of `V`.
-  let p : Ideal D.toSubring := (maximalIdeal W.toSubring).comap (Subring.inclusion hDW)
-  let Dp := LocalSubring.ofPrime D.toSubring p
-  have hDDp : D.toSubring ≤ Dp.toSubring := LocalSubring.le_ofPrime _ _
-  have : IsNoetherianRing Dp.toSubring := IsLocalization.isNoetherianRing p.primeCompl _ ‹_›
-  obtain ⟨hAW', hAWloc⟩ := hAW
-  have hADp : A ≤ Dp := by
-    refine ⟨hAD.trans hDDp, ⟨fun a ha ↦ ?_⟩⟩
-    by_contra hna
-    have hp : Subring.inclusion hAD a ∈ p :=
-      (mem_maximalIdeal _).mpr fun h ↦ hna (isUnit_of_map_unit (Subring.inclusion hAW') a h)
-    exact (IsLocalization.AtPrime.isUnit_to_map_iff Dp.toSubring p _).mp ha hp
-  have hDpf : ¬ IsField Dp.toSubring := by
-    intro hF
-    let := hF.toField
-    obtain ⟨a, ha, ha0⟩ := (Submodule.ne_bot_iff _).mp ((isField_iff_maximalIdeal_eq).not.mp hA)
-    obtain ⟨hADp', hADploc⟩ := hADp
-    have : IsUnit (Subring.inclusion hADp' a) :=
-      isUnit_iff_ne_zero.mpr fun h ↦
-        ha0 (Subtype.ext (congr_arg (fun x : Dp.toSubring ↦ (x : L)) h))
-    exact (mem_maximalIdeal a).mp ha (isUnit_of_map_unit _ a this)
-  -- Stacks 00P8 gives a one-dimensional Noetherian local `B` dominating `Dp`.
-  obtain ⟨B, hDpB, hBN, hBdim, hBeft⟩ := Dp.exists_le_ringKrullDim_eq_one hDpf
-  have hAB : A.toSubring ≤ B.toSubring :=
-    (hAD.trans hDDp).trans (LocalSubring.toSubring_mono hDpB)
-  have hADeft : (Subring.inclusion hAD).EssFiniteType :=
-    (RingHom.finiteType_algebraMap.mpr ‹Algebra.FiniteType A.toSubring D›).essFiniteType
-  have hDDpeft : (Subring.inclusion hDDp).EssFiniteType :=
-    RingHom.essFiniteType_algebraMap.mpr (.of_isLocalization _ p.primeCompl)
-  have hABeft : (Subring.inclusion hAB).EssFiniteType := (hADeft.comp hDDpeft).comp hBeft
+  obtain ⟨B, hAB', hBN, hBdim, hBfr, hABeft⟩ :=
+    A.exists_le_ringKrullDim_eq_one_of_closure_eq_top hA s hs
+  have hAB : A.toSubring ≤ B.toSubring := LocalSubring.toSubring_mono hAB'
   let : Algebra A.toSubring B.toSubring := (Subring.inclusion hAB).toAlgebra
   have : Algebra.EssFiniteType A.toSubring B.toSubring := hABeft
   have : IsUniversallyJapanese B.toSubring := .of_essFiniteType A.toSubring B.toSubring
   -- The normalization `C` of `B` is a Dedekind domain, finite over `B`.
-  have : IsFractionRing B.toSubring L :=
-    isFractionRing_of_subring_le (hDDp.trans (LocalSubring.toSubring_mono hDpB))
   let C := integralClosure B.toSubring L
   have hC : Module.Finite B.toSubring C :=
     IsJapanese.finite_integralClosure_of_isFractionRing L L
@@ -588,7 +485,7 @@ private theorem exists_dvr_le_of_closure_eq_top (A : LocalSubring L)
   have hdvr : IsDiscreteValuationRing R.toSubring :=
     IsLocalization.AtPrime.isDiscreteValuationRing_of_dedekind_domain (A := C₀) hn₀ R.toSubring
   have hfr : IsFractionRing R.toSubring L :=
-    isFractionRing_of_subring_le (LocalSubring.le_ofPrime C₀ n₀)
+    Subring.isFractionRing_of_le (LocalSubring.le_ofPrime C₀ n₀)
   have hBC : B.toSubring ≤ C₀ := fun b hb ↦ C.algebraMap_mem (⟨b, hb⟩ : B.toSubring)
   have hC₀R : C₀ ≤ R.toSubring := LocalSubring.le_ofPrime C₀ n₀
   have hBR : B ≤ R := by
@@ -602,7 +499,7 @@ private theorem exists_dvr_le_of_closure_eq_top (A : LocalSubring L)
     (RingHom.finite_algebraMap.mpr hC).finiteType.essFiniteType
   have hC₀Reft : (Subring.inclusion hC₀R).EssFiniteType :=
     RingHom.essFiniteType_algebraMap.mpr (.of_isLocalization _ n₀.primeCompl)
-  exact ⟨R, hADp.trans (hDpB.trans hBR), hdvr, hfr, hABeft.comp (hBCeft.comp hC₀Reft)⟩
+  exact ⟨R, hAB'.trans hBR, hdvr, hfr, hABeft.comp (hBCeft.comp hC₀Reft)⟩
 
 /-- **BLMNPS Lemma 11.15**, universally Japanese form. Let `A` be a Noetherian, universally
 Japanese local domain that is not a field, with fraction field `K`, and let `L` be a finitely
@@ -635,7 +532,7 @@ theorem exists_dvr_dominating_essFiniteType {A : Type u} [CommRing A] [IsLocalRi
   have hA' : ¬ IsField A'.toSubring := fun h ↦ hA (MulEquiv.isField h e.toMulEquiv)
   have hs :
       Subfield.closure ((A'.toSubring : Set L) ∪ Algebra.EssFiniteType.finset K L) = ⊤ := by
-    refine eq_top_of_essFiniteType K _ (fun k ↦ ?_)
+    refine Subfield.eq_top_of_essFiniteType K _ (fun k ↦ ?_)
       (Set.subset_union_right.trans Subfield.subset_closure)
     obtain ⟨a, b, -, rfl⟩ := IsFractionRing.div_surjective (A := A) k
     rw [map_div₀, ← IsScalarTower.algebraMap_apply, ← IsScalarTower.algebraMap_apply]

@@ -12,6 +12,7 @@ import DerivedAlgGeo.RingTheory.LocalRing
 import DerivedAlgGeo.RingTheory.Localization
 import DerivedAlgGeo.RingTheory.Nagata
 import DerivedAlgGeo.RingTheory.Spectrum
+import DerivedAlgGeo.RingTheory.Valuation
 
 /-!
 # Ring theory
