@@ -1,3 +1,4 @@
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Restriction.ExtensionByZero
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Restriction.Locality
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Restriction.OpenImmersion
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Restriction.Sections

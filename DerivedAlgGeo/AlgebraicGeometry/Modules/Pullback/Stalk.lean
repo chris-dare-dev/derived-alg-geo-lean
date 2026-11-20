@@ -1197,6 +1197,48 @@ def pullbackStalkIso {X Y : Scheme.{u}} (f : X ⟶ Y) (x : X) :
       (presheafModulePullbackStalkIso f x) ≪≫
     (CategoryTheory.Functor.associator _ _ _).symm
 
+private theorem isZero_moduleSkyscraperPresheaf_obj_of_notMem (X : Scheme.{u}) (x : X)
+    (N : ModuleCat.{u} (X.presheaf.stalk x)) (U : (Opens X)ᵒᵖ) (hU : x ∉ U.unop) :
+    IsZero ((moduleSkyscraperPresheaf X x N).obj U) := by
+  classical
+  letI : Subsingleton (terminal AddCommGrpCat.{u}) := terminalAddCommGrpSubsingleton
+  let e : ((moduleSkyscraperUnderlying X x N).obj U : Type u) ≃+
+      (terminal AddCommGrpCat.{u} : Type u) :=
+    (eqToIso (ite_eq_right hU) : (moduleSkyscraperUnderlying X x N).obj U ≅
+      terminal AddCommGrpCat).addCommGroupIsoToAddEquiv
+  haveI : Subsingleton ((moduleSkyscraperUnderlying X x N).obj U : Type u) :=
+    e.injective.subsingleton
+  letI := moduleSkyscraperModule X x N U
+  exact ModuleCat.isZero_of_subsingleton
+    (ModuleCat.of (X.ringCatSheaf.obj.obj U) ((moduleSkyscraperUnderlying X x N).obj U))
+
+/-- The module stalk at `y` of the presheaf pullback along a functor of open sets vanishes when
+`y` lies in no open set of the form `F U`.
+
+The stalk at `y` is left adjoint to the module skyscraper at `y`, so a morphism out of the stalk
+corresponds to a morphism from the source presheaf into the pushforward of a skyscraper. That
+pushforward has only zero sections, because every `F U` misses `y`. -/
+theorem isZero_presheafModuleStalk_pullback_of_forall_notMem {X Y : Scheme.{u}}
+    {F : Opens X ⥤ Opens Y}
+    (φ : X.ringCatSheaf.obj ⟶ F.op ⋙ Y.ringCatSheaf.obj) (y : Y) (hy : ∀ U, y ∉ F.obj U)
+    (M : _root_.PresheafOfModules.{u} X.ringCatSheaf.obj) :
+    IsZero ((presheafModuleStalkFunctor Y y).obj
+      ((_root_.PresheafOfModules.pullback φ).obj M)) := by
+  let A := (presheafModuleStalkFunctor Y y).obj ((_root_.PresheafOfModules.pullback φ).obj M)
+  let adj := (_root_.PresheafOfModules.pullbackPushforwardAdjunction φ).comp
+    (presheafModuleStalkSkyscraperAdjunction Y y)
+  have hzero (U : (Opens X)ᵒᵖ) : IsZero
+      (((_root_.PresheafOfModules.pushforward φ).obj
+        ((moduleSkyscraperPresheafFunctor Y y).obj A)).obj U) :=
+    Functor.map_isZero (ModuleCat.restrictScalars (φ.app U).hom)
+      (isZero_moduleSkyscraperPresheaf_obj_of_notMem Y y A (Opposite.op (F.obj U.unop))
+        (hy U.unop))
+  have hsub : Subsingleton (M ⟶ (moduleSkyscraperPresheafFunctor Y y ⋙
+      _root_.PresheafOfModules.pushforward φ).obj A) :=
+    ⟨fun a b ↦ _root_.PresheafOfModules.Hom.ext (funext fun U ↦ (hzero U).eq_of_tgt _ _)⟩
+  rw [IsZero.iff_id_eq_zero]
+  exact (adj.homEquiv M A).injective (Subsingleton.elim _ _)
+
 set_option backward.isDefEq.respectTransparency false in
 set_option backward.defeqAttrib.useBackward true in
 private theorem skyscraperAdjunction_unit_app_apply (X : Scheme.{u}) (x : X)
