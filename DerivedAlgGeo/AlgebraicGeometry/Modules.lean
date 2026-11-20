@@ -10,6 +10,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Flasque
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Flat
 import DerivedAlgGeo.AlgebraicGeometry.Modules.FlatGenerators
 import DerivedAlgGeo.AlgebraicGeometry.Modules.FlatResolutionTotalization
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Flattening
 import DerivedAlgGeo.AlgebraicGeometry.Modules.FixedBaseSheaf
 import DerivedAlgGeo.AlgebraicGeometry.Modules.FixedBaseSheafLocalization
 import DerivedAlgGeo.AlgebraicGeometry.Modules.GenericFlatness
