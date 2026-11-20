@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import Mathlib.Algebra.Category.ModuleCat.Sheaf.LocallyFree
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.GeneratingSections
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Invertible
 
 /-!
 # Local generator data transported along functors on slices
@@ -22,13 +23,19 @@ applies it to pullback on the slices of a scheme.
 
 ## Main definitions
 
-* `SheafOfModules.LocalGeneratorsData.transport`: the transported local generator data.
+* `SheafOfModules.LocalGeneratorsData.transport`: the transported local generator data;
+* `SheafOfModules.IsLocallyFreeOfRank`: locally free of a fixed rank `r`, meaning that some
+  locally free local frame has `r` generators on every member of its cover.
 
 ## Main results
 
 * `SheafOfModules.LocalGeneratorsData.isLocallyFreeData_transport`: locally free data is
   transported to locally free data;
-* `SheafOfModules.LocalGeneratorsData.transport_generators_I`: the index types are unchanged.
+* `SheafOfModules.LocalGeneratorsData.transport_generators_I`: the index types are unchanged;
+* `SheafOfModules.IsLocallyFreeOfRank.ofIso`: local freeness of rank `r` is invariant under
+  isomorphism;
+* `SheafOfModules.isLocallyFreeOfRank_free`: the free sheaf on `I` is locally free of rank
+  `Nat.card I`.
 -/
 
 open CategoryTheory Limits
@@ -85,5 +92,51 @@ instance isLocallyFreeData_transport [q.IsLocallyFreeData] :
     exact GeneratingSections.isIso_ofEpi_π ((q.generators i).map (F i) (η i)) (e i).hom
 
 end LocalGeneratorsData
+
+section Rank
+
+/-- A sheaf of modules is locally free of rank `r` when some local frame is locally free data
+whose generating family has `r` indices on every member of its cover. This refines
+`IsLocallyFree`, which constrains no index type. -/
+def IsLocallyFreeOfRank (M : SheafOfModules.{u} R) (r : ℕ) : Prop :=
+  ∃ q : M.LocalGeneratorsData.{u₁}, q.IsLocallyFreeData ∧ ∀ i, Nat.card (q.generators i).I = r
+
+/-- A sheaf locally free of some rank is locally free. -/
+theorem IsLocallyFreeOfRank.isLocallyFree {M : SheafOfModules.{u} R} {r : ℕ}
+    (h : IsLocallyFreeOfRank M r) : M.IsLocallyFree :=
+  ⟨h.choose, h.choose_spec.1⟩
+
+/-- Local freeness of rank `r` is invariant under isomorphism of module sheaves. -/
+theorem IsLocallyFreeOfRank.ofIso {M N : SheafOfModules.{u} R} {r : ℕ}
+    (h : IsLocallyFreeOfRank M r) (e : M ≅ N) : IsLocallyFreeOfRank N r := by
+  obtain ⟨q, hq, hrank⟩ := h
+  letI : q.IsLocallyFreeData := hq
+  exact ⟨q.ofIso e, inferInstance, hrank⟩
+
+/-- Local freeness of rank `r` is invariant under isomorphism of module sheaves, as an
+equivalence. -/
+theorem isLocallyFreeOfRank_congr {M N : SheafOfModules.{u} R} (e : M ≅ N) (r : ℕ) :
+    IsLocallyFreeOfRank M r ↔ IsLocallyFreeOfRank N r :=
+  ⟨fun h ↦ h.ofIso e, fun h ↦ h.ofIso e.symm⟩
+
+end Rank
+
+section Free
+
+variable [HasSheafify J AddCommGrpCat.{u}] [J.WEqualsLocallyBijective AddCommGrpCat.{u}]
+  [HasBinaryProducts C]
+
+/-- The free sheaf of modules on the index type `I` is locally free of rank `Nat.card I`. -/
+theorem isLocallyFreeOfRank_free (I : Type u) :
+    IsLocallyFreeOfRank (free (R := R) I) (Nat.card I) :=
+  ⟨(free.generatingSections I).localGeneratorsData, inferInstance, fun _ ↦ rfl⟩
+
+/-- The free sheaf of modules on `Fin r`, lifted to the universe of the sheaf of rings, is
+locally free of rank `r`. -/
+theorem isLocallyFreeOfRank_free_ulift_fin (r : ℕ) :
+    IsLocallyFreeOfRank (free (R := R) (ULift.{u} (Fin r))) r := by
+  simpa using isLocallyFreeOfRank_free (R := R) (ULift.{u} (Fin r))
+
+end Free
 
 end SheafOfModules
