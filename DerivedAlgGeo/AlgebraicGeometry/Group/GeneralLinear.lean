@@ -98,7 +98,7 @@ instance : IsOpenImmersion (toAffineSpace n S) :=
 instance : IsAffineHom (toAffineSpace n S) :=
   inferInstanceAs (IsAffineHom ((𝔸(n × n; S)).basicOpen (detCoord n S)).ι)
 
-@[reassoc (attr := simp)]
+@[simp, reassoc]
 lemma toAffineSpace_over :
     toAffineSpace n S ≫ 𝔸(n × n; S) ↘ S = (generalLinearGroup n S).hom := rfl
 
