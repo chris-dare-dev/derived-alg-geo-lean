@@ -23,13 +23,15 @@ None. The comparison functor `Pseudofunctor.DescentData.map` and the square
 
 ## Main results
 
+* `Pseudofunctor.isPrestackFor_iff_of_isEquivalence`,
+  `Pseudofunctor.isStackFor_iff_of_isEquivalence`: the statements for one presieve.
 * `Pseudofunctor.isPrestack_iff_of_isEquivalence`
 * `Pseudofunctor.isStack_iff_of_isEquivalence`
 * `Pseudofunctor.isStack_iff_of_equivalence`
 
 ## Implementation notes
 
-The argument runs one covering sieve at a time. In the square
+The argument runs one presieve at a time. In the square
 `toDescentDataCompMapIso f α`, the functors `DescentData.map f α` and
 `(α.app _).toFunctor` are equivalences, so the restriction functor of `F` is fully
 faithful (an equivalence) exactly when that of `G` is. The stack condition of `G` is never
@@ -54,10 +56,12 @@ open scoped Pseudofunctor.StrongTrans
 
 variable {C : Type u} [Category.{v} C] {F G : LocallyDiscrete Cᵒᵖ ⥤ᵖ Cat.{v', u'}}
 
-private lemma isPrestackFor_iff_of_isEquivalence (α : F ⟶ G)
-    [∀ X, (α.app X).toFunctor.IsEquivalence] {S : C} (R : Sieve S) :
-    F.IsPrestackFor R.arrows ↔ G.IsPrestackFor R.arrows := by
-  let e := toDescentDataCompMapIso (fun (a : R.arrows.category) ↦ a.obj.hom) α
+/-- Descent of morphisms along a presieve is invariant under a strong transformation whose
+components are equivalences of categories. -/
+theorem isPrestackFor_iff_of_isEquivalence (α : F ⟶ G)
+    [∀ X, (α.app X).toFunctor.IsEquivalence] {S : C} (R : Presieve S) :
+    F.IsPrestackFor R ↔ G.IsPrestackFor R := by
+  let e := toDescentDataCompMapIso (fun (a : R.category) ↦ a.obj.hom) α
   let a := (α.app (.mk (op S))).toFunctor.asEquivalence
   simp only [isPrestackFor_iff]
   refine ⟨fun ⟨h⟩ ↦ ⟨?_⟩, fun ⟨h⟩ ↦ ⟨?_⟩⟩
@@ -67,10 +71,12 @@ private lemma isPrestackFor_iff_of_isEquivalence (α : F ⟶ G)
   · exact Functor.FullyFaithful.ofCompFaithful (G := DescentData.map _ α)
       ((a.fullyFaithfulFunctor.comp h).ofIso e.symm)
 
-private lemma isStackFor_iff_of_isEquivalence (α : F ⟶ G)
-    [∀ X, (α.app X).toFunctor.IsEquivalence] {S : C} (R : Sieve S) :
-    F.IsStackFor R.arrows ↔ G.IsStackFor R.arrows := by
-  let e := toDescentDataCompMapIso (fun (a : R.arrows.category) ↦ a.obj.hom) α
+/-- Effective descent along a presieve is invariant under a strong transformation whose
+components are equivalences of categories. -/
+theorem isStackFor_iff_of_isEquivalence (α : F ⟶ G)
+    [∀ X, (α.app X).toFunctor.IsEquivalence] {S : C} (R : Presieve S) :
+    F.IsStackFor R ↔ G.IsStackFor R := by
+  let e := toDescentDataCompMapIso (fun (a : R.category) ↦ a.obj.hom) α
   simp only [isStackFor_iff]
   refine ⟨fun _ ↦ ?_, fun _ ↦ ?_⟩
   · have := Functor.isEquivalence_of_iso e
@@ -84,9 +90,9 @@ theorem isPrestack_iff_of_isEquivalence (α : F ⟶ G)
     [∀ X, (α.app X).toFunctor.IsEquivalence] (J : GrothendieckTopology C) :
     F.IsPrestack J ↔ G.IsPrestack J :=
   ⟨fun _ ↦ .of_isPrestackFor fun _ R hR ↦
-      (isPrestackFor_iff_of_isEquivalence α R).1 (F.isPrestackFor' R hR),
+      (isPrestackFor_iff_of_isEquivalence α R.arrows).1 (F.isPrestackFor' R hR),
     fun _ ↦ .of_isPrestackFor fun _ R hR ↦
-      (isPrestackFor_iff_of_isEquivalence α R).2 (G.isPrestackFor' R hR)⟩
+      (isPrestackFor_iff_of_isEquivalence α R.arrows).2 (G.isPrestackFor' R hR)⟩
 
 /-- Being a stack is invariant under a strong transformation whose components are
 equivalences of categories: this is [Stacks Project, Tag 042W] for pseudofunctors, and
@@ -103,9 +109,9 @@ theorem isStack_iff_of_isEquivalence (α : F ⟶ G)
     [∀ X, (α.app X).toFunctor.IsEquivalence] (J : GrothendieckTopology C) :
     F.IsStack J ↔ G.IsStack J :=
   ⟨fun _ ↦ .of_isStackFor fun _ R hR ↦
-      (isStackFor_iff_of_isEquivalence α R).1 (F.isStackFor' R hR),
+      (isStackFor_iff_of_isEquivalence α R.arrows).1 (F.isStackFor' R hR),
     fun _ ↦ .of_isStackFor fun _ R hR ↦
-      (isStackFor_iff_of_isEquivalence α R).2 (G.isStackFor' R hR)⟩
+      (isStackFor_iff_of_isEquivalence α R.arrows).2 (G.isStackFor' R hR)⟩
 
 /-- The component at `X` of an invertible modification. -/
 private def appIso {α α' : F ⟶ G} (e : α ≅ α') (X : LocallyDiscrete Cᵒᵖ) :

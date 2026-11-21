@@ -5,6 +5,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Equivalence
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Extension
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Finiteness
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Gluing
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.StrongTrans
 
 /-!
 # Affine module comparison
@@ -31,8 +32,8 @@ basic-open presentation covers and bridges.
 ## Implementation notes
 
 This umbrella re-exports `BasicOpen`, `Comparison`, `Epi`, `Equivalence`, `Extension`,
-`Finiteness`, and `Gluing`. Mathlib owns the `AlgebraicGeometry.IsLocalizing` predicate and its
-whole-counit equivalence; the local API restates it using
+`Finiteness`, `Gluing` and `StrongTrans`. Mathlib owns the `AlgebraicGeometry.IsLocalizing`
+predicate and its whole-counit equivalence; the local API restates it using
 `AlgebraicGeometry.Scheme.Modules.basicOpenRestriction`. The local files also provide
 presentation-cover and DerivedAlgGeo-specific bridges.
 Projective module charts consume `Extension` through
