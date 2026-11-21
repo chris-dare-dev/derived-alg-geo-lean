@@ -4,6 +4,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Epi
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Equivalence
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Extension
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Finiteness
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.FinitePresentation
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Gluing
 
 /-!
