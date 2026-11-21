@@ -6,5 +6,6 @@ import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Heart.E
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Heart.EquivalenceReverse
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Heart.HomVanishing
 import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Heart.Noetherian
+import DerivedAlgGeo.CategoryTheory.Triangulated.StabilityCondition.Weak.Heart.NoetherianChains
 
 /-! # Heart-level weak stability -/
