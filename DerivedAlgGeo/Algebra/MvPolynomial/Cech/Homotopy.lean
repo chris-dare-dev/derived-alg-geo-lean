@@ -75,7 +75,7 @@ attribute [local instance] MvPolynomial.gradedAlgebra
 
 /-! ## The exponent vector of a Čech tuple -/
 
-variable (ι k : Type u) [Field k]
+variable (ι k : Type u) [CommRing k]
 
 /-- The exponent vector of the Čech denominator of a tuple: one for each occurrence of each
 variable. -/
