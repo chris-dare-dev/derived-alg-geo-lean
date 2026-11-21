@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.BaseChange
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Relative.GradedAlgebraData
+import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.Proper
 
 /-!
 # Relative `Proj` of a quasi-coherent graded algebra
@@ -36,6 +37,10 @@ affine opens `U` of `S` glue to a scheme `Proj_S(𝒜)` over `S`, with
   `π⁻¹(U) ≅ Proj 𝒜(U)` lies over `U`.
 * `QuasicoherentGradedAlgebraData.relativeProjAffineIso_compat`: these isomorphisms are
   compatible with the restriction maps `Proj 𝒜(V) → Proj 𝒜(U)` (Stacks 01NO, 01NP).
+* `QuasicoherentGradedAlgebraData.relativeProjToBase_iff`: a property of morphisms that is local on
+  the target holds for `π` if and only if it holds for every `Proj 𝒜(U) → Spec Γ(S, U)`.
+* `QuasicoherentGradedAlgebraData.isSeparated_relativeProjToBase`: `π` is separated
+  (Stacks 01O2).
 
 ## Implementation notes
 
@@ -49,14 +54,15 @@ by its affine opens glues them. This replaces the explicit cocycle check of Stac
 `IsPullback` squares on the arrows of a locally directed cover are the gluing data.
 
 The compatibility statement is for the arrows of the affine Zariski site, the basic opens, since
-those are the restriction maps the data records. Functoriality and base change of `Proj_S`, the
-twisting sheaves `𝒪(d)` and separatedness are not proved here.
+those are the restriction maps the data records. Base change of `Proj_S` and the twisting sheaves
+`𝒪(d)` are not constructed here; functoriality is in `Relative/Functoriality.lean`.
 
 ## References
 
 * [Stacks, Section 27.15 (Tag 01NM)](https://stacks.math.columbia.edu/tag/01NM): relative Proj
   via glueing, Lemmas 27.15.2–27.15.4 (Tags 01NO, 01NP, 01NQ).
 * [Stacks, Definition 27.16.7 (Tag 01O0)](https://stacks.math.columbia.edu/tag/01O0).
+* [Stacks, Lemma 27.16.9 (Tag 01O2)](https://stacks.math.columbia.edu/tag/01O2): `π` is separated.
 * EGA II, §3.1.
 
 ## Tags
@@ -265,5 +271,31 @@ noncomputable def relativeProjIsoOfEqTop (U : S.AffineZariskiSite) (hU : U.toOpe
 theorem relativeProjIsoOfEqTop_inv (U : S.AffineZariskiSite) (hU : U.toOpens = ⊤) :
     (𝒜.relativeProjIsoOfEqTop U hU).inv = 𝒜.relativeProjι U := by
   simp [relativeProjIsoOfEqTop]
+
+/-- Morphisms out of `Proj_S(𝒜)` agree once they agree on every chart `Proj 𝒜(U)`. -/
+theorem relativeProj_hom_ext {T : Scheme.{u}} {f g : 𝒜.relativeProj ⟶ T}
+    (h : ∀ U, 𝒜.relativeProjι U ≫ f = 𝒜.relativeProjι U ≫ g) : f = g :=
+  colimit.hom_ext h
+
+/-- **`π` is determined by the charts.** A property of morphisms that is local on the target
+holds for `π : Proj_S(𝒜) → S` if and only if it holds for every structure map
+`Proj 𝒜(U) → Spec Γ(S, U)`, since `π⁻¹(U) ≅ Proj 𝒜(U)` over `U ≅ Spec Γ(S, U)`. -/
+theorem relativeProjToBase_iff (P : MorphismProperty Scheme.{u}) [IsZariskiLocalAtTarget P] :
+    P 𝒜.relativeProjToBase ↔ ∀ U, P (𝒜.projToSpec U) := by
+  refine ⟨fun H U ↦ ?_, fun H ↦ ?_⟩
+  · rw [← P.cancel_right_of_respectsIso _ U.2.isoSpec.inv]
+    exact IsZariskiLocalAtTarget.of_isPullback (𝒜.isPullback_relativeProjι U).flip H
+  · refine IsZariskiLocalAtTarget.of_openCover (AffineZariskiSite.directedCover S) fun U ↦ ?_
+    refine (P.arrow_mk_iso_iff (Arrow.isoMk (𝒜.isPullback_relativeProjι U).flip.isoPullback
+      (Iso.refl _) ?_)).mp ((P.cancel_right_of_respectsIso _ U.2.isoSpec.inv).mpr (H U))
+    simp only [Cover.pullbackHom, Iso.refl_hom, Category.comp_id]
+    exact (𝒜.isPullback_relativeProjι U).flip.isoPullback_hom_snd
+
+/-- **`Proj_S(𝒜) → S` is separated** (Stacks 01O2): over an affine open `U` it is
+`Proj 𝒜(U) → Spec 𝒜(U)₀ → Spec Γ(S, U)`, separated followed by affine. -/
+instance isSeparated_relativeProjToBase : IsSeparated 𝒜.relativeProjToBase :=
+  (𝒜.relativeProjToBase_iff @IsSeparated).mpr fun U ↦ by
+    rw [projToSpec]
+    infer_instance
 
 end AlgebraicGeometry.Scheme.QuasicoherentGradedAlgebraData

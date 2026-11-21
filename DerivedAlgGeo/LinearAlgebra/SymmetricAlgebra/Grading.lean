@@ -28,6 +28,7 @@ degree: its degree-`n` part `Symⁿ(M)` is the `n`-th power of the image of `M`.
 * `SymmetricAlgebra.gradedPiece_eq_map`: `Symⁿ(M)` is the image of the degree-`n` part of the
   tensor algebra.
 * `SymmetricAlgebra.map_mem_gradedPiece`: `SymmetricAlgebra.map R' g` preserves degree.
+* `SymmetricAlgebra.map_surjective`: `Sym` of a surjective linear map is surjective.
 * `SymmetricAlgebra.isLocalization_map`: the symmetric algebra commutes with localization. If
   `R'` is the localization of `R` at a submonoid `S` and `g : M →ₗ[R] M'` is the localization of
   `M` at `S`, then `Sym_{R'}(M')` is the localization of `Sym_R(M)` at the image of `S`;
@@ -182,6 +183,32 @@ theorem map_mem_gradedPiece {n : ℕ} {x : SymmetricAlgebra R M} (hx : x ∈ gra
     rwa [add_comm] at this
 
 end Map
+
+section MapSurjective
+
+variable {R M M' : Type*} [CommSemiring R] [AddCommMonoid M] [Module R M] [AddCommMonoid M']
+  [Module R M']
+
+/-- `Sym` of a surjective linear map is surjective: the image contains the scalars and the
+generators `ι (g x)`. -/
+theorem map_surjective {g : M →ₗ[R] M'} (hg : Function.Surjective g) :
+    Function.Surjective (map R g) := by
+  intro y
+  induction y using SymmetricAlgebra.induction with
+  | algebraMap r => exact ⟨algebraMap R _ r, AlgHom.commutes _ r⟩
+  | ι y =>
+    obtain ⟨x, rfl⟩ := hg y
+    exact ⟨ι R M x, map_ι g x⟩
+  | mul a b ha hb =>
+    obtain ⟨a, rfl⟩ := ha
+    obtain ⟨b, rfl⟩ := hb
+    exact ⟨a * b, map_mul _ a b⟩
+  | add a b ha hb =>
+    obtain ⟨a, rfl⟩ := ha
+    obtain ⟨b, rfl⟩ := hb
+    exact ⟨a + b, map_add _ a b⟩
+
+end MapSurjective
 
 section Localization
 
