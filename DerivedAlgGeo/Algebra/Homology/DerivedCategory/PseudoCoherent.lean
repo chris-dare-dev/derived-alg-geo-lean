@@ -24,7 +24,53 @@ import Mathlib.RingTheory.TensorProduct.Free
 /-!
 # Pseudo-coherent complexes of modules
 
-TODO
+Let `R` be a commutative ring and `D(R) = DerivedCategory (ModuleCat R)`. An object `K` of `D(R)`
+is `m`-pseudo-coherent (`ModuleCat.mPseudoCoherent R m`) if there are a bounded complex `E` of
+finite free `R`-modules and a morphism `α : E ⟶ K` such that `Hⁱ(α)` is an isomorphism for
+`i > m` and `Hᵐ(α)` is surjective (Stacks 064Q). It is pseudo-coherent
+(`ModuleCat.pseudoCoherent R`) if it is `m`-pseudo-coherent for every `m`; this is condition (2)
+of Stacks 064U, taken as the definition.
+
+## Main results
+
+* `ModuleCat.mPseudoCoherent_obj₃`, `ModuleCat.mPseudoCoherent_obj₂` and
+  `ModuleCat.mPseudoCoherent_obj₁`: the triangle lemmas (Stacks 064R).
+* `ModuleCat.pseudoCoherent R` is a triangulated subcategory of `D(R)` (Stacks 064V).
+* `ModuleCat.finite_homology_of_mPseudoCoherent`: the top cohomology of an `m`-pseudo-coherent
+  object concentrated in degrees `≤ m` is finite (Stacks 064S (1)).
+* `ModuleCat.mPseudoCoherent_of_isZero` and `ModuleCat.mPseudoCoherent_of_finite_homology`:
+  Stacks 064W (1) and (2).
+* `ModuleCat.mPseudoCoherent_zero_singleFunctor_iff` and
+  `ModuleCat.mPseudoCoherent_neg_one_singleFunctor_iff`: a module is `0`-pseudo-coherent if and
+  only if it is finite, and `(-1)`-pseudo-coherent if and only if it is finitely presented
+  (Stacks 064T (1), (2)).
+* `ModuleCat.pseudoCoherent_of_iso_Q_obj`: a complex quasi-isomorphic to a bounded above complex
+  of finite free modules is pseudo-coherent (Stacks 064U, (1) ⇒ (2)).
+* `ModuleCat.mPseudoCoherent_Q_obj_of_isStrictlyLE`: a bounded above complex whose terms `Eⁱ` are
+  `(m - i)`-pseudo-coherent is `m`-pseudo-coherent (Stacks 064Y).
+* `ModuleCat.mPseudoCoherent_iff_of_isNoetherianRing`,
+  `ModuleCat.pseudoCoherent_iff_of_isNoetherianRing` and
+  `ModuleCat.pseudoCoherent_singleFunctor_iff_of_isNoetherianRing`: over a Noetherian ring,
+  pseudo-coherence is finite generation of cohomology (Stacks 066E).
+* `ModuleCat.mPseudoCoherent_extendScalarsDerivedOfFlat`: flat base change (Stacks 066C, for
+  complexes).
+* `ModuleCat.mPseudoCoherent_of_faithfullyFlat`: faithfully flat descent (Stacks 068R).
+* `ModuleCat.mPseudoCoherent_of_span_eq_top`: descent along a finite Zariski cover
+  (Stacks 066D).
+
+## Implementation notes
+
+The triangle lemmas follow Stacks. A witness is replaced by its stupid truncation
+`σ_{≥ m}` (`HomologicalComplex.stupidTruncGEι`). A bounded complex of finite free modules is
+K-projective, so a morphism out of it in `D(R)` lifts to a map of complexes, whose mapping cone is
+again a bounded complex of finite free modules; the four lemma on the homology sequences of the
+resulting morphism of triangles finishes the proof. The Noetherian characterization and both
+descent results kill the top cohomology by a map from a finite free module placed in one degree
+and induct on the top degree, as in Stacks 066D and 068R.
+
+## References
+
+* [The Stacks project, More on Algebra, Section 15.66](https://stacks.math.columbia.edu/tag/064N)
 -/
 
 open CategoryTheory Limits Pretriangulated ZeroObject
@@ -556,11 +602,13 @@ theorem finite_homology_of_mPseudoCoherent {m : ℤ} {K : DerivedCategory (Modul
 /-! ### Single complexes -/
 
 private lemma finFree_single (F : ModuleCat.{u} R) [Module.Free R F] [Module.Finite R F]
-    (n : ℤ) : FinFree ((HomologicalComplex.single (ModuleCat.{u} R) (ComplexShape.up ℤ) n).obj F) := by
+    (n : ℤ) :
+    FinFree ((HomologicalComplex.single (ModuleCat.{u} R) (ComplexShape.up ℤ) n).obj F) := by
   intro i
   by_cases hi : i = n
   · subst hi
-    exact finFree_of_iso (HomologicalComplex.singleObjXSelf _ _ F).symm ⟨inferInstance, inferInstance⟩
+    exact finFree_of_iso (HomologicalComplex.singleObjXSelf _ _ F).symm
+      ⟨inferInstance, inferInstance⟩
   · exact finFree_of_isZero (HomologicalComplex.isZero_single_obj_X _ _ _ _ hi)
 
 /-- A finite free module placed in a single degree is pseudo-coherent. -/
@@ -717,7 +765,8 @@ private lemma mPseudoCoherent_of_forall_cone {m : ℤ}
 
 /-- An `m`-pseudo-coherent object has bounded above cohomology. -/
 theorem mPseudoCoherent.minus {m : ℤ} {K : DerivedCategory (ModuleCat.{u} R)}
-    (hK : mPseudoCoherent R m K) : (DerivedCategory.TStructure.t (C := ModuleCat.{u} R)).minus K := by
+    (hK : mPseudoCoherent R m K) :
+    (DerivedCategory.TStructure.t (C := ModuleCat.{u} R)).minus K := by
   obtain ⟨E, a, b, ha, hb, hE, α, hα, hαm⟩ := hK
   refine ⟨max b m, (DerivedCategory.isLE_iff K _).2 fun i hi ↦ ?_⟩
   have := hα i (by omega)
@@ -886,6 +935,16 @@ theorem pseudoCoherent_Q_obj_of_isStrictlyLE (E : CochainComplex (ModuleCat.{u} 
     pseudoCoherent R (DerivedCategory.Q.obj E) :=
   fun m ↦ mPseudoCoherent_Q_obj_of_isStrictlyLE E b m fun i ↦ h i (m - i)
 
+/-- Stacks 064U, (1) ⇒ (2). An object of `D(R)` isomorphic to a bounded above complex of finite
+free modules is pseudo-coherent. -/
+theorem pseudoCoherent_of_iso_Q_obj (E : CochainComplex (ModuleCat.{u} R) ℤ) (b : ℤ)
+    [E.IsStrictlyLE b] (hE : ∀ i, Module.Free R (E.X i) ∧ Module.Finite R (E.X i))
+    {K : DerivedCategory (ModuleCat.{u} R)} (e : DerivedCategory.Q.obj E ≅ K) :
+    pseudoCoherent R K :=
+  (pseudoCoherent R).prop_of_iso e fun m ↦ mPseudoCoherent_Q_obj_of_isStrictlyLE E b m fun i ↦ by
+    obtain ⟨_, _⟩ := hE i
+    exact pseudoCoherent_singleFunctor_obj (E.X i) 0 (m - i)
+
 /-- The characterization of `m`-pseudo-coherence by a cone: if `X → K → C → X[1]` is distinguished
 with `X` pseudo-coherent and `Hⁱ(C) = 0` for `i ≥ m`, then `K` is `m`-pseudo-coherent. -/
 private lemma mPseudoCoherent_obj₂_of_isZero {T : Triangle (DerivedCategory (ModuleCat.{u} R))}
@@ -903,7 +962,8 @@ variable {R S : CommRingCat.{u}}
 
 private lemma finFree_extendScalars (f : R ⟶ S) {M : ModuleCat.{u} R}
     (hM : Module.Free R M ∧ Module.Finite R M) :
-    Module.Free S ((extendScalars f.hom).obj M) ∧ Module.Finite S ((extendScalars f.hom).obj M) := by
+    Module.Free S ((extendScalars f.hom).obj M) ∧
+      Module.Finite S ((extendScalars f.hom).obj M) := by
   obtain ⟨_, _⟩ := hM
   let := f.hom.toAlgebra
   exact ⟨(inferInstance : Module.Free S (S ⊗[R] M)),

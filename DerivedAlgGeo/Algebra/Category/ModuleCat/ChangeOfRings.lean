@@ -7,7 +7,9 @@ import Mathlib.Algebra.Category.ModuleCat.ChangeOfRings
 /-!
 # Extension of scalars: additivity and composites given by an equation
 
-Extension of scalars along a ring map is an additive functor. Mathlib's `ModuleCat.extendScalarsComp` identifies extension of scalars along `f₂₃.comp f₁₂`
+Extension of scalars along a ring map is an additive functor.
+
+Mathlib's `ModuleCat.extendScalarsComp` identifies extension of scalars along `f₂₃.comp f₁₂`
 with extension along `f₁₂` followed by extension along `f₂₃`. This file adds the variant
 `ModuleCat.extendScalarsComp'`, which takes a ring morphism `f₁₃` together with a proof of
 `f₁₃ = f₂₃.comp f₁₂`, as Mathlib's `ModuleCat.restrictScalarsComp'` does for restriction of

@@ -19,6 +19,7 @@ import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor.Bounded
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.FGModuleCatInclusion
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor.Coproducts
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExtendScalars
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.PseudoCoherent
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Heart
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HeartHomology
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.BoundedHeart
@@ -53,7 +54,9 @@ functoriality laws for short-exact triangles, the opposite-category
 comparison, the exact derived lift of algebraic linear duality, `Ext`
 adjunction and dimension shift, K-projective and bounded-above-projective
 models, unbounded right-derived functors from K-injective resolutions, and the
-construction of derived tensor from a K-flat resolution.
+construction of derived tensor from a K-flat resolution. For a commutative ring, derived extension
+of scalars along a flat map is exact, and pseudo-coherent complexes of modules form a triangulated
+subcategory with flat base change and faithfully flat descent.
 Canonical localization of modules is naturally isomorphic, as an exact derived
 functor, to scalar extension to the localization; this comparison agrees with
 the degreewise cochain comparison after `Qh` on displayed complexes.
