@@ -28,6 +28,10 @@ bounded above and `Hⁱ(K ⊗^L_R M) = 0` for every `R`-module `M` and every `i 
   `K` is quasi-isomorphic to a complex of flat modules vanishing outside `[a, b]`.
 * `ModuleCat.torAmplitude_obj₃`, `ModuleCat.torAmplitude_obj₂`, `ModuleCat.torAmplitude_obj₁`:
   Stacks 0655 (1), (2) and (3), Tor amplitude in a distinguished triangle.
+* `ModuleCat.torAmplitude_extendScalarsDerivedOfFlat`: Stacks 066L, flat case. Base change
+  along a flat ring map preserves Tor amplitude.
+* `ModuleCat.torAmplitude_of_faithfullyFlat`: Stacks 068S. Tor amplitude descends along a
+  faithfully flat ring map.
 
 ## Implementation notes
 
@@ -48,6 +52,13 @@ bounded above and `Hⁱ(K ⊗^L_R M) = 0` for every `R`-module `M` and every `i 
   a map of strictly bounded-above complexes of projectives, and tensoring that map with `M`
   gives a distinguished triangle on the vertices of `- ⊗^L M`. No triangulated structure on
   `ModuleCat.derivedTensorRight` is asserted.
+* **Faithful flatness in 068S.** Flatness of `R → S` alone does not suffice: `ℤ → ℚ` is flat and
+  `K = (ℤ/2)[0]` has `K ⊗ ℚ = 0`, which has Tor amplitude in `[0, 0]`, but
+  `Tor₁^ℤ(ℤ/2, ℤ/2) ≠ 0`, so `K` does not.
+* **Proofs of 066L and 068S.** 066L transports a flat model in `[a, b]` (0654). 068S uses the
+  flat case of 0661 (`ModuleCat.nonempty_extendScalarsDerivedOfFlat_derivedTensorRight_iso`):
+  `Hⁱ(K ⊗^L_R M) ⊗_R S ≅ Hⁱ((K ⊗_R S) ⊗^L_S (S ⊗_R M))`, which vanishes for `i ∉ [a, b]`, and
+  a faithfully flat base change detects vanishing of modules.
 
 ## References
 
@@ -56,6 +67,8 @@ bounded above and `Hⁱ(K ⊗^L_R M) = 0` for every `R`-module `M` and every `i 
 * [Stacks: Tag 0653](https://stacks.math.columbia.edu/tag/0653)
 * [Stacks: Tag 0654](https://stacks.math.columbia.edu/tag/0654)
 * [Stacks: Tag 0655](https://stacks.math.columbia.edu/tag/0655)
+* [Stacks: Tag 066L](https://stacks.math.columbia.edu/tag/066L)
+* [Stacks: Tag 068S](https://stacks.math.columbia.edu/tag/068S)
 -/
 
 universe u
@@ -114,19 +127,6 @@ private lemma flat_of_projective (X : ModuleCat.{u} R) [Projective X] : Module.F
   have : Module.Projective R X := (IsProjective.iff_projective X).mpr ‹_›
   infer_instance
 
-/-- A bounded-above object of `D(R)` is the localization of a strictly bounded-above complex
-of projective modules. -/
-private lemma exists_projective_model {K : DerivedCategory (ModuleCat.{u} R)}
-    (hK : DerivedCategory.TStructure.t.minus K) :
-    ∃ (P : CochainComplex (ModuleCat.{u} R) ℤ) (n : ℤ) (_ : P.IsStrictlyLE n)
-      (_ : ∀ i, Projective (P.X i)), Nonempty (DerivedCategory.Q.obj P ≅ K) := by
-  obtain ⟨n, hn⟩ := hK
-  letI : K.IsLE n := hn
-  obtain ⟨L, _, ⟨e⟩⟩ := K.exists_iso_Q_obj_of_isLE n
-  obtain ⟨P, p, hP, hProj, hp⟩ :=
-    CochainComplex.exists_boundedAbove_projective_replacement L n
-  exact ⟨P, n, hP, hProj, ⟨asIso (DerivedCategory.Q.map p) ≪≫ e.symm⟩⟩
-
 /-- On a strictly bounded-above complex of flat modules, Tor amplitude is read off the
 degreewise tensor products. -/
 theorem torAmplitude_Q_obj_iff_of_flat (P : CochainComplex (ModuleCat.{u} R) ℤ) (n : ℤ)
@@ -165,7 +165,7 @@ private lemma exactAt_of_torAmplitude (P : CochainComplex (ModuleCat.{u} R) ℤ)
 theorem isZero_homology_of_torAmplitude {a b : ℤ} {K : DerivedCategory (ModuleCat.{u} R)}
     (h : torAmplitude R a b K) (i : ℤ) (hi : i < a ∨ b < i) :
     IsZero ((DerivedCategory.homologyFunctor _ i).obj K) := by
-  obtain ⟨P, n, _, hProj, ⟨e⟩⟩ := exists_projective_model h.1
+  obtain ⟨P, n, _, hProj, ⟨e⟩⟩ := exists_projective_model_of_minus h.1
   have hflat (j : ℤ) : Module.Flat R (P.X j) := by
     have := hProj j
     exact flat_of_projective _
@@ -255,7 +255,7 @@ theorem torAmplitude_iff_exists_flat (a b : ℤ) (K : DerivedCategory (ModuleCat
         Nonempty (DerivedCategory.Q.obj E ≅ K) := by
   constructor
   · intro h
-    obtain ⟨P, n, _, hProj, ⟨e⟩⟩ := exists_projective_model h.1
+    obtain ⟨P, n, _, hProj, ⟨e⟩⟩ := exists_projective_model_of_minus h.1
     have hflat (j : ℤ) : Module.Flat R (P.X j) := by
       have := hProj j
       exact flat_of_projective _
@@ -319,8 +319,8 @@ private lemma exists_distTriang_derivedTensorRight (M : ModuleCat.{u} R)
       Nonempty (T'.obj₁ ≅ (derivedTensorRight M).obj ⟨T.obj₁, h₁⟩) ∧
       Nonempty (T'.obj₂ ≅ (derivedTensorRight M).obj ⟨T.obj₂, h₂⟩) ∧
       Nonempty (T'.obj₃ ≅ (derivedTensorRight M).obj ⟨T.obj₃, h₃⟩) := by
-  obtain ⟨P₁, n₁, _, hP₁, ⟨e₁⟩⟩ := exists_projective_model h₁
-  obtain ⟨P₂, n₂, _, hP₂, ⟨e₂⟩⟩ := exists_projective_model h₂
+  obtain ⟨P₁, n₁, _, hP₁, ⟨e₁⟩⟩ := exists_projective_model_of_minus h₁
+  obtain ⟨P₂, n₂, _, hP₂, ⟨e₂⟩⟩ := exists_projective_model_of_minus h₂
   have : P₁.IsStrictlyLE (max n₁ n₂) := P₁.isStrictlyLE_of_le n₁ _ (le_max_left _ _)
   have : P₂.IsStrictlyLE (max n₁ n₂) := P₂.isStrictlyLE_of_le n₂ _ (le_max_right _ _)
   have : P₁.IsKProjective := CochainComplex.isKProjective_of_projective P₁ (max n₁ n₂)
@@ -407,5 +407,60 @@ theorem torAmplitude_obj₁ {T : Triangle (DerivedCategory (ModuleCat.{u} R))}
   · exact ((h₃.2 M (i - 1) (by omega)).of_iso
       ((DerivedCategory.homologyFunctor _ (i - 1)).mapIso f₃)).eq_of_src _ _
   · exact ((h₂.2 M i hi).of_iso ((DerivedCategory.homologyFunctor _ i).mapIso f₂)).eq_of_tgt _ _
+
+/-! ### Flat base change and faithfully flat descent -/
+
+section BaseChange
+
+open scoped TensorProduct
+
+variable {R S : CommRingCat.{u}}
+
+/-- Stacks 066L, flat case: derived extension of scalars along a flat ring map preserves Tor
+amplitude. A flat model of `K` in degrees `[a, b]` (0654) base-changes to one of `K ⊗_R S`.
+Flatness is used only to make extension of scalars exact. -/
+theorem torAmplitude_extendScalarsDerivedOfFlat (f : R ⟶ S) (hf : f.hom.Flat) {a b : ℤ}
+    {K : DerivedCategory (ModuleCat.{u} R)} (hK : torAmplitude R a b K) :
+    torAmplitude S a b ((extendScalarsDerivedOfFlat f hf).obj K) := by
+  obtain ⟨E, hEa, hEb, hE, ⟨e⟩⟩ := (torAmplitude_iff_exists_flat a b K).mp hK
+  let F := extendScalars.{u, u, u} f.hom
+  exact (torAmplitude_iff_exists_flat a b _).mpr
+    ⟨(F.mapHomologicalComplex (ComplexShape.up ℤ)).obj E,
+      mapHomologicalComplex_isStrictlyGE F E a hEa, mapHomologicalComplex_isStrictlyLE F E b hEb,
+      fun i ↦ flat_extendScalars_obj f (hE i),
+      ⟨((extendScalarsDerivedOfFlatFactors f hf).app E).symm ≪≫
+        (extendScalarsDerivedOfFlat f hf).mapIso e⟩⟩
+
+/-- A faithfully flat base change detects vanishing of modules. -/
+private lemma isZero_of_isZero_extendScalars (f : R ⟶ S) (hf : f.hom.FaithfullyFlat)
+    {M : ModuleCat.{u} R} (hM : IsZero ((extendScalars f.hom).obj M)) : IsZero M := by
+  let := f.hom.toAlgebra
+  have : Module.FaithfullyFlat R S := hf
+  have : Subsingleton (S ⊗[R] M) := ModuleCat.subsingleton_of_isZero hM
+  have := Module.FaithfullyFlat.lTensor_reflects_triviality R S M
+  exact ModuleCat.isZero_of_subsingleton M
+
+/-- Stacks 068S: Tor amplitude descends along a faithfully flat ring map. If `K ⊗_R S` has Tor
+amplitude in `[a, b]` over `S`, then `K` has Tor amplitude in `[a, b]` over `R`.
+
+Faithful flatness, not flatness, is needed: `ℤ → ℚ` is flat and `K = (ℤ/2)[0]` has
+`K ⊗ ℚ = 0`, which has Tor amplitude in `[0, 0]`, while `Tor₁^ℤ(ℤ/2, ℤ/2) ≠ 0`. -/
+theorem torAmplitude_of_faithfullyFlat (f : R ⟶ S) (hf : f.hom.FaithfullyFlat) {a b : ℤ}
+    {K : DerivedCategory (ModuleCat.{u} R)}
+    (hK : torAmplitude S a b ((extendScalarsDerivedOfFlat f hf.flat).obj K)) :
+    torAmplitude R a b K := by
+  obtain ⟨⟨n, hn⟩, h⟩ := hK
+  have hKm : DerivedCategory.TStructure.t.minus K := by
+    refine ⟨n, (DerivedCategory.isLE_iff K n).mpr fun i hi ↦ ?_⟩
+    exact isZero_of_isZero_extendScalars f hf
+      ((((DerivedCategory.isLE_iff _ n).mp hn) i hi).of_iso
+        (extendScalarsDerivedOfFlatHomologyIso f hf.flat K i).symm)
+  refine ⟨hKm, fun M i hi ↦ isZero_of_isZero_extendScalars f hf ?_⟩
+  obtain ⟨e⟩ := nonempty_extendScalarsDerivedOfFlat_derivedTensorRight_iso f hf.flat ⟨K, hKm⟩ M
+  exact (h ((extendScalars f.hom).obj M) i hi).of_iso
+    ((extendScalarsDerivedOfFlatHomologyIso f hf.flat _ i).symm ≪≫
+      (DerivedCategory.homologyFunctor _ i).mapIso e)
+
+end BaseChange
 
 end ModuleCat

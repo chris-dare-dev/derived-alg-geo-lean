@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Category.ModuleCat.ChangeOfRings
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Homology
 import Mathlib.Algebra.Category.ModuleCat.Descent
 import Mathlib.Algebra.Homology.DerivedCategory.ExactFunctor
 
@@ -13,7 +14,8 @@ Extension of scalars along a flat map of commutative rings `f : R ⟶ S` is an e
 `ModuleCat R ⥤ ModuleCat S` (`ModuleCat.preservesFiniteLimits_extendScalars_of_flat`), so
 Mathlib's `Functor.mapDerivedCategory` turns it into a triangulated functor
 `ModuleCat.extendScalarsDerivedOfFlat f hf : D(R) ⥤ D(S)`. On a complex it is computed termwise:
-`ModuleCat.extendScalarsDerivedOfFlatFactors`.
+`ModuleCat.extendScalarsDerivedOfFlatFactors`. It commutes with cohomology:
+`ModuleCat.extendScalarsDerivedOfFlatHomologyIso`.
 
 Flatness is used only to make the functor exact. Derived base change along an arbitrary ring map
 needs a derived tensor product and is not constructed here.
@@ -51,5 +53,15 @@ noncomputable def extendScalarsDerivedOfFlatFactors :
         DerivedCategory.Q :=
   haveI := preservesFiniteLimits_extendScalars_of_flat hf
   (extendScalars.{u, u, u} f.hom).mapDerivedCategoryFactors
+
+/-- Derived extension of scalars along a flat ring map commutes with cohomology:
+`Hⁿ(K ⊗_R S) ≅ Hⁿ(K) ⊗_R S`. -/
+noncomputable def extendScalarsDerivedOfFlatHomologyIso
+    (K : DerivedCategory (ModuleCat.{u} R)) (n : ℤ) :
+    (DerivedCategory.homologyFunctor (ModuleCat.{u} S) n).obj
+        ((extendScalarsDerivedOfFlat f hf).obj K) ≅
+      (extendScalars f.hom).obj ((DerivedCategory.homologyFunctor (ModuleCat.{u} R) n).obj K) :=
+  mapDerivedCategoryHomologyIso (extendScalars.{u, u, u} f.hom) inferInstance
+    (preservesFiniteLimits_extendScalars_of_flat hf) inferInstance K n
 
 end ModuleCat
