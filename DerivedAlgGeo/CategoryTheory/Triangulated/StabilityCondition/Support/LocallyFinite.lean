@@ -38,6 +38,8 @@ with `QuadraticSupportData`.
 
 ## Main results
 
+* `isStrictFiniteLength_of_hasSupportProperty`: strict finite length of every
+  thin interval of radius `1/4`, the norm-bound form.
 * `isLocallyFinite_of_hasSupportProperty`: the norm-bound form.
 * `isLocallyFinite_of_quadraticSupport`: Remark 12.3, second paragraph, with
   a genuine quadratic form.
@@ -188,27 +190,26 @@ private theorem sectorRe_of_intervalProp (σ : WithClassMap C v) (w : K₀ C →
 variable [IsTriangulated C]
 
 open WeakStabilityCondition.StabilityCondition in
-/-- **Local finiteness from the support property**, norm-bound form.
+/-- **Strict finite length from the support property**, norm-bound form.
 
 `w` sends `K₀` to a finite-dimensional real space with discrete image, `Zlin`
 is a real-linear charge on that space realizing `σ.Z`, and the support
 property bounds `‖w E‖` by a multiple of `‖Zlin (w E)‖` on nonzero semistable
-objects. Then every thin interval of radius `1/4` has finite length. -/
-theorem isLocallyFinite_of_hasSupportProperty (σ : WithClassMap C v)
+objects. Then every object of every thin interval of radius `1/4` has strict
+finite length. The radius `1/4` is the same for every such `σ`. -/
+theorem isStrictFiniteLength_of_hasSupportProperty (σ : WithClassMap C v)
     (w : K₀ C →+ V) (hw : DiscreteTopology (Set.range w)) (Zlin : V →ₗ[ℝ] ℂ)
     (hZ : ∀ x, Zlin (w x) = σ.Z (v x))
     (h : WeakStabilityCondition.Support.HasSupportProperty Zlin
-      {x | ∃ (φ : ℝ) (E : C), σ.slicing.P φ E ∧ ¬IsZero E ∧ x = w (K₀.of C E)}) :
-    σ.slicing.IsLocallyFinite C := by
+      {x | ∃ (φ : ℝ) (E : C), σ.slicing.P φ E ∧ ¬IsZero E ∧ x = w (K₀.of C E)})
+    (t : ℝ) [Fact (t - 1 / 4 < t + 1 / 4)] [Fact ((t + 1 / 4) - (t - 1 / 4) ≤ 1)]
+    (E : σ.slicing.IntervalCat C (t - 1 / 4) (t + 1 / 4)) :
+    IsStrictFiniteLengthObject E := by
   obtain ⟨K, hK, hbound⟩ := h
   have hb : ∀ φ E, σ.slicing.P φ E → ¬IsZero E →
       ‖w (K₀.of C E)‖ ≤ K * ‖σ.Z (v (K₀.of C E))‖ := fun φ E hP hE => by
     rw [← hZ]
     exact hbound _ ⟨φ, E, hP, hE, rfl⟩
-  refine Slicing.IsLocallyFinite.of_strictFiniteLength C σ.slicing (η := 1 / 4)
-    (by norm_num) (by norm_num) fun t E => ?_
-  have : Fact (t - 1 / 4 < t + 1 / 4) := ⟨by linarith⟩
-  have : Fact ((t + 1 / 4) - (t - 1 / 4) ≤ 1) := ⟨by linarith⟩
   have hest := fun {F : C} (hF : σ.slicing.intervalProp C (t - 1 / 4) (t + 1 / 4) F) =>
     sectorRe_of_intervalProp σ w hK.le hb t hF
   let ρ := sectorRe σ t
@@ -266,6 +267,22 @@ theorem isLocallyFinite_of_hasSupportProperty (σ : WithClassMap C v)
     fun _ _ hAB => hmono hAB
   exact ⟨ObjectProperty.is_of_prop _ hg.wellFoundedLT,
     ObjectProperty.is_of_prop _ hg.wellFoundedGT⟩
+
+/-- **Local finiteness from the support property**, norm-bound form.
+
+Under the hypotheses of `isStrictFiniteLength_of_hasSupportProperty`, every
+thin interval of radius `1/4` has finite length. -/
+theorem isLocallyFinite_of_hasSupportProperty (σ : WithClassMap C v)
+    (w : K₀ C →+ V) (hw : DiscreteTopology (Set.range w)) (Zlin : V →ₗ[ℝ] ℂ)
+    (hZ : ∀ x, Zlin (w x) = σ.Z (v x))
+    (h : WeakStabilityCondition.Support.HasSupportProperty Zlin
+      {x | ∃ (φ : ℝ) (E : C), σ.slicing.P φ E ∧ ¬IsZero E ∧ x = w (K₀.of C E)}) :
+    σ.slicing.IsLocallyFinite C := by
+  refine Slicing.IsLocallyFinite.of_strictFiniteLength C σ.slicing (η := 1 / 4)
+    (by norm_num) (by norm_num) fun t E => ?_
+  have : Fact (t - 1 / 4 < t + 1 / 4) := ⟨by linarith⟩
+  have : Fact ((t + 1 / 4) - (t - 1 / 4) ≤ 1) := ⟨by linarith⟩
+  exact isStrictFiniteLength_of_hasSupportProperty σ w hw Zlin hZ h t E
 
 /-- **Remark 12.3, second paragraph.** A pre-stability condition whose
 classes, pushed into `V` along `ι` with discrete image, satisfy the support

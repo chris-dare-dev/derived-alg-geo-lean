@@ -27,6 +27,8 @@ import DerivedAlgGeo.AlgebraicGeometry.Stability
 import DerivedAlgGeo.AlgebraicGeometry.Stacks
 import DerivedAlgGeo.AlgebraicGeometry.Surface
 import DerivedAlgGeo.AlgebraicGeometry.ValuativeCriterion
+import DerivedAlgGeo.AlgebraicGeometry.ValuativeCriterion.Proper
+import DerivedAlgGeo.AlgebraicGeometry.ValuativeCriterion.UniversallyClosed
 import DerivedAlgGeo.AlgebraicGeometry.Variety
 
 /-! # Algebraic geometry

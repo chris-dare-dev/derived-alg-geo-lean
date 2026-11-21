@@ -37,8 +37,8 @@ variety asks for: `Pⁿ` is locally Noetherian, and it is projective.
 (`Modules/Coherent/Abelian/Basic.lean`), so without this instance `Coh Pⁿ` has no kernels —
 `⊕O(-d) ↠ F` could not even be *stated* about `Pⁿ`, and `Dᵇ(Coh Pⁿ)` would not exist.
 
-The proof is a transfer and nothing more: `Spec k` is locally Noetherian because a field is a
-Noetherian ring, the structure morphism is `LocallyOfFiniteType` by
+The proof is a transfer and nothing more: `Spec k` is locally Noetherian because `k` is a
+Noetherian ring (any field is), the structure morphism is `LocallyOfFiniteType` by
 `Proj.locallyOfFiniteType_projectiveSpaceToSpec`, and Mathlib's
 `LocallyOfFiniteType.isLocallyNoetherian` carries the property along it. `Finite ι` is what makes
 the structure morphism of finite type, so it is required here for the same reason it is required
@@ -90,20 +90,20 @@ open CategoryTheory MvPolynomial
 
 namespace AlgebraicGeometry.Proj
 
-variable (ι k : Type u) [Field k]
-
 attribute [local instance] MvPolynomial.gradedAlgebra
 
 /-! ## Locally Noetherian -/
 
-/-- **Polynomial projective space is locally Noetherian.**
+/-- **Polynomial projective space over a Noetherian ring is locally Noetherian.**
 
-The structure morphism is of finite type and the base is the spectrum of a field, so Mathlib's
-transfer along a finite-type morphism applies. `Finite ι` is genuine: it is what makes
+The structure morphism is of finite type and the base is the spectrum of a Noetherian ring, so
+Mathlib's transfer along a finite-type morphism applies. `Finite ι` is genuine: it is what makes
 `projectiveSpaceToSpec` of finite type in the first place. -/
-instance isLocallyNoetherian_projectiveSpace [Finite ι] :
-    IsLocallyNoetherian (Proj (polynomialGrading ι k)) :=
+instance isLocallyNoetherian_projectiveSpace (ι k : Type u) [CommRing k] [IsNoetherianRing k]
+    [Finite ι] : IsLocallyNoetherian (Proj (polynomialGrading ι k)) :=
   LocallyOfFiniteType.isLocallyNoetherian (projectiveSpaceToSpec ι k)
+
+variable (ι k : Type u) [Field k]
 
 
 /-! ## The identity presentation -/

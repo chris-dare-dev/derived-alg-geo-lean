@@ -10,7 +10,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.Boundedness
 /-!
 # The variable cover of projective space is Čech-acyclic
 
-For polynomial projective space over a field, the standard cover by the variable charts
+For polynomial projective space over any commutative ring, the standard cover by the variable charts
 `D₊(Xᵢ)` is Čech-acyclic for every quasi-coherent associated sheaf, and in particular for every
 twist `O(d)`, of either sign.  This is the hypothesis that the
 Čech-to-derived comparison of
@@ -79,7 +79,7 @@ attribute [local instance] MvPolynomial.gradedAlgebra
 
 /-- The variable basic opens cover polynomial projective space, as a covering family for the
 open-set Grothendieck topology. -/
-theorem polynomialVariable_coversTop (ι k : Type u) [Field k] :
+theorem polynomialVariable_coversTop (ι k : Type u) [CommRing k] :
     (Opens.grothendieckTopology
       (_root_.AlgebraicGeometry.Proj (polynomialGrading ι k))).CoversTop
       (fun i : ι => _root_.AlgebraicGeometry.Proj.basicOpen (polynomialGrading ι k)
@@ -99,7 +99,7 @@ is quasi-coherence rather than a twist: the degree restriction that constrains t
 quasi-coherence is known — integer twists included, once that is available — is acyclic here for
 the same reason. -/
 theorem polynomialVariable_isCechAcyclicFor_of_isQuasicoherent
-    (ι k : Type u) [Field k] {M σM : Type u}
+    (ι k : Type u) [CommRing k] {M σM : Type u}
     [AddCommGroup M] [Module (MvPolynomial ι k) M]
     [SetLike σM M] [AddSubgroupClass σM M]
     (𝓜 : ℕ → σM) [SetLike.GradedSMul (polynomialGrading ι k) 𝓜]
@@ -142,7 +142,7 @@ set_option synthInstance.maxHeartbeats 400000 in
 
 This is `polynomialVariable_isCechAcyclicFor_of_isQuasicoherent` with the quasi-coherence of a
 nonnegative twist supplied. -/
-theorem polynomialVariable_isCechAcyclicFor (ι k : Type u) [Field k] (d : ℕ)
+theorem polynomialVariable_isCechAcyclicFor (ι k : Type u) [CommRing k] (d : ℕ)
     [hExt : HasExt.{u + 1} (TopCat.Sheaf AddCommGrpCat.{u}
       (_root_.AlgebraicGeometry.Proj (polynomialGrading ι k)))] :
     @CategoryTheory.Sheaf.IsCechAcyclicFor
@@ -166,7 +166,7 @@ This is exactly the hypothesis of
 `CategoryTheory.Sheaf.isCechAcyclicCover_cechComputesDerivedCohomology`, so the Čech cohomology
 of the variable cover is the derived cohomology in every degree. -/
 theorem polynomialVariable_isCechAcyclicCover_of_isQuasicoherent
-    (ι k : Type u) [Field k] {M σM : Type u}
+    (ι k : Type u) [CommRing k] {M σM : Type u}
     [AddCommGroup M] [Module (MvPolynomial ι k) M]
     [SetLike σM M] [AddSubgroupClass σM M]
     (𝓜 : ℕ → σM) [SetLike.GradedSMul (polynomialGrading ι k) 𝓜]
@@ -192,7 +192,7 @@ twist is acyclic on every nonempty finite intersection.
 This is exactly the hypothesis of
 `CategoryTheory.Sheaf.isCechAcyclicCover_cechComputesDerivedCohomology`, so `Hⁱ(Pⁿ, O(d))` is
 the Čech cohomology of the variable cover in every degree. -/
-theorem polynomialVariable_isCechAcyclicCover (ι k : Type u) [Field k] (d : ℕ)
+theorem polynomialVariable_isCechAcyclicCover (ι k : Type u) [CommRing k] (d : ℕ)
     [hExt : HasExt.{u + 1} (TopCat.Sheaf AddCommGrpCat.{u}
       (_root_.AlgebraicGeometry.Proj (polynomialGrading ι k)))] :
     @CategoryTheory.Sheaf.IsCechAcyclicCover
@@ -245,7 +245,7 @@ not be allowed to pick.
 The conclusion is `Nonempty` rather than a chosen equivalence because that is the shape
 `CechComputesDerivedCohomologyAt` supplies; nothing downstream needs a canonical choice, and the
 comparison is not natural in `d` without further work. -/
-theorem polynomialVariableCechComplex_computesCohomology (ι k : Type u) [Field k] (d n : ℕ)
+theorem polynomialVariableCechComplex_computesCohomology (ι k : Type u) [CommRing k] (d n : ℕ)
     [hExt : HasExt.{u + 1} (TopCat.Sheaf AddCommGrpCat.{u}
       (_root_.AlgebraicGeometry.Proj (polynomialGrading ι k)))] :
     Nonempty
@@ -274,7 +274,7 @@ case costs exactly one application, once `polynomialIntShift_isQuasicoherent` ex
 set_option maxHeartbeats 1600000 in
 set_option synthInstance.maxHeartbeats 400000 in
 /-- Every integer twist `O(d)` is acyclic on every variable Čech intersection. -/
-theorem polynomialVariableIntShift_isCechAcyclicFor (ι k : Type u) [Field k] (d : ℤ)
+theorem polynomialVariableIntShift_isCechAcyclicFor (ι k : Type u) [CommRing k] (d : ℤ)
     [hExt : HasExt.{u + 1} (TopCat.Sheaf AddCommGrpCat.{u}
       (_root_.AlgebraicGeometry.Proj (polynomialGrading ι k)))] :
     @CategoryTheory.Sheaf.IsCechAcyclicFor
@@ -297,7 +297,7 @@ cohomology of that cover in every degree and for either sign of `d`.
 This is the input the dévissage proof of Serre finiteness needs: it surjects a finite sum of
 `O(-d)` onto a coherent sheaf and does descending induction, which requires the comparison at
 negative twists. -/
-theorem polynomialVariableIntShift_isCechAcyclicCover (ι k : Type u) [Field k] (d : ℤ)
+theorem polynomialVariableIntShift_isCechAcyclicCover (ι k : Type u) [CommRing k] (d : ℤ)
     [hExt : HasExt.{u + 1} (TopCat.Sheaf AddCommGrpCat.{u}
       (_root_.AlgebraicGeometry.Proj (polynomialGrading ι k)))] :
     @CategoryTheory.Sheaf.IsCechAcyclicCover
@@ -341,7 +341,7 @@ This is the input the dévissage proof of Serre finiteness consumes. It surjects
 `O(-d)` onto a coherent sheaf and does descending induction on the degree, which needs
 `Hⁱ(Pⁿ, O(d))` presented as the cohomology of an explicit complex at negative `d`, not only at
 nonnegative `d`. -/
-theorem polynomialVariableIntCechComplex_computesCohomology (ι k : Type u) [Field k]
+theorem polynomialVariableIntCechComplex_computesCohomology (ι k : Type u) [CommRing k]
     (d : ℤ) (n : ℕ)
     [hExt : HasExt.{u + 1} (TopCat.Sheaf AddCommGrpCat.{u}
       (_root_.AlgebraicGeometry.Proj (polynomialGrading ι k)))] :

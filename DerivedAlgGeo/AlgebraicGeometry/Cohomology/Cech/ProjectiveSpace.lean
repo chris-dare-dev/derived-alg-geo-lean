@@ -90,7 +90,7 @@ universe u
 
 attribute [local instance] MvPolynomial.gradedAlgebra
 
-variable (ι k : Type u) [Field k]
+variable (ι k : Type u) [CommRing k]
 
 /-- The variable basic-open cover of polynomial `Proj`: the chart where the `i`-th coordinate
 is invertible. This is the cover the algebraic Čech terms are indexed by. -/

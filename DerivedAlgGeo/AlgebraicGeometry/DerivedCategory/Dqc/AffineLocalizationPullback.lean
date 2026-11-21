@@ -136,7 +136,7 @@ def affineLocalizationExtendRestrictCounitIso :
 localization-derived construction. -/
 theorem affineLocalizationExtendScalars_additive :
     (ModuleCat.extendScalars.{u, u, u} (algebraMap R A)).Additive :=
-  affineExtendScalars_additive (CommRingCat.ofHom (algebraMap R A))
+  ModuleCat.extendScalars_additive (algebraMap R A)
 
 include M in
 /-- The algebra map of a localization is flat. -/
@@ -167,7 +167,7 @@ include M in
 extension-of-scalars functor specialized to the flat localization map. -/
 def affineLocalizationDerivedPullbackComparison :
     affineLocalizationDerivedPullback (R := R) (A := A) M ≅
-      affineExtendScalarsDerived
+      ModuleCat.extendScalarsDerivedOfFlat
         (CommRingCat.ofHom (algebraMap R A))
         (affineLocalizationAlgebraMap_flat M) :=
   Iso.refl _

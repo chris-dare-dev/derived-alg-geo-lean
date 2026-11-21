@@ -76,7 +76,7 @@ namespace AlgebraicGeometry.Proj
 
 attribute [local instance] MvPolynomial.gradedAlgebra
 
-variable (ι k : Type u) [Field k]
+variable (ι k : Type u) [CommRing k]
 
 /-- **The endomorphism of the twist presheaf a base scalar induces.**
 

@@ -7,7 +7,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.LinearCech
 import DerivedAlgGeo.Algebra.MvPolynomial.LaurentFinite
 
 /-!
-# The base field acting on sections of a twist
+# The base ring acting on sections of a twist
 
 `FiniteDimensionalCohomology` requires `Module.Finite k`, and the `k`-action it means is
 `coherentScalarAction`: multiplication by the global function a scalar becomes under the
@@ -26,7 +26,7 @@ that they are, at the level of sections.
 
 * `AlgebraicGeometry.Proj.openToLocalization_baseFieldToGlobalSections`: the global function a
   scalar becomes has value `r / 1` at every point.
-* `AlgebraicGeometry.Proj.varietyScalarAction_apply_fiber`: the base-field action on sections of
+* `AlgebraicGeometry.Proj.varietyScalarAction_apply_fiber`: the base-ring action on sections of
   an associated sheaf is scalar multiplication in each fiber.
 * `AlgebraicGeometry.Proj.varietyScalarAction_app_eq`: the sheaf endomorphism is multiplication
   by the restricted constant, on any open.
@@ -65,7 +65,7 @@ The file cites no literature. It builds on
 
 ## Tags
 
-projective space, twisting sheaf, base field action, graded localization, Čech cohomology
+projective space, twisting sheaf, base ring action, graded localization, Čech cohomology
 -/
 
 universe u
@@ -78,12 +78,12 @@ namespace AlgebraicGeometry.Proj
 
 attribute [local instance] MvPolynomial.gradedAlgebra
 
-variable (ι k : Type u) [Field k]
+variable (ι k : Type u) [CommRing k]
 variable {σM : Type u} [SetLike σM (MvPolynomial ι k)]
   [AddSubgroupClass σM (MvPolynomial ι k)] (𝓜 : ℕ → σM)
   [SetLike.GradedSMul (polynomialGrading ι k) 𝓜]
 
-/-- **The base field acts through the constants.** The global function a scalar becomes on
+/-- **The base ring acts through the constants.** The global function a scalar becomes on
 projective space has value `r / 1` at every point, which is exactly the map
 `polynomialToHomogeneousLocalization` that the graded localizations are `k`-modules by.
 
@@ -104,7 +104,7 @@ theorem openToLocalization_baseFieldToGlobalSections (r : k)
 
 set_option backward.isDefEq.respectTransparency false in
 set_option backward.defeqAttrib.useBackward true in
-/-- **The base-field action on sections is scalar multiplication, fiber by fiber.**
+/-- **The base-ring action on sections is scalar multiplication, fiber by fiber.**
 
 `varietyScalarAction` is multiplication by the global function attached to the scalar, and the
 structure-sheaf action on an associated sheaf is pointwise on fibers by construction. Combining
