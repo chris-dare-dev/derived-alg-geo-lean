@@ -7,12 +7,18 @@ import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Homology
 import DerivedAlgGeo.Algebra.Homology.Embedding.StupidTruncGE
 import Mathlib.Algebra.Category.ModuleCat.Biproducts
 import Mathlib.Algebra.Category.ModuleCat.Projective
+import Mathlib.Algebra.Module.FinitePresentation
 import Mathlib.Algebra.Homology.DerivedCategory.FullyFaithful
 import Mathlib.Algebra.Homology.DerivedCategory.KProjective
+import Mathlib.Algebra.Homology.DerivedCategory.SingleTriangle
+import Mathlib.Algebra.Homology.HomologicalComplexAbelian
 import Mathlib.Algebra.Homology.DerivedCategory.TStructure
 import Mathlib.CategoryTheory.Abelian.DiagramLemmas.Four
 import Mathlib.CategoryTheory.Triangulated.Subcategory
+import Mathlib.RingTheory.Finiteness.Descent
 import Mathlib.RingTheory.Finiteness.Prod
+import Mathlib.RingTheory.RingHom.FaithfullyFlat
+import Mathlib.RingTheory.TensorProduct.Free
 
 /-!
 # Pseudo-coherent complexes of modules
@@ -21,6 +27,7 @@ TODO
 -/
 
 open CategoryTheory Limits Pretriangulated ZeroObject
+open scoped TensorProduct
 
 attribute [local instance] HasDerivedCategory.standard
 
@@ -45,6 +52,8 @@ def mPseudoCoherent (R : Type u) [CommRing R] (m : ℤ) :
 def pseudoCoherent (R : Type u) [CommRing R] :
     ObjectProperty (DerivedCategory (ModuleCat.{u} R)) :=
   fun K ↦ ∀ m, mPseudoCoherent R m K
+
+section Ring
 
 variable {R : Type u} [CommRing R]
 
@@ -249,28 +258,35 @@ private lemma hom_eq_zero_of_isStrictlyGE {P : CochainComplex (ModuleCat.{u} R) 
     · exact (C'.isZero_of_isStrictlyLE (m - 1) i (by omega)).eq_of_tgt _ _
   rw [← cancel_mono e.hom, zero_comp, ← hψ, this, Functor.map_zero]
 
-/-- The lifting step in the proof of Stacks 064R (Derived Categories, Lemma 13.19.? ):
-a morphism from a K-projective complex in degrees `≥ m` factors through any `β : E ⟶ L` with
-`Hⁱ(β)` an isomorphism for `i > m` and surjective for `i = m`, by an actual map of complexes. -/
+/-- In a distinguished triangle `X → Y → Z → X[1]`, if `Hⁱ(X) → Hⁱ(Y)` is surjective for `i ≥ n`
+and injective for `i > n`, then `Hⁱ(Z) = 0` for `i ≥ n`. -/
+private lemma isZero_homology_obj₃ {T : Triangle (DerivedCategory (ModuleCat.{u} R))}
+    (hT : T ∈ distTriang _) {n : ℤ} (hepi : ∀ i, n ≤ i → Epi ((H i).map T.mor₁))
+    (hmono : ∀ i, n < i → Mono ((H i).map T.mor₁)) (i : ℤ) (hi : n ≤ i) :
+    IsZero ((H i).obj T.obj₃) :=
+  (DerivedCategory.HomologySequence.exact₃ _ hT i (i + 1)).isZero_of_both_zeros
+    ((DerivedCategory.HomologySequence.epi_homologyMap_mor₁_iff _ hT i).1 (hepi i hi))
+    ((DerivedCategory.HomologySequence.mono_homologyMap_mor₁_iff _ hT i (i + 1)).1
+      (hmono (i + 1) (by omega)))
+
+/-- The lifting step in the proof of Stacks 064R: a morphism from a K-projective complex in
+degrees `≥ m` factors through any `β : E ⟶ L` with `Hⁱ(β)` an isomorphism for `i > m` and
+surjective for `i = m`, by an actual map of complexes. -/
 private lemma exists_lift {P E : CochainComplex (ModuleCat.{u} R) ℤ} [P.IsKProjective] {m : ℤ}
     [P.IsStrictlyGE m] {L : DerivedCategory (ModuleCat.{u} R)}
     (β : DerivedCategory.Q.obj E ⟶ L) (hβ : ∀ i, m < i → IsIso ((H i).map β))
     (hβm : Epi ((H m).map β)) (γ : DerivedCategory.Q.obj P ⟶ L) :
     ∃ φ : P ⟶ E, DerivedCategory.Q.map φ ≫ β = γ := by
   obtain ⟨C, g, h, hT⟩ := distinguished_cocone_triangle β
-  have hC : ∀ i, m ≤ i → IsZero ((H i).obj C) := by
-    intro i hi
-    have hepi : Epi ((H i).map β) := by
+  have hC := isZero_homology_obj₃ hT (n := m)
+    (fun i hi ↦ by
       rcases hi.lt_or_eq with hi | rfl
       · have := hβ i hi
-        infer_instance
-      · exact hβm
-    have hmono : Mono ((H (i + 1)).map β) := by
-      have := hβ (i + 1) (by omega)
-      infer_instance
-    exact (DerivedCategory.HomologySequence.exact₃ _ hT i (i + 1)).isZero_of_both_zeros
-      ((DerivedCategory.HomologySequence.epi_homologyMap_mor₁_iff _ hT i).1 hepi)
-      ((DerivedCategory.HomologySequence.mono_homologyMap_mor₁_iff _ hT i (i + 1)).1 hmono)
+        exact (inferInstance : Epi ((H i).map β))
+      · exact hβm)
+    (fun i hi ↦ by
+      have := hβ i hi
+      exact (inferInstance : Mono ((H i).map β)))
   obtain ⟨a, ha⟩ := Triangle.coyoneda_exact₂ _ hT γ (hom_eq_zero_of_isStrictlyGE hC _)
   obtain ⟨φ, rfl⟩ := Q_map_surjective a
   exact ⟨φ, ha.symm⟩
@@ -618,5 +634,378 @@ theorem mPseudoCoherent_zero_singleFunctor_iff (M : ModuleCat.{u} R) :
     exact finite_of_iso e (finite_homology_of_mPseudoCoherent h hz)
   · intro h
     exact mPseudoCoherent_of_finite_homology hz (finite_of_iso e.symm h)
+
+/-- Stacks 064T (2). A module `M` is `(-1)`-pseudo-coherent, that is, `M[0]` is
+`(-1)`-pseudo-coherent, if and only if `M` is a finitely presented `R`-module. -/
+theorem mPseudoCoherent_neg_one_singleFunctor_iff (M : ModuleCat.{u} R) :
+    mPseudoCoherent R (-1) ((DerivedCategory.singleFunctor _ 0).obj M) ↔
+      Module.FinitePresentation R M := by
+  -- A presentation `0 → N → R^k → M → 0` and its distinguished triangle.
+  have key (hM : Module.Finite R M) : ∃ (k : ℕ) (π : (Fin k → R) →ₗ[R] M)
+      (_ : Function.Surjective π),
+      (mPseudoCoherent R (-1) ((DerivedCategory.singleFunctor _ 0).obj M) ↔
+        mPseudoCoherent R 0 ((DerivedCategory.singleFunctor _ 0).obj
+          (ModuleCat.of R (LinearMap.ker π)))) := by
+    obtain ⟨k, π, hπ⟩ := Module.Finite.exists_fin' R M
+    let S : ShortComplex (ModuleCat.{u} R) := ShortComplex.mk
+      (ModuleCat.ofHom (LinearMap.ker π).subtype) (ModuleCat.ofHom π : ModuleCat.of R _ ⟶ M)
+      (by ext x; exact x.2)
+    have hS : S.ShortExact :=
+      { exact := (ShortComplex.moduleCat_exact_iff_range_eq_ker S).2 (by
+          simp [S, Submodule.range_subtype])
+        mono_f := (ModuleCat.mono_iff_injective _).2 (LinearMap.ker π).injective_subtype
+        epi_g := (ModuleCat.epi_iff_surjective _).2 hπ }
+    have hT := hS.singleTriangle_distinguished
+    have hfree := pseudoCoherent_singleFunctor_obj (ModuleCat.of R (Fin k → R)) 0
+    refine ⟨k, π, hπ, fun h ↦ ?_, fun h ↦ ?_⟩
+    · have := mPseudoCoherent_obj₁ hT (m := -1) (hfree _) h
+      rwa [neg_add_cancel] at this
+    · rw [← neg_add_cancel (1 : ℤ)] at h
+      exact mPseudoCoherent_obj₃ hT h (hfree _)
+  constructor
+  · intro h
+    have hM := (mPseudoCoherent_zero_singleFunctor_iff M).1 (h.of_le (by norm_num))
+    obtain ⟨k, π, hπ, hiff⟩ := key hM
+    have := (mPseudoCoherent_zero_singleFunctor_iff _).1 (hiff.1 h)
+    exact Module.finitePresentation_of_free_of_surjective π hπ (Module.Finite.iff_fg.1 this)
+  · intro h
+    obtain ⟨k, π, hπ, hiff⟩ := key inferInstance
+    exact hiff.2 ((mPseudoCoherent_zero_singleFunctor_iff _).2
+      (Module.Finite.iff_fg.2 (Module.FinitePresentation.fg_ker π hπ)))
+
+/-! ### Killing the top cohomology -/
+
+/-- The inductive scheme of Stacks 066B, 066D, 066E and 068R. Let `P` be a property of objects of
+`D(R)` such that the top cohomology `Hⁿ(K)` (`n ≥ m`) of an object `K` with `P` is finite, and
+such that `P` passes from `K` to the cone of any map `F[-n] ⟶ K` from a finite free module. Then
+every object with `P` and bounded above cohomology is `m`-pseudo-coherent. -/
+private lemma mPseudoCoherent_of_forall_cone {m : ℤ}
+    (P : ObjectProperty (DerivedCategory (ModuleCat.{u} R)))
+    (hfin : ∀ K, P K → ∀ n, m ≤ n → (∀ i, n < i → IsZero ((H i).obj K)) →
+      Module.Finite R ((H n).obj K))
+    (hcone : ∀ (n : ℤ) (k : ℕ) (K C : DerivedCategory (ModuleCat.{u} R))
+      (α : (DerivedCategory.singleFunctor _ n).obj (ModuleCat.of R (Fin k → R)) ⟶ K)
+      (g : K ⟶ C) (h : C ⟶ ((DerivedCategory.singleFunctor _ n).obj
+        (ModuleCat.of R (Fin k → R)))⟦(1 : ℤ)⟧),
+      Triangle.mk α g h ∈ distTriang _ → P K → P C)
+    (n : ℤ) (K : DerivedCategory (ModuleCat.{u} R)) (hK : ∀ i, n < i → IsZero ((H i).obj K))
+    (hPK : P K) : mPseudoCoherent R m K := by
+  suffices ∀ k : ℕ, ∀ K, (∀ i, m - 1 + k < i → IsZero ((H i).obj K)) → P K →
+      mPseudoCoherent R m K by
+    by_cases hn : n ≤ m - 1
+    · exact this 0 K (fun i hi ↦ hK i (by omega)) hPK
+    · exact this (n - m + 1).toNat K (fun i hi ↦ hK i (by omega)) hPK
+  intro k
+  induction k with
+  | zero => exact fun K hK _ ↦ mPseudoCoherent_of_isZero fun i hi ↦ hK i (by omega)
+  | succ k ih =>
+    intro K hK hPK
+    have hK' : ∀ i, m + k < i → IsZero ((H i).obj K) := fun i hi ↦ hK i (by omega)
+    obtain ⟨k', α, hα⟩ := exists_singleFunctor_epi hK' (hfin K hPK _ (by omega) hK')
+    obtain ⟨C, g, h, hT⟩ := distinguished_cocone_triangle α
+    have hC := isZero_homology_obj₃ hT (n := m + k)
+      (fun i hi ↦ by
+        rcases hi.lt_or_eq with hi | rfl
+        · exact (hK' i hi).epi _
+        · exact hα)
+      (fun i hi ↦ (isZero_homology_singleFunctor_obj _ _ i (by omega)).mono _)
+    exact mPseudoCoherent_obj₂ hT (pseudoCoherent_singleFunctor_obj _ _ _)
+      (ih C (fun i hi ↦ hC i (by omega)) (hcone _ _ _ _ _ _ _ hT hPK))
+
+/-! ### Noetherian rings -/
+
+/-- An `m`-pseudo-coherent object has bounded above cohomology. -/
+theorem mPseudoCoherent.minus {m : ℤ} {K : DerivedCategory (ModuleCat.{u} R)}
+    (hK : mPseudoCoherent R m K) : (DerivedCategory.TStructure.t (C := ModuleCat.{u} R)).minus K := by
+  obtain ⟨E, a, b, ha, hb, hE, α, hα, hαm⟩ := hK
+  refine ⟨max b m, (DerivedCategory.isLE_iff K _).2 fun i hi ↦ ?_⟩
+  have := hα i (by omega)
+  exact (DerivedCategory.isZero_of_isLE (DerivedCategory.Q.obj E) b i (by omega)).of_iso
+    (asIso ((H i).map α)).symm
+
+private lemma finite_of_isZero {M : ModuleCat.{u} R} (hM : IsZero M) : Module.Finite R M :=
+  (finFree_of_isZero hM).2
+
+private lemma finite_homology_singleFunctor_obj (F : ModuleCat.{u} R) [Module.Finite R F]
+    (n i : ℤ) : Module.Finite R ((H i).obj ((DerivedCategory.singleFunctor _ n).obj F)) := by
+  by_cases hi : i = n
+  · subst hi
+    exact finite_of_iso ((DerivedCategory.singleFunctorCompHomologyFunctorIso _ i).app F).symm
+      (inferInstance : Module.Finite R F)
+  · exact finite_of_isZero (isZero_homology_singleFunctor_obj F n i hi)
+
+private lemma finite_of_exact [IsNoetherianRing R] {S : ShortComplex (ModuleCat.{u} R)}
+    (hS : S.Exact) (h₁ : Module.Finite R S.X₁) (h₃ : Module.Finite R S.X₃) :
+    Module.Finite R S.X₂ := by
+  rw [Module.finite_def]
+  apply Submodule.fg_of_fg_map_of_fg_inf_ker S.g.hom
+  · exact IsNoetherian.noetherian _
+  · rw [top_inf_eq, ← (ShortComplex.moduleCat_exact_iff_range_eq_ker S).1 hS,
+      LinearMap.range_eq_map]
+    exact Module.Finite.fg_top.map _
+
+private lemma finite_homology_of_finite [IsNoetherianRing R]
+    (E : CochainComplex (ModuleCat.{u} R) ℤ) (i : ℤ) (hE : Module.Finite R (E.X i)) :
+    Module.Finite R (E.homology i) := by
+  have : Module.Finite R (E.cycles i) :=
+    Module.Finite.of_injective (E.iCycles i).hom ((ModuleCat.mono_iff_injective _).1 inferInstance)
+  exact Module.Finite.of_surjective (E.homologyπ i).hom
+    ((ModuleCat.epi_iff_surjective _).1 inferInstance)
+
+/-- Stacks 066E (1). Over a Noetherian ring, `K` is `m`-pseudo-coherent if and only if `K` has
+bounded above cohomology and `Hⁱ(K)` is a finite `R`-module for `i ≥ m`.
+
+The Noetherian hypothesis is necessary: for `A = ℤ[x, y₁, y₂, …]/(x yᵢ)ᵢ` and `K = (A/(x))[0]`,
+the cohomology of `K` is finite and bounded, but the kernel `(y₁, y₂, …)` of `x : A → A` is not
+finitely generated, so `K` is not `(-2)`-pseudo-coherent. -/
+theorem mPseudoCoherent_iff_of_isNoetherianRing [IsNoetherianRing R] (m : ℤ)
+    (K : DerivedCategory (ModuleCat.{u} R)) :
+    mPseudoCoherent R m K ↔ (DerivedCategory.TStructure.t (C := ModuleCat.{u} R)).minus K ∧
+      ∀ i, m ≤ i → Module.Finite R ((H i).obj K) := by
+  constructor
+  · intro hK
+    refine ⟨hK.minus, fun i hi ↦ ?_⟩
+    obtain ⟨E, a, b, ha, hb, hE, α, hα, hαm⟩ := hK
+    have hepi : Epi ((H i).map α) := epi_of_witness hα hαm i hi
+    have : Module.Finite R ((H i).obj (DerivedCategory.Q.obj E)) :=
+      finite_of_iso ((DerivedCategory.homologyFunctorFactors _ i).app E).symm
+        (finite_homology_of_finite E i (hE i).2)
+    exact Module.Finite.of_surjective ((H i).map α).hom
+      ((ModuleCat.epi_iff_surjective _).1 hepi)
+  · rintro ⟨⟨n, hn⟩, hfin⟩
+    refine mPseudoCoherent_of_forall_cone (fun K ↦ ∀ i, m ≤ i → Module.Finite R ((H i).obj K))
+      (fun K hK n hn _ ↦ hK n hn) ?_ n K ((DerivedCategory.isLE_iff K n).1 hn) hfin
+    intro n k K C α g h hT hK i hi
+    exact finite_of_exact (DerivedCategory.HomologySequence.exact₃ _ hT i (i + 1)) (hK i hi)
+      (finite_homology_singleFunctor_obj _ n (i + 1))
+
+/-- Stacks 066E (2). Over a Noetherian ring, `K` is pseudo-coherent if and only if `K` has bounded
+above cohomology and every `Hⁱ(K)` is a finite `R`-module. -/
+theorem pseudoCoherent_iff_of_isNoetherianRing [IsNoetherianRing R]
+    (K : DerivedCategory (ModuleCat.{u} R)) :
+    pseudoCoherent R K ↔ (DerivedCategory.TStructure.t (C := ModuleCat.{u} R)).minus K ∧
+      ∀ i, Module.Finite R ((H i).obj K) := by
+  constructor
+  · intro hK
+    exact ⟨(hK 0).minus, fun i ↦ ((mPseudoCoherent_iff_of_isNoetherianRing i K).1 (hK i)).2 i
+      le_rfl⟩
+  · rintro ⟨hK, hfin⟩ m
+    exact (mPseudoCoherent_iff_of_isNoetherianRing m K).2 ⟨hK, fun i _ ↦ hfin i⟩
+
+/-- Stacks 066E (3). Over a Noetherian ring, a module is pseudo-coherent if and only if it is
+finite. -/
+theorem pseudoCoherent_singleFunctor_iff_of_isNoetherianRing [IsNoetherianRing R]
+    (M : ModuleCat.{u} R) :
+    pseudoCoherent R ((DerivedCategory.singleFunctor _ 0).obj M) ↔ Module.Finite R M :=
+  ⟨fun h ↦ (mPseudoCoherent_zero_singleFunctor_iff M).1 (h 0), fun h m ↦
+    (mPseudoCoherent_iff_of_isNoetherianRing m _).2
+      ⟨⟨0, inferInstance⟩, fun i _ ↦ by
+        have := h
+        exact finite_homology_singleFunctor_obj M 0 i⟩⟩
+
+/-! ### Complexes of pseudo-coherent modules -/
+
+private lemma mPseudoCoherent_of_isZero_obj {m : ℤ} {K : DerivedCategory (ModuleCat.{u} R)}
+    (hK : IsZero K) : mPseudoCoherent R m K :=
+  mPseudoCoherent_of_isZero fun i _ ↦ (H i).map_isZero hK
+
+/-- `M[-n]` is `m`-pseudo-coherent when `M[0]` is `(m - n)`-pseudo-coherent. -/
+private lemma mPseudoCoherent_singleFunctor_obj {m n : ℤ} {M : ModuleCat.{u} R}
+    (hM : mPseudoCoherent R (m - n) ((DerivedCategory.singleFunctor _ 0).obj M)) :
+    mPseudoCoherent R m ((DerivedCategory.singleFunctor _ n).obj M) := by
+  have := hM.shift (-n)
+  rw [sub_neg_eq_add, sub_add_cancel] at this
+  exact (mPseudoCoherent R m).prop_of_iso
+    (((DerivedCategory.singleFunctors (ModuleCat.{u} R)).shiftIso (-n) n 0 (by omega)).app M) this
+
+/-- Stacks 064Y. A bounded above complex `E` whose terms `Eⁱ` are `(m - i)`-pseudo-coherent
+modules is `m`-pseudo-coherent. -/
+theorem mPseudoCoherent_Q_obj_of_isStrictlyLE (E : CochainComplex (ModuleCat.{u} R) ℤ)
+    (b m : ℤ) [E.IsStrictlyLE b]
+    (h : ∀ i, mPseudoCoherent R (m - i) ((DerivedCategory.singleFunctor _ 0).obj (E.X i))) :
+    mPseudoCoherent R m (DerivedCategory.Q.obj E) := by
+  suffices ∀ k : ℕ, ∀ E : CochainComplex (ModuleCat.{u} R) ℤ, E.IsStrictlyLE (m - 1 + k) →
+      (∀ i, mPseudoCoherent R (m - i) ((DerivedCategory.singleFunctor _ 0).obj (E.X i))) →
+      mPseudoCoherent R m (DerivedCategory.Q.obj E) by
+    by_cases hb : b ≤ m - 1
+    · exact this 0 E (E.isStrictlyLE_of_le b _ (by omega)) h
+    · exact this (b - m + 1).toNat E (E.isStrictlyLE_of_le b _ (by omega)) h
+  intro k
+  induction k with
+  | zero =>
+    intro E hE _
+    exact mPseudoCoherent_of_isZero fun i hi ↦
+      DerivedCategory.isZero_of_isLE (DerivedCategory.Q.obj E) (m - 1 + (0 : ℕ)) i (by omega)
+  | succ k ih =>
+    intro E hE h
+    -- Split off the top term: `0 → Eⁿ[-n] → E → C → 0`.
+    obtain ⟨n, hn⟩ : ∃ n, n = m + k := ⟨_, rfl⟩
+    have hE' : E.IsStrictlyLE n := E.isStrictlyLE_of_le (m - 1 + (k + 1 : ℕ)) n (by omega)
+    let f := HomologicalComplex.mkHomFromSingle (𝟙 (E.X n)) (fun j hj ↦
+      (E.isZero_of_isStrictlyLE n j (by simp at hj; omega)).eq_of_tgt _ _)
+    have hf (i : ℤ) : Mono (f.f i) := by
+      by_cases hi : i = n
+      · subst hi
+        rw [HomologicalComplex.mkHomFromSingle_f]
+        infer_instance
+      · exact ⟨fun _ _ _ ↦ (HomologicalComplex.isZero_single_obj_X _ _ _ _ hi).eq_of_tgt _ _⟩
+    have : Mono f := HomologicalComplex.mono_of_mono_f f hf
+    let S := ShortComplex.mk f (cokernel.π f) (cokernel.condition f)
+    have hS : S.ShortExact := ⟨ShortComplex.exact_cokernel f⟩
+    have hSi := (HomologicalComplex.shortExact_iff_degreewise_shortExact S).1 hS
+    have hC (i : ℤ) (hi : n ≤ i) : IsZero ((cokernel f).X i) := by
+      rcases hi.lt_or_eq with hi | rfl
+      · have := (hSi i).epi_g
+        exact IsZero.of_epi ((cokernel.π f).f i) (E.isZero_of_isStrictlyLE n i hi)
+      · refine ((hSi n).isIso_f_iff).1 ?_
+        change IsIso (f.f n)
+        rw [HomologicalComplex.mkHomFromSingle_f]
+        infer_instance
+    have : CochainComplex.IsStrictlyLE (cokernel f) (m - 1 + k) := by
+      rw [CochainComplex.isStrictlyLE_iff]
+      exact fun i hi ↦ hC i (by omega)
+    refine mPseudoCoherent_obj₂ (DerivedCategory.triangleOfSES_distinguished hS) ?_ (ih _ this ?_)
+    · exact (mPseudoCoherent R m).prop_of_iso
+        ((DerivedCategory.singleFunctorIsoCompQ _ n).app (E.X n))
+        (mPseudoCoherent_singleFunctor_obj (h n))
+    · intro i
+      by_cases hi : n ≤ i
+      · exact mPseudoCoherent_of_isZero_obj
+          ((DerivedCategory.singleFunctor _ 0).map_isZero (hC i hi))
+      · have : IsIso ((cokernel.π f).f i) := ((hSi i).isIso_g_iff).2
+          (HomologicalComplex.isZero_single_obj_X (ComplexShape.up ℤ) _ _ _ (by omega))
+        exact (mPseudoCoherent R _).prop_of_iso
+          ((DerivedCategory.singleFunctor _ 0).mapIso (asIso ((cokernel.π f).f i))) (h i)
+
+/-- Stacks 064Y, second part. A bounded above complex of pseudo-coherent modules is
+pseudo-coherent. -/
+theorem pseudoCoherent_Q_obj_of_isStrictlyLE (E : CochainComplex (ModuleCat.{u} R) ℤ)
+    (b : ℤ) [E.IsStrictlyLE b]
+    (h : ∀ i, pseudoCoherent R ((DerivedCategory.singleFunctor _ 0).obj (E.X i))) :
+    pseudoCoherent R (DerivedCategory.Q.obj E) :=
+  fun m ↦ mPseudoCoherent_Q_obj_of_isStrictlyLE E b m fun i ↦ h i (m - i)
+
+/-- The characterization of `m`-pseudo-coherence by a cone: if `X → K → C → X[1]` is distinguished
+with `X` pseudo-coherent and `Hⁱ(C) = 0` for `i ≥ m`, then `K` is `m`-pseudo-coherent. -/
+private lemma mPseudoCoherent_obj₂_of_isZero {T : Triangle (DerivedCategory (ModuleCat.{u} R))}
+    (hT : T ∈ distTriang _) {m : ℤ} (h₁ : pseudoCoherent R T.obj₁)
+    (h₃ : ∀ i, m ≤ i → IsZero ((H i).obj T.obj₃)) : mPseudoCoherent R m T.obj₂ :=
+  mPseudoCoherent_obj₂ hT (h₁ m) (mPseudoCoherent_of_isZero h₃)
+
+end Ring
+
+/-! ### Flat base change and faithfully flat descent -/
+
+section BaseChange
+
+variable {R S : CommRingCat.{u}}
+
+private lemma finFree_extendScalars (f : R ⟶ S) {M : ModuleCat.{u} R}
+    (hM : Module.Free R M ∧ Module.Finite R M) :
+    Module.Free S ((extendScalars f.hom).obj M) ∧ Module.Finite S ((extendScalars f.hom).obj M) := by
+  obtain ⟨_, _⟩ := hM
+  let := f.hom.toAlgebra
+  exact ⟨(inferInstance : Module.Free S (S ⊗[R] M)),
+    (inferInstance : Module.Finite S (S ⊗[R] M))⟩
+
+/-- The homology of a derived extension of scalars along a flat map. -/
+private noncomputable def extendScalarsDerivedOfFlatHomologyIso (f : R ⟶ S) (hf : f.hom.Flat)
+    (K : DerivedCategory (ModuleCat.{u} R)) (n : ℤ) :
+    (DerivedCategory.homologyFunctor (ModuleCat.{u} S) n).obj
+        ((extendScalarsDerivedOfFlat f hf).obj K) ≅
+      (extendScalars f.hom).obj ((DerivedCategory.homologyFunctor (ModuleCat.{u} R) n).obj K) :=
+  mapDerivedCategoryHomologyIso (extendScalars.{u, u, u} f.hom) inferInstance
+    (preservesFiniteLimits_extendScalars_of_flat hf) inferInstance K n
+
+private lemma isZero_homology_extendScalarsDerivedOfFlat (f : R ⟶ S) (hf : f.hom.Flat)
+    {K : DerivedCategory (ModuleCat.{u} R)} {n : ℤ}
+    (hK : IsZero ((DerivedCategory.homologyFunctor (ModuleCat.{u} R) n).obj K)) :
+    IsZero ((DerivedCategory.homologyFunctor (ModuleCat.{u} S) n).obj
+      ((extendScalarsDerivedOfFlat f hf).obj K)) :=
+  ((extendScalars f.hom).map_isZero hK).of_iso (extendScalarsDerivedOfFlatHomologyIso f hf K n)
+
+private lemma pseudoCoherent_extendScalarsDerivedOfFlat_singleFunctor (f : R ⟶ S)
+    (hf : f.hom.Flat) (F : ModuleCat.{u} R) [Module.Free R F] [Module.Finite R F] (n : ℤ) :
+    pseudoCoherent S ((extendScalarsDerivedOfFlat f hf).obj
+      ((DerivedCategory.singleFunctor _ n).obj F)) := by
+  have := preservesFiniteLimits_extendScalars_of_flat hf
+  obtain ⟨_, _⟩ := finFree_extendScalars f ⟨(inferInstance : Module.Free R F),
+    (inferInstance : Module.Finite R F)⟩
+  exact (pseudoCoherent S).prop_of_iso
+    (((extendScalars.{u, u, u} f.hom).mapDerivedCategorySingleFunctor n).app F).symm
+    (pseudoCoherent_singleFunctor_obj _ n)
+
+/-- Stacks 066C, for complexes. Derived extension of scalars along a flat ring map preserves
+`m`-pseudo-coherence. Flatness is used only to make extension of scalars exact; base change along
+an arbitrary ring map (Stacks 0650) needs a derived tensor product. -/
+theorem mPseudoCoherent_extendScalarsDerivedOfFlat (f : R ⟶ S) (hf : f.hom.Flat) {m : ℤ}
+    {K : DerivedCategory (ModuleCat.{u} R)} (hK : mPseudoCoherent R m K) :
+    mPseudoCoherent S m ((extendScalarsDerivedOfFlat f hf).obj K) := by
+  obtain ⟨E, a, b, ha, hb, hE, α, hα, hαm⟩ := hK
+  obtain ⟨C, g, h, hT⟩ := distinguished_cocone_triangle α
+  have hC := isZero_homology_obj₃ hT (n := m) (fun i hi ↦ epi_of_witness hα hαm i hi)
+    (fun i hi ↦ mono_of_witness hα i hi)
+  have := preservesFiniteLimits_extendScalars_of_flat hf
+  let E' : CochainComplex (ModuleCat.{u} S) ℤ :=
+    (extendScalars.{u, u, u} f.hom).mapHomologicalComplex (ComplexShape.up ℤ) |>.obj E
+  have : E'.IsStrictlyGE a := mapHomologicalComplex_isStrictlyGE _ E a ha
+  have : E'.IsStrictlyLE b := mapHomologicalComplex_isStrictlyLE _ E b hb
+  refine mPseudoCoherent_obj₂_of_isZero
+    ((extendScalarsDerivedOfFlat f hf).map_distinguished _ hT) ?_ fun i hi ↦
+      isZero_homology_extendScalarsDerivedOfFlat f hf (hC i hi)
+  exact (pseudoCoherent S).prop_of_iso ((extendScalarsDerivedOfFlatFactors f hf).app E).symm
+    (pseudoCoherent_Q_obj_aux E' a b fun i ↦ finFree_extendScalars f (hE i))
+
+/-- Faithfully flat descent of `m`-pseudo-coherence along a finite family of flat ring maps that
+jointly detect vanishing and finite generation of modules: the common proof of Stacks 066D and
+068R. -/
+private lemma mPseudoCoherent_of_extendScalarsDerivedOfFlat {ι : Type*} [Finite ι]
+    {S : ι → CommRingCat.{u}} (f : ∀ j, R ⟶ S j) (hf : ∀ j, (f j).hom.Flat)
+    (hzero : ∀ M : ModuleCat.{u} R, (∀ j, IsZero ((extendScalars (f j).hom).obj M)) → IsZero M)
+    (hfin : ∀ M : ModuleCat.{u} R, (∀ j, Module.Finite (S j) ((extendScalars (f j).hom).obj M)) →
+      Module.Finite R M)
+    {m : ℤ} {K : DerivedCategory (ModuleCat.{u} R)}
+    (hK : ∀ j, mPseudoCoherent (S j) m ((extendScalarsDerivedOfFlat (f j) (hf j)).obj K)) :
+    mPseudoCoherent R m K := by
+  -- `K` has bounded above cohomology.
+  choose n hn using fun j ↦ (hK j).minus
+  obtain ⟨N, hN⟩ := (Set.finite_range n).bddAbove
+  have hKN (i : ℤ) (hi : N < i) :
+      IsZero ((DerivedCategory.homologyFunctor (ModuleCat.{u} R) i).obj K) :=
+    hzero _ fun j ↦ (((DerivedCategory.isLE_iff _ _).1 (hn j)) i
+      (lt_of_le_of_lt (hN ⟨j, rfl⟩) hi)).of_iso
+        (extendScalarsDerivedOfFlatHomologyIso (f j) (hf j) K i).symm
+  refine mPseudoCoherent_of_forall_cone
+    (fun K ↦ ∀ j, mPseudoCoherent (S j) m ((extendScalarsDerivedOfFlat (f j) (hf j)).obj K))
+    (fun K hK n hn hKn ↦ hfin _ fun j ↦ ?_) (fun n k K C α g h hT hK j ↦ ?_) N K hKN hK
+  · exact finite_of_iso (extendScalarsDerivedOfFlatHomologyIso (f j) (hf j) K n)
+      (finite_homology_of_mPseudoCoherent ((hK j).of_le hn) fun i hi ↦
+        isZero_homology_extendScalarsDerivedOfFlat (f j) (hf j) (hKn i hi))
+  · have h₁ := pseudoCoherent_extendScalarsDerivedOfFlat_singleFunctor (f j) (hf j)
+      (ModuleCat.of R (Fin k → R)) n
+    exact mPseudoCoherent_obj₃ ((extendScalarsDerivedOfFlat (f j) (hf j)).map_distinguished _ hT)
+      (h₁ (m + 1)) (hK j)
+
+/-- Stacks 068R. Pseudo-coherence descends along faithfully flat ring maps: if `K ⊗_R S` is
+`m`-pseudo-coherent for a faithfully flat `R → S`, then `K` is `m`-pseudo-coherent.
+
+Faithful flatness, not flatness, is needed: `ℤ → ℚ` is flat and `K = (⨁_{n ∈ ℕ} ℤ/2)[0]` has
+`K ⊗ ℚ = 0`, which is pseudo-coherent, while `H⁰(K)` is not finite, so `K` is not
+`0`-pseudo-coherent (Stacks 064T). -/
+theorem mPseudoCoherent_of_faithfullyFlat (f : R ⟶ S) (hf : f.hom.FaithfullyFlat) {m : ℤ}
+    {K : DerivedCategory (ModuleCat.{u} R)}
+    (hK : mPseudoCoherent S m ((extendScalarsDerivedOfFlat f hf.flat).obj K)) :
+    mPseudoCoherent R m K := by
+  let := f.hom.toAlgebra
+  have : Module.FaithfullyFlat R S := hf
+  refine mPseudoCoherent_of_extendScalarsDerivedOfFlat (ι := Unit) (fun _ ↦ f)
+    (fun _ ↦ hf.flat) (fun M hM ↦ ?_) (fun M hM ↦ ?_) (fun _ ↦ hK)
+  · have : Subsingleton (S ⊗[R] M) := ModuleCat.subsingleton_of_isZero (hM ())
+    have := Module.FaithfullyFlat.lTensor_reflects_triviality R S M
+    exact ModuleCat.isZero_of_subsingleton M
+  · have : Module.Finite S (S ⊗[R] M) := hM ()
+    exact Module.Finite.of_finite_tensorProduct_of_faithfullyFlat S
+
+end BaseChange
 
 end ModuleCat
