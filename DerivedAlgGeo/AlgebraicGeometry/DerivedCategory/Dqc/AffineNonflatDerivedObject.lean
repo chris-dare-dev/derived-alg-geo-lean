@@ -98,7 +98,7 @@ private abbrev zmodTwoExtend : ModuleCat ℤ ⥤ ModuleCat (ZMod 2) :=
   ModuleCat.extendScalars zmodTwoRingMap.hom
 
 private instance zmodTwoExtend_additive : zmodTwoExtend.Additive :=
-  affineExtendScalars_additive zmodTwoRingMap
+  ModuleCat.extendScalars_additive zmodTwoRingMap.hom
 
 private def timesTwo : zModule ⟶ zModule :=
   ModuleCat.ofHom (LinearMap.lsmul ℤ ℤ 2)
