@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Morphisms.EssentiallyOfFiniteType
+import DerivedAlgGeo.AlgebraicGeometry.ResidueField
 import DerivedAlgGeo.RingTheory.Nagata
 import Mathlib.AlgebraicGeometry.ValuativeCriterion
 
@@ -183,135 +184,54 @@ theorem exists_dvr_of_specializes {X Y : Scheme.{u}} (f : X ⟶ Y)
   subst hx
   obtain ⟨_, ⟨U, hU, rfl⟩, hy'U, -⟩ :=
     Y.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ y') isOpen_univ
-  have hyU : f x ∈ U := h.mem_open U.isOpen hy'U
   have : IsNoetherianRing Γ(Y, U) := IsLocallyNoetherian.component_noetherian ⟨U, hU⟩
   have : _root_.IsUniversallyJapanese Γ(Y, U) :=
     Scheme.IsUniversallyJapanese.isUniversallyJapanese ⟨U, hU⟩
-  -- The stalk at `y'` and its map to `κ(y)`.
-  let O := Y.presheaf.stalk y'
-  let : Algebra Γ(Y, U) O := (Y.presheaf.germ U y' hy'U).hom.toAlgebra
-  have : IsLocalization.AtPrime O (hU.primeIdealOf ⟨y', hy'U⟩).asIdeal :=
-    hU.isLocalization_stalk ⟨y', hy'U⟩
-  have : IsNoetherianRing O := IsLocalization.isNoetherianRing
-    (hU.primeIdealOf ⟨y', hy'U⟩).asIdeal.primeCompl O ‹_›
-  have hgerm : (Y.presheaf.germ U y' hy'U).hom.EssFiniteType :=
-    RingHom.essFiniteType_algebraMap.mpr
-      (.of_isLocalization O (hU.primeIdealOf ⟨y', hy'U⟩).asIdeal.primeCompl)
-  let φ : O ⟶ Y.residueField (f x) := Y.presheaf.stalkSpecializes h ≫ Y.residue (f x)
-  let A : Subring (Y.residueField (f x)) := φ.hom.range
-  have hφs : Function.Surjective φ.hom.rangeRestrict := φ.hom.rangeRestrict_surjective
-  have : IsLocalRing A := .of_surjective' φ.hom.rangeRestrict hφs
-  have : IsNoetherianRing A := isNoetherianRing_of_surjective O A _ hφs
-  let : Algebra Γ(Y, U) A := (φ.hom.rangeRestrict.comp (Y.presheaf.germ U y' hy'U).hom).toAlgebra
-  have : Algebra.EssFiniteType Γ(Y, U) A :=
-    hgerm.comp (RingHom.FiniteType.of_surjective _ hφs).essFiniteType
-  have : _root_.IsUniversallyJapanese A := .of_essFiniteType Γ(Y, U) A
-  have hφ : Spec.map φ ≫ Y.fromSpecStalk y' = Y.fromSpecResidueField (f x) := by
-    rw [Spec.map_comp, Category.assoc, Scheme.SpecMap_stalkSpecializes_fromSpecStalk]
-    rfl
-  have hAf : ¬ IsField A := by
-    intro hF
-    let := hF.toField
-    have hker : RingHom.ker φ.hom = maximalIdeal O := by
-      rw [← IsLocalRing.ker_eq_maximalIdeal φ.hom.rangeRestrict hφs, RingHom.ker_rangeRestrict]
-    have hpt : Spec.map φ (closedPoint (Y.residueField (f x))) = closedPoint O := by
-      refine PrimeSpectrum.ext ?_
-      change Ideal.comap φ.hom (maximalIdeal (Y.residueField (f x))) = maximalIdeal O
-      rw [maximalIdeal_eq_bot, ← RingHom.ker_eq_comap_bot, hker]
-    have h1 : (Spec.map φ ≫ Y.fromSpecStalk y') (closedPoint (Y.residueField (f x))) = f x := by
-      rw [hφ]
-      exact Scheme.fromSpecResidueField_apply _ _
-    have h2 : (Spec.map φ ≫ Y.fromSpecStalk y') (closedPoint (Y.residueField (f x))) = y' := by
-      change Y.fromSpecStalk y' (Spec.map φ (closedPoint (Y.residueField (f x)))) = y'
-      rw [hpt]
-      exact Scheme.fromSpecStalk_closedPoint
-    exact hne (h1.symm.trans h2)
-  -- `A` has fraction field `κ(y)`.
-  let Oy := Y.presheaf.stalk (f x)
-  let : Algebra Γ(Y, U) Oy := (Y.presheaf.germ U (f x) hyU).hom.toAlgebra
-  have : IsLocalization.AtPrime Oy (hU.primeIdealOf ⟨f x, hyU⟩).asIdeal :=
-    hU.isLocalization_stalk ⟨f x, hyU⟩
-  have hgg : ∀ r : Γ(Y, U), φ.hom ((Y.presheaf.germ U y' hy'U).hom r) =
-      (Y.residue (f x)).hom ((Y.presheaf.germ U (f x) hyU).hom r) := fun r ↦ by
-    have := congr($(TopCat.Presheaf.germ_stalkSpecializes Y.presheaf hy'U h).hom r)
-    simp only [CommRingCat.hom_comp, RingHom.comp_apply] at this
-    simp only [φ, CommRingCat.hom_comp, RingHom.comp_apply, this]
-  have : IsFractionRing A (Y.residueField (f x)) :=
-    { map_units := fun b ↦ IsUnit.mk0 _ fun h0 ↦ nonZeroDivisors.coe_ne_zero b (Subtype.ext h0)
-      surj := fun z ↦ by
-        obtain ⟨t, rfl⟩ := Y.residue_surjective (f x) z
-        obtain ⟨⟨r, s⟩, rfl⟩ :=
-          IsLocalization.mk'_surjective (hU.primeIdealOf ⟨f x, hyU⟩).asIdeal.primeCompl t
-        have hs : (Y.residue (f x)).hom ((Y.presheaf.germ U (f x) hyU).hom s) ≠ 0 :=
-          ((IsLocalization.map_units Oy s).map (Y.residue (f x)).hom).ne_zero
-        refine ⟨⟨⟨_, (Y.presheaf.germ U y' hy'U).hom r, rfl⟩,
-          ⟨⟨_, (Y.presheaf.germ U y' hy'U).hom s, rfl⟩,
-            mem_nonZeroDivisors_of_ne_zero ?_⟩⟩, ?_⟩
-        · intro h0
-          apply hs
-          rw [← hgg]
-          exact congr_arg Subtype.val h0
-        · change (Y.residue (f x)).hom (IsLocalization.mk' Oy r s) *
-            φ.hom ((Y.presheaf.germ U y' hy'U).hom s) = φ.hom ((Y.presheaf.germ U y' hy'U).hom r)
-          rw [hgg, hgg, ← map_mul]
-          congr 1
-          exact IsLocalization.mk'_spec Oy r s
-      exists_of_eq := fun h ↦ ⟨1, by simpa using Subtype.ext h⟩ }
+  have : IsNoetherianRing (Y.residueFieldSubring h) := Scheme.isNoetherianRing_residueFieldSubring h
+  let : Algebra Γ(Y, U) (Y.residueFieldSubring h) :=
+    ((Scheme.toResidueFieldSubring h).comp (Y.presheaf.germ U y' hy'U).hom).toAlgebra
+  have : Algebra.EssFiniteType Γ(Y, U) (Y.residueFieldSubring h) :=
+    RingHom.essFiniteType_algebraMap.mp
+      (Scheme.essFiniteType_toResidueFieldSubring_comp_germ h hU hy'U)
+  have : _root_.IsUniversallyJapanese (Y.residueFieldSubring h) :=
+    .of_essFiniteType Γ(Y, U) (Y.residueFieldSubring h)
   -- `κ(x)` is a finitely generated extension of `κ(y)`.
   let : Algebra (Y.residueField (f x)) (X.residueField x) := (f.residueFieldMap x).hom.toAlgebra
-  have : Algebra.EssFiniteType (Y.residueField (f x)) (X.residueField x) := by
-    have h1 : ((X.residue x).hom.comp (f.stalkMap x).hom).EssFiniteType :=
-      (LocallyOfFiniteType.stalkMap f x).comp
-        (RingHom.FiniteType.of_surjective _ (X.residue_surjective x)).essFiniteType
-    rw [← CommRingCat.hom_comp, ← Scheme.residue_residueFieldMap, CommRingCat.hom_comp] at h1
-    exact RingHom.EssFiniteType.of_comp _ h1
-  let : Algebra A (X.residueField x) := ((algebraMap (Y.residueField (f x)) (X.residueField x)).comp
-    (algebraMap A (Y.residueField (f x)))).toAlgebra
-  have : IsScalarTower A (Y.residueField (f x)) (X.residueField x) :=
+  have : Algebra.EssFiniteType (Y.residueField (f x)) (X.residueField x) :=
+    RingHom.essFiniteType_algebraMap.mp (LocallyOfFiniteType.essFiniteType_residueFieldMap f x)
+  let : Algebra (Y.residueFieldSubring h) (X.residueField x) :=
+    ((algebraMap (Y.residueField (f x)) (X.residueField x)).comp
+      (algebraMap (Y.residueFieldSubring h) (Y.residueField (f x)))).toAlgebra
+  have : IsScalarTower (Y.residueFieldSubring h) (Y.residueField (f x)) (X.residueField x) :=
     .of_algebraMap_eq fun _ ↦ rfl
   -- BLMNPS Lemma 11.15 gives the discrete valuation ring.
-  obtain ⟨R, hR, hdvr, hfr, heft⟩ :=
-    exists_dvr_dominating_essFiniteType hAf (Y.residueField (f x)) (X.residueField x)
-  obtain ⟨hR₁, hRloc⟩ := id hR
-  let c := (algebraMap A (X.residueField x)).codRestrict R.toSubring
-    fun a ↦ LocalSubring.toSubring_mono hR ⟨a, rfl⟩
-  let e : A →+* (LocalSubring.range (algebraMap A (X.residueField x))).toSubring :=
-    (algebraMap A (X.residueField x)).codRestrict _ fun a ↦ ⟨a, rfl⟩
-  have : IsLocalHom e := .of_surjective e fun ⟨_, a, rfl⟩ ↦ ⟨a, rfl⟩
-  have : IsLocalHom φ.hom.rangeRestrict := .of_surjective _ hφs
-  let ψ : O →+* R.toSubring := c.comp φ.hom.rangeRestrict
-  have : IsLocalHom ψ :=
-    inferInstanceAs (IsLocalHom (((Subring.inclusion hR₁).comp e).comp φ.hom.rangeRestrict))
-  let g : Spec (.of R.toSubring) ⟶ Y := Spec.map (CommRingCat.ofHom ψ) ≫ Y.fromSpecStalk y'
-  have hψ : (ψ.comp (Y.presheaf.germ U y' hy'U).hom).EssFiniteType :=
-    hgerm.comp ((RingHom.FiniteType.of_surjective _ hφs).essFiniteType.comp heft)
-  have hg : EssentiallyOfFiniteType g := by
+  obtain ⟨R, hR, hdvr, hfr, heft⟩ := exists_dvr_dominating_essFiniteType
+    (Scheme.not_isField_residueFieldSubring h hne) (Y.residueField (f x)) (X.residueField x)
+  obtain ⟨ψ, -, hψK, hcl, hsq⟩ :=
+    Scheme.exists_hom_of_le_residueFieldSubring h (f.residueFieldMap x) R hR
+  have hψ : (ψ.comp (Y.presheaf.germ U y' hy'U).hom).EssFiniteType := by
+    have : ψ.comp (Y.presheaf.germ U y' hy'U).hom =
+        ((algebraMap (Y.residueFieldSubring h) (X.residueField x)).codRestrict R.toSubring
+          fun a ↦ LocalSubring.toSubring_mono hR ⟨a, rfl⟩).comp
+          ((Scheme.toResidueFieldSubring h).comp (Y.presheaf.germ U y' hy'U).hom) :=
+      RingHom.ext fun r ↦ Subtype.ext (hψK _)
+    rw [this]
+    exact (Scheme.essFiniteType_toResidueFieldSubring_comp_germ h hU hy'U).comp heft
+  have hg : EssentiallyOfFiniteType (Spec.map (CommRingCat.ofHom ψ) ≫ Y.fromSpecStalk y') := by
     have : IsOpenImmersion hU.fromSpec := IsAffineOpen.isOpenImmersion_fromSpec hU
     have : LocallyOfFiniteType hU.fromSpec := locallyOfFiniteType_of_isOpenImmersion _
     have := essentiallyOfFiniteType_spec_map_comp
       (Y.presheaf.germ U y' hy'U ≫ CommRingCat.ofHom ψ) hψ hU.fromSpec
-    have e1 :
-        g = Spec.map (Y.presheaf.germ U y' hy'U ≫ CommRingCat.ofHom ψ) ≫ hU.fromSpec := by
-      simp only [g, ← hU.fromSpecStalk_eq_fromSpecStalk hy'U, IsAffineOpen.fromSpecStalk,
+    have e1 : Spec.map (CommRingCat.ofHom ψ) ≫ Y.fromSpecStalk y' =
+        Spec.map (Y.presheaf.germ U y' hy'U ≫ CommRingCat.ofHom ψ) ≫ hU.fromSpec := by
+      simp only [← hU.fromSpecStalk_eq_fromSpecStalk hy'U, IsAffineOpen.fromSpecStalk,
         ← Category.assoc]
       congr 1
       exact (Spec.map_comp _ _).symm
     rw [e1]
     exact this
-  have hcl : g (closedPoint R.toSubring) = y' := by
-    change Y.fromSpecStalk y' (Spec.map (CommRingCat.ofHom ψ) (closedPoint R.toSubring)) = y'
-    have : Spec.map (CommRingCat.ofHom ψ) (closedPoint R.toSubring) = closedPoint O :=
-      IsLocalRing.comap_closedPoint ψ
-    rw [this]
-    exact Scheme.fromSpecStalk_closedPoint
-  have hring : Y.presheaf.stalkSpecializes h ≫ Y.residue (f x) ≫ f.residueFieldMap x =
-      CommRingCat.ofHom ψ ≫ CommRingCat.ofHom (algebraMap R.toSubring (X.residueField x)) := by
-    ext t
-    rfl
-  refine ⟨R.toSubring, hdvr, hfr, g, hg, hcl, ?_⟩
-  rw [← Scheme.Hom.SpecMap_residueFieldMap_fromSpecResidueField, Scheme.fromSpecResidueField,
-    ← Scheme.SpecMap_stalkSpecializes_fromSpecStalk h, ← Category.assoc, ← Category.assoc,
-    ← Spec.map_comp, ← Spec.map_comp, hring, Spec.map_comp, Category.assoc]
+  refine ⟨R.toSubring, hdvr, hfr, _, hg, hcl, ?_⟩
+  exact (Scheme.Hom.SpecMap_residueFieldMap_fromSpecResidueField f x).symm.trans hsq.symm
 
 /-- BLMNPS Lemma 11.19 as a valuative commutative square: the top arrow is
 `Spec κ(x) ⟶ X`, the valuation ring is a discrete valuation ring, and the bottom arrow is

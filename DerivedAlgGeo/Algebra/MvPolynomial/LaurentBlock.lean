@@ -366,7 +366,7 @@ theorem AwayRep.frac_blockFilter_raise (h𝓜 : IsPolynomialTwist 𝓜 d) {γ : 
 
 set_option maxHeartbeats 800000 in
 /-- **Well-definedness.** Two representatives of one fraction filter to the same fraction. -/
-theorem AwayRep.frac_blockFilter_congr [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d)
+theorem AwayRep.frac_blockFilter_congr (h𝓜 : IsPolynomialTwist 𝓜 d)
     {γ : ι →₀ ℕ} (F : Finset ι)
     {r₁ r₂ : AwayRep ι R 𝓜 γ} (h : r₁.frac = r₂.frac) :
     (r₁.blockFilter h𝓜 F).frac = (r₂.blockFilter h𝓜 F).frac := by
@@ -374,7 +374,7 @@ theorem AwayRep.frac_blockFilter_congr [IsDomain R] (h𝓜 : IsPolynomialTwist �
       (MvPolynomial.monomial γ (1 : R)) ^ r₁.pow * r₂.num := by
     have hx := (DegreeZeroLocalization.awayMk_eq_awayMk_iff
       (monomial_one_mem_polynomialGrading (R := R) γ)
-      (monomial_one_ne_zero (R := R) γ) r₁.num_mem r₂.num_mem).mp h
+      (isSMulRegular_monomial_one (S := R) γ) r₁.num_mem r₂.num_mem).mp h
     simpa [smul_eq_mul] using hx
   have hgen : ∀ (n₁ n₂ : ℕ) (a b : MvPolynomial ι R)
       (ha : a ∈ 𝓜 (n₁ • γ.degree))
@@ -393,7 +393,7 @@ theorem AwayRep.frac_blockFilter_congr [IsDomain R] (h𝓜 : IsPolynomialTwist �
 /-- **The block projection**, as a map on the localization. Defined by choosing a
 representative; `blockProj_awayMk` is the equation that pins it down and is what every caller
 should use. -/
-noncomputable def blockProj [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d) (γ : ι →₀ ℕ)
+noncomputable def blockProj (h𝓜 : IsPolynomialTwist 𝓜 d) (γ : ι →₀ ℕ)
     (F : Finset ι)
     (z : DegreeZeroLocalization (polynomialGrading ι R)
       (𝓜) (.powers (MvPolynomial.monomial γ (1 : R)))) :
@@ -401,14 +401,14 @@ noncomputable def blockProj [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d) (γ 
       (𝓜) (.powers (MvPolynomial.monomial γ (1 : R))) :=
   ((AwayRep.frac_surjective 𝓜 γ z).choose.blockFilter h𝓜 F).frac
 
-theorem blockProj_frac [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d) (γ : ι →₀ ℕ)
+theorem blockProj_frac (h𝓜 : IsPolynomialTwist 𝓜 d) (γ : ι →₀ ℕ)
     (F : Finset ι) (r : AwayRep ι R 𝓜 γ) :
     blockProj h𝓜 γ F r.frac = (r.blockFilter h𝓜 F).frac :=
   AwayRep.frac_blockFilter_congr h𝓜 F (AwayRep.frac_surjective 𝓜 γ r.frac).choose_spec
 
 /-- **The defining equation of the block projection**: on a representative it filters the
 numerator and keeps the exponent. -/
-theorem blockProj_awayMk [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d) (γ : ι →₀ ℕ)
+theorem blockProj_awayMk (h𝓜 : IsPolynomialTwist 𝓜 d) (γ : ι →₀ ℕ)
     (F : Finset ι) {m : ℕ}
     {p : MvPolynomial ι R}
     (hp : p ∈ 𝓜 (m • γ.degree)) :
@@ -423,14 +423,14 @@ theorem blockProj_awayMk [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d) (γ : �
 set_option maxHeartbeats 800000 in
 /-- The block projection is additive: align the fractions at a common denominator, where it is
 `laurentFilter_add`. -/
-theorem blockProj_add [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d) (γ : ι →₀ ℕ)
+theorem blockProj_add (h𝓜 : IsPolynomialTwist 𝓜 d) (γ : ι →₀ ℕ)
     (F : Finset ι)
     (z₁ z₂ : DegreeZeroLocalization (polynomialGrading ι R)
       (𝓜) (.powers (MvPolynomial.monomial γ (1 : R)))) :
     blockProj h𝓜 γ F (z₁ + z₂) = blockProj h𝓜 γ F z₁ + blockProj h𝓜 γ F z₂ := by
   obtain ⟨m, p₁, p₂, hp₁, hp₂, rfl, rfl⟩ :=
     DegreeZeroLocalization.exists_awayMk_pair
-      (monomial_one_mem_polynomialGrading (R := R) γ) (monomial_one_pow_ne_zero γ) z₁ z₂
+      (monomial_one_mem_polynomialGrading (R := R) γ) z₁ z₂
   rw [← DegreeZeroLocalization.awayMk_add
       (monomial_one_mem_polynomialGrading (R := R) γ) m p₁ p₂ hp₁ hp₂,
     blockProj_awayMk h𝓜 γ F, blockProj_awayMk h𝓜 γ F, blockProj_awayMk h𝓜 γ F,
@@ -447,7 +447,7 @@ theorem blockProj_add [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d) (γ : ι �
   exact hcongr _ _ _ _ (laurentFilter_add γ m F p₁ p₂)
 
 /-- The block projection bundled as an additive map. -/
-noncomputable def blockProjHom [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d) (γ : ι →₀ ℕ)
+noncomputable def blockProjHom (h𝓜 : IsPolynomialTwist 𝓜 d) (γ : ι →₀ ℕ)
     (F : Finset ι) :
     DegreeZeroLocalization (polynomialGrading ι R)
         (𝓜)
@@ -458,7 +458,7 @@ noncomputable def blockProjHom [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d) (
   AddMonoidHom.mk' (blockProj h𝓜 γ F) (blockProj_add h𝓜 γ F)
 
 @[simp]
-theorem blockProjHom_apply [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d) (γ : ι →₀ ℕ)
+theorem blockProjHom_apply (h𝓜 : IsPolynomialTwist 𝓜 d) (γ : ι →₀ ℕ)
     (F : Finset ι)
     (z : DegreeZeroLocalization (polynomialGrading ι R)
       (𝓜) (.powers (MvPolynomial.monomial γ (1 : R)))) :
@@ -470,12 +470,12 @@ set_option maxHeartbeats 800000 in
 `γ.support.powerset` sum to the identity. This is the whole decomposition step in the form the
 vanishing argument consumes: no direct sum, no reindexed complex — each element *is* the finite
 sum of its blocks, one localization at a time. -/
-theorem sum_blockProj [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d) (γ : ι →₀ ℕ)
+theorem sum_blockProj (h𝓜 : IsPolynomialTwist 𝓜 d) (γ : ι →₀ ℕ)
     (z : DegreeZeroLocalization (polynomialGrading ι R)
       (𝓜) (.powers (MvPolynomial.monomial γ (1 : R)))) :
     ∑ F ∈ γ.support.powerset, blockProj h𝓜 γ F z = z := by
   obtain ⟨m, p, hp, rfl⟩ := DegreeZeroLocalization.exists_awayMk
-    (monomial_one_mem_polynomialGrading (R := R) γ) (monomial_one_pow_ne_zero γ) z
+    (monomial_one_mem_polynomialGrading (R := R) γ) z
   have hcongr : ∀ (a b : MvPolynomial ι R)
       (ha : a ∈ 𝓜 (m • γ.degree))
       (hb : b ∈ 𝓜 (m • γ.degree)), a = b →
@@ -504,13 +504,13 @@ theorem sum_blockProj [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d) (γ : ι �
         hcongr _ _ _ _ (sum_laurentFilter_powerset γ m p)
 
 /-- The block projections are idempotent. -/
-theorem blockProj_blockProj_self [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d) (γ : ι →₀ ℕ)
+theorem blockProj_blockProj_self (h𝓜 : IsPolynomialTwist 𝓜 d) (γ : ι →₀ ℕ)
     (F : Finset ι)
     (z : DegreeZeroLocalization (polynomialGrading ι R)
       (𝓜) (.powers (MvPolynomial.monomial γ (1 : R)))) :
     blockProj h𝓜 γ F (blockProj h𝓜 γ F z) = blockProj h𝓜 γ F z := by
   obtain ⟨m, p, hp, rfl⟩ := DegreeZeroLocalization.exists_awayMk
-    (monomial_one_mem_polynomialGrading (R := R) γ) (monomial_one_pow_ne_zero γ) z
+    (monomial_one_mem_polynomialGrading (R := R) γ) z
   rw [blockProj_awayMk h𝓜 γ F, blockProj_awayMk h𝓜 γ F]
   have hcongr : ∀ (a b : MvPolynomial ι R)
       (ha : a ∈ 𝓜 (m • γ.degree))
@@ -523,13 +523,13 @@ theorem blockProj_blockProj_self [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d)
   exact hcongr _ _ _ _ (laurentFilter_laurentFilter_self γ m F p)
 
 /-- Distinct block projections are orthogonal. -/
-theorem blockProj_blockProj_of_ne [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d)
+theorem blockProj_blockProj_of_ne (h𝓜 : IsPolynomialTwist 𝓜 d)
     {F F' : Finset ι} (h : F ≠ F') (γ : ι →₀ ℕ)
     (z : DegreeZeroLocalization (polynomialGrading ι R)
       (𝓜) (.powers (MvPolynomial.monomial γ (1 : R)))) :
     blockProj h𝓜 γ F (blockProj h𝓜 γ F' z) = 0 := by
   obtain ⟨m, p, hp, rfl⟩ := DegreeZeroLocalization.exists_awayMk
-    (monomial_one_mem_polynomialGrading (R := R) γ) (monomial_one_pow_ne_zero γ) z
+    (monomial_one_mem_polynomialGrading (R := R) γ) z
   rw [blockProj_awayMk h𝓜 γ F', blockProj_awayMk h𝓜 γ F]
   have hcongr : ∀ (a : MvPolynomial ι R)
       (ha : a ∈ 𝓜 (m • γ.degree)), a = 0 →
@@ -540,13 +540,13 @@ theorem blockProj_blockProj_of_ne [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d
   exact hcongr _ _ (laurentFilter_laurentFilter_of_ne h γ m p)
 
 /-- A block outside the denominator's support projects to zero. -/
-theorem blockProj_eq_zero_of_not_subset [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d)
+theorem blockProj_eq_zero_of_not_subset (h𝓜 : IsPolynomialTwist 𝓜 d)
     {γ : ι →₀ ℕ} {F : Finset ι} (h : ¬ F ⊆ γ.support)
     (z : DegreeZeroLocalization (polynomialGrading ι R)
       (𝓜) (.powers (MvPolynomial.monomial γ (1 : R)))) :
     blockProj h𝓜 γ F z = 0 := by
   obtain ⟨m, p, hp, rfl⟩ := DegreeZeroLocalization.exists_awayMk
-    (monomial_one_mem_polynomialGrading (R := R) γ) (monomial_one_pow_ne_zero γ) z
+    (monomial_one_mem_polynomialGrading (R := R) γ) z
   rw [blockProj_awayMk h𝓜 γ F]
   have hcongr : ∀ (a : MvPolynomial ι R)
       (ha : a ∈ 𝓜 (m • γ.degree)), a = 0 →
@@ -567,14 +567,14 @@ set_option maxHeartbeats 1200000 in
 the block-`F` component is taking the block-`F` component and restricting after. This is
 `laurentFilter_monomial_mul` at `σ = m • single e c`; no restriction on `F` is needed, in
 contrast to the sign projection's square. -/
-theorem laurentFace_blockProj [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d)
+theorem laurentFace_blockProj (h𝓜 : IsPolynomialTwist 𝓜 d)
     {γ γ' : ι →₀ ℕ} {e : ι} {c : ℕ}
     (hγ : γ = Finsupp.single e c + γ') (F : Finset ι)
     (z : DegreeZeroLocalization (polynomialGrading ι R)
       (𝓜) (.powers (MvPolynomial.monomial γ' (1 : R)))) :
     laurentFace 𝓜 hγ (blockProj h𝓜 γ' F z) = blockProj h𝓜 γ F (laurentFace 𝓜 hγ z) := by
   obtain ⟨m, q, hq, rfl⟩ := DegreeZeroLocalization.exists_awayMk
-    (monomial_one_mem_polynomialGrading (R := R) γ') (monomial_one_pow_ne_zero γ') z
+    (monomial_one_mem_polynomialGrading (R := R) γ') z
   have hdeg : γ.degree = c + γ'.degree := by rw [hγ, map_add, Finsupp.degree_single]
   have hres : (MvPolynomial.monomial (Finsupp.single e c) (1 : R)) ^ m •
       laurentFilter γ' m F q ∈
