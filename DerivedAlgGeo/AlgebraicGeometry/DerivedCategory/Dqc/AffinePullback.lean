@@ -4,6 +4,7 @@ Released under the MIT license.
 -/
 import Mathlib.Algebra.Category.ModuleCat.Descent
 import Mathlib.CategoryTheory.Adjunction.Restrict
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExtendScalars
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffineKProjectivePullback
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.AffinePushforward
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.AffineSpec
@@ -92,7 +93,6 @@ def affineQuasicoherentSheavesPullbackGammaIso
 instance affineQuasicoherentSheavesPullback_additive
     {R S : CommRingCat.{u}} (f : R ⟶ S) :
     (affineQuasicoherentSheavesPullback f).Additive := by
-  letI := affineExtendScalars_additive f
   dsimp [affineQuasicoherentSheavesPullback,
     equivalenceTransportFunctor]
   infer_instance
@@ -126,16 +126,6 @@ def affineQuasicoherentDerivedPullback
   letI := affineQuasicoherentSheavesPullback_preservesFiniteLimits f hf
   exact (affineQuasicoherentSheavesPullback f).mapDerivedCategory
 
-/-- Derived extension of scalars along a flat map, with exactness packaged
-in the construction. -/
-def affineExtendScalarsDerived
-    {R S : CommRingCat.{u}} (f : R ⟶ S) (hf : f.hom.Flat) :
-    DerivedCategory (ModuleCat R) ⥤ DerivedCategory (ModuleCat S) := by
-  letI : PreservesFiniteLimits
-      (ModuleCat.extendScalars.{u, u, u} f.hom) :=
-    ModuleCat.preservesFiniteLimits_extendScalars_of_flat hf
-  exact (ModuleCat.extendScalars f.hom).mapDerivedCategory
-
 /-- For exact affine pullback, derived sheafification commutes with extension
 of scalars on the derived categories of all module sheaves. Both exactness
 hypotheses are explicit; no quasi-coherent or bounded-coherent restriction is
@@ -151,7 +141,7 @@ def affineSchemeModuleExactDerivedPullbackComparison
   letI : (tilde.functor R).Additive := inferInstance
   letI : (tilde.functor S).Additive := inferInstance
   letI : (Scheme.Modules.pullback (Spec.map f)).Additive := inferInstance
-  letI : (ModuleCat.extendScalars f.hom).Additive := affineExtendScalars_additive f
+  letI : (ModuleCat.extendScalars f.hom).Additive := ModuleCat.extendScalars_additive f.hom
   letI : PreservesFiniteLimits (tilde.functor R) := inferInstance
   letI : PreservesFiniteLimits (tilde.functor S) := inferInstance
   letI : PreservesFiniteColimits (tilde.functor R) := inferInstance
@@ -177,7 +167,7 @@ def affineQuasicoherentDerivedPullbackGammaIso
     affineQuasicoherentDerivedPullback f hf ⋙
         affineGammaDerivedFunctor S ≅
       affineGammaDerivedFunctor R ⋙
-        affineExtendScalarsDerived f hf := by
+        ModuleCat.extendScalarsDerivedOfFlat f hf := by
   letI := affineQuasicoherentSheavesPullback_preservesFiniteLimits f hf
   letI : PreservesFiniteLimits
       (ModuleCat.extendScalars.{u, u, u} f.hom) :=
@@ -203,21 +193,21 @@ def affineQuasicoherentDerivedPullbackComparison
       equivalenceTransportFunctor
         (affineQuasicoherentDerivedEquivalence R)
         (affineQuasicoherentDerivedEquivalence S)
-        (affineExtendScalarsDerived f hf) := by
+        (ModuleCat.extendScalarsDerivedOfFlat f hf) := by
   letI : PreservesFiniteLimits
       (ModuleCat.extendScalars.{u, u, u} f.hom) :=
     ModuleCat.preservesFiniteLimits_extendScalars_of_flat hf
   let transported := equivalenceTransportFunctor
     (affineQuasicoherentDerivedEquivalence R)
     (affineQuasicoherentDerivedEquivalence S)
-    (affineExtendScalarsDerived f hf)
+    (ModuleCat.extendScalarsDerivedOfFlat f hf)
   let cancel : transported ⋙ affineGammaDerivedFunctor S ≅
       affineGammaDerivedFunctor R ⋙
-        affineExtendScalarsDerived f hf :=
+        ModuleCat.extendScalarsDerivedOfFlat f hf :=
     Functor.associator _ _ _ ≪≫
       Functor.isoWhiskerLeft
         ((affineQuasicoherentDerivedEquivalence R).inverse ⋙
-          affineExtendScalarsDerived f hf)
+          ModuleCat.extendScalarsDerivedOfFlat f hf)
         (affineQuasicoherentDerivedEquivalence S).unitIso.symm ≪≫
       Functor.rightUnitor _
   letI : (affineGammaDerivedFunctor S).Full :=
