@@ -32,6 +32,12 @@ hypothesis on `Y`.
 * `AlgebraicGeometry.exists_dvr_residueField_of_mem_closure_range`: the "moreover" of 0CM2, for
   `y` outside the image: the fraction field can be taken to be the residue field of that generic
   point.
+* `AlgebraicGeometry.IsSeparated.of_dvr_residueField`: Stacks 0207, (4) ⇒ (1). Over a locally
+  Noetherian base, a morphism locally of finite type is separated as soon as the squares at generic
+  points of irreducible components, with a discrete valuation ring `R ⊆ κ(η)` of fraction field
+  `κ(η)`, have at most one lift.
+* `AlgebraicGeometry.IsSeparated.iff_dvr`: Stacks 0207, (1) ⇔ (3). Separatedness is equivalent to
+  uniqueness of lifts for squares over a discrete valuation ring.
 
 ## Implementation notes
 
@@ -45,6 +51,7 @@ domain for which it cannot be.
 
 * [Stacks: Tag 054F](https://stacks.math.columbia.edu/tag/054F)
 * [Stacks: Tag 0CM2](https://stacks.math.columbia.edu/tag/0CM2)
+* [Stacks: Tag 0207](https://stacks.math.columbia.edu/tag/0207)
 * Bayer, Lahoz, Macrì, Nuer, Perry, Stellari, *Stability conditions in families*,
   arXiv:1902.08184v4, Lemma 11.19
 
@@ -55,7 +62,7 @@ valuative criterion, discrete valuation ring, specialization
 
 universe u
 
-open CategoryTheory IsLocalRing
+open CategoryTheory CategoryTheory.Limits IsLocalRing
 
 namespace AlgebraicGeometry
 
@@ -211,5 +218,84 @@ theorem exists_dvr_residueField_of_mem_closure_range {X Y : Scheme.{u}} (f : X �
   obtain ⟨R, hdvr, hfr, g, hcl, hcomm⟩ :=
     IsLocallyNoetherian.exists_dvr_of_specializes f hηy hne rfl
   exact ⟨η, hη, R, hdvr, hfr, g, hcl, hcomm⟩
+
+/-- **Stacks 0207**, (4) ⇒ (1). Let `f : X ⟶ S` be locally of finite type over a locally Noetherian
+`S`. If for every generic point `η` of an irreducible component of `X`, every discrete valuation
+ring `R ⊆ κ(η)` with fraction field `κ(η)` and every bottom arrow `Spec R ⟶ S`, the square with top
+arrow `Spec κ(η) ⟶ X` has at most one lift, then `f` is separated.
+
+The proof applies `IsLocallyNoetherian.exists_dvr_of_specializes` to the diagonal `Δ`, which is
+a quasi-compact immersion because `X` is locally Noetherian, hence quasi-separated (Stacks 01OY).
+A point `z` in the closure of the range of `Δ` specializes from `Δ η` for a generic point `η`
+(Stacks 02JQ), and then a square for `Δ` over a discrete valuation ring `R ⊆ κ(η)` sends the closed
+point to `z`. The two projections of its bottom arrow are lifts of the same square for `f`,
+so they agree, and the bottom arrow factors through `Δ`. -/
+@[stacks 0207 "(4) ⇒ (1)"]
+theorem IsSeparated.of_dvr_residueField {X S : Scheme.{u}} (f : X ⟶ S) [IsLocallyNoetherian S]
+    [LocallyOfFiniteType f]
+    (h : ∀ η : X, closure {η} ∈ irreducibleComponents X →
+      ∀ (R : Subring (X.residueField η)) [IsDiscreteValuationRing R]
+        [IsFractionRing R (X.residueField η)] (g : Spec (.of R) ⟶ S)
+        (w : CommSq (X.fromSpecResidueField η)
+          (Spec.map (CommRingCat.ofHom (algebraMap R (X.residueField η)))) f g),
+        Subsingleton w.LiftStruct) :
+    IsSeparated f where
+  isClosedImmersion_diagonal := by
+    have : IsLocallyNoetherian X := LocallyOfFiniteType.isLocallyNoetherian f
+    have : QuasiSeparated f := inferInstance
+    refine .of_isPreimmersion _ (closure_subset_iff_isClosed.mp ?_)
+    intro z hz
+    obtain ⟨η, hη, hηz⟩ :=
+      exists_isGenericPoint_specializes_of_mem_closure_range (pullback.diagonal f) hz
+    by_cases hne : pullback.diagonal f η = z
+    · exact ⟨η, hne⟩
+    obtain ⟨R, hdvr, hfr, g, hcl, hcomm⟩ :=
+      IsLocallyNoetherian.exists_dvr_of_specializes (pullback.diagonal f) hηz hne rfl
+    have hfst : X.fromSpecResidueField η =
+        Spec.map (CommRingCat.ofHom (algebraMap R (X.residueField η))) ≫ g ≫ pullback.fst f f := by
+      rw [← Category.assoc, ← hcomm]; simp
+    have hsnd : X.fromSpecResidueField η =
+        Spec.map (CommRingCat.ofHom (algebraMap R (X.residueField η))) ≫ g ≫ pullback.snd f f := by
+      rw [← Category.assoc, ← hcomm]; simp
+    have w : CommSq (X.fromSpecResidueField η)
+        (Spec.map (CommRingCat.ofHom (algebraMap R (X.residueField η)))) f
+        (g ≫ pullback.fst f f ≫ f) := ⟨by
+          have := congrArg (· ≫ f) hfst
+          simp only [Category.assoc] at this
+          exact this⟩
+    have := h η hη R (g ≫ pullback.fst f f ≫ f) w
+    have h₁₂ : (⟨g ≫ pullback.fst f f, hfst.symm, by simp⟩ : w.LiftStruct) =
+        ⟨g ≫ pullback.snd f f, hsnd.symm, by simp [pullback.condition]⟩ :=
+      Subsingleton.elim _ _
+    have hl : g ≫ pullback.fst f f = g ≫ pullback.snd f f := congrArg CommSq.LiftStruct.l h₁₂
+    have hg : (g ≫ pullback.fst f f) ≫ pullback.diagonal f = g := by
+      apply pullback.hom_ext <;> simp [hl]
+    refine ⟨(g ≫ pullback.fst f f) (closedPoint R), ?_⟩
+    exact (congrArg (fun k : Spec ↧R ⟶ _ ↦ k (closedPoint R)) hg).trans hcl
+
+/-- **Stacks 0207**, (1) ⇔ (3). Let `f : X ⟶ S` be locally of finite type over a locally Noetherian
+`S`. Then `f` is separated if and only if every valuative square over `f` whose valuation ring is a
+discrete valuation ring has at most one lift. By `IsSeparated.of_dvr_residueField` it already
+suffices to test the squares at generic points of irreducible components.
+
+The hypothesis is locally of finite type, not finite type: Stacks 0208 and 05JY need finite type.
+Both hypotheses are needed.
+* `[LocallyOfFiniteType f]`: let `V = ⋃ₙ k[t^{1/n}]_{(t^{1/n})}`, a valuation ring with value group
+  `ℚ`, and let `X` be two copies of `Spec V` glued along `Spec (Frac V)`. Then `X ⟶ Spec k` is not
+  separated. In a discrete valuation ring square a lift sending the closed point to a doubled point
+  would make `V ⟶ A` local and injective, so `A ∩ Frac V = V` would have value group `ℚ ⊆ ℤ`. So
+  every lift lands in the separated open `Spec (Frac V)`, and lifts are unique.
+* `[IsLocallyNoetherian S]`: for `S = Spec V` with `V` as above and `X` the scheme `S` with its
+  closed point doubled, `X ⟶ S` is locally an isomorphism and not separated. A square with closed
+  point over the closed point of `S` either makes `V ⟶ A` local and injective, which is impossible
+  as above, or lands in the closed fibre, two discrete points, where the lift is determined. -/
+@[stacks 0207]
+theorem IsSeparated.iff_dvr {X S : Scheme.{u}} (f : X ⟶ S) [IsLocallyNoetherian S]
+    [LocallyOfFiniteType f] :
+    IsSeparated f ↔ ∀ sq : ValuativeCommSq f, IsDiscreteValuationRing sq.R →
+      Subsingleton sq.commSq.LiftStruct := by
+  refine ⟨fun _ sq _ ↦ IsSeparated.valuativeCriterion f sq, fun h ↦ ?_⟩
+  refine IsSeparated.of_dvr_residueField f fun η _ R _ _ g w ↦ ?_
+  exact h ⟨R, X.residueField η, X.fromSpecResidueField η, g, w⟩ inferInstance
 
 end AlgebraicGeometry
