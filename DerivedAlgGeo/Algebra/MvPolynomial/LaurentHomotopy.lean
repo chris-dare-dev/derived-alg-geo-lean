@@ -148,7 +148,7 @@ theorem laurentHomotopy_back (i₀ : ι) (γ : ι →₀ ℕ) :
 `X_{i₀}`, then reinsert the surplus `X_{i₀}^{γ(i₀)}` by a face. A composite of two maps that
 are already well defined and additive, so it is both, with no new descent argument. Callers
 use `laurentHomotopy_awayMk`. -/
-noncomputable def laurentHomotopy [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d) (i₀ : ι)
+noncomputable def laurentHomotopy (h𝓜 : IsPolynomialTwist 𝓜 d) (i₀ : ι)
     (γ : ι →₀ ℕ) :
     DegreeZeroLocalization (polynomialGrading ι R)
         (𝓜)
@@ -180,7 +180,7 @@ theorem laurentHomotopy_numerator_mem (h𝓜 : IsPolynomialTwist 𝓜 d) (i₀ :
 set_option maxHeartbeats 1200000 in
 /-- **The defining equation of the homotopy map**: on `q / (X_{i₀}·Xᵞ)ᵐ` it divides the
 numerator by `X_{i₀}^{m(1+γ(i₀))}` and multiplies `X_{i₀}^{m·γ(i₀)}` back in. -/
-theorem laurentHomotopy_awayMk [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d) (i₀ : ι)
+theorem laurentHomotopy_awayMk (h𝓜 : IsPolynomialTwist 𝓜 d) (i₀ : ι)
     (γ : ι →₀ ℕ) {m : ℕ}
     {q : MvPolynomial ι R}
     (hq : q ∈ 𝓜
@@ -217,7 +217,7 @@ The front face multiplies the numerator by `X_{i₀}^m`; the projection half of 
 restores that surplus — and restoring is exact precisely because on block `F` with `i₀ ∉ F`
 every term had `β i₀ ≥ m·t` to give (`laurentFilter_apply_ge`). This is the only identity in
 the homotopy that sees the block. -/
-theorem laurentHomotopy_laurentFace_blockProj [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d)
+theorem laurentHomotopy_laurentFace_blockProj (h𝓜 : IsPolynomialTwist 𝓜 d)
     {i₀ : ι} {F : Finset ι} (hi₀ : i₀ ∉ F) (γ : ι →₀ ℕ)
     (z : DegreeZeroLocalization (polynomialGrading ι R)
       (𝓜) (.powers (MvPolynomial.monomial γ (1 : R)))) :
@@ -226,7 +226,7 @@ theorem laurentHomotopy_laurentFace_blockProj [IsDomain R] (h𝓜 : IsPolynomial
           (blockProj h𝓜 γ F z)) =
       blockProj h𝓜 γ F z := by
   obtain ⟨m, q₀, hq₀, rfl⟩ := DegreeZeroLocalization.exists_awayMk
-    (monomial_one_mem_polynomialGrading (R := R) γ) (monomial_one_pow_ne_zero γ) z
+    (monomial_one_mem_polynomialGrading (R := R) γ) z
   rw [blockProj_awayMk h𝓜 γ F]
   have hq : laurentFilter γ m F q₀ ∈
       𝓜 (m • γ.degree) :=
@@ -280,7 +280,7 @@ on the right, and the two sides agree exactly. The composite definition of `Π` 
 
 The two splittings are hypotheses, as elsewhere in this computation; both are
 associativity-and-commutativity rearrangements the Čech caller has in hand. -/
-theorem laurentHomotopy_laurentFace_comm [IsDomain R] (h𝓜 : IsPolynomialTwist 𝓜 d)
+theorem laurentHomotopy_laurentFace_comm (h𝓜 : IsPolynomialTwist 𝓜 d)
     (i₀ e : ι) (γ₀ : ι →₀ ℕ)
     (htop : Finsupp.single i₀ 1 + (γ₀ + Finsupp.single e 1) =
       Finsupp.single e 1 + (Finsupp.single i₀ 1 + γ₀))
@@ -291,8 +291,7 @@ theorem laurentHomotopy_laurentFace_comm [IsDomain R] (h𝓜 : IsPolynomialTwist
     laurentHomotopy h𝓜 i₀ (γ₀ + Finsupp.single e 1) (laurentFace 𝓜 htop z) =
       laurentFace 𝓜 hbot (laurentHomotopy h𝓜 i₀ γ₀ z) := by
   obtain ⟨m, q, hq, rfl⟩ := DegreeZeroLocalization.exists_awayMk
-    (monomial_one_mem_polynomialGrading (R := R) (Finsupp.single i₀ 1 + γ₀))
-    (monomial_one_pow_ne_zero _) z
+    (monomial_one_mem_polynomialGrading (R := R) (Finsupp.single i₀ 1 + γ₀)) z
   -- Left side: face up to the enlarged cone denominator, then the homotopy map.
   have hdegtop : (Finsupp.single i₀ 1 + (γ₀ + Finsupp.single e 1)).degree =
       1 + (Finsupp.single i₀ 1 + γ₀).degree := by
