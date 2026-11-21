@@ -17,6 +17,7 @@ import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Fibered
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.FiberProduct
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Morphism
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.ObjectProperty
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Over
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Representable
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Representability
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.ULift
@@ -43,8 +44,9 @@ its directory, so this umbrella imports the children directly.
   moduli of objects `StackInGroupoids.ofObjectProperty`, universe lifts of
   stacks, 2-fibre products, diagonals and Isom sheaves of stacks in
   groupoids, the 2-Yoneda equivalence `StackInGroupoids.yonedaEquivalence`,
-  and representable morphisms of stacks, natural in the test object
-  (`StackMorphism.IsRepresentable`).
+  representable morphisms of stacks, natural in the test object
+  (`StackMorphism.IsRepresentable`), and the total stack `StackInGroupoids.overTotal` of a stack
+  on a slice site.
 * `ULift.lean`: descent data of the universe lift `Pseudofunctor.ulift` are
   equivalent to those of the original pseudofunctor.
 
@@ -64,7 +66,9 @@ its directory, so this umbrella imports the children directly.
 * `ObjectProperty.lean`: the core of a stack is a stack, and a local object
   property closed under isomorphisms cuts out a substack.
 * `Over.lean`: the pullback of a stack along a continuous functor is a stack, so a stack on
-  `C` pulls back to a stack on `Over S` along `Over.forget S` and along `X ×_S -`.
+  `C` pulls back to a stack on `Over S` along `Over.forget S` and along `X ×_S -`; and when
+  `yoneda.obj S` is a sheaf, a pseudofunctor on `Over S` is a stack for the slice topology if and
+  only if its total pseudofunctor on `C` is a stack.
 * `SheafOver.lean`: sheaves on the slices of a site form a prestack for every coefficient
   category, and sheaves of types form a stack when covering sieves contain small covering
   families.
