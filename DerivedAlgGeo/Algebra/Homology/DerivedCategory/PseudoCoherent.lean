@@ -15,6 +15,8 @@ import Mathlib.Algebra.Homology.DerivedCategory.SingleTriangle
 import Mathlib.Algebra.Homology.HomologicalComplexAbelian
 import Mathlib.Algebra.Homology.DerivedCategory.TStructure
 import Mathlib.CategoryTheory.Abelian.DiagramLemmas.Four
+import Mathlib.CategoryTheory.Functor.OfSequence
+import Mathlib.CategoryTheory.Limits.Constructions.EventuallyConstant
 import Mathlib.CategoryTheory.Triangulated.Subcategory
 import Mathlib.RingTheory.Finiteness.Descent
 import Mathlib.RingTheory.Finiteness.Prod
@@ -44,8 +46,10 @@ of Stacks 064U, taken as the definition.
   `ModuleCat.mPseudoCoherent_neg_one_singleFunctor_iff`: a module is `0`-pseudo-coherent if and
   only if it is finite, and `(-1)`-pseudo-coherent if and only if it is finitely presented
   (Stacks 064T (1), (2)).
-* `ModuleCat.pseudoCoherent_of_iso_Q_obj`: a complex quasi-isomorphic to a bounded above complex
-  of finite free modules is pseudo-coherent (Stacks 064U, (1) ⇒ (2)).
+* `ModuleCat.pseudoCoherent_iff_exists_finiteFree`: an object of `D(R)` is pseudo-coherent if and
+  only if it is isomorphic to a bounded above complex of finite free modules (Stacks 064U);
+  `ModuleCat.exists_finiteFree_of_pseudoCoherent` takes the complex to vanish above any degree
+  above which the cohomology vanishes.
 * `ModuleCat.mPseudoCoherent_Q_obj_of_isStrictlyLE`: a bounded above complex whose terms `Eⁱ` are
   `(m - i)`-pseudo-coherent is `m`-pseudo-coherent (Stacks 064Y).
 * `ModuleCat.mPseudoCoherent_iff_of_isNoetherianRing`,
@@ -67,6 +71,13 @@ again a bounded complex of finite free modules; the four lemma on the homology s
 resulting morphism of triangles finishes the proof. The Noetherian characterization and both
 descent results kill the top cohomology by a map from a finite free module placed in one degree
 and induct on the top degree, as in Stacks 066D and 068R.
+
+The finite free model of 064U is built by descending induction on the degree. A stage is a
+complex `E` of finite free modules with a map `E ⟶ L` to a fixed complex `L` that is a
+quasi-isomorphism above `n` and surjective on `Hⁿ`. The next stage is the mapping cone of a map
+from a finite free module in degree `n` to `E`, chosen through the fiber of `E ⟶ L` in `D(R)`; the
+map to `L` is extended along `E ⟶ cone` on the nose, so the stages form a sequence of complexes
+that is constant in each degree from some stage on, and its colimit is the model.
 
 ## References
 
@@ -205,6 +216,17 @@ private lemma homologyFunctor_map_Q_map_iff {E F : CochainComplex (ModuleCat.{u}
     ((DerivedCategory.homologyFunctorFactors _ i).app F)
     (DerivedCategory.homologyFunctorFactors_hom_naturality φ i)
 
+/-- A map of complexes which is an isomorphism in degrees `i - 1`, `i` and `i + 1` is a
+quasi-isomorphism in degree `i`. -/
+private lemma quasiIsoAt_of_isIso_f {E F : CochainComplex (ModuleCat.{u} R) ℤ} (φ : E ⟶ F)
+    (i : ℤ) (h₁ : IsIso (φ.f (i - 1))) (h₂ : IsIso (φ.f i)) (h₃ : IsIso (φ.f (i + 1))) :
+    QuasiIsoAt φ i := by
+  rw [quasiIsoAt_iff' _ (i - 1) i (i + 1) (by simp) (by simp)]
+  have : IsIso ((HomologicalComplex.shortComplexFunctor' (ModuleCat.{u} R) (ComplexShape.up ℤ)
+      (i - 1) i (i + 1)).map φ) :=
+    @ShortComplex.isIso_of_isIso _ _ _ _ _ _ h₁ h₂ h₃
+  infer_instance
+
 /-! ### Stupid truncation -/
 
 section StupidTrunc
@@ -218,15 +240,9 @@ private lemma isIso_stupidTruncGEι_f (j : ℤ) (hj : m ≤ j) :
   infer_instance
 
 private lemma quasiIsoAt_stupidTruncGEι (i : ℤ) (hi : m < i) :
-    QuasiIsoAt (HomologicalComplex.stupidTruncGEι E m) i := by
-  rw [quasiIsoAt_iff' _ (i - 1) i (i + 1) (by simp) (by simp)]
-  have h₁ := isIso_stupidTruncGEι_f E m (i - 1) (by omega)
-  have h₂ := isIso_stupidTruncGEι_f E m i (by omega)
-  have h₃ := isIso_stupidTruncGEι_f E m (i + 1) (by omega)
-  have : IsIso ((HomologicalComplex.shortComplexFunctor' (ModuleCat.{u} R) (ComplexShape.up ℤ)
-      (i - 1) i (i + 1)).map (HomologicalComplex.stupidTruncGEι E m)) :=
-    @ShortComplex.isIso_of_isIso _ _ _ _ _ _ h₁ h₂ h₃
-  infer_instance
+    QuasiIsoAt (HomologicalComplex.stupidTruncGEι E m) i :=
+  quasiIsoAt_of_isIso_f _ i (isIso_stupidTruncGEι_f E m (i - 1) (by omega))
+    (isIso_stupidTruncGEι_f E m i (by omega)) (isIso_stupidTruncGEι_f E m (i + 1) (by omega))
 
 private lemma epi_homologyMap_stupidTruncGEι :
     Epi (HomologicalComplex.homologyMap (HomologicalComplex.stupidTruncGEι E m) m) := by
@@ -951,6 +967,316 @@ private lemma mPseudoCoherent_obj₂_of_isZero {T : Triangle (DerivedCategory (M
     (hT : T ∈ distTriang _) {m : ℤ} (h₁ : pseudoCoherent R T.obj₁)
     (h₃ : ∀ i, m ≤ i → IsZero ((H i).obj T.obj₃)) : mPseudoCoherent R m T.obj₂ :=
   mPseudoCoherent_obj₂ hT (h₁ m) (mPseudoCoherent_of_isZero h₃)
+
+/-! ### Finite free models -/
+
+section FiniteFreeModel
+
+open CochainComplex
+
+/-- The inclusion `E ⟶ cone(φ)` is an isomorphism in degree `i` if `P^{i + 1} = 0`. -/
+private lemma isIso_inr_f {P E : CochainComplex (ModuleCat.{u} R) ℤ} (φ : P ⟶ E) (i : ℤ)
+    (h : IsZero (P.X (i + 1))) : IsIso ((mappingCone.inr φ).f i) :=
+  ⟨(mappingCone.snd φ).v i i (add_zero i), mappingCone.inr_f_snd_v φ i, by
+    rw [← mappingCone.id_X φ i (i + 1) rfl, h.eq_of_tgt ((mappingCone.fst φ).1.v i (i + 1) rfl) 0,
+      zero_comp, zero_add]⟩
+
+/-- Extension of a map of complexes along the inclusion `E ⟶ cone(φ)` with a prescribed image in
+`D(R)`: if `φ : P ⟶ E` with `P` K-projective, `f : E ⟶ L`, and `c : cone(φ) ⟶ L` in `D(R)`
+restricts to `f`, then `c` is the image of a map of complexes restricting to `f` on the nose. -/
+private lemma exists_mappingCone_desc {P E L : CochainComplex (ModuleCat.{u} R) ℤ}
+    [P.IsKProjective] (φ : P ⟶ E) (f : E ⟶ L)
+    (c : DerivedCategory.Q.obj (mappingCone φ) ⟶ DerivedCategory.Q.obj L)
+    (hc : DerivedCategory.Q.map (mappingCone.inr φ) ≫ c = DerivedCategory.Q.map f) :
+    ∃ f' : mappingCone φ ⟶ L,
+      mappingCone.inr φ ≫ f' = f ∧ DerivedCategory.Q.map f' = c := by
+  have hT := DerivedCategory.mappingCone_triangle_distinguished φ
+  -- `φ ≫ f` is null-homotopic, so `f` extends to the cone.
+  have h₀ : DerivedCategory.Q.map (φ ≫ f) = 0 := by
+    rw [Functor.map_comp, ← hc, ← Category.assoc,
+      show DerivedCategory.Q.map φ ≫ DerivedCategory.Q.map (mappingCone.inr φ) = 0 from
+        comp_distTriang_mor_zero₁₂ _ hT, zero_comp]
+  have h₁ : (HomotopyCategory.quotient _ _).map (φ ≫ f) = 0 := by
+    apply (CochainComplex.IsKProjective.Qh_map_bijective P _).1
+    have := (DerivedCategory.quotientCompQhIso (ModuleCat.{u} R)).hom.naturality (φ ≫ f)
+    dsimp at this
+    rw [Functor.map_zero, ← cancel_mono ((DerivedCategory.quotientCompQhIso _).hom.app L),
+      zero_comp, this, h₀, comp_zero]
+  obtain ⟨hh⟩ := (HomotopyCategory.quotient_map_eq_zero_iff _).1 h₁
+  let z := HomComplex.Cochain.equivHomotopy _ _ hh
+  let d₀ := mappingCone.desc φ z.1 f (by rw [← add_zero (HomComplex.δ (-1) 0 z.1),
+    ← HomComplex.Cochain.ofHom_zero, ← z.2])
+  -- Correct `d₀` by a map factoring through `cone(φ) ⟶ P[1]`.
+  obtain ⟨t, ht⟩ := Triangle.yoneda_exact₃ _ hT (c - DerivedCategory.Q.map d₀) (by
+    change DerivedCategory.Q.map (mappingCone.inr φ) ≫ _ = 0
+    rw [Preadditive.comp_sub, hc, ← Functor.map_comp, mappingCone.inr_desc, sub_self])
+  obtain ⟨t', ht'⟩ := Q_map_surjective ((DerivedCategory.Q.commShiftIso (1 : ℤ)).hom.app P ≫ t)
+  let δ : mappingCone φ ⟶ P⟦(1 : ℤ)⟧ := (mappingCone.triangle φ).mor₃
+  have hδ : mappingCone.inr φ ≫ δ = 0 := mappingCone.inr_triangleδ φ
+  refine ⟨d₀ + δ ≫ t', ?_, ?_⟩
+  · rw [Preadditive.comp_add, mappingCone.inr_desc, reassoc_of% hδ, zero_comp, add_zero]
+  · have ht₂ : DerivedCategory.Q.map δ ≫ (DerivedCategory.Q.commShiftIso (1 : ℤ)).hom.app P ≫ t =
+        c - DerivedCategory.Q.map d₀ := by
+      rw [ht]
+      exact (Category.assoc _ _ _).symm
+    rw [Functor.map_add, Functor.map_comp, ht', ht₂, add_sub_cancel]
+
+/-- A stage in the construction of a finite free model of `L` (Stacks 064U): a complex of finite
+free modules in degrees `≤ b` with a map to `L` which is a quasi-isomorphism in degrees `> n` and
+surjective on `Hⁿ`. -/
+private structure Stage (L : CochainComplex (ModuleCat.{u} R) ℤ) (b : ℤ) where
+  /-- The degree down to which the stage approximates `L`. -/
+  n : ℤ
+  le : n ≤ b + 1
+  /-- The complex of finite free modules. -/
+  E : CochainComplex (ModuleCat.{u} R) ℤ
+  isStrictlyLE : E.IsStrictlyLE b
+  finFree : FinFree E
+  /-- The map to `L`. -/
+  f : E ⟶ L
+  quasiIsoAt (i : ℤ) : n < i → QuasiIsoAt f i
+  epi : Epi (HomologicalComplex.homologyMap f n)
+
+/-- The inductive step of Stacks 064U: a stage approximating a pseudo-coherent `L` down to degree
+`n` extends, by attaching a finite free module in degree `n - 1` through a mapping cone, to a
+stage approximating `L` down to degree `n - 1`. -/
+private lemma Stage.exists_next {L : CochainComplex (ModuleCat.{u} R) ℤ}
+    (hL : pseudoCoherent R (DerivedCategory.Q.obj L)) {b : ℤ} (s : Stage L b) :
+    ∃ (s' : Stage L b) (ι : s.E ⟶ s'.E), s'.n = s.n - 1 ∧ ι ≫ s'.f = s.f ∧
+      ∀ i, s.n ≤ i → IsIso (ι.f i) := by
+  have := s.isStrictlyLE
+  let n := s.n
+  let α := DerivedCategory.Q.map s.f
+  have hαiso (i : ℤ) (hi : n < i) : IsIso ((H i).map α) :=
+    (homologyFunctor_map_Q_map_iff s.f i).1.2 (by have := s.quasiIsoAt i hi; infer_instance)
+  have hαn : Epi ((H n).map α) := (homologyFunctor_map_Q_map_iff s.f n).2.1.2 s.epi
+  -- The fiber `D` of `α`: its cohomology vanishes above `n`, and `Hⁿ(D)` is finite.
+  obtain ⟨D, u', w, hT⟩ := distinguished_cocone_triangle₁ α
+  have hD (i : ℤ) (hi : n < i) : IsZero ((H i).obj D) :=
+    (isZero_homology_obj₃ (rot_of_distTriang _ hT) (n := n) (epi_of_witness hαiso hαn)
+      (mono_of_witness hαiso) (i - 1) (by omega)).of_iso
+      (((DerivedCategory.homologyFunctor _ 0).shiftIso 1 (i - 1) i (by omega)).app D).symm
+  have hDpc : mPseudoCoherent R n D := by
+    have := mPseudoCoherent_obj₁ hT (m := n - 1)
+      (by rw [sub_add_cancel]; exact pseudoCoherent_of_iso_Q_obj s.E b s.finFree (Iso.refl _) n)
+      (hL (n - 1))
+    rwa [sub_add_cancel] at this
+  obtain ⟨k, β, hβ⟩ := exists_singleFunctor_epi hD (finite_homology_of_mPseudoCoherent hDpc hD)
+  -- A finite free module `F` in degree `n` with a map to `D` that is surjective on `Hⁿ`.
+  let F := ModuleCat.of R (Fin k → R)
+  let S := (HomologicalComplex.single (ModuleCat.{u} R) (ComplexShape.up ℤ) n).obj F
+  have hS : FinFree S := finFree_single F n
+  have : CochainComplex.IsKProjective S := isKProjective_of_finFree S n hS
+  let e := (DerivedCategory.singleFunctorIsoCompQ (ModuleCat.{u} R) n).app F
+  let β₀ : DerivedCategory.Q.obj S ⟶ D := e.inv ≫ β
+  obtain ⟨g, hg⟩ := Q_map_surjective (β₀ ≫ u')
+  -- Compare the triangle of `cone(g)` with that of `D`.
+  have hT' := DerivedCategory.mappingCone_triangle_distinguished g
+  have comm : (DerivedCategory.Q.mapTriangle.obj (mappingCone.triangle g)).mor₁ ≫ 𝟙 _ =
+      β₀ ≫ (Triangle.mk u' α w).mor₁ := by
+    change DerivedCategory.Q.map g ≫ 𝟙 _ = _
+    rw [Category.comp_id, hg]
+    rfl
+  obtain ⟨c, hc₁, hc₂⟩ := complete_distinguished_triangle_morphism _ _ hT' hT β₀ (𝟙 _) comm
+  let ψ := Triangle.homMk (DerivedCategory.Q.mapTriangle.obj (mappingCone.triangle g))
+    (Triangle.mk u' α w) β₀ (𝟙 _) c comm hc₁ hc₂
+  have hSz (i : ℤ) (hi : i ≠ n) : IsZero ((H i).obj (DerivedCategory.Q.obj S)) :=
+    (isZero_homology_singleFunctor_obj F n i hi).of_iso ((H i).mapIso e).symm
+  have h₁epi (i : ℤ) (hi : n ≤ i) : Epi ((H i).map ψ.hom₁) := by
+    rcases hi.lt_or_eq with hi | rfl
+    · exact (hD i hi).epi _
+    · change Epi ((H _).map (e.inv ≫ β))
+      rw [Functor.map_comp]
+      infer_instance
+  have h₁mono (i : ℤ) (hi : n < i) : Mono ((H i).map ψ.hom₁) := (hSz i (by omega)).mono _
+  have h₂ (i : ℤ) : IsIso ((H i).map ψ.hom₂) := by
+    change IsIso ((H i).map (𝟙 _))
+    rw [CategoryTheory.Functor.map_id]
+    infer_instance
+  have hcepi (i : ℤ) (hi : n - 1 ≤ i) : Epi ((H i).map c) :=
+    epi_homologyFunctor_map_hom₃ hT' hT ψ i inferInstance (h₁epi (i + 1) (by omega))
+      inferInstance
+  have hcmono (i : ℤ) (hi : n ≤ i) : Mono ((H i).map c) :=
+    mono_homologyFunctor_map_hom₃ hT' hT ψ i (h₁epi i hi) inferInstance
+      (h₁mono (i + 1) (by omega))
+  -- Realize `c` by a map of complexes extending `s.f`.
+  obtain ⟨f', hf'₁, hf'₂⟩ := exists_mappingCone_desc g s.f c
+    (hc₁.trans (Category.id_comp α))
+  have hle : (mappingCone g).IsStrictlyLE b := by
+    have := isStrictlyLE_mappingCone g n b
+    rwa [max_eq_right (by have := s.le; omega)] at this
+  refine ⟨⟨n - 1, by have := s.le; omega, mappingCone g, hle, finFree_mappingCone g hS s.finFree,
+    f', fun i hi ↦ ?_, ?_⟩, mappingCone.inr g, rfl, hf'₁, fun i hi ↦ isIso_inr_f g i
+      (HomologicalComplex.isZero_single_obj_X _ _ _ _ (by omega))⟩
+  · rw [quasiIsoAt_iff_isIso_homologyMap]
+    refine (homologyFunctor_map_Q_map_iff f' i).1.1 ?_
+    rw [hf'₂]
+    exact @isIso_of_mono_of_epi _ _ _ _ _ _ (hcmono i (by omega)) (hcepi i (by omega))
+  · refine (homologyFunctor_map_Q_map_iff f' (n - 1)).2.1.1 ?_
+    rw [hf'₂]
+    exact hcepi _ le_rfl
+
+/-- The first stage: the zero complex, when `Hⁱ(L) = 0` for `i > b`. -/
+private noncomputable def Stage.zero {L : CochainComplex (ModuleCat.{u} R) ℤ} {b : ℤ}
+    (hL : ∀ i, b < i → IsZero (L.homology i)) : Stage L b where
+  n := b + 1
+  le := le_rfl
+  E := 0
+  isStrictlyLE := by
+    rw [CochainComplex.isStrictlyLE_iff]
+    exact fun i _ ↦ (HomologicalComplex.eval _ _ i).map_isZero (isZero_zero _)
+  finFree i := finFree_of_isZero ((HomologicalComplex.eval _ _ i).map_isZero (isZero_zero _))
+  f := 0
+  quasiIsoAt i hi := by
+    rw [quasiIsoAt_iff_isIso_homologyMap]
+    exact isIso_of_source_target_iso_zero _
+      ((HomologicalComplex.homologyFunctor _ _ i).map_isZero (isZero_zero _)).isoZero
+      (hL i (by omega)).isoZero
+  epi := (hL (b + 1) (by omega)).epi _
+
+/-- The next stage, chosen by `Stage.exists_next`. -/
+private noncomputable def Stage.next {L : CochainComplex (ModuleCat.{u} R) ℤ}
+    (hL : pseudoCoherent R (DerivedCategory.Q.obj L)) {b : ℤ} (s : Stage L b) : Stage L b :=
+  (s.exists_next hL).choose
+
+/-- The inclusion of a stage into the next one. -/
+private noncomputable def Stage.ι {L : CochainComplex (ModuleCat.{u} R) ℤ}
+    (hL : pseudoCoherent R (DerivedCategory.Q.obj L)) {b : ℤ} (s : Stage L b) :
+    s.E ⟶ (s.next hL).E :=
+  (s.exists_next hL).choose_spec.choose
+
+private lemma Stage.next_n {L : CochainComplex (ModuleCat.{u} R) ℤ}
+    (hL : pseudoCoherent R (DerivedCategory.Q.obj L)) {b : ℤ} (s : Stage L b) :
+    (s.next hL).n = s.n - 1 :=
+  (s.exists_next hL).choose_spec.choose_spec.1
+
+@[reassoc]
+private lemma Stage.ι_f {L : CochainComplex (ModuleCat.{u} R) ℤ}
+    (hL : pseudoCoherent R (DerivedCategory.Q.obj L)) {b : ℤ} (s : Stage L b) :
+    s.ι hL ≫ (s.next hL).f = s.f :=
+  (s.exists_next hL).choose_spec.choose_spec.2.1
+
+private lemma Stage.isIso_ι_f {L : CochainComplex (ModuleCat.{u} R) ℤ}
+    (hL : pseudoCoherent R (DerivedCategory.Q.obj L)) {b : ℤ} (s : Stage L b) (i : ℤ)
+    (hi : s.n ≤ i) : IsIso ((s.ι hL).f i) :=
+  (s.exists_next hL).choose_spec.choose_spec.2.2 i hi
+
+/-- The sequence of stages starting from the zero complex. -/
+private noncomputable def stage {L : CochainComplex (ModuleCat.{u} R) ℤ}
+    (hL : pseudoCoherent R (DerivedCategory.Q.obj L)) {b : ℤ}
+    (hb : ∀ i, b < i → IsZero (L.homology i)) : ℕ → Stage L b
+  | 0 => Stage.zero hb
+  | k + 1 => (stage hL hb k).next hL
+
+private lemma stage_n {L : CochainComplex (ModuleCat.{u} R) ℤ}
+    (hL : pseudoCoherent R (DerivedCategory.Q.obj L)) {b : ℤ}
+    (hb : ∀ i, b < i → IsZero (L.homology i)) (k : ℕ) : (stage hL hb k).n = b + 1 - k := by
+  induction k with
+  | zero => simp [stage, Stage.zero]
+  | succ k ih =>
+    rw [stage, Stage.next_n, ih]
+    push_cast
+    ring
+
+/-- The inclusion of a stage into the next one. -/
+private noncomputable def stageι {L : CochainComplex (ModuleCat.{u} R) ℤ}
+    (hL : pseudoCoherent R (DerivedCategory.Q.obj L)) {b : ℤ}
+    (hb : ∀ i, b < i → IsZero (L.homology i)) (k : ℕ) :
+    (stage hL hb k).E ⟶ (stage hL hb (k + 1)).E :=
+  (stage hL hb k).ι hL
+
+private lemma stageι_f {L : CochainComplex (ModuleCat.{u} R) ℤ}
+    (hL : pseudoCoherent R (DerivedCategory.Q.obj L)) {b : ℤ}
+    (hb : ∀ i, b < i → IsZero (L.homology i)) (k : ℕ) :
+    stageι hL hb k ≫ (stage hL hb (k + 1)).f = (stage hL hb k).f :=
+  (stage hL hb k).ι_f hL
+
+/-- A complex `L` whose image in `D(R)` is pseudo-coherent and whose cohomology vanishes above `b`
+is quasi-isomorphic to a complex of finite free modules in degrees `≤ b`: the colimit of the
+stages, which is constant in each degree from some stage on. -/
+private lemma exists_quasiIso_of_pseudoCoherent {L : CochainComplex (ModuleCat.{u} R) ℤ}
+    (hL : pseudoCoherent R (DerivedCategory.Q.obj L)) {b : ℤ}
+    (hb : ∀ i, b < i → IsZero (L.homology i)) :
+    ∃ (E : CochainComplex (ModuleCat.{u} R) ℤ) (f : E ⟶ L), E.IsStrictlyLE b ∧ FinFree E ∧
+      QuasiIso f := by
+  let s := stage hL hb
+  let G : ℕ ⥤ CochainComplex (ModuleCat.{u} R) ℤ := Functor.ofSequence (stageι hL hb)
+  -- In degree `i`, the sequence is constant from any stage `k` with `b + 1 - k ≤ i`.
+  have hconst (i : ℤ) (k : ℕ) (hk : b + 1 - k ≤ i) :
+      (G ⋙ HomologicalComplex.eval _ _ i).IsEventuallyConstantFrom k := by
+    intro j φ
+    obtain ⟨h, rfl⟩ : ∃ h, φ = homOfLE h := ⟨leOfHom φ, Subsingleton.elim _ _⟩
+    induction j, h using Nat.le_induction with
+    | base =>
+      rw [Subsingleton.elim (homOfLE _) (𝟙 k), CategoryTheory.Functor.map_id]
+      infer_instance
+    | succ j hkj ih =>
+      rw [← homOfLE_comp hkj (Nat.le_succ j), Functor.map_comp]
+      have := ih
+      have : IsIso ((G ⋙ HomologicalComplex.eval _ _ i).map (homOfLE (Nat.le_succ j))) := by
+        change IsIso ((G.map (homOfLE (Nat.le_add_right j 1))).f i)
+        rw [Functor.ofSequence_map_homOfLE_succ]
+        exact (stage hL hb j).isIso_ι_f hL i (by rw [stage_n]; omega)
+      infer_instance
+  have hι (i : ℤ) (k : ℕ) (hk : b + 1 - k ≤ i) : IsIso ((colimit.ι G k).f i) :=
+    (hconst i k hk).isIso_ι_of_isColimit
+      (isColimitOfPreserves (HomologicalComplex.eval _ _ i) (colimit.isColimit G))
+  let f : colimit G ⟶ L := colimit.desc G
+    { pt := L
+      ι := NatTrans.ofSequence (fun k ↦ (s k).f) (fun k ↦ by
+        simp only [G, Functor.ofSequence_map_homOfLE_succ, Functor.const_obj_map]
+        exact stageι_f hL hb k) }
+  have hf (k : ℕ) : colimit.ι G k ≫ f = (s k).f := colimit.ι_desc _ _
+  refine ⟨colimit G, f, ?_, fun i ↦ ?_, ?_⟩
+  · rw [CochainComplex.isStrictlyLE_iff]
+    intro i hi
+    have := (s 0).isStrictlyLE
+    have := hι i 0 (by omega)
+    exact ((s 0).E.isZero_of_isStrictlyLE b i hi).of_iso (asIso ((colimit.ι G 0).f i)).symm
+  · have := hι i (b + 1 - i).toNat (by omega)
+    exact finFree_of_iso (asIso ((colimit.ι G (b + 1 - i).toNat).f i)) ((s _).finFree i)
+  · rw [quasiIso_iff]
+    intro i
+    let k := (b + 2 - i).toNat
+    have := quasiIsoAt_of_isIso_f (colimit.ι G k) i (hι _ k (by omega)) (hι _ k (by omega))
+      (hι _ k (by omega))
+    have : QuasiIsoAt (colimit.ι G k ≫ f) i := by
+      rw [hf]
+      exact (s k).quasiIsoAt i (by rw [stage_n]; omega)
+    exact quasiIsoAt_of_comp_left (colimit.ι G k) f i
+
+/-- Stacks 064U, (2) ⇒ (1), with the refinement on degrees. A pseudo-coherent object `K` of `D(R)`
+with `Hⁱ(K) = 0` for `i > b` is isomorphic to a complex of finite free modules in degrees
+`≤ b`. -/
+theorem exists_finiteFree_of_pseudoCoherent {K : DerivedCategory (ModuleCat.{u} R)}
+    (hK : pseudoCoherent R K) (b : ℤ) (hb : ∀ i, b < i → IsZero ((H i).obj K)) :
+    ∃ E : CochainComplex (ModuleCat.{u} R) ℤ, E.IsStrictlyLE b ∧
+      (∀ i, Module.Free R (E.X i) ∧ Module.Finite R (E.X i)) ∧
+      Nonempty (DerivedCategory.Q.obj E ≅ K) := by
+  let L := DerivedCategory.Q.objPreimage K
+  let eL : DerivedCategory.Q.obj L ≅ K := DerivedCategory.Q.objObjPreimageIso K
+  obtain ⟨E, f, hE, hfin, hf⟩ := exists_quasiIso_of_pseudoCoherent
+    ((pseudoCoherent R).prop_of_iso eL.symm hK) (b := b) fun i hi ↦
+      (hb i hi).of_iso (((DerivedCategory.homologyFunctorFactors _ i).app L).symm ≪≫
+        (H i).mapIso eL)
+  exact ⟨E, hE, hfin, ⟨asIso (DerivedCategory.Q.map f) ≪≫ eL⟩⟩
+
+/-- Stacks 064U. An object of `D(R)` is pseudo-coherent if and only if it is isomorphic to a
+bounded above complex of finite free modules. -/
+theorem pseudoCoherent_iff_exists_finiteFree (K : DerivedCategory (ModuleCat.{u} R)) :
+    pseudoCoherent R K ↔ ∃ (E : CochainComplex (ModuleCat.{u} R) ℤ) (b : ℤ),
+      E.IsStrictlyLE b ∧ (∀ i, Module.Free R (E.X i) ∧ Module.Finite R (E.X i)) ∧
+      Nonempty (DerivedCategory.Q.obj E ≅ K) := by
+  constructor
+  · intro hK
+    obtain ⟨b, hb⟩ := (hK 0).minus
+    obtain ⟨E, hE, hfin, he⟩ := exists_finiteFree_of_pseudoCoherent hK b
+      ((DerivedCategory.isLE_iff K b).1 hb)
+    exact ⟨E, b, hE, hfin, he⟩
+  · rintro ⟨E, b, hE, hfin, ⟨e⟩⟩
+    exact pseudoCoherent_of_iso_Q_obj E b hfin e
+
+end FiniteFreeModel
 
 end Ring
 
