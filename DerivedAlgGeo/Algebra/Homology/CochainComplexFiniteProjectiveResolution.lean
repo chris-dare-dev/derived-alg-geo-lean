@@ -3,17 +3,16 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.Algebra.Category.FGModuleCat.Projective
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.BoundedAboveProjective
 import Mathlib.Algebra.Category.FGModuleCat.Abelian
-import Mathlib.Algebra.Homology.CochainComplexOpposite
-import Mathlib.Algebra.Homology.Factorizations.CM5a
 import Mathlib.Algebra.Homology.FullSubcategory
 
 /-!
 # Finite-term bounded-above projective replacements
 
-Mathlib constructs strictly bounded-below injective replacements. Opposing a cochain
-complex and negating its integer degrees gives a strictly bounded-above projective
-replacement in `FGModuleCat R`, where finite-free epimorphisms supply enough projectives.
+`CochainComplex.exists_boundedAbove_projective_replacement` gives strictly bounded-above
+projective replacements in any abelian category with enough projectives. In
+`FGModuleCat R` over a noetherian ring, finite-free epimorphisms supply enough projectives.
 The `ModuleCat` version below transfers the resulting complex and quasi-isomorphism
 through the finite-module inclusion. No finite lower bound or derived-arrow comparison
 is asserted.
@@ -25,23 +24,6 @@ open CategoryTheory CategoryTheory.Limits
 
 noncomputable section
 
-/-- Reindexing an opposite-category cochain complex by negation preserves a
-quasi-isomorphism. The short complexes in degree `n` and `-n` are definitionally
-the same after choosing their adjacent indices explicitly. -/
-private lemma quasiIso_restrictionNeg {C : Type*} [Category* C] [Abelian C]
-    {J L : CochainComplex Cᵒᵖ ℤ} (i : J ⟶ L) (hi : QuasiIso i) :
-    QuasiIso (HomologicalComplex.restrictionMap i ComplexShape.embeddingDownIntUpInt) := by
-  letI : QuasiIso i := hi
-  rw [quasiIso_iff]
-  intro n
-  have hi' : QuasiIsoAt i (-n) := (quasiIso_iff i).mp inferInstance (-n)
-  have hsc := (quasiIsoAt_iff' i (- (n + 1)) (-n) (- (n - 1))
-    (by simp; omega) (by simp; omega)).mp hi'
-  apply (quasiIsoAt_iff'
-    (HomologicalComplex.restrictionMap i ComplexShape.embeddingDownIntUpInt)
-    (n + 1) n (n - 1) (by simp) (by simp)).mpr
-  exact hsc
-
 namespace FGModuleCat
 
 /-- A strictly bounded-above complex of finite modules over a noetherian
@@ -52,7 +34,6 @@ theorem exists_boundedAbove_projective_replacement {R : Type u} [CommRing R]
     (b : ℤ) [K.IsStrictlyLE b] :
     ∃ (P : CochainComplex (FGModuleCat.{u} R) ℤ) (p : P ⟶ K),
       P.IsStrictlyLE b ∧ (∀ i : ℤ, Projective (P.X i)) ∧ QuasiIso p := by
-  classical
   letI : EnoughProjectives (FGModuleCat.{u} R) := by
     constructor
     intro X
@@ -61,44 +42,7 @@ theorem exists_boundedAbove_projective_replacement {R : Type u} [CommRing R]
              projective := FGModuleCat.projective_of_finFree k
              f := q
              epi := hq }⟩
-  let E := CochainComplex.opEquivalence (FGModuleCat.{u} R)
-  let J := E.functor.obj (Opposite.op K)
-  have hJ : J.IsStrictlyGE (-b) := by
-    rw [CochainComplex.isStrictlyGE_iff]
-    intro i hi
-    have hzero : IsZero (K.X (-i)) := K.isZero_of_isStrictlyLE b (-i) (by omega)
-    change IsZero (Opposite.op (K.X (-i)))
-    exact hzero.op
-  letI : J.IsStrictlyGE (-b) := hJ
-  obtain ⟨L, i, hqi, hInj, hL⟩ :=
-    CochainComplex.Plus.modelCategoryQuillen.exists_quasiIso_injective J (-b)
-  let P : CochainComplex (FGModuleCat.{u} R) ℤ := Opposite.unop (E.inverse.obj L)
-  let p : P ⟶ K := (E.inverse.map i).unop ≫
-    (E.unitIso.app (Opposite.op K)).unop.hom
-  have hBound : P.IsStrictlyLE b := by
-    rw [CochainComplex.isStrictlyLE_iff]
-    intro n hn
-    change IsZero (Opposite.unop (L.X (-n)))
-    have hzero : IsZero (L.X (-n)) := by
-      letI : L.IsStrictlyGE (-b) := hL
-      exact L.isZero_of_isStrictlyGE (-b) (-n) (by omega)
-    exact hzero.unop
-  have hProj (n : ℤ) : Projective (P.X n) := by
-    change Projective (Opposite.unop (L.X (-n)))
-    letI : Injective (L.X (-n)) := hInj (-n)
-    infer_instance
-  have hRestrict : QuasiIso
-      (HomologicalComplex.restrictionMap i ComplexShape.embeddingDownIntUpInt) :=
-    quasiIso_restrictionNeg i hqi
-  have hUnop : QuasiIso (E.inverse.map i).unop := by
-    change QuasiIso ((HomologicalComplex.unopFunctor (FGModuleCat.{u} R)
-      (ComplexShape.down ℤ)).map
-        (HomologicalComplex.restrictionMap i ComplexShape.embeddingDownIntUpInt).op)
-    exact (HomologicalComplex.quasiIso_unopFunctor_map_iff _).mpr hRestrict
-  letI : QuasiIso (E.inverse.map i).unop := hUnop
-  refine ⟨P, p, hBound, hProj, ?_⟩
-  dsimp [p]
-  infer_instance
+  exact CochainComplex.exists_boundedAbove_projective_replacement K b
 
 end FGModuleCat
 
