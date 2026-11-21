@@ -38,7 +38,10 @@ in the proof of Bayer's Lemma 5.7.
 ## Main results
 
 * `QuadraticMap.apply_eq_apply_kerProj_add` — `Q v` splits along `ker Z ⊕ (ker Z)ᗮ`.
-* `QuadraticMap.IsNormalized.apply_eq` — Bayer's equation (2).
+* `QuadraticMap.IsNormalized.apply_eq` and `QuadraticMap.IsNormalized.of_apply_eq` —
+  normalized pairs are exactly those satisfying Bayer's equation (2).
+* `QuadraticMap.isNormalized_actC_comp` — a `GL⁺(2, ℝ)`-translate is normalized once it
+  is an isometry on `(ker Z)ᗮ`, because it has the same kernel (`ker_actC_comp`).
 * `QuadraticMap.IsNormalized.normalized_charge_bound` — the estimate
   `‖(Z + u ∘ kerProj Q Z) v - Z v‖ ≤ c * ‖Z v‖` for `0 ≤ Q v`, whenever `c` bounds `u`
   against the norm that `-Q` puts on `ker Z`.
@@ -168,6 +171,29 @@ structure IsNormalized (Q : QuadraticForm ℝ V) (Z : V →ₗ[ℝ] ℂ) : Prop 
   apply_eq_of_mem_orthogonal :
     ∀ w ∈ BilinForm.orthogonal Q.polarBilin (LinearMap.ker Z), Q w = ‖Z w‖ ^ 2
 
+/-- A `GL⁺(2, ℝ)`-translate of a charge has the same kernel. -/
+theorem ker_actC_comp (T : Matrix.GLPos (Fin 2) ℝ) (Z : V →ₗ[ℝ] ℂ) :
+    LinearMap.ker (actC T ∘ₗ Z) = LinearMap.ker Z := by
+  ext v
+  simp only [LinearMap.mem_ker, LinearMap.comp_apply]
+  refine ⟨fun h => ?_, fun h => by rw [h, map_zero]⟩
+  have := actC_mul T⁻¹ T (Z v)
+  rwa [inv_mul_cancel, actC_one, h, map_zero] at this
+
+/-- A `GL⁺(2, ℝ)`-translate `T ∘ Z` of a charge with `Q`-negative definite kernel is
+normalized as soon as it is an isometry on the orthogonal complement of `ker Z`. The
+translate has the same kernel (`ker_actC_comp`), so nothing else needs checking. -/
+theorem isNormalized_actC_comp {Q : QuadraticForm ℝ V} {Z : V →ₗ[ℝ] ℂ}
+    (hZ : ((-Q).restrict (LinearMap.ker Z)).PosDef) {T : Matrix.GLPos (Fin 2) ℝ}
+    (hT : ∀ w ∈ BilinForm.orthogonal Q.polarBilin (LinearMap.ker Z),
+      Q w = ‖actC T (Z w)‖ ^ 2) :
+    IsNormalized Q (actC T ∘ₗ Z) := by
+  refine ⟨?_, ?_⟩
+  · rw [ker_actC_comp]
+    exact hZ
+  · rw [ker_actC_comp]
+    exact hT
+
 variable [FiniteDimensional ℝ V] {Q : QuadraticForm ℝ V} {Z : V →ₗ[ℝ] ℂ}
 
 /-- **Bayer's equation (2)**: `Q v = ‖Z v‖ ^ 2 - ‖kerProj Q Z v‖²`, where the norm on
@@ -179,12 +205,11 @@ theorem IsNormalized.apply_eq (h : IsNormalized Q Z) (v : V) :
     h.apply_eq_of_mem_orthogonal _ (sub_kerProj_mem_orthogonal hZ v), map_sub,
     LinearMap.map_coe_ker, sub_zero, add_comm]
 
-/-- Equation (2), together with negative definiteness on the kernel, characterizes
-normalized pairs. -/
-theorem isNormalized_iff :
-    IsNormalized Q Z ↔ ((-Q).restrict (LinearMap.ker Z)).PosDef ∧
-      ∀ v, Q v = ‖Z v‖ ^ 2 + Q (kerProj Q Z v) := by
-  refine ⟨fun h => ⟨h.negDef_ker, h.apply_eq⟩, fun ⟨hneg, h⟩ => ⟨hneg, fun w hw => ?_⟩⟩
+/-- Bayer's equation (2), together with negative definiteness on the kernel, makes the
+pair normalized. -/
+theorem IsNormalized.of_apply_eq (hneg : ((-Q).restrict (LinearMap.ker Z)).PosDef)
+    (h : ∀ v, Q v = ‖Z v‖ ^ 2 + Q (kerProj Q Z v)) : IsNormalized Q Z := by
+  refine ⟨hneg, fun w hw => ?_⟩
   have hZ := polarBilin_restrict_nondegenerate_of_negDef hneg
   have hp : (kerProj Q Z w : V) = 0 := by
     have hsub := sub_kerProj_mem_orthogonal hZ w
@@ -193,6 +218,13 @@ theorem isNormalized_iff :
     exact (Submodule.disjoint_def.mp (isCompl_ker_orthogonal hZ).disjoint) _
       (kerProj Q Z w).2 hmem
   rw [h w, hp, map_zero, add_zero]
+
+/-- Equation (2), together with negative definiteness on the kernel, characterizes
+normalized pairs. -/
+theorem isNormalized_iff :
+    IsNormalized Q Z ↔ ((-Q).restrict (LinearMap.ker Z)).PosDef ∧
+      ∀ v, Q v = ‖Z v‖ ^ 2 + Q (kerProj Q Z v) :=
+  ⟨fun h => ⟨h.negDef_ker, h.apply_eq⟩, fun ⟨hneg, h⟩ => .of_apply_eq hneg h⟩
 
 /-- On the classes with `0 ≤ Q v`, the kernel component is bounded by the charge:
 `‖kerProj Q Z v‖² ≤ ‖Z v‖ ^ 2`. -/
@@ -399,37 +431,10 @@ theorem exists_isNormalized_actC (hsig : PeriodDomain.HasSignatureTwo Q)
     rw [hexp, hd2, hf2]
     field_simp
     ring
-  have hker : LinearMap.ker (actC T ∘ₗ Z) = LinearMap.ker Z := by
-    ext v
-    simp only [LinearMap.mem_ker, LinearMap.comp_apply]
-    refine ⟨fun h => ?_, fun h => by rw [h, map_zero]⟩
-    have h0 := hT (Z v)
-    rw [h, norm_zero] at h0
-    set x := (Z v).re
-    set y := (Z v).im
-    have hsq : (a * x + b * y) ^ 2 + (a * c - b ^ 2) * y ^ 2 = 0 := by
-      have : a * (a * x ^ 2 + 2 * b * x * y + c * y ^ 2) =
-          (a * x + b * y) ^ 2 + (a * c - b ^ 2) * y ^ 2 := by ring
-      rw [← this, ← h0]
-      ring
-    have hy2 : (a * c - b ^ 2) * y ^ 2 = 0 :=
-      le_antisymm (by nlinarith [sq_nonneg (a * x + b * y)])
-        (mul_nonneg hdisc.le (sq_nonneg y))
-    have hy : y = 0 := pow_eq_zero_iff two_ne_zero |>.mp
-      ((mul_eq_zero.mp hy2).resolve_left hdisc.ne')
-    have hx : x = 0 := by
-      rw [hy, mul_zero, add_zero, zero_pow two_ne_zero, mul_zero, add_zero] at hsq
-      have := pow_eq_zero_iff two_ne_zero |>.mp hsq
-      exact (mul_eq_zero.mp this).resolve_left ha.ne'
-    exact Complex.ext hx hy
-  refine ⟨T, ⟨?_, ?_⟩⟩
-  · rw [hker]
-    exact hZ
-  · rw [hker]
-    intro w hw
-    rw [LinearMap.comp_apply, hT]
-    conv_lhs => rw [hdecomp w hw]
-    exact hQ _ _
+  refine ⟨T, isNormalized_actC_comp hZ fun w hw => ?_⟩
+  rw [hT]
+  conv_lhs => rw [hdecomp w hw]
+  exact hQ _ _
 
 end Signature
 
