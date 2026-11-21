@@ -12,6 +12,7 @@ import DerivedAlgGeo.CategoryTheory.Sites.Descent.ObjectProperty
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.Over
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.SheafOver
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Diagonal
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Discrete
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Fibered
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.FiberProduct
@@ -69,6 +70,9 @@ its directory, so this umbrella imports the children directly.
   category, and sheaves of types form a stack when covering sieves contain small covering
   families.
 * `ULift.lean`: a pseudofunctor is a prestack (a stack) exactly when its universe lift is.
+* `StackInGroupoids/Diagonal.lean`: the fibres of the diagonal of a stack in groupoids are
+  its Isom sheaves, so the diagonal is representable exactly when every Isom sheaf is
+  (`StackInGroupoids.hasRepresentableDiagonal_iff`).
 * `StackInGroupoids/Fibered.lean`: the Grothendieck construction of a stack in
   groupoids is a category fibred in groupoids (`StackInGroupoids.isStronglyCartesian`).
 
