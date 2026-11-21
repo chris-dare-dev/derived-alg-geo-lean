@@ -99,13 +99,13 @@ theorem laurentFilter_eq_zero_of_forall_mem (j₀ : ι) {F : Finset ι} (hF : �
 
 /-- The block of everything, over a nonempty variable set, projects everything to zero when
 the twist is nonnegative. -/
-theorem blockProj_eq_zero_of_forall_mem [IsDomain R] (j₀ : ι) {F : Finset ι}
+theorem blockProj_eq_zero_of_forall_mem (j₀ : ι) {F : Finset ι}
     (hF : ∀ j : ι, j ∈ F) (γ : ι →₀ ℕ) (d : ℕ)
     (z : DegreeZeroLocalization (polynomialGrading ι R)
       (natShift (polynomialGrading ι R) d) (.powers (MvPolynomial.monomial γ (1 : R)))) :
     blockProj (isPolynomialTwist_natShift (R := R) d) γ F z = 0 := by
   obtain ⟨m, p, hp, rfl⟩ := DegreeZeroLocalization.exists_awayMk
-    (monomial_one_mem_polynomialGrading (R := R) γ) (monomial_one_pow_ne_zero γ) z
+    (monomial_one_mem_polynomialGrading (R := R) γ) z
   rw [blockProj_awayMk (isPolynomialTwist_natShift (R := R) d) γ F]
   have hcongr : ∀ (a : MvPolynomial ι R)
       (ha : a ∈ natShift (polynomialGrading ι R) d (m • γ.degree)), a = 0 →
@@ -115,7 +115,7 @@ theorem blockProj_eq_zero_of_forall_mem [IsDomain R] (j₀ : ι) {F : Finset ι}
     exact DegreeZeroLocalization.awayMk_zero (monomial_one_mem_polynomialGrading (R := R) γ) m
   exact hcongr _ _ (laurentFilter_eq_zero_of_forall_mem j₀ hF hp)
 
-variable (ι k : Type u) [Field k]
+variable (ι k : Type u) [CommRing k]
 
 /-- The Čech form: any tuple supplies the witness. -/
 theorem cechBlockProj_eq_zero_of_forall_mem (d : ℕ) {n : ℕ} (x : Fin (n + 1) → ι)
