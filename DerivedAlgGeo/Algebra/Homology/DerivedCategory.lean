@@ -41,6 +41,8 @@ import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyIntLoc
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KFlatResolution
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.BoundedAboveProjective
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.BoundedAboveProjective.Unitality
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ModuleCatTensor
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.TorAmplitude
 
 /-! # Derived categories of abelian categories
 
@@ -70,6 +72,12 @@ replacement whose derived-category Hom map into a bounded-below complex
 localizes. The quasi-isomorphism comparison now transports this localization
 to derived-category Hom-sets out of the original bounded-above complex.
 The codomains remain degreewise localizations of the displayed complexes.
+With enough projectives, the bounded-above derived category lies in the
+bounded-above projective locus, so an additive functor can be derived on it by
+projective replacement. For modules over a commutative ring this gives the derived
+tensor product `K ⊗^L_R M` of a bounded-above complex with a module, computed by
+bounded-above complexes of flat modules, and Tor amplitude and finite Tor
+dimension with their flat models and behaviour in distinguished triangles.
 No internal derived-Hom or geometric base-change comparison is asserted.
 Algebraic geometry supplies abelian categories such as `Coh X` and consumes
 this API; it does not own the derived-category construction.

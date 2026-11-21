@@ -2,6 +2,9 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import Mathlib.Algebra.Homology.CochainComplexOpposite
+import Mathlib.Algebra.Homology.DerivedCategory.TStructure
+import Mathlib.Algebra.Homology.Factorizations.CM5a
 import Mathlib.CategoryTheory.Preadditive.Projective.Preserves
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KProjective
 
@@ -12,7 +15,86 @@ For any abelian category, this file cuts out the derived locus represented by
 bounded-above complexes of projective objects.  Additive functors preserving
 projectives act functorially on this locus.  Extension of scalars for module
 categories is a downstream affine instance.
+
+With enough projectives, Mathlib's bounded-below injective replacement, applied
+in the opposite category, gives every strictly bounded-above complex a strictly
+bounded-above projective replacement
+(`CochainComplex.exists_boundedAbove_projective_replacement`). So the bounded-above
+derived category `DerivedCategory.Minus C` lies in the bounded-above projective
+locus, and any additive functor can be derived on it by K-projective replacement
+(`minusKProjectiveDerivedFunctor`), computed on a bounded-above complex of
+projectives by applying the functor degreewise
+(`minusKProjectiveDerivedFunctorObjIso`). No exactness is assumed of the functor,
+no universal property of a left-derived functor is stated, and nothing is asserted
+on unbounded objects.
 -/
+
+namespace CochainComplex
+
+open CategoryTheory Limits
+
+/-- Reindexing an opposite-category cochain complex by negation preserves a
+quasi-isomorphism. The short complexes in degree `n` and `-n` are definitionally
+the same after choosing their adjacent indices explicitly. -/
+private lemma quasiIso_restrictionNeg {C : Type*} [Category* C] [Abelian C]
+    {J L : CochainComplex Cᵒᵖ ℤ} (i : J ⟶ L) (hi : QuasiIso i) :
+    QuasiIso (HomologicalComplex.restrictionMap i ComplexShape.embeddingDownIntUpInt) := by
+  letI : QuasiIso i := hi
+  rw [quasiIso_iff]
+  intro n
+  have hi' : QuasiIsoAt i (-n) := (quasiIso_iff i).mp inferInstance (-n)
+  have hsc := (quasiIsoAt_iff' i (- (n + 1)) (-n) (- (n - 1))
+    (by simp; omega) (by simp; omega)).mp hi'
+  apply (quasiIsoAt_iff'
+    (HomologicalComplex.restrictionMap i ComplexShape.embeddingDownIntUpInt)
+    (n + 1) n (n - 1) (by simp) (by simp)).mpr
+  exact hsc
+
+/-- In an abelian category with enough projectives, a strictly bounded-above complex
+has a strictly bounded-above quasi-isomorphic complex of projective objects, with the
+same upper bound. Its lower tail may be infinite. -/
+theorem exists_boundedAbove_projective_replacement {C : Type*} [Category* C] [Abelian C]
+    [EnoughProjectives C] (K : CochainComplex C ℤ) (b : ℤ) [K.IsStrictlyLE b] :
+    ∃ (P : CochainComplex C ℤ) (p : P ⟶ K),
+      P.IsStrictlyLE b ∧ (∀ i : ℤ, Projective (P.X i)) ∧ QuasiIso p := by
+  let E := CochainComplex.opEquivalence C
+  let J := E.functor.obj (Opposite.op K)
+  have hJ : J.IsStrictlyGE (-b) := by
+    rw [CochainComplex.isStrictlyGE_iff]
+    intro i hi
+    have hzero : IsZero (K.X (-i)) := K.isZero_of_isStrictlyLE b (-i) (by omega)
+    change IsZero (Opposite.op (K.X (-i)))
+    exact hzero.op
+  letI : J.IsStrictlyGE (-b) := hJ
+  obtain ⟨L, i, hqi, hInj, hL⟩ :=
+    CochainComplex.Plus.modelCategoryQuillen.exists_quasiIso_injective J (-b)
+  let P : CochainComplex C ℤ := Opposite.unop (E.inverse.obj L)
+  let p : P ⟶ K := (E.inverse.map i).unop ≫ (E.unitIso.app (Opposite.op K)).unop.hom
+  have hBound : P.IsStrictlyLE b := by
+    rw [CochainComplex.isStrictlyLE_iff]
+    intro n hn
+    change IsZero (Opposite.unop (L.X (-n)))
+    have hzero : IsZero (L.X (-n)) := by
+      letI : L.IsStrictlyGE (-b) := hL
+      exact L.isZero_of_isStrictlyGE (-b) (-n) (by omega)
+    exact hzero.unop
+  have hProj (n : ℤ) : Projective (P.X n) := by
+    change Projective (Opposite.unop (L.X (-n)))
+    letI : Injective (L.X (-n)) := hInj (-n)
+    infer_instance
+  have hRestrict : QuasiIso
+      (HomologicalComplex.restrictionMap i ComplexShape.embeddingDownIntUpInt) :=
+    quasiIso_restrictionNeg i hqi
+  have hUnop : QuasiIso (E.inverse.map i).unop := by
+    change QuasiIso ((HomologicalComplex.unopFunctor C (ComplexShape.down ℤ)).map
+        (HomologicalComplex.restrictionMap i ComplexShape.embeddingDownIntUpInt).op)
+    exact (HomologicalComplex.quasiIso_unopFunctor_map_iff _).mpr hRestrict
+  letI : QuasiIso (E.inverse.map i).unop := hUnop
+  refine ⟨P, p, hBound, hProj, ?_⟩
+  dsimp [p]
+  infer_instance
+
+end CochainComplex
 
 namespace CategoryTheory
 
@@ -201,6 +283,61 @@ def boundedAboveProjectiveDerivedFunctorCompIso
       (Functor.associator EC.inverse MF MG) EE.functor ≪≫
     Functor.isoWhiskerRight
       (Functor.isoWhiskerLeft EC.inverse e') EE.functor
+
+section Minus
+
+variable (C : Type u) [Category.{v} C] [Abelian C] [EnoughProjectives C]
+
+/-- With enough projectives, every bounded-above object of the derived category is
+represented by a bounded-above complex of projective objects. -/
+theorem minus_le_essImage_boundedAboveProjectiveQh :
+    DerivedCategory.TStructure.t.minus ≤ (boundedAboveProjectiveQh C).essImage := by
+  rintro X ⟨n, hn⟩
+  letI : X.IsLE n := hn
+  obtain ⟨K, _, ⟨e⟩⟩ := X.exists_iso_Q_obj_of_isLE n
+  obtain ⟨P, p, hP, hProj, hp⟩ :=
+    CochainComplex.exists_boundedAbove_projective_replacement K n
+  exact ⟨⟨(HomotopyCategory.quotient C (ComplexShape.up ℤ)).obj P, n, hP, hProj⟩,
+    ⟨(DerivedCategory.quotientCompQhIso C).app P ≪≫
+      asIso (DerivedCategory.Q.map p) ≪≫ e.symm⟩⟩
+
+/-- With enough projectives, every bounded-above object of the derived category is
+represented by a K-projective complex. -/
+theorem minus_le_essImage_kProjectiveQh :
+    DerivedCategory.TStructure.t.minus ≤ (kProjectiveQh C).essImage := by
+  intro X hX
+  obtain ⟨K, ⟨e⟩⟩ := minus_le_essImage_boundedAboveProjectiveQh C X hX
+  exact ⟨(boundedAboveProjectiveToKProjective C).obj K, ⟨e⟩⟩
+
+/-- The bounded-above derived category, as a full subcategory of the K-projective
+derived locus. -/
+def minusToKProjectiveDerived :
+    DerivedCategory.Minus C ⥤ KProjectiveDerivedCategory C :=
+  (kProjectiveQh C).essImage.lift DerivedCategory.Minus.ι
+    fun X ↦ minus_le_essImage_kProjectiveQh C _ X.property
+
+variable {C} {D : Type u'} [Category.{v'} D] [Abelian D]
+
+/-- An additive functor derived on the bounded-above derived category: replace by a
+K-projective complex and apply the functor degreewise. No exactness of the functor is
+assumed, and no universal property of a left-derived functor is stated. -/
+def minusKProjectiveDerivedFunctor (F : C ⥤ D) [F.Additive] :
+    DerivedCategory.Minus C ⥤ DerivedCategory D :=
+  minusToKProjectiveDerived C ⋙ kProjectiveLocusDerivedFunctor F
+
+/-- On a bounded-above complex of projective objects, `minusKProjectiveDerivedFunctor` is
+the functor applied degreewise. -/
+def minusKProjectiveDerivedFunctorObjIso (F : C ⥤ D) [F.Additive]
+    (K : CochainComplex C ℤ) (d : ℤ) [K.IsStrictlyLE d] [∀ n : ℤ, Projective (K.X n)] :
+    (minusKProjectiveDerivedFunctor F).obj ⟨DerivedCategory.Q.obj K, d, inferInstance⟩ ≅
+      DerivedCategory.Q.obj ((F.mapHomologicalComplex (ComplexShape.up ℤ)).obj K) :=
+  (kProjectiveLocusDerivedFunctor F).mapIso
+      (ObjectProperty.isoMk _ ((DerivedCategory.quotientCompQhIso C).app K)).symm ≪≫
+    (kProjectiveLocusDerivedComparison F).app
+      (KProjectiveHomotopyCategory.ofBoundedAboveProjectives K d) ≪≫
+    kProjectiveDerivedFunctorObjIso F K d
+
+end Minus
 
 end
 
