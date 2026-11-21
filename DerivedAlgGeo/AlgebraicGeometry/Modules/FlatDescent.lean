@@ -59,10 +59,12 @@ namespace AlgebraicGeometry.Scheme.Modules
 universe u
 
 /-- Flatness of a stalk module over the base transports along an equality of morphisms. -/
-private theorem flat_restrictScalars_stalkMap_congr {P T : Scheme.{u}} {f g : P ⟶ T} (hfg : f = g)
-    (z : P) (N : ModuleCat.{u} (P.presheaf.stalk z))
-    (hN : Module.Flat (T.presheaf.stalk (f z)) ((ModuleCat.restrictScalars (f.stalkMap z).hom).obj N)) :
-    Module.Flat (T.presheaf.stalk (g z)) ((ModuleCat.restrictScalars (g.stalkMap z).hom).obj N) := by
+private theorem flat_restrictScalars_stalkMap_congr {P T : Scheme.{u}} {f g : P ⟶ T}
+    (hfg : f = g) (z : P) (N : ModuleCat.{u} (P.presheaf.stalk z))
+    (hN : Module.Flat (T.presheaf.stalk (f z))
+      ((ModuleCat.restrictScalars (f.stalkMap z).hom).obj N)) :
+    Module.Flat (T.presheaf.stalk (g z))
+      ((ModuleCat.restrictScalars (g.stalkMap z).hom).obj N) := by
   subst hfg
   exact hN
 
