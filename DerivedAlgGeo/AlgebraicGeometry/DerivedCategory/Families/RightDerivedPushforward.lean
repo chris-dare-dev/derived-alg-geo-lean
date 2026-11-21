@@ -17,6 +17,11 @@ postulating an unrelated functor.
 
 When module-sheaf pushforward is exact, its degreewise derived functor inhabits the interface.
 Closed immersions provide a concrete geometric instance of this normalization.
+
+Every morphism inhabits the interface: `RightDerivedPushforward.ofKInjective` in
+`Families/KInjectivePushforward.lean` is the total direct image `Rf_*`, computed on K-injective
+resolutions. When pushforward is exact, `RightDerivedPushforward.exactComparison` identifies it
+with the degreewise functor.
 -/
 
 attribute [local instance] HasDerivedCategory.standard
