@@ -27,6 +27,8 @@ sheaf, or other geometric input occurs here.
 * `Adjunction.mapHomologicalComplex` and `Adjunction.mapDerivedCategory`:
   additive adjunctions prolong degreewise to homological complexes, and exact
   adjunctions descend to derived categories;
+* `Adjunction.isIso_unit_mapDerivedCategory`: the unit of the derived adjunction is invertible
+  when the unit of the adjunction of exact functors is;
 * `Functor.singleFunctorIsoOfFactors`: the degree-`n` embedding commutes with any functor on
   derived categories that factors degreewise through `F`;
 * `DerivedCategory.isoOfFactors`, with `DerivedCategory.idFactors` and
@@ -133,6 +135,37 @@ noncomputable def Adjunction.mapDerivedCategory {F : A ⥤ B} {G : B ⥤ A}
     (DerivedCategory.Q (C := B))
     (HomologicalComplex.quasiIso B (ComplexShape.up ℤ))
     F.mapDerivedCategory G.mapDerivedCategory
+
+/-- A natural transformation out of a derived category is invertible once it is invertible at the
+localization of each complex, because every object is isomorphic to such an object. -/
+lemma isIso_of_isIso_app_Q {D : Type*} [Category D] {F G : DerivedCategory A ⥤ D}
+    (η : F ⟶ G) (h : ∀ K : CochainComplex A ℤ, IsIso (η.app (DerivedCategory.Q.obj K))) :
+    IsIso η := by
+  have : ∀ X, IsIso (η.app X) := fun X ↦ by
+    let e := DerivedCategory.Q.objObjPreimageIso X
+    have := h (DerivedCategory.Q.objPreimage X)
+    have key : η.app X = F.map e.inv ≫
+        η.app (DerivedCategory.Q.obj (DerivedCategory.Q.objPreimage X)) ≫ G.map e.hom := by
+      rw [← η.naturality e.hom, ← Category.assoc, ← F.map_comp, e.inv_hom_id, F.map_id,
+        Category.id_comp]
+    rw [key]
+    infer_instance
+  exact NatIso.isIso_of_isIso_app η
+
+/-- The unit of the derived adjunction of an adjunction of exact functors is invertible when the
+unit of the adjunction is. -/
+instance Adjunction.isIso_unit_mapDerivedCategory {F : A ⥤ B} {G : B ⥤ A}
+    [F.Additive] [PreservesFiniteLimits F] [PreservesFiniteColimits F]
+    [G.Additive] [PreservesFiniteLimits G] [PreservesFiniteColimits G]
+    (adj : F ⊣ G) [IsIso adj.unit] : IsIso adj.mapDerivedCategory.unit := by
+  refine isIso_of_isIso_app_Q _ fun K ↦ ?_
+  have : IsIso ((adj.mapHomologicalComplex (ComplexShape.up ℤ)).unit.app K) := by
+    have : ∀ i, IsIso (((adj.mapHomologicalComplex (ComplexShape.up ℤ)).unit.app K).f i) :=
+      fun i ↦ (inferInstance : IsIso (adj.unit.app (K.X i)))
+    exact HomologicalComplex.Hom.isIso_of_components _
+  unfold Adjunction.mapDerivedCategory
+  rw [Adjunction.localization_unit_app]
+  infer_instance
 
 /-- The functor on derived categories induced by an exact functor preserves
 the canonical `≤ n` truncation bound. -/

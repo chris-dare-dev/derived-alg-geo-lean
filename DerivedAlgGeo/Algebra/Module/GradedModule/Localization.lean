@@ -55,11 +55,12 @@ family of module twists, belong to the separate graded-shift layer.
 * `exists_awayMk` — every degree-zero fraction away from `f` *is* an `awayMk`. The denominator
   is a power of `f` by construction; what has to be proved is that the `NumDenSameDeg` degree
   certificate is forced to be `n • deg f`, which is `DirectSum.degree_eq_of_mem_mem` once `fⁿ`
-  is known to be nonzero.
+  is known to be nonzero. When some `fⁿ` vanishes the localization is zero and there is nothing
+  to prove, so the statement carries no hypothesis.
 * `awayMk_eq_awayMk_iff` — two such fractions agree exactly when they cross-multiply, with no
   residual `∃ u` from the localization. The `∃ u` is what the general
-  `mk_eq_mk_iff` leaves behind; cancelling it is where the domain and torsion-freeness
-  hypotheses are spent, and they are spent nowhere else.
+  `mk_eq_mk_iff` leaves behind; cancelling it is where the hypothesis that `f` acts injectively
+  on `M` (`IsSMulRegular M f`) is spent, and it is spent nowhere else.
 
 Together these turn `DegreeZeroLocalization 𝒜 𝓜 (.powers f)` into fractions with an explicit
 representative and a computable equality test, which is what any basis for it has to start from
@@ -241,6 +242,13 @@ theorem mk_surjective :
 theorem ext {x y : DegreeZeroLocalization 𝒜 𝓜 S}
     (h : (x : LocalizedModule S M) = y) : x = y :=
   Subtype.ext h
+
+/-- A denominator set containing `0` leaves no fractions: the ambient localized module is already
+zero (`LocalizedModule.subsingleton`). -/
+theorem subsingleton_of_zero_mem (h : (0 : A) ∈ S) :
+    Subsingleton (DegreeZeroLocalization 𝒜 𝓜 S) :=
+  haveI := LocalizedModule.subsingleton (M := M) h
+  ⟨fun _ _ => ext (Subsingleton.elim _ _)⟩
 
 /-- Equality of homogeneous fractions is the ordinary localized-module equality criterion. -/
 theorem mk_eq_mk_iff (p q : NumDenSameDeg 𝒜 𝓜 S) :
@@ -630,12 +638,17 @@ that the `NumDenSameDeg` degree certificate has no freedom left. It is pinned by
 `DirectSum.degree_eq_of_mem_mem`: the denominator lies both in the certified piece and, as `fⁿ`,
 in `n • deg f`, and a nonzero homogeneous element lies in exactly one piece.
 
-The hypothesis is `∀ n, fⁿ ≠ 0` rather than `f ≠ 0` so that no domain assumption is needed here;
-in a domain `pow_ne_zero` supplies it. It cannot be dropped: over a ring where `f` is nilpotent
-the localization is trivial and the degree is genuinely unconstrained. -/
-theorem exists_awayMk {f : A} {e : ι} (hf : f ∈ 𝒜 e) (hf0 : ∀ n : ℕ, f ^ n ≠ 0)
+No hypothesis on `f` is needed. If some `fⁿ` vanishes, `0` is a denominator, the localization is
+zero (`subsingleton_of_zero_mem`) and `z` is the fraction `0 / f⁰`; the degree certificate is then
+genuinely unconstrained, but nothing depends on it. Otherwise every `fⁿ` is nonzero and the
+degree pinning above applies. -/
+theorem exists_awayMk {f : A} {e : ι} (hf : f ∈ 𝒜 e)
     (z : DegreeZeroLocalization 𝒜 𝓜 (.powers f)) :
     ∃ (n : ℕ) (m : M) (hm : m ∈ 𝓜 (n • e)), z = awayMk hf n m hm := by
+  by_cases hnil : (0 : A) ∈ Submonoid.powers f
+  · haveI := subsingleton_of_zero_mem (𝒜 := 𝒜) (𝓜 := 𝓜) hnil
+    exact ⟨0, 0, zero_mem _, Subsingleton.elim _ _⟩
+  have hf0 : ∀ n : ℕ, f ^ n ≠ 0 := fun n h => hnil ⟨n, h⟩
   obtain ⟨c, rfl⟩ := mk_surjective z
   obtain ⟨deg, num, den, den_mem⟩ := c
   obtain ⟨n, hn⟩ := den_mem
@@ -651,22 +664,20 @@ theorem exists_awayMk {f : A} {e : ι} (hf : f ∈ 𝒜 e) (hf0 : ∀ n : ℕ, f
 `fᵐ • p = fⁿ • q`, with no surviving `∃ u`.
 
 `mk_eq_mk_iff` is the general criterion and it leaves an unknown `u ∈ Submonoid.powers f`
-behind. Cancelling that `u` is the whole point of this lemma and the only place the two
-hypotheses are used: `IsDomain A` makes every `fᵗ` regular, and `Module.IsTorsionFree A M`
-turns a regular ring element into an injective scalar action on `M`. For `M = A` the latter is
-an instance, so the polynomial case needs neither supplied by hand.
+behind. Cancelling that `u` is the whole point of this lemma and the only place the hypothesis
+`IsSMulRegular M f` is used: it makes every `fᵗ` act injectively on `M`. Over a domain with `M`
+torsion-free it follows from `f ≠ 0`; for a monomial in a polynomial ring it holds over any
+commutative ring.
 
-Without torsion-freeness the statement is false, not merely unproved: an `f`-torsion element of
-`M` is a nonzero numerator whose fraction is zero. -/
-theorem awayMk_eq_awayMk_iff [IsDomain A] [Module.IsTorsionFree A M] {f : A} {e : ι}
-    (hf : f ∈ 𝒜 e) (hf0 : f ≠ 0) {n m : ℕ} {p q : M} (hp : p ∈ 𝓜 (n • e))
-    (hq : q ∈ 𝓜 (m • e)) :
+Without it the statement is false, not merely unproved: an `f`-torsion element of `M` is a
+nonzero numerator whose fraction is zero. -/
+theorem awayMk_eq_awayMk_iff {f : A} {e : ι} (hf : f ∈ 𝒜 e) (hreg : IsSMulRegular M f)
+    {n m : ℕ} {p q : M} (hp : p ∈ 𝓜 (n • e)) (hq : q ∈ 𝓜 (m • e)) :
     awayMk hf n p hp = awayMk hf m q hq ↔ f ^ m • p = f ^ n • q := by
   rw [awayMk, awayMk, mk_eq_mk_iff]
   constructor
   · rintro ⟨⟨u, t, rfl⟩, hu⟩
-    exact Module.IsTorsionFree.isSMulRegular (M := M)
-      (IsRegular.of_ne_zero (pow_ne_zero t hf0)) hu
+    exact hreg.pow t hu
   · intro h
     exact ⟨1, by simpa using h⟩
 
@@ -729,14 +740,14 @@ theorem awayMk_shift {f : A} {e : ι} (hf : f ∈ 𝒜 e) (n t : ℕ) (p : M)
 This is `exists_awayMk` on each fraction followed by `awayMk_shift` to align the two exponents
 at their sum. It is the move every statement about a *sum* of fractions opens with — additivity
 of `awayMk` exists only at a fixed denominator — and it is what the additivity of the sign
-projection `MvPolynomial.signProjection_add` reduces to. Like `exists_awayMk`, it costs no domain
-or torsion-freeness hypothesis: no cancellation is performed. -/
-theorem exists_awayMk_pair {f : A} {e : ι} (hf : f ∈ 𝒜 e) (hf0 : ∀ n : ℕ, f ^ n ≠ 0)
+projection `MvPolynomial.signProjection_add` reduces to. Like `exists_awayMk`, it costs no
+hypothesis on `f`: no cancellation is performed. -/
+theorem exists_awayMk_pair {f : A} {e : ι} (hf : f ∈ 𝒜 e)
     (z₁ z₂ : DegreeZeroLocalization 𝒜 𝓜 (.powers f)) :
     ∃ (n : ℕ) (p₁ p₂ : M) (hp₁ : p₁ ∈ 𝓜 (n • e)) (hp₂ : p₂ ∈ 𝓜 (n • e)),
       z₁ = awayMk hf n p₁ hp₁ ∧ z₂ = awayMk hf n p₂ hp₂ := by
-  obtain ⟨n₁, q₁, hq₁, rfl⟩ := exists_awayMk hf hf0 z₁
-  obtain ⟨n₂, q₂, hq₂, rfl⟩ := exists_awayMk hf hf0 z₂
+  obtain ⟨n₁, q₁, hq₁, rfl⟩ := exists_awayMk hf z₁
+  obtain ⟨n₂, q₂, hq₂, rfl⟩ := exists_awayMk hf z₂
   have hp₁ : f ^ n₂ • q₁ ∈ 𝓜 ((n₁ + n₂) • e) := by
     have h := SetLike.GradedSMul.smul_mem (SetLike.pow_mem_graded n₂ hf) hq₁
     rwa [vadd_eq_add, show n₂ • e + n₁ • e = (n₁ + n₂) • e by rw [add_nsmul, add_comm]] at h
@@ -759,12 +770,12 @@ theorem exists_awayMk_pair {f : A} {e : ι} (hf : f ∈ 𝒜 e) (hf0 : ∀ n : �
 
 This is `awayMk_eq_awayMk_iff` against the zero fraction, and it is what makes the numerator a
 faithful record of the element: any independence statement about fractions reduces to one about
-numerators. The hypotheses are inherited from that lemma and are needed for the same reason —
-without torsion-freeness an `f`-torsion numerator is a nonzero numerator with a zero fraction. -/
-theorem awayMk_eq_zero_iff [IsDomain A] [Module.IsTorsionFree A M] {f : A} {e : ι}
-    (hf : f ∈ 𝒜 e) (hf0 : f ≠ 0) {n : ℕ} {p : M} (hp : p ∈ 𝓜 (n • e)) :
+numerators. The hypothesis is inherited from that lemma and is needed for the same reason —
+an `f`-torsion numerator is a nonzero numerator with a zero fraction. -/
+theorem awayMk_eq_zero_iff {f : A} {e : ι} (hf : f ∈ 𝒜 e) (hreg : IsSMulRegular M f) {n : ℕ}
+    {p : M} (hp : p ∈ 𝓜 (n • e)) :
     awayMk hf n p hp = 0 ↔ p = 0 := by
-  rw [← awayMk_zero (𝓜 := 𝓜) hf 0, awayMk_eq_awayMk_iff hf hf0]
+  rw [← awayMk_zero (𝓜 := 𝓜) hf 0, awayMk_eq_awayMk_iff hf hreg]
   simp
 /-- Two equal degree indices give the same `awayMk`.
 

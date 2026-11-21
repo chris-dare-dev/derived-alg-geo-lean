@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.AlgebraicSpace.Basic
 import DerivedAlgGeo.AlgebraicGeometry.AlgebraicSpace.FiberProduct
 import DerivedAlgGeo.AlgebraicGeometry.AlgebraicSpace.GlobalFunctions
+import DerivedAlgGeo.AlgebraicGeometry.AlgebraicSpace.Representable
 
 /-!
 # Algebraic spaces
@@ -15,8 +16,9 @@ representable by schemes and an étale surjective atlas by a scheme.
 ## Main definitions
 
 None: this umbrella re-exports its children, among them `AlgebraicGeometry.isAlgebraicSpace`,
-the category `AlgebraicGeometry.AlgebraicSpace` and its global functions
-`AlgebraicGeometry.AlgebraicSpace.globalFunctions`.
+the category `AlgebraicGeometry.AlgebraicSpace`, its global functions
+`AlgebraicGeometry.AlgebraicSpace.globalFunctions`, and the morphisms of presheaves
+`AlgebraicGeometry.representableByAlgebraicSpaces` representable by algebraic spaces.
 
 ## Main results
 
@@ -30,8 +32,9 @@ affine schemes, Stacks 05Z1).
 `AlgebraicSpace/Basic.lean` holds the definition, schemes as algebraic spaces, the underlying sheaf
 and stack, and the universe conventions; `AlgebraicSpace/FiberProduct.lean` holds fibre products
 and the terminal object; `AlgebraicSpace/GlobalFunctions.lean` holds global functions and morphisms
-to affine schemes. Nothing here imports algebraic stacks, moduli problems or stability
-conditions.
+to affine schemes; `AlgebraicSpace/Representable.lean` holds morphisms of presheaves
+representable by algebraic spaces and their properties measured on étale atlases. Nothing here
+imports algebraic stacks, moduli problems or stability conditions.
 
 ## References
 

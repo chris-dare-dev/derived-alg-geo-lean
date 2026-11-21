@@ -8,9 +8,9 @@ import DerivedAlgGeo.Algebra.MvPolynomial.LaurentFinite
 /-!
 # The full blocks of a Čech degree, assembled
 
-`LaurentFinite.lean` shows the full block of one localization is a finite-dimensional `k`-space,
+`LaurentFinite.lean` shows the full block of one localization is a finitely generated `k`-module,
 stated at the monomial denominator `Xᵞ`. A Čech term is the same object at the denominator
-`∏ Xₓₐ`, which is that monomial — `tupleDenominator_eq` — but not syntactically, so the subspace
+`∏ Xₓₐ`, which is that monomial — `tupleDenominator_eq` — but not syntactically, so the submodule
 has to be carried across. `powersCongrLinear` is the transport, and it is `k`-linear for the same
 reason its additive form exists at all: it moves nothing but the name of the type.
 
@@ -18,7 +18,7 @@ reason its additive form exists at all: it moves nothing but the name of the typ
 
 * `MvPolynomial.powersCongrLinear`: `DegreeZeroLocalization.powersCongr` as a `k`-linear
   equivalence.
-* `MvPolynomial.cechBlockSpan`: the full block of a Čech term, as a `k`-subspace.
+* `MvPolynomial.cechBlockSpan`: the full block of a Čech term, as a `k`-submodule.
 
 ## Main results
 
@@ -26,7 +26,7 @@ reason its additive form exists at all: it moves nothing but the name of the typ
   in `cechBlockSpan`.
 * `MvPolynomial.fg_cechBlockSpan`: the full block of one tuple is finitely generated.
 * `MvPolynomial.module_finite_pi_cechBlockSpan`: the full blocks of all tuples of a fixed length
-  together form a finite-dimensional `k`-space.
+  together form a finitely generated `k`-module.
 
 ## Implementation notes
 
@@ -52,7 +52,7 @@ The block decomposition of `DerivedAlgGeo.Algebra.MvPolynomial.LaurentFinite` (`
 
 ## Tags
 
-Čech complex, Laurent polynomial, homogeneous localization, finite-dimensional
+Čech complex, Laurent polynomial, homogeneous localization, finitely generated
 -/
 
 universe u
@@ -63,7 +63,7 @@ namespace MvPolynomial
 
 attribute [local instance] MvPolynomial.gradedAlgebra
 
-variable (ι k : Type u) [Field k]
+variable (ι k : Type u) [CommRing k]
 variable {σM : Type u} [SetLike σM (MvPolynomial ι k)]
   [AddSubgroupClass σM (MvPolynomial ι k)] (𝓜 : ℕ → σM)
   [SetLike.GradedSMul (polynomialGrading ι k) 𝓜]
@@ -87,7 +87,7 @@ theorem powersCongrLinear_symm_apply {f g : MvPolynomial ι k} (h : f = g)
       (DegreeZeroLocalization.powersCongr (𝒜 := polynomialGrading ι k) (𝓜 := 𝓜) h).symm z := by
   subst h; rfl
 
-/-- The full block of a Čech term, as a `k`-subspace: the block of the monomial presentation,
+/-- The full block of a Čech term, as a `k`-submodule: the block of the monomial presentation,
 carried back along the denominator comparison.
 
 Definable without finiteness of `ι` — only its finite generation needs that. -/
@@ -98,7 +98,7 @@ noncomputable def cechBlockSpan (d : ℤ) {n : ℕ} (x : Fin (n + 1) → ι) :
     (Submodule.span k (blockRep ι k 𝓜 (tupleExponent ι x) ''
       {α : ι →₀ ℤ | α.degree = d ∧ ∀ j : ι, α j < 0}))
 
-/-- The full-block projection of any term lands in that subspace. -/
+/-- The full-block projection of any term lands in that submodule. -/
 theorem cechBlockProj_mem_cechBlockSpan [Fintype ι] {d : ℤ} (h𝓜 : IsPolynomialTwist 𝓜 d)
     {n : ℕ} (x : Fin (n + 1) → ι) (z : cechTerm ι k 𝓜 x) :
     cechBlockProj ι k h𝓜 x Finset.univ z ∈ cechBlockSpan ι k 𝓜 d x := by
@@ -114,7 +114,7 @@ theorem fg_cechBlockSpan [Fintype ι] (d : ℤ) {n : ℕ} (x : Fin (n + 1) → �
   exact Submodule.FG.map (powersCongrLinear ι k 𝓜 (tupleDenominator_eq ι k x)).symm.toLinearMap
     (fg_blockSpan ι k 𝓜 (d := d) (tupleExponent ι x))
 
-/-- **The full blocks of all tuples together are finite-dimensional.**
+/-- **The full blocks of all tuples together form a finitely generated `k`-module.**
 
 Two finiteness facts meet here and neither is enough alone: each block is finitely generated
 because only finitely many Laurent exponents are negative in every variable, and there are only
