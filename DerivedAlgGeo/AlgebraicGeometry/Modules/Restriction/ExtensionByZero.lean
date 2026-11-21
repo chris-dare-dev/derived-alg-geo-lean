@@ -22,10 +22,14 @@ new left Kan extension: it is `SheafOfModules.pullback` for the ring map definin
 
 * `AlgebraicGeometry.Scheme.Modules.extendByZero`: the functor `f_!`.
 * `AlgebraicGeometry.Scheme.Modules.extendByZeroAdjunction`: `f_! ⊣ f^*`.
+* `AlgebraicGeometry.Scheme.Modules.extendByZeroPullbackAdjunction`: the same adjunction, with the
+  right adjoint presented as module pullback.
 * `AlgebraicGeometry.Scheme.Modules.extendByZeroStalkIso`: `(f_! M)_{f x} ≅ M_x`.
 * `AlgebraicGeometry.Scheme.Modules.extendByZeroCompRestrictIso`: `f^* ∘ f_! ≅ 𝟭`.
-* `AlgebraicGeometry.Scheme.Modules.extendByZeroCompPullbackIso`: `f_!` commutes with pullback
-  along every morphism `g`, for the base-changed open immersion.
+* `AlgebraicGeometry.Scheme.Modules.extendByZeroCompPullbackIsoOfIsPullback`: `f_!` commutes with
+  pullback along every morphism `g`, for any pullback square of `f` along `g`.
+* `AlgebraicGeometry.Scheme.Modules.extendByZeroCompPullbackIso`: the case of the chosen
+  pullback.
 
 ## Main results
 
@@ -42,11 +46,11 @@ The stalk at a point outside the image vanishes because a module stalk is left a
 skyscraper, and the pushforward of a skyscraper at a point outside the image of `f` has only zero
 sections. This is applied to the presheaf pullback, and module sheafification preserves stalks.
 
-Base change is proved on the right adjoints: restriction after pushforward along `g` is
-pushforward along `pullback.snd g f` after restriction along `pullback.fst g f`. Both sides have
-the same sections, because `pullback.fst g f ''ᵁ pullback.snd g f ⁻¹ᵁ U = g ⁻¹ᵁ f ''ᵁ U`, and the
-identification is compatible with the scalar actions. Uniqueness of left adjoints then gives the
-base change isomorphism for `f_!`.
+Base change is proved on the right adjoints, for any pullback square `fst, snd, g, f` of the open
+immersion `f` along `g`: restriction after pushforward along `g` is pushforward along `snd` after
+restriction along `fst`. Both sides have the same sections, because
+`fst ''ᵁ snd ⁻¹ᵁ U = g ⁻¹ᵁ f ''ᵁ U`, and the identification is compatible with the scalar actions.
+Uniqueness of left adjoints then gives the base change isomorphism for `f_!`.
 
 ## References
 
@@ -96,6 +100,19 @@ set_option backward.defeqAttrib.useBackward true in
 def extendByZeroAdjunction : extendByZero f ⊣ restrictFunctor f :=
   SheafOfModules.pullbackPushforwardAdjunction.{u} (restrictRingCatSheafHom f)
 
+instance : (extendByZero f).IsLeftAdjoint := (extendByZeroAdjunction f).isLeftAdjoint
+
+instance : (extendByZero f).Additive :=
+  haveI : PreservesBinaryBiproducts (extendByZero f) :=
+    preservesBinaryBiproducts_of_preservesBinaryCoproducts _
+  Functor.additive_of_preservesBinaryBiproducts _
+
+set_option backward.isDefEq.respectTransparency.types false in
+set_option backward.defeqAttrib.useBackward true in
+/-- Extension by zero is left adjoint to module pullback, which is isomorphic to restriction. -/
+def extendByZeroPullbackAdjunction : extendByZero f ⊣ pullback f :=
+  (extendByZeroAdjunction f).ofNatIsoRight (restrictFunctorIsoPullback f)
+
 /-- The adjoint triple `f_! ⊣ f^* ⊣ f_*`. -/
 def extendByZeroTriple :
     Adjunction.Triple (extendByZero f) (restrictFunctor f) (pushforward f) :=
@@ -105,6 +122,11 @@ def extendByZeroTriple :
 counit. -/
 instance : IsIso (extendByZeroAdjunction f).unit :=
   (extendByZeroTriple f).isIso_unit_iff_isIso_counit.mpr inferInstance
+
+instance : IsIso (extendByZeroPullbackAdjunction f).unit := by
+  unfold extendByZeroPullbackAdjunction
+  show IsIso ((extendByZeroAdjunction f).unit ≫ _)
+  infer_instance
 
 /-- Restriction after extension by zero is the identity (Stacks Tag 00A7 (4)). -/
 def extendByZeroCompRestrictIso : extendByZero f ⋙ restrictFunctor f ≅ 𝟭 X.Modules :=
@@ -198,26 +220,29 @@ instance : PreservesFiniteLimits (extendByZero f) :=
 
 section BaseChange
 
-variable {Y' : Scheme.{u}} (g : Y' ⟶ Y)
+variable {Y' P : Scheme.{u}} (g : Y' ⟶ Y) (fst : P ⟶ Y') (snd : P ⟶ X) [IsOpenImmersion fst]
+  (hP : IsPullback fst snd g f)
 
-/-- For an open immersion `f`, the image under `pullback.fst g f` of the preimage under
-`pullback.snd g f` of `U` is the preimage under `g` of the image of `U` under `f`. -/
+include hP
+
+/-- For an open immersion `f`, the image under `fst` of the preimage under
+`snd` of `U` is the preimage under `g` of the image of `U` under `f`. -/
 theorem baseChange_image_preimage (U : X.Opens) :
-    pullback.fst g f ''ᵁ pullback.snd g f ⁻¹ᵁ U = g ⁻¹ᵁ f ''ᵁ U :=
+    fst ''ᵁ snd ⁻¹ᵁ U = g ⁻¹ᵁ f ''ᵁ U :=
   IsOpenImmersion.image_preimage_eq_preimage_image_of_isPullback
-    (IsPullback.of_hasPullback g f).flip U
+    hP.flip U
 
 /-- The two ring maps `Γ(X, U) ⟶ Γ(Y', g ⁻¹ᵁ f ''ᵁ U)` and `Γ(X, U) ⟶ Γ(Y', fst ''ᵁ snd ⁻¹ᵁ U)`
 that act on the two sides of base change agree after the identification of the opens. -/
 theorem baseChange_ring (U : X.Opens) :
     (f.appIso U).inv ≫ g.app (f ''ᵁ U) ≫
-      Y'.presheaf.map (eqToHom (baseChange_image_preimage f g U)).op =
-    (pullback.snd g f).app U ≫
-      (Scheme.Hom.appIso (pullback.fst g f) (pullback.snd g f ⁻¹ᵁ U)).inv := by
-  rw [← cancel_mono (Scheme.Hom.appIso (pullback.fst g f) (pullback.snd g f ⁻¹ᵁ U)).hom,
+      Y'.presheaf.map (eqToHom (baseChange_image_preimage f g fst snd hP U)).op =
+    snd.app U ≫
+      (Scheme.Hom.appIso fst (snd ⁻¹ᵁ U)).inv := by
+  rw [← cancel_mono (Scheme.Hom.appIso fst (snd ⁻¹ᵁ U)).hom,
     Category.assoc, Category.assoc, Category.assoc, Iso.inv_hom_id, Category.comp_id,
-    IsOpenImmersion.app_eq_appIso_inv_app_of_comp_eq (pullback.snd g f) f
-      (pullback.fst g f ≫ g) pullback.condition U]
+    IsOpenImmersion.app_eq_appIso_inv_app_of_comp_eq snd f
+      (fst ≫ g) hP.w U]
   simp [Scheme.Hom.appIso_hom]
   congr 1
   congr 1
@@ -226,54 +251,57 @@ theorem baseChange_ring (U : X.Opens) :
 
 variable (N : Y'.Modules)
 
-/-- Restriction along `f` of the pushforward along `g` and pushforward along `pullback.snd g f` of
-the restriction along `pullback.fst g f` have the same sections: this is the transport of sections
+/-- Restriction along `f` of the pushforward along `g` and pushforward along `snd` of
+the restriction along `fst` have the same sections: this is the transport of sections
 along `baseChange_image_preimage`. -/
 def baseChangeSections (U : X.Opens) :
     Γ((restrictFunctor f).obj ((pushforward g).obj N), U) ⟶
-      Γ((pushforward (pullback.snd g f)).obj ((restrictFunctor (pullback.fst g f)).obj N), U) :=
-  N.presheaf.map (eqToHom (baseChange_image_preimage f g U)).op
+      Γ((pushforward snd).obj ((restrictFunctor fst).obj N), U) :=
+  N.presheaf.map (eqToHom (baseChange_image_preimage f g fst snd hP U)).op
 
 /-- The inverse of `baseChangeSections`. -/
 def baseChangeSectionsInv (U : X.Opens) :
-    Γ((pushforward (pullback.snd g f)).obj ((restrictFunctor (pullback.fst g f)).obj N), U) ⟶
+    Γ((pushforward snd).obj ((restrictFunctor fst).obj N), U) ⟶
       Γ((restrictFunctor f).obj ((pushforward g).obj N), U) :=
-  N.presheaf.map (eqToHom (baseChange_image_preimage f g U).symm).op
+  N.presheaf.map (eqToHom (baseChange_image_preimage f g fst snd hP U).symm).op
 
 /-- The transport of sections is linear over `Γ(X, U)`. -/
 theorem baseChangeSections_smul (U : X.Opens) (r : Γ(X, U))
     (x : Γ((restrictFunctor f).obj ((pushforward g).obj N), U)) :
-    (baseChangeSections f g N U).hom (r • x) = r • (baseChangeSections f g N U).hom x := by
+    (baseChangeSections f g fst snd hP N U).hom (r • x) =
+      r • (baseChangeSections f g fst snd hP N U).hom x := by
   have hL : (r • x : Γ((restrictFunctor f).obj ((pushforward g).obj N), U)) =
       (show Γ(Y', g ⁻¹ᵁ f ''ᵁ U) from (g.app (f ''ᵁ U)).hom ((f.appIso U).inv.hom r)) •
         (show Γ(N, g ⁻¹ᵁ f ''ᵁ U) from x) := rfl
-  have hR : (r • (baseChangeSections f g N U).hom x :
-      Γ((pushforward (pullback.snd g f)).obj ((restrictFunctor (pullback.fst g f)).obj N), U)) =
-      (show Γ(Y', pullback.fst g f ''ᵁ pullback.snd g f ⁻¹ᵁ U) from
-        ((pullback.fst g f).appIso (pullback.snd g f ⁻¹ᵁ U)).inv.hom
-          ((pullback.snd g f).app U |>.hom r)) •
-        (show Γ(N, pullback.fst g f ''ᵁ pullback.snd g f ⁻¹ᵁ U) from
-          (baseChangeSections f g N U).hom x) := rfl
-  have hring := congrArg (fun φ : Γ(X, U) ⟶ Γ(Y', pullback.fst g f ''ᵁ pullback.snd g f ⁻¹ᵁ U) =>
-    φ.hom r) (baseChange_ring f g U)
+  have hR : (r • (baseChangeSections f g fst snd hP N U).hom x :
+      Γ((pushforward snd).obj ((restrictFunctor fst).obj N), U)) =
+      (show Γ(Y', fst ''ᵁ snd ⁻¹ᵁ U) from
+        (fst.appIso (snd ⁻¹ᵁ U)).inv.hom
+          (snd.app U |>.hom r)) •
+        (show Γ(N, fst ''ᵁ snd ⁻¹ᵁ U) from
+          (baseChangeSections f g fst snd hP N U).hom x) := rfl
+  have hring := congrArg (fun φ : Γ(X, U) ⟶ Γ(Y', fst ''ᵁ snd ⁻¹ᵁ U) =>
+    φ.hom r) (baseChange_ring f g fst snd hP U)
   refine (Scheme.Modules.map_smul N _ _ _).trans ?_
   refine Eq.symm (hR.trans ?_)
-  exact congrArg (fun s : Γ(Y', pullback.fst g f ''ᵁ pullback.snd g f ⁻¹ᵁ U) =>
-    s • (show Γ(N, pullback.fst g f ''ᵁ pullback.snd g f ⁻¹ᵁ U) from
-      (baseChangeSections f g N U).hom x)) hring.symm
+  exact congrArg (fun s : Γ(Y', fst ''ᵁ snd ⁻¹ᵁ U) =>
+    s • (show Γ(N, fst ''ᵁ snd ⁻¹ᵁ U) from
+      (baseChangeSections f g fst snd hP N U).hom x)) hring.symm
 
 theorem baseChangeSectionsInv_baseChangeSections (U : X.Opens)
     (x : Γ((restrictFunctor f).obj ((pushforward g).obj N), U)) :
-    (baseChangeSectionsInv f g N U).hom ((baseChangeSections f g N U).hom x) = x := by
+    (baseChangeSectionsInv f g fst snd hP N U).hom
+      ((baseChangeSections f g fst snd hP N U).hom x) = x := by
   show (N.presheaf.map _ ≫ N.presheaf.map _).hom x = x
   rw [← Functor.map_comp, ← op_comp, eqToHom_trans, eqToHom_refl, op_id]
   erw [CategoryTheory.Functor.map_id]
   rfl
 
 theorem baseChangeSections_baseChangeSectionsInv (U : X.Opens)
-    (x : Γ((pushforward (pullback.snd g f)).obj ((restrictFunctor (pullback.fst g f)).obj N),
+    (x : Γ((pushforward snd).obj ((restrictFunctor fst).obj N),
       U)) :
-    (baseChangeSections f g N U).hom ((baseChangeSectionsInv f g N U).hom x) = x := by
+    (baseChangeSections f g fst snd hP N U).hom
+      ((baseChangeSectionsInv f g fst snd hP N U).hom x) = x := by
   show (N.presheaf.map _ ≫ N.presheaf.map _).hom x = x
   rw [← Functor.map_comp, ← op_comp, eqToHom_trans, eqToHom_refl, op_id]
   erw [CategoryTheory.Functor.map_id]
@@ -282,61 +310,69 @@ theorem baseChangeSections_baseChangeSectionsInv (U : X.Opens)
 /-- The transport of sections as a linear equivalence over `Γ(X, U)`. -/
 def baseChangeSectionsEquiv (U : X.Opens) :
     Γ((restrictFunctor f).obj ((pushforward g).obj N), U) ≃ₗ[Γ(X, U)]
-      Γ((pushforward (pullback.snd g f)).obj ((restrictFunctor (pullback.fst g f)).obj N),
+      Γ((pushforward snd).obj ((restrictFunctor fst).obj N),
         U) where
-  toFun x := (baseChangeSections f g N U).hom x
+  toFun x := (baseChangeSections f g fst snd hP N U).hom x
   map_add' x y := map_add _ x y
-  map_smul' r x := baseChangeSections_smul f g N U r x
-  invFun x := (baseChangeSectionsInv f g N U).hom x
-  left_inv x := baseChangeSectionsInv_baseChangeSections f g N U x
-  right_inv x := baseChangeSections_baseChangeSectionsInv f g N U x
+  map_smul' r x := baseChangeSections_smul f g fst snd hP N U r x
+  invFun x := (baseChangeSectionsInv f g fst snd hP N U).hom x
+  left_inv x := baseChangeSectionsInv_baseChangeSections f g fst snd hP N U x
+  right_inv x := baseChangeSections_baseChangeSectionsInv f g fst snd hP N U x
 
-/-- Restriction along `f` of the pushforward along `g` is pushforward along `pullback.snd g f` of
-restriction along `pullback.fst g f`, object by object. -/
+/-- Restriction along `f` of the pushforward along `g` is pushforward along `snd` of
+restriction along `fst`, object by object. -/
 def pushforwardRestrictBaseChangeIso :
     (restrictFunctor f).obj ((pushforward g).obj N) ≅
-      (pushforward (pullback.snd g f)).obj ((restrictFunctor (pullback.fst g f)).obj N) :=
+      (pushforward snd).obj ((restrictFunctor fst).obj N) :=
   (SheafOfModules.fullyFaithfulForget _).preimageIso
-    (PresheafOfModules.isoMk (fun V ↦ (baseChangeSectionsEquiv f g N V.unop).toModuleIso)
+    (PresheafOfModules.isoMk (fun V ↦ (baseChangeSectionsEquiv f g fst snd hP N V.unop).toModuleIso)
       (fun {V W} i ↦ by
         ext x
         exact Scheme.Modules.presheaf_map_square_eq N
           ((Opens.map g.base).map (f.opensFunctor.map i.unop)).op
-          (eqToHom (baseChange_image_preimage f g W.unop)).op
-          (eqToHom (baseChange_image_preimage f g V.unop)).op
-          ((pullback.fst g f).opensFunctor.map
-            ((Opens.map (pullback.snd g f).base).map i.unop)).op x))
+          (eqToHom (baseChange_image_preimage f g fst snd hP W.unop)).op
+          (eqToHom (baseChange_image_preimage f g fst snd hP V.unop)).op
+          (fst.opensFunctor.map
+            ((Opens.map snd.base).map i.unop)).op x))
 
 /-- Restriction along an open immersion `f` commutes with pushforward along `g`, in the form
-`g_* ⋙ f^* ≅ (fst)^* ⋙ (snd)_*` for the base change of `f` along `g`. -/
+`g_* ⋙ f^* ≅ fst^* ⋙ snd_*` for the base change of `f` along `g`. -/
 def pushforwardRestrictBaseChangeNatIso :
     pushforward g ⋙ restrictFunctor f ≅
-      restrictFunctor (pullback.fst g f) ⋙ pushforward (pullback.snd g f) :=
-  NatIso.ofComponents (pushforwardRestrictBaseChangeIso f g) (fun {M N} φ ↦ by
+      restrictFunctor fst ⋙ pushforward snd :=
+  NatIso.ofComponents (pushforwardRestrictBaseChangeIso f g fst snd hP) (fun {M N} φ ↦ by
     apply Scheme.Modules.hom_ext
     intro W
     ext x
     exact (NatTrans.naturality_apply φ.mapPresheaf
-      (eqToHom (baseChange_image_preimage f g W)).op x).symm)
+      (eqToHom (baseChange_image_preimage f g fst snd hP W)).op x).symm)
 
-/-- Extension by zero commutes with pullback along any morphism `g : Y' ⟶ Y`, for the base
-change `pullback.fst g f` of the open immersion `f`:
-`g^* ∘ f_! ≅ (pullback.fst g f)_! ∘ (pullback.snd g f)^*`.
+/-- Extension by zero commutes with pullback along any morphism `g : Y' ⟶ Y`, for any pullback
+square of `f` along `g`: `g^* ∘ f_! ≅ fst_! ∘ snd^*`, where `fst : P ⟶ Y'` is the base change of
+the open immersion `f`.
 
-This is the conjugate under the adjunctions `f_! ⊣ f^*`, `(fst)_! ⊣ (fst)^*`, `g^* ⊣ g_*` and
+This is the conjugate under the adjunctions `f_! ⊣ f^*`, `fst_! ⊣ fst^*`, `g^* ⊣ g_*` and
 `snd^* ⊣ snd_*` of the base change isomorphism `f^* g_* ≅ snd_* fst^*` of restriction and
-pushforward. Stacks has no tag for this statement; it follows formally from the adjunctions.
-The open immersion used on the right is `pullback.fst g f`, the base change of `f`. -/
-def extendByZeroCompPullbackIso :
-    extendByZero f ⋙ pullback g ≅
-      pullback (Limits.pullback.snd g f) ⋙ extendByZero (Limits.pullback.fst g f) :=
+pushforward. Stacks has no tag for this statement; it follows formally from the adjunctions. -/
+def extendByZeroCompPullbackIsoOfIsPullback :
+    extendByZero f ⋙ pullback g ≅ pullback snd ⋙ extendByZero fst :=
   Adjunction.leftAdjointUniq
     ((extendByZeroAdjunction f).comp (pullbackPushforwardAdjunction g))
-    (((pullbackPushforwardAdjunction (Limits.pullback.snd g f)).comp
-      (extendByZeroAdjunction (Limits.pullback.fst g f))).ofNatIsoRight
-        (pushforwardRestrictBaseChangeNatIso f g).symm)
+    (((pullbackPushforwardAdjunction snd).comp
+      (extendByZeroAdjunction fst)).ofNatIsoRight
+        (pushforwardRestrictBaseChangeNatIso f g fst snd hP).symm)
 
 end BaseChange
+
+/-- Extension by zero commutes with pullback along every morphism `g : Y' ⟶ Y`, for the base
+changed open immersion `pullback.fst g f`:
+`g^* ∘ f_! ≅ (pullback.fst g f)_! ∘ (pullback.snd g f)^*`. This is
+`extendByZeroCompPullbackIsoOfIsPullback` for the chosen pullback. -/
+def extendByZeroCompPullbackIso {Y' : Scheme.{u}} (g : Y' ⟶ Y) :
+    extendByZero f ⋙ pullback g ≅
+      pullback (Limits.pullback.snd g f) ⋙ extendByZero (Limits.pullback.fst g f) :=
+  extendByZeroCompPullbackIsoOfIsPullback f g (Limits.pullback.fst g f) (Limits.pullback.snd g f)
+    (IsPullback.of_hasPullback g f)
 
 end
 
