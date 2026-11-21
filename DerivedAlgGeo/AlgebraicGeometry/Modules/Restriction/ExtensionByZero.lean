@@ -1,0 +1,343 @@
+/-
+Copyright (c) 2026 Chris Dare. All rights reserved.
+Released under the MIT license.
+-/
+import Mathlib.Algebra.Category.ModuleCat.Sheaf.PullbackContinuous
+import Mathlib.AlgebraicGeometry.Modules.Sheaf
+import Mathlib.AlgebraicGeometry.Pullbacks
+import Mathlib.CategoryTheory.Adjunction.Triple
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Stalk
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Restriction.Sections
+
+/-!
+# Extension by zero of module sheaves along an open immersion
+
+For an open immersion `f : X ⟶ Y` of schemes, restriction
+`Scheme.Modules.restrictFunctor f : Y.Modules ⥤ X.Modules` is Mathlib's pushforward of sheaves of
+modules along the continuous functor `f.opensFunctor`. Its left adjoint is the pullback along that
+functor, and this file calls it `extendByZero f`, the functor `f_!` of the literature. It is not a
+new left Kan extension: it is `SheafOfModules.pullback` for the ring map defining restriction.
+
+## Main definitions
+
+* `AlgebraicGeometry.Scheme.Modules.extendByZero`: the functor `f_!`.
+* `AlgebraicGeometry.Scheme.Modules.extendByZeroAdjunction`: `f_! ⊣ f^*`.
+* `AlgebraicGeometry.Scheme.Modules.extendByZeroStalkIso`: `(f_! M)_{f x} ≅ M_x`.
+* `AlgebraicGeometry.Scheme.Modules.extendByZeroCompRestrictIso`: `f^* ∘ f_! ≅ 𝟭`.
+* `AlgebraicGeometry.Scheme.Modules.extendByZeroCompPullbackIso`: `f_!` commutes with pullback
+  along every morphism `g`, for the base-changed open immersion.
+
+## Main results
+
+* `AlgebraicGeometry.Scheme.Modules.isZero_extendByZero_stalk`: the stalk of `f_! M` at a point
+  outside the image of `f` is zero.
+* the instance `PreservesFiniteLimits (extendByZero f)`: `f_!` is exact.
+
+## Implementation notes
+
+The adjunction comes from Mathlib. The unit of `f_! ⊣ f^*` is invertible because `f_!` sits in an
+adjoint triple `f_! ⊣ f^* ⊣ f_*` whose right adjoint `f_*` has invertible counit.
+
+The stalk at a point outside the image vanishes because a module stalk is left adjoint to a module
+skyscraper, and the pushforward of a skyscraper at a point outside the image of `f` has only zero
+sections. This is applied to the presheaf pullback, and module sheafification preserves stalks.
+
+Base change is proved on the right adjoints: restriction after pushforward along `g` is
+pushforward along `pullback.snd g f` after restriction along `pullback.fst g f`. Both sides have
+the same sections, because `pullback.fst g f ''ᵁ pullback.snd g f ⁻¹ᵁ U = g ⁻¹ᵁ f ''ᵁ U`, and the
+identification is compatible with the scalar actions. Uniqueness of left adjoints then gives the
+base change isomorphism for `f_!`.
+
+## References
+
+* Stacks Project, Tags 00A4 and 00A7 (extension by zero for sheaves of modules on an open subset)
+  and Tag 01AK (it is exact).
+
+## Tags
+
+extension by zero, open immersion, sheaf of modules, restriction, base change
+-/
+
+universe u
+
+namespace AlgebraicGeometry.Scheme.Modules
+
+open CategoryTheory Limits Opposite TopologicalSpace
+
+noncomputable section
+
+variable {X Y : Scheme.{u}} (f : X ⟶ Y) [IsOpenImmersion f]
+
+set_option backward.defeqAttrib.useBackward true in
+/-- The morphism of sheaves of rings on `X.Opens` defining restriction along the open immersion
+`f`: it sends `Γ(X, U)` to `Γ(Y, f ''ᵁ U)` by the inverse of `f.appIso U`. -/
+def restrictRingCatSheafHom :
+    X.ringCatSheaf ⟶ (f.opensFunctor.sheafPushforwardContinuous RingCat.{u}
+      (Opens.grothendieckTopology X) (Opens.grothendieckTopology Y)).obj Y.ringCatSheaf :=
+  letI α : X.presheaf ⟶ f.opensFunctor.op ⋙ Y.presheaf := { app U := (f.appIso U.unop).inv }
+  ⟨Functor.whiskerRight α (forget₂ CommRingCat RingCat)⟩
+
+set_option backward.isDefEq.respectTransparency.types false in
+/-- Extension by zero `f_!` of module sheaves along an open immersion `f : X ⟶ Y`, the left
+adjoint of restriction `Scheme.Modules.restrictFunctor f` (Stacks Tags 00A4 and 00A7 (1)-(2)).
+
+It is Mathlib's `SheafOfModules.pullback` along `f.opensFunctor`, so it is the sheafification of
+the presheaf extension by zero `V ↦ M (f ⁻¹ᵁ V)` if `V ⊆ f(X)` and `0` otherwise.
+
+Downstream, `f_!` is preferred to the derived direct image `Rf_*` because it is exact
+(`instance : PreservesFiniteLimits (extendByZero f)`) and commutes with pullback along every
+morphism (`extendByZeroCompPullbackIso`), whereas `Rf_*` commutes only with flat base change. -/
+def extendByZero : X.Modules ⥤ Y.Modules :=
+  SheafOfModules.pullback.{u} (restrictRingCatSheafHom f)
+
+set_option backward.isDefEq.respectTransparency.types false in
+set_option backward.defeqAttrib.useBackward true in
+/-- Extension by zero is left adjoint to restriction. -/
+def extendByZeroAdjunction : extendByZero f ⊣ restrictFunctor f :=
+  SheafOfModules.pullbackPushforwardAdjunction.{u} (restrictRingCatSheafHom f)
+
+/-- The adjoint triple `f_! ⊣ f^* ⊣ f_*`. -/
+def extendByZeroTriple :
+    Adjunction.Triple (extendByZero f) (restrictFunctor f) (pushforward f) :=
+  ⟨extendByZeroAdjunction f, restrictAdjunction f⟩
+
+/-- The unit of `f_! ⊣ f^*` is invertible: the right adjoint `f_*` of `f^*` has invertible
+counit. -/
+instance : IsIso (extendByZeroAdjunction f).unit :=
+  (extendByZeroTriple f).isIso_unit_iff_isIso_counit.mpr inferInstance
+
+/-- Restriction after extension by zero is the identity (Stacks Tag 00A7 (4)). -/
+def extendByZeroCompRestrictIso : extendByZero f ⋙ restrictFunctor f ≅ 𝟭 X.Modules :=
+  (asIso (extendByZeroAdjunction f).unit).symm
+
+/-! ### Stalks -/
+
+/-- The stalk of `f_! M` at `f x` is the stalk of `M` at `x`, naturally in `M`. -/
+def extendByZeroStalkNatIso (x : X) :
+    extendByZero f ⋙ toPresheaf Y ⋙ TopCat.Presheaf.stalkFunctor _ (f.base x) ≅
+      toPresheaf X ⋙ TopCat.Presheaf.stalkFunctor _ x :=
+  (Functor.isoWhiskerLeft (extendByZero f) (restrictStalkNatIso f x)).symm ≪≫
+    (Functor.associator _ _ _).symm ≪≫
+    Functor.isoWhiskerRight (extendByZeroCompRestrictIso f)
+      (toPresheaf X ⋙ TopCat.Presheaf.stalkFunctor _ x) ≪≫
+    Functor.leftUnitor _
+
+/-- Stacks Tag 00A7 (3), at points of `X`: `(f_! M)_{f x} ≅ M_x`. -/
+def extendByZeroStalkIso (M : X.Modules) (x : X) :
+    ((extendByZero f).obj M).presheaf.stalk (f.base x) ≅ M.presheaf.stalk x :=
+  (extendByZeroStalkNatIso f x).app M
+
+set_option backward.isDefEq.respectTransparency.types false in
+/-- The module stalk of `f_! M` at a point outside the image of `f` is zero. -/
+theorem isZero_extendByZero_moduleStalk (M : X.Modules) (y : Y) (hy : y ∉ Set.range f.base) :
+    IsZero ((moduleStalkFunctor Y y).obj ((extendByZero f).obj M)) := by
+  have h := isZero_presheafModuleStalk_pullback_of_forall_notMem
+    (F := f.opensFunctor) (restrictRingCatSheafHom f).hom y
+    (fun U hU ↦ hy (by obtain ⟨x, _, hx⟩ := hU; exact ⟨x, hx⟩)) M.val
+  refine IsZero.of_iso h ?_
+  have := presheafModuleStalkToSheafificationApp_isIso Y y
+    ((PresheafOfModules.pullback (restrictRingCatSheafHom f).hom).obj
+      ((SheafOfModules.forget X.ringCatSheaf).obj M))
+  exact (moduleStalkFunctor Y y).mapIso ((SheafOfModules.pullbackIso.{u}
+    (restrictRingCatSheafHom f)).app M) ≪≫
+    (asIso (presheafModuleStalkToSheafificationApp Y y _)).symm
+
+/-- Stacks Tag 00A7 (3), outside the image: the stalk of `f_! M` at a point not in the image of
+`f` is zero. -/
+theorem isZero_extendByZero_stalk (M : X.Modules) (y : Y) (hy : y ∉ Set.range f.base) :
+    Limits.IsZero (((extendByZero f).obj M).presheaf.stalk y) :=
+  (Functor.map_isZero (forget₂ (ModuleCat.{u} (Y.presheaf.stalk y)) AddCommGrpCat.{u})
+    (isZero_extendByZero_moduleStalk f M y hy)).of_iso
+    ((moduleStalkForgetIso Y y).app ((extendByZero f).obj M)).symm
+
+/-! ### Exactness -/
+
+/-- The abelian-group stalk of the underlying presheaf of a module sheaf preserves finite
+limits. -/
+theorem preservesFiniteLimits_toPresheaf_stalkFunctor (Z : Scheme.{u}) (z : Z) :
+    PreservesFiniteLimits (toPresheaf Z ⋙ TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} z) := by
+  let e : moduleStalkFunctor Z z ⋙ forget₂ (ModuleCat.{u} (Z.presheaf.stalk z)) AddCommGrpCat.{u} ≅
+      toPresheaf Z ⋙ TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} z :=
+    moduleStalkForgetIso Z z ≪≫ (Functor.associator _ _ _).symm
+  have := moduleStalkFunctor_preservesFiniteLimits Z z
+  have : PreservesFiniteLimits (moduleStalkFunctor Z z ⋙
+      forget₂ (ModuleCat.{u} (Z.presheaf.stalk z)) AddCommGrpCat.{u}) := inferInstance
+  exact preservesFiniteLimits_of_natIso e
+
+/-- Extension by zero followed by any module stalk preserves finite limits: at a point `f x` the
+composite is the stalk at `x`, and elsewhere it is zero. -/
+theorem extendByZero_stalk_preservesFiniteLimits (y : Y) :
+    PreservesFiniteLimits (extendByZero f ⋙ moduleStalkFunctor Y y) := by
+  by_cases hy : y ∈ Set.range f.base
+  · obtain ⟨x, rfl⟩ := hy
+    let forgetY := forget₂ (ModuleCat.{u} (Y.presheaf.stalk (f.base x))) AddCommGrpCat.{u}
+    let e : (extendByZero f ⋙ moduleStalkFunctor Y (f.base x)) ⋙ forgetY ≅
+        toPresheaf X ⋙ TopCat.Presheaf.stalkFunctor AddCommGrpCat.{u} x :=
+      Functor.associator _ _ _ ≪≫
+        Functor.isoWhiskerLeft (extendByZero f)
+          (moduleStalkForgetIso Y (f.base x) ≪≫ (Functor.associator _ _ _).symm) ≪≫
+        extendByZeroStalkNatIso f x
+    have : PreservesFiniteLimits ((extendByZero f ⋙ moduleStalkFunctor Y (f.base x)) ⋙
+        forgetY) :=
+      @preservesFiniteLimits_of_natIso _ _ _ _ _ _ e.symm
+        (preservesFiniteLimits_toPresheaf_stalkFunctor X x)
+    exact preservesFiniteLimits_of_reflects_of_preserves
+      (extendByZero f ⋙ moduleStalkFunctor Y (f.base x)) forgetY
+  · have : PreservesLimitsOfSize.{0, 0} (extendByZero f ⋙ moduleStalkFunctor Y y) :=
+      Functor.preservesLimitsOfSize_of_isZero _
+        (Functor.isZero _ fun M ↦ isZero_extendByZero_moduleStalk f M y hy)
+    infer_instance
+
+/-- Extension by zero is exact (Stacks Tag 01AK, for modules): exactness of module sheaves is
+checked on stalks, and the stalks of `f_! M` are those of `M` inside the image of `f` and zero
+outside it. -/
+instance : PreservesFiniteLimits (extendByZero f) :=
+  preservesFiniteLimits_of_stalkwise (extendByZero f) (extendByZero_stalk_preservesFiniteLimits f)
+
+/-! ### Base change -/
+
+section BaseChange
+
+variable {Y' : Scheme.{u}} (g : Y' ⟶ Y)
+
+/-- For an open immersion `f`, the image under `pullback.fst g f` of the preimage under
+`pullback.snd g f` of `U` is the preimage under `g` of the image of `U` under `f`. -/
+theorem baseChange_image_preimage (U : X.Opens) :
+    pullback.fst g f ''ᵁ pullback.snd g f ⁻¹ᵁ U = g ⁻¹ᵁ f ''ᵁ U :=
+  IsOpenImmersion.image_preimage_eq_preimage_image_of_isPullback
+    (IsPullback.of_hasPullback g f).flip U
+
+/-- The two ring maps `Γ(X, U) ⟶ Γ(Y', g ⁻¹ᵁ f ''ᵁ U)` and `Γ(X, U) ⟶ Γ(Y', fst ''ᵁ snd ⁻¹ᵁ U)`
+that act on the two sides of base change agree after the identification of the opens. -/
+theorem baseChange_ring (U : X.Opens) :
+    (f.appIso U).inv ≫ g.app (f ''ᵁ U) ≫
+      Y'.presheaf.map (eqToHom (baseChange_image_preimage f g U)).op =
+    (pullback.snd g f).app U ≫
+      (Scheme.Hom.appIso (pullback.fst g f) (pullback.snd g f ⁻¹ᵁ U)).inv := by
+  rw [← cancel_mono (Scheme.Hom.appIso (pullback.fst g f) (pullback.snd g f ⁻¹ᵁ U)).hom,
+    Category.assoc, Category.assoc, Category.assoc, Iso.inv_hom_id, Category.comp_id,
+    IsOpenImmersion.app_eq_appIso_inv_app_of_comp_eq (pullback.snd g f) f
+      (pullback.fst g f ≫ g) pullback.condition U]
+  simp [Scheme.Hom.appIso_hom]
+  congr 1
+  congr 1
+  rw [← Functor.map_comp]
+  rfl
+
+variable (N : Y'.Modules)
+
+/-- Restriction along `f` of the pushforward along `g` and pushforward along `pullback.snd g f` of
+the restriction along `pullback.fst g f` have the same sections: this is the transport of sections
+along `baseChange_image_preimage`. -/
+def baseChangeSections (U : X.Opens) :
+    Γ((restrictFunctor f).obj ((pushforward g).obj N), U) ⟶
+      Γ((pushforward (pullback.snd g f)).obj ((restrictFunctor (pullback.fst g f)).obj N), U) :=
+  N.presheaf.map (eqToHom (baseChange_image_preimage f g U)).op
+
+/-- The inverse of `baseChangeSections`. -/
+def baseChangeSectionsInv (U : X.Opens) :
+    Γ((pushforward (pullback.snd g f)).obj ((restrictFunctor (pullback.fst g f)).obj N), U) ⟶
+      Γ((restrictFunctor f).obj ((pushforward g).obj N), U) :=
+  N.presheaf.map (eqToHom (baseChange_image_preimage f g U).symm).op
+
+/-- The transport of sections is linear over `Γ(X, U)`. -/
+theorem baseChangeSections_smul (U : X.Opens) (r : Γ(X, U))
+    (x : Γ((restrictFunctor f).obj ((pushforward g).obj N), U)) :
+    (baseChangeSections f g N U).hom (r • x) = r • (baseChangeSections f g N U).hom x := by
+  have hL : (r • x : Γ((restrictFunctor f).obj ((pushforward g).obj N), U)) =
+      (show Γ(Y', g ⁻¹ᵁ f ''ᵁ U) from (g.app (f ''ᵁ U)).hom ((f.appIso U).inv.hom r)) •
+        (show Γ(N, g ⁻¹ᵁ f ''ᵁ U) from x) := rfl
+  have hR : (r • (baseChangeSections f g N U).hom x :
+      Γ((pushforward (pullback.snd g f)).obj ((restrictFunctor (pullback.fst g f)).obj N), U)) =
+      (show Γ(Y', pullback.fst g f ''ᵁ pullback.snd g f ⁻¹ᵁ U) from
+        ((pullback.fst g f).appIso (pullback.snd g f ⁻¹ᵁ U)).inv.hom
+          ((pullback.snd g f).app U |>.hom r)) •
+        (show Γ(N, pullback.fst g f ''ᵁ pullback.snd g f ⁻¹ᵁ U) from
+          (baseChangeSections f g N U).hom x) := rfl
+  have hring := congrArg (fun φ : Γ(X, U) ⟶ Γ(Y', pullback.fst g f ''ᵁ pullback.snd g f ⁻¹ᵁ U) =>
+    φ.hom r) (baseChange_ring f g U)
+  refine (Scheme.Modules.map_smul N _ _ _).trans ?_
+  refine Eq.symm (hR.trans ?_)
+  exact congrArg (fun s : Γ(Y', pullback.fst g f ''ᵁ pullback.snd g f ⁻¹ᵁ U) =>
+    s • (show Γ(N, pullback.fst g f ''ᵁ pullback.snd g f ⁻¹ᵁ U) from
+      (baseChangeSections f g N U).hom x)) hring.symm
+
+theorem baseChangeSectionsInv_baseChangeSections (U : X.Opens)
+    (x : Γ((restrictFunctor f).obj ((pushforward g).obj N), U)) :
+    (baseChangeSectionsInv f g N U).hom ((baseChangeSections f g N U).hom x) = x := by
+  show (N.presheaf.map _ ≫ N.presheaf.map _).hom x = x
+  rw [← Functor.map_comp, ← op_comp, eqToHom_trans, eqToHom_refl, op_id]
+  erw [CategoryTheory.Functor.map_id]
+  rfl
+
+theorem baseChangeSections_baseChangeSectionsInv (U : X.Opens)
+    (x : Γ((pushforward (pullback.snd g f)).obj ((restrictFunctor (pullback.fst g f)).obj N),
+      U)) :
+    (baseChangeSections f g N U).hom ((baseChangeSectionsInv f g N U).hom x) = x := by
+  show (N.presheaf.map _ ≫ N.presheaf.map _).hom x = x
+  rw [← Functor.map_comp, ← op_comp, eqToHom_trans, eqToHom_refl, op_id]
+  erw [CategoryTheory.Functor.map_id]
+  rfl
+
+/-- The transport of sections as a linear equivalence over `Γ(X, U)`. -/
+def baseChangeSectionsEquiv (U : X.Opens) :
+    Γ((restrictFunctor f).obj ((pushforward g).obj N), U) ≃ₗ[Γ(X, U)]
+      Γ((pushforward (pullback.snd g f)).obj ((restrictFunctor (pullback.fst g f)).obj N),
+        U) where
+  toFun x := (baseChangeSections f g N U).hom x
+  map_add' x y := map_add _ x y
+  map_smul' r x := baseChangeSections_smul f g N U r x
+  invFun x := (baseChangeSectionsInv f g N U).hom x
+  left_inv x := baseChangeSectionsInv_baseChangeSections f g N U x
+  right_inv x := baseChangeSections_baseChangeSectionsInv f g N U x
+
+/-- Restriction along `f` of the pushforward along `g` is pushforward along `pullback.snd g f` of
+restriction along `pullback.fst g f`, object by object. -/
+def pushforwardRestrictBaseChangeIso :
+    (restrictFunctor f).obj ((pushforward g).obj N) ≅
+      (pushforward (pullback.snd g f)).obj ((restrictFunctor (pullback.fst g f)).obj N) :=
+  (SheafOfModules.fullyFaithfulForget _).preimageIso
+    (PresheafOfModules.isoMk (fun V ↦ (baseChangeSectionsEquiv f g N V.unop).toModuleIso)
+      (fun {V W} i ↦ by
+        ext x
+        exact Scheme.Modules.presheaf_map_square_eq N
+          ((Opens.map g.base).map (f.opensFunctor.map i.unop)).op
+          (eqToHom (baseChange_image_preimage f g W.unop)).op
+          (eqToHom (baseChange_image_preimage f g V.unop)).op
+          ((pullback.fst g f).opensFunctor.map
+            ((Opens.map (pullback.snd g f).base).map i.unop)).op x))
+
+/-- Restriction along an open immersion `f` commutes with pushforward along `g`, in the form
+`g_* ⋙ f^* ≅ (fst)^* ⋙ (snd)_*` for the base change of `f` along `g`. -/
+def pushforwardRestrictBaseChangeNatIso :
+    pushforward g ⋙ restrictFunctor f ≅
+      restrictFunctor (pullback.fst g f) ⋙ pushforward (pullback.snd g f) :=
+  NatIso.ofComponents (pushforwardRestrictBaseChangeIso f g) (fun {M N} φ ↦ by
+    apply Scheme.Modules.hom_ext
+    intro W
+    ext x
+    exact (NatTrans.naturality_apply φ.mapPresheaf
+      (eqToHom (baseChange_image_preimage f g W)).op x).symm)
+
+/-- Extension by zero commutes with pullback along any morphism `g : Y' ⟶ Y`, for the base
+change `pullback.fst g f` of the open immersion `f`:
+`g^* ∘ f_! ≅ (pullback.fst g f)_! ∘ (pullback.snd g f)^*`.
+
+This is the conjugate under the adjunctions `f_! ⊣ f^*`, `(fst)_! ⊣ (fst)^*`, `g^* ⊣ g_*` and
+`snd^* ⊣ snd_*` of the base change isomorphism `f^* g_* ≅ snd_* fst^*` of restriction and
+pushforward. Stacks has no tag for this statement; it follows formally from the adjunctions.
+The open immersion used on the right is `pullback.fst g f`, the base change of `f`. -/
+def extendByZeroCompPullbackIso :
+    extendByZero f ⋙ pullback g ≅
+      pullback (Limits.pullback.snd g f) ⋙ extendByZero (Limits.pullback.fst g f) :=
+  Adjunction.leftAdjointUniq
+    ((extendByZeroAdjunction f).comp (pullbackPushforwardAdjunction g))
+    (((pullbackPushforwardAdjunction (Limits.pullback.snd g f)).comp
+      (extendByZeroAdjunction (Limits.pullback.fst g f))).ofNatIsoRight
+        (pushforwardRestrictBaseChangeNatIso f g).symm)
+
+end BaseChange
+
+end
+
+end AlgebraicGeometry.Scheme.Modules
