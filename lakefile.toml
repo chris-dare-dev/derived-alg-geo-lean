@@ -29,6 +29,9 @@ rev = "v4.35.0"
 
 [[lean_lib]]
 name = "DerivedAlgGeo"
+# Measurement only, not for merge: every Mathlib standard-set linter on, with the
+# 1500-line file limit Mathlib sets for itself, so the warning log counts each one.
+leanOptions = { weak.linter.mathlibStandardSet = true, weak.linter.style.longFile = 1500 }
 
 # Mathlib's standard linter set, as Mathlib enables it for itself. It is switched on in this
 # library's own table, not in `weakLeanArgs`, because Lake traces this table: changing a value
