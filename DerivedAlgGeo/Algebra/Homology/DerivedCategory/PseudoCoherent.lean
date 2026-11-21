@@ -55,7 +55,7 @@ of Stacks 064U, taken as the definition.
 * `ModuleCat.mPseudoCoherent_extendScalarsDerivedOfFlat`: flat base change (Stacks 066C, for
   complexes).
 * `ModuleCat.mPseudoCoherent_of_faithfullyFlat`: faithfully flat descent (Stacks 068R).
-* `ModuleCat.mPseudoCoherent_of_span_eq_top`: descent along a finite Zariski cover
+* `ModuleCat.mPseudoCoherent_of_span_eq_top`: descent along a cover by basic opens
   (Stacks 066D).
 
 ## Implementation notes
@@ -1067,9 +1067,7 @@ theorem mPseudoCoherent_of_faithfullyFlat (f : R ⟶ S) (hf : f.hom.FaithfullyFl
   · have : Module.Finite S (S ⊗[R] M) := hM ()
     exact Module.Finite.of_finite_tensorProduct_of_faithfullyFlat S
 
-/-- Stacks 066D. Pseudo-coherence is local for the Zariski topology: if `r₁, …, rₙ` generate the
-unit ideal and every `K ⊗_R R_{rᵢ}` is `m`-pseudo-coherent, then `K` is `m`-pseudo-coherent. -/
-theorem mPseudoCoherent_of_span_eq_top {ι : Type*} [Finite ι] (r : ι → R)
+private lemma mPseudoCoherent_of_span_eq_top_of_finite {ι : Type*} [Finite ι] (r : ι → R)
     (hr : Ideal.span (Set.range r) = ⊤) {m : ℤ} {K : DerivedCategory (ModuleCat.{u} R)}
     (hK : ∀ i, mPseudoCoherent (Localization.Away (r i)) m
       ((extendScalarsDerivedOfFlat (CommRingCat.ofHom (algebraMap R (Localization.Away (r i))))
@@ -1100,6 +1098,24 @@ theorem mPseudoCoherent_of_span_eq_top {ι : Type*} [Finite ι] (r : ι → R)
       (fun g ↦ M.localizedModuleMkLinearMap _) ?_
     rintro ⟨_, i, rfl⟩
     exact finite_of_iso (extendScalarsLocalizationIso _ M) (hM i)
+
+/-- Stacks 066D. Pseudo-coherence is local for the Zariski topology: if the `rᵢ` generate the unit
+ideal and every `K ⊗_R R_{rᵢ}` is `m`-pseudo-coherent, then `K` is `m`-pseudo-coherent. The family
+need not be finite: finitely many of the `rᵢ` already generate the unit ideal. -/
+theorem mPseudoCoherent_of_span_eq_top {ι : Type*} (r : ι → R)
+    (hr : Ideal.span (Set.range r) = ⊤) {m : ℤ} {K : DerivedCategory (ModuleCat.{u} R)}
+    (hK : ∀ i, mPseudoCoherent (Localization.Away (r i)) m
+      ((extendScalarsDerivedOfFlat (CommRingCat.ofHom (algebraMap R (Localization.Away (r i))))
+        (RingHom.flat_algebraMap_iff.mpr
+          (IsLocalization.flat _ (Submonoid.powers (r i))))).obj K)) :
+    mPseudoCoherent R m K := by
+  obtain ⟨s, hs, hspan⟩ := (Ideal.span_eq_top_iff_finite _).1 hr
+  choose j hj using fun g : s ↦ hs g.2
+  refine mPseudoCoherent_of_span_eq_top_of_finite (fun g : s ↦ r (j g)) ?_ fun g ↦ hK (j g)
+  convert hspan
+  ext x
+  simp only [Set.mem_range, hj, Finset.mem_coe]
+  exact ⟨fun ⟨g, hg⟩ ↦ hg ▸ g.2, fun hx ↦ ⟨⟨x, hx⟩, rfl⟩⟩
 
 end BaseChange
 
