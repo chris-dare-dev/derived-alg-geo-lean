@@ -19,6 +19,8 @@ to its total presheaf holds sieve by sieve.
 
 * `CategoryTheory.Over.totalPresheaf`: the total presheaf of a presheaf on `Over X`.
 * `CategoryTheory.Over.totalPresheafπ`: its projection to the lifted representable presheaf.
+* `CategoryTheory.Over.representableByOfTotalPresheaf`: a representation of the total presheaf
+  of `G` by `Y` gives a representation of `G` by `Y` over `X`.
 
 ## Main results
 
@@ -186,6 +188,44 @@ private lemma totalPresheaf_ext {Y : C} {p : Y ⟶ X} {a : G.obj (op (Over.mk p)
   obtain rfl : p = p' := h
   rw [totalPresheafEv_mk] at h'
   rw [h']
+
+set_option backward.isDefEq.respectTransparency false in
+/-- If the total presheaf of `G` is represented by `Y`, then `G` is represented by `Y` over `X`,
+with structure morphism the first component of the universal element `e.homEquiv (𝟙 Y)`. -/
+def representableByOfTotalPresheaf {G : (Over X)ᵒᵖ ⥤ Type v₁} {Y : C}
+    (e : (totalPresheaf G).RepresentableBy Y) :
+    G.RepresentableBy (Over.mk (e.homEquiv (𝟙 Y)).1) where
+  homEquiv {T} :=
+    { toFun u := totalPresheafEv T (e.homEquiv u.left) (by
+        rw [e.homEquiv_eq]
+        simpa using Over.w u)
+      invFun s := Over.homMk (e.homEquiv.symm
+          ⟨T.hom, G.map (Over.homMk (𝟙 T.left) : Over.mk T.hom ⟶ T).op s⟩) (by
+        have := congrArg Sigma.fst (e.homEquiv.apply_symm_apply
+          ⟨T.hom, G.map (Over.homMk (𝟙 T.left) : Over.mk T.hom ⟶ T).op s⟩)
+        rw [e.homEquiv_eq] at this
+        simpa using this)
+      left_inv u := by
+        ext
+        simp only [Over.homMk_left]
+        refine (e.homEquiv.symm_apply_eq).2 (totalPresheaf_ext ?_ ?_)
+        · rw [e.homEquiv_eq]
+          simpa using (Over.w u).symm
+        · simp only [totalPresheafEv, ← comp_apply, ← Functor.map_comp, ← op_comp]
+          congr 3
+          ext
+          simp
+      right_inv s := by
+        simp only [Over.homMk_left]
+        rw [totalPresheafEv_congr (e.homEquiv.apply_symm_apply _)]
+        simp only [totalPresheafEv, ← comp_apply, ← Functor.map_comp, ← op_comp]
+        rw [show (Over.homMk (𝟙 T.left) : T ⟶ Over.mk T.hom) ≫ Over.homMk (𝟙 T.left) = 𝟙 T by
+          ext; simp]
+        simp }
+  homEquiv_comp {T T'} f u := by
+    dsimp
+    rw [totalPresheafEv_congr (e.homEquiv_comp f.left u.left)]
+    exact totalPresheafEv_map f _ _
 
 /-- Let `S` be a sieve on `Y`. If `yoneda.obj X` is a sheaf for `S` and, for every `p : Y ⟶ X`,
 `G` is a sheaf for the sieve on `Over.mk p` corresponding to `S`, then the total presheaf of `G`

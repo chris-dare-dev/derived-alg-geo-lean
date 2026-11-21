@@ -5,11 +5,12 @@ Released under the MIT license.
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.DescentDataPrime
 import Mathlib.CategoryTheory.Limits.Connected
 import Mathlib.CategoryTheory.Limits.Constructions.Over.Products
+import Mathlib.CategoryTheory.Sigma.Basic
 import Mathlib.CategoryTheory.Sites.Descent.Precoverage
 import Mathlib.CategoryTheory.Sites.Over
 
 /-!
-# Stacks pulled back along a continuous functor, and stacks on `Over S`
+# Stacks pulled back along a continuous functor, stacks on `Over S`, and total stacks
 
 Let `Φ : D ⥤ C` be a functor that sends the coverings of a precoverage `K` on `D` to families
 generating covering sieves of a Grothendieck topology `J` on `C`, and that preserves the fibre
@@ -20,9 +21,15 @@ This is Stacks 04WC, for the continuous functors of Stacks 00WV.
 The two reindexings to a slice used downstream follow: restriction of a stack on `C` to
 `Over S` along `Over.forget S`, and its pullback along `X ×_S - : Over S ⥤ C` for `X : Over S`.
 
+In the other direction, a pseudofunctor `F` on `Over S` has a total pseudofunctor
+`F.overTotal` on `C`, whose fibre over `Y` is `Σ (p : Y ⟶ S), F(Over.mk p)`. When `yoneda.obj S`
+is a `J`-sheaf, `F` is a stack for the slice topology `J.over S` exactly when `F.overTotal` is a
+`J`-stack. This is the stack form of Stacks 00Y1.
+
 ## Main definitions
 
-None.
+* `CategoryTheory.Pseudofunctor.overTotal`: the total pseudofunctor on `C` of a pseudofunctor
+  on `Over S`.
 
 ## Main results
 
@@ -32,6 +39,10 @@ None.
   restricts to a `K.toGrothendieck.over S`-stack on `Over S`.
 * `CategoryTheory.Pseudofunctor.isStack_over_comp_prodFunctor`: its pullback along
   `prod.functor.obj X ⋙ Over.forget S` is a `K.toGrothendieck.over S`-stack.
+* `CategoryTheory.Pseudofunctor.isStack_overTotal_iff`: if `yoneda.obj S` is a `J`-sheaf, a
+  pseudofunctor on `Over S` is a `J.over S`-stack if and only if its total pseudofunctor is a
+  `J`-stack. The two directions are `isStack_overTotal_of_isStack` and
+  `isStack_of_isStack_overTotal`; the second only needs `yoneda.obj S` to be separated.
 
 ## Implementation notes
 
@@ -48,17 +59,33 @@ products in `Over S` are built from pullbacks in `C` by a local instance. The pr
 `(X ⨯ T).left` is not definitionally `pullback X.hom T.hom`, so the last corollary is stated for
 `prod.functor.obj X ⋙ Over.forget S`.
 
+The fibre `OverTotal.Fiber F Y` of the total pseudofunctor is Mathlib's disjoint union category
+`CategoryTheory.Sigma.sigma`. A morphism of it lies in one summand, so objects whose indices are
+equal but not syntactically equal, such as `(𝟙 Y ≫ p, a)` and `(p, a)`, are compared by `eqToHom`.
+The comparison isomorphisms of `F.overTotal` are computed at an index chosen by the caller, by
+lemmas such as `OverTotal.compHom_eq` and `OverTotal.overTotal_mapComp'_hom_app` whose indices are
+variables; the coherence of `F.overTotal` then reduces to that of `F`.
+
+Descent data of `F.overTotal` along a family `f i : X i ⟶ Y` have compatible first components,
+which glue to `p : Y ⟶ S` when `yoneda.obj S` is a sheaf; the second components are then descent
+data of `F` along the family `Over.homMk (f i) : Over.mk (f i ≫ p) ⟶ Over.mk p`. Showing that
+`F` is a stack when `F.overTotal` is one only uses that the first components are unique, that is,
+that `yoneda.obj S` is separated. The definition `overTotal` is `[implicit_reducible]`, so that its
+fibres unfold to `OverTotal.Fiber F Y` when implicit arguments are compared, and the descent proofs
+switch off `backward.isDefEq.respectTransparency`, as Mathlib's descent files do.
+
 ## References
 
 * [Stacks Project, Tag 04WC](https://stacks.math.columbia.edu/tag/04WC)
 * [Stacks Project, Tag 00WV](https://stacks.math.columbia.edu/tag/00WV)
+* [Stacks Project, Tag 00Y1](https://stacks.math.columbia.edu/tag/00Y1)
 
 ## Tags
 
-stack, descent, continuous functor, slice site, over category
+stack, descent, continuous functor, slice site, over category, total stack
 -/
 
-universe v₂ v' v u₂ u' u
+universe t w₁ w₂ v₂ v' v u₂ u' u
 
 namespace CategoryTheory.Pseudofunctor
 
@@ -151,5 +178,849 @@ theorem isStack_over_comp_prodFunctor {S : C} (X : Over S) :
       (fun i ↦ (Over.forget S).map_isPullback (isPullback_prodMap_id_snd (g i) X)))
 
 end Over
+
+section OverTotal
+
+variable {S : C} (F : LocallyDiscrete (Over S)ᵒᵖ ⥤ᵖ Cat.{v', u'})
+
+namespace OverTotal
+
+/-- The fibre of `F.overTotal` over `Y`: the disjoint union `Σ (p : Y ⟶ S), F(Over.mk p)` of the
+fibres of `F` over the objects of `Over S` with underlying object `Y`. -/
+abbrev Fiber (Y : C) : Type (max v u') := Σ p : Y ⟶ S, F.obj ⟨op (Over.mk p)⟩
+
+/-- A morphism of the summand of `p`, as a morphism of `OverTotal.Fiber F Y`. -/
+abbrev sMk {Y : C} {p : Y ⟶ S} {a b : F.obj ⟨op (Over.mk p)⟩} (φ : a ⟶ b) :
+    (⟨p, a⟩ : Fiber F Y) ⟶ ⟨p, b⟩ :=
+  Sigma.SigmaHom.mk φ
+
+@[reassoc (attr := simp)]
+lemma sMk_comp {Y : C} {p : Y ⟶ S} {a b c : F.obj ⟨op (Over.mk p)⟩} (φ : a ⟶ b) (ψ : b ⟶ c) :
+    sMk F φ ≫ sMk F ψ = sMk F (φ ≫ ψ) := rfl
+
+@[simp]
+lemma sMk_id {Y : C} {p : Y ⟶ S} (a : F.obj ⟨op (Over.mk p)⟩) :
+    sMk F (𝟙 a) = 𝟙 (⟨p, a⟩ : Fiber F Y) := rfl
+
+lemma sMk_injective {Y : C} {p : Y ⟶ S} {a b : F.obj ⟨op (Over.mk p)⟩} :
+    Function.Injective (sMk F (Y := Y) (a := a) (b := b)) := fun _ _ h ↦ by
+  injection h
+
+/-- Pullback by `F` along `Over.homMk g w : Over.mk r ⟶ Over.mk p`. -/
+abbrev pb {Y Y' : C} {p : Y ⟶ S} (g : Y' ⟶ Y) {r : Y' ⟶ S} (w : g ≫ p = r) :
+    F.obj ⟨op (Over.mk p)⟩ ⥤ F.obj ⟨op (Over.mk r)⟩ :=
+  (F.map (Over.homMk g w : Over.mk r ⟶ Over.mk p).op.toLoc).toFunctor
+
+/-- The action of the transition functor `OverTotal.map F g` on morphisms. -/
+def mapHom {Y Y' : C} (g : Y' ⟶ Y) :
+    ∀ {x y : Fiber F Y}, (x ⟶ y) → ((⟨g ≫ x.1, (pb F g rfl).obj x.2⟩ : Fiber F Y') ⟶
+      ⟨g ≫ y.1, (pb F g rfl).obj y.2⟩)
+  | _, _, Sigma.SigmaHom.mk φ => sMk F ((pb F g rfl).map φ)
+
+/-- The transition functor of `F.overTotal` along `g : Y' ⟶ Y`: it sends `(p, a)` to
+`(g ≫ p, F(g)(a))`. -/
+abbrev map {Y Y' : C} (g : Y' ⟶ Y) : Fiber F Y ⥤ Fiber F Y' where
+  obj x := ⟨g ≫ x.1, (pb F g rfl).obj x.2⟩
+  map φ := mapHom F g φ
+  map_id := by
+    rintro ⟨p, a⟩
+    exact congrArg (sMk F) ((pb F g rfl).map_id a)
+  map_comp := by
+    rintro ⟨p, a⟩ ⟨_, b⟩ ⟨_, c⟩ ⟨φ⟩ ⟨ψ⟩
+    exact congrArg (sMk F) ((pb F g rfl).map_comp φ ψ)
+
+@[simp]
+lemma map_map_sMk {Y Y' : C} (g : Y' ⟶ Y) {p : Y ⟶ S} {a b : F.obj ⟨op (Over.mk p)⟩}
+    (φ : a ⟶ b) : (map F g).map (sMk F φ) = sMk F ((pb F g rfl).map φ) := rfl
+
+@[simp]
+lemma mapHom_sMk {Y Y' : C} (g : Y' ⟶ Y) {p : Y ⟶ S} {a b : F.obj ⟨op (Over.mk p)⟩}
+    (φ : a ⟶ b) : mapHom F g (sMk F φ) = sMk F ((pb F g rfl).map φ) := rfl
+
+@[simp]
+lemma mapHom_comp {Y Y' : C} (g : Y' ⟶ Y) {x y z : Fiber F Y} (φ : x ⟶ y) (ψ : y ⟶ z) :
+    mapHom F g (φ ≫ ψ) = mapHom F g φ ≫ mapHom F g ψ :=
+  (map F g).map_comp φ ψ
+
+@[simp]
+lemma mapHom_eqToHom {Y Y' : C} (g : Y' ⟶ Y) {x y : Fiber F Y} (h : x = y) :
+    mapHom F g (eqToHom h) = eqToHom (by subst h; rfl) := by
+  subst h
+  exact (map F g).map_id x
+
+lemma mk_pb_congr {Y Y' : C} {p : Y ⟶ S} (g : Y' ⟶ Y) {r r' : Y' ⟶ S} (w : g ≫ p = r)
+    (w' : g ≫ p = r') (a : F.obj ⟨op (Over.mk p)⟩) :
+    (⟨r, (pb F g w).obj a⟩ : Fiber F Y') = ⟨r', (pb F g w').obj a⟩ := by
+  obtain rfl := w.symm.trans w'
+  rfl
+
+lemma homMk_id_toLoc {Y : C} (p : Y ⟶ S) {w : 𝟙 Y ≫ p = p} :
+    (Over.homMk (𝟙 Y) w : Over.mk p ⟶ Over.mk p).op.toLoc =
+      𝟙 (⟨op (Over.mk p)⟩ : LocallyDiscrete (Over S)ᵒᵖ) := by
+  rw [show (Over.homMk (𝟙 Y) w : Over.mk p ⟶ Over.mk p) = 𝟙 _ from Over.OverMorphism.ext rfl]
+  rfl
+
+lemma homMk_comp_toLoc {Y₀ Y₁ Y₂ : C} {p₀ : Y₀ ⟶ S} {p₁ : Y₁ ⟶ S} {p₂ : Y₂ ⟶ S}
+    (g : Y₁ ⟶ Y₀) (h : Y₂ ⟶ Y₁) (w₁ : g ≫ p₀ = p₁) (w₂ : h ≫ p₁ = p₂) (w : (h ≫ g) ≫ p₀ = p₂) :
+    (Over.homMk g w₁ : Over.mk p₁ ⟶ Over.mk p₀).op.toLoc ≫
+      (Over.homMk h w₂ : Over.mk p₂ ⟶ Over.mk p₁).op.toLoc =
+      (Over.homMk (h ≫ g) w : Over.mk p₂ ⟶ Over.mk p₀).op.toLoc := by
+  rw [← Quiver.Hom.comp_toLoc, ← op_comp]
+  congr 2
+
+/-- The component at `(p, a)` of the unit comparison of the transition functors. -/
+def idHom {Y : C} (p : Y ⟶ S) (a : F.obj ⟨op (Over.mk p)⟩) :
+    (⟨𝟙 Y ≫ p, (pb F (𝟙 Y) rfl).obj a⟩ : Fiber F Y) ⟶ ⟨p, a⟩ :=
+  eqToHom (mk_pb_congr F (𝟙 Y) rfl (Category.id_comp p) a) ≫
+    sMk F ((F.mapId' (Over.homMk (𝟙 Y) (Category.id_comp p) :
+      Over.mk p ⟶ Over.mk p).op.toLoc (homMk_id_toLoc p)).hom.toNatTrans.app a)
+
+/-- The component at `(p, a)` of the composition comparison of the transition functors. -/
+def compHom {Y₀ Y₁ Y₂ : C} (g : Y₁ ⟶ Y₀) (h : Y₂ ⟶ Y₁) (p : Y₀ ⟶ S)
+    (a : F.obj ⟨op (Over.mk p)⟩) :
+    (⟨(h ≫ g) ≫ p, (pb F (h ≫ g) rfl).obj a⟩ : Fiber F Y₂) ⟶
+      ⟨h ≫ g ≫ p, (pb F h rfl).obj ((pb F g rfl).obj a)⟩ :=
+  eqToHom (mk_pb_congr F (h ≫ g) rfl (Category.assoc h g p) a) ≫
+    sMk F ((F.mapComp'
+      (Over.homMk g rfl : Over.mk (g ≫ p) ⟶ Over.mk p).op.toLoc
+      (Over.homMk h rfl : Over.mk (h ≫ g ≫ p) ⟶ Over.mk (g ≫ p)).op.toLoc
+      (Over.homMk (h ≫ g) (Category.assoc h g p) : Over.mk (h ≫ g ≫ p) ⟶ Over.mk p).op.toLoc
+      (homMk_comp_toLoc g h rfl rfl (Category.assoc h g p))).hom.toNatTrans.app a)
+
+@[reassoc]
+lemma sMk_pb_map_comp_eqToHom {Y Y' : C} {p : Y ⟶ S} (g : Y' ⟶ Y) {r r' : Y' ⟶ S}
+    (w : g ≫ p = r) (w' : g ≫ p = r') {a b : F.obj ⟨op (Over.mk p)⟩} (φ : a ⟶ b) :
+    sMk F ((pb F g w).map φ) ≫ eqToHom (mk_pb_congr F g w w' b) =
+      eqToHom (mk_pb_congr F g w w' a) ≫ sMk F ((pb F g w').map φ) := by
+  obtain rfl := w.symm.trans w'
+  simp
+
+lemma mk_pb_congr' {Y Y' : C} {p : Y ⟶ S} {k k' : Y' ⟶ Y} (hk : k = k') {r r' : Y' ⟶ S}
+    (w : k ≫ p = r) (w' : k' ≫ p = r') (a : F.obj ⟨op (Over.mk p)⟩) :
+    (⟨r, (pb F k w).obj a⟩ : Fiber F Y') = ⟨r', (pb F k' w').obj a⟩ := by
+  subst hk
+  exact mk_pb_congr F k w w' a
+
+lemma mk_pb_pb_congr {Y₀ Y₁ Y₂ : C} {p : Y₀ ⟶ S} (g : Y₁ ⟶ Y₀) (h : Y₂ ⟶ Y₁)
+    {m m' : Y₁ ⟶ S} {r r' : Y₂ ⟶ S} (wg : g ≫ p = m) (wh : h ≫ m = r) (wg' : g ≫ p = m')
+    (wh' : h ≫ m' = r') (a : F.obj ⟨op (Over.mk p)⟩) :
+    (⟨r, (pb F h wh).obj ((pb F g wg).obj a)⟩ : Fiber F Y₂) =
+      ⟨r', (pb F h wh').obj ((pb F g wg').obj a)⟩ := by
+  obtain rfl := wg.symm.trans wg'
+  obtain rfl := wh.symm.trans wh'
+  rfl
+
+lemma homMk_comp_toLoc' {Y₀ Y₁ Y₂ : C} {p₀ : Y₀ ⟶ S} {p₁ : Y₁ ⟶ S} {p₂ : Y₂ ⟶ S}
+    (g : Y₁ ⟶ Y₀) (h : Y₂ ⟶ Y₁) {k : Y₂ ⟶ Y₀} (hk : h ≫ g = k) (w₁ : g ≫ p₀ = p₁)
+    (w₂ : h ≫ p₁ = p₂) (w : k ≫ p₀ = p₂) :
+    (Over.homMk g w₁ : Over.mk p₁ ⟶ Over.mk p₀).op.toLoc ≫
+      (Over.homMk h w₂ : Over.mk p₂ ⟶ Over.mk p₁).op.toLoc =
+      (Over.homMk k w : Over.mk p₂ ⟶ Over.mk p₀).op.toLoc := by
+  subst hk
+  exact homMk_comp_toLoc g h w₁ w₂ w
+
+lemma sMk_eqToHom {Y : C} {p : Y ⟶ S} {a b : F.obj ⟨op (Over.mk p)⟩} (h : a = b) :
+    sMk F (eqToHom h) = eqToHom (congrArg (Sigma.mk p) h : (⟨p, a⟩ : Fiber F Y) = ⟨p, b⟩) := by
+  subst h
+  rfl
+
+/-- The component at `(p, a)` of the unit comparison, as an isomorphism. -/
+def idIso {Y : C} (p : Y ⟶ S) (a : F.obj ⟨op (Over.mk p)⟩) :
+    (⟨𝟙 Y ≫ p, (pb F (𝟙 Y) rfl).obj a⟩ : Fiber F Y) ≅ ⟨p, a⟩ where
+  hom := idHom F p a
+  inv := sMk F ((F.mapId' (Over.homMk (𝟙 Y) (Category.id_comp p) :
+      Over.mk p ⟶ Over.mk p).op.toLoc (homMk_id_toLoc p)).inv.toNatTrans.app a) ≫
+    eqToHom (mk_pb_congr F (𝟙 Y) rfl (Category.id_comp p) a).symm
+  hom_inv_id := by simp [idHom]
+  inv_hom_id := by simp [idHom]
+
+/-- The component at `(p, a)` of the composition comparison, as an isomorphism. -/
+def compIso {Y₀ Y₁ Y₂ : C} (g : Y₁ ⟶ Y₀) (h : Y₂ ⟶ Y₁) (p : Y₀ ⟶ S)
+    (a : F.obj ⟨op (Over.mk p)⟩) :
+    (⟨(h ≫ g) ≫ p, (pb F (h ≫ g) rfl).obj a⟩ : Fiber F Y₂) ≅
+      ⟨h ≫ g ≫ p, (pb F h rfl).obj ((pb F g rfl).obj a)⟩ where
+  hom := compHom F g h p a
+  inv := sMk F ((F.mapComp'
+      (Over.homMk g rfl : Over.mk (g ≫ p) ⟶ Over.mk p).op.toLoc
+      (Over.homMk h rfl : Over.mk (h ≫ g ≫ p) ⟶ Over.mk (g ≫ p)).op.toLoc
+      (Over.homMk (h ≫ g) (Category.assoc h g p) : Over.mk (h ≫ g ≫ p) ⟶ Over.mk p).op.toLoc
+      (homMk_comp_toLoc g h rfl rfl (Category.assoc h g p))).inv.toNatTrans.app a) ≫
+    eqToHom (mk_pb_congr F (h ≫ g) rfl (Category.assoc h g p) a).symm
+  hom_inv_id := by simp [compHom]
+  inv_hom_id := by simp [compHom]
+
+lemma compHom_eq {Y₀ Y₁ Y₂ : C} (g : Y₁ ⟶ Y₀) (h : Y₂ ⟶ Y₁) (p : Y₀ ⟶ S)
+    (a : F.obj ⟨op (Over.mk p)⟩) {m : Y₁ ⟶ S} {r : Y₂ ⟶ S} {k : Y₂ ⟶ Y₀} (wg : g ≫ p = m)
+    (wh : h ≫ m = r) (hk : h ≫ g = k) (w : k ≫ p = r) :
+    compHom F g h p a = eqToHom (mk_pb_congr' F hk rfl w a) ≫
+      sMk F ((F.mapComp' (Over.homMk g wg : Over.mk m ⟶ Over.mk p).op.toLoc
+        (Over.homMk h wh : Over.mk r ⟶ Over.mk m).op.toLoc
+        (Over.homMk k w : Over.mk r ⟶ Over.mk p).op.toLoc
+        (homMk_comp_toLoc' g h hk wg wh w)).hom.toNatTrans.app a) ≫
+      eqToHom (mk_pb_pb_congr F g h wg wh rfl rfl a) := by
+  subst wg wh hk
+  simp [compHom]
+
+lemma compIso_inv_eq {Y₀ Y₁ Y₂ : C} (g : Y₁ ⟶ Y₀) (h : Y₂ ⟶ Y₁) (p : Y₀ ⟶ S)
+    (a : F.obj ⟨op (Over.mk p)⟩) {m : Y₁ ⟶ S} {r : Y₂ ⟶ S} {k : Y₂ ⟶ Y₀} (wg : g ≫ p = m)
+    (wh : h ≫ m = r) (hk : h ≫ g = k) (w : k ≫ p = r) :
+    (compIso F g h p a).inv = eqToHom (mk_pb_pb_congr F g h rfl rfl wg wh a) ≫
+      sMk F ((F.mapComp' (Over.homMk g wg : Over.mk m ⟶ Over.mk p).op.toLoc
+        (Over.homMk h wh : Over.mk r ⟶ Over.mk m).op.toLoc
+        (Over.homMk k w : Over.mk r ⟶ Over.mk p).op.toLoc
+        (homMk_comp_toLoc' g h hk wg wh w)).inv.toNatTrans.app a) ≫
+      eqToHom (mk_pb_congr' F hk rfl w a).symm := by
+  subst wg wh hk
+  simp [compIso]
+
+/-- The unit comparison of the transition functors. -/
+def mapIdIso (Y : C) : map F (𝟙 Y) ≅ 𝟭 _ :=
+  Sigma.natIso fun p ↦ NatIso.ofComponents (fun a ↦ idIso F p a) (fun {a b} φ ↦ by
+    change sMk F ((pb F (𝟙 Y) rfl).map φ) ≫ idHom F p b = idHom F p a ≫ sMk F φ
+    rw [idHom, idHom, sMk_pb_map_comp_eqToHom_assoc F (𝟙 Y) rfl (Category.id_comp p) φ,
+      Category.assoc (eqToHom _), sMk_comp, sMk_comp, mapId'_hom_naturality])
+
+/-- The composition comparison of the transition functors. -/
+def mapCompIso {Y₀ Y₁ Y₂ : C} (g : Y₁ ⟶ Y₀) (h : Y₂ ⟶ Y₁) :
+    map F (h ≫ g) ≅ map F g ⋙ map F h :=
+  Sigma.natIso fun p ↦ NatIso.ofComponents (fun a ↦ compIso F g h p a) (fun {a b} φ ↦ by
+    change sMk F ((pb F (h ≫ g) rfl).map φ) ≫ compHom F g h p b =
+      compHom F g h p a ≫ sMk F ((pb F h rfl).map ((pb F g rfl).map φ))
+    rw [compHom, compHom, sMk_pb_map_comp_eqToHom_assoc F (h ≫ g) rfl (Category.assoc h g p) φ,
+      Category.assoc (eqToHom _), sMk_comp, sMk_comp, mapComp'_hom_naturality])
+
+private lemma mapComp'_hom_app_comp_map_mapId'_hom_app {b b' : LocallyDiscrete (Over S)ᵒᵖ}
+    (e : b ⟶ b) (he : e = 𝟙 b) (u : b ⟶ b') (h : e ≫ u = u) (X : F.obj b) :
+    (F.mapComp' e u u h).hom.toNatTrans.app X ≫
+      (F.map u).toFunctor.map ((F.mapId' e he).hom.toNatTrans.app X) = 𝟙 _ := by
+  subst he
+  simp [mapComp'_id_comp_hom_app, mapId'_eq_mapId, ← Functor.map_comp]
+
+private lemma mapComp'_hom_app_comp_mapId'_hom_app {b b' : LocallyDiscrete (Over S)ᵒᵖ} (u : b ⟶ b')
+    (e : b' ⟶ b') (he : e = 𝟙 b') (h : u ≫ e = u) (X : F.obj b) :
+    (F.mapComp' u e u h).hom.toNatTrans.app X ≫
+      (F.mapId' e he).hom.toNatTrans.app ((F.map u).toFunctor.obj X) = 𝟙 _ := by
+  subst he
+  simp [mapComp'_comp_id_hom_app, mapId'_eq_mapId]
+
+private lemma eqToHom_comp_sMk_comp_eqToHom {Y : C} {x y : Fiber F Y} {p : Y ⟶ S}
+    {a b : F.obj ⟨op (Over.mk p)⟩} (e₁ : x = ⟨p, a⟩) (e₂ : (⟨p, b⟩ : Fiber F Y) = y) (e : x = y)
+    (X : a ⟶ b) (h : a = b) (hX : X = eqToHom h) :
+    eqToHom e₁ ≫ sMk F X ≫ eqToHom e₂ = eqToHom e := by
+  subst hX h
+  simp
+
+private lemma assoc_component {Y₀ Y₁ Y₂ Y₃ : C} (f : Y₁ ⟶ Y₀) (g : Y₂ ⟶ Y₁) (h : Y₃ ⟶ Y₂)
+    (p : Y₀ ⟶ S) (a : F.obj ⟨op (Over.mk p)⟩) :
+    compHom F (g ≫ f) h p a ≫ (map F h).map (compHom F f g p a) ≫
+      (compIso F g h (f ≫ p) ((pb F f rfl).obj a)).inv ≫ (compIso F f (h ≫ g) p a).inv =
+    eqToHom (mk_pb_congr' F (Category.assoc h g f).symm rfl rfl a) := by
+  rw [compHom_eq F (g ≫ f) h p a (m := g ≫ f ≫ p) (r := h ≫ g ≫ f ≫ p) (k := h ≫ g ≫ f)
+      (Category.assoc g f p) rfl rfl (by simp), compHom,
+    compIso_inv_eq F f (h ≫ g) p a (m := f ≫ p) (r := h ≫ g ≫ f ≫ p) (k := h ≫ g ≫ f) rfl
+      (by simp) (by simp) (by simp)]
+  simp only [compIso, mapHom_comp, mapHom_eqToHom, mapHom_sMk, Category.assoc,
+    eqToHom_trans_assoc, eqToHom_refl, Category.id_comp, sMk_comp_assoc]
+  refine eqToHom_comp_sMk_comp_eqToHom F _ _ _ _ rfl ?_
+  rw [mapComp'₀₂₃_hom_comp_mapComp'_hom_whiskerRight_app_assoc
+    (f₁₃ := (Over.homMk (h ≫ g) (Category.assoc h g (f ≫ p)) :
+      Over.mk (h ≫ g ≫ f ≫ p) ⟶ Over.mk (f ≫ p)).op.toLoc)
+    (h₁₃ := homMk_comp_toLoc g h rfl rfl (Category.assoc h g (f ≫ p)))
+    (hf := homMk_comp_toLoc _ _ _ _ _)]
+  simp
+
+private lemma eqToHom_comp_sMk {Y : C} {x : Fiber F Y} {p : Y ⟶ S}
+    {a b : F.obj ⟨op (Over.mk p)⟩} (e₁ : x = ⟨p, a⟩) (e : x = ⟨p, b⟩)
+    (X : a ⟶ b) (h : a = b) (hX : X = eqToHom h) :
+    eqToHom e₁ ≫ sMk F X = eqToHom e := by
+  subst hX h
+  simp
+
+private lemma leftUnitor_component {Y₀ Y₁ : C} (f : Y₁ ⟶ Y₀) (p : Y₀ ⟶ S)
+    (a : F.obj ⟨op (Over.mk p)⟩) :
+    compHom F (𝟙 Y₀) f p a ≫ (map F f).map (idHom F p a) =
+      eqToHom (mk_pb_congr' F (Category.comp_id f) rfl rfl a) := by
+  rw [compHom_eq F (𝟙 Y₀) f p a (m := p) (r := f ≫ p) (k := f) (Category.id_comp p) rfl
+    (Category.comp_id f) rfl, idHom]
+  simp only [mapHom_comp, mapHom_eqToHom, mapHom_sMk, Category.assoc,
+    eqToHom_trans_assoc, eqToHom_refl, Category.id_comp, sMk_comp]
+  refine eqToHom_comp_sMk F _ _ _ rfl ?_
+  rw [mapComp'_hom_app_comp_map_mapId'_hom_app, eqToHom_refl]
+
+private lemma rightUnitor_component {Y₀ Y₁ : C} (f : Y₁ ⟶ Y₀) (p : Y₀ ⟶ S)
+    (a : F.obj ⟨op (Over.mk p)⟩) :
+    compHom F f (𝟙 Y₁) p a ≫ idHom F (f ≫ p) ((pb F f rfl).obj a) =
+      eqToHom (mk_pb_congr' F (Category.id_comp f) rfl rfl a) := by
+  rw [compHom_eq F f (𝟙 Y₁) p a (m := f ≫ p) (r := f ≫ p) (k := f) rfl (Category.id_comp _)
+    (Category.id_comp f) rfl, idHom]
+  simp only [Category.assoc, eqToHom_trans_assoc, eqToHom_refl, Category.id_comp, sMk_comp]
+  refine eqToHom_comp_sMk F _ _ _ rfl ?_
+  rw [mapComp'_hom_app_comp_mapId'_hom_app, eqToHom_refl]
+
+end OverTotal
+
+open OverTotal in
+/-- The total pseudofunctor, as built by `LocallyDiscrete.mkPseudofunctor`. -/
+private def overTotalAux : LocallyDiscrete Cᵒᵖ ⥤ᵖ Cat.{max v v' u', max v u'} :=
+  LocallyDiscrete.mkPseudofunctor (fun Y ↦ Cat.of (Fiber F Y.unop))
+    (fun g ↦ (OverTotal.map F g.unop).toCatHom)
+    (fun Y ↦ Cat.Hom.isoMk (mapIdIso F Y.unop))
+    (fun f g ↦ Cat.Hom.isoMk (mapCompIso F f.unop g.unop))
+    (fun f g h ↦ by
+      ext ⟨p, a⟩
+      simp [mapCompIso]
+      exact assoc_component F _ _ _ p a)
+    (fun f ↦ by
+      ext ⟨p, a⟩
+      simp [mapCompIso, mapIdIso]
+      exact leftUnitor_component F _ p a)
+    (fun f ↦ by
+      ext ⟨p, a⟩
+      simp [mapCompIso, mapIdIso]
+      exact (congrArg _ (Category.comp_id _)).trans (rightUnitor_component F _ p a))
+
+/-- The total pseudofunctor of a pseudofunctor `F` on `Over S`. Its fibre over `Y : C` is
+`OverTotal.Fiber F Y = Σ (p : Y ⟶ S), F(Over.mk p)`, pullback along `g : Y' ⟶ Y` sends `(p, a)` to
+`(g ≫ p, F(g)(a))`, and its comparison isomorphisms are those of `F`. It is a stack exactly when
+`F` is one, for the slice topology, by `CategoryTheory.Pseudofunctor.isStack_overTotal_iff`. -/
+@[implicit_reducible]
+def overTotal : LocallyDiscrete Cᵒᵖ ⥤ᵖ Cat.{max v v' u', max v u'} :=
+  { overTotalAux F with
+    obj := fun Y ↦ Cat.of (OverTotal.Fiber F Y.as.unop)
+    map := fun g ↦ (OverTotal.map F g.as.unop).toCatHom }
+
+namespace OverTotal
+
+lemma toLoc_comp_eq {Y₀ Y₁ Y₂ : C} {f : Y₁ ⟶ Y₀} {g : Y₂ ⟶ Y₁} {fg : Y₂ ⟶ Y₀} (hfg : g ≫ f = fg) :
+    f.op.toLoc ≫ g.op.toLoc = (fg.op.toLoc : (⟨op Y₀⟩ : LocallyDiscrete Cᵒᵖ) ⟶ ⟨op Y₂⟩) := by
+  subst hfg
+  rfl
+
+@[simp]
+lemma overTotal_map_toFunctor {Y Y' : C} (g : Y' ⟶ Y) :
+    (F.overTotal.map g.op.toLoc).toFunctor = map F g := rfl
+
+@[simp]
+lemma overTotal_comp {Y : C} {x y z : ↑(F.overTotal.obj ⟨op Y⟩)} (φ : x ⟶ y) (ψ : y ⟶ z) :
+    φ ≫ ψ = @CategoryStruct.comp (Fiber F Y) _ x y z φ ψ := rfl
+
+@[simp]
+lemma overTotal_eqToHom {Y : C} {x y : ↑(F.overTotal.obj ⟨op Y⟩)} (h : x = y) :
+    eqToHom h = @eqToHom (Fiber F Y) _ x y h := rfl
+
+lemma sMk_pb_map_eq {Y Y' : C} {p : Y ⟶ S} (g : Y' ⟶ Y) {r r' : Y' ⟶ S}
+    (w : g ≫ p = r) (w' : g ≫ p = r') {a b : F.obj ⟨op (Over.mk p)⟩} (φ : a ⟶ b) :
+    sMk F ((pb F g w).map φ) = eqToHom (mk_pb_congr F g w w' a) ≫ sMk F ((pb F g w').map φ) ≫
+      eqToHom (mk_pb_congr F g w' w b) := by
+  obtain rfl := w.symm.trans w'
+  simp
+
+lemma overTotal_mapComp'_hom_app {Y₀ Y₁ Y₂ : C} (f : Y₁ ⟶ Y₀) (g : Y₂ ⟶ Y₁) (fg : Y₂ ⟶ Y₀)
+    (hfg : g ≫ f = fg) (p : Y₀ ⟶ S) (a : F.obj ⟨op (Over.mk p)⟩) {m : Y₁ ⟶ S} {r : Y₂ ⟶ S}
+    (wf : f ≫ p = m) (wg : g ≫ m = r) (w : fg ≫ p = r) :
+    (F.overTotal.mapComp' f.op.toLoc g.op.toLoc fg.op.toLoc (toLoc_comp_eq hfg)).hom.toNatTrans.app
+      (⟨p, a⟩ : Fiber F Y₀) =
+    eqToHom (mk_pb_congr F fg rfl w a) ≫
+      sMk F ((F.mapComp' (Over.homMk f wf : Over.mk m ⟶ Over.mk p).op.toLoc
+        (Over.homMk g wg : Over.mk r ⟶ Over.mk m).op.toLoc
+        (Over.homMk fg w : Over.mk r ⟶ Over.mk p).op.toLoc
+        (homMk_comp_toLoc' f g hfg wf wg w)).hom.toNatTrans.app a) ≫
+      eqToHom (mk_pb_pb_congr F f g wf wg rfl rfl a) := by
+  subst hfg
+  have : F.overTotal.mapComp' f.op.toLoc g.op.toLoc (g ≫ f).op.toLoc (toLoc_comp_eq rfl) =
+      F.overTotal.mapComp f.op.toLoc g.op.toLoc := mapComp'_eq_mapComp _ _ _
+  rw [this]
+  exact compHom_eq F f g p a wf wg rfl w
+
+lemma overTotal_mapComp'_inv_app {Y₀ Y₁ Y₂ : C} (f : Y₁ ⟶ Y₀) (g : Y₂ ⟶ Y₁) (fg : Y₂ ⟶ Y₀)
+    (hfg : g ≫ f = fg) (p : Y₀ ⟶ S) (a : F.obj ⟨op (Over.mk p)⟩) {m : Y₁ ⟶ S} {r : Y₂ ⟶ S}
+    (wf : f ≫ p = m) (wg : g ≫ m = r) (w : fg ≫ p = r) :
+    (F.overTotal.mapComp' f.op.toLoc g.op.toLoc fg.op.toLoc (toLoc_comp_eq hfg)).inv.toNatTrans.app
+      (⟨p, a⟩ : Fiber F Y₀) =
+    eqToHom (mk_pb_pb_congr F f g rfl rfl wf wg a) ≫
+      sMk F ((F.mapComp' (Over.homMk f wf : Over.mk m ⟶ Over.mk p).op.toLoc
+        (Over.homMk g wg : Over.mk r ⟶ Over.mk m).op.toLoc
+        (Over.homMk fg w : Over.mk r ⟶ Over.mk p).op.toLoc
+        (homMk_comp_toLoc' f g hfg wf wg w)).inv.toNatTrans.app a) ≫
+      eqToHom (mk_pb_congr F fg w rfl a) := by
+  subst hfg
+  have : F.overTotal.mapComp' f.op.toLoc g.op.toLoc (g ≫ f).op.toLoc (toLoc_comp_eq rfl) =
+      F.overTotal.mapComp f.op.toLoc g.op.toLoc := mapComp'_eq_mapComp _ _ _
+  rw [this]
+  exact compIso_inv_eq F f g p a wf wg rfl w
+
+set_option backward.isDefEq.respectTransparency false in
+open LocallyDiscreteOpToCat in
+private lemma pullHom_eqToHom_sMk {Z Z' X₁ X₂ : C} {r₁ : X₁ ⟶ S} {r₂ : X₂ ⟶ S}
+    (x₁ : F.obj ⟨op (Over.mk r₁)⟩) (x₂ : F.obj ⟨op (Over.mk r₂)⟩) {f₁ : Z ⟶ X₁} {f₂ : Z ⟶ X₂}
+    {s : Z ⟶ S} (w₁ : f₁ ≫ r₁ = s) (w₂ : f₂ ≫ r₂ = s)
+    (X : (pb F f₁ w₁).obj x₁ ⟶ (pb F f₂ w₂).obj x₂)
+    (g : Z' ⟶ Z) (gf₁ : Z' ⟶ X₁) (gf₂ : Z' ⟶ X₂) (hgf₁ : g ≫ f₁ = gf₁) (hgf₂ : g ≫ f₂ = gf₂)
+    {s' : Z' ⟶ S} (w : g ≫ s = s') (w₁' : gf₁ ≫ r₁ = s') (w₂' : gf₂ ≫ r₂ = s') :
+    pullHom (F := F.overTotal) (M₁ := (⟨r₁, x₁⟩ : Fiber F X₁)) (M₂ := (⟨r₂, x₂⟩ : Fiber F X₂))
+      (eqToHom (mk_pb_congr F f₁ rfl w₁ x₁) ≫ sMk F X ≫ eqToHom (mk_pb_congr F f₂ w₂ rfl x₂))
+      g gf₁ gf₂ hgf₁ hgf₂ =
+    eqToHom (mk_pb_congr F gf₁ rfl w₁' x₁) ≫
+      sMk F (pullHom (F := F) X (Over.homMk g w : Over.mk s' ⟶ Over.mk s) (Over.homMk gf₁ w₁')
+        (Over.homMk gf₂ w₂') (by ext; simpa using hgf₁) (by ext; simpa using hgf₂)) ≫
+      eqToHom (mk_pb_congr F gf₂ w₂' rfl x₂) := by
+  simp only [pullHom]
+  rw [overTotal_mapComp'_hom_app F f₁ g gf₁ hgf₁ r₁ x₁ w₁ w w₁',
+    overTotal_mapComp'_inv_app F f₂ g gf₂ hgf₂ r₂ x₂ w₂ w w₂']
+  simp only [overTotal_comp, overTotal_eqToHom, overTotal_map_toFunctor, mapHom_comp,
+    mapHom_eqToHom, mapHom_sMk]
+  rw [sMk_pb_map_eq F g rfl w X]
+  simp only [Category.assoc, eqToHom_trans_assoc, eqToHom_refl, Category.id_comp, sMk_comp_assoc]
+
+section Descent
+
+set_option backward.isDefEq.respectTransparency false
+
+variable {Y : C} {ι : Type t} {X : ι → C} (f : ∀ i, X i ⟶ Y)
+
+/-- The family `f` lying over `p : Y ⟶ S`. -/
+private abbrev fam (p : Y ⟶ S) (i : ι) : Over.mk (f i ≫ p) ⟶ Over.mk p := Over.homMk (f i) rfl
+
+private lemma fst_eq_of_hom {Z : C} {x y : Fiber F Z} (φ : x ⟶ y) : x.1 = y.1 := by
+  obtain ⟨φ⟩ := φ
+  rfl
+
+/-- The morphism of a summand underlying a morphism of the fibre. -/
+private def sUnmk {Z : C} {r : Z ⟶ S} {a b : F.obj ⟨op (Over.mk r)⟩} :
+    ((⟨r, a⟩ : Fiber F Z) ⟶ ⟨r, b⟩) → (a ⟶ b)
+  | Sigma.SigmaHom.mk φ => φ
+
+@[simp]
+private lemma sUnmk_sMk {Z : C} {r : Z ⟶ S} {a b : F.obj ⟨op (Over.mk r)⟩} (φ : a ⟶ b) :
+    sUnmk F (sMk F (Y := Z) φ) = φ := rfl
+
+@[simp]
+private lemma sMk_sUnmk {Z : C} {r : Z ⟶ S} {a b : F.obj ⟨op (Over.mk r)⟩}
+    (ψ : (⟨r, a⟩ : Fiber F Z) ⟶ ⟨r, b⟩) : sMk F (sUnmk F ψ) = ψ := by
+  obtain ⟨φ⟩ := ψ
+  rfl
+
+private lemma eqToHom_sMk_eqToHom_eq_id {Z : C} {x : Fiber F Z} {r : Z ⟶ S}
+    {a : F.obj ⟨op (Over.mk r)⟩} (e₁ : x = ⟨r, a⟩) (e₂ : (⟨r, a⟩ : Fiber F Z) = x) (A : a ⟶ a)
+    (hA : A = 𝟙 a) :
+    eqToHom e₁ ≫ sMk F A ≫ eqToHom e₂ = 𝟙 x := by
+  subst hA
+  simp
+
+private lemma eqToHom_sMk_eqToHom_comp {Z : C} {x y z : Fiber F Z} {r : Z ⟶ S}
+    {a b c : F.obj ⟨op (Over.mk r)⟩} (e₁ : x = ⟨r, a⟩) (e₂ : (⟨r, b⟩ : Fiber F Z) = y)
+    (e₃ : y = ⟨r, b⟩) (e₄ : (⟨r, c⟩ : Fiber F Z) = z) (A : a ⟶ b) (B : b ⟶ c) :
+    (eqToHom e₁ ≫ sMk F A ≫ eqToHom e₂) ≫ (eqToHom e₃ ≫ sMk F B ≫ eqToHom e₄) =
+      eqToHom e₁ ≫ sMk F (A ≫ B) ≫ eqToHom e₄ := by
+  subst e₂
+  simp
+
+/-- Descent data of `F` along the family over `p`, as descent data of the total pseudofunctor. -/
+private def incPObj (p : Y ⟶ S) (D : F.DescentData (fam f p)) : F.overTotal.DescentData f where
+  obj i := (⟨f i ≫ p, D.obj i⟩ : Fiber F (X i))
+  hom Z q i₁ i₂ g₁ g₂ hg₁ hg₂ :=
+    eqToHom (mk_pb_congr F g₁ rfl (r' := q ≫ p) (by rw [← hg₁, Category.assoc]) (D.obj i₁)) ≫
+      sMk F (D.hom (Over.homMk q rfl : Over.mk (q ≫ p) ⟶ Over.mk p)
+        (Over.homMk g₁ (by simp [← hg₁]) : Over.mk (q ≫ p) ⟶ Over.mk (f i₁ ≫ p))
+        (Over.homMk g₂ (by simp [← hg₂]) : Over.mk (q ≫ p) ⟶ Over.mk (f i₂ ≫ p))
+        (by ext; simpa using hg₁) (by ext; simpa using hg₂)) ≫
+      eqToHom (mk_pb_congr F g₂ (r := q ≫ p) (by rw [← hg₂, Category.assoc]) rfl (D.obj i₂))
+  pullHom_hom Z' Z g q q' hq i₁ i₂ g₁ g₂ hg₁ hg₂ gf₁ gf₂ hgf₁ hgf₂ := by
+    rw [pullHom_eqToHom_sMk F _ _ _ _ _ g gf₁ gf₂ hgf₁ hgf₂ (s' := q' ≫ p)
+      (by rw [← hq, Category.assoc]) (by rw [← hq, ← hgf₁, ← hg₁]; simp)
+      (by rw [← hq, ← hgf₂, ← hg₂]; simp)]
+    congr 2
+    refine congrArg (sMk F) (D.pullHom_hom _ _ _ ?_ _ _ ?_ ?_ _ _ ?_ ?_) <;>
+      · ext
+        simp [hq, hg₁, hg₂, hgf₁, hgf₂]
+  hom_self Z q i g hg :=
+    eqToHom_sMk_eqToHom_eq_id F _ _ _ (D.hom_self (Over.homMk q rfl : Over.mk (q ≫ p) ⟶ Over.mk p)
+      (Over.homMk g (by simp [← hg]) : Over.mk (q ≫ p) ⟶ Over.mk (f i ≫ p))
+      (by ext; simpa using hg))
+  hom_comp Z q i₁ i₂ i₃ g₁ g₂ g₃ hg₁ hg₂ hg₃ :=
+    (eqToHom_sMk_eqToHom_comp F _ _ _ _ _ _).trans
+      (congrArg (fun A ↦ eqToHom _ ≫ sMk F A ≫ eqToHom _) (D.hom_comp _ _ _ _ _ _ _))
+
+private lemma incPObj_hom_eq (p : Y ⟶ S) (D : F.DescentData (fam f p)) {Z : C} (q : Z ⟶ Y)
+    {i₁ i₂ : ι} (g₁ : Z ⟶ X i₁) (g₂ : Z ⟶ X i₂) (hg₁ : g₁ ≫ f i₁ = q) (hg₂ : g₂ ≫ f i₂ = q)
+    {s : Z ⟶ S} (w : q ≫ p = s) (w₁ : g₁ ≫ f i₁ ≫ p = s) (w₂ : g₂ ≫ f i₂ ≫ p = s) :
+    (incPObj F f p D).hom q g₁ g₂ hg₁ hg₂ =
+      eqToHom (mk_pb_congr F g₁ rfl w₁ (D.obj i₁)) ≫
+        sMk F (D.hom (Over.homMk q w : Over.mk s ⟶ Over.mk p)
+          (Over.homMk g₁ w₁ : Over.mk s ⟶ Over.mk (f i₁ ≫ p))
+          (Over.homMk g₂ w₂ : Over.mk s ⟶ Over.mk (f i₂ ≫ p))
+          (by ext; simpa using hg₁) (by ext; simpa using hg₂)) ≫
+        eqToHom (mk_pb_congr F g₂ w₂ rfl (D.obj i₂)) := by
+  subst w
+  rfl
+
+private lemma eqToHom_sMk_eqToHom_eq_iff {Z : C} {x y : Fiber F Z} {r : Z ⟶ S}
+    {a b : F.obj ⟨op (Over.mk r)⟩} (e₁ : x = ⟨r, a⟩) (e₂ : (⟨r, b⟩ : Fiber F Z) = y)
+    (A B : a ⟶ b) :
+    eqToHom e₁ ≫ sMk F A ≫ eqToHom e₂ = eqToHom e₁ ≫ sMk F B ≫ eqToHom e₂ ↔ A = B := by
+  refine ⟨fun h ↦ sMk_injective F ((cancel_mono (eqToHom e₂)).1 ((cancel_epi (eqToHom e₁)).1 h)),
+    fun h ↦ h ▸ rfl⟩
+
+private lemma comm_iff {Z X₁ X₂ : C} {m₁ : X₁ ⟶ S} {m₂ : X₂ ⟶ S} (g₁ : Z ⟶ X₁) (g₂ : Z ⟶ X₂)
+    {s : Z ⟶ S} (w₁ : g₁ ≫ m₁ = s) (w₂ : g₂ ≫ m₂ = s) {a₁ a₂ : F.obj ⟨op (Over.mk m₁)⟩}
+    {b₁ b₂ : F.obj ⟨op (Over.mk m₂)⟩} (α : a₁ ⟶ a₂) (β : b₁ ⟶ b₂)
+    (A : (pb F g₁ w₁).obj a₁ ⟶ (pb F g₂ w₂).obj b₁)
+    (B : (pb F g₁ w₁).obj a₂ ⟶ (pb F g₂ w₂).obj b₂) :
+    sMk F ((pb F g₁ rfl).map α) ≫ eqToHom (mk_pb_congr F g₁ rfl w₁ a₂) ≫ sMk F B ≫
+        eqToHom (mk_pb_congr F g₂ w₂ rfl b₂) =
+      (eqToHom (mk_pb_congr F g₁ rfl w₁ a₁) ≫ sMk F A ≫ eqToHom (mk_pb_congr F g₂ w₂ rfl b₁)) ≫
+        sMk F ((pb F g₂ rfl).map β) ↔
+    (pb F g₁ w₁).map α ≫ B = A ≫ (pb F g₂ w₂).map β := by
+  rw [sMk_pb_map_comp_eqToHom_assoc F g₁ rfl w₁ α, Category.assoc, Category.assoc,
+    ← sMk_pb_map_comp_eqToHom F g₂ w₂ rfl β, sMk_comp_assoc, sMk_comp_assoc,
+    eqToHom_sMk_eqToHom_eq_iff]
+
+/-- The functor from descent data of `F` over `p` to descent data of the total pseudofunctor. -/
+private def incP (p : Y ⟶ S) : F.DescentData (fam f p) ⥤ F.overTotal.DescentData f where
+  obj D := incPObj F f p D
+  map {D₁ D₂} φ :=
+    { hom i := sMk F (φ.hom i)
+      comm Z q i₁ i₂ g₁ g₂ hg₁ hg₂ :=
+        (comm_iff F g₁ g₂ (s := q ≫ p) (by simp [← hg₁]) (by simp [← hg₂]) (φ.hom i₁) (φ.hom i₂)
+          _ _).2 (φ.comm _ _ _ (by ext; simpa using hg₁) (by ext; simpa using hg₂)) }
+  map_id _ := by ext; rfl
+  map_comp _ _ := by ext; exact (sMk_comp F _ _).symm
+
+private instance (p : Y ⟶ S) : (incP F f p).Faithful where
+  map_injective {D₁ D₂} φ ψ h := by
+    ext i
+    exact sMk_injective F (congrArg (fun χ ↦ DescentData.Hom.hom χ i) h)
+
+private instance (p : Y ⟶ S) : (incP F f p).Full where
+  map_surjective {D₁ D₂} ψ := by
+    refine ⟨{ hom i := sUnmk F (ψ.hom i), comm W q i₁ i₂ u₁ u₂ hu₁ hu₂ := ?_ }, ?_⟩
+    · obtain ⟨W, s, rfl⟩ := W.mk_surjective
+      have h₁ : u₁.left ≫ f i₁ = q.left := by simpa using congrArg CommaMorphism.left hu₁
+      have h₂ : u₂.left ≫ f i₂ = q.left := by simpa using congrArg CommaMorphism.left hu₂
+      have := ψ.comm q.left u₁.left u₂.left h₁ h₂
+      dsimp only [incP] at this
+      rw [incPObj_hom_eq F f p D₂ q.left u₁.left u₂.left h₁ h₂ (Over.w q) (Over.w u₁) (Over.w u₂),
+        incPObj_hom_eq F f p D₁ q.left u₁.left u₂.left h₁ h₂ (Over.w q) (Over.w u₁) (Over.w u₂),
+        ← sMk_sUnmk F (ψ.hom i₁), ← sMk_sUnmk F (ψ.hom i₂)] at this
+      exact (comm_iff F u₁.left u₂.left (Over.w u₁) (Over.w u₂) _ _ _ _).1 this
+    · ext i
+      exact sMk_sUnmk F (ψ.hom i)
+
+private lemma toDescentData_obj_hom_eq (p : Y ⟶ S) (a : F.obj ⟨op (Over.mk p)⟩) {Z : C} (q : Z ⟶ Y)
+    {i₁ i₂ : ι} (g₁ : Z ⟶ X i₁) (g₂ : Z ⟶ X i₂) (hg₁ : g₁ ≫ f i₁ = q) (hg₂ : g₂ ≫ f i₂ = q) :
+    ((F.overTotal.toDescentData f).obj (⟨p, a⟩ : Fiber F Y)).hom q g₁ g₂ hg₁ hg₂ =
+      ((incP F f p).obj ((F.toDescentData (fam f p)).obj a)).hom q g₁ g₂ hg₁ hg₂ := by
+  change (F.overTotal.mapComp' (f i₁).op.toLoc g₁.op.toLoc q.op.toLoc
+      (toLoc_comp_eq hg₁)).inv.toNatTrans.app (⟨p, a⟩ : Fiber F Y) ≫
+    (F.overTotal.mapComp' (f i₂).op.toLoc g₂.op.toLoc q.op.toLoc
+      (toLoc_comp_eq hg₂)).hom.toNatTrans.app (⟨p, a⟩ : Fiber F Y) = _
+  rw [overTotal_mapComp'_inv_app F (f i₁) g₁ q hg₁ p a rfl
+    (by simp [← hg₁]) rfl, overTotal_mapComp'_hom_app F (f i₂) g₂ q hg₂ p a rfl
+    (by simp [← hg₂]) rfl, eqToHom_sMk_eqToHom_comp]
+  rfl
+
+/-- The descent datum of an object of the total fibre is that of its second component. -/
+private def toDescentDataIso (p : Y ⟶ S) (a : F.obj ⟨op (Over.mk p)⟩) :
+    (F.overTotal.toDescentData f).obj (⟨p, a⟩ : Fiber F Y) ≅
+      (incP F f p).obj ((F.toDescentData (fam f p)).obj a) :=
+  DescentData.isoMk (fun _ ↦ Iso.refl _) (fun Z q i₁ i₂ g₁ g₂ hg₁ hg₂ ↦ by
+    simp only [Iso.refl_hom, Functor.map_id, Category.id_comp, Category.comp_id]
+    exact (toDescentData_obj_hom_eq F f p a q g₁ g₂ hg₁ hg₂).symm)
+
+private lemma toDescentDataIso_hom_naturality (p : Y ⟶ S) {a b : F.obj ⟨op (Over.mk p)⟩}
+    (φ : a ⟶ b) :
+    (F.overTotal.toDescentData f).map (sMk F φ) ≫ (toDescentDataIso F f p b).hom =
+      (toDescentDataIso F f p a).hom ≫ (incP F f p).map ((F.toDescentData (fam f p)).map φ) := by
+  ext i
+  exact (Category.comp_id _).trans (Category.id_comp _).symm
+
+/-- The descent functor of the total pseudofunctor, as the functors of the summands. -/
+private def toDescentDataSigmaIso : F.overTotal.toDescentData f ≅
+    Sigma.desc (fun p ↦ F.toDescentData (fam f p) ⋙ incP F f p) :=
+  NatIso.ofComponents (fun x ↦ toDescentDataIso F f x.1 x.2) (by
+    rintro ⟨p, a⟩ ⟨_, b⟩ ⟨φ⟩
+    exact toDescentDataIso_hom_naturality F f p φ)
+
+private lemma fst_eq_of_incP_hom {p q : Y ⟶ S} {D₁ : F.DescentData (fam f p)}
+    {D₂ : F.DescentData (fam f q)} (ψ : (incP F f p).obj D₁ ⟶ (incP F f q).obj D₂) (i : ι) :
+    f i ≫ p = f i ≫ q :=
+  fst_eq_of_hom F (ψ.hom i)
+
+variable {f} in
+private lemma eq_of_isSeparatedFor
+    (hS : Presieve.IsSeparatedFor (yoneda.obj S) (Presieve.ofArrows X f))
+    {p q : Y ⟶ S} (h : ∀ i, f i ≫ p = f i ≫ q) : p = q :=
+  hS.ext fun _ _ hg ↦ by
+    obtain ⟨i⟩ := hg
+    exact h i
+
+section Transport
+
+variable (G : LocallyDiscrete Cᵒᵖ ⥤ᵖ Cat.{w₁, w₂})
+
+open LocallyDiscreteOpToCat in
+private lemma pullHom_map_comp_map {X₁ X₂ : C} {M₁ M₁' : G.obj ⟨op X₁⟩} {M₂ M₂' : G.obj ⟨op X₂⟩}
+    {Z : C} {f₁ : Z ⟶ X₁} {f₂ : Z ⟶ X₂} (α : M₁' ⟶ M₁)
+    (φ : (G.map f₁.op.toLoc).toFunctor.obj M₁ ⟶ (G.map f₂.op.toLoc).toFunctor.obj M₂)
+    (β : M₂ ⟶ M₂') {Z' : C} (g : Z' ⟶ Z) (gf₁ : Z' ⟶ X₁) (gf₂ : Z' ⟶ X₂) (hgf₁ : g ≫ f₁ = gf₁)
+    (hgf₂ : g ≫ f₂ = gf₂) :
+    pullHom ((G.map f₁.op.toLoc).toFunctor.map α ≫ φ ≫ (G.map f₂.op.toLoc).toFunctor.map β)
+        g gf₁ gf₂ hgf₁ hgf₂ =
+      (G.map gf₁.op.toLoc).toFunctor.map α ≫ pullHom φ g gf₁ gf₂ hgf₁ hgf₂ ≫
+        (G.map gf₂.op.toLoc).toFunctor.map β := by
+  simp only [pullHom, Functor.map_comp, Category.assoc, mapComp'_inv_naturality]
+  rw [← mapComp'_hom_naturality_assoc]
+
+variable {G}
+
+variable {f} in
+/-- Descent data transported along isomorphisms of their objects. -/
+private def transportDescentData (D : G.DescentData f) (M : ∀ i, G.obj ⟨op (X i)⟩)
+    (e : ∀ i, D.obj i ≅ M i) : G.DescentData f where
+  obj := M
+  hom Z q i₁ i₂ g₁ g₂ hg₁ hg₂ := (G.map g₁.op.toLoc).toFunctor.map (e i₁).inv ≫
+    D.hom q g₁ g₂ hg₁ hg₂ ≫ (G.map g₂.op.toLoc).toFunctor.map (e i₂).hom
+  pullHom_hom Z' Z g q q' hq i₁ i₂ g₁ g₂ hg₁ hg₂ gf₁ gf₂ hgf₁ hgf₂ := by
+    rw [pullHom_map_comp_map, D.pullHom_hom _ _ _ hq _ _ hg₁ hg₂ _ _ hgf₁ hgf₂]
+  hom_self Z q i g hg := by
+    rw [D.hom_self _ _ hg, Category.id_comp, ← Functor.map_comp, Iso.inv_hom_id, Functor.map_id]
+  hom_comp Z q i₁ i₂ i₃ g₁ g₂ g₃ hg₁ hg₂ hg₃ := by
+    simp only [Category.assoc, ← Functor.map_comp_assoc, Iso.hom_inv_id, Functor.map_id,
+      Category.id_comp, D.hom_comp_assoc]
+
+variable {f} in
+/-- Descent data are isomorphic to their transport. -/
+private def transportDescentDataIso (D : G.DescentData f) (M : ∀ i, G.obj ⟨op (X i)⟩)
+    (e : ∀ i, D.obj i ≅ M i) : D ≅ transportDescentData D M e :=
+  DescentData.isoMk e (fun Z q i₁ i₂ g₁ g₂ hg₁ hg₂ ↦ by
+    simp [transportDescentData, ← Functor.map_comp_assoc])
+
+end Transport
+
+/-- An object of a summand of the total fibre, moved along an equality of indices. -/
+private def transportObj {Z : C} (x : Fiber F Z) {r : Z ⟶ S} (h : x.1 = r) :
+    F.obj ⟨op (Over.mk r)⟩ :=
+  h ▸ x.2
+
+private lemma eq_mk_transportObj {Z : C} (x : Fiber F Z) {r : Z ⟶ S} (h : x.1 = r) :
+    x = ⟨r, transportObj F x h⟩ := by
+  obtain ⟨r', a⟩ := x
+  subst h
+  rfl
+
+variable {f} in
+/-- A descent datum of the total pseudofunctor whose objects lie over `f i ≫ p`. -/
+private def glueTransport (D : F.overTotal.DescentData f) (p : Y ⟶ S)
+    (hp : ∀ i, (D.obj i).1 = f i ≫ p) : F.overTotal.DescentData f :=
+  transportDescentData D (fun i ↦ (⟨f i ≫ p, transportObj F (D.obj i) (hp i)⟩ : Fiber F (X i)))
+    (fun i ↦ eqToIso (eq_mk_transportObj F (D.obj i) (hp i)))
+
+private lemma eqToHom_comp_eqToHom_eq_id {D : Type*} [Category D] {x y : D} (e₁ : x = y)
+    (e₂ : y = x) (φ : y ⟶ y) (hφ : φ = 𝟙 y) : eqToHom e₁ ≫ φ ≫ eqToHom e₂ = 𝟙 x := by
+  subst hφ e₁
+  simp
+
+private lemma eqToHom_comp_comp_comp_eqToHom {D : Type*} [Category D] {x y z w x' : D} (e₁ : x = y)
+    (A : y ⟶ z) (B : z ⟶ w) (e₂ : w = x') (C : y ⟶ w) (h : A ≫ B = C) :
+    eqToHom e₁ ≫ A ≫ B ≫ eqToHom e₂ = eqToHom e₁ ≫ C ≫ eqToHom e₂ := by
+  rw [← h, Category.assoc]
+
+variable {f} in
+/-- The descent datum of `F` underlying a total descent datum whose objects lie over the
+`f i ≫ p`. -/
+private def unIncObj (D : F.overTotal.DescentData f) (p : Y ⟶ S) (hp : ∀ i, (D.obj i).1 = f i ≫ p) :
+    F.DescentData (fam f p) where
+  obj i := transportObj F (D.obj i) (hp i)
+  hom W q i₁ i₂ u₁ u₂ hu₁ hu₂ :=
+    sUnmk F (eqToHom (mk_pb_congr F (p := f i₁ ≫ p) u₁.left (Over.w u₁) rfl
+        (transportObj F (D.obj i₁) (hp i₁))) ≫
+      (glueTransport F D p hp).hom q.left u₁.left u₂.left
+        (by simpa using congrArg CommaMorphism.left hu₁)
+        (by simpa using congrArg CommaMorphism.left hu₂) ≫
+      eqToHom (mk_pb_congr F (p := f i₂ ≫ p) u₂.left rfl (Over.w u₂)
+        (transportObj F (D.obj i₂) (hp i₂))))
+  pullHom_hom W' W v q q' hq i₁ i₂ u₁ u₂ hu₁ hu₂ vu₁ vu₂ hvu₁ hvu₂ := by
+    obtain ⟨W, s, rfl⟩ := W.mk_surjective
+    obtain ⟨W', s', rfl⟩ := W'.mk_surjective
+    have h₁ : u₁.left ≫ f i₁ = q.left := by simpa using congrArg CommaMorphism.left hu₁
+    have h₂ : u₂.left ≫ f i₂ = q.left := by simpa using congrArg CommaMorphism.left hu₂
+    have hv₁ : v.left ≫ u₁.left = vu₁.left := by simpa using congrArg CommaMorphism.left hvu₁
+    have hv₂ : v.left ≫ u₂.left = vu₂.left := by simpa using congrArg CommaMorphism.left hvu₂
+    have hq' : v.left ≫ q.left = q'.left := by simpa using congrArg CommaMorphism.left hq
+    apply sMk_injective F
+    have key := pullHom_eqToHom_sMk F (transportObj F (D.obj i₁) (hp i₁))
+      (transportObj F (D.obj i₂) (hp i₂)) (Over.w u₁) (Over.w u₂)
+      (sUnmk F (eqToHom (mk_pb_congr F (p := f i₁ ≫ p) u₁.left (Over.w u₁) rfl
+        (transportObj F (D.obj i₁) (hp i₁))) ≫
+      (glueTransport F D p hp).hom q.left u₁.left u₂.left h₁ h₂ ≫
+      eqToHom (mk_pb_congr F (p := f i₂ ≫ p) u₂.left rfl (Over.w u₂)
+        (transportObj F (D.obj i₂) (hp i₂)))))
+      v.left vu₁.left vu₂.left hv₁ hv₂ (Over.w v) (Over.w vu₁) (Over.w vu₂)
+    simp only [sMk_sUnmk, Category.assoc, eqToHom_trans_assoc, eqToHom_refl, Category.id_comp,
+      eqToHom_trans, Category.comp_id, Over.homMk_eta] at key
+    rw [(glueTransport F D p hp).pullHom_hom _ _ _ hq' _ _ h₁ h₂ _ _ hv₁ hv₂] at key
+    rw [sMk_sUnmk, key]
+    simp
+  hom_self W q i u hu := by
+    apply sMk_injective F
+    rw [sMk_sUnmk, sMk_id]
+    exact eqToHom_comp_eqToHom_eq_id _ _ _ ((glueTransport F D p hp).hom_self _ _
+      (by simpa using congrArg CommaMorphism.left hu))
+  hom_comp W q i₁ i₂ i₃ u₁ u₂ u₃ hu₁ hu₂ hu₃ := by
+    apply sMk_injective F
+    rw [← sMk_comp, sMk_sUnmk, sMk_sUnmk, sMk_sUnmk]
+    simp only [Category.assoc, eqToHom_trans_assoc, eqToHom_refl, Category.id_comp]
+    exact eqToHom_comp_comp_comp_eqToHom _ _ _ _ _ (DescentData.hom_comp _ _ _ _ _
+      (by simpa using congrArg CommaMorphism.left hu₁)
+      (by simpa using congrArg CommaMorphism.left hu₂)
+      (by simpa using congrArg CommaMorphism.left hu₃))
+
+private lemma eqToHom_comp_eqToHom_comp_comp_eqToHom_comp_eqToHom {D : Type*} [Category D]
+    {x y z w : D} (e₁ : x = y) (e₂ : y = x) (φ : x ⟶ z) (e₃ : z = w) (e₄ : w = z) :
+    eqToHom e₁ ≫ (eqToHom e₂ ≫ φ ≫ eqToHom e₃) ≫ eqToHom e₄ = φ := by
+  subst e₁ e₃
+  simp
+
+variable {f} in
+/-- A total descent datum whose objects lie over the `f i ≫ p` is the image of a descent datum
+of `F`. -/
+private def incPUnIncObjIso (D : F.overTotal.DescentData f) (p : Y ⟶ S)
+    (hp : ∀ i, (D.obj i).1 = f i ≫ p) : (incP F f p).obj (unIncObj F D p hp) ≅ D :=
+  DescentData.isoMk (D₂ := glueTransport F D p hp) (fun _ ↦ Iso.refl _)
+    (fun Z q i₁ i₂ g₁ g₂ hg₁ hg₂ ↦ by
+      simp only [Iso.refl_hom, Functor.map_id, Category.id_comp, Category.comp_id]
+      dsimp only [incP, incPObj, unIncObj]
+      rw [sMk_sUnmk]
+      exact (eqToHom_comp_eqToHom_comp_comp_eqToHom_comp_eqToHom _ _ _ _ _).symm) ≪≫
+  (transportDescentDataIso D _ _).symm
+
+private lemma isEquivalence_toDescentData_overTotal
+    (hS : Presieve.IsSheafFor (yoneda.obj S) (Presieve.ofArrows X f))
+    (h : ∀ p : Y ⟶ S, (F.toDescentData (fam f p)).IsEquivalence) :
+    (F.overTotal.toDescentData f).IsEquivalence := by
+  let K := Sigma.desc (fun p ↦ F.toDescentData (fam f p) ⋙ incP F f p)
+  have : K.Faithful := ⟨by
+    rintro ⟨p, a⟩ ⟨q, b⟩ ⟨φ⟩ ⟨ψ⟩ hφψ
+    congr 1
+    exact (F.toDescentData (fam f p)).map_injective ((incP F f p).map_injective hφψ)⟩
+  have : K.Full := ⟨by
+    rintro ⟨p, a⟩ ⟨q, b⟩ ψ
+    obtain rfl : p = q := eq_of_isSeparatedFor hS.isSeparatedFor (fst_eq_of_incP_hom F f ψ)
+    obtain ⟨φ, hφ⟩ := (F.toDescentData (fam f p) ⋙ incP F f p).map_surjective ψ
+    exact ⟨Sigma.SigmaHom.mk φ, hφ⟩⟩
+  have : K.EssSurj := ⟨fun D ↦ by
+    obtain ⟨p, hp, -⟩ := (Presieve.isSheafFor_arrows_iff _ _).1 hS (fun i ↦ (D.obj i).1)
+      (fun i j Z gi gj h ↦ fst_eq_of_hom F (D.hom _ gi gj rfl h.symm))
+    let D' := unIncObj F D p (fun i ↦ (hp i).symm)
+    exact ⟨⟨p, (F.toDescentData (fam f p)).objPreimage D'⟩,
+      ⟨(incP F f p).mapIso ((F.toDescentData (fam f p)).objObjPreimageIso D') ≪≫
+        incPUnIncObjIso F D p (fun i ↦ (hp i).symm)⟩⟩⟩
+  have : K.IsEquivalence := { }
+  exact Functor.isEquivalence_of_iso (toDescentDataSigmaIso F f).symm
+
+private lemma isEquivalence_toDescentData_of_overTotal
+    (hS : Presieve.IsSeparatedFor (yoneda.obj S) (Presieve.ofArrows X f))
+    [(F.overTotal.toDescentData f).IsEquivalence] (p : Y ⟶ S) :
+    (F.toDescentData (fam f p)).IsEquivalence := by
+  let e : Sigma.incl p ⋙ F.overTotal.toDescentData f ≅
+      F.toDescentData (fam f p) ⋙ incP F f p :=
+    Functor.isoWhiskerLeft (Sigma.incl p) (toDescentDataSigmaIso F f) ≪≫ Sigma.inclDesc _ p
+  have hff : (F.toDescentData (fam f p) ⋙ incP F f p).FullyFaithful :=
+    ((Functor.FullyFaithful.ofFullyFaithful (Sigma.incl p)).comp
+      (Functor.FullyFaithful.ofFullyFaithful (F.overTotal.toDescentData f))).ofIso e
+  have hG := hff.ofCompFaithful
+  have := hG.full
+  have := hG.faithful
+  have : (F.toDescentData (fam f p)).EssSurj := ⟨fun D' ↦ by
+    obtain ⟨⟨q, b⟩, ⟨e₀⟩⟩ : ∃ x, Nonempty ((F.overTotal.toDescentData f).obj x ≅
+        (incP F f p).obj D') := ⟨_, ⟨(F.overTotal.toDescentData f).objObjPreimageIso _⟩⟩
+    let e₁ := (toDescentDataIso F f q b).symm ≪≫ e₀
+    obtain rfl : q = p := eq_of_isSeparatedFor hS (fst_eq_of_incP_hom F f e₁.hom)
+    exact ⟨b, ⟨(Functor.FullyFaithful.ofFullyFaithful (incP F f q)).preimageIso e₁⟩⟩⟩
+  exact { }
+
+end Descent
+
+private lemma ofArrows_fam_eq {Y : C} (R : Sieve Y) (p : Y ⟶ S) :
+    Sieve.ofArrows _ (fam (fun (g : R.arrows.category) ↦ g.obj.hom) p) =
+      (Sieve.overEquiv (Over.mk p)).symm R := by
+  ext W u
+  rw [Sieve.mem_ofArrows_iff, Sieve.overEquiv_symm_iff]
+  constructor
+  · rintro ⟨g, a, rfl⟩
+    simpa using R.downward_closed g.property a.left
+  · intro hu
+    refine ⟨⟨Over.mk u.left, hu⟩, Over.homMk (𝟙 W.left) (by simpa using Over.w u), ?_⟩
+    ext
+    simp
+
+end OverTotal
+
+namespace OverTotal
+
+private lemma isStackFor_overEquiv_symm_iff {Y : C} (R : Sieve Y) (p : Y ⟶ S) :
+    F.IsStackFor ((Sieve.overEquiv (Over.mk p)).symm R).arrows ↔
+      (F.toDescentData (fam (fun (g : R.arrows.category) ↦ g.obj.hom) p)).IsEquivalence := by
+  rw [← ofArrows_fam_eq]
+  exact (F.IsStackFor_generate_iff _).trans (F.isStackFor_ofArrows_iff _)
+
+private lemma ofArrows_category_generate {Y : C} (R : Sieve Y) :
+    Sieve.generate (Presieve.ofArrows _ (fun (g : R.arrows.category) ↦ g.obj.hom)) = R := by
+  change Sieve.ofArrows _ _ = R
+  rw [Sieve.ofArrows_category', Sieve.generate_sieve]
+
+end OverTotal
+
+open OverTotal in
+/-- Let `yoneda.obj S` be a `J`-sheaf. If a pseudofunctor `F` on `Over S` is a stack for the
+slice topology `J.over S`, then its total pseudofunctor `F.overTotal` is a `J`-stack. -/
+@[stacks 00Y1 "stack version"]
+theorem isStack_overTotal_of_isStack (J : GrothendieckTopology C)
+    (hS : Presieve.IsSheaf J (yoneda.obj S)) [F.IsStack (J.over S)] :
+    F.overTotal.IsStack J := by
+  refine IsStack.of_isStackFor fun Y R hR ↦ ⟨?_⟩
+  refine isEquivalence_toDescentData_overTotal F _ ?_ fun p ↦
+    (isStackFor_overEquiv_symm_iff F R p).1 (F.isStackFor' _ (J.overEquiv_symm_mem_over _ _ hR))
+  rw [Presieve.isSheafFor_iff_generate, ofArrows_category_generate]
+  exact hS _ hR
+
+open OverTotal in
+/-- Let `yoneda.obj S` be `J`-separated. If the total pseudofunctor `F.overTotal` of a
+pseudofunctor `F` on `Over S` is a `J`-stack, then `F` is a stack for the slice topology
+`J.over S`. -/
+@[stacks 00Y1 "stack version"]
+theorem isStack_of_isStack_overTotal (J : GrothendieckTopology C)
+    (hS : Presieve.IsSeparated J (yoneda.obj S)) [F.overTotal.IsStack J] :
+    F.IsStack (J.over S) := by
+  refine IsStack.of_isStackFor fun Y' R' hR' ↦ ?_
+  obtain ⟨Y, p, rfl⟩ := Y'.mk_surjective
+  obtain ⟨R, rfl⟩ : ∃ R : Sieve Y, (Sieve.overEquiv (Over.mk p)).symm R = R' :=
+    (Sieve.overEquiv (Over.mk p)).symm.surjective R'
+  have hR : R ∈ J Y := (OrderIso.apply_symm_apply (Sieve.overEquiv (Over.mk p)) R) ▸
+    (GrothendieckTopology.mem_over_iff J _).1 hR'
+  have := (F.overTotal.isStackFor' R hR).isEquivalence
+  refine (isStackFor_overEquiv_symm_iff F R p).2
+    (isEquivalence_toDescentData_of_overTotal F _ ?_ p)
+  rw [Presieve.isSeparatedFor_iff_generate, ofArrows_category_generate]
+  exact hS _ hR
+
+/-- Let `yoneda.obj S` be a `J`-sheaf. A pseudofunctor `F` on `Over S` is a stack for the slice
+topology `J.over S` if and only if its total pseudofunctor `F.overTotal` is a `J`-stack. This
+is the stack form of Stacks 00Y1, where `j_{S!}` identifies sheaves on `C/S` with sheaves over
+`h_S`.
+
+Only the separatedness of `yoneda.obj S` is needed to show that `F` is a stack when its total
+pseudofunctor is one (`isStack_of_isStack_overTotal`). The sheaf hypothesis cannot be dropped:
+for `C = Type`, `J = ⊤` and `S = Bool`, the empty sieve covers, so the constant pseudofunctor with
+one-point fibres is a `⊤`-stack on `Over Bool`, but over `PUnit` its total pseudofunctor has a
+fibre with two objects and no morphism between them, so it is not a `⊤`-stack. -/
+@[stacks 00Y1 "stack version"]
+theorem isStack_overTotal_iff (J : GrothendieckTopology C)
+    (hS : Presieve.IsSheaf J (yoneda.obj S)) :
+    F.IsStack (J.over S) ↔ F.overTotal.IsStack J :=
+  ⟨fun _ ↦ F.isStack_overTotal_of_isStack J hS,
+    fun _ ↦ F.isStack_of_isStack_overTotal J hS.isSeparated⟩
+
+end OverTotal
 
 end CategoryTheory.Pseudofunctor
