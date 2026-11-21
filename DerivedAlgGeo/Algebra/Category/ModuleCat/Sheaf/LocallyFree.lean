@@ -35,14 +35,19 @@ applies it to pullback on the slices of a scheme.
 * `SheafOfModules.IsLocallyFreeOfRank.ofIso`: local freeness of rank `r` is invariant under
   isomorphism;
 * `SheafOfModules.isLocallyFreeOfRank_free`: the free sheaf on `I` is locally free of rank
-  `Nat.card I`.
+  `Nat.card I`;
+* `SheafOfModules.LocalGeneratorsData.bind`: local generator data on the members of a cover of
+  the terminal object glue to local generator data on the whole sheaf, with the same index
+  types and locally free data staying locally free data;
+* `SheafOfModules.IsLocallyFreeOfRank.of_coversTop`: local freeness of rank `r` descends from
+  a family of objects covering the terminal object.
 -/
 
 open CategoryTheory Limits
 
 namespace SheafOfModules
 
-universe u w u₁ v₁ u₂ v₂
+universe u w w' u₁ v₁ u₂ v₂
 
 variable {C : Type u₁} [Category.{v₁} C] {J : GrothendieckTopology C} {R : Sheaf J RingCat.{u}}
   {C' : Type u₂} [Category.{v₂} C'] {J' : GrothendieckTopology C'} {R' : Sheaf J' RingCat.{u}}
@@ -138,5 +143,68 @@ theorem isLocallyFreeOfRank_free_ulift_fin (r : ℕ) :
   simpa using isLocallyFreeOfRank_free (R := R) (ULift.{u} (Fin r))
 
 end Free
+
+section Bind
+
+variable {C₀ : Type u₁} [Category.{u₁} C₀] {J₀ : GrothendieckTopology C₀}
+  {R₀ : Sheaf J₀ RingCat.{u}}
+  [∀ X, HasSheafify (J₀.over X) AddCommGrpCat.{u}]
+  [∀ X, (J₀.over X).WEqualsLocallyBijective AddCommGrpCat.{u}]
+  [∀ X Y, HasSheafify ((J₀.over X).over Y) AddCommGrpCat.{u}]
+  [∀ X Y, ((J₀.over X).over Y).WEqualsLocallyBijective AddCommGrpCat.{u}]
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Local generator data on the restrictions of a sheaf of modules to the members of a cover of
+the terminal object glue to local generator data on the sheaf itself: the new cover consists of
+the members of the covers of the restrictions, and the new generators are the old ones, moved
+along the identification of the iterated slice with the slice. This is `QuasicoherentData.bind`
+for generating sections. -/
+noncomputable def LocalGeneratorsData.bind (M : SheafOfModules.{u} R₀) {I : Type w}
+    (X : I → C₀) (hX : J₀.CoversTop X)
+    (D : ∀ i, LocalGeneratorsData.{w'} (M.over (X i))) : M.LocalGeneratorsData.{max w w'} where
+  I := (i : I) × (D i).I
+  X ij := ((D ij.1).X ij.2).left
+  coversTop := hX.over (fun i ↦ (D i).coversTop)
+  generators i :=
+    letI e := pushforwardPushforwardEquivalence (Over.iteratedSliceEquiv ((D i.1).X i.2))
+      (S := (R₀.over _).over _) (R := R₀.over _) (𝟙 _) (𝟙 _)
+      (by ext : 2; exact R₀.1.map_id _) (by ext : 2; exact R₀.1.map_id _)
+    (((D i.1).generators i.2).map e.inverse (.refl _)).ofEpi
+      (e.fullyFaithfulFunctor.preimageIso
+      (by exact e.counitIso.app ((M.over (X i.1)).over ((D i.1).X i.2)))).hom
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Gluing local generator data keeps the index types of the generators. -/
+@[simp]
+lemma LocalGeneratorsData.bind_generators_I (M : SheafOfModules.{u} R₀) {I : Type w}
+    (X : I → C₀) (hX : J₀.CoversTop X) (D : ∀ i, LocalGeneratorsData.{w'} (M.over (X i)))
+    (ij : (i : I) × (D i).I) :
+    ((bind M X hX D).generators ij).I = ((D ij.1).generators ij.2).I :=
+  rfl
+
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
+/-- Gluing locally free data gives locally free data: moving generating sections along
+equivalences keeps `π` an isomorphism. -/
+instance LocalGeneratorsData.isLocallyFreeData_bind (M : SheafOfModules.{u} R₀) {I : Type w}
+    (X : I → C₀) (hX : J₀.CoversTop X) (D : ∀ i, LocalGeneratorsData.{w'} (M.over (X i)))
+    [∀ i, (D i).IsLocallyFreeData] : (bind M X hX D).IsLocallyFreeData where
+  isIso ij := by
+    have : IsIso ((D ij.1).generators ij.2).π := IsLocallyFreeData.isIso ij.2
+    dsimp only [LocalGeneratorsData.bind]
+    exact GeneratingSections.isIso_ofEpi_π _ _
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Local freeness of rank `r` descends from the restrictions of a sheaf of modules to the
+members of a family of objects covering the terminal object. -/
+theorem IsLocallyFreeOfRank.of_coversTop (M : SheafOfModules.{u} R₀) {r : ℕ} {I : Type u₁}
+    (X : I → C₀) (hX : J₀.CoversTop X) (h : ∀ i, IsLocallyFreeOfRank (M.over (X i)) r) :
+    IsLocallyFreeOfRank M r := by
+  choose D hD hrank using h
+  have (i : I) : (D i).IsLocallyFreeData := hD i
+  refine ⟨LocalGeneratorsData.bind M X hX D, inferInstance, fun ij ↦ ?_⟩
+  exact (congrArg Nat.card (LocalGeneratorsData.bind_generators_I M X hX D ij)).trans (hrank _ _)
+
+end Bind
 
 end SheafOfModules
