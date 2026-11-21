@@ -75,7 +75,7 @@ namespace AlgebraicGeometry.Proj
 
 attribute [local instance] MvPolynomial.gradedAlgebra
 
-variable (ι k : Type u) [Field k]
+variable (ι k : Type u) [CommRing k]
 
 /-- The full-block part of a Čech cochain, index by index. -/
 noncomputable def intCechFullBlock [Fintype ι] (d : ℤ) {m : ℕ}

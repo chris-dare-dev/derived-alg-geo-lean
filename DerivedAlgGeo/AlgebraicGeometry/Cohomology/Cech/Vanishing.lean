@@ -66,7 +66,7 @@ namespace AlgebraicGeometry.Proj
 
 attribute [local instance] MvPolynomial.gradedAlgebra
 
-variable (ι k : Type u) [Field k]
+variable (ι k : Type u) [CommRing k]
 
 set_option backward.isDefEq.respectTransparency false in
 set_option backward.defeqAttrib.useBackward true in
@@ -110,7 +110,7 @@ set_option backward.defeqAttrib.useBackward true in
 /-- **`Hⁿ(Pⁿ, O(d)) = 0` for `n ≥ 1` and `d ≥ 0`**, stated as the triviality of the derived
 sections group. The twist is a natural number, which is the whole of the `d ≥ 0` hypothesis;
 the projective space is `Proj` of a polynomial ring in an arbitrary — possibly infinite —
-variable set over a field. -/
+variable set over a commutative ring. -/
 theorem polynomialTwisting_H_subsingleton (d n : ℕ)
     [hExt : HasExt.{u + 1} (TopCat.Sheaf AddCommGrpCat.{u}
       (_root_.AlgebraicGeometry.Proj (polynomialGrading ι k)))] :
