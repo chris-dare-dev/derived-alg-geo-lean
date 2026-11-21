@@ -12,6 +12,7 @@ import DerivedAlgGeo.CategoryTheory.Sites.Descent.ObjectProperty
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.Over
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.SheafOver
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.BaseChange
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Discrete
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Fibered
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.FiberProduct
@@ -44,7 +45,8 @@ its directory, so this umbrella imports the children directly.
   stacks, 2-fibre products, diagonals and Isom sheaves of stacks in
   groupoids, the 2-Yoneda equivalence `StackInGroupoids.yonedaEquivalence`,
   and representable morphisms of stacks, natural in the test object
-  (`StackMorphism.IsRepresentable`).
+  (`StackMorphism.IsRepresentable`), with their stability under base change
+  and composition.
 * `ULift.lean`: descent data of the universe lift `Pseudofunctor.ulift` are
   equivalent to those of the original pseudofunctor.
 
@@ -71,6 +73,9 @@ its directory, so this umbrella imports the children directly.
 * `ULift.lean`: a pseudofunctor is a prestack (a stack) exactly when its universe lift is.
 * `StackInGroupoids/Fibered.lean`: the Grothendieck construction of a stack in
   groupoids is a category fibred in groupoids (`StackInGroupoids.isStronglyCartesian`).
+* `StackInGroupoids/BaseChange.lean`: representable morphisms of stacks in groupoids
+  are stable under base change and composition (`StackMorphism.isRepresentable_baseChange`,
+  `StackMorphism.isRepresentable_comp`).
 
 ## Implementation notes
 
