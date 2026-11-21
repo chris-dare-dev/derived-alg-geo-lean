@@ -90,7 +90,7 @@ namespace AlgebraicGeometry.Proj
 
 attribute [local instance] MvPolynomial.gradedAlgebra
 
-variable (ι k : Type u) [Field k]
+variable (ι k : Type u) [CommRing k]
 
 /-! ### The two-chart step
 
@@ -136,8 +136,8 @@ which is the degree-zero cocycle condition at that index, and `hij` is what make
 
 The denominators are `X_(x 0) ^ a`, `X_(x 1) ^ b` and `(X_(x 0) X_(x 1)) ^ n`; `mk_eq_mk_iff`
 supplies the equation multiplied through by some `u ∈ Submonoid.powers (X_(x 0) X_(x 1))`, and
-`MvPolynomial ι k` is a domain, so `u` and the common factor `X_(x 0) ^ b X_(x 1) ^ a` both
-cancel. -/
+monomials are non-zero-divisors over any commutative ring, so `u` and the common factor
+`X_(x 0) ^ b X_(x 1) ^ a` both cancel. Over the zero ring the numerator is zero outright. -/
 theorem num_eq_zero_of_intCechFace_eq_of_neg (d : ℤ) (hd : d < 0)
     (x : Fin 2 → ι) (hij : x 0 ≠ x 1)
     (ci : NumDenSameDeg (polynomialGrading ι k) (intShift (polynomialGrading ι k) d)
@@ -147,6 +147,8 @@ theorem num_eq_zero_of_intCechFace_eq_of_neg (d : ℤ) (hd : d < 0)
     (h : polynomialVariableIntCechFace ι k d x 0 (DegreeZeroLocalization.mk cj) =
       polynomialVariableIntCechFace ι k d x 1 (DegreeZeroLocalization.mk ci)) :
     (ci.num : MvPolynomial ι k) = 0 := by
+  rcases subsingleton_or_nontrivial k with hk | hk
+  · exact MvPolynomial.ext _ _ fun _ => Subsingleton.elim _ _
   -- Dropping index `1` leaves the `x 0`-chart; the full index has both variables.
   have hdi : polynomialVariableCechDenominator ι k (x ∘ (1 : Fin 2).succAbove) =
       MvPolynomial.X (x 0) := by
@@ -180,17 +182,15 @@ theorem num_eq_zero_of_intCechFace_eq_of_neg (d : ℤ) (hd : d < 0)
   have ht : polynomialVariableCechDenominator ι k x ^ t = (u : MvPolynomial ι k) := ht'
   simp only [smul_eq_mul] at hu
   rw [← ht, hd2] at hu
-  have hK : (MvPolynomial.X (x 0) ^ (t + b) * MvPolynomial.X (x 1) ^ (t + a) :
-      MvPolynomial ι k) ≠ 0 :=
-    mul_ne_zero (pow_ne_zero _ (MvPolynomial.X_ne_zero (R := k) (x 0)))
-      (pow_ne_zero _ (MvPolynomial.X_ne_zero (R := k) (x 1)))
   have key : (MvPolynomial.X (x 0) ^ (t + b) * MvPolynomial.X (x 1) ^ (t + a) :
         MvPolynomial ι k) * (MvPolynomial.X (x 0) ^ a * (cj.num : MvPolynomial ι k)) =
       (MvPolynomial.X (x 0) ^ (t + b) * MvPolynomial.X (x 1) ^ (t + a) : MvPolynomial ι k) *
         (MvPolynomial.X (x 1) ^ b * (ci.num : MvPolynomial ι k)) := by
     linear_combination hu
   have hcross : MvPolynomial.X (x 1) ^ b * (ci.num : MvPolynomial ι k) =
-      MvPolynomial.X (x 0) ^ a * (cj.num : MvPolynomial ι k) := (mul_left_cancel₀ hK key).symm
+      MvPolynomial.X (x 0) ^ a * (cj.num : MvPolynomial ι k) :=
+    (((MvPolynomial.isRegular_X_pow (t + b)).mul (MvPolynomial.isRegular_X_pow (t + a))).left
+      key).symm
   -- A nonzero homogeneous denominator pins the degree it was recorded at.
   have haX : (MvPolynomial.X (x 0) : MvPolynomial ι k) ^ a = (ci.den : MvPolynomial ι k) :=
     hdi ▸ ha
@@ -199,7 +199,7 @@ theorem num_eq_zero_of_intCechFace_eq_of_neg (d : ℤ) (hd : d < 0)
       (MvPolynomial.isHomogeneous_X k (x 0))
   have hdeg : ci.deg = a := by
     apply DirectSum.degree_eq_of_mem_mem (polynomialGrading ι k) ci.den.2 (haX ▸ hpow)
-    simpa only [← haX] using pow_ne_zero a (MvPolynomial.X_ne_zero (R := k) (x 0))
+    simpa only [← haX] using (MvPolynomial.isRegular_X_pow (n := x 0) (R := k) a).ne_zero
   -- `mem_intShiftPiece`: either the numerator is already zero, or it is homogeneous of the
   -- degree `a + d` that puts it below its own denominator.
   rcases ci.num.2 with h0 | ⟨m, hm, hmem⟩

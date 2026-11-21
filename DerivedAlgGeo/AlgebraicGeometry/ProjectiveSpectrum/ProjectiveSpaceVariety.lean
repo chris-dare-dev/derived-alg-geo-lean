@@ -13,28 +13,31 @@ import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.Proper
 import Mathlib.RingTheory.FiniteType
 
 /-!
-# Polynomial projective space as a variety over the base field
+# Polynomial projective space over the base ring, and as a variety over a field
 
-`IsVariety k X` asks for an integral scheme with a finite-type morphism to `Spec k`. For
-`Pⁿ = Proj k[Xᵢ]` the integrality is `AlgebraicGeometry.Proj.isIntegral`, and this file supplies
-the rest, as instances on `Proj (polynomialGrading ι k)` itself rather than on a bundle:
+Over a commutative ring `k`, this file makes `Pⁿ = Proj k[Xᵢ]` a proper scheme over `Spec k` and
+`O(d)` a coherent sheaf, as instances on `Proj (polynomialGrading ι k)` itself rather than on a
+bundle:
 
-* the degree-zero part of the standard grading is the constants, so the base field maps
+* the degree-zero part of the standard grading is the constants, so the base ring maps
   isomorphically onto `𝒜 0` and `Proj.toSpecZero` becomes a morphism to `Spec k`;
 * `k[Xᵢ]` is of finite type over `𝒜 0` when the variables are finite in number, which is what
   Mathlib's `LocallyOfFiniteType (Proj.toSpecZero 𝒜)` consumes.
 
+Over a field it is moreover a variety: `IsVariety k X` asks for an integral scheme with a
+finite-type morphism to `Spec k`, and the integrality is `AlgebraicGeometry.Proj.isIntegral`.
+
 ## Main definitions
 
 * `AlgebraicGeometry.Proj.projectiveSpaceToSpec` — the structure morphism of polynomial
-  projective space to the base field.
+  projective space to the base ring.
 * `AlgebraicGeometry.Proj.projectiveSpaceTwist` — the twisting sheaf `O(d)` as a coherent sheaf.
 
 ## Main results
 
 * `AlgebraicGeometry.Proj.isProper_projectiveSpaceToSpec` — the structure morphism is proper.
-* `AlgebraicGeometry.Proj.isVariety_projectiveSpace` — polynomial projective space is a variety
-  over the base field.
+* `AlgebraicGeometry.Proj.isVariety_projectiveSpace` — polynomial projective space over a field
+  is a variety.
 * `AlgebraicGeometry.Proj.polynomialIntShift_isCoherent` — every twist `O(d)` is coherent.
 
 ## Implementation notes
@@ -61,11 +64,13 @@ open GradedModule MvPolynomial
 
 namespace AlgebraicGeometry.Proj
 
-variable (ι k : Type u) [Field k]
-
 attribute [local instance] MvPolynomial.gradedAlgebra
 
-/-- The degree-zero part of the standard grading consists of the constants, so the base field
+section CommRing
+
+variable (ι k : Type u) [CommRing k]
+
+/-- The degree-zero part of the standard grading consists of the constants, so the base ring
 maps onto it. -/
 theorem algebraMap_polynomialGradeZero_surjective :
     Function.Surjective (algebraMap k ↥(polynomialGrading ι k 0)) := by
@@ -75,14 +80,14 @@ theorem algebraMap_polynomialGradeZero_surjective :
   obtain ⟨r, hr⟩ := Submodule.mem_one.mp hp'
   exact ⟨r, Subtype.ext hr⟩
 
-/-- The degree-zero part of the standard grading is of finite type over the base field, being a
+/-- The degree-zero part of the standard grading is of finite type over the base ring, being a
 quotient of it. -/
 instance finiteType_polynomialGradeZero :
     Algebra.FiniteType k ↥(polynomialGrading ι k 0) :=
   Algebra.FiniteType.of_surjective (Algebra.ofId k ↥(polynomialGrading ι k 0))
     (algebraMap_polynomialGradeZero_surjective ι k)
 
-/-- The base field acts on the polynomial ring through the degree-zero part of its grading. -/
+/-- The base ring acts on the polynomial ring through the degree-zero part of its grading. -/
 instance isScalarTower_polynomialGradeZero :
     IsScalarTower k ↥(polynomialGrading ι k 0) (MvPolynomial ι k) :=
   inferInstanceAs (IsScalarTower k
@@ -94,10 +99,10 @@ instance finiteType_polynomialGrading [Finite ι] :
     Algebra.FiniteType ↥(polynomialGrading ι k 0) (MvPolynomial ι k) :=
   Algebra.FiniteType.of_restrictScalars_finiteType k _ _
 
-/-- The structure morphism of polynomial projective space to the base field.
+/-- The structure morphism of polynomial projective space to the base ring.
 
 `Proj.toSpecZero` lands in the spectrum of the degree-zero part; composing with the spectrum of
-the base field's map onto that part gives the morphism `Variety` asks for. -/
+the base ring's map onto that part gives the morphism to `Spec k`. -/
 noncomputable def projectiveSpaceToSpec :
     Proj (polynomialGrading ι k) ⟶ Spec (CommRingCat.of k) :=
   Proj.toSpecZero (polynomialGrading ι k) ≫
@@ -117,47 +122,25 @@ instance locallyOfFiniteType_projectiveSpaceToSpec [Finite ι] :
 
 `Proj.toSpecZero` is proper because the polynomial ring is of finite type over its degree-zero
 part, and the identification of `k` with that part is an isomorphism: surjective by
-`algebraMap_polynomialGradeZero_surjective`, injective because `k` is a field. This is what
-makes `Pⁿ` Noetherian and separated through `Variety.isNoetherian_of_isProper` and
-`Variety.isSeparated_of_isProper`, which the finite-cover cohomology bound consumes. -/
+`algebraMap_polynomialGradeZero_surjective`, injective because constants are
+(`MvPolynomial.C_injective`). This is what makes `Pⁿ` Noetherian and separated through
+`Variety.isNoetherian_of_isProper` and `Variety.isSeparated_of_isProper`, which the finite-cover
+cohomology bound consumes. -/
 instance isProper_projectiveSpaceToSpec [Finite ι] : IsProper (projectiveSpaceToSpec ι k) := by
-  haveI : Nontrivial ↥(polynomialGrading ι k 0) :=
-    ⟨⟨0, 1, fun h => zero_ne_one (congrArg Subtype.val h)⟩⟩
   have : IsIso (CommRingCat.ofHom (algebraMap k ↥(polynomialGrading ι k 0))) :=
     (ConcreteCategory.isIso_iff_bijective _).2
-      ⟨(algebraMap k ↥(polynomialGrading ι k 0)).injective,
+      ⟨fun a b h => MvPolynomial.C_injective ι k (congrArg Subtype.val h),
         algebraMap_polynomialGradeZero_surjective ι k⟩
   show IsProper (Proj.toSpecZero (polynomialGrading ι k) ≫
     Spec.map (CommRingCat.ofHom (algebraMap k ↥(polynomialGrading ι k 0))))
   infer_instance
 
-/-- Polynomial projective space is nonempty once there is a variable.
-
-Nonemptiness is a hypothesis of `Proj.isIntegral` rather than a consequence: `Proj` of a graded
-ring concentrated in degree zero is empty. A variable supplies the missing point. -/
-instance nonempty_projectiveSpace [Nonempty ι] :
-    Nonempty (Proj (polynomialGrading ι k)) := by
-  obtain ⟨i⟩ := ‹Nonempty ι›
-  obtain ⟨x, -⟩ := basicOpen_nonempty (polynomialGrading ι k)
-    (MvPolynomial.isHomogeneous_X k i) Nat.one_pos (MvPolynomial.X_ne_zero i)
-  exact ⟨x⟩
-
-/-- **Polynomial projective space is a scheme over the base field**, with structure morphism
+/-- **Polynomial projective space is a scheme over the base ring**, with structure morphism
 `projectiveSpaceToSpec`. This is the `Scheme.Over` instance every statement about `Pⁿ` over
 `k` consumes; `Proj (polynomialGrading ι k) ↘ Spec (CommRingCat.of k)` unfolds to it. -/
 noncomputable instance instOverProjectiveSpace :
     (Proj (polynomialGrading ι k)).Over (Spec (CommRingCat.of k)) :=
   ⟨projectiveSpaceToSpec ι k⟩
-
-/-- **Polynomial projective space is a variety over the base field.**
-
-Finiteness of the variable set is what makes the structure morphism of finite type;
-nonemptiness is what makes the space irreducible rather than vacuously so. -/
-instance isVariety_projectiveSpace [Finite ι] [Nonempty ι] :
-    IsVariety k (Proj (polynomialGrading ι k)) where
-  toIsIntegral := Proj.isIntegral (polynomialGrading ι k)
-  toLocallyOfFiniteType :=
-    inferInstanceAs (LocallyOfFiniteType (projectiveSpaceToSpec ι k))
 
 /-- The twisting sheaf `O(d)` on polynomial projective space is coherent. -/
 theorem polynomialIntShift_isCoherent (d : ℤ) :
@@ -171,7 +154,7 @@ theorem polynomialIntShift_isCoherent (d : ℤ) :
 /-- **`O(d)` as a coherent sheaf on polynomial projective space.**
 
 This is the object `coherentScalarAction` and `linearCoherentH` are stated about, so with it the
-finiteness interface can name `Hⁱ(Pⁿ, O(d))` as a `k`-vector space. Coherence of `O(d)` needs
+finiteness interface can name `Hⁱ(Pⁿ, O(d))` as a `k`-module. Coherence of `O(d)` needs
 no finiteness of the index type; that enters only through `isVariety_projectiveSpace`. -/
 noncomputable def projectiveSpaceTwist (d : ℤ) :
     Coh (Proj (polynomialGrading ι k)) :=
@@ -184,5 +167,34 @@ lemma projectiveSpaceTwist_obj (d : ℤ) :
     (Coh.ι (Proj (polynomialGrading ι k))).obj (projectiveSpaceTwist ι k d) =
       associatedSheaf (polynomialGrading ι k) (intShift (polynomialGrading ι k) d) :=
   rfl
+
+end CommRing
+
+section Field
+
+variable (ι k : Type u) [Field k]
+
+/-- Polynomial projective space is nonempty once there is a variable.
+
+Nonemptiness is a hypothesis of `Proj.isIntegral` rather than a consequence: `Proj` of a graded
+ring concentrated in degree zero is empty. A variable supplies the missing point. -/
+instance nonempty_projectiveSpace [Nonempty ι] :
+    Nonempty (Proj (polynomialGrading ι k)) := by
+  obtain ⟨i⟩ := ‹Nonempty ι›
+  obtain ⟨x, -⟩ := basicOpen_nonempty (polynomialGrading ι k)
+    (MvPolynomial.isHomogeneous_X k i) Nat.one_pos (MvPolynomial.X_ne_zero i)
+  exact ⟨x⟩
+
+/-- **Polynomial projective space over a field is a variety.**
+
+Finiteness of the variable set is what makes the structure morphism of finite type;
+nonemptiness is what makes the space irreducible rather than vacuously so. -/
+instance isVariety_projectiveSpace [Finite ι] [Nonempty ι] :
+    IsVariety k (Proj (polynomialGrading ι k)) where
+  toIsIntegral := Proj.isIntegral (polynomialGrading ι k)
+  toLocallyOfFiniteType :=
+    inferInstanceAs (LocallyOfFiniteType (projectiveSpaceToSpec ι k))
+
+end Field
 
 end AlgebraicGeometry.Proj
