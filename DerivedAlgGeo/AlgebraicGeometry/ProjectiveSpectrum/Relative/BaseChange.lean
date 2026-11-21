@@ -44,8 +44,9 @@ regluing, and the square is checked to be cartesian over the same cover with
 of a pushout of graded rings (`AlgebraicGeometry.Proj.isPullback_map_of_isPushout`) followed by
 `π⁻¹(V) ≅ Proj 𝒜(V)`.
 
-The compatibility of twisting sheaves in Stacks 01O3 is not proved here: the twisting sheaves
-`𝒪(d)` of relative `Proj` are not constructed.
+The compatibility of twisting sheaves in Stacks 01O3 is not proved here. The twisting sheaves
+`𝒪(d)` of relative `Proj` are in `Relative/Twisting.lean`, and comparing their pullback along
+`relativeProjPullbackMap` with those of `Proj_{S'}(g^*𝒜)` is not done.
 
 ## References
 

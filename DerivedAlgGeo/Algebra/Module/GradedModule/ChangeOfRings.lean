@@ -27,6 +27,7 @@ along `Proj.map ψ`.
 * `GradedModule.DegreeZeroLocalization.mapOfRingHom_mk`: the formula on homogeneous fractions.
 * `GradedModule.DegreeZeroLocalization.mapOfRingHom_smul`: semilinearity over
   `HomogeneousLocalization.map ψ`.
+* `GradedModule.DegreeZeroLocalization.mapOfRingHom_comp`: the maps compose.
 
 ## Implementation notes
 
@@ -136,6 +137,23 @@ theorem mapOfRingHom_smul (a : HomogeneousLocalization 𝒜 P)
     localizedMapOfRingHom_mk, localizedMapOfRingHom_mk, LocalizedModule.mk_smul_mk]
   simp only [map_smulₛₗ, Submonoid.coe_mul, map_mul, GradedRingHom.coe_toRingHom]
   rfl
+
+/-- **The maps of degree-zero localizations compose**: along `ψ` then `ψ'` is along any
+`ψ'' = ψ' ∘ ψ`, with `g'' = g' ∘ g`. -/
+theorem mapOfRingHom_comp {C L σC σL : Type*} [CommRing C] [AddCommGroup L] [Module C L]
+    [SetLike σC C] [AddSubgroupClass σC C] [SetLike σL L] [AddSubgroupClass σL L]
+    {𝒞 : ι → σC} {𝓛 : ι → σL} [GradedRing 𝒞] [SetLike.GradedSMul 𝒞 𝓛]
+    (ψ' : ℬ →+*ᵍ 𝒞) (g' : N →ₛₗ[ψ'.toRingHom] L) {R : Submonoid C} (hQR : Q ≤ R.comap ψ')
+    (hg' : ∀ i (n : N), n ∈ 𝓝 i → g' n ∈ 𝓛 i) (ψ'' : 𝒜 →+*ᵍ 𝒞) (hψ'' : ∀ a, ψ'' a = ψ' (ψ a))
+    (g'' : M →ₛₗ[ψ''.toRingHom] L) (hg''eq : ∀ m, g'' m = g' (g m)) (hPR : P ≤ R.comap ψ'')
+    (hg'' : ∀ i (m : M), m ∈ 𝓜 i → g'' m ∈ 𝓛 i) (z : DegreeZeroLocalization 𝒜 𝓜 P) :
+    mapOfRingHom ψ' g' hQR hg' (mapOfRingHom ψ g hPQ hg z) = mapOfRingHom ψ'' g'' hPR hg'' z := by
+  obtain ⟨c, rfl⟩ := mk_surjective z
+  rw [mapOfRingHom_mk, mapOfRingHom_mk, mapOfRingHom_mk]
+  apply Subtype.ext
+  change LocalizedModule.mk (g' (g c.num)) ⟨ψ' (ψ c.den), _⟩ =
+    LocalizedModule.mk (g'' c.num) ⟨ψ'' c.den, _⟩
+  simp only [hg''eq, hψ'']
 
 end DegreeZeroLocalization
 
