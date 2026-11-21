@@ -15,6 +15,7 @@ import DerivedAlgGeo.LinearAlgebra.QuadraticForm.ComplexPairingSignature
 import DerivedAlgGeo.LinearAlgebra.QuadraticForm.OrthogonalityCutNonempty
 import DerivedAlgGeo.LinearAlgebra.QuadraticForm.PositiveFrame
 import DerivedAlgGeo.LinearAlgebra.QuadraticForm.PositiveFrameOrientation
+import DerivedAlgGeo.LinearAlgebra.QuadraticForm.ChargeNormalization
 
 /-! # Quadratic forms
 

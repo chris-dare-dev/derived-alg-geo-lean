@@ -208,6 +208,13 @@ theorem sym_grading [E.IsQuasicoherent] (U : S.AffineZariskiSite) :
     (sym E).grading U = SymmetricAlgebra.gradedPiece Γ(S, U.toOpens) Γ(E, U.toOpens) :=
   rfl
 
+/-- The restriction maps of `sym E` send a generator `x` to the generator `x|_V`. -/
+theorem sym_restrict_ι [E.IsQuasicoherent] {U V : S.AffineZariskiSite} (h : V ≤ U)
+    (x : Γ(E, U.toOpens)) :
+    (sym E).restrict h (SymmetricAlgebra.ι _ _ x) =
+      SymmetricAlgebra.ι _ _ (E.presheaf.map (homOfLE (toOpens_mono h)).op x) :=
+  symRestrict_ι E _ x
+
 end Sym
 
 end QuasicoherentGradedAlgebraData
