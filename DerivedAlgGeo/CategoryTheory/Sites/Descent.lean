@@ -8,6 +8,7 @@ import DerivedAlgGeo.CategoryTheory.Sites.Descent.DescentDataPrime
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.FiberProduct
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.IsStack
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.Local
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.ModOver
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.ObjectProperty
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.Over
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.SheafOver
@@ -20,6 +21,7 @@ import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.ObjectPropert
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Representable
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.Representability
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.StackInGroupoids.ULift
+import DerivedAlgGeo.CategoryTheory.Sites.Descent.Torsor
 import DerivedAlgGeo.CategoryTheory.Sites.Descent.ULift
 
 /-!
@@ -36,6 +38,8 @@ its directory, so this umbrella imports the children directly.
 * `DescentDataAsCoalgebra.lean`: the base change morphism of a chosen pullback,
   and descent data along one morphism as coalgebras for the comonad of
   `f^* ⊣ f_*` when two base change morphisms are isomorphisms.
+* `ModOver.lean`: the pseudofunctor of objects with an action of a sheaf of monoids on the
+  slices of a site.
 * `ObjectProperty.lean`: local object properties and the equivalence between
   descent data of the core and the core of descent data.
 * `StackInGroupoids.lean` and its children: stacks in groupoids, discrete
@@ -45,6 +49,8 @@ its directory, so this umbrella imports the children directly.
   groupoids, the 2-Yoneda equivalence `StackInGroupoids.yonedaEquivalence`,
   and representable morphisms of stacks, natural in the test object
   (`StackMorphism.IsRepresentable`).
+* `Torsor.lean`: torsors under a sheaf of groups, and the stack in groupoids of torsors
+  `torsorStack`.
 * `ULift.lean`: descent data of the universe lift `Pseudofunctor.ulift` are
   equivalent to those of the original pseudofunctor.
 
@@ -61,6 +67,8 @@ its directory, so this umbrella imports the children directly.
 * `Local.lean`: effective descent along a covering sieve can be checked on the
   members of a covering family of a second topology for which the pseudofunctor is a
   stack.
+* `ModOver.lean`: objects with an action of a sheaf of monoids on the slices of a site form a
+  stack, when sheaves of types on the slices do.
 * `ObjectProperty.lean`: the core of a stack is a stack, and a local object
   property closed under isomorphisms cuts out a substack.
 * `Over.lean`: the pullback of a stack along a continuous functor is a stack, so a stack on
@@ -68,6 +76,7 @@ its directory, so this umbrella imports the children directly.
 * `SheafOver.lean`: sheaves on the slices of a site form a prestack for every coefficient
   category, and sheaves of types form a stack when covering sieves contain small covering
   families.
+* `Torsor.lean`: being a torsor is local, so torsors form a stack in groupoids.
 * `ULift.lean`: a pseudofunctor is a prestack (a stack) exactly when its universe lift is.
 * `StackInGroupoids/Fibered.lean`: the Grothendieck construction of a stack in
   groupoids is a category fibred in groupoids (`StackInGroupoids.isStronglyCartesian`).
