@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.Algebra.Category.ModuleCat.Localization
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExtendScalars
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Homology
 import DerivedAlgGeo.Algebra.Homology.Embedding.StupidTruncGE
@@ -1005,6 +1006,40 @@ theorem mPseudoCoherent_of_faithfullyFlat (f : R ⟶ S) (hf : f.hom.FaithfullyFl
     exact ModuleCat.isZero_of_subsingleton M
   · have : Module.Finite S (S ⊗[R] M) := hM ()
     exact Module.Finite.of_finite_tensorProduct_of_faithfullyFlat S
+
+/-- Stacks 066D. Pseudo-coherence is local for the Zariski topology: if `r₁, …, rₙ` generate the
+unit ideal and every `K ⊗_R R_{rᵢ}` is `m`-pseudo-coherent, then `K` is `m`-pseudo-coherent. -/
+theorem mPseudoCoherent_of_span_eq_top {ι : Type*} [Finite ι] (r : ι → R)
+    (hr : Ideal.span (Set.range r) = ⊤) {m : ℤ} {K : DerivedCategory (ModuleCat.{u} R)}
+    (hK : ∀ i, mPseudoCoherent (Localization.Away (r i)) m
+      ((extendScalarsDerivedOfFlat (CommRingCat.ofHom (algebraMap R (Localization.Away (r i))))
+        (RingHom.flat_algebraMap_iff.mpr
+          (IsLocalization.flat _ (Submonoid.powers (r i))))).obj K)) :
+    mPseudoCoherent R m K := by
+  refine mPseudoCoherent_of_extendScalarsDerivedOfFlat
+    (S := fun i ↦ CommRingCat.of (Localization.Away (r i)))
+    (fun i ↦ CommRingCat.ofHom (algebraMap R (Localization.Away (r i)))) _
+    (fun M hM ↦ ?_) (fun M hM ↦ ?_) hK
+  · have h (i : ι) : IsZero (M.localizedModule (Submonoid.powers (r i))) :=
+      (hM i).of_iso (extendScalarsLocalizationIso _ M).symm
+    have : Subsingleton M := by
+      suffices ∀ z : M, z = 0 from ⟨fun x y ↦ by rw [this x, this y]⟩
+      intro z
+      have := Submodule.mem_of_span_eq_top_of_smul_pow_mem (⊥ : Submodule R M) (Set.range r) hr z
+        (by
+          rintro ⟨_, i, rfl⟩
+          have := ModuleCat.subsingleton_of_isZero (h i)
+          obtain ⟨⟨_, n, rfl⟩, hn⟩ := (IsLocalizedModule.eq_zero_iff (Submonoid.powers (r i))
+            (M.localizedModuleMkLinearMap (Submonoid.powers (r i)))).1 (Subsingleton.elim _ _)
+          exact ⟨n, by simpa [Submonoid.smul_def] using hn⟩)
+      simpa using this
+    exact ModuleCat.isZero_of_subsingleton M
+  · refine Module.Finite.of_localizationSpan' (Set.range r) hr
+      (Rₚ := fun g ↦ Localization.Away g.val)
+      (Mₚ := fun g ↦ M.localizedModule (Submonoid.powers g.val))
+      (fun g ↦ M.localizedModuleMkLinearMap _) ?_
+    rintro ⟨_, i, rfl⟩
+    exact finite_of_iso (extendScalarsLocalizationIso _ M) (hM i)
 
 end BaseChange
 
