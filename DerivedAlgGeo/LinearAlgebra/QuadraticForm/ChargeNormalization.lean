@@ -45,6 +45,8 @@ in the proof of Bayer's Lemma 5.7.
 * `QuadraticMap.IsNormalized.normalized_charge_bound` — the estimate
   `‖(Z + u ∘ kerProj Q Z) v - Z v‖ ≤ c * ‖Z v‖` for `0 ≤ Q v`, whenever `c` bounds `u`
   against the norm that `-Q` puts on `ker Z`.
+* `QuadraticMap.IsNormalized.apply_neg_of_apply_add_eq_zero` — for `c < 1` the kernel
+  of `Z + u ∘ kerProj Q Z` is still negative definite for `Q`.
 * `QuadraticMap.surjective_of_negDef` and
   `QuadraticMap.posDef_orthogonal_ker_of_hasSignatureTwo` — in signature
   `(2, dim V - 2)` (`PeriodDomain.HasSignatureTwo`), a charge with `Q`-negative definite
@@ -259,6 +261,37 @@ theorem IsNormalized.normalized_charge_bound (h : IsNormalized Q Z)
     (hu : ∀ k, ‖u k‖ ^ 2 ≤ c ^ 2 * -Q k) {v : V} (hv : 0 ≤ Q v) :
     ‖(Z + u ∘ₗ kerProj Q Z) v - Z v‖ ≤ c * ‖Z v‖ := by
   simpa using h.norm_apply_kerProj_le hc hu hv
+
+/-- **The deformed kernel stays negative definite.** For a normalized pair `(Q, Z)`
+and `u` of norm `c < 1` for `√(-Q)` on `ker Z`, every nonzero `v` in the kernel of
+`W = Z + u ∘ kerProj Q Z` has `Q v < 0`.
+
+Indeed `Z v = -u (p v)`, so `Q v = ‖u (p v)‖ ^ 2 + Q (p v) ≤ (1 - c ^ 2) Q (p v)`, and
+`p v ≠ 0` because otherwise `v ∈ ker Z` and `v = p v = 0`. This is the argument for
+`‖u‖ < 1` in the proof of Lemma 4.4(1) of arXiv:1606.02169, run in the other
+direction. -/
+theorem IsNormalized.apply_neg_of_apply_add_eq_zero (h : IsNormalized Q Z)
+    {u : LinearMap.ker Z →ₗ[ℝ] ℂ} {c : ℝ} (hc : 0 ≤ c) (hc1 : c < 1)
+    (hu : ∀ k, ‖u k‖ ^ 2 ≤ c ^ 2 * -Q k) {v : V}
+    (hv : (Z + u ∘ₗ kerProj Q Z) v = 0) (hv0 : v ≠ 0) : Q v < 0 := by
+  have hZ := polarBilin_restrict_nondegenerate_of_negDef h.negDef_ker
+  have hZv : Z v = -u (kerProj Q Z v) := by
+    simp only [LinearMap.add_apply, LinearMap.comp_apply] at hv
+    exact eq_neg_of_add_eq_zero_left hv
+  have hp : kerProj Q Z v ≠ 0 := by
+    intro hp0
+    have hker : v ∈ LinearMap.ker Z := by
+      rw [LinearMap.mem_ker, hZv, hp0, map_zero, neg_zero]
+    have := kerProj_apply_of_mem hZ hker
+    rw [hp0, Submodule.coe_zero] at this
+    exact hv0 this.symm
+  have hneg : 0 < -Q (kerProj Q Z v) := by
+    simpa using h.negDef_ker _ hp
+  have hbound := hu (kerProj Q Z v)
+  have heq := h.apply_eq v
+  rw [hZv, norm_neg] at heq
+  have hc2 : c ^ 2 < 1 := by nlinarith
+  nlinarith
 
 end Normalized
 
