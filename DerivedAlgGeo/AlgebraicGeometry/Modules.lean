@@ -8,6 +8,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.ExteriorPower
 import DerivedAlgGeo.AlgebraicGeometry.Modules.ExteriorPower.Restriction
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Flasque
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Flat
+import DerivedAlgGeo.AlgebraicGeometry.Modules.FlatDescent
 import DerivedAlgGeo.AlgebraicGeometry.Modules.FlatGenerators
 import DerivedAlgGeo.AlgebraicGeometry.Modules.FlatResolutionTotalization
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Flattening
