@@ -23,11 +23,14 @@ None: this umbrella re-exports its children.
 * `Module.Flat.of_injective_of_flat_quotient_of_isLocalHom`: Stacks 00ML, its variant.
 * `Module.Flat.exists_fg_subalgebra_flat_of_isNoetherianRing`: Stacks 02JO (1) over a Noetherian
   base, EGA IV₃ 11.2.6.1 and 11.2.7: flatness is reached on a finitely generated subalgebra.
+* `Module.Flat.exists_flat_of_isColimit`: EGA IV₃ 11.2.6.1 (ii): flatness descends to a finite stage
+  of a filtered colimit of rings.
 
 ## Implementation notes
 
-The children import Mathlib only, except `FilteredColimit`, which also imports `LocalCriterion`
-and the generic freeness file `Localization/Free`.
+The children import Mathlib only, except `FilteredColimit`, which also imports `LocalCriterion`,
+the generic freeness file `Localization/Free` and the Noetherian models of finitely presented
+modules.
 
 ## References
 
