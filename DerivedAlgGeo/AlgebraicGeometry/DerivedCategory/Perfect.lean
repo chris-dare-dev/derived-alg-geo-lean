@@ -2,6 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Perfect.BaseChange
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Perfect.Relative
 
 /-!
@@ -13,7 +14,7 @@ morphism, stated before any moduli problem consumes them.
 
 ## Main definitions
 
-None; this module re-exports its child `Perfect/Relative.lean`, which defines
+None; this module re-exports its children. `Perfect/Relative.lean` defines
 `AlgebraicGeometry.schemePseudoCoherent`,
 `AlgebraicGeometry.schemeLocallyFiniteTorAmplitudeOver`,
 `AlgebraicGeometry.schemeRelativePerfect` and
@@ -21,7 +22,9 @@ None; this module re-exports its child `Perfect/Relative.lean`, which defines
 
 ## Main results
 
-None; this module re-exports its children.
+None; this module re-exports its children. `Perfect/BaseChange.lean` proves that relative
+perfection is stable under derived base change of a flat family,
+`AlgebraicGeometry.schemeRelativePerfect_baseChange`.
 
 ## Implementation notes
 

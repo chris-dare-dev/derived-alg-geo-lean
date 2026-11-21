@@ -5,6 +5,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.AffineLocalizationUnit
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.AffineSpec
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.FixedBaseSections
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.FixedBaseOpenSections
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.FlatOverQuasiIso
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Free
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.LocallyFree
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Monoidal
