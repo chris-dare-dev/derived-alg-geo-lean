@@ -48,10 +48,8 @@ Tag 08BS is the K-injective preservation of Stacks, Tag 08BJ
 so the result is transported along `Scheme.Modules.restrictFunctorIsoPullback`.
 
 On module sheaves, the base change of restriction along pushforward is
-`Scheme.Modules.pushforwardRestrictBaseChangeNatIso`, stated for the chosen pullback. An
-arbitrary pullback square is compared with the chosen one through `IsPullback.isoPullback`;
-pushforward along that isomorphism of schemes is an equivalence, so the unit of
-`pullback ⊣ pushforward` along it is invertible.
+`Scheme.Modules.pushforwardRestrictBaseChangeNatIso`, stated for any pullback square of an open
+immersion, so it applies to the given square directly.
 
 Tag 08FE then follows from the universal property. `Rf_* ⋙ j^*` is a right derived functor of
 `f_* ⋙ j^*`, because `kInjectiveDerivedFunctor` stays one after post-composition. Its
@@ -148,33 +146,15 @@ theorem isOpenImmersion_left_of_isPullback (sq : IsPullback f' j' j f)
 
 /-- For a pullback square of scheme base changes whose right edge `j` is an open immersion,
 pushforward along `f` followed by restriction along `j` is restriction along `j'` followed by
-pushforward along `f'`. It is `Scheme.Modules.pushforwardRestrictBaseChangeNatIso`, transported
-from the chosen pullback to the given square. -/
+pushforward along `f'`. It is `Scheme.Modules.pushforwardRestrictBaseChangeNatIso` for the
+underlying square of schemes, with restriction rewritten as module pullback. -/
 def modulePushforwardCompPullbackIso (sq : IsPullback f' j' j f) [IsOpenImmersion j.left] :
-    modulePushforward f ⋙ modulePullback j ≅ modulePullback j' ⋙ modulePushforward f' := by
-  have sq' : IsPullback j'.left f'.left f.left j.left := (sq.map (Over.forget S)).flip
-  let e := sq'.isoPullback
-  have : (Scheme.Modules.pushforward e.hom).IsEquivalence :=
-    (CategoryTheory.Equivalence.mk (Scheme.Modules.pushforward e.hom)
-      (Scheme.Modules.pushforward e.inv)
-      ((Scheme.Modules.pushforwardId _).symm ≪≫
-        Scheme.Modules.pushforwardCongr e.hom_inv_id.symm ≪≫
-        (Scheme.Modules.pushforwardComp e.hom e.inv).symm)
-      (Scheme.Modules.pushforwardComp e.inv e.hom ≪≫
-        Scheme.Modules.pushforwardCongr e.inv_hom_id ≪≫
-        Scheme.Modules.pushforwardId _)).isEquivalence_functor
-  exact Functor.isoWhiskerLeft _ (Scheme.Modules.restrictFunctorIsoPullback j.left).symm ≪≫
-    Scheme.Modules.pushforwardRestrictBaseChangeNatIso j.left f.left ≪≫
-    Functor.isoWhiskerRight (Scheme.Modules.restrictFunctorIsoPullback _) _ ≪≫
-    Functor.isoWhiskerLeft _ ((Functor.leftUnitor _).symm ≪≫
-      Functor.isoWhiskerRight
-        (asIso (Scheme.Modules.pullbackPushforwardAdjunction e.hom).unit) _ ≪≫
-      Functor.associator _ _ _) ≪≫
-    (Functor.associator _ _ _).symm ≪≫
-    Functor.isoWhiskerRight (Scheme.Modules.pullbackComp e.hom _) _ ≪≫
-    Functor.isoWhiskerLeft _ (Scheme.Modules.pushforwardComp e.hom _) ≪≫
-    Functor.isoWhiskerRight (Scheme.Modules.pullbackCongr sq'.isoPullback_hom_fst) _ ≪≫
-    Functor.isoWhiskerLeft _ (Scheme.Modules.pushforwardCongr sq'.isoPullback_hom_snd)
+    modulePushforward f ⋙ modulePullback j ≅ modulePullback j' ⋙ modulePushforward f' :=
+  haveI := isOpenImmersion_left_of_isPullback sq
+  Functor.isoWhiskerLeft _ (Scheme.Modules.restrictFunctorIsoPullback j.left).symm ≪≫
+    Scheme.Modules.pushforwardRestrictBaseChangeNatIso j.left f.left j'.left f'.left
+      (sq.map (Over.forget S)).flip ≪≫
+    Functor.isoWhiskerRight (Scheme.Modules.restrictFunctorIsoPullback j'.left) _
 
 namespace RightDerivedPushforward
 
