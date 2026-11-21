@@ -8,6 +8,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Morphisms.Etale
 import DerivedAlgGeo.AlgebraicGeometry.Morphisms.FiltrationProperty
 import DerivedAlgGeo.AlgebraicGeometry.Morphisms.FinitePresentation
 import DerivedAlgGeo.AlgebraicGeometry.Morphisms.Projective
+import DerivedAlgGeo.AlgebraicGeometry.Morphisms.QuasiCompact
 import DerivedAlgGeo.AlgebraicGeometry.Morphisms.RelativelyAmple
 import DerivedAlgGeo.AlgebraicGeometry.Morphisms.UniversallyClosed
 
