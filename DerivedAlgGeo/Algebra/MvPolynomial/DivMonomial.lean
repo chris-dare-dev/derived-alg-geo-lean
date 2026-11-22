@@ -114,7 +114,7 @@ theorem divMonomial_pow_mul {γ γ' : ι →₀ ℕ} {i₀ : ι} {c : ℕ}
 /-- Dividing a homogeneous polynomial of degree `n + d` by `Xᵢⁿ`, when the division is exact,
 produces a homogeneous polynomial of degree `d`. -/
 theorem divMonomial_single_mem_homogeneousSubmodule
-    (ι k : Type u) [Field k] (i : ι) (n d : ℕ) (p : MvPolynomial ι k)
+    (ι k : Type u) [CommSemiring k] (i : ι) (n d : ℕ) (p : MvPolynomial ι k)
     (hp : p ∈ homogeneousSubmodule ι k (n + d)) :
     p.divMonomial (Finsupp.single i n) ∈ homogeneousSubmodule ι k d := by
   intro s hs
@@ -126,7 +126,7 @@ theorem divMonomial_single_mem_homogeneousSubmodule
 
 /-- Exact division by `Xᵢⁿ` reconstructs the original polynomial. -/
 theorem X_pow_mul_divMonomial_single
-    (ι k : Type u) [Field k] (i : ι) (n : ℕ) (p : MvPolynomial ι k)
+    (ι k : Type u) [CommSemiring k] (i : ι) (n : ℕ) (p : MvPolynomial ι k)
     (hdiv : (X i : MvPolynomial ι k) ^ n ∣ p) :
     X i ^ n * p.divMonomial (Finsupp.single i n) = p := by
   rw [X_pow_eq_monomial]
@@ -137,18 +137,28 @@ theorem X_pow_mul_divMonomial_single
     divMonomial_add_modMonomial p (Finsupp.single i n)
 
 /-- If a fraction with denominator a power of `Xᵢ` also admits a denominator involving only a
-different variable, then its numerator is divisible by the entire power of `Xᵢ`. -/
+different variable, then its numerator is divisible by the entire power of `Xᵢ`.
+
+The proof reads coefficients, so it holds over any commutative semiring: a monomial `Xˢ` of `p` with
+`s i < n` survives in `Xⱼᵐ * p` as `X^(s + m • eⱼ)`, whose `Xᵢ`-exponent is still `s i < n`, so it
+cannot occur in a multiple of `Xᵢⁿ`. -/
 theorem X_pow_dvd_of_cross_mul
-    (ι k : Type u) [Field k] {i j : ι} (hij : i ≠ j) (n m : ℕ)
+    (ι k : Type u) [CommSemiring k] {i j : ι} (hij : i ≠ j) (n m : ℕ)
     (p q : MvPolynomial ι k) (hcross : X j ^ m * p = X i ^ n * q) :
     (X i : MvPolynomial ι k) ^ n ∣ p := by
-  have hnot : ¬(X i : MvPolynomial ι k) ∣ X j ^ m := by
-    intro h
-    have hX : (X i : MvPolynomial ι k) ∣ X j :=
-      (X_prime (R := k) (i := i)).dvd_of_dvd_pow h
-    exact hij (X_dvd_X.mp hX)
-  apply (X_prime (R := k) (i := i)).pow_dvd_of_dvd_mul_left n hnot
-  exact ⟨q, hcross⟩
+  classical
+  rw [X_pow_eq_monomial, monomial_one_dvd_iff_modMonomial_eq_zero]
+  ext s
+  rw [AddMonoidAlgebra.coeff_zero, Finsupp.coe_zero, Pi.zero_apply]
+  by_cases hle : Finsupp.single i n ≤ s
+  · exact coeff_modMonomial_of_le p hle
+  · rw [coeff_modMonomial_of_not_le p hle]
+    have h := congrArg (fun r : MvPolynomial ι k => r.coeff (Finsupp.single j m + s)) hcross
+    rw [X_pow_eq_monomial, X_pow_eq_monomial, coeff_monomial_mul, one_mul,
+      coeff_monomial_mul', ite_eq_right] at h
+    · exact h
+    · rw [Finsupp.single_le_iff] at hle ⊢
+      simpa [Finsupp.single_apply, Ne.symm hij] using hle
 
 /-- A homogeneous polynomial divisible by `X i ^ a` but of degree below `a`
 is zero.
@@ -157,7 +167,7 @@ Every monomial of a multiple of `X i ^ a` carries `X i` to at least the
 power `a`, so its total degree is at least `a`. A homogeneous polynomial of
 degree `m < a` therefore has no monomials at all. -/
 theorem eq_zero_of_X_pow_dvd_of_isHomogeneous_of_lt
-    (ι k : Type u) [Field k] (i : ι) (a m : ℕ) (p : MvPolynomial ι k)
+    (ι k : Type u) [CommSemiring k] (i : ι) (a m : ℕ) (p : MvPolynomial ι k)
     (hp : p ∈ homogeneousSubmodule ι k m)
     (hdvd : (X i : MvPolynomial ι k) ^ a ∣ p)
     (hlt : m < a) :
@@ -190,7 +200,7 @@ cross-variable equation forces divisibility by its own denominator power.
 The cross equation makes `X i ^ a` divide `p`, while `m = a + d` and `d < 0`
 put the homogeneous degree of `p` strictly below `a`. -/
 theorem num_eq_zero_of_cross_of_neg
-    (ι k : Type u) [Field k] {i j : ι} (hij : i ≠ j) (d : ℤ) (hd : d < 0)
+    (ι k : Type u) [CommSemiring k] {i j : ι} (hij : i ≠ j) (d : ℤ) (hd : d < 0)
     (a b m : ℕ) (p q : MvPolynomial ι k) (hm : (m : ℤ) = (a : ℤ) + d)
     (hp : p ∈ homogeneousSubmodule ι k m)
     (hcross : X j ^ b * p = X i ^ a * q) :

@@ -36,7 +36,8 @@ arbitrary inclusions of affine opens carry no data. The degree-`d` pieces are re
 the submodules `𝒜(U)_d`; gluing them into quasi-coherent module sheaves is not done here.
 
 The carrier asks nothing about generation in degree one: `Proj` of a graded ring needs no such
-hypothesis, and the twisting sheaf `𝒪(1)` that does is not constructed here.
+hypothesis. The twisting sheaves `𝒪(d)`, which do, take it as the hypothesis
+`GeneratedInDegreeOne` in `Relative/Twisting.lean`.
 
 The independent consumers of the carrier are the projective bundles `P(E) = Proj_S(Sym(E))` built
 from `sym`, projective morphisms, and the Plücker and Quot constructions. The reconstruction of a
@@ -207,6 +208,13 @@ theorem sym_carrier [E.IsQuasicoherent] (U : S.AffineZariskiSite) :
 theorem sym_grading [E.IsQuasicoherent] (U : S.AffineZariskiSite) :
     (sym E).grading U = SymmetricAlgebra.gradedPiece Γ(S, U.toOpens) Γ(E, U.toOpens) :=
   rfl
+
+/-- The restriction maps of `sym E` send a generator `x` to the generator `x|_V`. -/
+theorem sym_restrict_ι [E.IsQuasicoherent] {U V : S.AffineZariskiSite} (h : V ≤ U)
+    (x : Γ(E, U.toOpens)) :
+    (sym E).restrict h (SymmetricAlgebra.ι _ _ x) =
+      SymmetricAlgebra.ι _ _ (E.presheaf.map (homOfLE (toOpens_mono h)).op x) :=
+  symRestrict_ι E _ x
 
 end Sym
 

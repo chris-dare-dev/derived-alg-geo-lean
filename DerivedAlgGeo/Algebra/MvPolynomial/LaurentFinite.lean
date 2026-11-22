@@ -5,7 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.Algebra.MvPolynomial.LaurentBlock
 
 /-!
-# The base field acting on a homogeneous localization, and the finiteness of a full block
+# The base ring acting on a homogeneous localization, and the finiteness of a full block
 
 `LaurentBlock.lean` decomposes an away localization by the negative support of the Laurent
 exponent and proves the combinatorial fact the top cohomology of `Pⁿ` rests on:
@@ -15,7 +15,7 @@ localization itself.
 
 ## Main definitions
 
-* `MvPolynomial.polynomialToHomogeneousLocalization`: the base field mapping into a homogeneous
+* `MvPolynomial.polynomialToHomogeneousLocalization`: the base ring mapping into a homogeneous
   localization of the polynomial ring through the constants.
 * `MvPolynomial.degreeZeroLocalizationModule`: the `k`-module structure on a degree-zero
   homogeneous localization, by restriction of scalars.
@@ -27,17 +27,17 @@ localization itself.
   numerator.
 * `MvPolynomial.blockProj_univ_mem_span`: the full block lies in the span of a fixed family
   indexed by a finite exponent set.
-* `MvPolynomial.fg_blockSpan`: the full block of one localization is a finite-dimensional
-  `k`-space.
+* `MvPolynomial.fg_blockSpan`: the full block of one localization is a finitely generated
+  `k`-module.
 * `MvPolynomial.mapOfLE_smul`: enlarging the denominator submonoid is `k`-linear.
 
 ## Implementation notes
 
-### Why the base field has to appear
+### Why the base ring has to appear
 
 Everything in the Čech computation of sheaf cohomology is valued in abelian groups, and "finitely
 many exponents" is not by itself a finiteness statement about a group: the block is a
-`k`-vector space, and it is spanned — not generated as an abelian group — by the corresponding
+`k`-module, and it is spanned — not generated as an abelian group — by the corresponding
 monomial fractions. So the `k`-action has to be named before the count can be used.
 
 It is not extra data. A constant is a degree-zero homogeneous element, so `k` maps into every
@@ -68,7 +68,7 @@ The Laurent-exponent decomposition of `DerivedAlgGeo.Algebra.MvPolynomial.Lauren
 
 ## Tags
 
-homogeneous localization, Laurent polynomial, restriction of scalars, finite-dimensional
+homogeneous localization, Laurent polynomial, restriction of scalars, finitely generated
 -/
 
 universe u
@@ -79,9 +79,9 @@ namespace MvPolynomial
 
 attribute [local instance] MvPolynomial.gradedAlgebra
 
-variable (ι k : Type u) [Field k]
+variable (ι k : Type u) [CommRing k]
 
-/-- The base field acts on every homogeneous localization of the polynomial ring, through the
+/-- The base ring acts on every homogeneous localization of the polynomial ring, through the
 constants — which are exactly the degree-zero part of the grading. -/
 noncomputable def polynomialToHomogeneousLocalization (S : Submonoid (MvPolynomial ι k)) :
     k →+* HomogeneousLocalization (polynomialGrading ι k) S :=
@@ -92,13 +92,13 @@ variable {σM : Type u} [SetLike σM (MvPolynomial ι k)]
   [AddSubgroupClass σM (MvPolynomial ι k)] (𝓜 : ℕ → σM)
   [SetLike.GradedSMul (polynomialGrading ι k) 𝓜]
 
-/-- The base field acting on a degree-zero homogeneous localization, by restriction of scalars
+/-- The base ring acting on a degree-zero homogeneous localization, by restriction of scalars
 along `polynomialToHomogeneousLocalization`. -/
 noncomputable instance degreeZeroLocalizationModule (S : Submonoid (MvPolynomial ι k)) :
     Module k (DegreeZeroLocalization (polynomialGrading ι k) 𝓜 S) :=
   Module.compHom _ (polynomialToHomogeneousLocalization ι k S)
 
-/-- **The base field acts on the numerator.** Scalar multiplication on a fraction `p / fⁿ` is
+/-- **The base ring acts on the numerator.** Scalar multiplication on a fraction `p / fⁿ` is
 scalar multiplication on `p`, because a constant is a degree-zero homogeneous element with
 denominator `1`. This is what lets a spanning argument strip coefficients off monomials. -/
 theorem awayMk_smul {d : ℤ} (h𝓜 : IsPolynomialTwist 𝓜 d) {f : MvPolynomial ι k} {e : ℕ}
@@ -168,13 +168,19 @@ noncomputable def blockRep (γ : ι →₀ ℕ) (α : ι →₀ ℤ) :
 
 /-- **The Laurent exponent selects the representative.** A monomial fraction is the chosen
 representative of its own exponent — `awayMk_monomial_eq_iff_laurentExponent` is what makes the
-choice harmless. -/
+choice harmless. Over the zero ring that criterion fails, but there `Xᵞ = 0` and both sides lie in
+the zero localization. -/
 theorem awayMk_eq_blockRep (γ : ι →₀ ℕ) {m : ℕ} {β : ι →₀ ℕ}
     (h : MvPolynomial.monomial β (1 : k) ∈ 𝓜 (m • γ.degree)) :
     DegreeZeroLocalization.awayMk (𝓜 := 𝓜) (monomial_one_mem_polynomialGrading (R := k) γ) m
         (MvPolynomial.monomial β 1) h =
       blockRep ι k 𝓜 γ (laurentExponent γ m β) := by
   classical
+  rcases subsingleton_or_nontrivial k with hk | hk
+  · haveI := DegreeZeroLocalization.subsingleton_of_zero_mem (𝒜 := polynomialGrading ι k)
+      (𝓜 := 𝓜) (S := .powers (MvPolynomial.monomial γ (1 : k)))
+      ⟨1, by simp [Subsingleton.elim (1 : k) 0]⟩
+    exact Subsingleton.elim _ _
   have hex : ∃ mb : ℕ × (ι →₀ ℕ),
       (MvPolynomial.monomial mb.2 (1 : k) ∈ 𝓜 (mb.1 • γ.degree)) ∧
         laurentExponent γ mb.1 mb.2 = laurentExponent γ m β := ⟨(m, β), h, rfl⟩
@@ -196,7 +202,7 @@ theorem blockProj_univ_mem_span [Fintype ι] {d : ℤ} (h𝓜 : IsPolynomialTwis
         {α : ι →₀ ℤ | α.degree = d ∧ ∀ j : ι, α j < 0}) := by
   classical
   obtain ⟨m, p, hp, rfl⟩ := DegreeZeroLocalization.exists_awayMk
-    (monomial_one_mem_polynomialGrading (R := k) γ) (monomial_one_pow_ne_zero γ) z
+    (monomial_one_mem_polynomialGrading (R := k) γ) z
   have hfilt := IsPolynomialTwist.laurentFilter_mem h𝓜 (F := Finset.univ) (γ := γ) (m := m) hp
   rw [blockProj_awayMk h𝓜 γ Finset.univ hp, awayMk_eq_sum_monomial h𝓜 γ _ hfilt]
   refine Submodule.sum_mem _ fun β hβ => ?_
@@ -219,7 +225,7 @@ theorem blockProj_univ_mem_span [Fintype ι] {d : ℤ} (h𝓜 : IsPolynomialTwis
       (by rw [intNegSupport_of_mem_support_laurentFilter ι k γ m Finset.univ p hβ]
           exact Finset.mem_univ j)
 
-/-- **The full block of one localization is a finite-dimensional `k`-space.**
+/-- **The full block of one localization is a finitely generated `k`-module.**
 
 `finite_setOf_degree_eq_of_neg` bounds the exponents that can appear — every coordinate negative
 with a fixed total — and `blockProj_univ_mem_span` says nothing outside that family is needed. -/

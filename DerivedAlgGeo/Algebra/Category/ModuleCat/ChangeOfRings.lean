@@ -5,7 +5,9 @@ Released under the MIT license.
 import Mathlib.Algebra.Category.ModuleCat.ChangeOfRings
 
 /-!
-# Extension of scalars along a composite given by an equation
+# Extension of scalars: additivity and composites given by an equation
+
+Extension of scalars along a ring map is an additive functor.
 
 Mathlib's `ModuleCat.extendScalarsComp` identifies extension of scalars along `f₂₃.comp f₁₂`
 with extension along `f₁₂` followed by extension along `f₂₃`. This file adds the variant
@@ -16,6 +18,7 @@ the legs `R.map f ≫ c.ι.app j' = c.ι.app j` of a cocone.
 
 ## Main definitions
 
+* `ModuleCat.extendScalars_additive`: extension of scalars along any ring map is additive.
 * `ModuleCat.extendScalarsComp'`: the isomorphism
   `extendScalars f₁₃ ≅ extendScalars f₁₂ ⋙ extendScalars f₂₃` for `f₁₃ = f₂₃.comp f₁₂`.
 
@@ -80,5 +83,20 @@ lemma extendScalarsComp'_inv_app_tmul (M : ModuleCat.{max v u} R₁) (s : R₃) 
     exact mul_comm (f₂₃ r) s
   rw [this]
   exact Iso.hom_inv_id_apply ((extendScalarsComp' f₁₂ f₂₃ f₁₃ h).app M) _
+
+section Additive
+
+variable {R : Type u₁} {S : Type u₂} [CommRing R] [CommRing S]
+
+/-- Extension of scalars along a ring map is additive: `1 ⊗ (g + h) = 1 ⊗ g + 1 ⊗ h`. -/
+instance extendScalars_additive (f : R →+* S) : (extendScalars.{u₁, u₂, v} f).Additive where
+  map_add {M N} g h := by
+    apply ExtendScalars.hom_ext
+    intro m
+    letI : Module R S := Module.compHom S f
+    change (1 : S) ⊗ₜ[R, f] (g m + h m) = (1 : S) ⊗ₜ[R, f] g m + (1 : S) ⊗ₜ[R, f] h m
+    rw [TensorProduct.tmul_add]
+
+end Additive
 
 end ModuleCat
