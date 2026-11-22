@@ -8,6 +8,7 @@ import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Relative.Bundle
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Relative.Functoriality
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Relative.GradedAlgebraData
 import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Relative.Pullback
+import DerivedAlgGeo.AlgebraicGeometry.ProjectiveSpectrum.Relative.Twisting
 
 /-!
 # Relative `Proj`
@@ -28,4 +29,6 @@ The relative `Proj` of a quasi-coherent graded `𝒪_S`-algebra (Stacks, Section
   morphism `g : S' ⟶ S`, glued from the local models `Γ(S', V') ⊗_{Γ(S, V)} 𝒜(V)`.
 * `Relative/BaseChange.lean`: `QuasicoherentGradedAlgebraData.relativeProj_isPullback`,
   `Proj_{S'}(g^*𝒜) = S' ×_S Proj_S(𝒜)`.
+* `Relative/Twisting.lean`: `QuasicoherentGradedAlgebraData.twistingSheaf`, the invertible twisting
+  sheaves `𝒪(d)` of `Proj_S(𝒜)` for `𝒜` generated in degree one, glued from those of the charts.
 -/
