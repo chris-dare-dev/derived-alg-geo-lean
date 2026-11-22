@@ -46,8 +46,8 @@ of pairs of charts.
 The global-section comparison holds over any commutative ring. Two charts of a global section are
 compared on the Čech intersection of the pair, where restriction is the Čech face and sections are
 fractions; variables are non-zero-divisors, so the faces are injective and the overlap condition
-clears to a cross equation of numerators (`X_pow_dvd_of_cross_mul`). The surjectivity proof uses
-two distinct variables (`Nontrivial ι`).
+clears to a cross equation of numerators (`X_pow_dvd_of_cross_mul`). With a single variable the
+divisibility needs no second chart.
 
 The global-section comparison is for a *nonnegative* twist. The imported algebraic layer owns
 variable generation, exact monomial division, the canonical localization fraction, and both Čech
@@ -123,6 +123,20 @@ noncomputable def polynomialToNatGlobalSections (ι k : Type u) [CommRing k] (d 
           LocalizedModule.mk (q : MvPolynomial ι k) _
     rw [LocalizedModule.mk_add_mk, LocalizedModule.mk_eq]
     exact ⟨1, by simp⟩
+
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
+/-- The section of a polynomial is the fraction `p / 1` at every point. -/
+theorem polynomialToNatGlobalSections_apply (ι k : Type u) [CommRing k] (d : ℕ)
+    (p : MvPolynomial.homogeneousSubmodule ι k d)
+    (x : ProjectiveSpectrum.top (polynomialGrading ι k)) (hx : x ∈ (⊤ : Opens _)) :
+    (polynomialToNatGlobalSections ι k d p).1 ⟨x, hx⟩ =
+      DegreeZeroLocalization.mk
+        { deg := 0
+          num := ⟨p.1, by change p.1 ∈ polynomialGrading ι k (0 + d); simp⟩
+          den := ⟨1, SetLike.one_mem_graded (polynomialGrading ι k)⟩
+          den_mem := Ideal.IsPrime.one_notMem inferInstance } :=
+  rfl
 
 /-- Nonnegative twists on polynomial projective space are quasi-coherent.
 
@@ -610,48 +624,74 @@ private theorem rightPairFace_injective (ι k : Type u) [CommRing k] (d : ℕ) (
       ((isSMulRegular_pairDenominator ι k i a).pow n h')
   rfl
 
+/-- With a single variable, a homogeneous polynomial of degree `n + d` is divisible by `Xᵢⁿ`: its
+only possible monomial is `Xᵢ ^ (n + d)`. -/
+private theorem X_pow_dvd_of_subsingleton (ι k : Type u) [CommRing k] [Subsingleton ι] (i : ι)
+    (n d : ℕ) {P : MvPolynomial ι k} (hP : P ∈ MvPolynomial.homogeneousSubmodule ι k (n + d)) :
+    (MvPolynomial.X i : MvPolynomial ι k) ^ n ∣ P := by
+  classical
+  rw [X_pow_eq_monomial, monomial_one_dvd_iff_modMonomial_eq_zero]
+  ext s
+  rw [AddMonoidAlgebra.coeff_zero, Finsupp.coe_zero, Pi.zero_apply]
+  by_cases hle : Finsupp.single i n ≤ s
+  · exact coeff_modMonomial_of_le P hle
+  · rw [coeff_modMonomial_of_not_le P hle]
+    by_contra hs
+    have hdeg := hP hs
+    have hsi : s = Finsupp.single i (s i) := by
+      ext j
+      rw [Subsingleton.elim j i]
+      simp
+    rw [Finsupp.single_le_iff] at hle
+    rw [hsi] at hdeg
+    simp only [Finsupp.weight_single, Pi.one_apply, smul_eq_mul, mul_one] at hdeg
+    omega
+
 /-- A global section of a nonnegative twist on polynomial projective space is represented by a
 single homogeneous polynomial.
 
-Two distinct variables `Xᵢ` and `Xⱼ` suffice to find it. On the overlap of their charts the two
-numerators cross-multiply, so the numerator `P` over `Xᵢⁿ` is divisible by `Xᵢⁿ`
-(`X_pow_dvd_of_cross_mul`) and `p = P / Xᵢⁿ` is the candidate. Every other chart agrees with `p`
-after the injective face to its overlap with the chart of `Xᵢ`. -/
+Pick a variable `Xᵢ` and write the section on its chart as `P / Xᵢⁿ`. The candidate is
+`p = P / Xᵢⁿ`, once `Xᵢⁿ ∣ P` is known. With a second variable `Xⱼ`, the two numerators
+cross-multiply on the overlap of the charts and `X_pow_dvd_of_cross_mul` gives the divisibility;
+with a single variable every monomial of `P` is a power of `Xᵢ` of degree at least `n`. Every
+other chart agrees with `p` after the injective face to its overlap with the chart of `Xᵢ`. -/
 theorem polynomialToNatGlobalSections_surjective
-    (ι k : Type u) [CommRing k] [Nontrivial ι] (d : ℕ) :
+    (ι k : Type u) [CommRing k] [Nonempty ι] (d : ℕ) :
     Function.Surjective (polynomialToNatGlobalSections ι k d) := by
   intro s
-  obtain ⟨i, j, hij⟩ := exists_pair_ne ι
+  obtain ⟨i⟩ := ‹Nonempty ι›
   obtain ⟨n, P, hP, hPi⟩ := DegreeZeroLocalization.exists_awayMk
     (MvPolynomial.isHomogeneous_X k i) (variableFractionOfGlobalSection ι k d i s)
-  obtain ⟨m, Q, hQ, hQj⟩ := DegreeZeroLocalization.exists_awayMk
-    (MvPolynomial.isHomogeneous_X k j) (variableFractionOfGlobalSection ι k d j s)
-  -- The two charts agree on their overlap, which clears to the cross equation.
-  have hg₂ := polynomialVariableCechDenominator_mem ι k ![i, j]
-  have hpair := leftPairFace_eq_rightPairFace ι k d i j s
-  rw [hPi, hQj] at hpair
-  replace hpair := ((DegreeZeroLocalization.faceMap_awayMk (MvPolynomial.isHomogeneous_X k j)
-      (MvPolynomial.isHomogeneous_X k i) _ _ hg₂ n P hP
-      (X_pow_smul_mem_natShift ι k d j n hP)).symm.trans hpair).trans
-    (DegreeZeroLocalization.faceMap_awayMk (MvPolynomial.isHomogeneous_X k i)
-      (MvPolynomial.isHomogeneous_X k j) _ _ hg₂ m Q hQ
-      (X_pow_smul_mem_natShift ι k d i m hQ))
-  rw [DegreeZeroLocalization.awayMk_eq_awayMk_iff _ (isSMulRegular_pairDenominator ι k i j),
-    ← X_mul_X_eq_pairDenominator] at hpair
-  simp only [smul_eq_mul] at hpair
-  have key : (MvPolynomial.X i ^ m * MvPolynomial.X j ^ n : MvPolynomial ι k) *
-        (MvPolynomial.X j ^ m * P) =
-      (MvPolynomial.X i ^ m * MvPolynomial.X j ^ n : MvPolynomial ι k) *
-        (MvPolynomial.X i ^ n * Q) := by
-    linear_combination hpair
-  have hcross : MvPolynomial.X j ^ m * P = MvPolynomial.X i ^ n * Q :=
-    ((MvPolynomial.isRegular_X_pow m).mul (MvPolynomial.isRegular_X_pow n)).left key
-  -- The numerator over `Xᵢⁿ` is divisible by `Xᵢⁿ`; the quotient is the candidate.
-  have hdiv : (MvPolynomial.X i : MvPolynomial ι k) ^ n ∣ P :=
-    X_pow_dvd_of_cross_mul ι k hij n m P Q hcross
   have hPhom : P ∈ MvPolynomial.homogeneousSubmodule ι k (n + d) := by
     have h : P ∈ polynomialGrading ι k (n • 1 + d) := hP
     simpa only [smul_eq_mul, mul_one] using h
+  -- The numerator over `Xᵢⁿ` is divisible by `Xᵢⁿ`; the quotient is the candidate.
+  have hdiv : (MvPolynomial.X i : MvPolynomial ι k) ^ n ∣ P := by
+    rcases subsingleton_or_nontrivial ι with hι | hι
+    · exact X_pow_dvd_of_subsingleton ι k i n d hPhom
+    obtain ⟨j, hji⟩ := exists_ne i
+    obtain ⟨m, Q, hQ, hQj⟩ := DegreeZeroLocalization.exists_awayMk
+      (MvPolynomial.isHomogeneous_X k j) (variableFractionOfGlobalSection ι k d j s)
+    -- The two charts agree on their overlap, which clears to the cross equation.
+    have hg₂ := polynomialVariableCechDenominator_mem ι k ![i, j]
+    have hpair := leftPairFace_eq_rightPairFace ι k d i j s
+    rw [hPi, hQj] at hpair
+    replace hpair := ((DegreeZeroLocalization.faceMap_awayMk (MvPolynomial.isHomogeneous_X k j)
+        (MvPolynomial.isHomogeneous_X k i) _ _ hg₂ n P hP
+        (X_pow_smul_mem_natShift ι k d j n hP)).symm.trans hpair).trans
+      (DegreeZeroLocalization.faceMap_awayMk (MvPolynomial.isHomogeneous_X k i)
+        (MvPolynomial.isHomogeneous_X k j) _ _ hg₂ m Q hQ
+        (X_pow_smul_mem_natShift ι k d i m hQ))
+    rw [DegreeZeroLocalization.awayMk_eq_awayMk_iff _ (isSMulRegular_pairDenominator ι k i j),
+      ← X_mul_X_eq_pairDenominator] at hpair
+    simp only [smul_eq_mul] at hpair
+    have key : (MvPolynomial.X i ^ m * MvPolynomial.X j ^ n : MvPolynomial ι k) *
+          (MvPolynomial.X j ^ m * P) =
+        (MvPolynomial.X i ^ m * MvPolynomial.X j ^ n : MvPolynomial ι k) *
+          (MvPolynomial.X i ^ n * Q) := by
+      linear_combination hpair
+    exact X_pow_dvd_of_cross_mul ι k hji.symm n m P Q
+      (((MvPolynomial.isRegular_X_pow m).mul (MvPolynomial.isRegular_X_pow n)).left key)
   let p : MvPolynomial.homogeneousSubmodule ι k d :=
     ⟨MvPolynomial.divMonomial P (Finsupp.single i n),
       divMonomial_single_mem_homogeneousSubmodule ι k i n d P hPhom⟩
@@ -707,7 +747,7 @@ theorem polynomialToNatGlobalSections_injective
 /-- Concrete additive comparison between degree-`d` homogeneous polynomials and global sections
 of the natural-shift model of `O(d)`. -/
 noncomputable def polynomialNatGlobalSectionsAddEquiv
-    (ι k : Type u) [CommRing k] [Nontrivial ι] (d : ℕ) :
+    (ι k : Type u) [CommRing k] [Nonempty ι] (d : ℕ) :
     MvPolynomial.homogeneousSubmodule ι k d ≃+
       polynomialNatGlobalSections ι k d :=
   AddEquiv.ofBijective (polynomialToNatGlobalSections ι k d)
@@ -731,7 +771,7 @@ noncomputable def polynomialNatToTwistingGlobalSectionsAddEquiv
 /-- The concrete global-section comparison requested for polynomial projective space:
 degree-`d` homogeneous polynomials are exactly `Γ(Proj k[Xᵢ], O(d))`. -/
 noncomputable def polynomialTwistingGlobalSectionsAddEquiv
-    (ι k : Type u) [CommRing k] [Nontrivial ι] (d : ℕ) :
+    (ι k : Type u) [CommRing k] [Nonempty ι] (d : ℕ) :
     MvPolynomial.homogeneousSubmodule ι k d ≃+
       polynomialTwistingGlobalSections ι k d :=
   (polynomialNatGlobalSectionsAddEquiv ι k d).trans
@@ -741,7 +781,7 @@ noncomputable def polynomialTwistingGlobalSectionsAddEquiv
 explicit polynomial comparison.  This avoids pretending that a separate base-ring action is
 definitionally present in Mathlib's sheaf-of-modules section type. -/
 noncomputable def polynomialTwistingGlobalSectionsModule
-    (ι k : Type u) [CommRing k] [Nontrivial ι] (d : ℕ) : ModuleCat.{u} k := by
+    (ι k : Type u) [CommRing k] [Nonempty ι] (d : ℕ) : ModuleCat.{u} k := by
   let e := polynomialTwistingGlobalSectionsAddEquiv ι k d
   letI : Module k (polynomialTwistingGlobalSections ι k d) := e.symm.module k
   exact ModuleCat.of k (polynomialTwistingGlobalSections ι k d)
@@ -749,7 +789,7 @@ noncomputable def polynomialTwistingGlobalSectionsModule
 /-- The concrete comparison as an isomorphism of `k`-modules, using the transported action made
 explicit by `polynomialTwistingGlobalSectionsModule`. -/
 noncomputable def polynomialTwistingGlobalSectionsModuleIso
-    (ι k : Type u) [CommRing k] [Nontrivial ι] (d : ℕ) :
+    (ι k : Type u) [CommRing k] [Nonempty ι] (d : ℕ) :
     ModuleCat.of k (MvPolynomial.homogeneousSubmodule ι k d) ≅
       polynomialTwistingGlobalSectionsModule ι k d := by
   let e := polynomialTwistingGlobalSectionsAddEquiv ι k d
