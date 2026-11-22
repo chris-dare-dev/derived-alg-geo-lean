@@ -18,6 +18,8 @@ import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ModuleCatLocalizationQh
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor.Bounded
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.FGModuleCatInclusion
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor.Coproducts
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExtendScalars
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.PseudoCoherent
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.Heart
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HeartHomology
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.BoundedHeart
@@ -41,6 +43,8 @@ import DerivedAlgGeo.Algebra.Homology.DerivedCategory.HomComplexCohomologyIntLoc
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KFlatResolution
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.BoundedAboveProjective
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.BoundedAboveProjective.Unitality
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ModuleCatTensor
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.TorAmplitude
 
 /-! # Derived categories of abelian categories
 
@@ -52,7 +56,9 @@ functoriality laws for short-exact triangles, the opposite-category
 comparison, the exact derived lift of algebraic linear duality, `Ext`
 adjunction and dimension shift, K-projective and bounded-above-projective
 models, unbounded right-derived functors from K-injective resolutions, and the
-construction of derived tensor from a K-flat resolution.
+construction of derived tensor from a K-flat resolution. For a commutative ring, derived extension
+of scalars along a flat map is exact, and pseudo-coherent complexes of modules form a triangulated
+subcategory with flat base change and faithfully flat descent.
 Canonical localization of modules is naturally isomorphic, as an exact derived
 functor, to scalar extension to the localization; this comparison agrees with
 the degreewise cochain comparison after `Qh` on displayed complexes.
@@ -70,6 +76,12 @@ replacement whose derived-category Hom map into a bounded-below complex
 localizes. The quasi-isomorphism comparison now transports this localization
 to derived-category Hom-sets out of the original bounded-above complex.
 The codomains remain degreewise localizations of the displayed complexes.
+With enough projectives, the bounded-above derived category lies in the
+bounded-above projective locus, so an additive functor can be derived on it by
+projective replacement. For modules over a commutative ring this gives the derived
+tensor product `K ⊗^L_R M` of a bounded-above complex with a module, computed by
+bounded-above complexes of flat modules, and Tor amplitude and finite Tor
+dimension with their flat models and behaviour in distinguished triangles.
 No internal derived-Hom or geometric base-change comparison is asserted.
 Algebraic geometry supplies abelian categories such as `Coh X` and consumes
 this API; it does not own the derived-category construction.

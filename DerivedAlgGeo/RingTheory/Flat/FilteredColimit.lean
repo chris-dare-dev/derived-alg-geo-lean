@@ -2,22 +2,31 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
+import DerivedAlgGeo.RingTheory.Extension.Presentation.Core
 import DerivedAlgGeo.RingTheory.Flat.LocalCriterion
 import DerivedAlgGeo.RingTheory.Localization.Free
+import Mathlib.Algebra.Category.ModuleCat.ChangeOfRings
+import Mathlib.Algebra.Category.Ring.FinitePresentation
 import Mathlib.RingTheory.Ideal.Quotient.Noetherian
 import Mathlib.RingTheory.Localization.InvSubmonoid
 
 /-!
-# Flatness over a finitely generated subalgebra
+# Flatness over a finitely generated subalgebra, and at a finite stage
 
 Let `R₀` be a Noetherian ring, `S₀` a finite type `R₀`-algebra, `M₀` a finite `S₀`-module and `R` an
 `R₀`-algebra. If `R ⊗[R₀] M₀` is flat over `R`, then `R₁ ⊗[R₀] M₀` is flat over `R₁` for some
 finitely generated `R₀`-subalgebra `R₁` of `R`.
 
+Let `R = colim R_λ` be a filtered colimit of rings, `A` a finitely presented `R_j`-algebra and `M` a
+finitely presented `A`-module. If `R ⊗[R_j] M` is flat over `R`, then `R_{j'} ⊗[R_j] M` is flat over
+`R_{j'}` for some `j ⟶ j'`.
+
 ## Main results
 
 * `Module.Flat.exists_fg_subalgebra_flat_of_isNoetherianRing`: the statement above; Stacks 02JO (1)
   for a Noetherian base, EGA IV₃ (11.2.6.1) (ii) and (11.2.7) a) ⇒ c).
+* `Module.Flat.exists_flat_of_isColimit`: flatness descends to a finite stage of a filtered colimit
+  of rings, EGA IV₃ (11.2.6.1) (ii), Stacks 02JO (3) in the single-stage form used for 05LY.
 
 ## Implementation notes
 
@@ -40,10 +49,16 @@ Noetherian induction on `I`, and `I = 0` with the maximal ideals of `A ⊗ S₀`
 
 The hypotheses are load-bearing; see the docstring of the main theorem.
 
+The descent to a finite stage reduces to the Noetherian case through a Noetherian model of the
+module (`Module.FinitePresentation.exists_noetherian_model`). It factors the subalgebra `R₁` through
+a stage by Mathlib's finite presentation results for filtered colimits, over the base `ℤ`, and
+compares the two maps out of `R₀` at a later stage.
+
 ## References
 
 * [Stacks: Tag 02JO](https://stacks.math.columbia.edu/tag/02JO)
 * [Stacks: Tag 051R](https://stacks.math.columbia.edu/tag/051R)
+* [Stacks: Tag 05LY](https://stacks.math.columbia.edu/tag/05LY)
 * EGA IV₃, (11.2.5), (11.2.6.1) and (11.2.7)
 
 ## Tags
@@ -1046,5 +1061,179 @@ theorem exists_fg_subalgebra_flat_of_isNoetherianRing
   exact flat_of_flat_localizations fun P _ Mq _ _ _ _ g _ => hflat P bot_le Mq g
 
 end Induction
+
+section FiniteStage
+
+open CategoryTheory Limits
+
+/-- **Flatness is reached on finitely generated subalgebras of a base change.** Let `A` be a
+finitely presented `R_j`-algebra, `M` a finitely presented `A`-module and `R` an `R_j`-algebra such
+that `R ⊗[R_j] M` is flat over `R`. Then there are a finitely generated `ℤ`-subalgebra `R₀ ⊆ R_j`
+and a finitely generated `R₀`-subalgebra `R₁ ⊆ R` such that `T ⊗[R_j] M` is flat over `T` for every
+`R_j`-algebra `T` receiving an `R₀`-algebra map from `R₁`.
+
+This combines a Noetherian model of `M` over `R₀` with
+`Module.Flat.exists_fg_subalgebra_flat_of_isNoetherianRing`. -/
+theorem exists_fg_subalgebras_flat_baseChange
+    {Rj A M R : Type u} [CommRing Rj] [CommRing A] [Algebra Rj A]
+    [Algebra.FinitePresentation Rj A] [AddCommGroup M] [Module A M] [Module Rj M]
+    [IsScalarTower Rj A M] [Module.FinitePresentation A M] [CommRing R] [Algebra Rj R]
+    (h : Module.Flat R (R ⊗[Rj] M)) :
+    ∃ (R₀ : Subalgebra ℤ Rj) (R₁ : Subalgebra R₀ R), R₀.FG ∧ R₁.FG ∧
+      ∀ (T : Type u) [CommRing T] [Algebra Rj T] (_ : R₁ →ₐ[R₀] T),
+        Module.Flat T (T ⊗[Rj] M) := by
+  obtain ⟨R₀, A₀, _, _, M₀, _, _, _, _, hR₀, hA₀, hM₀, -, ⟨e⟩⟩ :=
+    Module.FinitePresentation.exists_noetherian_model (R := Rj) (A := A) (M := M)
+  have : Algebra.FiniteType ℤ R₀ := Subalgebra.fg_iff_finiteType _ |>.1 hR₀
+  have : IsNoetherianRing R₀ := Algebra.FiniteType.isNoetherianRing ℤ R₀
+  -- `T ⊗[Rj] M ≃ T ⊗[R₀] M₀`
+  have key : ∀ (T : Type u) [CommRing T] [Algebra Rj T], Nonempty (T ⊗[Rj] M ≃ₗ[T] T ⊗[R₀] M₀) :=
+    fun T _ _ =>
+      ⟨(TensorProduct.AlgebraTensorModule.congr (LinearEquiv.refl T T) e.symm).trans
+        (TensorProduct.AlgebraTensorModule.cancelBaseChange R₀ Rj T T M₀)⟩
+  obtain ⟨eR⟩ := key R
+  have hR : Module.Flat R (R ⊗[R₀] M₀) := Module.Flat.of_linearEquiv eR.symm
+  obtain ⟨R₁, hR₁, hflat⟩ := exists_fg_subalgebra_flat_of_isNoetherianRing (S₀ := A₀) (M₀ := M₀)
+    (R := R) hR
+  refine ⟨R₀, R₁, hR₀, hR₁, fun T _ _ ψ => ?_⟩
+  obtain ⟨eT⟩ := key T
+  let : Algebra R₁ T := ψ.toRingHom.toAlgebra
+  have : IsScalarTower R₀ R₁ T := IsScalarTower.of_algebraMap_eq fun x => (ψ.commutes x).symm
+  have : Module.Flat T (T ⊗[R₁] (R₁ ⊗[R₀] M₀)) := inferInstance
+  exact Module.Flat.of_linearEquiv
+    (eT.trans (TensorProduct.AlgebraTensorModule.cancelBaseChange R₀ R₁ T T M₀).symm)
+
+
+/-- Ring maps out of `ULift ℤ` are unique. -/
+private lemma ulift_int_hom_ext {T : Type u} [CommRing T] (g₁ g₂ : ULift.{u} ℤ →+* T) :
+    g₁ = g₂ := by
+  ext x
+  have : x = ((x.down : ℤ) : ULift.{u} ℤ) := ULift.ext (by simp)
+  rw [this, map_intCast, map_intCast]
+
+/-- The unique ring map out of `ULift ℤ`, for a diagram of rings in a universe above `ℤ`. -/
+private def uliftInt (T : Type u) [CommRing T] : ULift.{u} ℤ →+* T :=
+  (algebraMap ℤ T).comp ULift.ringEquiv.toRingHom
+
+private lemma uliftInt_finitePresentation (T : Type u) [CommRing T]
+    [Algebra.FinitePresentation ℤ T] :
+    (uliftInt T).FinitePresentation := by
+  refine RingHom.FinitePresentation.comp ?_ ?_
+  · exact RingHom.finitePresentation_algebraMap.2 inferInstance
+  · refine RingHom.FinitePresentation.of_surjective _ ULift.ringEquiv.surjective ?_
+    have hk : RingHom.ker ULift.ringEquiv.toRingHom = (⊥ : Ideal (ULift.{u} ℤ)) :=
+      (RingHom.injective_iff_ker_eq_bot _).1 ULift.ringEquiv.injective
+    rw [hk]
+    exact Submodule.fg_bot
+
+private lemma uliftInt_finiteType (T : Type u) [CommRing T] [Algebra.FiniteType ℤ T] :
+    (uliftInt T).FiniteType :=
+  (RingHom.finiteType_algebraMap.2 inferInstance).comp
+    (RingHom.FiniteType.of_surjective _ ULift.ringEquiv.surjective)
+
+/-- A finitely generated `R₀` and a finitely presented `R₁` with ring maps
+`ρ : R₀ → R_j`, `ι : R₀ → R₁` and `ε : R₁ → colim R` that agree on `R₀` already agree at a stage:
+there are `j ⟶ j'` and `ψ : R₁ → R_{j'}` with `ψ ∘ ι` equal to `R₀ → R_j → R_{j'}`.
+
+Both factorizations are taken over the base `ℤ` (`ULift ℤ`, to match the universe of the diagram),
+so `R₀` needs only be of finite type and `R₁` of finite presentation over `ℤ`. -/
+private theorem exists_factor_stage_of_isColimit {J : Type u} [Category.{u} J] [IsFiltered J]
+    {F : J ⥤ CommRingCat.{u}} [PreservesColimit F (forget CommRingCat)]
+    {c : Cocone F} (hc : IsColimit c) {j : J} {R₀ R₁ : Type u} [CommRing R₀] [CommRing R₁]
+    [Algebra.FiniteType ℤ R₀] [Algebra.FinitePresentation ℤ R₁]
+    (ρ : R₀ →+* F.obj j) (ι : R₀ →+* R₁) (ε : R₁ →+* c.pt)
+    (h : ε.comp ι = (c.ι.app j).hom.comp ρ) :
+    ∃ (j' : J) (f : j ⟶ j') (ψ : R₁ →+* F.obj j'),
+      ψ.comp ι = (F.map f).hom.comp ρ := by
+  let α : (Functor.const J).obj (CommRingCat.of (ULift.{u} ℤ)) ⟶ F :=
+    { app i := CommRingCat.ofHom (uliftInt (F.obj i))
+      naturality _ _ f := by
+        ext x; exact RingHom.congr_fun (ulift_int_hom_ext (uliftInt _)
+          (((F.map f).hom).comp (uliftInt _))) x }
+  obtain ⟨i₁, g', -, hg'⟩ := RingHom.EssFiniteType.exists_eq_comp_ι_app_of_isColimit
+    (CommRingCat.of (ULift.{u} ℤ)) F α (CommRingCat.ofHom (uliftInt R₁)) c hc
+    (uliftInt_finitePresentation R₁) (CommRingCat.ofHom ε)
+    (fun i => by
+      ext x; exact RingHom.congr_fun (ulift_int_hom_ext (ε.comp (uliftInt R₁))
+        ((c.ι.app i).hom.comp (uliftInt _))) x)
+  obtain ⟨k, a, b, -⟩ := IsFilteredOrEmpty.cocone_objs j i₁
+  obtain ⟨k', hik, hjk, e⟩ := RingHom.EssFiniteType.exists_comp_map_eq_of_isColimit
+    (CommRingCat.of (ULift.{u} ℤ)) F α (CommRingCat.ofHom (uliftInt R₀)) c hc
+    (uliftInt_finiteType R₀).essFiniteType
+    (i := k) (CommRingCat.ofHom ρ ≫ F.map a) (by
+      ext x; exact RingHom.congr_fun (ulift_int_hom_ext (((F.map a).hom.comp ρ).comp (uliftInt R₀))
+        (uliftInt _)) x)
+    (j := k) (CommRingCat.ofHom ι ≫ g' ≫ F.map b) (by
+      ext x
+      exact RingHom.congr_fun (ulift_int_hom_ext
+        (((F.map b).hom.comp g'.hom).comp (ι.comp (uliftInt R₀)))
+        (uliftInt _)) x)
+    (by
+      have h' : CommRingCat.ofHom ι ≫ CommRingCat.ofHom ε =
+          CommRingCat.ofHom ρ ≫ c.ι.app j := by
+        ext x; exact RingHom.congr_fun h x
+      calc (CommRingCat.ofHom ρ ≫ F.map a) ≫ c.ι.app k
+          = CommRingCat.ofHom ρ ≫ c.ι.app j := by rw [Category.assoc, c.w]
+        _ = CommRingCat.ofHom ι ≫ CommRingCat.ofHom ε := h'.symm
+        _ = CommRingCat.ofHom ι ≫ g' ≫ c.ι.app i₁ := by rw [← hg']
+        _ = _ := by rw [Category.assoc, Category.assoc, c.w])
+  refine ⟨k', a ≫ hik, (g' ≫ F.map b ≫ F.map hjk).hom, ?_⟩
+  ext x
+  have := RingHom.congr_fun (congrArg CommRingCat.Hom.hom e) x
+  simpa using this.symm
+
+
+/-- **Flatness descends to a finite stage of a filtered colimit of rings** (EGA IV₃,
+Corollaire 11.2.6.1 (ii); Stacks, Lemma 02JO (3) in the single-stage form used in the proof of
+Lemma 05LY, Limits, Lemma 32.10.4).
+
+Let `R = colim R_λ` be a filtered colimit of commutative rings, `A` a finitely presented
+`R_j`-algebra (through `φ`) and `M` a finitely presented `A`-module, regarded as an `R_j`-module.
+If `R ⊗[R_j] M` is flat over `R`, then `R_{j'} ⊗[R_j] M` is flat over `R_{j'}` for some `j ⟶ j'`.
+
+This is the single-stage form: `M` lives at one stage and is only base changed. It is not the form
+of 02JO (3) for a compatible system `(R_λ → S_λ, M_λ)`, which also needs descent of modules.
+
+The proof takes a Noetherian model of `M` over a finitely generated `ℤ`-subalgebra `R₀ ⊆ R_j`,
+reaches flatness on a finitely generated `R₀`-subalgebra `R₁ ⊆ R`
+(`exists_fg_subalgebra_flat_of_isNoetherianRing`), factors `R₁ → R` through a stage, and compares
+the two maps out of `R₀` at a later stage.
+
+Both finite presentation hypotheses are load-bearing. Let `k` be a field, `J = ℕ` and
+`R_n = k[y₁, y₂, …] ⧸ (y₁, …, y_n)`, so that `R = k`, and take `j = 0`. Each `R_n` is a domain and
+`R_n ⧸ (y_{n+1}, …) ≅ k` is a nonzero torsion `R_n`-module, so it is not flat.
+* `φ` cannot be only of finite type: take `A = R₀ ⧸ (y₁, y₂, …)` and `M = A`. Then `R ⊗ M = k` is
+  flat over `k`, but `R_n ⊗[R₀] M ≅ R_n ⧸ (y_{n+1}, …)`.
+* `M` cannot be only finitely generated: take `A = R₀` and `M = R₀ ⧸ (y₁, y₂, …)`, with the same
+  computation. -/
+theorem exists_flat_of_isColimit {J : Type u} [Category.{u} J] [IsFiltered J]
+    {R : J ⥤ CommRingCat.{u}} [PreservesColimit R (forget CommRingCat)]
+    {c : Cocone R} (hc : IsColimit c) {j : J} {A : CommRingCat.{u}} (φ : R.obj j ⟶ A)
+    (hφ : φ.hom.FinitePresentation)
+    (M : ModuleCat.{u} A) [Module.FinitePresentation A M]
+    (hM : Module.Flat c.pt ((ModuleCat.extendScalars (c.ι.app j).hom).obj
+      ((ModuleCat.restrictScalars φ.hom).obj M))) :
+    ∃ (j' : J) (f : j ⟶ j'), Module.Flat (R.obj j')
+      ((ModuleCat.extendScalars (R.map f).hom).obj ((ModuleCat.restrictScalars φ.hom).obj M)) := by
+  let : Algebra (R.obj j) A := φ.hom.toAlgebra
+  have : Algebra.FinitePresentation (R.obj j) A := hφ
+  let : Module (R.obj j) M := Module.compHom M φ.hom
+  have : IsScalarTower (R.obj j) A M := IsScalarTower.of_algebraMap_smul fun _ _ => rfl
+  let : Algebra (R.obj j) c.pt := (c.ι.app j).hom.toAlgebra
+  have h : Module.Flat c.pt (c.pt ⊗[R.obj j] M) := hM
+  obtain ⟨R₀, R₁, hR₀, hR₁, H⟩ := exists_fg_subalgebras_flat_baseChange (A := A) h
+  have : Algebra.FiniteType ℤ R₀ := (Subalgebra.fg_iff_finiteType _).1 hR₀
+  have : Algebra.FiniteType R₀ R₁ := (Subalgebra.fg_iff_finiteType _).1 hR₁
+  have : Algebra.FiniteType ℤ R₁ := Algebra.FiniteType.trans (S := R₀) ‹_› ‹_›
+  have : Algebra.FinitePresentation ℤ R₁ := Algebra.FinitePresentation.of_finiteType.1 this
+  obtain ⟨j', f, ψ, hψ⟩ := exists_factor_stage_of_isColimit hc (R₀ := R₀) (R₁ := R₁)
+    (algebraMap R₀ (R.obj j)) (algebraMap R₀ R₁) (algebraMap R₁ c.pt) (by
+      ext x; exact (IsScalarTower.algebraMap_apply R₀ R₁ c.pt x).symm)
+  refine ⟨j', f, ?_⟩
+  let : Algebra (R.obj j) (R.obj j') := (R.map f).hom.toAlgebra
+  let ψ' : R₁ →ₐ[R₀] R.obj j' := { ψ with commutes' := fun x => (RingHom.congr_fun hψ x) }
+  exact H (R.obj j') ψ'
+
+end FiniteStage
 
 end Module.Flat

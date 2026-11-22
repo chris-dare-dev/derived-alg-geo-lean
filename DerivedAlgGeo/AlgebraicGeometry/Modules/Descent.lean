@@ -1,3 +1,5 @@
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Descent.Directed
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Descent.LocallyFree
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Descent.Zariski
 
 /-!
@@ -10,11 +12,19 @@ pullback, for a Grothendieck topology on the category of schemes.
 
 * `Descent/Zariski.lean`: the pseudofunctor `AlgebraicGeometry.Scheme.modulesPseudofunctor`
   and the module sheaf glued from a descent datum along open immersions.
+* `Descent/Directed.lean`: `AlgebraicGeometry.Scheme.Modules.DirectedGluingData`, module sheaves
+  on a directed system of open subschemes whose overlaps are unions of members, glued.
+* `Descent/LocallyFree.lean`: local freeness of a fixed rank as a local property of objects of
+  `modulesPseudofunctor`.
 
 ## Main results
 
 * `AlgebraicGeometry.Scheme.modulesPseudofunctor_isStack`: module sheaves form a stack for the
   big Zariski topology.
+* `AlgebraicGeometry.Scheme.Modules.isLocallyFreeOfRank_of_cover`: local freeness of rank `r`
+  descends along jointly surjective families of open immersions.
+* `AlgebraicGeometry.Scheme.Modules.DirectedGluingData.glueRestrictIso`: the glued sheaf restricts
+  to each member of a directed system.
 
 ## Implementation notes
 
