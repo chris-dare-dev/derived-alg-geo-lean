@@ -4,6 +4,8 @@ Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Affine.Gluing
 import DerivedAlgGeo.Algebra.Category.ModuleCat.Sheaf.Presentation.Over
+import Mathlib.Algebra.Module.FinitePresentation
+import Mathlib.RingTheory.LocalProperties.FinitePresentation
 import Mathlib.RingTheory.Localization.Finiteness
 
 /-!
@@ -20,7 +22,11 @@ can then be checked on a finite basic-open cover.
   opens whose defining elements span the unit ideal;
 * `Scheme.Modules.moduleFinite_globalSections_of_isFiniteType` patches the resulting finite
   localized modules;
-* `Scheme.Modules.moduleFinite_globalSections` specializes the result to finite presentation.
+* `Scheme.Modules.moduleFinite_globalSections` specializes the result to finite presentation;
+* `Scheme.Modules.moduleFinitePresentation_globalSections`: a finitely presented module sheaf on
+  `Spec R` has finitely presented global sections, with no noetherian hypothesis. Finite
+  presentations on basic opens (`Presentation.restrictBasicOpen`) take the place of finite
+  generating sections.
 -/
 
 universe u
@@ -317,5 +323,164 @@ theorem moduleFinite_globalSections (M : (Spec R).Modules)
     Module.Finite R (moduleSpecΓFunctor.obj M) := by
   letI hM' : SheafOfModules.IsFinitePresentation.{u, u, u} M := hM
   exact moduleFinite_globalSections_of_isFiniteType M inferInstance
+
+/-- A finite presentation transported across an equality of opens remains finite. -/
+private lemma presentation_isFinite_cast {M : (Spec R).Modules}
+    {U V : (Spec R).Opens} (h : U = V) (P : (M.over U).Presentation)
+    [Presentation.IsFinite.{u, u, u} P] :
+    Presentation.IsFinite.{u, u, u} (h ▸ P) := by
+  subst V
+  infer_instance
+
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
+/-- A presentation on `D(g)` transports to a presentation on `Spec R[1/g]`. -/
+noncomputable def Presentation.restrictBasicOpen (M : (Spec R).Modules) (g : R)
+    (P : (M.over (PrimeSpectrum.basicOpen g)).Presentation) :
+    (M.restrict (basicOpenSpecMap g)).Presentation :=
+  let h := basicOpenSpecMap_opensRange (R := R) g
+  let P' : (M.over (basicOpenSpecMap g).opensRange).Presentation := h.symm ▸ P
+  P'.map (basicOpenSpecMap g).opensRangeModulesEquivalence.inverse
+    (basicOpenSpecMap g).opensRangeModulesEquivalenceInverseUnitIso.symm
+
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
+set_option maxHeartbeats 1600000 in
+set_option synthInstance.maxHeartbeats 400000 in
+/-- Restriction from a basic open to its affine spectrum preserves finite presentations. -/
+instance Presentation.isFinite_restrictBasicOpen (M : (Spec R).Modules) (g : R)
+    (P : (M.over (PrimeSpectrum.basicOpen g)).Presentation)
+    [Presentation.IsFinite.{u, u, u} P] :
+    (Presentation.restrictBasicOpen M g P).IsFinite := by
+  let h := basicOpenSpecMap_opensRange (R := R) g
+  let P' : (M.over (basicOpenSpecMap g).opensRange).Presentation := h.symm ▸ P
+  letI hP' : Presentation.IsFinite.{u, u, u} P' := presentation_isFinite_cast h.symm P
+  have hgen : Finite P'.generators.I := hP'.1.1
+  have hrel : Finite P'.relations.I := hP'.2.1
+  show Presentation.IsFinite.{u, u, u} _
+  exact
+    { isFiniteType_generators := ⟨hgen⟩
+      isFiniteType_relations := ⟨hrel⟩ }
+
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
+set_option maxHeartbeats 1600000 in
+/-- A finitely presented module sheaf on `Spec R` has finite presentations on a basic-open cover
+whose defining elements generate the unit ideal. -/
+theorem exists_basicOpen_finitePresentation_cover (M : (Spec R).Modules)
+    (hM : SheafOfModules.IsFinitePresentation.{u, u, u} M) :
+    ∃ (I : Type u) (g : I → R), Ideal.span (Set.range g) = ⊤ ∧
+      ∀ i, ∃ P : (M.over (PrimeSpectrum.basicOpen (g i))).Presentation,
+        Presentation.IsFinite.{u, u, u} P := by
+  obtain ⟨q, hq⟩ := hM.exists_quasicoherentData
+  let I := Σ i : q.I, {g : R // PrimeSpectrum.basicOpen g ≤ q.X i}
+  let g : I → R := fun i ↦ i.2.1
+  refine ⟨I, g, ?_, ?_⟩
+  · apply PrimeSpectrum.iSup_basicOpen_eq_top_iff.mp
+    apply TopologicalSpace.Opens.ext
+    apply Set.ext
+    intro x
+    constructor
+    · intro
+      trivial
+    intro hx
+    obtain ⟨U, f, hf, hxU⟩ := q.coversTop ⊤ x (by simp)
+    obtain ⟨i, ⟨k⟩⟩ := (Sieve.mem_ofObjects_iff ..).mp hf
+    have hxXi : x ∈ q.X i := k.le hxU
+    obtain ⟨V, ⟨_, ⟨a, rfl⟩, rfl⟩, hxV, hV⟩ :=
+      PrimeSpectrum.isBasis_basic_opens.exists_subset_of_mem_open hxXi (q.X i).2
+    rw [TopologicalSpace.Opens.coe_iSup]
+    exact Set.mem_iUnion.mpr ⟨⟨i, ⟨a, hV⟩⟩, hxV⟩
+  · rintro ⟨i, a, ha⟩
+    let W : Over (q.X i) := Over.mk (homOfLE ha)
+    haveI : Presentation.IsFinite.{u, u, u} (q.presentation i) := hq.isFinite_presentation i
+    exact ⟨(q.presentation i).over W, Presentation.isFinite_over (q.presentation i) W⟩
+
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
+/-- **A finite global presentation on `Spec R` gives finitely presented global sections.**
+
+The relation map of the presentation is `tilde` of a map `g : R^J ⟶ R^I` of finite free modules,
+because `tilde` is fully faithful. As a left adjoint `tilde` preserves cokernels, so `M` is
+`tilde (coker g)`, and the unit of the adjunction identifies `Γ(M)` with `coker g`. -/
+theorem moduleFinitePresentation_globalSections_of_presentation (M : (Spec R).Modules)
+    (P : M.Presentation) [Presentation.IsFinite.{u, u, u} P] :
+    Module.FinitePresentation R (moduleSpecΓFunctor.obj M) := by
+  let g := (tilde.functor R).preimage <| (tildeFinsupp _).hom ≫ P.relations.π ≫ kernel.ι _ ≫
+    (tildeFinsupp _).inv
+  let iso : cokernel ((tilde.functor R).map g) ≅ cokernel (P.relations.π ≫ kernel.ι _) := by
+    refine cokernel.mapIso _ _ (tildeFinsupp _) (tildeFinsupp _) ?_
+    simp only [g, (tilde.functor R).map_preimage]
+    simp
+  let e : (tilde.functor R).obj (cokernel g) ≅ M :=
+    PreservesCokernel.iso (tilde.functor R) g ≪≫ iso ≪≫
+      IsColimit.coconePointUniqueUpToIso (colimit.isColimit _) P.isColimit
+  let e' : cokernel g ≅ moduleSpecΓFunctor.obj M :=
+    asIso ((tilde.adjunction (R := R)).unit.app _) ≪≫ moduleSpecΓFunctor.mapIso e
+  haveI : Finite P.generators.I := ‹Presentation.IsFinite.{u, u, u} P›.1.1
+  haveI : Finite P.relations.I := ‹Presentation.IsFinite.{u, u, u} P›.2.1
+  haveI : Module.FinitePresentation R
+      ((P.generators.I →₀ R) ⧸ LinearMap.range g.hom) :=
+    Module.finitePresentation_of_surjective (LinearMap.range g.hom).mkQ
+      (Submodule.mkQ_surjective _) (by
+        rw [Submodule.ker_mkQ, LinearMap.range_eq_map]
+        exact Module.Finite.fg_top.map _)
+  exact Module.FinitePresentation.of_equiv
+    ((ModuleCat.cokernelIsoRangeQuotient g).symm ≪≫ e').toLinearEquiv
+
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
+set_option maxHeartbeats 1600000 in
+set_option synthInstance.maxHeartbeats 400000 in
+/-- **A finitely presented module sheaf on `Spec R` has finitely presented global sections.**
+
+No noetherian hypothesis is needed. The local finite presentations refine to basic opens
+`D(gᵢ)` with `(gᵢ)` spanning the unit ideal; on `Spec R[1/gᵢ]` the restriction has a finite
+global presentation, so its global sections are finitely presented
+(`moduleFinitePresentation_globalSections_of_presentation`), and they localize the global
+sections of `M`. `Module.FinitePresentation.of_localizationSpan'` patches. -/
+theorem moduleFinitePresentation_globalSections (M : (Spec R).Modules)
+    (hM : SheafOfModules.IsFinitePresentation.{u, u, u} M) :
+    Module.FinitePresentation R (moduleSpecΓFunctor.obj M) := by
+  classical
+  letI hM' : SheafOfModules.IsFinitePresentation.{u, u, u} M := hM
+  obtain ⟨I, g, hg, hP⟩ := M.exists_basicOpen_finitePresentation_cover hM
+  let N (x : Set.range g) := M.restrict (basicOpenSpecMap x.1)
+  let L (x : Set.range g) :=
+    moduleSpecΓFunctor (R := .of (Localization.Away x.1)).obj (N x)
+  letI (x : Set.range g) : Module R (L x) :=
+    Module.compHom (L x) (algebraMap R (Localization.Away x.1))
+  letI (x : Set.range g) : IsScalarTower R (Localization.Away x.1) (L x) :=
+    .of_algebraMap_smul fun _ _ => rfl
+  let e (x : Set.range g) :
+      L x ≃ₗ[R]
+        (modulesSpecToSheaf.obj M).presheaf.obj
+          (op (PrimeSpectrum.basicOpen x.1)) :=
+    M.restrictBasicOpenTopLinearEquiv x.1
+  let f (x : Set.range g) : moduleSpecΓFunctor.obj M →ₗ[R] L x :=
+    (e x).symm.toLinearMap ∘ₗ (M.basicOpenRestriction x.1).hom
+  letI (x : Set.range g) :
+      IsLocalizedModule (Submonoid.powers x.1) (f x) := by
+    letI hloc : IsLocalizedModule (Submonoid.powers x.1)
+        (M.basicOpenRestriction x.1).hom :=
+      M.isLocalizedModule_basicOpenRestriction_of_isQuasicoherent x.1
+    exact IsLocalizedModule.of_linearEquiv (Submonoid.powers x.1)
+      (M.basicOpenRestriction x.1).hom (e x).symm
+  have hfp (x : Set.range g) :
+      Module.FinitePresentation (Localization.Away x.1) (L x) := by
+    let i : I := x.2.choose
+    have hi : g i = x.1 := x.2.choose_spec
+    obtain ⟨P, hPfinite⟩ := hP i
+    letI hPi : Presentation.IsFinite.{u, u, u} P := hPfinite
+    let hopen : PrimeSpectrum.basicOpen (g i) = PrimeSpectrum.basicOpen x.1 :=
+      congrArg PrimeSpectrum.basicOpen hi
+    let Px : (M.over (PrimeSpectrum.basicOpen x.1)).Presentation := hopen ▸ P
+    letI hPx : Presentation.IsFinite.{u, u, u} Px := presentation_isFinite_cast hopen P
+    let PN := Presentation.restrictBasicOpen M x.1 Px
+    letI hPN : Presentation.IsFinite.{u, u, u} PN :=
+      @Presentation.isFinite_restrictBasicOpen R M x.1 Px hPx
+    exact @moduleFinitePresentation_globalSections_of_presentation
+      (.of (Localization.Away x.1)) (N x) PN hPN
+  exact Module.FinitePresentation.of_localizationSpan' (Set.range g) hg f hfp
 
 end AlgebraicGeometry.Scheme.Modules

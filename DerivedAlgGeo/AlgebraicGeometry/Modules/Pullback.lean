@@ -8,6 +8,7 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.FixedBaseOpenSections
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.FlatOverQuasiIso
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Free
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.LocallyFree
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Locality
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Monoidal
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.Presentation
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.ProjectionFormula

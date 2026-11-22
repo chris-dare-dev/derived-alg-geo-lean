@@ -1295,15 +1295,6 @@ private lemma finFree_extendScalars (f : R ⟶ S) {M : ModuleCat.{u} R}
   exact ⟨(inferInstance : Module.Free S (S ⊗[R] M)),
     (inferInstance : Module.Finite S (S ⊗[R] M))⟩
 
-/-- The homology of a derived extension of scalars along a flat map. -/
-private noncomputable def extendScalarsDerivedOfFlatHomologyIso (f : R ⟶ S) (hf : f.hom.Flat)
-    (K : DerivedCategory (ModuleCat.{u} R)) (n : ℤ) :
-    (DerivedCategory.homologyFunctor (ModuleCat.{u} S) n).obj
-        ((extendScalarsDerivedOfFlat f hf).obj K) ≅
-      (extendScalars f.hom).obj ((DerivedCategory.homologyFunctor (ModuleCat.{u} R) n).obj K) :=
-  mapDerivedCategoryHomologyIso (extendScalars.{u, u, u} f.hom) inferInstance
-    (preservesFiniteLimits_extendScalars_of_flat hf) inferInstance K n
-
 private lemma isZero_homology_extendScalarsDerivedOfFlat (f : R ⟶ S) (hf : f.hom.Flat)
     {K : DerivedCategory (ModuleCat.{u} R)} {n : ℤ}
     (hK : IsZero ((DerivedCategory.homologyFunctor (ModuleCat.{u} R) n).obj K)) :

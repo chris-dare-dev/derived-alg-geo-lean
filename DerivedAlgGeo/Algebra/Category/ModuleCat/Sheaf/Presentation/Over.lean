@@ -20,7 +20,8 @@ arguments import this module and add their geometric cover or finiteness input.
 
 ## Main results
 
-* `SheafOfModules.Presentation.over` restricts one presentation along an object of a slice site;
+* `SheafOfModules.Presentation.over` restricts one presentation along an object of a slice site,
+  and `SheafOfModules.Presentation.isFinite_over` keeps it finite;
 * `SheafOfModules.GeneratingSections.over` restricts a family of generating sections and
   preserves finiteness of its index;
 * `SheafOfModules.QuasicoherentData.over` restricts a full family of local presentations.
@@ -92,6 +93,15 @@ instance GeneratingSections.isFiniteType_over {M : SheafOfModules.{u} R} {U : C}
     (σ : (M.over U).GeneratingSections) [σ.IsFiniteType]
     (W : Over U) [HasBinaryProducts (Over U)] : (σ.over W).IsFiniteType where
   finite := inferInstanceAs (Finite σ.I)
+
+set_option maxHeartbeats 1600000 in
+/-- Restriction to a nested slice preserves finiteness of a presentation: `Presentation.over` is
+`Presentation.map` twice followed by `ofIsIso`, and none of them changes the index types. -/
+instance Presentation.isFinite_over {M : SheafOfModules.{u} R} {U : C}
+    (P : (M.over U).Presentation) [P.IsFinite]
+    (W : Over U) [HasBinaryProducts (Over U)] : (P.over W).IsFinite where
+  isFiniteType_generators := ⟨inferInstanceAs (Finite P.generators.I)⟩
+  isFiniteType_relations := ⟨inferInstanceAs (Finite P.relations.I)⟩
 
 section QuasicoherentDataOver
 
