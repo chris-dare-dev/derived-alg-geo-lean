@@ -3,6 +3,7 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import Mathlib.Algebra.Category.ModuleCat.Products
+import Mathlib.CategoryTheory.Functor.ReflectsIso.Exact
 import Mathlib.AlgebraicGeometry.Morphisms.Flat
 import Mathlib.RingTheory.Flat.EquationalCriterion
 import Mathlib.RingTheory.Flat.Localization
@@ -26,7 +27,8 @@ Flatness over the base can be checked on affine opens: it holds as soon as
 `p(U) ⊆ V`, and for a quasi-coherent `M` it is equivalent to that condition.
 It is stable under base change: for `p : X ⟶ S`, `g : S' ⟶ S` and the
 projection `X ×_S S' ⟶ X`, the pullback of a module sheaf flat over `S` is
-flat over `S'`.
+flat over `S'`. Pullback along that projection keeps a short exact sequence
+short exact when its quotient is flat over `S`, with no flatness of `p`.
 
 ## Main definitions
 
@@ -52,6 +54,13 @@ flat over `S'`.
   for any pullback square.
 * `AlgebraicGeometry.Scheme.Modules.IsFlatOver.of_isPullback` — flatness over the base is stable
   under base change along any pullback square; `isFlatOver_pullback` is the chosen fibre product.
+* `AlgebraicGeometry.Scheme.Modules.IsFlatOver.of_shortExact`, `IsFlatOver.biprod` and
+  `IsFlatOver.of_isFlatOver_id` — flatness over the base passes to kernels of epimorphisms between
+  flat modules and to biproducts, and flatness over the identity gives flatness over a flat
+  morphism.
+* `AlgebraicGeometry.Scheme.Modules.pullback_shortExact_of_isPullback` — base change keeps a short
+  exact sequence short exact when its quotient is flat over the base; the chosen fibre product is
+  `pullback_shortExact_of_isFlatOver`.
 
 ## Implementation notes
 
@@ -102,6 +111,12 @@ pushout `Γ(U) ⊗_{Γ(V)} Γ(V')` (`isIso_pushoutSection_of_isAffineOpen`), and
 `𝒪_{P,z}` is a localization of `Γ(W)`. The stalk is therefore a localization
 of `Γ(V') ⊗_{Γ(V)} M_y`, which is flat over `Γ(V')`.
 
+`pullback_shortExact_of_isPullback` uses the same presentation. Pullback is right exact, so only
+injectivity on the left is at stake. At a point it is the injectivity of
+`𝒪_{P,z} ⊗ M_{1,y} → 𝒪_{P,z} ⊗ M_{2,y}`, a localization of `Γ(V') ⊗_{Γ(V)} M_{1,y} →
+Γ(V') ⊗_{Γ(V)} M_{2,y}`, which is injective because `M_{3,y}` is flat over `Γ(V)`
+(`LinearMap.lTensor_injective_of_exact_of_flat`).
+
 ## References
 
 * [Stacks, Tag 01U2](https://stacks.math.columbia.edu/tag/01U2): Definition 01U3 is
@@ -131,6 +146,39 @@ private theorem flat_of_isLocalizedModule_of_flat {R A M M' : Type*} [CommRing R
   exact IsLocalizedModule.map_injective _ _ _ _ (by
     rw [TensorProduct.AlgebraTensorModule.coe_lTensor]; exact H N)
 
+/-- Let `L` localize `B` and `D` localize a `B`-algebra `C`, compatibly. For an `L`-module `M`,
+the map `C ⊗[B] M → D ⊗[L] M` sending `c ⊗ m` to `c • (1 ⊗ m)` is a localization. -/
+private theorem isLocalizedModule_tensor {B C L D : Type*} [CommRing B] [CommRing C]
+    [CommRing L] [CommRing D] [Algebra B C] [Algebra B L] (SB : Submonoid B) [IsLocalization SB L]
+    [Algebra C D] (SC : Submonoid C) [IsLocalization SC D]
+    [Algebra L D] [Algebra B D] [IsScalarTower B L D] [IsScalarTower B C D]
+    (M : Type*) [AddCommGroup M] [Module L M] [Module B M] [IsScalarTower B L M] :
+    IsLocalizedModule SC ((TensorProduct.isBaseChange B M C).lift
+      ((TensorProduct.mk L D M 1).restrictScalars B)) := by
+  have h₁ : IsBaseChange L (LinearMap.id : M →ₗ[B] M) :=
+    (isLocalizedModule_iff_isBaseChange SB L _).mp (isLocalizedModule_id SB M L)
+  have h₂ : IsBaseChange D ((TensorProduct.mk L D M 1).restrictScalars B ∘ₗ LinearMap.id) :=
+    h₁.comp (TensorProduct.isBaseChange L M D)
+  have hC : IsBaseChange C (TensorProduct.mk B C M 1) := TensorProduct.isBaseChange B M C
+  have hg : IsBaseChange D (hC.lift ((TensorProduct.mk L D M 1).restrictScalars B)) := by
+    refine hC.of_comp ?_
+    convert h₂ using 1
+    exact hC.lift_comp _
+  exact (isLocalizedModule_iff_isBaseChange SC D _).mpr hg
+
+/-- The map of `isLocalizedModule_tensor` on pure tensors: `c ⊗ m ↦ c • (1 ⊗ m)`. -/
+private theorem isBaseChange_lift_tmul {B C L D : Type*} [CommRing B] [CommRing C]
+    [CommRing L] [CommRing D] [Algebra B C] [Algebra B L] [Algebra C D] [Algebra L D]
+    [Algebra B D] [IsScalarTower B L D] [IsScalarTower B C D]
+    {M : Type*} [AddCommGroup M] [Module L M] [Module B M] [IsScalarTower B L M]
+    (c : C) (m : M) :
+    (TensorProduct.isBaseChange B M C).lift ((TensorProduct.mk L D M 1).restrictScalars B)
+      (c ⊗ₜ m) = c • ((1 : D) ⊗ₜ[L] m) := by
+  have : c ⊗ₜ[B] m = c • (TensorProduct.mk B C M 1 m) := by
+    simp [TensorProduct.smul_tmul']
+  rw [this, LinearMap.map_smul, IsBaseChange.lift_eq]
+  rfl
+
 /-- The ring-level step of base change. Let `C` be the pushout `A' ⊗[A] B`, and let `L` localize
 `B` and `D` localize `C`, compatibly. An `L`-module `M` flat over `A` then has `D ⊗[L] M` flat
 over `A'`, as a localization of `C ⊗[B] M ≅ A' ⊗[A] M`. In `isFlatOver_pullback` the rings
@@ -148,18 +196,125 @@ private theorem flat_tensor_of_isPushout {A A' B C L D : Type*} [CommRing A] [Co
     Module.Flat A' (D ⊗[L] M) := by
   have : Module.Flat A' (C ⊗[B] M) :=
     Module.Flat.of_linearEquiv (Algebra.IsPushout.cancelBaseChange A A' B C M)
-  have h₁ : IsBaseChange L (LinearMap.id : M →ₗ[B] M) :=
-    (isLocalizedModule_iff_isBaseChange SB L _).mp (isLocalizedModule_id SB M L)
-  have h₂ : IsBaseChange D ((TensorProduct.mk L D M 1).restrictScalars B ∘ₗ LinearMap.id) :=
-    h₁.comp (TensorProduct.isBaseChange L M D)
-  have hC : IsBaseChange C (TensorProduct.mk B C M 1) := TensorProduct.isBaseChange B M C
-  let g : C ⊗[B] M →ₗ[C] D ⊗[L] M := hC.lift ((TensorProduct.mk L D M 1).restrictScalars B)
-  have hg : IsBaseChange D g := by
-    refine hC.of_comp ?_
-    convert h₂ using 1
-    exact hC.lift_comp _
-  have : IsLocalizedModule SC g := (isLocalizedModule_iff_isBaseChange SC D g).mpr hg
-  exact flat_of_isLocalizedModule_of_flat SC g
+  have := isLocalizedModule_tensor SB (L := L) (D := D) SC M
+  exact flat_of_isLocalizedModule_of_flat SC
+    ((TensorProduct.isBaseChange B M C).lift ((TensorProduct.mk L D M 1).restrictScalars B))
+
+/-- The ring-level step of exactness under base change. In the setting of
+`flat_tensor_of_isPushout`, let `0 → M₁ → M₂ → M₃ → 0` be exact over `L` with `M₃` flat over
+`A`. Then `D ⊗[L] M₁ → D ⊗[L] M₂` is injective. It is a localization of
+`C ⊗[B] M₁ → C ⊗[B] M₂`, which is `A' ⊗[A] M₁ → A' ⊗[A] M₂`, injective because `M₃` is flat.
+No flatness of `B` over `A` is used. -/
+private theorem injective_baseChange_of_isPushout {A A' B C L D : Type*} [CommRing A]
+    [CommRing A'] [CommRing B] [CommRing C] [CommRing L] [CommRing D]
+    [Algebra A A'] [Algebra A B] [Algebra A C] [Algebra B C] [Algebra A' C]
+    [IsScalarTower A B C] [IsScalarTower A A' C] [Algebra.IsPushout A A' B C]
+    [Algebra B L] (SB : Submonoid B) [IsLocalization SB L]
+    [Algebra C D] (SC : Submonoid C) [IsLocalization SC D]
+    [Algebra L D] [Algebra B D] [IsScalarTower B L D] [IsScalarTower B C D]
+    {M₁ M₂ M₃ : Type*} [AddCommGroup M₁] [Module L M₁] [Module A M₁] [Module B M₁]
+    [IsScalarTower B L M₁] [IsScalarTower A B M₁]
+    [AddCommGroup M₂] [Module L M₂] [Module A M₂] [Module B M₂]
+    [IsScalarTower B L M₂] [IsScalarTower A B M₂]
+    [AddCommGroup M₃] [Module L M₃] [Module A M₃] [Module B M₃]
+    [IsScalarTower B L M₃] [IsScalarTower A B M₃] [Module.Flat A M₃]
+    {g : M₁ →ₗ[L] M₂} {f : M₂ →ₗ[L] M₃} (hg : Function.Injective g)
+    (hf : Function.Surjective f) (hgf : Function.Exact g f) :
+    Function.Injective (g.baseChange D) := by
+  let gB := g.restrictScalars B
+  let gA := gB.restrictScalars A
+  have h₁ : Function.Injective (gA.lTensor A') :=
+    LinearMap.lTensor_injective_of_exact_of_flat ((f.restrictScalars B).restrictScalars A) hf
+      gA hg hgf A'
+  let e₁ := Algebra.IsPushout.cancelBaseChange A A' B C M₁
+  let e₂ := Algebra.IsPushout.cancelBaseChange A A' B C M₂
+  have hcomm : ∀ y : A' ⊗[A] M₁,
+      gB.baseChange C (e₁.symm y) = e₂.symm (gA.lTensor A' y) := by
+    intro y
+    induction y using TensorProduct.inductionOn with
+    | tmul a m => simp [e₁, e₂, gA, gB, Algebra.IsPushout.cancelBaseChange_symm_tmul]
+    | add x y hx hy => simp only [map_add, hx, hy]
+  have h₂ : Function.Injective (gB.baseChange C) := by
+    intro x y hxy
+    rw [← e₁.symm_apply_apply x, ← e₁.symm_apply_apply y, hcomm, hcomm] at hxy
+    exact e₁.injective (h₁ (e₂.symm.injective hxy))
+  let ℓ₁ := (TensorProduct.isBaseChange B M₁ C).lift
+    ((TensorProduct.mk L D M₁ 1).restrictScalars B)
+  let ℓ₂ := (TensorProduct.isBaseChange B M₂ C).lift
+    ((TensorProduct.mk L D M₂ 1).restrictScalars B)
+  have hℓ₁ : IsLocalizedModule SC ℓ₁ := isLocalizedModule_tensor SB SC M₁
+  have hℓ₂ : IsLocalizedModule SC ℓ₂ := isLocalizedModule_tensor SB SC M₂
+  have hcomm' : ∀ x, (g.baseChange D) (ℓ₁ x) = ℓ₂ (gB.baseChange C x) := by
+    intro x
+    induction x using TensorProduct.inductionOn with
+    | tmul c m =>
+      change (g.baseChange D) (ℓ₁ (c ⊗ₜ m)) = ℓ₂ (c ⊗ₜ gB m)
+      rw [show ℓ₁ (c ⊗ₜ m) = c • ((1 : D) ⊗ₜ[L] m) from isBaseChange_lift_tmul c m,
+        show ℓ₂ (c ⊗ₜ gB m) = c • ((1 : D) ⊗ₜ[L] g m) from isBaseChange_lift_tmul c (g m),
+        LinearMap.map_smul_of_tower, LinearMap.baseChange_tmul]
+    | add x y hx hy => simp only [map_add, hx, hy]
+  rw [injective_iff_map_eq_zero]
+  intro x hx
+  obtain ⟨⟨y, s⟩, hy⟩ := IsLocalizedModule.surj SC ℓ₁ x
+  have hy' : (s : C) • x = ℓ₁ y := hy
+  have h0 : ℓ₂ (gB.baseChange C y) = 0 := by
+    rw [← hcomm', ← hy', LinearMap.map_smul_of_tower, hx, smul_zero]
+  obtain ⟨t, ht⟩ := (IsLocalizedModule.eq_zero_iff SC ℓ₂).1 h0
+  have ht' : (t : C) • gB.baseChange C y = 0 := ht
+  have hty : (t : C) • y = 0 := by
+    apply (injective_iff_map_eq_zero _).1 h₂
+    rw [LinearMap.map_smul, ht']
+  have hx0 : ((t * s : SC) : C) • x = 0 := by
+    rw [Submonoid.coe_mul, mul_smul, hy', ← LinearMap.map_smul, hty, map_zero]
+  have hu := IsLocalizedModule.map_units ℓ₁ (t * s)
+  rw [Module.End.isUnit_iff] at hu
+  apply hu.injective
+  rw [Module.algebraMap_end_apply, Module.algebraMap_end_apply, smul_zero]
+  exact hx0
+
+/-- A product of two flat modules is flat: `N ⊗ (M₁ × M₂) ≅ (N ⊗ M₁) × (N ⊗ M₂)` naturally
+in `N`. -/
+private theorem flat_prod {R M₁ M₂ : Type*} [CommRing R] [AddCommGroup M₁] [Module R M₁]
+    [AddCommGroup M₂] [Module R M₂] [Module.Flat R M₁] [Module.Flat R M₂] :
+    Module.Flat R (M₁ × M₂) := by
+  rw [Module.Flat.iff_lTensor_preserves_injective_linearMap]
+  intro N N' _ _ _ _ i hi
+  have h₁ := Module.Flat.lTensor_preserves_injective_linearMap (M := M₁) i hi
+  have h₂ := Module.Flat.lTensor_preserves_injective_linearMap (M := M₂) i hi
+  let e := TensorProduct.prodLeft R R M₁ M₂ N
+  let e' := TensorProduct.prodLeft R R M₁ M₂ N'
+  have hc : ∀ x, e' (i.lTensor (M₁ × M₂) x) =
+      LinearMap.prodMap (i.lTensor M₁) (i.lTensor M₂) (e x) := by
+    intro x
+    induction x using TensorProduct.inductionOn with
+    | tmul m n => obtain ⟨m₁, m₂⟩ := m; simp [e, e']
+    | add x y hx hy => simp only [map_add, hx, hy]
+  intro x y hxy
+  apply e.injective
+  have := congrArg e' hxy
+  rw [hc, hc] at this
+  exact Prod.map_injective.2 ⟨h₁, h₂⟩ this
+
+/-- In an exact sequence `0 → M₁ → M₂ → M₃ → 0` with `M₂` and `M₃` flat, `M₁` is flat: for an
+injective `N → N'`, the composite `N ⊗ M₁ → N' ⊗ M₁ → N' ⊗ M₂` is `N ⊗ M₁ → N ⊗ M₂ → N' ⊗ M₂`,
+injective as `M₃` and `M₂` are flat. -/
+private theorem flat_of_exact_of_flat {R M₁ M₂ M₃ : Type*} [CommRing R] [AddCommGroup M₁]
+    [Module R M₁] [AddCommGroup M₂] [Module R M₂] [AddCommGroup M₃] [Module R M₃]
+    [Module.Flat R M₂] [Module.Flat R M₃] {g : M₁ →ₗ[R] M₂} {f : M₂ →ₗ[R] M₃}
+    (hg : Function.Injective g) (hf : Function.Surjective f) (hgf : Function.Exact g f) :
+    Module.Flat R M₁ := by
+  rw [Module.Flat.iff_rTensor_preserves_injective_linearMap]
+  intro N N' _ _ _ _ i hi
+  have h₁ : Function.Injective (g.lTensor N) :=
+    LinearMap.lTensor_injective_of_exact_of_flat f hf g hg hgf N
+  have h₂ : Function.Injective (i.rTensor M₂) :=
+    Module.Flat.rTensor_preserves_injective_linearMap i hi
+  have hc : (g.lTensor N').comp (i.rTensor M₁) = (i.rTensor M₂).comp (g.lTensor N) := by
+    rw [LinearMap.lTensor_comp_rTensor, LinearMap.rTensor_comp_lTensor]
+  have : Function.Injective ((g.lTensor N').comp (i.rTensor M₁)) := by
+    rw [hc]
+    exact h₂.comp h₁
+  exact Function.Injective.of_comp this
 
 namespace AlgebraicGeometry
 
@@ -833,6 +988,235 @@ theorem isFlatOver_pullback {Y T T' : Scheme.{u}} (q : Y ⟶ T) (h : T' ⟶ T) (
     IsFlatOver (Limits.pullback.snd q h)
       ((Scheme.Modules.pullback (Limits.pullback.fst q h)).obj M) :=
   hM.of_isPullback (IsPullback.of_hasPullback q h)
+
+/-- A module sheaf flat over the identity is flat over every flat morphism: its stalks are flat
+over the local rings of `X`, which are flat over the local rings of `S`. -/
+theorem IsFlatOver.of_isFlatOver_id {X S : Scheme.{u}} {p : X ⟶ S} [Flat p] {M : X.Modules}
+    (hM : IsFlatOver (𝟙 X) M) : IsFlatOver p M := fun x ↦ by
+  have h := (isFlatOverId_iff_stalkwiseFlat X M).1 hM x
+  let : Algebra (S.presheaf.stalk (p x)) (X.presheaf.stalk x) := (p.stalkMap x).hom.toAlgebra
+  have : Module.Flat (S.presheaf.stalk (p x)) (X.presheaf.stalk x) := Flat.stalkMap p x
+  let Mx := (moduleStalkFunctor X x).obj M
+  let : Module (S.presheaf.stalk (p x)) Mx := Module.compHom Mx (p.stalkMap x).hom
+  have : IsScalarTower (S.presheaf.stalk (p x)) (X.presheaf.stalk x) Mx :=
+    IsScalarTower.of_algebraMap_smul fun _ _ ↦ rfl
+  exact Module.Flat.trans (S.presheaf.stalk (p x)) (X.presheaf.stalk x) Mx
+
+/-- In a short exact sequence of module sheaves whose middle and right terms are flat over the
+base, the left term is flat over the base. Stalks are exact, so this is the statement for
+modules, a consequence of `LinearMap.lTensor_injective_of_exact_of_flat`. -/
+theorem IsFlatOver.of_shortExact {X S : Scheme.{u}} {p : X ⟶ S} {Sc : ShortComplex X.Modules}
+    (hS : Sc.ShortExact) (h₂ : IsFlatOver p Sc.X₂) (h₃ : IsFlatOver p Sc.X₃) :
+    IsFlatOver p Sc.X₁ := fun x ↦ by
+  have := moduleStalkFunctor_preservesFiniteLimits X x
+  have := moduleStalkFunctor_preservesFiniteColimits X x
+  have hS' := hS.map_of_exact (moduleStalkFunctor X x)
+  have := h₂ x
+  have := h₃ x
+  let r := (p.stalkMap x).hom
+  have hg : Function.Injective ((moduleStalkFunctor X x).map Sc.f).hom :=
+    (ModuleCat.mono_iff_injective (Sc.map (moduleStalkFunctor X x)).f).1 hS'.mono_f
+  have hf : Function.Surjective ((moduleStalkFunctor X x).map Sc.g).hom :=
+    (ModuleCat.epi_iff_surjective (Sc.map (moduleStalkFunctor X x)).g).1 hS'.epi_g
+  have hgf : Function.Exact ((moduleStalkFunctor X x).map Sc.f).hom
+      ((moduleStalkFunctor X x).map Sc.g).hom :=
+    (ShortComplex.ShortExact.moduleCat_exact_iff_function_exact _).1 hS'.exact
+  exact flat_of_exact_of_flat
+    (g := ((ModuleCat.restrictScalars r).map ((moduleStalkFunctor X x).map Sc.f)).hom)
+    (f := ((ModuleCat.restrictScalars r).map ((moduleStalkFunctor X x).map Sc.g)).hom)
+    hg hf hgf
+
+/-- Flatness over the base is closed under binary biproducts: the stalk of `M ⊞ N` is the
+product of the stalks, by the split short exact sequence `M → M ⊞ N → N`. -/
+theorem IsFlatOver.biprod {X S : Scheme.{u}} {p : X ⟶ S} {M N : X.Modules}
+    (hM : IsFlatOver p M) (hN : IsFlatOver p N) : IsFlatOver p (M ⊞ N) := by
+  have hS : (ShortComplex.mk (biprod.inl : M ⟶ M ⊞ N) biprod.snd (by simp)).ShortExact :=
+    (ShortComplex.Splitting.ofHasBinaryBiproduct M N).shortExact
+  intro x
+  have := moduleStalkFunctor_preservesFiniteLimits X x
+  have := moduleStalkFunctor_preservesFiniteColimits X x
+  have hS' := hS.map_of_exact (moduleStalkFunctor X x)
+  have := hM x
+  have := hN x
+  let st := moduleStalkFunctor X x
+  let F := ModuleCat.restrictScalars (p.stalkMap x).hom
+  let g := (F.map (st.map (biprod.inl : M ⟶ M ⊞ N))).hom
+  let f := (F.map (st.map (biprod.snd : M ⊞ N ⟶ N))).hom
+  have hg : Function.Injective (st.map (biprod.inl : M ⟶ M ⊞ N)).hom :=
+    (ModuleCat.mono_iff_injective
+      ((ShortComplex.mk (biprod.inl : M ⟶ M ⊞ N) biprod.snd (by simp)).map st).f).1 hS'.mono_f
+  have hgf : Function.Exact (st.map (biprod.inl : M ⟶ M ⊞ N)).hom
+      (st.map (biprod.snd : M ⊞ N ⟶ N)).hom :=
+    (ShortComplex.ShortExact.moduleCat_exact_iff_function_exact _).1 hS'.exact
+  let s := (F.map (st.map (biprod.inr : N ⟶ M ⊞ N))).hom
+  have hs : f.comp s = LinearMap.id := by
+    ext n
+    change (st.map biprod.inr ≫ st.map biprod.snd).hom n = n
+    rw [← st.map_comp, biprod.inr_snd, st.map_id]
+    rfl
+  let e := ((show Function.Exact g f from hgf).splitSurjectiveEquiv hg ⟨s, hs⟩).1
+  have : Module.Flat (S.presheaf.stalk (p x)) (F.obj (st.obj M) × F.obj (st.obj N)) :=
+    flat_prod
+  exact Module.Flat.of_linearEquiv e
+
+/-- **Exactness of base change at a point.** For a pullback square `P = Y ×_T T'` and a short
+exact sequence `0 → M₁ → M₂ → M₃ → 0` of module sheaves on `Y` whose stalk `M₃` at `fst z` is
+flat over `𝒪_{T, q (fst z)}`, the map of stalks at `z` of the pullbacks of `M₁ → M₂` along `fst`
+is injective.
+
+The stalks of the pullbacks are `𝒪_{P,z} ⊗ M_{i, fst z}` (`pullbackStalkIso`), and over affine
+opens `𝒪_{P,z}` is a localization of the pushout of sections, as in
+`flat_stalk_of_isPullback`. -/
+private theorem mono_stalk_pullback_of_isPullback {P Y T T' : Scheme.{u}} {fst : P ⟶ Y}
+    {snd : P ⟶ T'} {q : Y ⟶ T} {h : T' ⟶ T} (H : IsPullback fst snd q h)
+    {Sc : ShortComplex Y.Modules} (hS : Sc.ShortExact) (z : P)
+    (hM : Module.Flat (T.presheaf.stalk (q (fst z)))
+      ((ModuleCat.restrictScalars (q.stalkMap (fst z)).hom).obj
+        ((moduleStalkFunctor Y (fst z)).obj Sc.X₃))) :
+    Mono ((ModuleCat.extendScalars (fst.stalkMap z).hom).map
+      ((moduleStalkFunctor Y (fst z)).map Sc.f)) := by
+  have hcond : q (fst z) = h (snd z) := by
+    rw [← Scheme.Hom.comp_apply, H.w, Scheme.Hom.comp_apply]
+  obtain ⟨V, hV, hyV, -⟩ :=
+    Opens.isBasis_iff_nbhd.mp T.isBasis_affineOpens (Opens.mem_top (q (fst z)))
+  obtain ⟨U, hU, hyU, hUV⟩ :=
+    Opens.isBasis_iff_nbhd.mp Y.isBasis_affineOpens (show fst z ∈ q ⁻¹ᵁ V from hyV)
+  obtain ⟨V', hV', hzV', hV'V⟩ := Opens.isBasis_iff_nbhd.mp T'.isBasis_affineOpens
+    (show snd z ∈ h ⁻¹ᵁ V from (show h (snd z) ∈ V by rw [← hcond]; exact hyV))
+  let W := fst ⁻¹ᵁ U ⊓ snd ⁻¹ᵁ V'
+  have hzW : z ∈ W := ⟨hyU, hzV'⟩
+  have hpush := (isIso_pushoutSection_iff H hV'V hUV (UY := W) rfl).mp
+    (isIso_pushoutSection_of_isAffineOpen H hV'V hUV rfl hV hV' hU)
+  have hW : IsAffineOpen W := by
+    have : IsAffine _ := hV
+    have : IsAffine _ := hV'
+    have : IsAffine _ := hU
+    exact .of_isIso (Scheme.Hom.isPullback_resLE H hV'V hUV rfl).isoPullback.hom
+  have hUW : W ≤ fst ⁻¹ᵁ U := inf_le_left
+  have hV'W : W ≤ snd ⁻¹ᵁ V' := inf_le_right
+  -- The pushout square of sections `Γ(V) → Γ(U), Γ(V') → Γ(W)`.
+  let : Algebra Γ(T, V) Γ(Y, U) := (q.appLE V U hUV).hom.toAlgebra
+  let : Algebra Γ(T, V) Γ(T', V') := (h.appLE V V' hV'V).hom.toAlgebra
+  let : Algebra Γ(Y, U) Γ(P, W) := (fst.appLE U W hUW).hom.toAlgebra
+  let : Algebra Γ(T', V') Γ(P, W) := (snd.appLE V' W hV'W).hom.toAlgebra
+  let : Algebra Γ(T, V) Γ(P, W) :=
+    (q.appLE V U hUV ≫ fst.appLE U W hUW).hom.toAlgebra
+  have : IsScalarTower Γ(T, V) Γ(Y, U) Γ(P, W) :=
+    IsScalarTower.of_algebraMap_eq' rfl
+  have : IsScalarTower Γ(T, V) Γ(T', V') Γ(P, W) :=
+    IsScalarTower.of_algebraMap_eq' (congrArg CommRingCat.Hom.hom hpush.w)
+  have : Algebra.IsPushout Γ(T, V) Γ(T', V') Γ(Y, U) Γ(P, W) :=
+    (CommRingCat.isPushout_iff_isPushout.mp hpush).symm
+  -- The local rings at `fst z` and `z` localize `Γ(U)` and `Γ(W)`.
+  let : Algebra Γ(Y, U) (Y.presheaf.stalk (fst z)) :=
+    TopCat.Presheaf.algebra_section_stalk Y.presheaf ⟨fst z, hyU⟩
+  have := hU.isLocalization_stalk ⟨fst z, hyU⟩
+  let : Algebra Γ(P, W) (P.presheaf.stalk z) :=
+    TopCat.Presheaf.algebra_section_stalk _ ⟨z, hzW⟩
+  have := hW.isLocalization_stalk ⟨z, hzW⟩
+  let : Algebra (Y.presheaf.stalk (fst z)) (P.presheaf.stalk z) :=
+    (fst.stalkMap z).hom.toAlgebra
+  let : Algebra Γ(Y, U) (P.presheaf.stalk z) :=
+    (Y.presheaf.germ U (fst z) hyU ≫ fst.stalkMap z).hom.toAlgebra
+  have : IsScalarTower Γ(Y, U) (Y.presheaf.stalk (fst z))
+      (P.presheaf.stalk z) :=
+    IsScalarTower.of_algebraMap_eq' rfl
+  have : IsScalarTower Γ(Y, U) Γ(P, W)
+      (P.presheaf.stalk z) :=
+    IsScalarTower.of_algebraMap_eq'
+      (congrArg CommRingCat.Hom.hom (germ_stalkMap_eq_appLE_germ fst hUW z hzW hyU))
+  -- The stalks `M_{i, y}`, with `M_{3, y}` flat over `Γ(V)`.
+  let L := Y.presheaf.stalk (fst z)
+  let st := moduleStalkFunctor Y (fst z)
+  let φB := algebraMap Γ(Y, U) L
+  let φA := φB.comp (algebraMap Γ(T, V) Γ(Y, U))
+  let M₁ := st.obj Sc.X₁
+  let M₂ := st.obj Sc.X₂
+  let M₃ := st.obj Sc.X₃
+  let : Module Γ(Y, U) M₁ := Module.compHom M₁ φB
+  let : Module Γ(Y, U) M₂ := Module.compHom M₂ φB
+  let : Module Γ(Y, U) M₃ := Module.compHom M₃ φB
+  let : Module Γ(T, V) M₁ := Module.compHom M₁ φA
+  let : Module Γ(T, V) M₂ := Module.compHom M₂ φA
+  let : Module Γ(T, V) M₃ := Module.compHom M₃ φA
+  have : IsScalarTower Γ(Y, U) L M₁ := IsScalarTower.of_algebraMap_smul fun _ _ ↦ rfl
+  have : IsScalarTower Γ(Y, U) L M₂ := IsScalarTower.of_algebraMap_smul fun _ _ ↦ rfl
+  have : IsScalarTower Γ(Y, U) L M₃ := IsScalarTower.of_algebraMap_smul fun _ _ ↦ rfl
+  have : IsScalarTower Γ(T, V) Γ(Y, U) M₁ := IsScalarTower.of_algebraMap_smul fun _ _ ↦ rfl
+  have : IsScalarTower Γ(T, V) Γ(Y, U) M₂ := IsScalarTower.of_algebraMap_smul fun _ _ ↦ rfl
+  have : IsScalarTower Γ(T, V) Γ(Y, U) M₃ := IsScalarTower.of_algebraMap_smul fun _ _ ↦ rfl
+  have : Module.Flat Γ(T, V) M₃ := by
+    have := (flat_stalk_iff q Sc.X₃ (fst z) hV hyV).mp hM
+    let e : M₃ ≃ₗ[Γ(T, V)] (ModuleCat.restrictScalars
+        (T.presheaf.germ V (q (fst z)) hyV ≫ q.stalkMap (fst z)).hom).obj M₃ :=
+      { toFun := fun m ↦ m
+        invFun := fun m ↦ m
+        left_inv := fun _ ↦ rfl
+        right_inv := fun _ ↦ rfl
+        map_add' := fun _ _ ↦ rfl
+        map_smul' := fun a m ↦ by
+          change Y.presheaf.germ U _ hyU (q.appLE V U hUV a) • m =
+            (T.presheaf.germ V _ hyV ≫ q.stalkMap (fst z)).hom a • m
+          exact congrArg (· • m) (congrArg (fun φ ↦ φ.hom a)
+            (germ_stalkMap_eq_appLE_germ q hUV _ hyU hyV)).symm }
+    exact Module.Flat.of_linearEquiv e
+  have := moduleStalkFunctor_preservesFiniteLimits Y (fst z)
+  have := moduleStalkFunctor_preservesFiniteColimits Y (fst z)
+  have hS' := hS.map_of_exact st
+  have hinj := injective_baseChange_of_isPushout (A := Γ(T, V)) (A' := Γ(T', V'))
+    (B := Γ(Y, U)) (C := Γ(P, W)) (L := L) (D := P.presheaf.stalk z)
+    (hU.primeIdealOf ⟨fst z, hyU⟩).asIdeal.primeCompl
+    (hW.primeIdealOf ⟨z, hzW⟩).asIdeal.primeCompl
+    (g := (st.map Sc.f).hom) (f := (st.map Sc.g).hom)
+    ((ModuleCat.mono_iff_injective (Sc.map st).f).1 hS'.mono_f)
+    ((ModuleCat.epi_iff_surjective (Sc.map st).g).1 hS'.epi_g)
+    ((ShortComplex.ShortExact.moduleCat_exact_iff_function_exact _).1 hS'.exact)
+  rw [ModuleCat.mono_iff_injective]
+  exact hinj
+
+/-- **Base change is exact on sequences with a quotient flat over the base**, along any pullback
+square. For `q : Y ⟶ T`, `h : T' ⟶ T` and a pullback square `P` with projections `fst : P ⟶ Y`
+and `snd : P ⟶ T'`, pullback along `fst` keeps a short exact sequence of module sheaves on `Y`
+short exact as soon as its quotient is flat over `T`.
+
+No flatness of `q` and no quasi-coherence is assumed. Pullback is right exact, and injectivity is
+checked on stalks, where it comes from the injectivity of `A' ⊗[A] M₁ → A' ⊗[A] M₂` for affine
+sections `A ⟶ A'` of the base: `M₃` is flat over `A`. -/
+theorem pullback_shortExact_of_isPullback {P Y T T' : Scheme.{u}} {fst : P ⟶ Y}
+    {snd : P ⟶ T'} {q : Y ⟶ T} {h : T' ⟶ T} (H : IsPullback fst snd q h)
+    {Sc : ShortComplex Y.Modules} (hS : Sc.ShortExact) (h₃ : IsFlatOver q Sc.X₃) :
+    (Sc.map (Scheme.Modules.pullback fst)).ShortExact := by
+  have (z : P) := moduleStalkFunctor_preservesFiniteLimits P z
+  have (z : P) := moduleStalkFunctor_preservesFiniteColimits P z
+  rw [(moduleStalkFunctors_jointlyReflectIsomorphisms P).shortExact_iff]
+  intro z
+  have := moduleStalkFunctor_preservesFiniteLimits Y (fst z)
+  have := moduleStalkFunctor_preservesFiniteColimits Y (fst z)
+  let r := (fst.stalkMap z).hom
+  let S' := (Sc.map (moduleStalkFunctor Y (fst z))).map (ModuleCat.extendScalars r)
+  let e : (Sc.map (Scheme.Modules.pullback fst)).map (moduleStalkFunctor P z) ≅ S' :=
+    ShortComplex.isoMk ((pullbackStalkIso fst z).app _) ((pullbackStalkIso fst z).app _)
+      ((pullbackStalkIso fst z).app _) ((pullbackStalkIso fst z).hom.naturality Sc.f).symm
+      ((pullbackStalkIso fst z).hom.naturality Sc.g).symm
+  refine ShortComplex.shortExact_of_iso e.symm ?_
+  have hS' := hS.map_of_exact (moduleStalkFunctor Y (fst z))
+  have hmono : Mono S'.f := mono_stalk_pullback_of_isPullback H hS z (h₃ _)
+  have hepi : Epi (Sc.map (moduleStalkFunctor Y (fst z))).g := hS'.epi_g
+  have hex : S'.Exact :=
+    hS'.exact.map_of_epi_of_preservesCokernel _ hepi inferInstance
+  have hepi' : Epi S'.g := by
+    change Epi ((ModuleCat.extendScalars r).map _)
+    infer_instance
+  exact ShortComplex.ShortExact.mk' hex hmono hepi'
+
+/-- **Base change is exact on sequences with a quotient flat over the base.** For `q : Y ⟶ T`
+and `h : T' ⟶ T`, pullback along the projection `Y ×_T T' ⟶ Y` keeps a short exact sequence of
+module sheaves on `Y` short exact as soon as its quotient is flat over `T`. This is
+`pullback_shortExact_of_isPullback` for the chosen fibre product; no flatness of `q` is used. -/
+theorem pullback_shortExact_of_isFlatOver {Y T T' : Scheme.{u}} (q : Y ⟶ T) (h : T' ⟶ T)
+    {Sc : ShortComplex Y.Modules} (hS : Sc.ShortExact) (h₃ : IsFlatOver q Sc.X₃) :
+    (Sc.map (Scheme.Modules.pullback (Limits.pullback.fst q h))).ShortExact :=
+  pullback_shortExact_of_isPullback (IsPullback.of_hasPullback q h) hS h₃
 
 end Scheme.Modules
 
