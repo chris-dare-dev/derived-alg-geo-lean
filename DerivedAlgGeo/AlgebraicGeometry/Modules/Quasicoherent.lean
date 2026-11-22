@@ -5,6 +5,7 @@ Released under the MIT license.
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.BasicOpen
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.Coproducts
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.Descent
+import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.Descent.Fpqc
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.Extensions
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.Kernels
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.Pullback
@@ -15,4 +16,6 @@ import DerivedAlgGeo.AlgebraicGeometry.Modules.Quasicoherent.Stalk
 Closure properties of quasi-coherence in the ambient category of all module
 sheaves, proved affine-locally and transported along an affine open cover, and
 the localization of quasi-coherent sections on basic opens of affine opens.
+Quasi-coherent sheaves form a Zariski stack (`Descent`) and an fpqc stack
+(`Descent/Fpqc`).
 -/

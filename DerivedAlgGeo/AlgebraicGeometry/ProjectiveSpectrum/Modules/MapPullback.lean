@@ -34,6 +34,10 @@ of Stacks 01MY, and it is an isomorphism once `𝒜` is generated in degree one 
   `s` to the image of `s` under `a / t ↦ ψ a / ψ t`.
 * `AlgebraicGeometry.Proj.isIso_mapPullbackTwistingSheaf`: `θ` is an isomorphism when `𝒜` is
   generated in degree one over `𝒜 0`.
+* `AlgebraicGeometry.Proj.twistingSheafMapOfRingHom_comp_app`: the maps
+  `𝒪(d) ⟶ (Proj.map ψ)_* 𝒪(d)` compose, on sections.
+* `AlgebraicGeometry.Proj.twistingSheafMapOfRingHom_app_image_bijective`: for `Proj.map ψ` an open
+  immersion, the map is bijective on sections over the image of an open.
 
 ## Implementation notes
 
@@ -186,6 +190,44 @@ def mapPullbackTwistingSheaf (d : ℤ) :
     (Scheme.Modules.pullback (map ψ hψ)).obj (twistingSheaf 𝒜 d) ⟶ twistingSheaf ℬ d :=
   ((Scheme.Modules.pullbackPushforwardAdjunction (map ψ hψ)).homEquiv _ _).symm
     (twistingSheafMapOfRingHom ψ hψ d)
+
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
+/-- **The maps `𝒪(d) ⟶ (Proj.map ψ)_* 𝒪(d)` compose**, on sections: the map along `ψ` followed by
+the map along `ψ'` is the map along `ψ'' = ψ' ∘ ψ`, after restriction to a common open. -/
+theorem twistingSheafMapOfRingHom_comp_app {C σC : Type u} [CommRing C] [SetLike σC C]
+    [AddSubgroupClass σC C] {𝒞 : ℕ → σC} [GradedRing 𝒞] (ψ' : ℬ →+*ᵍ 𝒞)
+    (hψ' : HomogeneousIdeal.irrelevant 𝒞 ≤ (HomogeneousIdeal.irrelevant ℬ).map ψ')
+    (ψ'' : 𝒜 →+*ᵍ 𝒞)
+    (hψ'' : HomogeneousIdeal.irrelevant 𝒞 ≤ (HomogeneousIdeal.irrelevant 𝒜).map ψ'')
+    (e : ψ'.comp ψ = ψ'') (d : ℤ) (U : Opens (ProjectiveSpectrum.top 𝒜))
+    (s : Γ(twistingSheaf 𝒜 d, U)) (V : (AlgebraicGeometry.Proj 𝒞).Opens)
+    (hV : V ≤ map ψ' hψ' ⁻¹ᵁ map ψ hψ ⁻¹ᵁ U) (hV'' : V ≤ map ψ'' hψ'' ⁻¹ᵁ U) :
+    (twistingSheaf 𝒞 d).presheaf.map (homOfLE hV).op
+        ((twistingSheafMapOfRingHom ψ' hψ' d).app _ ((twistingSheafMapOfRingHom ψ hψ d).app U s)) =
+      (twistingSheaf 𝒞 d).presheaf.map (homOfLE hV'').op
+        ((twistingSheafMapOfRingHom ψ'' hψ'' d).app U s) := by
+  subst e
+  apply section_ext
+  funext z
+  have h₁ := associatedSheafMapOfRingHom_app (intShift 𝒜 d) (intShift ℬ d) ψ hψ
+    ψ.toRingHom.toSemilinearMap (map_mem_intShift ψ d) U s
+  have h₂ := associatedSheafMapOfRingHom_app (intShift ℬ d) (intShift 𝒞 d) ψ' hψ'
+    ψ'.toRingHom.toSemilinearMap (map_mem_intShift ψ' d) _
+    ((twistingSheafMapOfRingHom ψ hψ d).app U s)
+  have h₃ := associatedSheafMapOfRingHom_app (intShift 𝒜 d) (intShift 𝒞 d) (ψ'.comp ψ) hψ''
+    (ψ'.comp ψ).toRingHom.toSemilinearMap (map_mem_intShift (ψ'.comp ψ) d) U s
+  change ((twistingSheafMapOfRingHom ψ' hψ' d).app _
+    ((twistingSheafMapOfRingHom ψ hψ d).app U s) :
+      (associatedSheafInType 𝒞 (intShift 𝒞 d)).1.obj _).1 ⟨z.1, hV z.2⟩ =
+    ((twistingSheafMapOfRingHom (ψ'.comp ψ) hψ'' d).app U s :
+      (associatedSheafInType 𝒞 (intShift 𝒞 d)).1.obj _).1 ⟨z.1, hV'' z.2⟩
+  erw [h₂, h₃, sectionMapOfRingHom_apply, sectionMapOfRingHom_apply, h₁,
+    sectionMapOfRingHom_apply]
+  exact DegreeZeroLocalization.mapOfRingHom_comp ψ ψ.toRingHom.toSemilinearMap _
+    (map_mem_intShift ψ d) ψ' ψ'.toRingHom.toSemilinearMap _ (map_mem_intShift ψ' d) (ψ'.comp ψ)
+    (fun _ ↦ rfl) (ψ'.comp ψ).toRingHom.toSemilinearMap (fun _ ↦ rfl) _
+    (map_mem_intShift (ψ'.comp ψ) d) _
 
 /-- `θ` sends the pullback of a section `s` of `𝒪(d)` to `s` pushed through `a / t ↦ ψ a / ψ t`. -/
 theorem mapPullbackTwistingSheaf_app_unit (d : ℤ) (U : Opens (ProjectiveSpectrum.top 𝒜))
@@ -444,6 +486,35 @@ theorem isIso_mapPullbackTwistingSheaf {I : Type u} (g : I → 𝒜 1)
   rw [← isIso_iff_of_reflects_iso _ (Scheme.Modules.toPresheaf _)]
   exact (inferInstance : IsIso ((sheafToPresheaf _ _).map
     ((SheafOfModules.toSheaf _).map (mapPullbackTwistingSheaf ψ hψ d))))
+
+/-- **On the image of an open immersion `Proj.map ψ`, the map `𝒪(d) ⟶ (Proj.map ψ)_* 𝒪(d)` is
+bijective on sections**, for `𝒜` generated in degree one: it is the restriction to the image
+followed by `θ`, an isomorphism. -/
+theorem twistingSheafMapOfRingHom_app_image_bijective [IsOpenImmersion (map ψ hψ)] {I : Type u}
+    (g : I → 𝒜 1) (hg : Algebra.adjoin (𝒜 0) (Set.range fun j => (g j : A)) = ⊤) (d : ℤ)
+    (B : (AlgebraicGeometry.Proj ℬ).Opens) :
+    Function.Bijective ((twistingSheafMapOfRingHom ψ hψ d).app (map ψ hψ ''ᵁ B)) := by
+  have hθ := isIso_mapPullbackTwistingSheaf ψ hψ g hg d
+  have key : twistingSheafMapOfRingHom ψ hψ d =
+      (Scheme.Modules.restrictAdjunction (map ψ hψ)).unit.app _ ≫
+        (Scheme.Modules.pushforward (map ψ hψ)).map
+          ((Scheme.Modules.restrictFunctorIsoPullback (map ψ hψ)).hom.app _ ≫
+            mapPullbackTwistingSheaf ψ hψ d) := by
+    rw [Functor.map_comp, ← Category.assoc, Scheme.Modules.restrictFunctorIsoPullback,
+      Adjunction.unit_leftAdjointUniq_hom_app, mapPullbackTwistingSheaf]
+    exact (Equiv.apply_symm_apply _ _).symm.trans (Adjunction.homEquiv_unit _ _ _ _)
+  have hU : map ψ hψ ''ᵁ map ψ hψ ⁻¹ᵁ (map ψ hψ ''ᵁ B) = map ψ hψ ''ᵁ B := by
+    rw [(map ψ hψ).preimage_image_eq]
+  have hle : IsIso (homOfLE ((map ψ hψ).image_preimage_le (map ψ hψ ''ᵁ B))) :=
+    ⟨⟨homOfLE hU.ge, Subsingleton.elim _ _, Subsingleton.elim _ _⟩⟩
+  have h₁ : IsIso ((twistingSheaf 𝒜 d).presheaf.map
+      (homOfLE ((map ψ hψ).image_preimage_le (map ψ hψ ''ᵁ B))).op) := inferInstance
+  have h₂ : IsIso (Scheme.Modules.Hom.app
+      ((Scheme.Modules.restrictFunctorIsoPullback (map ψ hψ)).hom.app (twistingSheaf 𝒜 d) ≫
+        mapPullbackTwistingSheaf ψ hψ d) (map ψ hψ ⁻¹ᵁ map ψ hψ ''ᵁ B)) := inferInstance
+  rw [key, Scheme.Modules.Hom.comp_app, Scheme.Modules.restrictAdjunction_unit_app_app,
+    Scheme.Modules.pushforward_map_app]
+  exact (ConcreteCategory.isIso_iff_bijective _).mp (IsIso.comp_isIso' h₁ h₂)
 
 /-- **`θ` as an isomorphism `(Proj.map ψ)^* 𝒪(d) ≅ 𝒪(d)`**, for `𝒜` generated in degree one. -/
 def mapPullbackTwistingSheafIso {I : Type u} (g : I → 𝒜 1)

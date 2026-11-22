@@ -2,7 +2,7 @@
 Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
-import Mathlib.Algebra.Category.ModuleCat.ChangeOfRings
+import DerivedAlgGeo.Algebra.Category.ModuleCat.ChangeOfRings
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.KProjective
 import DerivedAlgGeo.AlgebraicGeometry.DerivedCategory.Dqc.Affine
 import DerivedAlgGeo.AlgebraicGeometry.Modules.Pullback.AffineSpec
@@ -26,19 +26,6 @@ noncomputable section
 universe u
 
 attribute [local instance] HasDerivedCategory.standard
-
-/-- Extension of scalars is additive. -/
-instance affineExtendScalars_additive
-    {R A : CommRingCat.{u}} (f : R ⟶ A) :
-    (ModuleCat.extendScalars f.hom).Additive where
-  map_add {M N} g h := by
-    apply ModuleCat.ExtendScalars.hom_ext
-    intro m
-    let φ : R →+* A := f.hom
-    letI : Module R A := Module.compHom A φ
-    change (1 : A) ⊗ₜ[R,φ] (g m + h m) =
-      (1 : A) ⊗ₜ[R,φ] g m + (1 : A) ⊗ₜ[R,φ] h m
-    rw [TensorProduct.tmul_add]
 
 /-- Arbitrary extension of scalars on affine K-projective representatives. -/
 def affineKProjectivePullback {R A : CommRingCat.{u}} (f : R ⟶ A) :
@@ -83,7 +70,7 @@ noncomputable def affineKProjectiveSchemeModulePullbackComparison
   let I := ObjectProperty.ι (CategoryTheory.kProjectiveHomotopy (ModuleCat R))
   letI : (AlgebraicGeometry.tilde.functor R).Additive := inferInstance
   letI : (AlgebraicGeometry.tilde.functor A).Additive := inferInstance
-  letI : G.Additive := affineExtendScalars_additive f
+  letI : G.Additive := ModuleCat.extendScalars_additive f.hom
   letI : F.Additive := inferInstance
   letI : (G ⋙ T).Additive := inferInstance
   letI : T.Additive := inferInstance

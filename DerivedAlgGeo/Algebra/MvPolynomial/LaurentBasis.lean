@@ -51,10 +51,12 @@ The exponents `Finsupp.natToIntExponent` and `Finsupp.laurentExponent` are defin
 
 ## Implementation notes
 
-The equality criterion descends from `DegreeZeroLocalization.awayMk_eq_awayMk_iff`, which is
-where the domain hypothesis is spent, to `MvPolynomial.monomial_eq_monomial_iff`. Only the
-`IsDomain R` instance is needed: `Module.IsTorsionFree R R` is already an instance, so the
-polynomial case supplies nothing by hand.
+Everything here holds over an arbitrary commutative ring. The equality criterion descends from
+`DegreeZeroLocalization.awayMk_eq_awayMk_iff`, whose cancellation hypothesis is that `Xᵞ` acts
+injectively, to `MvPolynomial.monomial_eq_monomial_iff`. A monomial with coefficient `1` is a
+non-zero-divisor in any polynomial ring (`isSMulRegular_monomial_one`), so no domain hypothesis
+appears. The equality criterion alone needs `Nontrivial R`: over the zero ring every fraction is
+zero while distinct exponents stay distinct.
 
 `laurentExponent` is stated with `m` and `β` separate rather than packaged, because the caller
 that matters — a Čech cochain — produces them separately from `exists_awayMk` and never has the
@@ -93,9 +95,11 @@ theorem monomial_one_pow (γ : ι →₀ ℕ) (m : ℕ) :
     (MvPolynomial.monomial γ (1 : R)) ^ m = MvPolynomial.monomial (m • γ) 1 := by
   rw [MvPolynomial.monomial_pow, one_pow]
 
-theorem monomial_one_ne_zero [Nontrivial R] (γ : ι →₀ ℕ) :
-    (MvPolynomial.monomial γ (1 : R)) ≠ 0 := by
-  simp
+/-- `Xᵞ` is a non-zero-divisor over any commutative semiring, which is the cancellation hypothesis
+`awayMk_eq_awayMk_iff` consumes. -/
+theorem isSMulRegular_monomial_one {S : Type*} [CommSemiring S] (γ : ι →₀ ℕ) :
+    IsSMulRegular (MvPolynomial ι S) (MvPolynomial.monomial γ (1 : S)) :=
+  (isRegular_one.monomial).left.isSMulRegular
 
 /-- A monomial of the right total degree is a legitimate numerator over `(Xᵞ)ᵐ` for the twist
 `d`. -/
@@ -110,8 +114,8 @@ theorem monomial_mem_natShift (γ β : ι →₀ ℕ) (d m : ℕ)
 set_option maxHeartbeats 800000 in
 /-- Two monomial fractions over powers of `Xᵞ` are equal exactly when they cross-multiply to the
 same monomial. This is `awayMk_eq_awayMk_iff` followed by `monomial_eq_monomial_iff`; the
-coefficient side of the latter is discharged by `1 ≠ 0`. -/
-theorem awayMk_monomial_eq_iff [IsDomain R] {σM : Type u} [SetLike σM (MvPolynomial ι R)]
+coefficient side of the latter is discharged by `1 ≠ 0`, which is where `Nontrivial R` is used. -/
+theorem awayMk_monomial_eq_iff [Nontrivial R] {σM : Type u} [SetLike σM (MvPolynomial ι R)]
     [AddSubgroupClass σM (MvPolynomial ι R)] {𝓜 : ℕ → σM}
     [SetLike.GradedSMul (polynomialGrading ι R) 𝓜] (γ : ι →₀ ℕ) {m m' : ℕ} {β β' : ι →₀ ℕ}
     (hβ : (MvPolynomial.monomial β (1 : R)) ∈ 𝓜 (m • γ.degree))
@@ -121,7 +125,7 @@ theorem awayMk_monomial_eq_iff [IsDomain R] {σM : Type u} [SetLike σM (MvPolyn
       DegreeZeroLocalization.awayMk (𝓜 := 𝓜)
         (monomial_one_mem_polynomialGrading (R := R) γ) m' (MvPolynomial.monomial β' 1) hβ' ↔
       m' • γ + β = m • γ + β' := by
-  rw [DegreeZeroLocalization.awayMk_eq_awayMk_iff _ (monomial_one_ne_zero (R := R) γ),
+  rw [DegreeZeroLocalization.awayMk_eq_awayMk_iff _ (isSMulRegular_monomial_one (S := R) γ),
     smul_eq_mul, smul_eq_mul, monomial_one_pow, monomial_one_pow,
     MvPolynomial.monomial_mul_monomial, MvPolynomial.monomial_mul_monomial, one_mul,
     MvPolynomial.monomial_eq_monomial_iff]
@@ -136,7 +140,7 @@ common denominator. Combined with `degree_laurentExponent` and
 `laurentExponent_nonneg_of_apply_eq_zero`, it says the monomial fractions of the twist `d` are
 indexed by
 `{α : ι →₀ ℤ | α.degree = d ∧ ∀ j, γ j = 0 → 0 ≤ α j}`. -/
-theorem awayMk_monomial_eq_iff_laurentExponent [IsDomain R] {σM : Type u}
+theorem awayMk_monomial_eq_iff_laurentExponent [Nontrivial R] {σM : Type u}
     [SetLike σM (MvPolynomial ι R)] [AddSubgroupClass σM (MvPolynomial ι R)] {𝓜 : ℕ → σM}
     [SetLike.GradedSMul (polynomialGrading ι R) 𝓜] (γ : ι →₀ ℕ) {m m' : ℕ} {β β' : ι →₀ ℕ}
     (hβ : (MvPolynomial.monomial β (1 : R)) ∈ 𝓜 (m • γ.degree))
@@ -158,11 +162,6 @@ The route is short because both halves are already available. `exists_awayMk` pu
 element in the form `p / (Xᵞ)ᵐ`, `MvPolynomial.as_sum` splits the numerator, and `awayMk_sum`
 distributes the fraction over that splitting. No denominators have to be aligned afterwards:
 splitting a numerator never touches `m`. -/
-
-/-- `(Xᵞ)ⁿ` is never zero, which is the hypothesis `exists_awayMk` consumes. -/
-theorem monomial_one_pow_ne_zero [Nontrivial R] (γ : ι →₀ ℕ) (n : ℕ) :
-    (MvPolynomial.monomial γ (1 : R)) ^ n ≠ 0 := by
-  rw [monomial_one_pow]; simp
 
 /-! ## Twists of either sign, abstractly
 
@@ -310,7 +309,7 @@ monomial fractions over a single common denominator `(Xᵞ)ᵐ`.
 
 The denominator is shared across the whole sum, which is what makes this usable: a map defined by
 its effect on monomial fractions extends without any further alignment. -/
-theorem exists_sum_awayMk_monomial [Nontrivial R] {σM : Type u}
+theorem exists_sum_awayMk_monomial {σM : Type u}
     [SetLike σM (MvPolynomial ι R)] [AddSubgroupClass σM (MvPolynomial ι R)] {𝓜 : ℕ → σM}
     [SetLike.GradedSMul (polynomialGrading ι R) 𝓜] {d : ℤ} (h𝓜 : IsPolynomialTwist 𝓜 d)
     (γ : ι →₀ ℕ)
@@ -321,8 +320,7 @@ theorem exists_sum_awayMk_monomial [Nontrivial R] {σM : Type u}
         (monomial_one_mem_polynomialGrading (R := R) γ) m
         (MvPolynomial.monomial β (p.coeff β)) (h𝓜.monomial_coeff_mem hp β) := by
   obtain ⟨m, p, hp, rfl⟩ :=
-    DegreeZeroLocalization.exists_awayMk (monomial_one_mem_polynomialGrading (R := R) γ)
-      (monomial_one_pow_ne_zero γ) z
+    DegreeZeroLocalization.exists_awayMk (monomial_one_mem_polynomialGrading (R := R) γ) z
   exact ⟨m, p, hp, awayMk_eq_sum_monomial h𝓜 γ p hp⟩
 
 /-- Every exponent occurring in a spanning decomposition lands in the index set: total degree the
@@ -369,7 +367,7 @@ Combined with `exists_sum_awayMk_monomial` this is the Laurent monomial basis st
 form: every element is a monomial combination over a common denominator, and that combination is
 unique. A map may therefore be *defined* by its effect on the monomial fractions, which is what
 the sign projection of the Čech contracting homotopy needs. -/
-theorem sum_awayMk_monomial_eq_zero_iff [IsDomain R] {γ : ι →₀ ℕ} {d m : ℕ}
+theorem sum_awayMk_monomial_eq_zero_iff {γ : ι →₀ ℕ} {d m : ℕ}
     (s : Finset (ι →₀ ℕ)) (c : (ι →₀ ℕ) → R)
     (hc : ∀ β, MvPolynomial.monomial β (c β) ∈
       natShift (polynomialGrading ι R) d (m • γ.degree)) :
@@ -380,7 +378,7 @@ theorem sum_awayMk_monomial_eq_zero_iff [IsDomain R] {γ : ι →₀ ℕ} {d m :
   rw [← DegreeZeroLocalization.awayMk_sum
       (monomial_one_mem_polynomialGrading (R := R) γ) m s
       (fun β => MvPolynomial.monomial β (c β)) hc,
-    DegreeZeroLocalization.awayMk_eq_zero_iff _ (monomial_one_ne_zero (R := R) γ),
+    DegreeZeroLocalization.awayMk_eq_zero_iff _ (isSMulRegular_monomial_one (S := R) γ),
     sum_monomial_eq_zero_iff]
 
 end MvPolynomial

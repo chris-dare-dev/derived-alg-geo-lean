@@ -3,8 +3,10 @@ Copyright (c) 2026 Chris Dare. All rights reserved.
 Released under the MIT license.
 -/
 import DerivedAlgGeo.AlgebraicGeometry.AlgebraicSpace.Basic
+import DerivedAlgGeo.AlgebraicGeometry.AlgebraicSpace.ChangeOfBase
 import DerivedAlgGeo.AlgebraicGeometry.AlgebraicSpace.FiberProduct
 import DerivedAlgGeo.AlgebraicGeometry.AlgebraicSpace.GlobalFunctions
+import DerivedAlgGeo.AlgebraicGeometry.AlgebraicSpace.Representable
 
 /-!
 # Algebraic spaces
@@ -15,23 +17,29 @@ representable by schemes and an étale surjective atlas by a scheme.
 ## Main definitions
 
 None: this umbrella re-exports its children, among them `AlgebraicGeometry.isAlgebraicSpace`,
-the category `AlgebraicGeometry.AlgebraicSpace` and its global functions
-`AlgebraicGeometry.AlgebraicSpace.globalFunctions`.
+the category `AlgebraicGeometry.AlgebraicSpace`, the change of base
+`AlgebraicGeometry.changeOfBase` of a presheaf over a scheme `T` over `S`, its global functions
+`AlgebraicGeometry.AlgebraicSpace.globalFunctions`, and the morphisms of presheaves
+`AlgebraicGeometry.representableByAlgebraicSpaces` representable by algebraic spaces.
 
 ## Main results
 
 None; this module re-exports its children, among them `AlgebraicGeometry.isAlgebraicSpace_yoneda`
-(schemes are algebraic spaces, Stacks 025Z), `AlgebraicGeometry.isAlgebraicSpace_pullback`
+(schemes are algebraic spaces, Stacks 025Z), `AlgebraicGeometry.isAlgebraicSpace_iff_changeOfBase`
+(change of base, Stacks 04SG), `AlgebraicGeometry.isAlgebraicSpace_pullback`
 (fibre products, Stacks 04T9) and `AlgebraicGeometry.AlgebraicSpace.homSpecEquiv` (morphisms to
 affine schemes, Stacks 05Z1).
 
 ## Implementation notes
 
 `AlgebraicSpace/Basic.lean` holds the definition, schemes as algebraic spaces, the underlying sheaf
-and stack, and the universe conventions; `AlgebraicSpace/FiberProduct.lean` holds fibre products
+and stack, and the universe conventions; `AlgebraicSpace/ChangeOfBase.lean` compares algebraic
+spaces over `T.left` with algebraic spaces over `S` mapping to `T`;
+`AlgebraicSpace/FiberProduct.lean` holds fibre products
 and the terminal object; `AlgebraicSpace/GlobalFunctions.lean` holds global functions and morphisms
-to affine schemes. Nothing here imports algebraic stacks, moduli problems or stability
-conditions.
+to affine schemes; `AlgebraicSpace/Representable.lean` holds morphisms of presheaves
+representable by algebraic spaces and their properties measured on étale atlases. Nothing here
+imports algebraic stacks, moduli problems or stability conditions.
 
 ## References
 

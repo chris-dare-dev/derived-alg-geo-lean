@@ -74,7 +74,7 @@ The file cites no literature. It builds on
 
 ## Tags
 
-Čech cohomology, projective space, base field action, linearity, transport
+Čech cohomology, projective space, base ring action, linearity, transport
 -/
 
 universe u
@@ -87,7 +87,7 @@ namespace AlgebraicGeometry.Proj
 
 attribute [local instance] MvPolynomial.gradedAlgebra
 
-variable (ι k : Type u) [Field k]
+variable (ι k : Type u) [CommRing k]
 
 /-- Transport along an equality of opens commutes with the endomorphism a scalar induces. -/
 theorem eqToIso_transport_varietyScalarAction (d : ℤ)

@@ -51,6 +51,9 @@ All in the namespace `CategoryTheory.Triangulated.WeakStabilityCondition`.
 * `WeakStabilityFunction.isNoetherianObject_of_zeroCharge` — zero-charge
   objects of a noetherian torsion subcategory are noetherian in the abelian
   heart.
+* `WeakStabilityFunction.wellFoundedGT_zeroChargeSubobject` — the relative
+  chain condition makes the zero-charge subobjects of a heart object
+  well founded.
 * `WeakStabilityFunction.hasZeroChargeDecomposition_of_chainCondition`,
   `WeakStabilityFunction.hasZeroChargeDecompositions_of_chainCondition` — the
   relative chain condition yields maximal zero-charge subobjects with
@@ -79,27 +82,13 @@ here**, the torsion-pair half is carried as a `HeartTorsionPair`, and the
 equivalence of Remark 14.7 is *not* claimed — it is the textbook
 justification for the choice, not a theorem of this file.
 
-### What is deliberately NOT declared here
+### Lemmas 14.8 and 14.11
 
-Lemmas 14.8 and 14.11 are **statable but left undeclared**: an absent
-declaration is preferable to a sorry-backed one. What their proofs need,
-precisely:
-
-* **Lemma 14.8** (`A⁰` noetherian torsion + `Z` over `ℚ[i]` ⟹ `A`
-  noetherian): the proof runs on surjection chains, kernels of composites,
-  maximal subobjects with `ℑZ = 0` extracted from HN filtrations, and a
-  discreteness argument for the charge image. Missing at the pin: kernel and
-  image lemmas needed by the maximal-subobject construction and a
-  formalization decision for "Z defined over ℚ[i]" that makes the
-  discreteness step honest.  The abelian weak-HN package and its existence for
-  the slicing heart are in `HarderNarasimhan.lean`.
-* **Lemma 14.11** (bounded-slope chains terminate): the statement needs only
-  `slope` and the chains below; the proof needs `μ⁺`/`μ⁻` from HN data, the
-  compact-parallelogram argument, and the finitely-many-HN-classes input of
-  Remark 12.3, which is support-property infrastructure.
-
-The remaining kernel/image, discreteness and support inputs belong in focused
-modules before these two lemmas are attempted.
+The chain-termination lemmas that consume this layer, Lemma 14.8 (a
+noetherian `A⁰` and a charge defined over `ℚ[i]` make the heart noetherian)
+and Lemma 14.11 (bounded-slope chains terminate under the support property),
+are in `NoetherianChains.lean`, which also needs the HN property and the
+support-property finiteness of Remark 12.3.
 
 ## References
 
@@ -747,6 +736,50 @@ theorem WeakStabilityFunction.isNoetherianObject_of_zeroCharge
       exact Subobject.eq_of_comm e (by
         exact Subobject.ofLE_arrow (f.monotone (Nat.le_succ m)))
 
+/-- If zero-charge subobject chains of a heart object terminate, its
+zero-charge subobjects in the abelian heart satisfy the ascending chain
+condition. -/
+theorem WeakStabilityFunction.wellFoundedGT_zeroChargeSubobject
+    (W : WeakStabilityFunction t) (E : t.heart.FullSubcategory)
+    (hacc : ∀ c : SubobjectChain t W.zeroCharge E.obj, c.Terminates) :
+    WellFoundedGT {S : Subobject E // W.heartZeroCharge t (S : t.heart.FullSubcategory)} := by
+  rw [wellFoundedGT_iff_monotone_chain_condition]
+  intro f
+  let step (j : ℕ) :
+      (f j : t.heart.FullSubcategory) ⟶
+        (f (j + 1) : t.heart.FullSubcategory) :=
+    Subobject.ofLE (f j).1 (f (j + 1)).1
+      (show (f j).1 ≤ (f (j + 1)).1 from f.monotone (Nat.le_succ j))
+  let c : SubobjectChain t W.zeroCharge E.obj :=
+    { obj := fun j => (f j : t.heart.FullSubcategory).obj
+      prop := fun j => (f j).2
+      step := fun j => (step j).hom
+      toAmbient := fun j => (f j).1.arrow.hom
+      step_mono := fun j => isHeartMono_of_mono t (step j)
+      toAmbient_mono := fun j => isHeartMono_of_mono t (f j).1.arrow
+      comm := fun j => by
+        exact congrArg
+          (fun k : (f j : t.heart.FullSubcategory) ⟶ E => k.hom)
+          (Subobject.ofLE_arrow (f.monotone (Nat.le_succ j))) }
+  obtain ⟨n, hn⟩ := hacc c
+  refine ⟨n, fun m hnm => ?_⟩
+  induction m, hnm using Nat.le_induction with
+  | base => rfl
+  | succ m hnm ih =>
+      rw [ih]
+      let u : (f m : t.heart.FullSubcategory) ⟶
+          (f (m + 1) : t.heart.FullSubcategory) := step m
+      haveI : IsIso u.hom := hn m hnm
+      let e : (f m : t.heart.FullSubcategory) ≅
+          (f (m + 1) : t.heart.FullSubcategory) :=
+        { hom := u
+          inv := ObjectProperty.homMk (inv u.hom)
+          hom_inv_id := by ext; simp
+          inv_hom_id := by ext; simp }
+      apply Subtype.ext
+      exact Subobject.eq_of_comm e
+        (Subobject.ofLE_arrow (f.monotone (Nat.le_succ m)))
+
 /-- If zero-charge subobject chains terminate in a fixed heart object, then
 that object has a maximal zero-charge subobject and the corresponding quotient
 is right-orthogonal.
@@ -761,44 +794,7 @@ theorem WeakStabilityFunction.hasZeroChargeDecomposition_of_chainCondition
       Triangle.mk i p d ∈ distTriang C := by
   let EH : t.heart.FullSubcategory := ⟨E, hE⟩
   let ZSub := {S : Subobject EH // W.heartZeroCharge t (S : t.heart.FullSubcategory)}
-  have hwf : WellFoundedGT ZSub := by
-    rw [wellFoundedGT_iff_monotone_chain_condition]
-    intro f
-    let step (j : ℕ) :
-        (f j : t.heart.FullSubcategory) ⟶
-          (f (j + 1) : t.heart.FullSubcategory) :=
-      Subobject.ofLE (f j).1 (f (j + 1)).1
-        (show (f j).1 ≤ (f (j + 1)).1 from f.monotone (Nat.le_succ j))
-    let c : SubobjectChain t W.zeroCharge E :=
-      { obj := fun j => (f j : t.heart.FullSubcategory).obj
-        prop := fun j => (f j).2
-        step := fun j => (step j).hom
-        toAmbient := fun j => (f j).1.arrow.hom
-        step_mono := fun j => isHeartMono_of_mono t (step j)
-        toAmbient_mono := fun j => isHeartMono_of_mono t (f j).1.arrow
-        comm := fun j => by
-          exact congrArg
-            (fun k : (f j : t.heart.FullSubcategory) ⟶ EH => k.hom)
-            (Subobject.ofLE_arrow (f.monotone (Nat.le_succ j))) }
-    obtain ⟨n, hn⟩ := hacc c
-    refine ⟨n, fun m hnm => ?_⟩
-    induction m, hnm using Nat.le_induction with
-    | base => rfl
-    | succ m hnm ih =>
-        rw [ih]
-        let u : (f m : t.heart.FullSubcategory) ⟶
-            (f (m + 1) : t.heart.FullSubcategory) := step m
-        haveI : IsIso u.hom := hn m hnm
-        let e : (f m : t.heart.FullSubcategory) ≅
-            (f (m + 1) : t.heart.FullSubcategory) :=
-          { hom := u
-            inv := ObjectProperty.homMk (inv u.hom)
-            hom_inv_id := by ext; simp
-            inv_hom_id := by ext; simp }
-        apply Subtype.ext
-        exact Subobject.eq_of_comm e
-          (Subobject.ofLE_arrow (f.monotone (Nat.le_succ m)))
-  letI : WellFoundedGT ZSub := hwf
+  letI : WellFoundedGT ZSub := W.wellFoundedGT_zeroChargeSubobject t EH hacc
   have hbot : W.heartZeroCharge t ((⊥ : Subobject EH) : t.heart.FullSubcategory) := by
     apply (W.heartZeroCharge t).prop_of_isZero
     exact (isZero_zero t.heart.FullSubcategory).of_iso Subobject.botCoeIsoZero

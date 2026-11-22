@@ -23,6 +23,8 @@ reviewed abstract layer.
 
 ## Main results
 
+* `IsNoetherianTorsionSubcategory.terminates`: Remark 14.7's chain condition
+  for the torsion class;
 * `HasPhaseTiltingEnvelope.hasTiltingEnvelope`: forgetting the phase cut gives
   a Definition 14.12 envelope;
 * `TiltingProperty.hasTiltingEnvelope_of_phaseFree`: the tilting property
@@ -82,6 +84,16 @@ torsion class of a `NoetherianTorsionSubcategory`.  This exposes the class
 parameter suppressed by the data-carrying structure of Definition 14.6. -/
 def IsNoetherianTorsionSubcategory (B : ObjectProperty C) : Prop :=
   ∃ N : NoetherianTorsionSubcategory t, N.pair.tors = B
+
+omit [IsTriangulated C] in
+variable {t} in
+/-- Remark 14.7's chain condition for a noetherian torsion subcategory: every
+increasing chain of its subobjects of a heart object terminates. -/
+theorem IsNoetherianTorsionSubcategory.terminates {B : ObjectProperty C}
+    (h : IsNoetherianTorsionSubcategory t B) (E : C) (hE : t.heart E)
+    (c : SubobjectChain t B E) : c.Terminates := by
+  obtain ⟨N, rfl⟩ := h
+  exact N.noetherian E hE c
 
 namespace WeakPreStabilityCondition
 
