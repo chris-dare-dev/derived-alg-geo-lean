@@ -6,23 +6,23 @@ import DerivedAlgGeo.AlgebraicGeometry.Cohomology.Finiteness.ProjectiveSpaceCech
 import DerivedAlgGeo.Algebra.MvPolynomial.Cech.Finite
 
 /-!
-# `Hⁱ(Pⁿ, O(d))` is finite-dimensional in every positive degree
+# `Hⁱ(Pⁿ, O(d))` is finitely generated in every positive degree, over a Noetherian base
 
 `Cech/Vanishing.lean` kills every degree whose tuples are too short to meet all the variables, by
 contracting every Laurent block. The top degree is exactly where that fails, and
 `Cech/TopDegree.lean` separates the surviving block instead: every class is carried by the full
 block. `Algebra/MvPolynomial/Cech/Finite.lean` shows those full blocks form a
-finite-dimensional `k`-space. This file joins the algebraic result to the geometric Čech complex
+finitely generated `k`-module. This file joins the algebraic result to the geometric Čech complex
 and discharges the finiteness interface.
 
 ## Main definitions
 
-* `AlgebraicGeometry.Proj.intCechBlockCocycles`: the full-block cocycles of a Čech degree, a
-  finite-dimensional `k`-space.
+* `AlgebraicGeometry.Proj.intCechBlockCocycles`: the full-block cocycles of a Čech degree,
+  finitely generated over a Noetherian `k`.
 * `AlgebraicGeometry.Proj.intCechBlockClass`: the class of a full-block cocycle in Čech
   cohomology; `intCechBlockClassLinear` is the same map, `k`-linearly.
 * `AlgebraicGeometry.Proj.intTwistModules` and `AlgebraicGeometry.Proj.intChart`: the twist and
-  the variable charts presented at the variety.
+  the variable charts presented at the scheme `Proj (polynomialGrading ι k)`.
 
 ## Main results
 
@@ -30,16 +30,17 @@ and discharges the finiteness interface.
 * `AlgebraicGeometry.Proj.intCechBlockClass_surjective`: every positive-degree class is the class
   of a full-block cocycle.
 * `AlgebraicGeometry.Proj.module_finite_cechCohomology_intTwist`: `Hⁿ⁺¹` of an integer twist is
-  finite-dimensional on the Čech side.
+  finitely generated on the Čech side.
 * `AlgebraicGeometry.Proj.module_finite_linearCoherentH_projectiveSpaceTwist`: `Hⁿ⁺¹(Pⁿ, O(d))`
-  is a finite-dimensional `k`-vector space.
+  is a finitely generated `k`-module when `k` is Noetherian.
 
 ## Implementation notes
 
 ### The argument
 
-`intCechBlockCocycles` is the space of full-block cocycles of a degree — a submodule of the
-finite-dimensional space of full-block cochains, hence finite-dimensional. `intCechBlockClass`
+`intCechBlockCocycles` is the module of full-block cocycles of a degree — a submodule of the
+finitely generated module of full-block cochains, hence finitely generated when `k` is Noetherian.
+That is the one place the Noetherian hypothesis enters. `intCechBlockClass`
 sends such a cocycle to its cohomology class, and the two halves are:
 
 * `intCechBlockSmul_comp_class` — the class map is `k`-linear. The action on cohomology is the map
@@ -59,7 +60,7 @@ supplies the module instance at whatever spelling its `U` was elaborated with. W
 family as `polynomialVariableChart ι k` fixes that space to `ProjectiveSpectrum.top _`, while the
 finiteness interface is stated at `Y`; the two are definitionally equal, so the instance is
 inhabited, and *not* reducibly so, so instance search never finds it. `intChart` and
-`intTwistModules` are the same objects presented at the variety, and they exist only to make the
+`intTwistModules` are the same objects presented at the scheme, and they exist only to make the
 one instance search meets be the one that is there.
 
 The same effect appears twice more, and is handled the same way: the `AddCommGroup`, `Module` and
@@ -71,7 +72,7 @@ is a submodule of a product of submodules and search will not assemble that on i
 **Positive degrees only.** `exists_fullBlock_add_coboundary` splits a cocycle in degree `n + 1`,
 and the splitting is useful because the remainder is a coboundary — which needs a degree below.
 Degree `0` has none, and `H⁰` is not a subquotient but the module of global sections outright; its
-finiteness is the finite-dimensionality of a graded piece of the polynomial ring and is a separate
+finiteness is the finiteness of a graded piece of the polynomial ring and is a separate
 argument. So `Hⁿ(Pⁿ, O(d))` is covered for every `n ≥ 1`, at either sign of `d`, and `P⁰` is not.
 
 ## References
@@ -82,7 +83,7 @@ The file cites no literature. It builds on `AlgebraicGeometry.Proj.exists_fullBl
 
 ## Tags
 
-Čech cohomology, projective space, twisting sheaf, finite-dimensional, top degree
+Čech cohomology, projective space, twisting sheaf, finitely generated, top degree
 -/
 
 universe u
@@ -95,7 +96,7 @@ namespace AlgebraicGeometry.Proj
 
 attribute [local instance] MvPolynomial.gradedAlgebra
 
-variable (ι k : Type u) [Field k]
+variable (ι k : Type u) [CommRing k]
 
 theorem intCechCochainsDegreewiseAddEquiv_symm_smul (d : ℤ) (n : ℕ) (r : k)
     (s : polynomialVariableIntCechCochains ι k d n) :
@@ -183,10 +184,13 @@ noncomputable instance moduleIntCechBlockCocycles (d : ℤ) (n : ℕ) :
   Submodule.module (M := ∀ x : Fin (n + 1) → ι,
     ↥(cechBlockSpan ι k (intShift (polynomialGrading ι k) d) d x)) _
 
-instance module_finite_intCechBlockCocycles [Fintype ι] (d : ℤ) (n : ℕ) :
-    Module.Finite k ↥(intCechBlockCocycles ι k d n) :=
-  FiniteDimensional.finiteDimensional_submodule (K := k) (V := ∀ x : Fin (n + 1) → ι,
-    ↥(cechBlockSpan ι k (intShift (polynomialGrading ι k) d) d x)) _
+/-- Over a Noetherian base the full-block cocycles are finitely generated: they are a submodule of
+the finitely generated module of full-block cochains. -/
+instance module_finite_intCechBlockCocycles [Fintype ι] [IsNoetherianRing k] (d : ℤ) (n : ℕ) :
+    Module.Finite k ↥(intCechBlockCocycles ι k d n) := by
+  haveI := isNoetherian_of_isNoetherianRing_of_finite k (∀ x : Fin (n + 1) → ι,
+    ↥(cechBlockSpan ι k (intShift (polynomialGrading ι k) d) d x))
+  exact Module.IsNoetherian.finite k _
 
 /-- A full-block cocycle, as a map of abelian groups into the Čech cochains.
 
@@ -356,7 +360,7 @@ theorem intCechBlockClass_surjective [Fintype ι] (d : ℤ) (n : ℕ) :
   rw [← hz]
   exact (ConcreteCategory.comp_apply _ _ _).trans hbound.symm
 
-/-- The twist `O(d)` as a sheaf of modules on projective space *as a variety*.
+/-- The twist `O(d)` as a sheaf of modules on projective space *as a scheme*.
 
 The type ascription is the point: `associatedSheaf` takes values in `(Proj 𝒜).Modules`, and the
 finiteness interface is stated for `Y.Modules`. Those are the same term,
@@ -365,7 +369,7 @@ noncomputable abbrev intTwistModules (d : ℤ) :
     (Proj (polynomialGrading ι k)).Modules :=
   associatedSheaf (polynomialGrading ι k) (intShift (polynomialGrading ι k) d)
 
-/-- The variable charts, typed as opens of the *variety*.
+/-- The variable charts, typed as opens of the *scheme*.
 
 Same ascription trick as `intTwistModules`: `cechCohomologyFunctor` takes its space as an implicit
 argument, so the chart family has to be presented at `Y` for the module instance
@@ -395,8 +399,8 @@ noncomputable def intCechBlockClassLinear (d : ℤ) (n : ℕ) :
       exact hb }
 
 set_option maxHeartbeats 1000000 in
-/-- **`Hⁿ⁺¹` of an integer twist is finite-dimensional, on the Čech side.** -/
-theorem module_finite_cechCohomology_intTwist [Fintype ι] (d : ℤ) (n : ℕ) :
+/-- **`Hⁿ⁺¹` of an integer twist is finitely generated, on the Čech side.** -/
+theorem module_finite_cechCohomology_intTwist [Fintype ι] [IsNoetherianRing k] (d : ℤ) (n : ℕ) :
     letI := Cohomology.cechCohomologyModule k (Proj (polynomialGrading ι k))
       (intTwistModules ι k d) (intChart ι k) (n + 1)
     Module.Finite k
@@ -408,7 +412,7 @@ theorem module_finite_cechCohomology_intTwist [Fintype ι] (d : ℤ) (n : ℕ) :
   Module.Finite.of_surjective (intCechBlockClassLinear ι k d n)
     (intCechBlockClass_surjective ι k d n)
 
-/-- **`Hⁿ⁺¹(Pⁿ, O(d))` is a finite-dimensional `k`-vector space.**
+/-- **`Hⁿ⁺¹(Pⁿ, O(d))` is a finitely generated `k`-module over a Noetherian base.**
 
 The interface group is `linearCoherentH`, and the finite spanning set lives on the Čech side;
 `module_finite_linearCoherentH_of_cech` carries it across, and it is the `k`-linearity of the
@@ -418,7 +422,8 @@ The injective resolution is chosen rather than supplied: the site of opens is sm
 `canonicalInjectiveResolution` produces one. The `HasExt` witness is instantiated at
 `HasExt.standard _`, which is the reconciliation `module_finite_linearCoherentH_of_cech`'s
 docstring describes. -/
-theorem module_finite_linearCoherentH_projectiveSpaceTwist [Fintype ι] (d : ℤ) (n : ℕ) :
+theorem module_finite_linearCoherentH_projectiveSpaceTwist [Fintype ι] [IsNoetherianRing k]
+    (d : ℤ) (n : ℕ) :
     Module.Finite k ((Cohomology.linearCoherentH k (Proj (polynomialGrading ι k)) (n + 1)).obj
       (projectiveSpaceTwist ι k d)) :=
   Cohomology.module_finite_linearCoherentH_of_cech (Proj (polynomialGrading ι k))

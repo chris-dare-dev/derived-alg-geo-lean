@@ -21,6 +21,7 @@ finitely presented `R`-modules.
 
 * `AlgebraicGeometry.isFinitePresentation_tilde` — `M^~` is of finite presentation whenever
   `M` is a finitely presented `R`-module;
+* `AlgebraicGeometry.isFinitePresentation_tilde_iff` — and conversely, over any commutative ring;
 * `AlgebraicGeometry.isCoherent_tilde` — the same statement phrased with
   `Scheme.Modules.IsCoherent`, which is what `Coh (Spec R)` is carved out of;
 * `AlgebraicGeometry.isCoherent_tilde_of_finite` — over a noetherian ring the hypothesis
@@ -114,6 +115,19 @@ theorem isFinitePresentation_tilde (M : ModuleCat.{u} R) [Module.FinitePresentat
     · refine ⟨?_⟩
       exact inferInstanceAs (Finite t)
   exact IsFinitePresentation.of_presentation.{u, u, u} (presentationTilde M (s : Set M) hs t ht)
+
+/-- **Over any commutative ring, `M^~` is of finite presentation if and only if `M` is.**
+
+The reverse direction is `isFinitePresentation_tilde`. For the forward one, the global sections
+of `M^~` are finitely presented (`Scheme.Modules.moduleFinitePresentation_globalSections`, which
+needs no noetherian hypothesis), and the unit of the tilde adjunction identifies them with `M`. -/
+theorem isFinitePresentation_tilde_iff (M : ModuleCat.{u} R) :
+    SheafOfModules.IsFinitePresentation.{u, u, u} (tilde M) ↔ Module.FinitePresentation R M := by
+  refine ⟨fun h ↦ ?_, fun _ ↦ isFinitePresentation_tilde M⟩
+  haveI : Module.FinitePresentation R ((tilde.functor R ⋙ moduleSpecΓFunctor).obj M) :=
+    Scheme.Modules.moduleFinitePresentation_globalSections (tilde M) h
+  exact Module.FinitePresentation.of_equiv
+    (asIso ((tilde.adjunction (R := R)).unit.app M)).toLinearEquiv.symm
 
 /-- **`M^~` is coherent when `M` is finitely presented.**
 

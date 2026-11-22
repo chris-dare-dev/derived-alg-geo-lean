@@ -54,8 +54,9 @@ by its affine opens glues them. This replaces the explicit cocycle check of Stac
 `IsPullback` squares on the arrows of a locally directed cover are the gluing data.
 
 The compatibility statement is for the arrows of the affine Zariski site, the basic opens, since
-those are the restriction maps the data records. Base change of `Proj_S` and the twisting sheaves
-`𝒪(d)` are not constructed here; functoriality is in `Relative/Functoriality.lean`.
+those are the restriction maps the data records. Functoriality is in
+`Relative/Functoriality.lean`, base change in `Relative/BaseChange.lean` and the twisting sheaves
+`𝒪(d)` in `Relative/Twisting.lean`.
 
 ## References
 

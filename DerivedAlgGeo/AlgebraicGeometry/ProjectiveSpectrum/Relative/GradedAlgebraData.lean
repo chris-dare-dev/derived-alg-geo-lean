@@ -36,7 +36,8 @@ arbitrary inclusions of affine opens carry no data. The degree-`d` pieces are re
 the submodules `𝒜(U)_d`; gluing them into quasi-coherent module sheaves is not done here.
 
 The carrier asks nothing about generation in degree one: `Proj` of a graded ring needs no such
-hypothesis, and the twisting sheaf `𝒪(1)` that does is not constructed here.
+hypothesis. The twisting sheaves `𝒪(d)`, which do, take it as the hypothesis
+`GeneratedInDegreeOne` in `Relative/Twisting.lean`.
 
 The independent consumers of the carrier are the projective bundles `P(E) = Proj_S(Sym(E))` built
 from `sym`, projective morphisms, and the Plücker and Quot constructions. The reconstruction of a
