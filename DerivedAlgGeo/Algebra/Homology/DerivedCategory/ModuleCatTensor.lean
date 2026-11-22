@@ -6,7 +6,10 @@ import Mathlib.Algebra.Category.ModuleCat.Biproducts
 import Mathlib.Algebra.Category.ModuleCat.Monoidal.Basic
 import Mathlib.Algebra.Category.ModuleCat.Projective
 import Mathlib.Algebra.Homology.HomotopyCategory.Acyclic
+import Mathlib.Algebra.Category.ModuleCat.Monoidal.Adjunction
 import Mathlib.Algebra.Homology.ShortComplex.ModuleCat
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExtendScalars
+import DerivedAlgGeo.Algebra.Homology.DerivedCategory.ExactFunctor
 import DerivedAlgGeo.Algebra.Homology.DerivedCategory.BoundedAboveProjective
 import DerivedAlgGeo.RingTheory.Flat.Basic
 
@@ -39,6 +42,8 @@ quasi-isomorphism between such complexes stays one after `- ⊗_R M`, by its map
   bounded-above complexes of flat modules stays one after `- ⊗_R M`.
 * `ModuleCat.nonempty_derivedTensorRight_obj_iso_of_flat`: a strictly bounded-above complex
   of flat modules computes `⊗^L`.
+* `ModuleCat.nonempty_extendScalarsDerivedOfFlat_derivedTensorRight_iso`: Stacks 0661 in the
+  flat case, `(K ⊗^L_R M) ⊗_R S ≅ (K ⊗_R S) ⊗^L_S (S ⊗_R M)` for a flat `R → S`.
 
 ## Implementation notes
 
@@ -51,6 +56,7 @@ taken on the right, `K ⊗ M`, so the complex keeps its position in `tensorRight
 * [Stacks: Tag 064K](https://stacks.math.columbia.edu/tag/064K)
 * [Stacks: Tag 064L](https://stacks.math.columbia.edu/tag/064L)
 * [Stacks: Tag 00HM](https://stacks.math.columbia.edu/tag/00HM)
+* [Stacks: Tag 0661](https://stacks.math.columbia.edu/tag/0661)
 -/
 
 universe u
@@ -230,5 +236,98 @@ theorem nonempty_derivedTensorRight_obj_iso_of_flat (M : ModuleCat.{u} R)
   have := quasiIso_tensorRight_map_of_flat M q b hQflat hP
   exact ⟨(derivedTensorRight M).mapIso e.symm ≪≫ derivedTensorRightObjIso M Q b ≪≫
     asIso (DerivedCategory.Q.map (((tensorRight M).mapHomologicalComplex _).map q))⟩
+
+/-- A bounded-above object of `D(R)` is the localization of a strictly bounded-above complex
+of projective modules. -/
+theorem exists_projective_model_of_minus {K : DerivedCategory (ModuleCat.{u} R)}
+    (hK : DerivedCategory.TStructure.t.minus K) :
+    ∃ (P : CochainComplex (ModuleCat.{u} R) ℤ) (n : ℤ) (_ : P.IsStrictlyLE n)
+      (_ : ∀ i, Projective (P.X i)), Nonempty (DerivedCategory.Q.obj P ≅ K) := by
+  obtain ⟨n, hn⟩ := hK
+  letI : K.IsLE n := hn
+  obtain ⟨L, _, ⟨e⟩⟩ := K.exists_iso_Q_obj_of_isLE n
+  obtain ⟨P, p, hP, hProj, hp⟩ :=
+    CochainComplex.exists_boundedAbove_projective_replacement L n
+  exact ⟨P, n, hP, hProj, ⟨asIso (DerivedCategory.Q.map p) ≪≫ e.symm⟩⟩
+
+/-! ### Flat base change -/
+
+section BaseChange
+
+open scoped TensorProduct
+
+variable {R S : CommRingCat.{u}} (f : R ⟶ S)
+
+/-- Base change commutes with tensoring: `(P ⊗_R M) ⊗_R S ≅ (P ⊗_R S) ⊗_S (S ⊗_R M)`,
+naturally in `P`. It is the inverse of the monoidal structure of extension of scalars. -/
+def tensorRightCompExtendScalarsIso (M : ModuleCat.{u} R) :
+    tensorRight M ⋙ extendScalars.{u, u, u} f.hom ≅
+      extendScalars.{u, u, u} f.hom ⋙ tensorRight ((extendScalars f.hom).obj M) :=
+  NatIso.ofComponents (fun P ↦ (Functor.Monoidal.μIso (extendScalars f.hom) P M).symm)
+    (fun g ↦ (Functor.OplaxMonoidal.δ_natural_left (extendScalars f.hom) g M).symm)
+
+/-- The termwise isomorphism `(P ⊗_R M) ⊗_R S ≅ (P ⊗_R S) ⊗_S (S ⊗_R M)` of cochain
+complexes. -/
+def mapHomologicalComplexTensorRightExtendScalarsIso (M : ModuleCat.{u} R)
+    (P : CochainComplex (ModuleCat.{u} R) ℤ) :
+    ((extendScalars.{u, u, u} f.hom).mapHomologicalComplex (ComplexShape.up ℤ)).obj
+        (((tensorRight M).mapHomologicalComplex (ComplexShape.up ℤ)).obj P) ≅
+      ((tensorRight ((extendScalars f.hom).obj M)).mapHomologicalComplex (ComplexShape.up ℤ)).obj
+        (((extendScalars.{u, u, u} f.hom).mapHomologicalComplex (ComplexShape.up ℤ)).obj P) :=
+  HomologicalComplex.Hom.isoOfComponents
+    (fun i ↦ (tensorRightCompExtendScalarsIso f M).app (P.X i))
+    (fun i j _ ↦ ((tensorRightCompExtendScalarsIso f M).hom.naturality (P.d i j)).symm)
+
+/-- Extension of scalars along a flat map sends flat modules to flat modules. -/
+theorem flat_extendScalars_obj {X : ModuleCat.{u} R} (hX : Module.Flat R X) :
+    Module.Flat S ((extendScalars f.hom).obj X) := by
+  let := f.hom.toAlgebra
+  exact (inferInstance : Module.Flat S (S ⊗[R] X))
+
+variable (hf : f.hom.Flat)
+
+/-- Derived extension of scalars along a flat map preserves bounded-above objects. -/
+theorem minus_extendScalarsDerivedOfFlat_obj {K : DerivedCategory (ModuleCat.{u} R)}
+    (hK : DerivedCategory.TStructure.t.minus K) :
+    DerivedCategory.TStructure.t.minus ((extendScalarsDerivedOfFlat f hf).obj K) := by
+  obtain ⟨n, hn⟩ := hK
+  refine ⟨n, (DerivedCategory.isLE_iff _ n).mpr fun i hi ↦ ?_⟩
+  exact ((extendScalars f.hom).map_isZero
+    (((DerivedCategory.isLE_iff K n).mp hn) i hi)).of_iso
+      (extendScalarsDerivedOfFlatHomologyIso f hf K i)
+
+/-- Stacks 0661, flat case: for a flat ring map `R → S`, a bounded-above `K` and an `R`-module
+`M`, `(K ⊗^L_R M) ⊗_R S ≅ (K ⊗_R S) ⊗^L_S (S ⊗_R M)`. On a bounded-above projective model `P`
+of `K` both sides are the termwise isomorphic complexes `(P ⊗_R M) ⊗_R S` and
+`(P ⊗_R S) ⊗_S (S ⊗_R M)`, the latter computing `⊗^L_S` because `P ⊗_R S` is flat. -/
+theorem nonempty_extendScalarsDerivedOfFlat_derivedTensorRight_iso
+    (K : DerivedCategory.Minus (ModuleCat.{u} R)) (M : ModuleCat.{u} R) :
+    Nonempty ((extendScalarsDerivedOfFlat f hf).obj ((derivedTensorRight M).obj K) ≅
+      (derivedTensorRight ((extendScalars f.hom).obj M)).obj
+        ⟨(extendScalarsDerivedOfFlat f hf).obj K.obj,
+          minus_extendScalarsDerivedOfFlat_obj f hf K.property⟩) := by
+  obtain ⟨P, n, _, hProj, ⟨e⟩⟩ := exists_projective_model_of_minus K.property
+  let F := extendScalars.{u, u, u} f.hom
+  have := preservesFiniteLimits_extendScalars_of_flat hf
+  let P' := (F.mapHomologicalComplex (ComplexShape.up ℤ)).obj P
+  have : CochainComplex.IsStrictlyLE P' n := mapHomologicalComplex_isStrictlyLE F P n inferInstance
+  have hP' (i : ℤ) : Module.Flat S (P'.X i) := by
+    have := hProj i
+    have : Module.Projective R (P.X i) := (IsProjective.iff_projective (P.X i)).mpr ‹_›
+    exact flat_extendScalars_obj f inferInstance
+  obtain ⟨e'⟩ := nonempty_derivedTensorRight_obj_iso_of_flat (F.obj M) P' n hP'
+  let eK : (⟨DerivedCategory.Q.obj P', n, inferInstance⟩ : DerivedCategory.Minus _) ≅
+      ⟨(extendScalarsDerivedOfFlat f hf).obj K.obj,
+        minus_extendScalarsDerivedOfFlat_obj f hf K.property⟩ :=
+    ObjectProperty.isoMk _ (((extendScalarsDerivedOfFlatFactors f hf).app P).symm ≪≫
+      (extendScalarsDerivedOfFlat f hf).mapIso e)
+  exact ⟨(extendScalarsDerivedOfFlat f hf).mapIso
+      ((derivedTensorRight M).mapIso (ObjectProperty.isoMk _ e.symm) ≪≫
+        derivedTensorRightObjIso M P n) ≪≫
+    (extendScalarsDerivedOfFlatFactors f hf).app _ ≪≫
+    DerivedCategory.Q.mapIso (mapHomologicalComplexTensorRightExtendScalarsIso f M P) ≪≫
+    e'.symm ≪≫ (derivedTensorRight (F.obj M)).mapIso eK⟩
+
+end BaseChange
 
 end ModuleCat
