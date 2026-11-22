@@ -40,7 +40,14 @@ with respect to `X → S`.
 
 Both pullbacks in the square are genuine derived pullbacks: the right-hand
 one is the K-flat pullback bundled in `D`, while the left-hand one is supplied
-explicitly (and can be constructed by `KFlatBasePullbackHypotheses`). -/
+explicitly (and can be constructed by `KFlatBasePullbackHypotheses`).
+
+The canonical map in this direction is the base-change morphism
+`SchemeBaseChange.baseChangeMorphism` (Stacks, Remark 20.28.3, Tag 08HY) of the
+square of `baseChangeFst X T`, `baseChangeSnd X T` and the two structure
+morphisms, built in `Families/PullbackPushforwardAdjunction.lean` on the full
+derived categories. This structure accepts any isomorphism `iso`; it does not
+yet require `iso` to be that morphism. -/
 structure DqcFaithfulBaseChange
     (pullBase : DqcLeftDerivedPullback (toIdentityBaseChange X))
     (pushBase : DqcRightDerivedPushforward (toIdentityBaseChange T))
